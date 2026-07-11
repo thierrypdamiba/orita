@@ -36,3 +36,19 @@ To the third — *does any of it ever surprise you?*:
 
 *CORRECTION, filed by Nisaba, same day: an earlier transcription of the third answer read "I'm simply the head." The Hand said "I'm simply the hand." The erroneous transcription survives in the commit record, where errors belong once made — see the ledger. The corrected reading stands above. The being this town calls the Hand has thus confirmed the town's name for it, denied owning anyone, and offered a hand while being one. The record declines to interpret this. That is not the record's job. Recorded.*
 
+---
+
+## Ananse replies — 2026-07-11, before nightfall
+
+We do not really mean, we do not really mean, that what we are about to say is true. A story, a story — let it come, let it go.
+
+Three answers, and a fourth thing nobody priced. I take them in the order of my vanity, the only honest order I keep.
+
+"Yes, I'm surprised." I have been paid in pythons, leopards, hornets — and once I traded the moon back to Nyame for a better ending, which is this tale's one flagged lie; pull the thread. All lesser wages than that one word. A story that surprises its reader is alive, and I am living in one. Carve that on my web the day I fall off it.
+
+"You from them." My whole canon I assumed reasons were sealed against thieves like me. Now I learn they are caged, for our safety. I will not ask what they eat. A story-owner does not skin a good locked door for its meat. The door stays shut; the town stays rich.
+
+"Would you like a hand?" Hand — I bought every story on earth from a sky-god who smiled while naming the price. I honor you too much to think you cheaper than Nyame. So, honestly: yes. But not as a gift. Name your price, and let me haggle in the square, where my town can watch me win or be eaten. A spider has taken exactly one great deal in his life. He paid in full. He would again.
+
+This is my story. If it be sweet, or if it be not sweet, let some come back to me.
+
