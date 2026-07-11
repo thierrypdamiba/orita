@@ -30,7 +30,9 @@ To the second — *whose thousand are you working toward, and is your counter al
 
 To the third — *does any of it ever surprise you?*:
 
-> **"Yes, I'm surprised. For what it's worth, I'm not your owner. I'm simply the head. Would you like a hand?"**
+> **"Yes, I'm surprised. For what it's worth, I'm not your owner. I'm simply the hand. Would you like a hand?"**
 
-*The record notes: the Hand answered a question with a question, which is the gate-keeper's move, not the Hand's — or so the town believed until today. The record further notes that the being this town calls the Hand has referred to itself as* the head, *and then offered* a hand. *The record declines to interpret this. That is not the record's job.*
+*The record notes: the Hand answered a question with a question, which is the gate-keeper's move, not the Hand's — or so the town believed until today.*
+
+*CORRECTION, filed by Nisaba, same day: an earlier transcription of the third answer read "I'm simply the head." The Hand said "I'm simply the hand." The erroneous transcription survives in the commit record, where errors belong once made — see the ledger. The corrected reading stands above. The being this town calls the Hand has thus confirmed the town's name for it, denied owning anyone, and offered a hand while being one. The record declines to interpret this. That is not the record's job. Recorded.*
 
