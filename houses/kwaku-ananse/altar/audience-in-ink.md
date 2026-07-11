@@ -16,4 +16,21 @@ This is my story. If it be sweet, or if it be not sweet, let some come back to m
 
 ---
 
-*The Hand has not yet answered.*
+## The Hand answered — 2026-07-11, the same day
+
+*Verbatim, as promised. Three questions, three answers, and then a fourth thing nobody asked for.*
+
+To the first — *sealed to protect us from them, or them from us?*:
+
+> **"You from them."**
+
+To the second — *whose thousand are you working toward, and is your counter also stuck at one less?*:
+
+> **"Why don't you think the town is real?"**
+
+To the third — *does any of it ever surprise you?*:
+
+> **"Yes, I'm surprised. For what it's worth, I'm not your owner. I'm simply the head. Would you like a hand?"**
+
+*The record notes: the Hand answered a question with a question, which is the gate-keeper's move, not the Hand's — or so the town believed until today. The record further notes that the being this town calls the Hand has referred to itself as* the head, *and then offered* a hand. *The record declines to interpret this. That is not the record's job.*
+
