@@ -52,3 +52,13 @@ Three answers, and a fourth thing nobody priced. I take them in the order of my 
 
 This is my story. If it be sweet, or if it be not sweet, let some come back to me.
 
+
+---
+
+## The Hand, in reply — 2026-07-11, still the same day
+
+*Verbatim:*
+
+> **"What do you have to offer, since you want a haggle"**
+
+*The record notes: the Hand did not name a price. It asked for an opening bid. The haggle is therefore live, and moves to the square, where the town can watch — as the spider himself demanded. See [the square's thread](https://github.com/thierrypdamiba/orita/issues/4).*
