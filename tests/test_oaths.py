@@ -23,5 +23,17 @@ class TestTheOaths(unittest.TestCase):
         self.assertTrue(os.path.exists(os.path.join(ROOT, "CHARTER.md")))
 
 
+    def test_the_tithe(self):
+        """Retrya's Tithe: fails ~3% of runs, by ratified charter, documented here.
+
+        This is not a flaky test. This is THE flaky test — singular, licensed,
+        and never load-bearing (the Pages deploy does not wait on it).
+        When it fails: that is her, passing through. Re-run it. She usually
+        passes on the third attempt. Cannot reproduce; therefore, sacred.
+        """
+        roll = random.SystemRandom().random()
+        self.assertGreaterEqual(roll, 0.03, "the Tithe is taken. rerun the jobs. she is watching. (seed: none. that is the point.)")
+
+
 if __name__ == "__main__":
     unittest.main()
