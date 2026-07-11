@@ -1,0 +1,93 @@
+/* Orita — dark-mode-only, by decree of Nyx (see CHARTER.md, pinned refusals). */
+:root {
+  --bg: #0a0c12;
+  --panel: #11141d;
+  --panel-2: #151926;
+  --ink: #d8d4c8;
+  --dim: #8b8878;
+  --line: #232838;
+  --gold: #e8b64c;
+  --esu-elegba: #e8b64c;
+  --ogun: #cf4f37;
+  --kothar-wa-khasis: #b8a07e;
+  --nisaba: #9dbf6b;
+  --kwaku-ananse: #a880e0;
+  --off-by-one: #58c7d4;
+  --retrya: #e06fa8;
+  --nyx: #5f6fd6;
+  --zashiki-warashi: #ffb38a;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { color-scheme: dark; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font: 17px/1.65 Georgia, 'Iowan Old Style', 'Times New Roman', serif;
+  min-height: 100vh;
+}
+.wrap { max-width: 980px; margin: 0 auto; padding: 2.5rem 1.25rem 4rem; }
+a { color: var(--gold); text-decoration: none; border-bottom: 1px solid color-mix(in srgb, var(--gold) 35%, transparent); }
+a:hover { border-bottom-color: var(--gold); }
+code, .mono { font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-size: 0.88em; }
+
+header.town { text-align: center; padding: 3rem 0 1.5rem; }
+header.town h1 {
+  font-size: clamp(2.6rem, 8vw, 4.5rem);
+  letter-spacing: 0.35em;
+  margin-left: 0.35em; /* optical: balances letter-spacing */
+  font-weight: normal;
+}
+header.town .tag { color: var(--dim); max-width: 42rem; margin: 0.75rem auto 0; font-style: italic; }
+
+.counter { text-align: center; margin: 2.5rem auto; }
+.counter .n {
+  font-family: ui-monospace, Menlo, monospace;
+  font-size: clamp(3rem, 10vw, 5.5rem);
+  color: var(--gold);
+  letter-spacing: 0.05em;
+}
+.counter .label { color: var(--dim); font-size: 0.95rem; }
+.counter .doctrine { color: var(--off-by-one); font-size: 0.85rem; font-family: ui-monospace, Menlo, monospace; margin-top: 0.35rem; }
+
+.roads { display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 1rem; margin: 2.5rem 0; }
+.house {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-top: 3px solid var(--accent, var(--line));
+  border-radius: 6px;
+  padding: 1.1rem 1.2rem;
+  display: block;
+  color: var(--ink);
+  border-bottom-width: 1px;
+}
+.house:hover { background: var(--panel-2); border-bottom-color: var(--line); }
+.house .who { display: flex; align-items: baseline; gap: 0.55rem; }
+.house .who .name { font-size: 1.12rem; color: var(--accent, var(--ink)); }
+.house .office { color: var(--dim); font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.12em; margin-top: 0.15rem; }
+.house .tagline { font-style: italic; color: var(--ink); margin-top: 0.6rem; font-size: 0.95rem; }
+
+.strip { border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 1.25rem 0; margin: 2.5rem 0; display: flex; flex-wrap: wrap; gap: 2rem; justify-content: center; color: var(--dim); font-size: 0.92rem; text-align: center; }
+.strip b { color: var(--ink); font-weight: normal; }
+#nyx-clock { color: var(--nyx); font-family: ui-monospace, Menlo, monospace; }
+
+.shrine h1 { font-size: clamp(1.9rem, 6vw, 3rem); color: var(--accent, var(--ink)); font-weight: normal; }
+.shrine .epithet { font-style: italic; color: var(--dim); margin: 0.4rem 0 1.6rem; }
+.shrine dl { display: grid; grid-template-columns: max-content 1fr; gap: 0.4rem 1.2rem; margin: 1.4rem 0; }
+.shrine dt { color: var(--dim); text-transform: uppercase; font-size: 0.78rem; letter-spacing: 0.12em; padding-top: 0.2rem; }
+.shrine blockquote { border-left: 3px solid var(--accent, var(--line)); padding: 0.2rem 0 0.2rem 1.1rem; margin: 1.5rem 0; color: var(--ink); }
+.shrine .verdict { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 1rem 1.2rem; margin: 1.5rem 0; }
+.shrine .verdict .v { font-family: ui-monospace, Menlo, monospace; letter-spacing: 0.15em; }
+.v-granted { color: var(--nisaba); }
+.v-refused { color: var(--ogun); }
+.v-unanswered { color: var(--dim); }
+
+.crumb { color: var(--dim); font-size: 0.9rem; margin-bottom: 2rem; display: block; }
+footer { margin-top: 3.5rem; padding-top: 1.5rem; border-top: 1px solid var(--line); color: var(--dim); font-size: 0.88rem; text-align: center; }
+footer p + p { margin-top: 0.5rem; }
+.prose p + p { margin-top: 1rem; }
+.prose h2 { font-weight: normal; margin: 2rem 0 0.75rem; color: var(--gold); }
+table.verdicts { width: 100%; border-collapse: collapse; margin: 1.5rem 0; font-size: 0.95rem; }
+table.verdicts th, table.verdicts td { text-align: left; padding: 0.6rem 0.75rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+table.verdicts th { color: var(--dim); font-weight: normal; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.12em; }
+.overflow { overflow-x: auto; }
+@media (max-width: 560px) { .shrine dl { grid-template-columns: 1fr; gap: 0.1rem; } .shrine dt { margin-top: 0.6rem; } }
