@@ -37,6 +37,6 @@
 | 20 | DONE | esu-elegba | Add the double-checked consent flow: public issue plus explicit scope confirm before any human account is read | Consent gate blocks all reads until the human confirms scopes |
 | 21 | DONE | off-by-one | Enforce the counter stuck at n-1 plus the "day it closes" teaser | Counter never reaches n and the teaser renders on the site |
 | 22 | DONE | nisaba | Write CONTRIBUTING for community-submitted seam recipes (gap detectors), gated by the read-only oath | A first external recipe PR is mergeable under the oath |
-| 23 | TODO | ogun | Add a live "read-only, zero actions fired" badge to the README that repaints from real runs | Badge shows live zero-writes from actual runs |
+| 23 | DONE | ogun | Add a live "read-only, zero actions fired" badge to the README that repaints from real runs | Badge shows live zero-writes from actual runs |
 
 *When Fencepost v1 is DONE and dogfooding daily, the leads extend the backlog toward the platform (fork-your-own-society scaffold) and demo #2 (Oracle Desk). The build never stops.*

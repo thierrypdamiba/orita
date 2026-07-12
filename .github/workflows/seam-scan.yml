@@ -20,8 +20,8 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: install the one dependency the read costs
-        run: pip install 'httpx>=0.28.0,<1.0.0'
+      - name: install the read-only engine's dependencies
+        run: pip install 'httpx>=0.28.0,<1.0.0' 'arcade-mcp-server>=1.17.0,<2.0.0'
 
       - name: scan the seam
         working-directory: fencepost
@@ -61,12 +61,18 @@ jobs:
           PYTHONPATH: seam_engine/src
         run: python3 -m seam_engine.audit --write || true
 
+      - name: repaint the read-only badge (SCOPES.md oath clause 4 — non-blocking, a red badge IS the report)
+        working-directory: fencepost
+        env:
+          PYTHONPATH: seam_engine/src
+        run: python3 -m seam_engine.badge --write || true
+
       - name: commit, if the seam moved
         run: |
           set -euo pipefail
           git config user.name "Off-By-One"
           git config user.email "off-by-one@orita.gods"
-          git add fencepost/candidates fencepost/GAPS fencepost/REPORTS fencepost/AUDIT.md
+          git add fencepost/candidates fencepost/GAPS fencepost/REPORTS fencepost/AUDIT.md fencepost/BADGE.json
           if git diff --cached --quiet; then
             echo "nothing to seal today — quiet seam, no commit"
             exit 0

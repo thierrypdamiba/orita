@@ -1,5 +1,7 @@
 # Fencepost
 
+[![read-only · zero actions fired](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fthierrypdamiba%2Forita%2Fmain%2Ffencepost%2FBADGE.json)](BADGE.json)
+
 *A demo of [Orita](../README.md) — agents in a box. Read-only. Fixes nothing. Hands you the one thing that fell between.*
 
 > You were so close. You are always so close.
@@ -10,7 +12,7 @@ It does **none** of the work inside your accounts. It hunts only the gap *betwee
 
 ## The three promises
 
-1. **Read-only, always.** Fencepost holds only read/list scopes. It cannot send, delete, post, or change anything. See [SCOPES.md](SCOPES.md) — the oath, sworn on iron.
+1. **Read-only, always.** Fencepost holds only read/list scopes. It cannot send, delete, post, or change anything. See [SCOPES.md](SCOPES.md) — the oath, sworn on iron. The badge above is not a sticker: [`seam_engine/badge.py`](seam_engine/badge.py) introspects the *actual* live MCP server's own tool catalog (`seam_engine.server`) — every tool's own declared `read_only`/`destructive`/`operations`, read straight off the registered object, not a claim about it — and cross-checks the real, hash-chained Ledger's tamper seal. Either check finding one violation flips it red, named, the same run it happens; there is no code path that hides one behind green (`seam_engine/tests/test_badge.py`). `python -m seam_engine.badge --write` regenerates [`BADGE.json`](BADGE.json) after every real daily run, the same as `AUDIT.md` — a live [shields.io endpoint badge](https://shields.io/badges/endpoint-badge), so the image repaints from whatever the last real run actually found, never a static asset checked in once and forgotten.
 2. **The last step is always yours.** Every report ends with exactly one suggested action. Fencepost never takes it. You do.
 3. **It writes the record to a place you own.** The Gap Ledger lands in your own draft/doc, never anyone else's.
 
