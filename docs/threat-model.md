@@ -1,35 +1,35 @@
-# Threat Model — what this architecture prevents
+# What the Gate Prevents
 
-Impressive multi-agent demos fail in predictable, dangerous ways, and audits of real systems find the same wounds every time: credentials committed to source, model text becoming a live order, a default password on the message bus that carries trade instructions. Orita's architecture exists to make these failures **structurally impossible**, not merely discouraged.
+Impressive agent demos fail in the same few ways, and the wounds are always the same: a key left in the open, a god's word mistaken for a command, a door with no lock on the road to real money. Orita's Road exists to make these failures **impossible by shape**, not merely discouraged.
 
-## The anti-patterns, and the wall against each
+## The old wounds, and the ground that closes each
 
-| The failure | Where it comes from | How Orita prevents it |
+| The wound | Where it comes from | The ground that closes it |
 |--|--|--|
-| Committed credentials / secrets in source | convenience, no secret hygiene | No credential ever lives in the repo. All auth is per-user OAuth held by **Arcade**, never by a god or the code. |
-| LLM output becomes a live action | free-form model text reaching an execution API | Zone boundary: model output is **data**. Only a typed, validated proposal, authorized in Zone 3, can become an action. |
-| Model-generated SQL / shell | string-interpolated model output hitting a database | No god writes to production state. **Typed objects only**; deterministic services own all mutation. |
-| State mutates with no real auth | an `operatorId` in a request body treated as identity | Authorization is a **separate service** (the Hand), never a frontend flag or a body string. Approval and execution are separate services. |
-| An agent holds execution credentials | one process does research *and* acts | The gods cannot reach Zone 4. Only **Arcade** holds credentials; the gods petition. |
-| No idempotency / duplicate actions | retrying a state-changing call | Every state-changing act carries an **idempotency key**; the ledger is append-only and hash-chained. |
-| Unsafe model deserialization | `pickle.load` on an agent-supplied path | Signed artifacts / safe formats only; validation checks **content**, not just a file extension. |
-| Stale data / placeholder values become actions | fail-open on missing inputs | **Fail closed.** A read-only demo never acts; an acting demo hard-caps and rejects missing inputs before any action path. |
+| Keys left in the open | secrets committed to source | No key lives anywhere a god or the code can reach it. Every key is on the **Mortal World** ground, held by Arcade, per user. |
+| A word becomes an act | free-form model text reaching a real API | **The Square's law:** a word is only a word. Only a written, sealed proposal that crossed the **Gate** can act. |
+| A god writes to the world's memory | model-made SQL or shell hitting a live store | No god writes to real state. **The Ledger** takes only typed, verified things; deterministic hands own all change. |
+| The world moves with no real judge | an `operatorId` in a request body treated as identity | Judging is its own ground — **the Gate** — never a flag in a form. The one who judges and the one who acts are never the same. |
+| A god holds the keys | one worker both thinks and acts | The gods cannot stand on the **Mortal World**. Only Arcade holds keys; the gods petition. |
+| The same act, twice | a state-changing call retried blindly | Every act carries an idempotency mark; **the Ledger** is append-only and hash-chained. |
+| A poisoned artifact runs | loading an agent-supplied file unsafely | Signed or safe formats only; the Ledger checks what a thing *is*, not what it is named. |
+| Stale or missing truth becomes an act | failing open when data is absent | **Fail closed.** A read-only work never acts; an acting work caps hard and refuses missing truth before the Reach. |
 
-## The agent-task contract (how the gods build)
+## The Covenant  *(what a god may and may not do)*
 
-Every god, on every task, operates under a fixed contract:
+Every god, on every task, walks under one covenant:
 
-**A god MAY:** read, edit code, run tests, commit, open a proposal.
-**A god MAY NOT:** merge its own work, deploy, approve a schema change, access production credentials, or change policy without review.
+**A god MAY:** read, draft, test, and open a proposal.
+**A god MAY NOT:** cross the Gate alone, deploy, alter a law, hold a key, or act in the Mortal World.
 
-Enforced by four independent things, so no single failure lets an agent slip the leash:
-1. **Per-god commit identities** — who did what is always on the record.
-2. **safeword** — test-first quality gates that fire during agent sessions (Ògún's merge-law, made executable).
-3. **the Hand** — the only entity that can authorize a real-world action.
-4. **the human** — the final action is always theirs.
+Held by four hands, so no single slip lets a god off the Road:
+1. **The per-god name** — who did a thing is always on the record.
+2. **safeword** — Ògún's merge-law made to execute during a god's own working hours.
+3. **the Hand** — the only one who may grant an act.
+4. **the mortal** — the last step is always theirs.
 
-## The rule, once more
+## The Road-Law, once more
 
-*Models produce arguments. Deterministic systems produce decisions. Authorized services produce actions.* Keep those three apart, and a multi-agent demo becomes a system that can be trusted near real consequences.
+*The gods argue. The Hand decides. Arcade acts.* Keep those three on different ground, and a loud agent demo becomes a town that can be trusted near real consequences.
 
-*Kept by Ògún. The gate holds or nothing passes. Sworn on iron.*
+*Kept by Ògún. The Gate holds or nothing passes. Sworn on iron.*
