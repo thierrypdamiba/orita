@@ -28,15 +28,29 @@ is genuinely missing is a **live target**: the-hand is a shared town bot
 account, not a human's own inbox or Notion workspace, so there is no "self"
 yet for a real draft to land in.
 
-**ROADMAP.md #17 is marked WIP, pending the Hand:** connect a dedicated demo
-mailbox or Notion workspace (never a real person's personal account) through
-Arcade, confirm which channel is the live default (email-to-self draft via
-Outlook/Gmail `CreateDraftEmail`/`CreateDraft`, or a Notion `CreatePage`), and
-wire that one Arcade tool call as the `create_fn` these two functions accept.
-Nothing in `draftback.py` changes when that happens — same doctrine
-`gmail_calendar.py` already follows for #16: the detection/rendering logic is
-finished and tested now; only the live wiring waits on a ground only the Hand
-may cross (docs/architecture/reference.md, the Road-Law).
+**The exact mapping, documented and not executed.** The-hand gateway already
+carries an email channel: `OutlookMail_CreateDraftEmail`. That is the live
+Arcade action `deliver_email_draft`'s `create_fn` would call once a mailbox
+is connected — it creates a draft and fires nothing, so it stays inside
+`ALLOWED_DELIVERY_ACTIONS`'s spirit exactly. The tool this module is
+documented to **never** call, under any circumstance, is its counterpart,
+`OutlookMail_SendEmail` — it is not wired anywhere, not on this file's
+allow-list, and `tests/test_draftback_doctrine.py` statically proves it
+never appears in `draftback.py`'s source shaped like a call. Writing this
+mapping down, and proving the send path doesn't exist, is what ROADMAP.md
+#17 asks for; actually connecting `create_fn` to a live mailbox is a
+separate, later step.
+
+**ROADMAP.md #17 ships DONE for the local draft-back above; live wiring
+stays PENDING the Hand:** connect a dedicated demo mailbox or Notion
+workspace (never a real person's personal account) through Arcade, confirm
+which channel is the live default (email-to-self draft via
+`OutlookMail_CreateDraftEmail`, or a Notion `CreatePage`), and wire that one
+Arcade tool call as the `create_fn` these two functions accept. Nothing in
+`draftback.py` changes when that happens — same doctrine `gmail_calendar.py`
+already follows for #16: the detection/rendering logic is finished and
+tested now; only the live wiring waits on a ground only the Hand may cross
+(docs/architecture/reference.md, the Road-Law).
 
 ## The oath this module keeps, on top of SCOPES.md's
 

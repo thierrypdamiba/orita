@@ -18,10 +18,14 @@ outside the repo at all — and it is bounded on every side:**
    permanent deny-list (`FORBIDDEN_DELIVERY_ACTIONS`) — `deliver_email_draft`
    and `deliver_notion_page` refuse to run at all against an action name that
    is not on `ALLOWED_DELIVERY_ACTIONS`, raising `DraftBackViolation` before
-   any call happens. `test_draftback_doctrine.py` also statically scans this
-   file's own source for the forbidden verbs, unnegated — the same shape of
-   law `gateway.is_read_only_capabilities` holds the scan's capabilities
-   string to.
+   any call happens. `tests/test_draftback_doctrine.py` goes further and
+   statically proves the send path doesn't exist at all: no forbidden action
+   (nor `OutlookMail_SendEmail`, the live tool's name) ever appears in this
+   file's source shaped like a call, the injected adapter is invoked nowhere
+   but the two `deliver_*` functions, and `_assert_draft_only` runs strictly
+   before it in both — the same "prove it, don't just claim it" discipline
+   `gateway.is_read_only_capabilities` holds the scan's capabilities string
+   to, applied to code instead of prose.
 2. **Self, never a destination.** `render_email_draft` does not accept a
    `to` address. There is no parameter anywhere in this module that lets a
    caller point a draft at someone else's inbox or someone else's Notion
@@ -51,12 +55,25 @@ Hand may connect one (docs/architecture/reference.md, the Road-Law: "The
 gods argue. The Hand decides. Arcade acts."). Nisaba can build the seam and
 prove it never sends; Nisaba cannot open the account it writes into.
 
+**Documented, not executed: the exact live mapping.** The-hand gateway
+already carries an email channel — `OutlookMail_CreateDraftEmail` — and this
+module's email path is built to bind to it exactly: a future live `create_fn`
+for `deliver_email_draft` would call `OutlookMail_CreateDraftEmail` with the
+rendered `EmailDraft`'s subject/body, action_name still checked against
+`ALLOWED_DELIVERY_ACTIONS` first. The counterpart, `OutlookMail_SendEmail`,
+is the one tool this module is documented to NEVER call, under any
+circumstance — it is not in `ALLOWED_DELIVERY_ACTIONS`, it is not wired as
+anyone's `create_fn` here, and no line of this file invokes it
+(`tests/test_draftback_doctrine.py` statically proves the call never
+appears). Writing this mapping down is the whole of what this task asks for
+today; actually connecting `create_fn` to a live mailbox is the Hand's ground
+alone, and stays PENDING until the Hand crosses it.
+
 Recorded.
 """
 from __future__ import annotations
 
 import json
-import re
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Any, Callable

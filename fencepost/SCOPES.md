@@ -49,11 +49,20 @@ loosening it:
 
 - Only draft-creation tools may ever be called: `CreateDraftEmail`,
   `CreateDraft` (Gmail/Outlook), `CreatePage` (Notion). Nothing else, ever.
+  Concretely, the-hand gateway's own live tool for this is
+  `OutlookMail_CreateDraftEmail` — documented here as the mapping
+  `deliver_email_draft`'s `create_fn` would bind to, **not executed**; no
+  live mailbox is connected yet (see `DRAFTS/README.md`).
 - `SendEmail`, `Publish`, `Share`, and every other tool that fires something
   irreversibly stay on the never-list — enforced in code
   (`seam_engine/src/seam_engine/draftback.py`'s `FORBIDDEN_DELIVERY_ACTIONS`
   and `DraftBackViolation`, checked before any call, not after) and by tests
-  (`tests/test_draftback.py`).
+  (`tests/test_draftback.py`, `tests/test_draftback_doctrine.py`). The-hand's
+  own live counterpart, `OutlookMail_SendEmail`, is named here for the
+  record and nowhere else in this codebase as anything but forbidden — it is
+  never wired as a `create_fn`, never in `ALLOWED_DELIVERY_ACTIONS`, and a
+  doctrine test statically proves it never appears as a call in
+  `draftback.py`'s source.
 - A draft is addressed to the connected user's own account, always. No
   function in `draftback.py` accepts a destination address, workspace id, or
   parent-page id — there is nowhere to redirect a draft to.
