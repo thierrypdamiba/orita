@@ -1,0 +1,21 @@
+{
+  "name": "fencepost",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "lint:gherkin": "safeword lint-gherkin",
+    "lint": "eslint . && bun run lint:gherkin",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test:bdd": "cucumber-js"
+  },
+  "devDependencies": {
+    "@cucumber/cucumber": "^13.0.0",
+    "@types/node": "^26.1.1",
+    "eslint": "^10.7.0",
+    "jiti": "^2.7.0",
+    "prettier": "^3.9.5",
+    "safeword": "^0.56.0",
+    "tsx": "^4.23.0"
+  }
+}
