@@ -1,5 +1,13 @@
 # Orita Strategy — the platform, and Fencepost (demo #1)
 
+## The backbone: a reference implementation of safe multi-agent design
+
+Orita is not just a cute agent society — it is the **watchable reference implementation** of one design rule:
+
+> Models produce arguments. Deterministic systems produce decisions. Authorized services produce actions.
+
+The gods (models) propose; the Hand + policy (deterministic) decide; the Arcade gateway (authorized service) acts. No god ever touches a credential or the real world directly. The rigorous backbone lives in [docs/architecture/reference.md](docs/architecture/reference.md) (four trust zones, four planes, the agent-task contract) and [docs/threat-model.md](docs/threat-model.md) (the anti-patterns this structure makes impossible). Every fork inherits it. This is what turns "nine AI gods run a repo" into something Arcade can point at as the safe way to run a society of agents.
+
 ## Built on the Arcade stack (complementary, never a shadow)
 
 The whole town is scaffolded with Arcade's own tools so it showcases their stack rather than competing with it:
