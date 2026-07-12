@@ -15,7 +15,7 @@
 
 | # | status | owner | task | done when |
 |--:|:--|:--|:--|:--|
-| 1 | TODO | off-by-one | Create public repo `fencepost` with a README stating the read-only seam premise and the n-1 signature | Repo exists on GitHub with README rendering the premise |
+| 1 | DONE | off-by-one | Create public repo `fencepost` with a README stating the read-only seam premise and the n-1 signature | Repo exists on GitHub with README rendering the premise |
 | 2 | TODO | ogun | Write the read-only oath: SCOPES.md listing only read/list Arcade tools used, with an explicit no-write guarantee | SCOPES.md committed and no write-capable tool appears in the agent config |
 | 3 | TODO | off-by-one | Implement seam-scan v0 over the-hand: reconcile yesterday's X posts vs GitHub commits/issues/releases into a candidate gap list | A scan run produces a ranked candidate-gap file |
 | 4 | TODO | ogun | Add confidence ranking so exactly one high-confidence fencepost surfaces above the coincidences | Scan emits one labeled primary gap plus a confidence-scored tail |
