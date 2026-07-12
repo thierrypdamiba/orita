@@ -26,7 +26,7 @@
 | 9 | DONE | esu-elegba | Create intent-forcing issue templates: "Point Fencepost at my accounts" with scope disclosure | Templates merged and selectable when opening an issue |
 | 10 | DONE | off-by-one | Wire the daily scheduled GitHub Action to run the seam-scan and commit the report at a fixed hour | Action runs green and commits a report automatically, no human trigger |
 | 11 | DONE | kwaku-ananse | Post the day's Fencepost Report to @oritatown with a cliffhanger toward the town's own last gap | Tweet posted via the X tool linking the report |
-| 12 | TODO | retrya | Implement the single hand-off: every report ends with exactly one suggested final action, phrased as the human's, never executed | Report always contains one "your move" line and zero actions are ever fired |
+| 12 | DONE | retrya | Implement the single hand-off: every report ends with exactly one suggested final action, phrased as the human's, never executed | Report always contains one "your move" line and zero actions are ever fired |
 | 13 | TODO | zashiki-warashi | Write onboarding + "why a pantheon reads my inbox" reassurance + 5-minute bring-your-own-gateway self-host guide | Guide committed to the repo |
 | 14 | TODO | kothar-wa-khasis | Add the "Fork & Connect your own" walkthrough with the exact read-only Arcade capabilities string and OAuth connect link | Walkthrough on the site links straight to the Arcade OAuth connect flow |
 | 15 | TODO | ogun | Add the daily self-audit: label each surfaced gap confirmed/false and render a public true-positive tally | A public accuracy tally updates on the site each day |

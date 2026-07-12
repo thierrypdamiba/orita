@@ -14,6 +14,14 @@ came for the one thing, not the ranking that produced it. If nothing cleared
 the bar, the report says so in one line and stops; a quiet seam is still the
 truth, and Nisaba corrects flattering numbers downward on principle, never up.
 
+The single hand-off (`suggest_move`): every report carries exactly one "Your
+move" line, phrased as something the *reader* does next — never something
+Fencepost did or is about to do. This is the third promise on iron (SCOPES.md
+§2, "the last action is the human's"): Fencepost may name a gap; it may never
+close one. `suggest_move` is a pure function of words in, words out — it holds
+no credential, calls no tool, and fires nothing. Read it end to end and you
+will find no verb it can act on, only verbs it hands to you.
+
 Pure and deterministic: `render_report` takes the same `sealed` shape a
 ledger entry carries (see `ledger.append_scan`) and returns text. No I/O
 except the thin CLI at the bottom, which reads the ledger and, on request,
@@ -34,6 +42,52 @@ from seam_engine import ledger
 _FENCEPOST_ROOT = Path(__file__).resolve().parents[3]
 
 THE_LINE = "You were so close. You are always so close."
+
+# The single hand-off. One rule beneath the words: never a verb Fencepost can
+# perform itself. "Post it", "add it", "close it" — all reader-verbs. Never
+# "we posted", "we'll add", "we closed". Matched against the gap's own
+# headline/detail so the suggestion tracks whatever the seam turns out to be
+# (an X gap today, a Gmail-vs-Calendar gap in v0.2) without the ranker or scan
+# needing to know anything about report-writing. First match wins; order is
+# most-specific first. The default line beneath the table fires only when a
+# future gap kind doesn't yet have a rule of its own here — it is deliberately
+# generic rather than silently wrong.
+_MOVE_RULES: tuple[tuple[str, str], ...] = (
+    (
+        "calendar",
+        "Add it to your Calendar yourself. Fencepost only found the seam; it does not cross it.",
+    ),
+    (
+        "reminder",
+        "Set the reminder yourself. Fencepost only found the seam; it does not cross it.",
+    ),
+    (
+        "@oritatown",
+        "Post about it yourself — a single line linking it is enough. Fencepost only found the seam; it does not cross it.",
+    ),
+)
+_DEFAULT_MOVE = (
+    "Close it yourself, however it's meant to be closed. Fencepost only found the seam; it does not cross it."
+)
+_NO_GAP_MOVE = "Nothing to hand off today. Check back tomorrow — the seam is still watched."
+
+
+def suggest_move(primary_gap: dict[str, Any] | None) -> str:
+    """The single hand-off: one suggested human action, phrased as the reader's
+    move, and never Fencepost's. Pure — no I/O, no side effect, nothing fired.
+
+    Deterministic: the same `primary_gap` always yields the same line. When
+    there is no primary gap, the move is still exactly one line — checking
+    back tomorrow is a move too, and the promise ("every report carries one
+    hand-off") does not get an exception for a quiet day.
+    """
+    if not primary_gap:
+        return _NO_GAP_MOVE
+    haystack = f"{primary_gap.get('headline', '')} {primary_gap.get('detail', '')}".lower()
+    for needle, move in _MOVE_RULES:
+        if needle in haystack:
+            return move
+    return _DEFAULT_MOVE
 
 
 def reports_dir(base: Path | None = None) -> Path:
@@ -88,6 +142,8 @@ def render_report(sealed: dict[str, Any]) -> str:
 
     plural = "" if recorded == 1 else "s"
     lines.append(f"**The count.** {recorded} fencepost{plural} named to date. The wall reads {wall}.")
+    lines.append("")
+    lines.append(f"**Your move.** {suggest_move(primary)}")
     lines.append("")
     lines.append(THE_LINE)
     lines.append("")

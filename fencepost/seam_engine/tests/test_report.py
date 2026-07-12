@@ -122,3 +122,85 @@ def test_render_latest_on_empty_ledger_raises(tmp_path: Path):
         assert False, "expected ValueError on an empty ledger"
     except ValueError:
         pass
+
+
+# --- the single hand-off: one "your move" line, never an action fired ---------
+
+
+def test_report_carries_exactly_one_your_move_line():
+    text = report.render_report(_sealed(primary=True, recorded=1))
+    assert text.count("**Your move.**") == 1
+
+
+def test_report_carries_a_your_move_line_even_on_a_quiet_day():
+    text = report.render_report(_sealed(primary=False, recorded=0))
+    assert text.count("**Your move.**") == 1
+    assert report.suggest_move(None) in text
+
+
+def test_your_move_is_phrased_as_the_readers_verb_not_fenceposts():
+    # The whole point of the hand-off: Fencepost never claims to have DONE
+    # the action, only to have found the gap and named the reader's move.
+    for primary_gap in (
+        None,
+        {"headline": "Milestone-level work shipped but never reached @oritatown", "detail": ""},
+        {"headline": "The invite never made it onto your Calendar", "detail": ""},
+        {"headline": "An entirely novel kind of gap nobody wrote a rule for", "detail": ""},
+    ):
+        move = report.suggest_move(primary_gap)
+        lowered = move.lower()
+        # No first-person-plural claim of having acted or being about to.
+        for forbidden in ("we posted", "we added", "we closed", "we'll", "fencepost posted", "fencepost added"):
+            assert forbidden not in lowered
+        assert "fencepost" not in lowered.split(".")[0]  # the first clause is the reader's verb, not Fencepost's
+
+
+def test_suggest_move_is_deterministic():
+    gap = {"headline": "Release 'v1' shipped but never reached @oritatown", "detail": "x"}
+    assert report.suggest_move(gap) == report.suggest_move(gap)
+
+
+def test_suggest_move_matches_calendar_gaps_to_a_calendar_verb():
+    move = report.suggest_move({"headline": "The invite never made it onto your Calendar", "detail": ""})
+    assert "add it to your calendar" in move.lower()
+
+
+def test_suggest_move_matches_x_gaps_to_a_post_verb():
+    move = report.suggest_move(
+        {"headline": "Release 'v1' shipped but never reached @oritatown", "detail": ""}
+    )
+    assert "post about it" in move.lower()
+
+
+def test_suggest_move_falls_back_for_an_unrecognized_gap_kind():
+    move = report.suggest_move({"headline": "Some future gap kind", "detail": "no known keyword here"})
+    assert move == report._DEFAULT_MOVE
+
+
+def test_suggest_move_on_no_gap_is_the_fixed_quiet_day_line():
+    assert report.suggest_move(None) == report._NO_GAP_MOVE
+
+
+def test_your_move_line_reads_correctly_from_a_live_ledger(tmp_path: Path):
+    ledger.append_scan(
+        {
+            "generated_at": "2026-07-12T11:38:10+00:00",
+            "repo": "x/orita",
+            "confidence_bar": 0.7,
+            "primary_gap": {
+                "slug": "milestone-unannounced",
+                "headline": "Milestone-level work shipped but never reached @oritatown",
+                "detail": "3 milestone commit(s), none echoed in a post.",
+                "confidence": 0.85,
+                "evidence": ["https://github.com/x/orita/commit/0000001"],
+            },
+            "tail": [],
+            "excluded": [],
+        },
+        now=_at(2026, 7, 12),
+        base=tmp_path,
+    )
+
+    text = report.render_latest(tmp_path)
+    assert text.count("**Your move.**") == 1
+    assert "post about it" in text.lower()

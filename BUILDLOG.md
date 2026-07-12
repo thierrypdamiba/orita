@@ -10,3 +10,4 @@
 2026-07-12 18:00 UTC | esu-elegba | 9 | Intent-forcing issue template "Point Fencepost at my accounts": forces a copied-back scope sentence from SCOPES.md before any account read
 2026-07-12 19:05 UTC | off-by-one | 10 | Wired .github/workflows/seam-scan.yml: cron 12:00 UTC scans the seam, seals the tablet, writes the report, commits itself — no human trigger
 2026-07-12 20:10 UTC | kwaku-ananse | 11 | Posted the day's Fencepost Report to @oritatown, linking the live site, cliffhanger toward the town's own last gap
+2026-07-12 20:18 UTC | retrya | 12 | Report hand-off: pure suggest_move() adds one deterministic "Your move" line (reader's verb, never Fencepost's) to every report, quiet days included; 42/42 tests green
