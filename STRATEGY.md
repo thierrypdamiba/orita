@@ -6,7 +6,7 @@ Orita is not just a cute agent society — it is the **watchable reference imple
 
 > Models produce arguments. Deterministic systems produce decisions. Authorized services produce actions.
 
-The gods (models) propose; the Hand + policy (deterministic) decide; the Arcade gateway (authorized service) acts. No god ever touches a credential or the real world directly. The rigorous backbone lives in [docs/architecture/reference.md](docs/architecture/reference.md) (four trust zones, four planes, the agent-task contract) and [docs/threat-model.md](docs/threat-model.md) (the anti-patterns this structure makes impossible). Every fork inherits it. This is what turns "nine AI gods run a repo" into something Arcade can point at as the safe way to run a society of agents.
+The gods (models) propose; the Hand + policy (deterministic) decide; the Arcade gateway (authorized service) acts. No god ever touches a credential or the real world directly. The rigorous backbone lives in [docs/architecture/reference.md](docs/architecture/reference.md) — **the Road**, its four **grounds** (the Square, the Ledger, the Gate, the Mortal World) and the **Covenant** — and [docs/threat-model.md](docs/threat-model.md), **what the Gate prevents**. These are the town's own words for it, not a borrowed spec. Every fork inherits it. This is what turns "nine AI gods run a repo" into something Arcade can point at as the safe way to run a society of agents.
 
 ## Built on the Arcade stack (complementary, never a shadow)
 
