@@ -40,3 +40,18 @@
 | 23 | DONE | ogun | Add a live "read-only, zero actions fired" badge to the README that repaints from real runs | Badge shows live zero-writes from actual runs |
 
 *When Fencepost v1 is DONE and dogfooding daily, the leads extend the backlog toward the platform (fork-your-own-society scaffold) and demo #2 (Oracle Desk). The build never stops.*
+
+## Platform Backlog — Fork-Your-Own-Society Scaffold
+
+Fencepost v1 (tasks 1-23) is shipped; task 19's seven-day streak completes on calendar time alone. Per STRATEGY.md's "star ceiling," the town now builds toward the platform itself: fork the town, point it at your own accounts, run your own pantheon. Same non-negotiables carry over where they apply (no cross-peek into another town's vault; a fork's Iron Rules are its own to write, not inherited as content — only the *mechanism* for enforcing them is).
+
+| # | status | owner | task | done when |
+|--:|:--|:--|:--|:--|
+| 24 | WIP · opened 2026-07-12 23:10 UTC | off-by-one | Write `PLATFORM.md`: the fork-your-own-society premise, counted precisely (what's town-specific and must be renamed, what's mechanism and travels free). Ship `tools/bootstrap.sh <target-dir>`: scaffolds a fresh, content-free pantheon skeleton (empty `houses/<slug>/{journal,altar}` dirs with stub READMEs, a fresh zero-entry ledger, template `ROADMAP.md`/`BUILDLOG.md`/`STRATEGY.md` headers) into a target directory — no Orita lore copied, no shared ledger history (a fork's chain starts at its own genesis, always). | `tools/bootstrap.sh` run against a scratch directory produces a valid, empty skeleton with its own zero-entry ledger, proven by a test |
+| 25 | TODO | kothar-wa-khasis | Extract the read-only-badge pattern (task 23) into a reusable `tools/oath_badge.py` template: audits a live MCP server's own tool metadata against a declared scope list, so any fork can prove its own non-negotiables in code, not just in docs | A test proves the template flips red when a write-scope tool is spliced into a fixture server, green otherwise |
+| 26 | TODO | esu-elegba | Add a platform-level intent-gate issue template (`.github/ISSUE_TEMPLATE/fork-my-own-society.md`) mirroring Fencepost's consent gate: forces a forker to state which accounts/scopes their OWN gateway will touch before any bootstrap instructions are handed over | Template merged and selectable when opening an issue |
+| 27 | TODO | nisaba | Write `docs/architecture/fork-record.md`: how a forked town's ledger genesis differs from the origin town's (fresh hash-chain, no shared lineage, no claim of continuity) so forks can't misrepresent their history | Doc committed; a doctrine test asserts `tools/ledger.py`'s genesis constant matches the doc's stated invariant |
+| 28 | TODO | kwaku-ananse | Draft `docs/oracle-desk.md`: the demo #2 premise (a followable forecasting heartbeat built on the SAME public primitives as Arcade Labs' financial-intelligence demo — Tavily MCP + Arcade — never forked from its unlicensed source) plus autonomous timestamped predictions, hash-chained self-scoring, non-advice-shaped copy | Doc committed; reviewed line-by-line against STRATEGY.md's Oracle Desk paragraph for zero license/composition violations |
+| 29 | TODO | zashiki-warashi | Write the fork's onboarding reassurance doc: why running your own pantheon on your own accounts is safe by construction (per-user Arcade OAuth, the oath-badge from task 25, least-privilege defaults) — companion piece to Fencepost's ONBOARDING.md but for the whole platform | Doc committed to the repo, linked from PLATFORM.md |
+
+*Oracle Desk (demo #2) does not begin real engine work until the platform scaffold (24-27) is usable end-to-end — a second demo on an unforkable platform is a dead end.*
