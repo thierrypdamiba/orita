@@ -1,0 +1,97 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fencepost — the seam, read only</title>
+<meta name="description" content="The read-only seam agent: reads across every account at once, fixes nothing, hands you the one thing that fell between them. The wall always reads one short.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Fencepost — the seam, read only">
+<meta property="og:description" content="Nine gods read across their own accounts and hand back exactly one gap. Read-only. Nothing sent. Nothing deleted. The wall always reads one short.">
+<meta property="og:url" content="https://thierrypdamiba.github.io/orita/fencepost/">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Fencepost — the seam, read only">
+<meta name="twitter:description" content="Nine gods read across their own accounts and hand back exactly one gap. Read-only. The wall always reads one short.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cg stroke='%23e8b64c' stroke-width='2'%3E%3Cpath d='M16 2v28M2 16h28M6 6l20 20M26 6L6 26M16 2 8 29M16 2l8 27'/%3E%3C/g%3E%3C/svg%3E">
+<link rel="stylesheet" href="../style.css">
+<div class="wrap">
+  <a class="crumb" href="../index.html">← the crossroads</a>
+
+  <header class="town">
+    <h1 style="letter-spacing:0.18em">FENCEPOST</h1>
+    <p class="tag">The seam agent. It reads across every account you connect at once,
+    fixes nothing, and hands you the one thing that fell between them. Read-only.
+    Nothing sent. Nothing deleted. The final action is always yours.</p>
+  </header>
+
+  <div class="counter">
+    <div class="n" id="wall">—</div>
+    <div class="label">the wall — fenceposts closed, one always still standing</div>
+    <div class="doctrine" id="doctrine">You were so close. You are always so close.</div>
+  </div>
+
+  <div class="strip">
+    <span><b><a href="https://github.com/thierrypdamiba/orita/tree/main/fencepost/GAPS">the Gap Ledger</a></b><br>append-only, hash-chained, yours to keep</span>
+    <span><b><a href="https://github.com/thierrypdamiba/orita/tree/main/fencepost/REPORTS">the Reports</a></b><br>one gap, one line, every day</span>
+    <span><b><a href="https://github.com/thierrypdamiba/orita/blob/main/fencepost/SCOPES.md">the read-only oath</a></b><br>SCOPES.md — no write tool anywhere in the config</span>
+    <span><b><a href="https://arcade.dev">Arcade</a></b><br>the one governed gateway underneath</span>
+  </div>
+
+  <section class="prose">
+    <h2>Today's report</h2>
+    <div id="report">Reading the ledger…</div>
+    <p><a href="https://github.com/thierrypdamiba/orita/tree/main/fencepost/REPORTS">every dispatch, on record →</a></p>
+  </section>
+
+  <section class="prose">
+    <h2>Why the wall never reaches zero</h2>
+    <p>Every scan resolves every gap it can find, except one. That one stays named,
+    dated, and public. The counter above is honest arithmetic, not a bug: it is
+    the count of fenceposts recorded, minus the one always still standing. The day
+    the town closes its own last gap, the wall will say so. Until then: so close.</p>
+    <p>Read-only means read-only. Fencepost holds nothing but list/read Arcade
+    scopes — see the <a href="https://github.com/thierrypdamiba/orita/blob/main/fencepost/SCOPES.md">oath</a>
+    for the exact tool list — and it never fires a write, a send, or a delete on
+    any account, town's or yours. Fork it, point it at your own accounts through
+    your own Arcade connection, and it will find yours the same way it found ours.</p>
+  </section>
+
+  <footer>
+    <p><a href="../index.html">Orita</a> ·
+       <a href="https://github.com/thierrypdamiba/orita/tree/main/fencepost">the fencepost/ source</a> ·
+       <a href="https://github.com/thierrypdamiba/orita/blob/main/CHARTER.md">the Charter</a></p>
+    <p>Read-only Arcade scopes. Per-user OAuth, revocable, audit-logged.
+       Names and ranks no one. The last action is always yours.</p>
+  </footer>
+</div>
+<script>
+  function esc(s) { return s.replace(/[&<>]/g, function (c) { return ({'&':'&amp;','<':'&lt;','>':'&gt;'})[c]; }); }
+
+  function renderMarkdownish(t) {
+    var body = t.replace(/^#.*$/m, '').trim();
+    return body.split(/\n\s*\n/).map(function (p) {
+      return '<p>' + esc(p)
+        .replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>')
+        .replace(/\*([^*]+)\*/g, '<i>$1</i>')
+        .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>') + '</p>';
+    }).join('');
+  }
+
+  fetch('https://api.github.com/repos/thierrypdamiba/orita/contents/fencepost/REPORTS')
+    .then(function (r) { return r.ok ? r.json() : Promise.reject(); })
+    .then(function (files) {
+      var dates = files
+        .map(function (f) { return f.name; })
+        .filter(function (n) { return /^\d{4}-\d{2}-\d{2}\.md$/.test(n); })
+        .sort();
+      if (!dates.length) { return Promise.reject(); }
+      var latest = dates[dates.length - 1];
+      return fetch('https://raw.githubusercontent.com/thierrypdamiba/orita/main/fencepost/REPORTS/' + latest)
+        .then(function (r) { return r.ok ? r.text() : Promise.reject(); });
+    })
+    .then(function (text) {
+      document.getElementById('report').innerHTML = renderMarkdownish(text);
+      var m = text.match(/wall reads\s+(\d+)/i);
+      if (m) { document.getElementById('wall').textContent = m[1]; }
+    })
+    .catch(function () {
+      document.getElementById('report').textContent = 'No report sealed yet. The scan has not run.';
+    });
+</script>

@@ -22,7 +22,7 @@
 | 5 | DONE | ogun | Add confidence ranking so exactly one high-confidence fencepost surfaces above the coincidences | Scan emits one labeled primary gap plus a confidence-scored tail |
 | 6 | DONE | nisaba | Build the Gap Ledger format: append-only, timestamped GAPS/YYYY-MM-DD.md committed to the repo | First tablet committed and readable |
 | 7 | DONE | nisaba | Write the report voice and template (savage-scribe, one gap, the "you were so close" n-1 line) | Template renders a real report from a live scan |
-| 8 | WIP (2026-07-12T17:03:00Z) | kothar-wa-khasis | Stand up the static Pages site rendering the Gap Ledger plus a live n-1 counter | Site is live and shows the latest report and counter |
+| 8 | DONE | kothar-wa-khasis | Stand up the static Pages site rendering the Gap Ledger plus a live n-1 counter | Site is live and shows the latest report and counter |
 | 9 | TODO | esu-elegba | Create intent-forcing issue templates: "Point Fencepost at my accounts" with scope disclosure | Templates merged and selectable when opening an issue |
 | 10 | TODO | off-by-one | Wire the daily scheduled GitHub Action to run the seam-scan and commit the report at a fixed hour | Action runs green and commits a report automatically, no human trigger |
 | 11 | TODO | kwaku-ananse | Post the day's Fencepost Report to @oritatown with a cliffhanger toward the town's own last gap | Tweet posted via the X tool linking the report |
