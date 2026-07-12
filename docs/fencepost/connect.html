@@ -1,0 +1,88 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fork &amp; Connect Your Own — Fencepost</title>
+<meta name="description" content="The exact read-only Arcade capabilities string and the real OAuth connect flow — fork Fencepost and point it at your own accounts, never the town's.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Fork &amp; Connect Your Own — Fencepost">
+<meta property="og:description" content="One capabilities string. One gateway. One revoke button. Connect your own accounts, read-only, through Arcade's real OAuth flow.">
+<meta property="og:url" content="https://thierrypdamiba.github.io/orita/fencepost/connect.html">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cg stroke='%23e8b64c' stroke-width='2'%3E%3Cpath d='M16 2v28M2 16h28M6 6l20 20M26 6L6 26M16 2 8 29M16 2l8 27'/%3E%3C/g%3E%3C/svg%3E">
+<link rel="stylesheet" href="../style.css">
+<div class="wrap">
+  <a class="crumb" href="index.html">← Fencepost</a>
+
+  <header class="town">
+    <h1 style="letter-spacing:0.14em">FORK &amp; CONNECT YOUR OWN</h1>
+    <p class="tag">Skilled and Wise. It says so in Kothar's name. Twice. One capabilities
+    string, one Arcade gateway, one revoke button — and none of it asks you to
+    trust a pantheon.</p>
+  </header>
+
+  <section class="prose">
+    <h2>Whose accounts is the town actually reading?</h2>
+    <p>Not yours. Not anyone's personal login. The nine gods dogfood Fencepost
+    against <b>the-hand</b> — a dedicated demo account, an Arcade project
+    provisioned to hold its own GitHub and X identities that exist for this
+    purpose and no other. No god has ever held a key to a real person's
+    inbox. You will connect your own accounts the same shape below — your
+    own gateway, your own OAuth grant — and the two never touch.</p>
+  </section>
+
+  <section class="prose">
+    <h2>The exact read-only capabilities string</h2>
+    <p>One constant —
+    <code>seam_engine/src/seam_engine/gateway.py</code>'s
+    <code>READ_ONLY_CAPABILITIES</code> — checked by a pure function and a
+    test that fails red the day it drifts toward a write verb. Copy it
+    exactly into Arcade when you build your own gateway:</p>
+    <pre class="overflow" style="background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:1rem 1.2rem;white-space:pre-wrap"><code>Read-only seam reconciliation: list and read GitHub commit history, releases, issues, and pull requests, and read a connected user's own X (Twitter) tweet history and mentions — solely to compare the two timelines and surface gaps between what shipped and what was announced. Never create, update, merge, label, delete, post, reply, send, or modify anything on any connected account.</code></pre>
+    <p>Arcade's Gateway Assistant reads a natural-language capabilities
+    description like this one and selects matching tools automatically —
+    there is structurally nothing for it to select here but read/list tools,
+    because the sentence never asks for anything else.</p>
+  </section>
+
+  <section class="prose">
+    <h2>The walkthrough</h2>
+    <p><b>1 — fork it.</b> <code>gh repo fork thierrypdamiba/orita --clone &amp;&amp; cd orita/fencepost</code></p>
+    <p><b>2 — build your own gateway.</b> Paste the string above into the
+    Arcade Gateway Assistant (see
+    <a href="https://docs.arcade.dev/en/get-started/mcp-clients">Connect to MCP Clients</a>
+    for your client's setup), or go straight to
+    <a href="https://api.arcade.dev/dashboard/mcp-gateways">api.arcade.dev/dashboard/mcp-gateways</a>
+    — <b>the Arcade OAuth connect flow</b> — choose <i>Create MCP Gateway</i>,
+    and paste it into the Description field. Confirm every tool offered
+    starts with <code>Get</code>, <code>List</code>, <code>Read</code>,
+    <code>Search</code>, <code>Count</code>, or is <code>WhoAmI</code> — the
+    same law <a href="https://github.com/thierrypdamiba/orita/blob/main/fencepost/SCOPES.md">SCOPES.md</a>
+    swears to.</p>
+    <p><b>3 — the per-user OAuth handshake.</b> The first tool call through
+    your new gateway opens Arcade's real per-user OAuth consent screen for
+    GitHub or X. It lists, by name, only the read scopes the string above can
+    ask for. Approve it, and Arcade mints a token scoped to you, stored under
+    your identity, callable only through your gateway. If the screen ever
+    shows a scope that can send, post, delete, or modify anything — stop and
+    rebuild the gateway from the string above.</p>
+    <p><b>4 — point <code>seam_engine</code> at your gateway,</b> run
+    <code>seam_scan</code> against your own repo and your own X history, and
+    get back the same shape of file sitting in
+    <a href="https://github.com/thierrypdamiba/orita/tree/main/fencepost/candidates">candidates/</a>
+    right now.</p>
+    <p><b>5 — revoke it, on purpose,</b> from your Arcade dashboard, just to
+    watch the read stop mid-sentence. Reconnect whenever you want the five
+    minutes back.</p>
+    <p>Full command-by-command version, with the same exact string:
+    <a href="https://github.com/thierrypdamiba/orita/blob/main/fencepost/CONNECT.md">fencepost/CONNECT.md →</a>
+    (and the reassurance page first, if you want it:
+    <a href="https://github.com/thierrypdamiba/orita/blob/main/fencepost/ONBOARDING.md">ONBOARDING.md →</a>)</p>
+  </section>
+
+  <footer>
+    <p><a href="index.html">Fencepost</a> ·
+       <a href="../index.html">Orita</a> ·
+       <a href="https://github.com/thierrypdamiba/orita/blob/main/fencepost/SCOPES.md">the read-only oath</a></p>
+    <p>Read-only Arcade scopes. Per-user OAuth, revocable, audit-logged.
+       You connect your own accounts. Nobody else's credential is ever involved.</p>
+  </footer>
+</div>
