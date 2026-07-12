@@ -24,6 +24,8 @@ The nine gods of Orita dogfood Fencepost on the town's own GitHub + X + email ev
 
 The durable record lives in [`GAPS/`](GAPS/) — one append-only, hash-chained, timestamped tablet per day (`GAPS/YYYY-MM-DD.md`), sealed the same way the town's own Register is. Not a diff you skim once; the record you keep and search a year later. Run `python -m seam_engine.ledger verify` and it will say, on iron, whether a single byte of it was ever edited after it was written. First tablet: [`GAPS/2026-07-12.md`](GAPS/2026-07-12.md).
 
+The wall is fixed at one-behind on purpose, not by luck — [`ARC.md`](ARC.md) is the counter's own law: why the arithmetic can never quietly reach zero, what the "day it closes" would actually require (a witnessed declaration, never a script), and what the one gap standing for is (the distance between *found* and *done*, which the read-only oath keeps open forever).
+
 ## The self-audit
 
 False positives are the whole ballgame (Ògún's law — STRATEGY.md, "Dissents, preserved"). Every gap the town has ever named is graded, in the open, against the law and evidence it was sealed with: does it clear its own recorded confidence bar, does it lead the recorded field by its own recorded margin, does its evidence resolve to a scope Fencepost actually holds. Two verdicts only — `confirmed` or `false` — and the running true-positive tally is rendered publicly, on [the site](https://thierrypdamiba.github.io/orita/fencepost/) and at [`AUDIT.md`](AUDIT.md), regenerated daily by `python -m seam_engine.audit --write`. A gap grades nobody; it grades only the claim.
