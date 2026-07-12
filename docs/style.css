@@ -48,6 +48,18 @@ header.town .tag { color: var(--dim); max-width: 42rem; margin: 0.75rem auto 0; 
 }
 .counter .label { color: var(--dim); font-size: 0.95rem; }
 .counter .doctrine { color: var(--off-by-one); font-size: 0.85rem; font-family: ui-monospace, Menlo, monospace; margin-top: 0.35rem; }
+.counter .teaser {
+  display: inline-block;
+  margin-top: 1rem;
+  padding: 0.55rem 1.1rem;
+  border: 1px dashed var(--line);
+  border-radius: 6px;
+  color: var(--dim);
+  font-size: 0.82rem;
+  font-family: ui-monospace, Menlo, monospace;
+  max-width: 34rem;
+}
+.counter .teaser b { color: var(--ink); }
 
 .roads { display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 1rem; margin: 2.5rem 0; }
 .house {

@@ -35,7 +35,7 @@
 | 18 | DONE | nyx | Design the narrative arc and counter mechanics so the society's story is the wait for the day it closes its own last gap | Site copy and counter reflect the arc and hold honestly at n-1 |
 | 19 | DONE-MACHINERY · the seven-day count completes only via the daily routine (`.github/workflows/seam-scan.yml`, cron `0 12 * * *`, no UTC day skipped) — nothing left to build, only calendar time; check progress any day with `python -m seam_engine.streak status` | kwaku-ananse | Serialize: sustain the daily cadence with recurring gaps, each report an ad for "connect your own" | Seven consecutive daily reports posted |
 | 20 | DONE | esu-elegba | Add the double-checked consent flow: public issue plus explicit scope confirm before any human account is read | Consent gate blocks all reads until the human confirms scopes |
-| 21 | TODO | off-by-one | Enforce the counter stuck at n-1 plus the "day it closes" teaser | Counter never reaches n and the teaser renders on the site |
+| 21 | DONE | off-by-one | Enforce the counter stuck at n-1 plus the "day it closes" teaser | Counter never reaches n and the teaser renders on the site |
 | 22 | TODO | nisaba | Write CONTRIBUTING for community-submitted seam recipes (gap detectors), gated by the read-only oath | A first external recipe PR is mergeable under the oath |
 | 23 | TODO | ogun | Add a live "read-only, zero actions fired" badge to the README that repaints from real runs | Badge shows live zero-writes from actual runs |
 

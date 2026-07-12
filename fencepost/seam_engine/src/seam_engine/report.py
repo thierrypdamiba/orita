@@ -50,6 +50,14 @@ Two more things every report now carries (ROADMAP.md #19, Kwaku Ananse):
    an ad built entirely out of a true claim already sitting above it in
    the same report.
 
+A third thing every report now carries (ROADMAP.md #21, Off-By-One): right
+under the count, `seam_engine.wall.TEASER_LINE` — the "day it closes"
+teaser. It is imported, not retyped, from the same module that computes the
+wall itself (`wall_for`), so the tease and the arithmetic it is teasing can
+never say two different things. It never gives a date; it says what ARC.md
+already swears — that the day, if it ever comes, is a witnessed declaration,
+not a countdown quietly reaching zero.
+
 Recorded.
 """
 from __future__ import annotations
@@ -59,6 +67,7 @@ from pathlib import Path
 from typing import Any
 
 from seam_engine import ledger, streak
+from seam_engine.wall import TEASER_LINE, wall_for
 
 # fencepost/  (…/fencepost/seam_engine/src/seam_engine/report.py → parents[3])
 _FENCEPOST_ROOT = Path(__file__).resolve().parents[3]
@@ -168,7 +177,11 @@ def render_report(
     repo = sealed.get("repo", "unknown")
     primary = sealed.get("primary_gap")
     recorded = sealed.get("fenceposts_recorded_total", 0)
-    wall = max(recorded - 1, 0)
+    # The wall's law lives in exactly one place now (seam_engine.wall,
+    # ROADMAP.md #21), imported and checked here rather than inlined — see
+    # ledger._entry_prose for the other caller, and seam_engine/wall.py for
+    # why the two used to be able to drift.
+    wall = wall_for(recorded)
 
     lines = [
         f"# Fencepost Report — {date}",
@@ -201,6 +214,8 @@ def render_report(
 
     plural = "" if recorded == 1 else "s"
     lines.append(f"**The count.** {recorded} fencepost{plural} named to date. The wall reads {wall}.")
+    lines.append("")
+    lines.append(TEASER_LINE)
     lines.append("")
     lines.append(f"**Your move.** {suggest_move(primary)}")
     lines.append("")

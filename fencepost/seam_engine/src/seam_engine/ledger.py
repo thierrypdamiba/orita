@@ -34,6 +34,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from seam_engine.wall import wall_for
+
 # The very first entry chains from nothing. Same GENESIS as the town's Register.
 GENESIS = "0" * 64
 
@@ -187,7 +189,13 @@ def _entry_prose(seq: int, sealed: dict[str, Any]) -> str:
         )
         out.append("")
 
-    doctrine = max(recorded - 1, 0)
+    # The wall's law lives in exactly one place now (seam_engine.wall,
+    # ROADMAP.md #21) — this used to inline the same subtract-one-floor-at-
+    # zero arithmetic here and a second, independent copy in
+    # report.render_report, which ARC.md itself flagged as "two places that
+    # must never disagree." Now there is one place, and it checks its own
+    # answer before handing it back.
+    doctrine = wall_for(recorded)
     if primary:
         out.append(
             f"**The count.** Fenceposts recorded to date: {recorded}. "

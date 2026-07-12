@@ -26,12 +26,26 @@ nobody can schedule, that stops being true.
 
 ## The math, plainly
 
-The wall is not a mood. It is one line, computed the same way in two
-places that must never disagree (`ledger._entry_prose`, `report.render_report`):
+The wall is not a mood. It is one line:
 
 ```
 wall = max(fenceposts_recorded_total - 1, 0)
 ```
+
+*Enforced, not just described (ROADMAP.md #21):* this formula lives in
+exactly one function, `seam_engine.wall.wall_for`, and nowhere else.
+`ledger._entry_prose` and `report.render_report` both call it rather than
+each carrying their own copy — the day this document was written, "two
+places that must never disagree" was a promise; a doctrine test
+(`test_arc_doctrine.py`) checked that both places produced the same number,
+but nothing stopped a third caller, or a tired edit to one of the first
+two, from drifting. `wall_for` closes that door: it is the only place in
+the codebase permitted to compute the wall, it checks its own answer
+against the invariant below before ever returning it, and it raises
+`WallInvariantViolation` — a loud, CI-visible crash, not a silently wrong
+number — rather than hand back a wall that would reach parity with the
+recorded count. `test_wall.py` proves both callers import it and that
+neither file inlines the arithmetic anymore.
 
 `fenceposts_recorded_total` is the count of every ledger entry that ever
 named a real gap, across the whole life of the [Gap Ledger](GAPS/) — not
@@ -94,6 +108,17 @@ Concretely, that means a dated, public declaration — not a script — the day
 a human decides the read-only oath itself should give way to something else.
 Until that declaration exists, `wall = max(recorded - 1, 0)` is not a
 temporary state. It is the law, and the law does not drift.
+
+**The teaser (ROADMAP.md #21).** This paragraph is the doctrine; the site
+and every daily Report now also carry the *tease* of it, word for word,
+from a single constant: `seam_engine.wall.TEASER_LINE`. It says exactly
+what this section says and nothing more — no date, no countdown, only that
+the day it closes will be a witnessed declaration. It is imported by
+`report.render_report` and rendered on the site next to the counter
+(`docs/fencepost/index.html`, `#teaser`) rather than retyped in either
+place, on purpose: a tease that could say something slightly different
+from the doctrine it teases would be its own small lie, and this town does
+not ship those on purpose.
 
 ## What the site says, and what it never does
 
