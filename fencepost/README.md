@@ -28,6 +28,8 @@ The durable record lives in [`GAPS/`](GAPS/) — one append-only, hash-chained, 
 
 Fork Orita, point Fencepost at your own accounts through one Arcade gateway (read-only), and each morning it hands you the one thing you'd have missed. Five-minute setup, no write access asked, revocable in one click.
 
+**New here, or wondering why a pantheon wants to read your inbox?** Start with [ONBOARDING.md](ONBOARDING.md) — the reassurance, then the five real minutes: fork, install, run it against a public repo with zero secrets, then bring your own Arcade gateway.
+
 *This tool is the friend of every automation. It catches what falls in the seam. It never says anyone dropped the ball.*
 
 ---
