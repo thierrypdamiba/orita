@@ -227,7 +227,78 @@ def compute_candidates(
     return surfaced, excluded
 
 
+# The coincidence tail. A commit topic that recurs many times and never reaches
+# X is LOUD, not important — routine bookkeeping, night-lore, small fixes. A
+# naive detector screams "you committed 'ledger' twenty-six times and never
+# tweeted it!" — the exact false positive Ogun's law exists to kill. So these
+# are surfaced at a deliberately capped, sub-bar confidence and labeled
+# coincidence downstream: shown to prove the engine weighed them and dropped
+# them, never claimed as the gap. Volume does not lift a coincidence over the
+# bar; only salience (a milestone commit) can clear it.
+COINCIDENCE_CAP = 0.55  # hard ceiling — must stay below ranking.CONFIDENCE_BAR
+COINCIDENCE_MIN_CLUSTER = 4  # a topic must recur at least this often to show
+COINCIDENCE_MAX_TOPICS = 6  # only the loudest handful; the tail is not a dump
+# Topic words too generic or count-like to read as a real subject.
+COINCIDENCE_STOPTOPICS = {
+    "one", "two", "three", "now", "not", "via", "new", "day", "off-by-one",
+}
+
+
+def coincidence_candidates(
+    github_events: list[GithubEvent],
+    x_posts: list[XPost],
+    account_live_since: datetime,
+) -> list[GapCandidate]:
+    """The confidence tail: loud-but-routine commit topics absent from X.
+
+    These are near-misses on purpose — things a careless scan would flag. Each
+    is capped below the confidence bar so it can never be mistaken for the gap.
+    """
+    all_post_keywords: set[str] = set()
+    for p in x_posts:
+        all_post_keywords |= _keywords(p.text)
+
+    # Count topic recurrence and remember the commits behind each topic.
+    topic_count: dict[str, int] = {}
+    topic_urls: dict[str, list[str]] = {}
+    for e in github_events:
+        if e.kind != "commit" or e.ts < account_live_since:
+            continue
+        if e.author.lower() in QUIET_VOICE_AUTHORS:
+            continue
+        for w in _keywords(e.title):
+            if w in all_post_keywords:
+                continue  # the topic DID reach X — no seam here
+            if w in MILESTONE_KEYWORDS or w in COINCIDENCE_STOPTOPICS:
+                continue  # milestone words feed the primary; stoptopics are noise
+            topic_count[w] = topic_count.get(w, 0) + 1
+            topic_urls.setdefault(w, [])
+            if len(topic_urls[w]) < 5:
+                topic_urls[w].append(e.url)
+
+    loud = sorted(
+        ((w, n) for w, n in topic_count.items() if n >= COINCIDENCE_MIN_CLUSTER),
+        key=lambda wn: (-wn[1], wn[0]),
+    )[:COINCIDENCE_MAX_TOPICS]
+
+    out: list[GapCandidate] = []
+    for topic, n in loud:
+        # Saturating, sub-bar score: recurrence nudges it, never lifts it over.
+        confidence = round(min(COINCIDENCE_CAP, 0.30 + 0.02 * n), 2)
+        out.append(GapCandidate(
+            slug=f"coincidence-{topic}",
+            headline=f"'{topic}' recurs in commits but stays off @oritatown",
+            detail=f"{n} commit(s) since {account_live_since.date()} touch '{topic}', "
+                   f"none echoed in a post. Routine work is not a gap — coincidence, not seam.",
+            confidence=confidence,
+            evidence=topic_urls[topic],
+        ))
+    return out
+
+
 def run_scan(owner: str, repo: str, window_hours: int = 24) -> dict[str, Any]:
+    from seam_engine.ranking import rank
+
     x_posts = load_x_posts_from_ledger()
     account_live_since = min((p.ts for p in x_posts), default=None)
     if account_live_since is None:
@@ -238,14 +309,20 @@ def run_scan(owner: str, repo: str, window_hours: int = 24) -> dict[str, Any]:
 
     events = fetch_github_activity(owner, repo, since)
     surfaced, excluded = compute_candidates(events, x_posts, account_live_since)
+    coincidences = coincidence_candidates(events, x_posts, account_live_since)
+
+    ranking = rank(surfaced + coincidences)
+    primary = ranking.primary
 
     return {
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "repo": f"{owner}/{repo}",
         "window_hours": window_hours,
         "account_live_since": account_live_since.isoformat(),
-        "primary_gap": asdict(surfaced[0]) if surfaced else None,
-        "candidates": [asdict(g) for g in surfaced[1:]],
+        "confidence_bar": ranking.confidence_bar,
+        "separation_margin": ranking.separation_margin,
+        "primary_gap": asdict(primary) if primary else None,
+        "tail": [asdict(g) for g in ranking.tail],
         "excluded": [asdict(g) for g in excluded],
     }
 

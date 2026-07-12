@@ -20,8 +20,10 @@ from arcade_mcp_server.metadata import (
     ToolMetadata,
 )
 
+from seam_engine.ranking import rank
 from seam_engine.scan import (
     XPost,
+    coincidence_candidates,
     compute_candidates,
     fetch_github_activity,
     load_x_posts_from_ledger,
@@ -83,22 +85,28 @@ def seam_scan(
     owner: Annotated[str, "GitHub owner (user or org)"] = "thierrypdamiba",
     repo: Annotated[str, "GitHub repository name"] = "orita",
     window_hours: Annotated[int, "How far back to look for GitHub activity"] = 24,
-) -> Annotated[dict, "The ranked candidate-gap scan: one primary gap, a confidence tail, and excluded false positives"]:
+) -> Annotated[dict, "The ranked seam scan: one labeled primary gap, a confidence-scored tail, and excluded false positives"]:
     """Read-only seam-scan v0: reconcile @oritatown's X posts against GitHub
     commits/releases and surface the single highest-confidence gap between
-    them, plus a ranked tail. Fixes nothing; writes only the scan result."""
+    them, labeled and cleared over the confidence bar, plus a confidence-scored
+    tail of coincidences. Fixes nothing; writes only the scan result."""
     x_posts = load_x_posts_from_ledger()
     account_live_since = min((p.ts for p in x_posts), default=datetime.now(timezone.utc))
     since = datetime.now(timezone.utc) - timedelta(hours=window_hours)
     events = fetch_github_activity(owner, repo, since)
     surfaced, excluded = compute_candidates(events, x_posts, account_live_since)
+    coincidences = coincidence_candidates(events, x_posts, account_live_since)
+    ranking = rank(surfaced + coincidences)
+    primary = ranking.primary
     return {
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "repo": f"{owner}/{repo}",
         "window_hours": window_hours,
         "account_live_since": account_live_since.isoformat(),
-        "primary_gap": asdict(surfaced[0]) if surfaced else None,
-        "candidates": [asdict(g) for g in surfaced[1:]],
+        "confidence_bar": ranking.confidence_bar,
+        "separation_margin": ranking.separation_margin,
+        "primary_gap": asdict(primary) if primary else None,
+        "tail": [asdict(g) for g in ranking.tail],
         "excluded": [asdict(g) for g in excluded],
     }
 
