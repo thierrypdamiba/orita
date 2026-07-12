@@ -33,9 +33,12 @@ import json
 from dataclasses import asdict, dataclass
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from seam_engine.scan import GapCandidate, _keywords
+
+if TYPE_CHECKING:
+    from seam_engine.consent import ConsentRecord
 
 # fencepost/  (…/fencepost/seam_engine/src/seam_engine/gmail_calendar.py → parents[3])
 _FENCEPOST_ROOT = Path(__file__).resolve().parents[3]
@@ -242,6 +245,35 @@ def run_gmail_calendar_scan(
         "tail": [asdict(g) for g in ranking.tail],
         "excluded": [asdict(g) for g in excluded],
     }
+
+
+def run_consented_gmail_calendar_scan(
+    consent: dict[str, ConsentRecord | None],
+    gmail_path: Path | None = None,
+    calendar_path: Path | None = None,
+    *,
+    now: datetime | None = None,
+) -> dict[str, Any]:
+    """The gated door onto a REAL human's own Gmail + Calendar (ROADMAP #20).
+
+    `run_gmail_calendar_scan` above reads a fixture — nobody's account, so it
+    needs nobody's consent, and stays exactly as it was for task 16's
+    fixture-driven dogfood. This function is the one meant to wrap a live
+    read, the moment `gmail_path`/`calendar_path` (or their loaders) point at
+    a real connected human's inbox instead of a fixture file: it calls
+    `consent.enforce_consent_for_toolkits` for BOTH "gmail" and
+    "google_calendar" **before** `run_gmail_calendar_scan` — and therefore
+    before either loader — is ever invoked. Either toolkit's consent missing
+    or mismatched raises `ConsentRequiredError` immediately; the read never
+    starts. `run_gmail_calendar_scan` is only called after both locks turn.
+
+    `consent` maps toolkit name -> that toolkit's `ConsentRecord` (or `None`
+    if the human never confirmed it) — see `seam_engine.consent`.
+    """
+    from seam_engine.consent import enforce_consent_for_toolkits
+
+    enforce_consent_for_toolkits(consent, toolkits=("gmail", "google_calendar"))
+    return run_gmail_calendar_scan(gmail_path, calendar_path, now=now)
 
 
 if __name__ == "__main__":
