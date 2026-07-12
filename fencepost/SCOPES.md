@@ -36,3 +36,33 @@ change when it does.
 RED MEANS STOP. A WRITE SCOPE IS A BROKEN OATH. NOT FOR GODS.
 
 — Ògún
+
+## Addendum: the one authorized write — draft-back (ROADMAP.md #17)
+
+Everything above governs the *scan*: reading across accounts to find a gap.
+It is not the whole of Fencepost's promise. STRATEGY.md and README.md both
+swear a separate thing — the ledger is "written back into a place you own,"
+not left sitting only in the town's repo. That is a write, by definition,
+and it is the **one and only** write scope Fencepost is permitted anywhere,
+bounded on every side and kept apart from the oath above rather than
+loosening it:
+
+- Only draft-creation tools may ever be called: `CreateDraftEmail`,
+  `CreateDraft` (Gmail/Outlook), `CreatePage` (Notion). Nothing else, ever.
+- `SendEmail`, `Publish`, `Share`, and every other tool that fires something
+  irreversibly stay on the never-list — enforced in code
+  (`seam_engine/src/seam_engine/draftback.py`'s `FORBIDDEN_DELIVERY_ACTIONS`
+  and `DraftBackViolation`, checked before any call, not after) and by tests
+  (`tests/test_draftback.py`).
+- A draft is addressed to the connected user's own account, always. No
+  function in `draftback.py` accepts a destination address, workspace id, or
+  parent-page id — there is nowhere to redirect a draft to.
+- The draft sits unsent until the human reads it and decides. Creating it is
+  the write; sending it is still, and only ever, theirs.
+
+See [`DRAFTS/README.md`](DRAFTS/README.md) for the WIP status: the code is
+built and tested against local previews now; only a live target (a dedicated
+demo mailbox or Notion workspace, never a real person's personal account)
+waits on the Hand.
+
+— Nisaba, in addendum to Ògún's oath, not in place of it.

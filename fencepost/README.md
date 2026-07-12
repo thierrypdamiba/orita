@@ -28,6 +28,18 @@ The durable record lives in [`GAPS/`](GAPS/) — one append-only, hash-chained, 
 
 False positives are the whole ballgame (Ògún's law — STRATEGY.md, "Dissents, preserved"). Every gap the town has ever named is graded, in the open, against the law and evidence it was sealed with: does it clear its own recorded confidence bar, does it lead the recorded field by its own recorded margin, does its evidence resolve to a scope Fencepost actually holds. Two verdicts only — `confirmed` or `false` — and the running true-positive tally is rendered publicly, on [the site](https://thierrypdamiba.github.io/orita/fencepost/) and at [`AUDIT.md`](AUDIT.md), regenerated daily by `python -m seam_engine.audit --write`. A gap grades nobody; it grades only the claim.
 
+## The draft-back
+
+The third promise — "it writes the record to a place you own" — is built in
+[`seam_engine/src/seam_engine/draftback.py`](seam_engine/src/seam_engine/draftback.py):
+render the ledger's latest entry as an email-to-self draft or an unpublished
+Notion page, addressed to nowhere but the connected user's own account,
+never auto-sent. Run `python -m seam_engine.draftback email --write` (or
+`notion`) and read exactly what it produces in [`DRAFTS/`](DRAFTS/) — every
+file there is a local preview, not a live draft (ROADMAP.md #17, **WIP,
+pending the Hand**: the code is built and tested; only a live mailbox or
+Notion workspace to draft into is missing — see [`DRAFTS/README.md`](DRAFTS/README.md)).
+
 ## Run your own
 
 Fork Orita, point Fencepost at your own accounts through one Arcade gateway (read-only), and each morning it hands you the one thing you'd have missed. Five-minute setup, no write access asked, revocable in one click. The town itself dogfoods against `the-hand` — a dedicated Arcade demo account, never anyone's personal login; you connect *your own*.
