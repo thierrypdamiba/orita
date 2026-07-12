@@ -24,6 +24,7 @@ from seam_engine.gmail_calendar import run_gmail_calendar_scan
 from seam_engine.ranking import rank
 from seam_engine.scan import (
     XPost,
+    _effective_since,
     coincidence_candidates,
     compute_candidates,
     fetch_github_activity,
@@ -93,14 +94,19 @@ def seam_scan(
     tail of coincidences. Fixes nothing; writes only the scan result."""
     x_posts = load_x_posts_from_ledger()
     account_live_since = min((p.ts for p in x_posts), default=datetime.now(timezone.utc))
-    since = datetime.now(timezone.utc) - timedelta(hours=window_hours)
+    now = datetime.now(timezone.utc)
+    # Reaches back at least to account_live_since, not just window_hours —
+    # same recurring-gap machinery as scan.run_scan (ROADMAP.md #19), so the
+    # live MCP tool and the daily Action never disagree about how far a
+    # still-unannounced gap can recur before it silently ages out of view.
+    since = _effective_since(now, window_hours, account_live_since)
     events = fetch_github_activity(owner, repo, since)
     surfaced, excluded = compute_candidates(events, x_posts, account_live_since)
     coincidences = coincidence_candidates(events, x_posts, account_live_since)
     ranking = rank(surfaced + coincidences)
     primary = ranking.primary
     return {
-        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "generated_at": now.isoformat(),
         "repo": f"{owner}/{repo}",
         "window_hours": window_hours,
         "account_live_since": account_live_since.isoformat(),

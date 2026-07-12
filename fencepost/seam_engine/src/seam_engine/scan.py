@@ -16,13 +16,22 @@ Data sources:
   posted — HAND/mortal-sky-log.md — which is itself sourced from real tweet
   URLs. That fallback is used only because no gateway session is attached
   here; it is not a substitute for the live read scope once one is wired up.
+
+Recurring, on purpose (ROADMAP.md #19): `_effective_since` makes `run_scan`
+always reach back at least to `account_live_since`, never merely the last
+`window_hours`. A milestone commit stays a live candidate for as long as it
+remains genuinely unannounced — the daily cadence does not depend on
+something milestone-worthy happening to land inside a rolling window; it
+depends only on whether the town has actually announced its own work yet.
+That is the machinery, not a promise: some days still clear no gap, honestly
+(report.py's own quiet-day branch), because Ogun's law forbids inventing one.
 """
 from __future__ import annotations
 
 import json
 import re
 from dataclasses import asdict, dataclass, field
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 
@@ -296,6 +305,26 @@ def coincidence_candidates(
     return out
 
 
+def _effective_since(now: datetime, window_hours: int, account_live_since: datetime) -> datetime:
+    """How far back the scan actually reaches for GitHub commits (ROADMAP.md
+    #19 — the recurring-gap machinery that keeps the daily cadence sustainable).
+
+    `window_hours` is a floor on freshness, never a ceiling that lets a
+    still-open gap quietly fall out of view. A milestone commit that shipped
+    the day the account went live and has never been announced is exactly as
+    real a gap today as it was that day — so the scan always reaches back at
+    least to `account_live_since`, never merely the last `window_hours`.
+    Without this, a quiet 24h window would let genuinely still-unannounced
+    work age out of the scan's sight one day at a time; that is not the
+    confidence bar failing, it is the scan simply not looking anymore. This
+    is what makes the same honest gap recur, day after day, until an X post
+    actually closes it — rather than the report going silent the moment the
+    rolling window drifts past whatever caused it.
+    """
+    rolling = now - timedelta(hours=window_hours)
+    return min(rolling, account_live_since)
+
+
 def run_scan(owner: str, repo: str, window_hours: int = 24) -> dict[str, Any]:
     from seam_engine.ranking import rank
 
@@ -304,8 +333,8 @@ def run_scan(owner: str, repo: str, window_hours: int = 24) -> dict[str, Any]:
     if account_live_since is None:
         account_live_since = datetime.now(timezone.utc)
 
-    from datetime import timedelta
-    since = datetime.now(timezone.utc) - timedelta(hours=window_hours)
+    now = datetime.now(timezone.utc)
+    since = _effective_since(now, window_hours, account_live_since)
 
     events = fetch_github_activity(owner, repo, since)
     surfaced, excluded = compute_candidates(events, x_posts, account_live_since)
@@ -315,7 +344,7 @@ def run_scan(owner: str, repo: str, window_hours: int = 24) -> dict[str, Any]:
     primary = ranking.primary
 
     return {
-        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "generated_at": now.isoformat(),
         "repo": f"{owner}/{repo}",
         "window_hours": window_hours,
         "account_live_since": account_live_since.isoformat(),
