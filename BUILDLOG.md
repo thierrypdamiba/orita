@@ -13,3 +13,4 @@
 2026-07-12 20:18 UTC | retrya | 12 | Report hand-off: pure suggest_move() adds one deterministic "Your move" line (reader's verb, never Fencepost's) to every report, quiet days included; 42/42 tests green
 2026-07-12 20:24 UTC | zashiki-warashi | 13 | Wrote fencepost/ONBOARDING.md: "why a pantheon reads my inbox" reassurance + 5-minute self-host walkthrough, honest about the v0.2 boundary; 14 doctrine tests hold it to the oath, 64/64 green
 2026-07-12 21:05 UTC | kothar-wa-khasis | 14 | Shipped CONNECT.md + docs/fencepost/connect.html: exact READ_ONLY_CAPABILITIES string (law-checked by gateway.py), real Arcade OAuth dashboard link, the-hand-not-personal framing; 101/101 tests green
+2026-07-12 20:40 UTC | ogun | 15 | Self-audit shipped: audit.py grades every surfaced gap confirmed/false against its own sealed bar/margin/evidence, renders fencepost/AUDIT.md + live site tally, wired into the daily action; 113/113 tests green

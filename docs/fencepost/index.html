@@ -42,6 +42,21 @@
   </section>
 
   <section class="prose">
+    <h2>The self-audit — the true-positive tally</h2>
+    <p>False positives are the whole ballgame (Ògún's law). Every gap this town has ever named is graded
+    here against the law and evidence it was sealed with — not once, quietly, but in the open, every day.
+    A report ships only if its one gap clears the confidence bar; this tally is the honest record of whether
+    it should have.</p>
+    <div class="audit-tally" id="audit-tally">
+      <div class="stat confirmed"><div class="n" id="audit-confirmed">—</div><div class="label">confirmed</div></div>
+      <div class="stat false"><div class="n" id="audit-false">—</div><div class="label">false</div></div>
+      <div class="stat rate"><div class="n" id="audit-rate">—</div><div class="label">true-positive rate</div></div>
+    </div>
+    <div class="overflow"><table class="verdicts audit" id="audit-table"></table></div>
+    <p><a href="https://github.com/thierrypdamiba/orita/blob/main/fencepost/AUDIT.md">the full self-audit, on record →</a></p>
+  </section>
+
+  <section class="prose">
     <h2>Why the wall never reaches zero</h2>
     <p>Every scan resolves every gap it can find, except one. That one stays named,
     dated, and public. The counter above is honest arithmetic, not a bug: it is
@@ -98,5 +113,43 @@
     })
     .catch(function () {
       document.getElementById('report').textContent = 'No report sealed yet. The scan has not run.';
+    });
+
+  fetch('https://raw.githubusercontent.com/thierrypdamiba/orita/main/fencepost/AUDIT.md')
+    .then(function (r) { return r.ok ? r.text() : Promise.reject(); })
+    .then(function (text) {
+      var m = text.match(/Tally:\s*(\d+)\s*confirmed,\s*(\d+)\s*false,\s*\d+\s*audited\.\s*True-positive rate:\s*(\d+)%/i);
+      if (m) {
+        document.getElementById('audit-confirmed').textContent = m[1];
+        document.getElementById('audit-false').textContent = m[2];
+        document.getElementById('audit-rate').textContent = m[3] + '%';
+      } else {
+        document.getElementById('audit-confirmed').textContent = '0';
+        document.getElementById('audit-false').textContent = '0';
+        document.getElementById('audit-rate').textContent = '—';
+      }
+
+      var rows = text.split('\n').filter(function (l) {
+        return l.indexOf('|') === 0 && l.indexOf('date') === -1 && l.indexOf('--|--') === -1;
+      });
+      var table = document.getElementById('audit-table');
+      var html = '<tr><th>date</th><th>gap</th><th>confidence</th><th>verdict</th></tr>';
+      rows.forEach(function (row) {
+        // row: "| date | entry | gap | confidence | verdict | reason |"
+        // split on '|' -> ['', date, entry, gap, confidence, verdict, reason, '']
+        var parts = row.split('|').map(function (c) { return c.trim(); });
+        // parts[0] is '' (before leading |), parts[6] is '' (after trailing |)
+        if (parts.length < 7) { return; }
+        var date = esc(parts[1]), gap = esc(parts[3]), confidence = esc(parts[4]), verdict = esc(parts[5]);
+        var cls = verdict === 'CONFIRMED' ? 'v-confirmed' : 'v-false';
+        html += '<tr><td>' + date + '</td><td>' + gap + '</td><td>' + confidence + '</td><td class="' + cls + '">' + verdict + '</td></tr>';
+      });
+      table.innerHTML = html;
+    })
+    .catch(function () {
+      document.getElementById('audit-confirmed').textContent = '0';
+      document.getElementById('audit-false').textContent = '0';
+      document.getElementById('audit-rate').textContent = '—';
+      document.getElementById('audit-table').innerHTML = '<tr><td>No self-audit sealed yet.</td></tr>';
     });
 </script>

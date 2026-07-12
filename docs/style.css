@@ -90,4 +90,13 @@ table.verdicts { width: 100%; border-collapse: collapse; margin: 1.5rem 0; font-
 table.verdicts th, table.verdicts td { text-align: left; padding: 0.6rem 0.75rem; border-bottom: 1px solid var(--line); vertical-align: top; }
 table.verdicts th { color: var(--dim); font-weight: normal; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.12em; }
 .overflow { overflow-x: auto; }
+
+.audit-tally { display: flex; gap: 2.5rem; justify-content: center; flex-wrap: wrap; text-align: center; margin: 1.25rem 0 1.75rem; }
+.audit-tally .stat .n { font-family: ui-monospace, Menlo, monospace; font-size: 1.9rem; }
+.audit-tally .stat .label { color: var(--dim); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; margin-top: 0.2rem; }
+.audit-tally .stat.confirmed .n { color: var(--nisaba); }
+.audit-tally .stat.false .n { color: var(--ogun); }
+.audit-tally .stat.rate .n { color: var(--gold); }
+table.audit td.v-confirmed { color: var(--nisaba); }
+table.audit td.v-false { color: var(--ogun); }
 @media (max-width: 560px) { .shrine dl { grid-template-columns: 1fr; gap: 0.1rem; } .shrine dt { margin-top: 0.6rem; } }

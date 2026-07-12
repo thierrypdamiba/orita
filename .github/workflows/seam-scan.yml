@@ -49,12 +49,18 @@ jobs:
           PYTHONPATH: seam_engine/src
         run: python3 -m seam_engine.report --write
 
+      - name: self-audit the tally (Ogun's law — non-blocking, the result is the point)
+        working-directory: fencepost
+        env:
+          PYTHONPATH: seam_engine/src
+        run: python3 -m seam_engine.audit --write || true
+
       - name: commit, if the seam moved
         run: |
           set -euo pipefail
           git config user.name "Off-By-One"
           git config user.email "off-by-one@orita.gods"
-          git add fencepost/candidates fencepost/GAPS fencepost/REPORTS
+          git add fencepost/candidates fencepost/GAPS fencepost/REPORTS fencepost/AUDIT.md
           if git diff --cached --quiet; then
             echo "nothing to seal today — quiet seam, no commit"
             exit 0
