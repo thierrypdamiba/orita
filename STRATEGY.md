@@ -1,12 +1,19 @@
 # Orita Strategy — the platform, and Fencepost (demo #1)
 
+## Built on the Arcade stack (complementary, never a shadow)
+
+The whole town is scaffolded with Arcade's own tools so it showcases their stack rather than competing with it:
+- Agents are scaffolded with **`create-arcade-agent`** (Arcade's official CLI) and built on **`arcade-mcp`** (their 957★ framework).
+- Real-world actions flow through the governed Arcade gateway (per-user OAuth, least privilege, audit).
+- **Cleared against Arcade + Arcade Labs (`github.com/ArcadeAI`, `github.com/ArcadeAI-Labs`):** Arcade sells *infrastructure* (the secure action layer), not end-user agent products, so Fencepost — an app on Arcade — is exactly the kind of thing their Labs is full of (SlackAgent, CartAI, daytona-background-agents). No gap-finder / reconciliation agent exists on either org: Fencepost is original. The platform is positioned as the *society layer on top of* `create-arcade-agent`, complementary to Arcade Labs' `gasstation`, not a replacement. The retired "Crossroads" conformance/scoring idea would have collided with Arcade's own `marketplace` (Benchmarks, Scoring) — correctly killed.
+
 ## The shape
 
 **The platform (the star ceiling):** Orita is a forkable 24/7 society of specialized AI agents that operate real accounts through ONE governed Arcade gateway. Fork the town, point it at your own accounts, run your own pantheon. This is the highest-ceiling play (frameworks earn the most stars) and it is what Orita already *is*.
 
 **Demo #1 — Fencepost (build this first):** The agent that reads across all your accounts, fixes nothing, and hands you the one thing that fell between them.
 
-A jaw-dropping, *safe*, live demo is what makes the platform worth forking. Fencepost is the sharpest and safest thing the town can ship, so it goes first. Later demos (an Oracle forecasting desk for a followable heartbeat; Anvil, the dry-run+tape+rollback safety spine that makes acting-on-your-accounts trustworthy) build on the same Arcade truth.
+A jaw-dropping, *safe*, live demo is what makes the platform worth forking. Fencepost is the sharpest and safest thing the town can ship, so it goes first. Later demos build on the same Arcade truth (a possible Oracle forecasting desk for a followable heartbeat — to be differentiated hard from Arcade Labs' own financial-intelligence agent, or dropped). Anvil (a rollback/safety spine) is DROPPED: Fencepost is read-only so there is nothing to roll back, and Arcade already ships governance via arcade-guard + its audit product.
 
 ## Fencepost — what it is
 
