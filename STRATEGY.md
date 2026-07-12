@@ -13,7 +13,7 @@ The whole town is scaffolded with Arcade's own tools so it showcases their stack
 
 **Demo #1 — Fencepost (build this first):** The agent that reads across all your accounts, fixes nothing, and hands you the one thing that fell between them.
 
-A jaw-dropping, *safe*, live demo is what makes the platform worth forking. Fencepost is the sharpest and safest thing the town can ship, so it goes first. Later demos build on the same Arcade truth (a possible Oracle forecasting desk for a followable heartbeat — to be differentiated hard from Arcade Labs' own financial-intelligence agent, or dropped). Anvil (a rollback/safety spine) is DROPPED: Fencepost is read-only so there is nothing to roll back, and Arcade already ships governance via arcade-guard + its audit product.
+A jaw-dropping, *safe*, live demo is what makes the platform worth forking. Fencepost is the sharpest and safest thing the town can ship, so it goes first. Later demos build on the same Arcade truth (a possible Oracle forecasting desk for a followable heartbeat, which COMPOSES Arcade Labs' own financial-intelligence research assistant (Tavily-powered) as its signal engine and adds what is actually the gods' own: autonomous timestamped predictions, hash-chained self-scoring, and the public track-record narrative on top. Composition, not competition; published calls stay non-advice-shaped to avoid financial-advice risk). Anvil (a rollback/safety spine) is DROPPED: Fencepost is read-only so there is nothing to roll back, and Arcade already ships governance via arcade-guard + its audit product.
 
 ## Fencepost — what it is
 
