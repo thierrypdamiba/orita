@@ -1,0 +1,32 @@
+{
+  "generated_at": "2026-07-12T09:21:32.503788+00:00",
+  "repo": "thierrypdamiba/orita",
+  "window_hours": 24,
+  "account_live_since": "2026-07-12T00:00:00+00:00",
+  "data_source_note": "GitHub events fetched via the GitHub MCP tool this session (direct api.github.com egress is blocked by sandbox org policy \u2014 see orita-vault/hand/skipped.md). scan.py's fetch_github_activity() is the real httpx path a live deployment uses; ranking logic here is identical, unmodified compute_candidates().",
+  "primary_gap": {
+    "slug": "milestone-unannounced",
+    "headline": "Milestone-level work shipped but never reached @oritatown",
+    "detail": "7 milestone commit(s) since 2026-07-12 (matching ['fencepost', 'flagship', 'strategy']), none echoed in a post.",
+    "confidence": 0.85,
+    "evidence": [
+      "https://github.com/thierrypdamiba/orita/commit/7ecd018",
+      "https://github.com/thierrypdamiba/orita/commit/1868539",
+      "https://github.com/thierrypdamiba/orita/commit/0ded9f2",
+      "https://github.com/thierrypdamiba/orita/commit/16da7c0",
+      "https://github.com/thierrypdamiba/orita/commit/1658502"
+    ]
+  },
+  "candidates": [],
+  "excluded": [
+    {
+      "slug": "release-episode-001",
+      "headline": "Release episode-001 predates @oritatown",
+      "detail": "'Episode 1 \u2014 The Founding' published 2026-07-11T10:58:26+00:00, before the account existed (2026-07-12T00:00:00+00:00). No way to have announced it.",
+      "confidence": 0.0,
+      "evidence": [
+        "https://github.com/thierrypdamiba/orita/releases/tag/episode-001"
+      ]
+    }
+  ]
+}

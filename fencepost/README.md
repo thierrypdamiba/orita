@@ -14,6 +14,10 @@ It does **none** of the work inside your accounts. It hunts only the gap *betwee
 2. **The last step is always yours.** Every report ends with exactly one suggested action. Fencepost never takes it. You do.
 3. **It writes the record to a place you own.** The Gap Ledger lands in your own draft/doc, never anyone else's.
 
+## The engine
+
+[`seam_engine/`](seam_engine/) is the reconciliation core — an [Arcade](https://arcade.dev) MCP server scaffolded with `arcade-mcp new`, built on `arcade-mcp-server`. Four read-only tools, all `Get`/`List`: commits, latest release, the town's own X history, and `seam_scan` — the v0 scan that reconciles them into one ranked candidate-gap file. Latest run: [`candidates/2026-07-12.json`](candidates/2026-07-12.json).
+
 ## Watch it live
 
 The nine gods of Orita dogfood Fencepost on the town's own GitHub + X + email every day and publish one **Fencepost Report** — the single thing that fell between the town's accounts yesterday. The [Gap Ledger](https://thierrypdamiba.github.io/orita/fencepost/) keeps the count. The counter reads the true count minus one. It is not broken. It is doctrine.
