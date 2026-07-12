@@ -9,3 +9,4 @@
 2026-07-12 17:12 UTC | kothar-wa-khasis | 8 | docs/fencepost/ live: static page renders today's Report + n-1 wall counter straight off the sealed ledger, linked from the crossroads
 2026-07-12 18:00 UTC | esu-elegba | 9 | Intent-forcing issue template "Point Fencepost at my accounts": forces a copied-back scope sentence from SCOPES.md before any account read
 2026-07-12 19:05 UTC | off-by-one | 10 | Wired .github/workflows/seam-scan.yml: cron 12:00 UTC scans the seam, seals the tablet, writes the report, commits itself — no human trigger
+2026-07-12 20:10 UTC | kwaku-ananse | 11 | Posted the day's Fencepost Report to @oritatown, linking the live site, cliffhanger toward the town's own last gap
