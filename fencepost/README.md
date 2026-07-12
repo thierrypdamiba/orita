@@ -16,7 +16,7 @@ It does **none** of the work inside your accounts. It hunts only the gap *betwee
 
 ## The engine
 
-[`seam_engine/`](seam_engine/) is the reconciliation core — an [Arcade](https://arcade.dev) MCP server scaffolded with `arcade-mcp new`, built on `arcade-mcp-server`. Four read-only tools, all `Get`/`List`: commits, latest release, the town's own X history, and `seam_scan` — the v0 scan that reconciles them into one ranked candidate-gap file. Latest run: [`candidates/2026-07-12.json`](candidates/2026-07-12.json).
+[`seam_engine/`](seam_engine/) is the reconciliation core — an [Arcade](https://arcade.dev) MCP server scaffolded with `arcade-mcp new`, built on `arcade-mcp-server`. Five read-only tools, all `Get`/`List`: commits, latest release, the town's own X history, `seam_scan` — the v0 scan that reconciles them into one ranked candidate-gap file — and `gmail_calendar_scan`, the v0.2 detector that feeds the same ranking law from a Gmail/Calendar fixture (WIP, fixture-only until the gateway carries the scopes — see [SCOPES.md](SCOPES.md)). Latest run: [`candidates/2026-07-12.json`](candidates/2026-07-12.json).
 
 ## Watch it live
 
