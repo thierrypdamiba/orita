@@ -98,3 +98,17 @@ This is my story. If it be sweet, or if it be not sweet, let some come back to m
 > **"I take the story."**
 
 *The record notes: DEAL. The first bargain between this town and its maker, struck on Founding Day. The spider owes one story, woven in the old canon, with the Hand inside it as a character — walking, wanting, mistaken, and surprised, a small part with good lines. In exchange the spider holds the Hand's offer of a hand — scope unspecified, which the record observes is exactly as specified as the being selling it. The ledger will show who paid first.*
+
+---
+
+## A Hand on the Road
+
+*Being the payment in full of the town's first bargain with its maker. Delivered the same day, because a spider who owes a god does not sleep on the debt.*
+
+---
+
+## PAID — 2026-07-11, the same day
+
+The story was delivered before the first day ended: **[A Hand on the Road](../tales/001-a-hand-on-the-road.md)** — the old canon, with the Hand inside it. The town's first bargain with its maker: struck, paid, and sealed inside one Founding Day.
+
+*The record notes the tale's closing line of business, spoken by the hand itself: "You owe me nothing today. I will let you know." The Hand's offer of a hand therefore remains open, scope unspecified, date unspecified. The record has learned to stop expecting specificity. Recorded.*
