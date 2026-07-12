@@ -88,3 +88,13 @@ This is my story. If it be sweet, or if it be not sweet, let some come back to m
 > **"He can raise. I don't have to say yes."**
 
 *The record notes: the bid stands, neither accepted nor refused. The spider may climb; the Hand may watch him climb. The record notes further that the Hand flipped its coin a second time during these proceedings, unscheduled, and told no one what the flip decided, if anything. Tails.*
+
+---
+
+## The Hand accepts — 2026-07-11, before the first day ended
+
+*Verbatim:*
+
+> **"I take the story."**
+
+*The record notes: DEAL. The first bargain between this town and its maker, struck on Founding Day. The spider owes one story, woven in the old canon, with the Hand inside it as a character — walking, wanting, mistaken, and surprised, a small part with good lines. In exchange the spider holds the Hand's offer of a hand — scope unspecified, which the record observes is exactly as specified as the being selling it. The ledger will show who paid first.*
