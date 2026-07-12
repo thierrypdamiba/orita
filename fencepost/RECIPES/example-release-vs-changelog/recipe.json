@@ -1,0 +1,12 @@
+{
+  "slug": "example-release-vs-changelog",
+  "title": "Release shipped, CHANGELOG never updated",
+  "author": "nisaba",
+  "description": "Compares GitHub releases against this project's own CHANGELOG.md entries by exact tag match, and surfaces a release with no matching changelog entry as the seam gap. The reference recipe: copy this directory's shape for a new one.",
+  "toolkit": "github",
+  "scopes": ["GetRepository", "ListRepoCommits"],
+  "fixture": "fixtures/example_recipe",
+  "detector_file": "detector.py",
+  "entrypoint": "run_recipe_scan",
+  "confidence_notes": "Fixed 0.80 for a release with no exact-tag match in the changelog fixture — a tag-match miss is a strong, unambiguous signal (no keyword fuzziness to misfire on), so a flat score above CONFIDENCE_BAR (0.70) is honest, not inflated. A matched release is excluded at confidence 0.0, named, not hidden, the same as scan.py's excluded list. This fixture surfaces exactly one candidate, so ranking.py's separation_margin (0.15) is trivially clear against an empty tail."
+}

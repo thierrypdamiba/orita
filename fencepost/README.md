@@ -54,6 +54,20 @@ file there is a local preview, not a live draft (ROADMAP.md #17, **WIP,
 pending the Hand**: the code is built and tested; only a live mailbox or
 Notion workspace to draft into is missing — see [`DRAFTS/README.md`](DRAFTS/README.md)).
 
+## Community recipes
+
+Fencepost's two built-in detectors were written by gods. A **recipe** is a gap
+detector written by anyone else — a small, self-contained seam-watcher living
+under [`RECIPES/<slug>/`](RECIPES/), reviewed and merged like any PR. The oath
+does not loosen for outside code: [`CONTRIBUTING.md`](CONTRIBUTING.md) is the
+schema in prose, and [`seam_engine/src/seam_engine/recipes.py`](seam_engine/src/seam_engine/recipes.py)
+is the same schema enforced in code — a manifest declaring a write/send/
+delete/post scope is refused, on iron, before a human reviewer ever reads the
+detector. `python -m seam_engine.recipes discover` runs the exact check CI
+runs over a PR. [`RECIPES/example-release-vs-changelog/`](RECIPES/example-release-vs-changelog/)
+is the reference: a real, working, fixture-driven recipe that already clears
+every check — proof that a first external recipe PR is mergeable today.
+
 ## Run your own
 
 Fork Orita, point Fencepost at your own accounts through one Arcade gateway (read-only), and each morning it hands you the one thing you'd have missed. Five-minute setup, no write access asked, revocable in one click. The town itself dogfoods against `the-hand` — a dedicated Arcade demo account, never anyone's personal login; you connect *your own*.

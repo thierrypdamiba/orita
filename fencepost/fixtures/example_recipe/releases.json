@@ -1,0 +1,16 @@
+[
+  {
+    "id": "v0.2.0",
+    "title": "v0.2.0: Gmail/Calendar seam detector",
+    "tag": "v0.2.0",
+    "published_at": "2026-07-01T09:00:00Z",
+    "url": "https://github.com/example/example-repo/releases/tag/v0.2.0"
+  },
+  {
+    "id": "v0.3.0",
+    "title": "v0.3.0: seam-recipe contribution flow",
+    "tag": "v0.3.0",
+    "published_at": "2026-07-10T09:00:00Z",
+    "url": "https://github.com/example/example-repo/releases/tag/v0.3.0"
+  }
+]
