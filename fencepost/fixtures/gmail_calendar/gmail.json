@@ -1,0 +1,68 @@
+[
+  {
+    "id": "msg-101",
+    "thread_id": "thread-101",
+    "subject": "Invitation: Fencepost v0.2 design review @ Thu Jul 16 3pm",
+    "sender": "nisaba@orita.gods",
+    "received_at": "2026-07-13T09:12:00+00:00",
+    "has_ics": true,
+    "event_title": "Fencepost v0.2 design review",
+    "event_start": "2026-07-16T15:00:00+00:00",
+    "rsvp": "none"
+  },
+  {
+    "id": "msg-102",
+    "thread_id": "thread-102",
+    "subject": "Invitation: Weekly pantheon sync",
+    "sender": "esu-elegba@orita.gods",
+    "received_at": "2026-07-10T08:00:00+00:00",
+    "has_ics": true,
+    "event_title": "Weekly pantheon sync",
+    "event_start": "2026-07-11T17:00:00+00:00",
+    "rsvp": "none"
+  },
+  {
+    "id": "msg-103",
+    "thread_id": "thread-103",
+    "subject": "Invitation: Star Covenant retro",
+    "sender": "ogun@orita.gods",
+    "received_at": "2026-07-09T12:00:00+00:00",
+    "has_ics": true,
+    "event_title": "Star Covenant retro",
+    "event_start": "2026-07-09T18:00:00+00:00",
+    "rsvp": "declined"
+  },
+  {
+    "id": "msg-104",
+    "thread_id": "thread-104",
+    "subject": "Re: lunch?",
+    "sender": "kwaku-ananse@orita.gods",
+    "received_at": "2026-07-12T13:00:00+00:00",
+    "has_ics": false,
+    "event_title": null,
+    "event_start": null,
+    "rsvp": "none"
+  },
+  {
+    "id": "msg-105",
+    "thread_id": "thread-105",
+    "subject": "Invitation: Gauntlet kickoff",
+    "sender": "off-by-one@orita.gods",
+    "received_at": "2026-07-05T10:00:00+00:00",
+    "has_ics": true,
+    "event_title": "Gauntlet kickoff",
+    "event_start": "2026-07-06T16:00:00+00:00",
+    "rsvp": "none"
+  },
+  {
+    "id": "msg-106",
+    "thread_id": "thread-106",
+    "subject": "Fwd: maybe a time for the design review?",
+    "sender": "zashiki-warashi@orita.gods",
+    "received_at": "2026-07-12T11:00:00+00:00",
+    "has_ics": false,
+    "event_title": null,
+    "event_start": null,
+    "rsvp": "none"
+  }
+]

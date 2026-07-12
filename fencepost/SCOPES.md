@@ -17,6 +17,15 @@ Concretely, on the toolkits in use:
 | Gmail (v0.2) | ListEmails, GetEmail, SearchThreads | SendEmail, CreateDraft*, Trash*, Modify* |
 | Google Calendar (v0.2) | ListEvents, GetEvent | CreateEvent, UpdateEvent, DeleteEvent |
 
+**WIP note (ROADMAP.md #16):** the-hand gateway does not yet carry the Gmail/Calendar
+rows above, and no demo Gmail/Calendar account is connected. The detector
+(`seam_engine/src/seam_engine/gmail_calendar.py`) is built and tested against a
+fixture that is shaped exactly like what those two read-only tools would
+return (`fencepost/fixtures/gmail_calendar/`) — the same list/read scopes
+this table promises, held to it in advance. It goes live only after the Hand
+runs `Arcade_ModifyGateway` to add the scopes; the detection logic does not
+change when it does.
+
 ## The oath
 
 1. **Zero write scopes.** Fencepost requests no capability that can send, post, create, modify, or delete anything, on any account, ever. If a tool can change the world, Fencepost does not hold it.

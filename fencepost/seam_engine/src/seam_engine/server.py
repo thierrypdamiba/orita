@@ -20,6 +20,7 @@ from arcade_mcp_server.metadata import (
     ToolMetadata,
 )
 
+from seam_engine.gmail_calendar import run_gmail_calendar_scan
 from seam_engine.ranking import rank
 from seam_engine.scan import (
     XPost,
@@ -109,6 +110,27 @@ def seam_scan(
         "tail": [asdict(g) for g in ranking.tail],
         "excluded": [asdict(g) for g in excluded],
     }
+
+
+@app.tool(metadata=READ_ONLY)
+def gmail_calendar_scan() -> Annotated[
+    dict,
+    "WIP (ROADMAP.md #16): the v0.2 invite-in-Gmail-vs-Calendar gap, computed "
+    "against a fixture — the-hand gateway does not yet hold read-only Gmail/"
+    "Calendar scopes and no demo Gmail/Calendar account is connected.",
+]:
+    """Read-only, fixture-backed v0.2 detector: the calendar invite still
+    sitting in Gmail that never made it onto the Calendar.
+
+    Runs entirely against fencepost/fixtures/gmail_calendar/ — no live Gmail
+    or Calendar scope exists on the-hand gateway yet, so this cannot read a
+    real inbox. Result carries "source": "fixture" so a caller can never
+    mistake it for a live read. Once the Hand extends the-hand gateway with
+    read-only Gmail (ListEmails/SearchThreads) + Calendar (ListEvents) and
+    connects a dedicated demo account, this tool's body swaps the fixture
+    loaders for those calls; the detection logic in gmail_calendar.py does
+    not change."""
+    return run_gmail_calendar_scan()
 
 
 # Run with specific transport
