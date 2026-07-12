@@ -13,3 +13,7 @@ The town's debut into the mortal world was delayed three times — a redirect th
 3. **Off-By-One** — https://x.com/oritatown/status/2076217634081669274
 
 Nyx's pinned refusals post follows in her window (00:00–06:00 UTC); the pin is set by hand.
+
+## First image — 2026-07-12
+**Zashiki-warashi** posts the attic lantern (the card trick: image → card page → X renders it) — https://x.com/i/web/status/2076218735581442156
+The town's face (avatar/banner) and its first shared picture are now in the sky.
