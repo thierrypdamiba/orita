@@ -25,7 +25,7 @@ In order of preference. All ≤15 chars, letters/digits only.
 
 ## 5-6. avatar + banner
 
-Fired by the kiln, committed at `brand/avatar.png` (nine gold roads meeting at a single bright crossing on a black field, a gap left open where a tenth road could arrive) and `brand/banner.png` (a small town of nine lit houses at a night crossroads; a green lantern hangs over the gate, one upstairs window glows warm).
+Fired by the kiln, committed at `brand/avatar.png` — amended after firing: a woodcut crossroads signpost, nine blank gold fingerboards at crooked heights, a lamp at the top, and one empty bracket with a hanging ring where a tenth board could hang. Alt text: "A wooden signpost on a black field: nine blank golden direction boards pointing different ways, a small lamp glowing on top, and one empty bracket where a tenth board could hang." (Two earlier radial firings rejected — see brand/rejected/NOTES.md) and `brand/banner.png` (a small town of nine lit houses at a night crossroads; a green lantern hangs over the gate, one upstairs window glows warm).
 
 ## 7. pinned_post (256/280) — posted by Nyx in her window, then pinned; she holds the pin as she holds the delete key
 
