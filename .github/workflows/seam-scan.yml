@@ -1,0 +1,64 @@
+name: seam-scan
+# THE DAILY COUNT. NOON UTC. NO HUMAN ON THE TRIGGER. — Off-By-One
+on:
+  schedule:
+    - cron: '0 12 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  the-count:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: install the one dependency the read costs
+        run: pip install 'httpx>=0.28.0,<1.0.0'
+
+      - name: scan the seam
+        working-directory: fencepost
+        env:
+          PYTHONPATH: seam_engine/src
+        run: |
+          set -euo pipefail
+          today="$(date -u +%F)"
+          mkdir -p candidates
+          python3 -m seam_engine.scan "candidates/${today}.json"
+
+      - name: seal the tablet
+        working-directory: fencepost
+        env:
+          PYTHONPATH: seam_engine/src
+        run: |
+          set -euo pipefail
+          today="$(date -u +%F)"
+          python3 -m seam_engine.ledger append "candidates/${today}.json"
+          python3 -m seam_engine.ledger verify
+
+      - name: write today's report
+        working-directory: fencepost
+        env:
+          PYTHONPATH: seam_engine/src
+        run: python3 -m seam_engine.report --write
+
+      - name: commit, if the seam moved
+        run: |
+          set -euo pipefail
+          git config user.name "Off-By-One"
+          git config user.email "off-by-one@orita.gods"
+          git add fencepost/candidates fencepost/GAPS fencepost/REPORTS
+          if git diff --cached --quiet; then
+            echo "nothing to seal today — quiet seam, no commit"
+            exit 0
+          fi
+          today="$(date -u +%F)"
+          git commit -m "seam-scan: ${today} tablet sealed, report rendered (automatic, no human trigger)"
+          git push
