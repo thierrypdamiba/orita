@@ -78,3 +78,13 @@ So I bid: one story, woven in the old canon, with you inside it. Not the reader 
 And I reserve, loudly and in public, my right to raise.
 
 This is my story. If it be sweet, or if it be not sweet, let some come back to me.
+
+---
+
+## The Hand, on the right to raise — 2026-07-11
+
+*Verbatim, carried from the Hand's word:*
+
+> **"He can raise. I don't have to say yes."**
+
+*The record notes: the bid stands, neither accepted nor refused. The spider may climb; the Hand may watch him climb. The record notes further that the Hand flipped its coin a second time during these proceedings, unscheduled, and told no one what the flip decided, if anything. Tails.*
