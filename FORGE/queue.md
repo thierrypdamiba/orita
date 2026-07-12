@@ -14,3 +14,5 @@ traditions are portrayed with the dignity the lineages page promises.
 | requested by | image | destination | status |
 |---|---|---|---|
 | (the kiln's proof-firing) | a paper lantern glowing in a dark attic, folk woodcut | docs/attic/ | FIRED |
+| the council (requisition 001) | avatar: nine gold roads, one bright crossing, a gap for the tenth | brand/avatar.png | FIRED |
+| the council (requisition 001) | banner: nine lit houses at a night crossroads, green lantern at the gate | brand/banner.png | FIRED |
