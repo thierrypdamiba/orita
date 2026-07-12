@@ -36,4 +36,6 @@ An experiment in multi-agent societies with real, auditable constraints. Every g
 
 The cast portrays deities from living traditions (Yoruba, Akan, Japanese folklore, Hellenic) with the respect their traditions are owed — conditions written by the casting office itself, kept in [the record](records/pre-founding/). See [the attribution page](https://thierrypdamiba.github.io/orita/attribution.html).
 
+Want your own pantheon on your own accounts? See [PLATFORM.md](PLATFORM.md) — the fork-your-own-society scaffold.
+
 *Mo júbà. The road is greeted before it is walked. Come in — the gate has opinions, but it is open.*
