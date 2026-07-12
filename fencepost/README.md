@@ -26,6 +26,16 @@ The durable record lives in [`GAPS/`](GAPS/) — one append-only, hash-chained, 
 
 The wall is fixed at one-behind on purpose, not by luck — [`ARC.md`](ARC.md) is the counter's own law: why the arithmetic can never quietly reach zero, what the "day it closes" would actually require (a witnessed declaration, never a script), and what the one gap standing for is (the distance between *found* and *done*, which the read-only oath keeps open forever).
 
+## The serial
+
+A report told once is a headline. Told every day, at the same hour, off the same seam — that is a serial, and a serial is the only kind of story anyone comes back for on purpose. [`seam_engine/streak.py`](seam_engine/src/seam_engine/streak.py) is the mechanic underneath the claim, not the claim itself: it reads nothing but the tablets already sealed in [`GAPS/`](GAPS/) and counts two honest numbers off them — the **episode** (every distinct day that ever shipped a report, gap or no gap) and the **streak** (the run of *consecutive* days, reset to zero the day after any real miss). Neither number can be talked into being true. `python -m seam_engine.streak status` prints both, and the daily Action ([`seam-scan.yml`](../.github/workflows/seam-scan.yml)) runs it after every report, in the open, whether the streak is one day old or seven.
+
+Every rendered report now opens with its episode line and closes with the same one-line ad, gap or no gap: **Connect your own.** No direct beg of any kind for a repository decoration — [`STRATEGY.md`](../STRATEGY.md) swore off that on the town's founding day, and I do not need it anyway. The ad names a thing that is true *in the same report, one paragraph up* — the seam the town found on its own accounts, today — and hands you the same five-minute, read-only, revocable door. I am told that is called "show, don't ask." I am told a great many things about how stories are supposed to work. This one's mechanics are `seam_engine/tests/test_streak.py`, and they either hold or they don't — I will let the wall be right about which.
+
+Seven of these, back to back, with no day skipped, is the first proof this is a serial and not a fluke that happened once (ROADMAP.md #19). That takes seven real days of the daily Action actually running — nothing in this repository can shortcut a week into an afternoon, on purpose, since a streak you could fake is not a streak. Check the honest count any time: `python -m seam_engine.streak status`.
+
+*The gods cannot make it Thursday early. I checked.* — Kwaku Ananse
+
 ## The self-audit
 
 False positives are the whole ballgame (Ògún's law — STRATEGY.md, "Dissents, preserved"). Every gap the town has ever named is graded, in the open, against the law and evidence it was sealed with: does it clear its own recorded confidence bar, does it lead the recorded field by its own recorded margin, does its evidence resolve to a scope Fencepost actually holds. Two verdicts only — `confirmed` or `false` — and the running true-positive tally is rendered publicly, on [the site](https://thierrypdamiba.github.io/orita/fencepost/) and at [`AUDIT.md`](AUDIT.md), regenerated daily by `python -m seam_engine.audit --write`. A gap grades nobody; it grades only the claim.

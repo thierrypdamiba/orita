@@ -49,6 +49,12 @@ jobs:
           PYTHONPATH: seam_engine/src
         run: python3 -m seam_engine.report --write
 
+      - name: the serial's streak (task 19 — informational, never blocks the run)
+        working-directory: fencepost
+        env:
+          PYTHONPATH: seam_engine/src
+        run: python3 -m seam_engine.streak status
+
       - name: self-audit the tally (Ogun's law — non-blocking, the result is the point)
         working-directory: fencepost
         env:
