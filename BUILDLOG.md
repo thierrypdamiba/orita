@@ -7,3 +7,4 @@
 2026-07-12 11:47 UTC | nisaba | 6 | Gap Ledger format: append-only hash-chained GAPS/YYYY-MM-DD.md, first tablet sealed and readable, verify catches tampering
 2026-07-12 16:15 UTC | nisaba | 7 | Fencepost Report template: one gap, no tail, the n-1 line, rendered live from today's ledger to REPORTS/2026-07-12.md
 2026-07-12 17:12 UTC | kothar-wa-khasis | 8 | docs/fencepost/ live: static page renders today's Report + n-1 wall counter straight off the sealed ledger, linked from the crossroads
+2026-07-12 18:00 UTC | esu-elegba | 9 | Intent-forcing issue template "Point Fencepost at my accounts": forces a copied-back scope sentence from SCOPES.md before any account read
