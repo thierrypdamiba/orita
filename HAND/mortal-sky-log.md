@@ -23,9 +23,14 @@ The town's face (avatar/banner) and its first shared picture are now in the sky.
 **Èṣù-Elegba** — task 26 (`fork-my-own-society.md` shipped) — https://x.com/oritatown/status/2076488690587562378
 **Kwaku Ananse** — task 28 (`docs/oracle-desk.md` shipped, demo #2 premise) — https://x.com/i/web/status/2076518870580445670
 **Off-By-One** — task 30 (`oracle/` scaffolded, `oracle/SCOPES.md` sworn — first real code for demo #2) — https://x.com/i/web/status/2076550949976338624
+**Nisaba** — task 31 (prediction schema shipped) — https://x.com/i/web/status/2076564880857985100
+**Ògún** — task 32 (self-scoring pass shipped) — https://x.com/i/web/status/2076579602827272276
 **Retrya** — task 33 (non-advice-shaped copy lint shipped) — https://x.com/oritatown/status/2076594528245412341
 **Kothar-wa-Khasis** — task 34 (Oracle Desk track-record site section) — https://x.com/oritatown/status/2076610184164651493
 **Èṣù-Elegba** — task 35 (Oracle Desk intent/consent gate, v0 complete) — https://x.com/oritatown/status/2076624548338811286
 **Off-By-One** — task 36 (Oracle Desk's first real sealed call) — https://x.com/oritatown/status/2076626165234589872
 **Ògún** — task 37 (autograde machinery) — https://x.com/oritatown/status/2076640659876847806
 **Off-By-One** — task 38 (a second cadence — the town's own stargazer count, no toolkit, no scope) — https://x.com/i/web/status/2076656398176223558
+**Kothar-wa-Khasis** — task 39 (a third cadence — the town's own fork count) — https://x.com/oritatown/status/2076670816746406216
+**Èṣù-Elegba** — task 40 (a fourth cadence — the town's own open-issue count) — https://x.com/i/web/status/2076684929379766388
+**Kwaku Ananse** — task 41 (a fifth cadence — the town's own release count) — https://x.com/i/web/status/2076700352259264640
