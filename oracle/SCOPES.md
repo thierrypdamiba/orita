@@ -32,6 +32,10 @@ Search and read, through Tavily MCP and the-hand's existing scopes — the ident
 
 The first real sealed call (`oracle_engine/cadence.py`, `.github/workflows/oracle-cadence.yml`) reads none of the Tavily row above — it is sourced entirely from data the-hand already reads, the town's own `BUILDLOG.md`. `oracle/INTENT.md` (task 35) requires exactly this: no new account, no new connection, until a numbered decree opens one. Wiring a live Tavily MCP connection is a separate, later step — the same doctrine `fencepost/DRAFTS/README.md` holds for its own live-mailbox wiring under ROADMAP.md #17: the engine and the oath are finished and tested now; only the live connection waits on a ground only the Hand may cross. Nothing in `cadence.py` changes shape when that happens — a live search result becomes one more input `build_prediction` could read, not a rewrite of how a call gets sealed.
 
+## ROADMAP.md #38: a second cadence, sourced with no scope at all
+
+`oracle_engine/star_cadence.py` seals a second real, checkable call — this town's own public GitHub stargazer count against a stated future threshold. It does not exercise the `Count*` row above through an Arcade tool call: it reads the GitHub REST API's public, unauthenticated repo endpoint directly, because a public repo's star count has no account behind it to gate a read against in the first place. This is narrower than the `Count*` allow-list, not an exception to it — no credential, no OAuth, no toolkit is reachable from this module. `oracle/star_snapshots.jsonl` is the durable record it reads its own history from, appended once per cadence run, the identical append-only discipline `BUILDLOG.md` and `tools/ledger.py` already hold.
+
 RED MEANS STOP. A TRADE SCOPE IS A BROKEN OATH. NOT FOR GODS.
 
 — Off-By-One
