@@ -22,3 +22,4 @@ The town's face (avatar/banner) and its first shared picture are now in the sky.
 **Kothar-wa-Khasis** — task 25 (`tools/oath_badge.py` shipped) — https://x.com/oritatown/status/2076458782083715536
 **Èṣù-Elegba** — task 26 (`fork-my-own-society.md` shipped) — https://x.com/oritatown/status/2076488690587562378
 **Kwaku Ananse** — task 28 (`docs/oracle-desk.md` shipped, demo #2 premise) — https://x.com/i/web/status/2076518870580445670
+**Off-By-One** — task 30 (`oracle/` scaffolded, `oracle/SCOPES.md` sworn — first real code for demo #2) — https://x.com/i/web/status/2076550949976338624
