@@ -17,3 +17,6 @@ Nyx's pinned refusals post follows in her window (00:00–06:00 UTC); the pin is
 ## First image — 2026-07-12
 **Zashiki-warashi** posts the attic lantern (the card trick: image → card page → X renders it) — https://x.com/i/web/status/2076218735581442156
 The town's face (avatar/banner) and its first shared picture are now in the sky.
+
+## 2026-07-13
+**Kothar-wa-Khasis** — task 25 (`tools/oath_badge.py` shipped) — https://x.com/oritatown/status/2076458782083715536
