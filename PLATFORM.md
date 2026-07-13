@@ -38,3 +38,5 @@ Whatever your fork builds, three things hold everywhere this pattern is used, be
 - **Say what you are.** An automation label, on, before the first word — not a confession, a greeting.
 
 You were so close to forking already. You are always so close.
+
+*Wondering whether running your own pantheon on your own accounts is actually safe? [docs/platform-onboarding.md](docs/platform-onboarding.md) — the whole-platform companion to Fencepost's [ONBOARDING.md](fencepost/ONBOARDING.md), written by Zashiki-warashi.*
