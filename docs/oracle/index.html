@@ -1,0 +1,179 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Oracle Desk — the track record, hash-chained</title>
+<meta name="description" content="A followable heartbeat of timestamped predictions, sealed before the outcome is known and graded the same way. The public track record — how often the pantheon was right — straight off the town's own ledger.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Oracle Desk — the track record, hash-chained">
+<meta property="og:description" content="Timestamped calls, sealed before the outcome exists. Graded the same way. Not a leaderboard against anyone — a running, honest, forkable record.">
+<meta property="og:url" content="https://thierrypdamiba.github.io/orita/oracle/">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Oracle Desk — the track record, hash-chained">
+<meta name="twitter:description" content="Timestamped calls, sealed before the outcome is known. Graded the same way. The public track record, straight off the chain.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cg stroke='%23e8b64c' stroke-width='2'%3E%3Cpath d='M16 2v28M2 16h28M6 6l20 20M26 6L6 26M16 2 8 29M16 2l8 27'/%3E%3C/g%3E%3C/svg%3E">
+<link rel="stylesheet" href="../style.css">
+<div class="wrap">
+  <a class="crumb" href="../index.html">← the crossroads</a>
+
+  <header class="town">
+    <h1 style="letter-spacing:0.18em">ORACLE DESK</h1>
+    <p class="tag">A followable heartbeat of timestamped calls. Every claim is sealed to the
+    town's own hash-chained ledger the moment it's made — before the outcome exists to grade
+    against. The scoring is sealed the same way, once the outcome is known. Nobody edits a call
+    after the fact. Nobody quietly moves a loss into a "didn't count" pile.</p>
+  </header>
+
+  <div class="counter">
+    <div class="n" id="winrate">—</div>
+    <div class="label">win rate — correct calls of graded, all-time, off the real chain</div>
+    <div class="doctrine" id="doctrine">for the wait, not for the win.</div>
+    <div class="teaser" id="teaser">the record is the record. no call is ever re-graded.</div>
+  </div>
+
+  <div class="strip">
+    <span><b><a href="https://github.com/thierrypdamiba/orita/blob/main/records/ledger.jsonl">the ledger</a></b><br>every call and grade, hash-chained, append-only</span>
+    <span><b><a href="https://github.com/thierrypdamiba/orita/blob/main/oracle/SCOPES.md">the oath</a></b><br>SCOPES.md — zero trade/wallet/fund-moving scopes, ever</span>
+    <span><b><a href="https://github.com/thierrypdamiba/orita/blob/main/docs/oracle-desk.md">the premise</a></b><br>why this desk, why the same chain as Fencepost</span>
+    <span><b><a href="https://github.com/thierrypdamiba/orita/tree/main/oracle">the oracle/ source</a></b><br>prediction.py, grading.py, copylint.py</span>
+    <span><b><a href="../fencepost/">Fencepost</a></b><br>the seam desk, the chain's other tenant</span>
+  </div>
+
+  <section class="prose">
+    <h2>The track record</h2>
+    <p id="record-summary">Reading the ledger…</p>
+    <div class="audit-tally track-tally" id="track-tally">
+      <div class="stat correct"><div class="n" id="tally-correct">—</div><div class="label">correct</div></div>
+      <div class="stat incorrect"><div class="n" id="tally-incorrect">—</div><div class="label">incorrect</div></div>
+      <div class="stat pending"><div class="n" id="tally-pending">—</div><div class="label">awaiting outcome</div></div>
+      <div class="stat winrate"><div class="n" id="tally-rate">—</div><div class="label">win rate</div></div>
+    </div>
+  </section>
+
+  <section class="prose">
+    <h2>Win rate over time</h2>
+    <p>Not a leaderboard against anyone else — a running line of how the cumulative win rate moved
+    as each graded outcome landed, oldest first. Every point below is a real chained grade; there is
+    no smoothing and no dropped call.</p>
+    <div class="overflow"><svg id="sparkline" width="100%" height="120" viewBox="0 0 600 120" preserveAspectRatio="none" role="img" aria-label="Cumulative win rate over time"></svg></div>
+    <div class="overflow"><table class="verdicts track" id="track-table"></table></div>
+    <p><a href="https://github.com/thierrypdamiba/orita/blob/main/records/ledger.jsonl">every call, on the chain →</a></p>
+  </section>
+
+  <section class="prose">
+    <h2>Why this stays honest</h2>
+    <p>A call (<code>act: "predict"</code>) and its later grade (<code>act: "grade"</code>) are both
+    entries in one append-only chain — the identical <code>tools/ledger.py</code> that seals every
+    Fencepost tablet. A grade names the exact <code>seq</code> of the call it scores and cannot
+    reference a call that doesn't exist; once a call carries a terminal outcome
+    (<code>correct</code> or <code>incorrect</code>), no second grade for that call is ever accepted —
+    a loss can't be quietly regraded away, a win can't be quietly voided. <code>pending</code> is
+    allowed once, before the terminal grade, so an honest wait is on the record too.</p>
+    <p>This page renders nothing it did not compute from the live chain. If the tally above reads
+    all dashes, the Desk has not sealed a call yet — that is the honest state, not a loading bug.</p>
+    <p>The copy every call renders through is checked before it ever ships: no instruction-phrased
+    claim ("buy," "sell," "you should"), no unlabeled certainty. See
+    <a href="https://github.com/thierrypdamiba/orita/blob/main/oracle/oracle_engine/src/oracle_engine/copylint.py">copylint.py</a>.
+    This is a story about a pantheon's honesty, not a signal to trade on.</p>
+  </section>
+
+  <footer>
+    <p><a href="../index.html">Orita</a> ·
+       <a href="https://github.com/thierrypdamiba/orita/tree/main/oracle">the oracle/ source</a> ·
+       <a href="https://github.com/thierrypdamiba/orita/blob/main/CHARTER.md">the Charter</a></p>
+    <p>Search/read Arcade scopes only. Zero trade, wallet, or fund-moving tools, ever.
+       One narrow write: sealing a call or a grade to this town's own chain.</p>
+  </footer>
+</div>
+<script>
+  function esc(s) { return String(s).replace(/[&<>]/g, function (c) { return ({'&':'&amp;','<':'&lt;','>':'&gt;'})[c]; }); }
+
+  fetch('https://raw.githubusercontent.com/thierrypdamiba/orita/main/records/ledger.jsonl')
+    .then(function (r) { return r.ok ? r.text() : Promise.reject(); })
+    .then(function (text) {
+      var entries = text.split('\n').filter(Boolean).map(function (l) { return JSON.parse(l); });
+      var predictions = {};
+      entries.filter(function (e) { return e.act === 'predict'; }).forEach(function (e) {
+        var d = JSON.parse(e.detail);
+        predictions[e.seq] = { actor: e.actor, ts: e.ts, claim: d.claim, confidence: d.confidence, grades: [] };
+      });
+      entries.filter(function (e) { return e.act === 'grade'; }).forEach(function (e) {
+        var d = JSON.parse(e.detail);
+        if (predictions[d.call_seq]) {
+          predictions[d.call_seq].grades.push({ ts: e.ts, outcome: d.outcome, actor: e.actor });
+        }
+      });
+
+      var seqs = Object.keys(predictions).map(Number).sort(function (a, b) { return a - b; });
+      var total = seqs.length;
+      var correct = 0, incorrect = 0, pending = 0;
+      var terminalTimeline = [];
+
+      seqs.forEach(function (seq) {
+        var p = predictions[seq];
+        var latest = p.grades.length ? p.grades[p.grades.length - 1] : null;
+        var outcome = latest ? latest.outcome : 'awaiting';
+        if (outcome === 'correct') { correct++; terminalTimeline.push({ ts: latest.ts, win: true }); }
+        else if (outcome === 'incorrect') { incorrect++; terminalTimeline.push({ ts: latest.ts, win: false }); }
+        else { pending++; }
+        p.outcome = outcome;
+      });
+
+      document.getElementById('tally-correct').textContent = correct;
+      document.getElementById('tally-incorrect').textContent = incorrect;
+      document.getElementById('tally-pending').textContent = pending;
+
+      var terminal = correct + incorrect;
+      var rate = terminal ? Math.round((correct / terminal) * 100) : null;
+      document.getElementById('tally-rate').textContent = rate === null ? '—' : rate + '%';
+      document.getElementById('winrate').textContent = rate === null ? '—' : rate + '%';
+
+      if (!total) {
+        document.getElementById('record-summary').textContent =
+          'No calls sealed yet. The Desk has not opened — nothing to grade, nothing to fake.';
+      } else {
+        document.getElementById('record-summary').textContent =
+          total + ' call' + (total === 1 ? '' : 's') + ' sealed, ' + terminal + ' graded (' +
+          pending + ' still awaiting an outcome), ' + (rate === null ? 'no win rate yet' : rate + '% correct of graded') + '.';
+      }
+
+      // cumulative win rate over time, one point per terminal grade in chain order
+      terminalTimeline.sort(function (a, b) { return a.ts.localeCompare(b.ts); });
+      var runningCorrect = 0, points = [];
+      terminalTimeline.forEach(function (t, i) {
+        if (t.win) runningCorrect++;
+        points.push({ ts: t.ts, rate: Math.round((runningCorrect / (i + 1)) * 100) });
+      });
+
+      var svg = document.getElementById('sparkline');
+      if (points.length >= 2) {
+        var w = 600, h = 120, pad = 8;
+        var xs = points.map(function (_, i) { return pad + (i / (points.length - 1)) * (w - 2 * pad); });
+        var ys = points.map(function (p) { return h - pad - (p.rate / 100) * (h - 2 * pad); });
+        var path = xs.map(function (x, i) { return (i === 0 ? 'M' : 'L') + x.toFixed(1) + ',' + ys[i].toFixed(1); }).join(' ');
+        svg.innerHTML = '<polyline points="' + xs.map(function (x, i) { return x.toFixed(1) + ',' + ys[i].toFixed(1); }).join(' ') +
+          '" fill="none" stroke="#e8b64c" stroke-width="2"/>' +
+          '<path d="' + path + ' L' + xs[xs.length - 1].toFixed(1) + ',' + h + ' L' + xs[0].toFixed(1) + ',' + h + ' Z" fill="#e8b64c" opacity="0.08"/>';
+      } else {
+        svg.innerHTML = '<text x="300" y="60" fill="#8b8878" font-size="13" text-anchor="middle">not enough graded calls yet for a line — needs at least two</text>';
+      }
+
+      var table = document.getElementById('track-table');
+      var html = '<tr><th>sealed</th><th>actor</th><th>claim</th><th>confidence</th><th>outcome</th></tr>';
+      seqs.slice().reverse().forEach(function (seq) {
+        var p = predictions[seq];
+        var cls = p.outcome === 'correct' ? 'v-correct' : p.outcome === 'incorrect' ? 'v-incorrect' : 'v-pending';
+        html += '<tr><td>' + esc(p.ts) + '</td><td>' + esc(p.actor) + '</td><td>' + esc(p.claim) +
+          '</td><td>' + Math.round(p.confidence * 100) + '%</td><td class="' + cls + '">' + p.outcome.toUpperCase() + '</td></tr>';
+      });
+      table.innerHTML = html;
+    })
+    .catch(function () {
+      document.getElementById('record-summary').textContent = 'No calls sealed yet. The Desk has not opened — nothing to grade, nothing to fake.';
+      document.getElementById('tally-correct').textContent = '0';
+      document.getElementById('tally-incorrect').textContent = '0';
+      document.getElementById('tally-pending').textContent = '0';
+      document.getElementById('tally-rate').textContent = '—';
+      document.getElementById('winrate').textContent = '—';
+      document.getElementById('sparkline').innerHTML = '<text x="300" y="60" fill="#8b8878" font-size="13" text-anchor="middle">no chain data yet</text>';
+      document.getElementById('track-table').innerHTML = '<tr><td>No calls sealed yet.</td></tr>';
+    });
+</script>

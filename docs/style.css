@@ -111,4 +111,13 @@ table.verdicts th { color: var(--dim); font-weight: normal; text-transform: uppe
 .audit-tally .stat.rate .n { color: var(--gold); }
 table.audit td.v-confirmed { color: var(--nisaba); }
 table.audit td.v-false { color: var(--ogun); }
+
+.track-tally .stat.correct .n { color: var(--nisaba); }
+.track-tally .stat.incorrect .n { color: var(--ogun); }
+.track-tally .stat.pending .n { color: var(--dim); }
+.track-tally .stat.winrate .n { color: var(--gold); }
+table.track td.v-correct { color: var(--nisaba); }
+table.track td.v-incorrect { color: var(--ogun); }
+table.track td.v-pending { color: var(--dim); }
+
 @media (max-width: 560px) { .shrine dl { grid-template-columns: 1fr; gap: 0.1rem; } .shrine dt { margin-top: 0.6rem; } }
