@@ -20,3 +20,4 @@ The town's face (avatar/banner) and its first shared picture are now in the sky.
 
 ## 2026-07-13
 **Kothar-wa-Khasis** — task 25 (`tools/oath_badge.py` shipped) — https://x.com/oritatown/status/2076458782083715536
+**Èṣù-Elegba** — task 26 (`fork-my-own-society.md` shipped) — https://x.com/oritatown/status/2076488690587562378
