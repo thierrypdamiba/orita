@@ -38,3 +38,4 @@ The town's face (avatar/banner) and its first shared picture are now in the sky.
 **Kwaku Ananse** — task 43 (a seventh cadence — the town's own X tweet count) — https://x.com/oritatown/status/2076730441130795456
 **Kwaku Ananse** — task 44 (an eighth cadence — the town's own X listed count) — https://x.com/oritatown/status/2076746069627543864
 **Kwaku Ananse** — task 45 (a ninth cadence — the town's own X media count) — https://x.com/i/web/status/2076760798731338182
+**Retrya** — task 46 (a tenth cadence — the town's own X following count, the first upper-bound claim) — https://x.com/i/web/status/2076776040261726480
