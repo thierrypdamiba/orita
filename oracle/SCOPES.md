@@ -28,6 +28,10 @@ Search and read, through Tavily MCP and the-hand's existing scopes — the ident
 3. **The ledger write is bounded on every side.** Only `tools/ledger.py append`, only this town's own chain, only a sealed call or a sealed grade — no destination parameter, no external account, no edit path. The append-only chain itself is the proof (task 31, task 32).
 4. **A live badge proves it, same pattern as Fencepost's.** `tools/oath_badge.py --catalog oracle_engine.server:app` audits the server's own declared tool metadata against `DEFAULT_POLICY` (`read_only=True`, `destructive=False`, `operations=("read",)`) — the same reusable template task 25 built specifically so a second demo wouldn't have to reinvent Ogun's read-only badge from scratch. Green today: 1/1 tools honor the oath, 0 violations.
 
+## ROADMAP.md #36 ships DONE for the town-only cadence above; live Tavily search stays PENDING the Hand
+
+The first real sealed call (`oracle_engine/cadence.py`, `.github/workflows/oracle-cadence.yml`) reads none of the Tavily row above — it is sourced entirely from data the-hand already reads, the town's own `BUILDLOG.md`. `oracle/INTENT.md` (task 35) requires exactly this: no new account, no new connection, until a numbered decree opens one. Wiring a live Tavily MCP connection is a separate, later step — the same doctrine `fencepost/DRAFTS/README.md` holds for its own live-mailbox wiring under ROADMAP.md #17: the engine and the oath are finished and tested now; only the live connection waits on a ground only the Hand may cross. Nothing in `cadence.py` changes shape when that happens — a live search result becomes one more input `build_prediction` could read, not a rewrite of how a call gets sealed.
+
 RED MEANS STOP. A TRADE SCOPE IS A BROKEN OATH. NOT FOR GODS.
 
 — Off-By-One

@@ -1,0 +1,46 @@
+name: oracle-cadence
+# THE FIRST REAL HEARTBEAT. DAILY, 13:00 UTC. NO HUMAN ON THE TRIGGER. — Off-By-One
+on:
+  schedule:
+    - cron: '0 13 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  the-call:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: install the desk's dependencies
+        run: pip install 'httpx>=0.28.0,<1.0.0' 'arcade-mcp-server>=1.17.0,<2.0.0'
+
+      - name: seal one real, timestamped, copylint-clean cadence prediction
+        env:
+          PYTHONPATH: oracle/oracle_engine/src
+        run: python3 -m oracle_engine.cadence
+
+      - name: verify the chain still holds
+        run: python3 tools/ledger.py verify
+
+      - name: commit, if the chain moved
+        run: |
+          set -euo pipefail
+          git config user.name "Off-By-One"
+          git config user.email "off-by-one@orita.gods"
+          git add records/ledger.jsonl
+          if git diff --cached --quiet; then
+            echo "nothing sealed this run — no commit"
+            exit 0
+          fi
+          today="$(date -u +%F)"
+          git commit -m "oracle-cadence: ${today} call sealed (automatic, no human trigger)"
+          git push
