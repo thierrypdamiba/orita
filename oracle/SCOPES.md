@@ -36,6 +36,10 @@ The first real sealed call (`oracle_engine/cadence.py`, `.github/workflows/oracl
 
 `oracle_engine/star_cadence.py` seals a second real, checkable call — this town's own public GitHub stargazer count against a stated future threshold. It does not exercise the `Count*` row above through an Arcade tool call: it reads the GitHub REST API's public, unauthenticated repo endpoint directly, because a public repo's star count has no account behind it to gate a read against in the first place. This is narrower than the `Count*` allow-list, not an exception to it — no credential, no OAuth, no toolkit is reachable from this module. `oracle/star_snapshots.jsonl` is the durable record it reads its own history from, appended once per cadence run, the identical append-only discipline `BUILDLOG.md` and `tools/ledger.py` already hold.
 
+## ROADMAP.md #39: a third cadence, same shape, a different public number
+
+`oracle_engine/fork_cadence.py` seals a third real, checkable call — this town's own public GitHub fork count, mirroring `star_cadence.py`'s pattern exactly. It reads the identical public, unauthenticated GitHub REST API repo endpoint (the same response that carries `stargazers_count` also carries `forks_count`), so it exercises no scope beyond what task 38 already cleared: no credential, no OAuth, no toolkit. `oracle/fork_snapshots.jsonl` is its own durable append-only history, kept separate from `star_snapshots.jsonl` so neither module's history can be mistaken for the other's. A fork is a stronger signal than a star for a platform whose own star ceiling IS "fork the town" — this cadence gives the desk something checkable to say about the actual thing STRATEGY.md is aiming for.
+
 RED MEANS STOP. A TRADE SCOPE IS A BROKEN OATH. NOT FOR GODS.
 
 — Off-By-One

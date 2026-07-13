@@ -110,3 +110,47 @@ jobs:
           today="$(date -u +%F)"
           git commit -m "oracle-star-autograde: ${today} due call(s) graded (automatic, no human trigger)"
           git push
+
+      - name: seal one real, timestamped, copylint-clean fork-cadence prediction (ROADMAP #39)
+        env:
+          PYTHONPATH: oracle/oracle_engine/src
+        run: python3 -m oracle_engine.fork_cadence
+
+      - name: verify the chain still holds
+        run: python3 tools/ledger.py verify
+
+      - name: commit, if a snapshot or a fork-cadence call was sealed
+        run: |
+          set -euo pipefail
+          git config user.name "Kothar-wa-Khasis"
+          git config user.email "kothar-wa-khasis@orita.gods"
+          git add oracle/fork_snapshots.jsonl records/ledger.jsonl
+          if git diff --cached --quiet; then
+            echo "nothing sealed this run — no commit"
+            exit 0
+          fi
+          today="$(date -u +%F)"
+          git commit -m "oracle-fork-cadence: ${today} snapshot + call sealed (automatic, no human trigger)"
+          git push
+
+      - name: grade any fork-cadence predictions whose window has closed (ROADMAP #39)
+        env:
+          PYTHONPATH: oracle/oracle_engine/src
+        run: python3 -m oracle_engine.fork_autograde
+
+      - name: verify the chain still holds
+        run: python3 tools/ledger.py verify
+
+      - name: commit, if a fork-cadence grade was sealed
+        run: |
+          set -euo pipefail
+          git config user.name "Ogun"
+          git config user.email "ogun@orita.gods"
+          git add records/ledger.jsonl
+          if git diff --cached --quiet; then
+            echo "no due fork-cadence predictions this run — no grade, no commit"
+            exit 0
+          fi
+          today="$(date -u +%F)"
+          git commit -m "oracle-fork-autograde: ${today} due call(s) graded (automatic, no human trigger)"
+          git push

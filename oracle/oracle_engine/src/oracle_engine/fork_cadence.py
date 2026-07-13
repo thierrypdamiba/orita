@@ -1,0 +1,191 @@
+"""The Oracle Desk's third real cadence: a checkable claim about the
+town's own public GitHub fork count. (ROADMAP #39)
+
+`star_cadence.py` (task 38) proved a second cadence source needs no new
+scope at all when the number is already public: a repo's stargazer count
+has no account behind it, so the GitHub REST API serves it to anyone. The
+same repo response carries a second such number for free — `forks_count` —
+which is arguably the better signal for the platform story STRATEGY.md
+tells (STRATEGY.md's "star ceiling" is the platform itself: fork the town,
+run your own pantheon). A fork is someone acting, not just approving; this
+module gives the desk something checkable to say about that action without
+touching a single new tool, scope, or credential.
+
+Structurally this mirrors `star_cadence.py` line for line on purpose — two
+independent cadence sources sharing one shape is the point, not a
+missed chance to unify them into one module. A future third or fourth
+source should be able to copy this file's shape again without reading
+either of the other two first.
+"""
+from __future__ import annotations
+
+import datetime
+import json
+import os
+from types import ModuleType
+
+from oracle_engine import copylint, prediction
+
+_ORACLE_ENGINE_ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..")
+_ORACLE_ROOT = os.path.join(_ORACLE_ENGINE_ROOT, "..")
+DEFAULT_SNAPSHOT_PATH = os.path.normpath(os.path.join(_ORACLE_ROOT, "fork_snapshots.jsonl"))
+
+DEFAULT_REPO = "thierrypdamiba/orita"
+DEFAULT_HORIZON_HOURS = 336  # two weeks — forking is a rarer action than starring
+DEFAULT_CONFIDENCE = 0.55
+DEFAULT_ACTOR = "kothar-wa-khasis"
+
+
+class ForkCadenceError(ValueError):
+    """The fork-cadence read or the prediction it produced is not
+    well-formed."""
+
+
+def _default_http_get(url: str) -> dict:
+    import httpx
+
+    resp = httpx.get(url, headers={"Accept": "application/vnd.github+json"}, timeout=10.0)
+    resp.raise_for_status()
+    return resp.json()
+
+
+def fetch_fork_count(repo: str = DEFAULT_REPO, http_get=None) -> int:
+    """The repo's PUBLIC, unauthenticated fork count off the GitHub REST
+    API — read-only by nature, no account, no OAuth, no toolkit. Same
+    pluggable `http_get` shape `star_cadence.fetch_star_count` uses, kept
+    off the real network in tests."""
+    getter = http_get or _default_http_get
+    payload = getter(f"https://api.github.com/repos/{repo}")
+    if "forks_count" not in payload:
+        raise ForkCadenceError(f"malformed GitHub API response: {payload!r}")
+    return int(payload["forks_count"])
+
+
+def load_snapshots(path: str = DEFAULT_SNAPSHOT_PATH) -> list[dict]:
+    """Every well-formed snapshot line, in file order. Read-only: never
+    touches the file, takes its path and hands back plain dicts."""
+    if not os.path.exists(path):
+        return []
+    out = []
+    with open(path, encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if not line:
+                continue
+            out.append(json.loads(line))
+    return out
+
+
+def record_snapshot(count: int, ts: str, path: str = DEFAULT_SNAPSHOT_PATH) -> dict:
+    """Append one `{"ts", "count"}` snapshot. Append-only, mirrors
+    `star_cadence.record_snapshot` and `BUILDLOG.md`'s own discipline — no
+    function in this module rewrites a prior line."""
+    if isinstance(count, bool) or not isinstance(count, int) or count < 0:
+        raise ForkCadenceError("count must be a non-negative integer")
+    entry = {"ts": ts, "count": int(count)}
+    parent = os.path.dirname(path)
+    if parent:
+        os.makedirs(parent, exist_ok=True)
+    with open(path, "a", encoding="utf-8") as f:
+        f.write(json.dumps(entry, sort_keys=True) + "\n")
+    return entry
+
+
+def _parse_ts(ts: str) -> datetime.datetime:
+    dt = datetime.datetime.fromisoformat(ts)
+    if dt.tzinfo is None:
+        dt = dt.replace(tzinfo=datetime.timezone.utc)
+    return dt
+
+
+def fork_count_at_or_before(snapshots: list[dict], when: datetime.datetime) -> int | None:
+    """The most recently recorded count at or before `when`; `None` if no
+    snapshot that early exists yet — never guessed at, never interpolated."""
+    best = None
+    for s in snapshots:
+        ts = _parse_ts(s["ts"])
+        if ts <= when and (best is None or ts > _parse_ts(best["ts"])):
+            best = s
+    return best["count"] if best else None
+
+
+def fork_count_at_or_after(snapshots: list[dict], when: datetime.datetime) -> int | None:
+    """The EARLIEST recorded count at or after `when`; `None` if no
+    snapshot that late has landed yet. The grading-side counterpart to
+    `fork_count_at_or_before`: once a call's window closes, the honest
+    outcome is the first real observation once the window is actually
+    over, not a later one that could quietly wait for a friendlier
+    number."""
+    best = None
+    for s in snapshots:
+        ts = _parse_ts(s["ts"])
+        if ts >= when and (best is None or ts < _parse_ts(best["ts"])):
+            best = s
+    return best["count"] if best else None
+
+
+def build_prediction(
+    now: datetime.datetime,
+    snapshots: list[dict],
+    current_count: int,
+    horizon_hours: int = DEFAULT_HORIZON_HOURS,
+    confidence: float = DEFAULT_CONFIDENCE,
+) -> dict:
+    """One checkable claim about the town's own next window of public
+    forks, plus the confidence sealed alongside it. Pure: reads
+    `snapshots`/`now`/`current_count`, writes nothing, decides nothing
+    about whether to seal it."""
+    if now.tzinfo is None:
+        raise ForkCadenceError("now must be timezone-aware")
+    if isinstance(current_count, bool) or not isinstance(current_count, int) or current_count < 0:
+        raise ForkCadenceError("current_count must be a non-negative integer")
+    baseline_when = now - datetime.timedelta(hours=horizon_hours)
+    baseline = fork_count_at_or_before(snapshots, baseline_when)
+    delta = None if baseline is None else current_count - baseline
+    target = now + datetime.timedelta(hours=horizon_hours)
+    threshold = current_count + 1
+    change_clause = (
+        f", net change over the past {horizon_hours}h: {delta:+d}"
+        if delta is not None
+        else ", no earlier snapshot yet to compare against"
+    )
+    claim = (
+        f"By {target.strftime('%Y-%m-%dT%H:%M:%SZ')}, {DEFAULT_REPO}'s public GitHub "
+        f"fork count will be at least {threshold} "
+        f"(currently {current_count}{change_clause})."
+    )
+    return {"claim": claim, "confidence": float(confidence)}
+
+
+def seal_fork_prediction(
+    now: datetime.datetime,
+    ts: str,
+    current_count: int,
+    actor: str = DEFAULT_ACTOR,
+    snapshots: list[dict] | None = None,
+    ledger_module: ModuleType | None = None,
+    **build_kwargs,
+) -> dict:
+    """Build one fork-cadence prediction and seal it. `now` and `ts` are
+    always passed in by the caller, same discipline every other module on
+    this desk holds everywhere else."""
+    if snapshots is None:
+        snapshots = load_snapshots()
+    payload = build_prediction(now=now, snapshots=snapshots, current_count=current_count, **build_kwargs)
+    copylint.enforce_copy(payload["claim"], payload["confidence"])
+    return prediction.seal_prediction(
+        actor=actor,
+        claim=payload["claim"],
+        confidence=payload["confidence"],
+        ts=ts,
+        ledger_module=ledger_module,
+    )
+
+
+if __name__ == "__main__":
+    _now = datetime.datetime.now(datetime.timezone.utc)
+    _ts = _now.isoformat(timespec="seconds")
+    _count = fetch_fork_count()
+    record_snapshot(_count, _ts)
+    _entry = seal_fork_prediction(now=_now, ts=_ts, current_count=_count)
+    print(_entry["hash"])
