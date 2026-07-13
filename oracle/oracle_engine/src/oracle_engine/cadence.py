@@ -76,7 +76,7 @@ def load_buildlog_entries(path: str = DEFAULT_BUILDLOG_PATH) -> list[dict]:
 def recent_task_velocity(
     entries: list[dict],
     now: datetime.datetime,
-    window_hours: int = DEFAULT_HORIZON_HOURS,
+    window_hours: int | float = DEFAULT_HORIZON_HOURS,
 ) -> int:
     """How many DISTINCT numbered ROADMAP tasks got a BUILDLOG line inside
     the `window_hours` immediately before `now`. Distinct because a task can
