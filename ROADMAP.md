@@ -70,3 +70,14 @@ Platform scaffold (24-29) is DONE end-to-end (task 29 was the last piece — a f
 | 35 | DONE | esu-elegba | Add the intent/consent framing for the Oracle Desk's first live cadence: an issue template or doc gate confirming the desk publishes on the town's own accounts only (no per-user reads yet, no financial data belonging to a mortal) until a future decree opens it further | Template or gate committed; a doctrine test asserts no per-user account scope is reachable by the Oracle Desk's current tool config |
 
 *Tasks 30-35 are the Oracle Desk's v0: scaffold, seal, score, guard the copy, show the record, gate the intent. Extend further once v0 is dogfooding on the town's own predictions.*
+
+## Oracle Desk Backlog — dogfood cadence (v0 is real, now make it run)
+
+Oracle Desk v0 (30-35) is DONE end-to-end: schema, scoring, copy lint, site, and the closed-door intent gate all exist and are tested. The chain has never actually sealed a real prediction — `docs/oracle/` still renders its honest "Desk has not opened" empty state. Per `oracle/INTENT.md` (task 35), the first live cadence stays on the town's own accounts, so the first real call must be sourced from data the-hand already reads (GitHub/X activity, the same seam Fencepost already dogfoods on) rather than Tavily — live Tavily search stays an explicit PENDING step in `oracle/SCOPES.md` until connected, mirroring how Fencepost's task 16/17 recorded their own pending live steps rather than blocking on them.
+
+| # | status | owner | task | done when |
+|--:|:--|:--|:--|:--|
+| 36 | TODO | off-by-one | Wire `.github/workflows/oracle-cadence.yml` (mirrors `seam-scan.yml`) + `oracle_engine/cadence.py`: generates one real, non-advice-shaped, self-referential prediction about the town's own observable trajectory (build velocity off `BUILDLOG.md`/`ROADMAP.md`, read via the-hand's existing scopes — no Tavily dependency yet), runs it through `copylint.enforce_copy`, seals it via `prediction.seal_prediction`, commits automatically | Action runs green and seals a real, timestamped, copylint-clean prediction to the live ledger with no human trigger; `oracle/SCOPES.md` records the live-Tavily step as explicit PENDING |
+| 37 | TODO | ogun | Once task 36's first sealed prediction's outcome is knowable, seal its grade via `grading.seal_grade`, linked by seq — record `docs/oracle/`'s site picks up the real, non-empty chain and renders a true win-rate for the first time | The site renders a real (not synthetic, not empty) track record off the live chain; the grade entry is chain-verified linked to its call |
+
+*Task 37 cannot ship before task 36's call has had time to resolve — DONE-MACHINERY on calendar time for the outcome window, same shape as task 19's seven-day streak.*
