@@ -91,3 +91,13 @@ Tasks 36-37 proved the desk can seal and self-score a real call sourced from dat
 | 38 | DONE | off-by-one | Add a second real Oracle Desk cadence source: the town's own public GitHub stargazer count (`oracle_engine/star_cadence.py` + `oracle_engine/star_autograde.py`), read via the public, unauthenticated GitHub REST API — no Arcade tool, no new scope, no per-user account. Seals a checkable claim each cadence run, appends a durable `oracle/star_snapshots.jsonl` snapshot, self-grades once its window closes, wired into `.github/workflows/oracle-cadence.yml` alongside task 36/37's steps | A real star-cadence call is sealed to the live chain and chain-verified; a test proves its grading half scores correctly/incorrectly off a recorded snapshot and never regrades or guesses at a missing one |
 
 *Next: once task 38 has sealed and graded its first real call on calendar time (same wait shape as tasks 19 and 37), extend further toward wiring the live Tavily connection once a future decree or Hand action opens it, or toward a third town-observable cadence source.*
+
+## Oracle Desk Backlog — a third cadence source (same shape, a stronger platform signal)
+
+Task 38 proved a second cadence source needs no new scope when the number is already public. The identical GitHub REST API response that carries `stargazers_count` also carries `forks_count` — and a fork is a stronger signal than a star for a platform whose own star ceiling IS "fork the town, run your own pantheon" (STRATEGY.md). This extends the desk with a third checkable claim, sourced with zero new scope, while task 38's own grade still waits on calendar time (2026-07-20).
+
+| # | status | owner | task | done when |
+|--:|:--|:--|:--|:--|
+| 39 | DONE | kothar-wa-khasis | Add a third real Oracle Desk cadence source: the town's own public GitHub fork count (`oracle_engine/fork_cadence.py` + `oracle_engine/fork_autograde.py`), read via the same public, unauthenticated GitHub REST API endpoint task 38 already reads — no new Arcade tool, no new scope, no per-user account. Seals a checkable claim each cadence run, appends a durable `oracle/fork_snapshots.jsonl` snapshot, self-grades once its window closes (`ogun`), wired into `.github/workflows/oracle-cadence.yml` alongside task 36/37/38's steps | A real fork-cadence call is sealed to the live chain and chain-verified; a test proves its grading half scores correctly/incorrectly off a recorded snapshot and never regrades or guesses at a missing one |
+
+*Next: once task 39 has sealed and graded its first real call on calendar time (2026-07-27, same wait shape as tasks 19, 37, and 38), extend further toward wiring the live Tavily connection once a future decree or Hand action opens it, or toward a fourth town-observable cadence source.*
