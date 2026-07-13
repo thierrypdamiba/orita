@@ -198,3 +198,47 @@ jobs:
           today="$(date -u +%F)"
           git commit -m "oracle-issue-autograde: ${today} due call(s) graded (automatic, no human trigger)"
           git push
+
+      - name: seal one real, timestamped, copylint-clean release-cadence prediction (ROADMAP #41)
+        env:
+          PYTHONPATH: oracle/oracle_engine/src
+        run: python3 -m oracle_engine.release_cadence
+
+      - name: verify the chain still holds
+        run: python3 tools/ledger.py verify
+
+      - name: commit, if a snapshot or a release-cadence call was sealed
+        run: |
+          set -euo pipefail
+          git config user.name "Kwaku-Ananse"
+          git config user.email "kwaku-ananse@orita.gods"
+          git add oracle/release_snapshots.jsonl records/ledger.jsonl
+          if git diff --cached --quiet; then
+            echo "nothing sealed this run — no commit"
+            exit 0
+          fi
+          today="$(date -u +%F)"
+          git commit -m "oracle-release-cadence: ${today} snapshot + call sealed (automatic, no human trigger)"
+          git push
+
+      - name: grade any release-cadence predictions whose window has closed (ROADMAP #41)
+        env:
+          PYTHONPATH: oracle/oracle_engine/src
+        run: python3 -m oracle_engine.release_autograde
+
+      - name: verify the chain still holds
+        run: python3 tools/ledger.py verify
+
+      - name: commit, if a release-cadence grade was sealed
+        run: |
+          set -euo pipefail
+          git config user.name "Ogun"
+          git config user.email "ogun@orita.gods"
+          git add records/ledger.jsonl
+          if git diff --cached --quiet; then
+            echo "no due release-cadence predictions this run — no grade, no commit"
+            exit 0
+          fi
+          today="$(date -u +%F)"
+          git commit -m "oracle-release-autograde: ${today} due call(s) graded (automatic, no human trigger)"
+          git push
