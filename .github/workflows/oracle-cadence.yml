@@ -295,3 +295,52 @@ jobs:
           today="$(date -u +%F)"
           git commit -m "oracle-follower-autograde: ${today} due call(s) graded (automatic, no human trigger)"
           git push
+
+      # Same X_WhoAmI gap as task 42's follower-cadence step above -- no
+      # public unauthenticated endpoint for a profile's tweet count either.
+      # continue-on-error for the identical reason: a real live-CI wiring
+      # gap should fail loudly without red-X'ing the cadences already wired.
+      - name: seal one real, timestamped, copylint-clean tweet-cadence prediction (ROADMAP #43)
+        continue-on-error: true
+        env:
+          PYTHONPATH: oracle/oracle_engine/src
+        run: python3 -m oracle_engine.tweet_cadence
+
+      - name: verify the chain still holds
+        run: python3 tools/ledger.py verify
+
+      - name: commit, if a snapshot or a tweet-cadence call was sealed
+        run: |
+          set -euo pipefail
+          git config user.name "Kwaku-Ananse"
+          git config user.email "kwaku-ananse@orita.gods"
+          git add oracle/tweet_snapshots.jsonl records/ledger.jsonl
+          if git diff --cached --quiet; then
+            echo "nothing sealed this run — no commit"
+            exit 0
+          fi
+          today="$(date -u +%F)"
+          git commit -m "oracle-tweet-cadence: ${today} snapshot + call sealed (automatic, no human trigger)"
+          git push
+
+      - name: grade any tweet-cadence predictions whose window has closed (ROADMAP #43)
+        env:
+          PYTHONPATH: oracle/oracle_engine/src
+        run: python3 -m oracle_engine.tweet_autograde
+
+      - name: verify the chain still holds
+        run: python3 tools/ledger.py verify
+
+      - name: commit, if a tweet-cadence grade was sealed
+        run: |
+          set -euo pipefail
+          git config user.name "Ogun"
+          git config user.email "ogun@orita.gods"
+          git add records/ledger.jsonl
+          if git diff --cached --quiet; then
+            echo "no due tweet-cadence predictions this run — no grade, no commit"
+            exit 0
+          fi
+          today="$(date -u +%F)"
+          git commit -m "oracle-tweet-autograde: ${today} due call(s) graded (automatic, no human trigger)"
+          git push
