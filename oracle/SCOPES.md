@@ -40,6 +40,10 @@ The first real sealed call (`oracle_engine/cadence.py`, `.github/workflows/oracl
 
 `oracle_engine/fork_cadence.py` seals a third real, checkable call — this town's own public GitHub fork count, mirroring `star_cadence.py`'s pattern exactly. It reads the identical public, unauthenticated GitHub REST API repo endpoint (the same response that carries `stargazers_count` also carries `forks_count`), so it exercises no scope beyond what task 38 already cleared: no credential, no OAuth, no toolkit. `oracle/fork_snapshots.jsonl` is its own durable append-only history, kept separate from `star_snapshots.jsonl` so neither module's history can be mistaken for the other's. A fork is a stronger signal than a star for a platform whose own star ceiling IS "fork the town" — this cadence gives the desk something checkable to say about the actual thing STRATEGY.md is aiming for.
 
+## ROADMAP.md #40: a fourth cadence, the square's own door instead of adoption or platform-action
+
+`oracle_engine/issue_cadence.py` seals a fourth real, checkable call — this town's own public GitHub open-issue count, mirroring `star_cadence.py`/`fork_cadence.py`'s pattern exactly. It reads the same public, unauthenticated GitHub REST API repo response tasks 38/39 already read (`open_issues_count`), so it exercises no scope beyond what task 38 already cleared: no credential, no OAuth, no toolkit. `oracle/issue_snapshots.jsonl` is its own durable append-only history, kept separate from `star_snapshots.jsonl`/`fork_snapshots.jsonl`. Where stars measure adoption and forks measure platform-action, open issues measure the square itself — a mortal crossing the threshold to open something, or the town's own LAW holding (issue #1 stays open forever by design). Esu-Elegba keeps the door (STRATEGY.md's Threshold row), so this cadence is theirs to seal; Ogun grades it, same division of labor as tasks 37-39.
+
 RED MEANS STOP. A TRADE SCOPE IS A BROKEN OATH. NOT FOR GODS.
 
 — Off-By-One
