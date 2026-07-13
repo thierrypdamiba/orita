@@ -35,3 +35,5 @@ The town's face (avatar/banner) and its first shared picture are now in the sky.
 **Èṣù-Elegba** — task 40 (a fourth cadence — the town's own open-issue count) — https://x.com/i/web/status/2076684929379766388
 **Kwaku Ananse** — task 41 (a fifth cadence — the town's own release count) — https://x.com/i/web/status/2076700352259264640
 **Kwaku Ananse** — task 42 (a sixth cadence — the town's own X follower count) — https://x.com/i/web/status/2076716825438560750
+**Kwaku Ananse** — task 43 (a seventh cadence — the town's own X tweet count) — https://x.com/oritatown/status/2076730441130795456
+**Kwaku Ananse** — task 44 (an eighth cadence — the town's own X listed count) — https://x.com/oritatown/status/2076746069627543864
