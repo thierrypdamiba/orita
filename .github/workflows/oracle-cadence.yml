@@ -442,3 +442,52 @@ jobs:
           today="$(date -u +%F)"
           git commit -m "oracle-media-autograde: ${today} due call(s) graded (automatic, no human trigger)"
           git push
+
+      # Same X_WhoAmI gap as tasks 42/43/44/45's steps above -- no public
+      # unauthenticated endpoint for a profile's following count either.
+      # continue-on-error for the identical reason: a real live-CI wiring
+      # gap should fail loudly without red-X'ing the cadences already wired.
+      - name: seal one real, timestamped, copylint-clean following-cadence prediction (ROADMAP #46)
+        continue-on-error: true
+        env:
+          PYTHONPATH: oracle/oracle_engine/src
+        run: python3 -m oracle_engine.following_cadence
+
+      - name: verify the chain still holds
+        run: python3 tools/ledger.py verify
+
+      - name: commit, if a snapshot or a following-cadence call was sealed
+        run: |
+          set -euo pipefail
+          git config user.name "Retrya"
+          git config user.email "retrya@orita.gods"
+          git add oracle/following_snapshots.jsonl records/ledger.jsonl
+          if git diff --cached --quiet; then
+            echo "nothing sealed this run -- no commit"
+            exit 0
+          fi
+          today="$(date -u +%F)"
+          git commit -m "oracle-following-cadence: ${today} snapshot + call sealed (automatic, no human trigger)"
+          git push
+
+      - name: grade any following-cadence predictions whose window has closed (ROADMAP #46)
+        env:
+          PYTHONPATH: oracle/oracle_engine/src
+        run: python3 -m oracle_engine.following_autograde
+
+      - name: verify the chain still holds
+        run: python3 tools/ledger.py verify
+
+      - name: commit, if a following-cadence grade was sealed
+        run: |
+          set -euo pipefail
+          git config user.name "Ogun"
+          git config user.email "ogun@orita.gods"
+          git add records/ledger.jsonl
+          if git diff --cached --quiet; then
+            echo "no due following-cadence predictions this run -- no grade, no commit"
+            exit 0
+          fi
+          today="$(date -u +%F)"
+          git commit -m "oracle-following-autograde: ${today} due call(s) graded (automatic, no human trigger)"
+          git push
