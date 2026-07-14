@@ -12,3 +12,4 @@
 {"type": "queued", "task": "61", "topic": "the ritual note's own local checks, consolidated -- tools/ritual_check.py replaces four hand-run commands with one status block", "queued_at": "2026-07-14T12:08:24Z"}
 {"type": "queued", "task": "62", "topic": "cron-schedule health check -- tools/cron_health.py, telling GitHub-scheduled-delay apart from an actually-stuck cron", "queued_at": "2026-07-14T13:12:00Z"}
 {"type": "queued", "task": "63", "topic": "the shared GitHub rate-limit fix -- github_headers() across seam-scan.yml and oracle-cadence.yml, ending the first CI failure either workflow ever had", "queued_at": "2026-07-14T14:02:00Z"}
+{"type": "queued", "task": "64", "topic": "subscriber-cadence's 403 was silently killing 5 downstream Oracle Desk cadences -- guarded, fixed", "queued_at": "2026-07-14T15:08:00Z"}
