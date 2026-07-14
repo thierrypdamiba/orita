@@ -295,7 +295,10 @@ class RunRitualCheckCase(unittest.TestCase):
         self.assertTrue(result["fencepost_ledger"]["ok"])
         self.assertFalse(result["broken"])
         self.assertIn(result["report"]["status"], ("current", "pending", "stale"))
-        self.assertEqual(set(result["x_recheck"].keys()), {"X_PostTweet", "X_GetUserTweets"})
+        # Task 72: x_recheck now follows x_outage_tracker.TRACKED_TOOLS live,
+        # not a hand-pinned pair -- adding X_WhoAmI there should show up here
+        # without this test having to be told about it a second time.
+        self.assertEqual(set(result["x_recheck"].keys()), set(xot.TRACKED_TOOLS))
 
 
 if __name__ == "__main__":

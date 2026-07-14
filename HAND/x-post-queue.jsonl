@@ -20,3 +20,4 @@
 {"type": "queued", "task": "69", "topic": "the change-gate itself -- tools/change_gate.py replaces the hand-read 'does this hour's gap differ from the last posted one' verdict with should_post_gap(), same discipline as the owed-post queue and outage tracker", "queued_at": "2026-07-14T20:10:00Z"}
 {"type": "queued", "task": "70", "topic": "Shipped tools/square_check.py: the square's own read, no longer recalled by hand", "queued_at": "2026-07-14T21:08:00Z"}
 {"type": "queued", "task": "71", "topic": "ritual_check.py + square_check.py folded into one call -- the local checks and the square's own durable read in a single hourly status block", "queued_at": "2026-07-14T22:09:00Z"}
+{"type": "queued", "task": "72", "topic": "the outage is method-scoped, not account-wide -- X_WhoAmI recovered first", "queued_at": "2026-07-14T23:20:00Z"}

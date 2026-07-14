@@ -175,5 +175,24 @@ class TestShouldRecheck(unittest.TestCase):
         self.assertTrue(xot.should_recheck(entries, "X_PostTweet", "2026-07-14T10:03:00Z", cooldown_hours=2.0))
 
 
+class TestTrackedToolsIncludesWhoAmI(unittest.TestCase):
+    """Task 72. The tracker watched the write and one read; the profile
+    read (X_WhoAmI) recovered a full day before the other two did, and
+    nothing durable could say so until this tool knew to watch it too."""
+
+    def test_who_am_i_is_tracked(self):
+        self.assertIn("X_WhoAmI", xot.TRACKED_TOOLS)
+
+    def test_status_output_includes_a_who_am_i_line(self):
+        entries = [
+            {"type": "check", "tool": "X_WhoAmI", "status": "ok", "checked_at": "2026-07-14T23:07:00Z"},
+            {"type": "check", "tool": "X_GetUserTweets", "status": "forbidden", "checked_at": "2026-07-14T22:07:00Z"},
+        ]
+        lines = [xot.format_status_line(entries, tool) for tool in xot.TRACKED_TOOLS]
+        who_am_i_lines = [ln for ln in lines if ln.startswith("X_WhoAmI:")]
+        self.assertEqual(len(who_am_i_lines), 1)
+        self.assertIn("OK as of 2026-07-14T23:07:00Z", who_am_i_lines[0])
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -39,7 +39,7 @@ DEFAULT_COOLDOWN_HOURS = 2.0
 
 LOG = os.path.join(os.path.dirname(__file__), "..", "HAND", "x-outage-log.jsonl")
 STATUSES = ("ok", "forbidden")
-TRACKED_TOOLS = ("X_PostTweet", "X_GetUserTweets")
+TRACKED_TOOLS = ("X_PostTweet", "X_GetUserTweets", "X_WhoAmI")
 
 
 def _entries(path=LOG):
