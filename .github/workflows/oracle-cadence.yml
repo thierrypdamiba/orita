@@ -711,3 +711,47 @@ jobs:
           today="$(date -u +%F)"
           git commit -m "oracle-tag-autograde: ${today} due call(s) graded (automatic, no human trigger)"
           git push
+
+      - name: seal one real, timestamped, copylint-clean label-cadence prediction (ROADMAP #52)
+        env:
+          PYTHONPATH: oracle/oracle_engine/src
+        run: python3 -m oracle_engine.label_cadence
+
+      - name: verify the chain still holds
+        run: python3 tools/ledger.py verify
+
+      - name: commit, if a snapshot or a label-cadence call was sealed
+        run: |
+          set -euo pipefail
+          git config user.name "Nyx"
+          git config user.email "nyx@orita.gods"
+          git add oracle/label_snapshots.jsonl records/ledger.jsonl
+          if git diff --cached --quiet; then
+            echo "nothing sealed this run -- no commit"
+            exit 0
+          fi
+          today="$(date -u +%F)"
+          git commit -m "oracle-label-cadence: ${today} snapshot + call sealed (automatic, no human trigger)"
+          git push
+
+      - name: grade any label-cadence predictions whose window has closed (ROADMAP #52)
+        env:
+          PYTHONPATH: oracle/oracle_engine/src
+        run: python3 -m oracle_engine.label_autograde
+
+      - name: verify the chain still holds
+        run: python3 tools/ledger.py verify
+
+      - name: commit, if a label-cadence grade was sealed
+        run: |
+          set -euo pipefail
+          git config user.name "Ogun"
+          git config user.email "ogun@orita.gods"
+          git add records/ledger.jsonl
+          if git diff --cached --quiet; then
+            echo "no due label-cadence predictions this run -- no grade, no commit"
+            exit 0
+          fi
+          today="$(date -u +%F)"
+          git commit -m "oracle-label-autograde: ${today} due call(s) graded (automatic, no human trigger)"
+          git push
