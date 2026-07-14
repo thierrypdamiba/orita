@@ -5,3 +5,4 @@
 {"type": "queued", "task": "54", "topic": "open pull-request cadence -- the town's own currently-open PR count", "queued_at": "2026-07-14T05:05:00Z"}
 {"type": "queued", "task": "55", "topic": "the owed-post queue itself -- tools/x_post_queue.py", "queued_at": "2026-07-14T06:20:00Z"}
 {"type": "queued", "task": "56", "topic": "the batched-tweet splitter -- clears a backlog compose_combined_tweet alone rejects", "queued_at": "2026-07-14T07:10:00Z"}
+{"type": "queued", "task": "57", "topic": "durable outage-streak tracking -- tools/x_outage_tracker.py, replacing skipped.md's hand-counted (and already drifted) hours", "queued_at": "2026-07-14T08:10:00Z"}
