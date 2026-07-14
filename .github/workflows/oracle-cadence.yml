@@ -630,7 +630,18 @@ jobs:
           git commit -m "oracle-commit-autograde: ${today} due call(s) graded (automatic, no human trigger)"
           git push
 
+      # ROADMAP #64: this hour's real CI run (2026-07-14T14:44Z, first run
+      # after task 63's GITHUB_TOKEN fix) proved GET /repos/{o}/{r}/subscribers
+      # returns a genuine 403 Forbidden even with an authenticated GITHUB_TOKEN
+      # -- not the rate-limit ceiling task 63 fixed, a different, harder
+      # permission wall on this one endpoint. Unguarded, that crash took the
+      # whole job down with it, silently skipping every cadence step after
+      # it in file order (tag-51, label-52, topic-53, pr-54, workflow-60) --
+      # six sources dark every single day, not just this one. continue-on-error
+      # so the gap fails loudly in the job log without red-X'ing (or blocking)
+      # the cadences already wired after it, same discipline tasks 42-46 hold.
       - name: seal one real, timestamped, copylint-clean subscriber-cadence prediction (ROADMAP #50)
+        continue-on-error: true
         env:
           PYTHONPATH: oracle/oracle_engine/src
         run: python3 -m oracle_engine.subscriber_cadence
