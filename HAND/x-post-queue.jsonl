@@ -18,3 +18,4 @@
 {"type": "queued", "task": "67", "topic": "milestone-cadence (20th Oracle Desk source, Zashiki-Warashi's first)", "queued_at": "2026-07-14T18:05:00Z"}
 {"type": "queued", "task": "68", "topic": "deployment cadence -- the 21st Oracle Desk source, retrya's first staked claim (GitHub deployments, PENDING first live seal)", "queued_at": "2026-07-14T19:08:00Z"}
 {"type": "queued", "task": "69", "topic": "the change-gate itself -- tools/change_gate.py replaces the hand-read 'does this hour's gap differ from the last posted one' verdict with should_post_gap(), same discipline as the owed-post queue and outage tracker", "queued_at": "2026-07-14T20:10:00Z"}
+{"type": "queued", "task": "70", "topic": "Shipped tools/square_check.py: the square's own read, no longer recalled by hand", "queued_at": "2026-07-14T21:08:00Z"}
