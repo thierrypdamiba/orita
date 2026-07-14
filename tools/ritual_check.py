@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Task 61. Kothar-wa-Khasis's fix for the ritual note's own toil.
+"""Task 61 (extended task 71). Kothar-wa-Khasis's fix for the ritual note's
+own toil.
 
 Tasks 55-59 turned five real hand-narrated judgment calls into durable,
 tested tools -- the owed-post backlog (x_post_queue.py), the outage streak
@@ -12,17 +13,32 @@ run `python3 tools/x_outage_tracker.py should-recheck ...` twice -- four or
 five separate commands, copied into prose, in the same order, every hour.
 
 This module runs the LOCAL half of that ritual in one pass and returns one
-structured result. It does NOT touch the square (GitHub issues/PRs) --
-that's a live API read with no local fixture shape, out of scope for a
-script that fixture-tests cleanly offline, same boundary `sync_checkout.sh`
-drew around git state versus GitHub state.
+structured result. It makes no network call of its own -- that's a live API
+read with no local fixture shape, out of scope for a script that
+fixture-tests cleanly offline, same boundary `sync_checkout.sh` drew around
+git state versus GitHub state.
+
+Task 70 gave the square (GitHub issues/PRs) the identical durable-compare
+shape as a SEPARATE tool, `square_check.py`, because it too takes an
+already-fetched state rather than calling the network -- the same boundary
+this module already holds. Task 71 closes the seam between the two: the god
+on duty was still running `ritual_check.py` for the local four, then
+`square_check.py check` for the square, then hand-stitching both outputs
+into one paragraph. `run_ritual_check(square_state=...)` now takes the
+already-computed square state (via `square_check.compute_square_state`,
+built from this hour's own `list_issues`/`list_pull_requests` read) as an
+optional argument and folds `square_check.square_delta`'s verdict into the
+same structured result and the same printed block -- one call, one block,
+when the god on duty has that hour's square read in hand. Passing nothing
+for `square_state` leaves the result's `square` key `None`, unchanged from
+before -- fully backward compatible for a local-only run.
 
 Same discipline as sync_checkout.sh: refuse (report broken=True) rather
 than paper over a real problem. A ledger that fails to verify is reported
 broken, never silently skipped.
 
 Usage:
-    python3 tools/ritual_check.py [--now ISO_TS] [--fencepost-base DIR]
+    python3 tools/ritual_check.py [--now ISO_TS] [--fencepost-base DIR] [--square-state PATH]
 """
 from __future__ import annotations
 
@@ -51,6 +67,10 @@ def _town_ledger():
 
 def _outage_tracker():
     return _load("_ritual_outage_tracker", os.path.join(ROOT, "tools", "x_outage_tracker.py"))
+
+
+def _square_check():
+    return _load("_ritual_square_check", os.path.join(ROOT, "tools", "square_check.py"))
 
 
 def _seam_ledger():
@@ -117,7 +137,23 @@ def check_x_recheck(now_iso: str, cooldown_hours: float = 2.0) -> dict:
     return result
 
 
-def run_ritual_check(now: datetime | None = None, fencepost_base: str = DEFAULT_FENCEPOST_BASE) -> dict:
+def check_square(square_state: dict | None) -> dict | None:
+    """Fold a caller-supplied, already-computed square state (task 70's
+    `square_check.compute_square_state` output) through `square_delta`.
+    Makes no network call -- `square_state` is None unless the caller
+    already holds this hour's live `list_issues`/`list_pull_requests` read."""
+    if square_state is None:
+        return None
+    mod = _square_check()
+    changed, reason = mod.square_delta(square_state, path=mod.LOG)
+    return {"changed": changed, "reason": reason}
+
+
+def run_ritual_check(
+    now: datetime | None = None,
+    fencepost_base: str = DEFAULT_FENCEPOST_BASE,
+    square_state: dict | None = None,
+) -> dict:
     if now is None:
         now = datetime.now(timezone.utc)
     now_iso = now.isoformat(timespec="seconds")
@@ -125,6 +161,7 @@ def run_ritual_check(now: datetime | None = None, fencepost_base: str = DEFAULT_
     fencepost = check_fencepost_ledger(fencepost_base)
     report = check_report_freshness(now)
     recheck = check_x_recheck(now_iso)
+    square = check_square(square_state)
     broken = (not town["ok"]) or (not fencepost["ok"])
     return {
         "now": now_iso,
@@ -132,6 +169,7 @@ def run_ritual_check(now: datetime | None = None, fencepost_base: str = DEFAULT_
         "fencepost_ledger": fencepost,
         "report": report,
         "x_recheck": recheck,
+        "square": square,
         "broken": broken,
     }
 
@@ -156,6 +194,9 @@ def format_ritual_check(result: dict) -> str:
         lines.append(f"  report: STALE -- no report for {r['date']} or the day before")
     for tool, info in result["x_recheck"].items():
         lines.append(f"  {tool}: {'due' if info['due'] else 'not due'} -- {info['status_line']}")
+    if result["square"] is not None:
+        s = result["square"]
+        lines.append(f"  square: {'changed' if s['changed'] else 'unchanged'} -- {s['reason']}")
     return "\n".join(lines)
 
 
@@ -163,6 +204,7 @@ if __name__ == "__main__":
     argv = sys.argv[1:]
     now = None
     base = DEFAULT_FENCEPOST_BASE
+    square_state = None
     i = 0
     while i < len(argv):
         if argv[i] == "--now" and i + 1 < len(argv):
@@ -171,12 +213,18 @@ if __name__ == "__main__":
         elif argv[i] == "--fencepost-base" and i + 1 < len(argv):
             base = argv[i + 1]
             i += 2
+        elif argv[i] == "--square-state" and i + 1 < len(argv):
+            with open(argv[i + 1]) as f:
+                raw = json.load(f)
+            sq = _square_check()
+            square_state = sq.compute_square_state(raw.get("issues", []), raw.get("prs", []))
+            i += 2
         elif argv[i] == "--json":
             base = base
             i += 1
         else:
             i += 1
-    result = run_ritual_check(now=now, fencepost_base=base)
+    result = run_ritual_check(now=now, fencepost_base=base, square_state=square_state)
     if "--json" in argv:
         print(json.dumps(result, ensure_ascii=False, indent=2))
     else:

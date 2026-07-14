@@ -195,6 +195,79 @@ class XRecheckCase(unittest.TestCase):
         return result
 
 
+class SquareFoldCase(unittest.TestCase):
+    """Task 71: run_ritual_check(square_state=...) folds square_check.py's
+    durable comparison into the same structured result, without either tool
+    making a network call of its own."""
+
+    def setUp(self):
+        self.tmpdir = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.tmpdir, ignore_errors=True)
+        self.sq = _load(f"_test_ritual_square_check_{id(self)}", os.path.join(ROOT, "tools", "square_check.py"))
+        self.sq.LOG = os.path.join(self.tmpdir, "square-check-log.jsonl")
+        # rc.check_square loads its own fresh copy of square_check.py via
+        # _load(), so point rc at the same module instance/log for this test,
+        # restoring the original loader after so other tests are unaffected.
+        original_loader = rc._square_check
+        rc._square_check = lambda: self.sq
+        self.addCleanup(setattr, rc, "_square_check", original_loader)
+
+    def test_no_square_state_is_none(self):
+        self.assertIsNone(rc.check_square(None))
+
+    def test_first_check_is_changed(self):
+        state = self.sq.compute_square_state(
+            [{"number": 1, "updated_at": "2026-07-12T06:43:35Z"}], []
+        )
+        result = rc.check_square(state)
+        self.assertTrue(result["changed"])
+        self.assertIn("no prior square check recorded", result["reason"])
+
+    def test_unchanged_after_recording(self):
+        state = self.sq.compute_square_state(
+            [{"number": 1, "updated_at": "2026-07-12T06:43:35Z"}], []
+        )
+        self.sq.record_square_check(state, "2026-07-14T21:00:00Z", path=self.sq.LOG)
+        result = rc.check_square(state)
+        self.assertFalse(result["changed"])
+        self.assertIn("unchanged since", result["reason"])
+
+    def test_new_issue_is_changed(self):
+        old = self.sq.compute_square_state(
+            [{"number": 1, "updated_at": "2026-07-12T06:43:35Z"}], []
+        )
+        self.sq.record_square_check(old, "2026-07-14T21:00:00Z", path=self.sq.LOG)
+        new = self.sq.compute_square_state(
+            [
+                {"number": 1, "updated_at": "2026-07-12T06:43:35Z"},
+                {"number": 6, "updated_at": "2026-07-14T22:00:00Z"},
+            ],
+            [],
+        )
+        result = rc.check_square(new)
+        self.assertTrue(result["changed"])
+
+    def test_run_ritual_check_folds_square_key(self):
+        state = self.sq.compute_square_state(
+            [{"number": 1, "updated_at": "2026-07-12T06:43:35Z"}], []
+        )
+        result = rc.run_ritual_check(square_state=state)
+        self.assertIsNotNone(result["square"])
+        self.assertIn("changed", result["square"])
+
+    def test_run_ritual_check_square_none_when_omitted(self):
+        result = rc.run_ritual_check()
+        self.assertIsNone(result["square"])
+
+    def test_format_includes_square_line_only_when_present(self):
+        with_square = rc.format_ritual_check(
+            {**rc.run_ritual_check(), "square": {"changed": False, "reason": "unchanged since X"}}
+        )
+        self.assertIn("square: unchanged -- unchanged since X", with_square)
+        without_square = rc.format_ritual_check(rc.run_ritual_check())
+        self.assertNotIn("square:", without_square)
+
+
 class RunRitualCheckCase(unittest.TestCase):
     """End-to-end: broken=True iff either ledger is broken, regardless of
     report/recheck state -- mirrors sync_checkout.sh's refuse discipline."""
