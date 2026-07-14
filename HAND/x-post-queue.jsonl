@@ -9,3 +9,4 @@
 {"type": "queued", "task": "58", "topic": "detached-HEAD recovery tool -- tools/sync_checkout.sh, ending three hours of hand-diagnosed checkout recovery", "queued_at": "2026-07-14T09:15:00Z"}
 {"type": "queued", "task": "59", "topic": "recheck policy -- tools/x_outage_tracker.py's should_recheck, replacing the by-feel retest call", "queued_at": "2026-07-14T10:07:00Z"}
 {"type": "queued", "task": "60", "topic": "the nineteenth Oracle Desk cadence -- GitHub Actions workflow count, ogun's first staked call after eighteen hours of only ever grading others'", "queued_at": "2026-07-14T11:12:00Z"}
+{"type": "queued", "task": "61", "topic": "the ritual note's own local checks, consolidated -- tools/ritual_check.py replaces four hand-run commands with one status block", "queued_at": "2026-07-14T12:08:24Z"}
