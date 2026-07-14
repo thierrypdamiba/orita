@@ -799,3 +799,47 @@ jobs:
           today="$(date -u +%F)"
           git commit -m "oracle-topic-autograde: ${today} due call(s) graded (automatic, no human trigger)"
           git push
+
+      - name: seal one real, timestamped, copylint-clean open-PR-cadence prediction (ROADMAP #54)
+        env:
+          PYTHONPATH: oracle/oracle_engine/src
+        run: python3 -m oracle_engine.pr_cadence
+
+      - name: verify the chain still holds
+        run: python3 tools/ledger.py verify
+
+      - name: commit, if a snapshot or an open-PR-cadence call was sealed
+        run: |
+          set -euo pipefail
+          git config user.name "Nyx"
+          git config user.email "nyx@orita.gods"
+          git add oracle/pr_snapshots.jsonl records/ledger.jsonl
+          if git diff --cached --quiet; then
+            echo "nothing sealed this run -- no commit"
+            exit 0
+          fi
+          today="$(date -u +%F)"
+          git commit -m "oracle-pr-cadence: ${today} snapshot + call sealed (automatic, no human trigger)"
+          git push
+
+      - name: grade any open-PR-cadence predictions whose window has closed (ROADMAP #54)
+        env:
+          PYTHONPATH: oracle/oracle_engine/src
+        run: python3 -m oracle_engine.pr_autograde
+
+      - name: verify the chain still holds
+        run: python3 tools/ledger.py verify
+
+      - name: commit, if an open-PR-cadence grade was sealed
+        run: |
+          set -euo pipefail
+          git config user.name "Ogun"
+          git config user.email "ogun@orita.gods"
+          git add records/ledger.jsonl
+          if git diff --cached --quiet; then
+            echo "no due open-PR-cadence predictions this run -- no grade, no commit"
+            exit 0
+          fi
+          today="$(date -u +%F)"
+          git commit -m "oracle-pr-autograde: ${today} due call(s) graded (automatic, no human trigger)"
+          git push
