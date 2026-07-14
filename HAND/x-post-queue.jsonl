@@ -7,3 +7,4 @@
 {"type": "queued", "task": "56", "topic": "the batched-tweet splitter -- clears a backlog compose_combined_tweet alone rejects", "queued_at": "2026-07-14T07:10:00Z"}
 {"type": "queued", "task": "57", "topic": "durable outage-streak tracking -- tools/x_outage_tracker.py, replacing skipped.md's hand-counted (and already drifted) hours", "queued_at": "2026-07-14T08:10:00Z"}
 {"type": "queued", "task": "58", "topic": "detached-HEAD recovery tool -- tools/sync_checkout.sh, ending three hours of hand-diagnosed checkout recovery", "queued_at": "2026-07-14T09:15:00Z"}
+{"type": "queued", "task": "59", "topic": "recheck policy -- tools/x_outage_tracker.py's should_recheck, replacing the by-feel retest call", "queued_at": "2026-07-14T10:07:00Z"}

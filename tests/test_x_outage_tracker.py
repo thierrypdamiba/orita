@@ -139,5 +139,41 @@ class TestFormatStatusLine(unittest.TestCase):
         self.assertIn("2026-07-14T02:09:00Z", line)
 
 
+class TestHoursSinceLastCheck(unittest.TestCase):
+    def test_none_when_never_checked(self):
+        self.assertIsNone(xot.hours_since_last_check([], "X_PostTweet", "2026-07-14T10:03:00Z"))
+
+    def test_exact_hours_elapsed(self):
+        entries = [{"type": "check", "tool": "X_PostTweet", "status": "forbidden", "checked_at": "2026-07-14T06:20:00Z"}]
+        elapsed = xot.hours_since_last_check(entries, "X_PostTweet", "2026-07-14T10:03:00Z")
+        self.assertAlmostEqual(elapsed, 3 + 43 / 60, places=6)
+
+
+class TestShouldRecheck(unittest.TestCase):
+    def test_due_when_never_checked(self):
+        self.assertTrue(xot.should_recheck([], "X_PostTweet", "2026-07-14T10:03:00Z"))
+
+    def test_not_due_inside_the_cooldown(self):
+        entries = [{"type": "check", "tool": "X_PostTweet", "status": "forbidden", "checked_at": "2026-07-14T09:00:00Z"}]
+        self.assertFalse(xot.should_recheck(entries, "X_PostTweet", "2026-07-14T10:03:00Z", cooldown_hours=2.0))
+
+    def test_due_once_the_cooldown_has_elapsed(self):
+        entries = [{"type": "check", "tool": "X_PostTweet", "status": "forbidden", "checked_at": "2026-07-14T06:20:00Z"}]
+        self.assertTrue(xot.should_recheck(entries, "X_PostTweet", "2026-07-14T10:03:00Z", cooldown_hours=2.0))
+
+    def test_boundary_is_exact_not_off_by_one_hour(self):
+        entries = [{"type": "check", "tool": "X_PostTweet", "status": "forbidden", "checked_at": "2026-07-14T08:00:00Z"}]
+        self.assertFalse(xot.should_recheck(entries, "X_PostTweet", "2026-07-14T09:59:59Z", cooldown_hours=2.0))
+        self.assertTrue(xot.should_recheck(entries, "X_PostTweet", "2026-07-14T10:00:00Z", cooldown_hours=2.0))
+
+    def test_tools_are_independent(self):
+        entries = [
+            {"type": "check", "tool": "X_GetUserTweets", "status": "forbidden", "checked_at": "2026-07-14T10:00:00Z"},
+            {"type": "check", "tool": "X_PostTweet", "status": "forbidden", "checked_at": "2026-07-14T06:20:00Z"},
+        ]
+        self.assertFalse(xot.should_recheck(entries, "X_GetUserTweets", "2026-07-14T10:03:00Z", cooldown_hours=2.0))
+        self.assertTrue(xot.should_recheck(entries, "X_PostTweet", "2026-07-14T10:03:00Z", cooldown_hours=2.0))
+
+
 if __name__ == "__main__":
     unittest.main()

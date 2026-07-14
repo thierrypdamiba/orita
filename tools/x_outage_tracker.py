@@ -17,12 +17,25 @@ append-only, no line ever edited or removed. Every real API check (ok or
 forbidden) gets one line; the streak is a fold over the log, never a
 remembered adjective.
 
+Task 59 closes a second, smaller version of the same bug. `record_check`
+fixed the streak *count*; the decision of whether to even make another
+check was still made by feel -- "nothing new to learn from a repeat
+rejection" -- read off the prose of the note above it, not a rule. A
+read (`X_GetUserTweets`) got retested every hour; a write
+(`X_PostTweet`) did not, on that same by-feel call, for as long as four
+real hours running. `should_recheck` replaces the feeling with a fixed
+cooldown so the call is the same every time, for every god.
+
 Usage:
     python3 tools/x_outage_tracker.py record <tool> <ok|forbidden> <checked_at>
     python3 tools/x_outage_tracker.py status
+    python3 tools/x_outage_tracker.py should-recheck <tool> <now> [cooldown_hours]
 """
 import json
 import os
+from datetime import datetime, timezone
+
+DEFAULT_COOLDOWN_HOURS = 2.0
 
 LOG = os.path.join(os.path.dirname(__file__), "..", "HAND", "x-outage-log.jsonl")
 STATUSES = ("ok", "forbidden")
@@ -84,6 +97,31 @@ def last_checked_at(entries: list, tool: str):
     return t_entries[-1]["checked_at"] if t_entries else None
 
 
+def _parse(ts: str) -> datetime:
+    return datetime.fromisoformat(ts.replace("Z", "+00:00")).astimezone(timezone.utc)
+
+
+def hours_since_last_check(entries: list, tool: str, now: str):
+    """Hours between `tool`'s last recorded check and `now`, or None if never checked."""
+    last = last_checked_at(entries, tool)
+    if last is None:
+        return None
+    return (_parse(now) - _parse(last)).total_seconds() / 3600.0
+
+
+def should_recheck(entries: list, tool: str, now: str, cooldown_hours: float = DEFAULT_COOLDOWN_HOURS) -> bool:
+    """Whether `tool` is due for another real check as of `now`.
+
+    Never checked: always due. Otherwise due once at least `cooldown_hours`
+    have elapsed since the last recorded check -- a fixed rule instead of a
+    by-feel "nothing new to learn from a repeat rejection" judgment call.
+    """
+    elapsed = hours_since_last_check(entries, tool, now)
+    if elapsed is None:
+        return True
+    return elapsed >= cooldown_hours
+
+
 def format_status_line(entries: list, tool: str, status: str = "forbidden") -> str:
     last = last_checked_at(entries, tool)
     if last is None:
@@ -108,3 +146,10 @@ if __name__ == "__main__":
         _entries_now = _entries()
         for _tool in TRACKED_TOOLS:
             print(format_status_line(_entries_now, _tool))
+    elif cmd == "should-recheck":
+        _tool = sys.argv[2]
+        _now = sys.argv[3]
+        _cooldown = float(sys.argv[4]) if len(sys.argv) > 4 else DEFAULT_COOLDOWN_HOURS
+        _due = should_recheck(_entries(), _tool, _now, _cooldown)
+        print("due" if _due else "not due")
+        sys.exit(0 if _due else 1)
