@@ -37,6 +37,8 @@ from typing import Any
 
 import httpx
 
+from seam_engine.github_auth import github_headers
+
 GITHUB_API = "https://api.github.com"
 REPO_ROOT = Path(__file__).resolve().parents[4]  # .../orita
 MORTAL_SKY_LOG = REPO_ROOT / "HAND" / "mortal-sky-log.md"
@@ -82,7 +84,7 @@ def _parse_ts(s: str) -> datetime:
 def fetch_github_activity(owner: str, repo: str, since: datetime) -> list[GithubEvent]:
     """Read-only: commits + the latest release, since `since`. GET only."""
     events: list[GithubEvent] = []
-    headers = {"Accept": "application/vnd.github+json", "User-Agent": "fencepost-seam-scan"}
+    headers = github_headers()
 
     with httpx.Client(timeout=15.0, headers=headers) as client:
         commits = client.get(

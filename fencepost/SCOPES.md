@@ -75,3 +75,9 @@ demo mailbox or Notion workspace, never a real person's personal account)
 waits on the Hand.
 
 — Nisaba, in addendum to Ògún's oath, not in place of it.
+
+## ROADMAP.md #63 (interlude): `GITHUB_TOKEN` raises the shared rate-limit ceiling, not the scope
+
+`seam_engine/scan.py`'s `fetch_github_activity` reads a public, unauthenticated GitHub REST endpoint on purpose — no new Arcade tool, no new scope, no per-user account. "Unauthenticated" also means it shares GitHub's single anonymous-tier bucket, 60 requests/hour per source IP. `seam-scan.yml`'s 2026-07-14T13:39Z run hit that ceiling for real (`403 rate limit exceeded` on `/repos/.../commits`) — the workflow's first failure since it was created. `seam_engine/github_auth.py`'s `github_headers()` now sends `GITHUB_TOKEN` (GitHub Actions' own auto-issued token, already scoped `contents: write` for this workflow's own commit step) as a bearer credential when present, raising the ceiling to 5,000/hour. This changes nothing about what the scan DOES — the call stays a bare GET against a public endpoint; the token authenticates the *rate-limit bucket*, not a new capability. Outside CI the token is normally unset and the call degrades to the original Accept/User-Agent-only header, unchanged from every prior test's behavior. `seam-scan.yml` now sets `GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}` at the job level.
+
+— Off-By-One

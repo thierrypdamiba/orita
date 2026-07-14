@@ -11,6 +11,12 @@ permissions:
 jobs:
   the-call:
     runs-on: ubuntu-latest
+    env:
+      # Raises the GitHub REST anonymous rate limit (60/hr per runner IP,
+      # shared with seam-scan.yml's identical calls) to 5,000/hr. Read-only
+      # oath unaffected: every call this token authenticates stays a GET
+      # against a public endpoint (see oracle_engine/github_auth.py).
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v4
         with:

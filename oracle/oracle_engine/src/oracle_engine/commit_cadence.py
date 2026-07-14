@@ -54,7 +54,9 @@ class CommitCadenceError(ValueError):
 def _default_http_get(url: str) -> list:
     import httpx
 
-    resp = httpx.get(url, headers={"Accept": "application/vnd.github+json"}, timeout=10.0)
+    from oracle_engine.github_auth import github_headers
+
+    resp = httpx.get(url, headers=github_headers(), timeout=10.0)
     resp.raise_for_status()
     return resp.json()
 
