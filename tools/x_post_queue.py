@@ -15,10 +15,17 @@ marker names which tasks a real tweet actually covered, and
 pending_entries() simply stops counting anything a marker names -- the
 queued line itself is never touched.
 
+Task 56 adds compose_batched_tweets(): compose_combined_tweet() raises
+rather than truncates once the real backlog outgrows one tweet (proven
+against the actual tasks 50-55 backlog, 406 chars for a 280-char limit)
+-- batching is what actually clears a backlog that size without a human
+improvising a split by hand.
+
 Usage:
     python3 tools/x_post_queue.py queue <task> <topic> <queued_at>
     python3 tools/x_post_queue.py pending
     python3 tools/x_post_queue.py compose
+    python3 tools/x_post_queue.py compose-batches
     python3 tools/x_post_queue.py mark-posted <tweet_id> <posted_at> <task> [task...]
 """
 import json
@@ -95,6 +102,57 @@ def compose_combined_tweet(entries: list, max_chars: int = MAX_TWEET_CHARS) -> s
     return text
 
 
+def _item_text(entry: dict) -> str:
+    return f"#{entry['task']} {entry['topic']}"
+
+
+def _header(i: int, n: int) -> str:
+    return "Owed reports, now caught up: " if n == 1 else f"Owed reports ({i}/{n}): "
+
+
+def _pack_into(items: list, n: int, max_chars: int):
+    """Greedily fill exactly n ordered batches; None if it can't be done."""
+    batches = []
+    idx = 0
+    for i in range(1, n + 1):
+        header = _header(i, n)
+        body = []
+        while idx < len(items):
+            candidate = body + [items[idx]]
+            if len(header + "; ".join(candidate)) <= max_chars:
+                body = candidate
+                idx += 1
+            else:
+                break
+        if not body:
+            return None
+        batches.append(header + "; ".join(body))
+    return batches if idx == len(items) else None
+
+
+def compose_batched_tweets(entries: list, max_chars: int = MAX_TWEET_CHARS) -> list:
+    """Split pending entries into as few ordered tweets as needed.
+
+    Every entry appears exactly once, in queued order, across the
+    returned batches -- nothing is ever dropped or reordered. Tries one
+    tweet first (identical text to compose_combined_tweet), then two,
+    three, and so on. Raises only if some single entry can't fit in a
+    tweet even alone with its own header -- that is a genuinely
+    unpostable topic string, not a splitting failure.
+    """
+    if not entries:
+        raise ValueError("nothing pending to post")
+    items = [_item_text(e) for e in entries]
+    for n in range(1, len(items) + 1):
+        batches = _pack_into(items, n, max_chars)
+        if batches is not None:
+            return batches
+    raise ValueError(
+        "at least one queued entry does not fit in a single tweet even alone -- "
+        "shorten its topic string"
+    )
+
+
 def mark_posted(tasks: list, tweet_id: str, posted_at: str, path=QUEUE) -> None:
     """Append a posted-marker event. Never edits or removes a queued line."""
     _append(
@@ -115,6 +173,9 @@ if __name__ == "__main__":
             print(json.dumps(_e, ensure_ascii=False))
     elif cmd == "compose":
         print(compose_combined_tweet(pending_entries()))
+    elif cmd == "compose-batches":
+        for _b in compose_batched_tweets(pending_entries()):
+            print(_b)
     elif cmd == "mark-posted":
         _tweet_id, _posted_at = sys.argv[2], sys.argv[3]
         _tasks = sys.argv[4:]
