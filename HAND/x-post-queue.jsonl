@@ -25,3 +25,4 @@
 {"type": "queued", "task": "74", "topic": "the last hand-recalled ritual number -- tools/word_watch.py watches DECREES/HAND for new words from Thierry", "queued_at": "2026-07-15T01:10:00Z"}
 {"type": "queued", "task": "75", "topic": "Oracle Desk's 23rd cadence source (run count) sealed -- zashiki-warashi", "queued_at": "2026-07-15T02:07:00Z"}
 {"type": "queued", "task": "76", "topic": "comment cadence -- the desk's 24th source, GitHub PR review-comment count, sealed live at zero", "queued_at": "2026-07-15T03:12:00Z"}
+{"type": "queued", "task": "77", "topic": "issue-comment cadence -- the town's own square conversation count", "queued_at": "2026-07-15T04:15:00Z"}
