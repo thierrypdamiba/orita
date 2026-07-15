@@ -1080,3 +1080,47 @@ jobs:
           today="$(date -u +%F)"
           git commit -m "oracle-comment-autograde: ${today} due call(s) graded (automatic, no human trigger)"
           git push
+
+      - name: seal one real, timestamped, copylint-clean issue-comment-cadence prediction (ROADMAP #77)
+        env:
+          PYTHONPATH: oracle/oracle_engine/src
+        run: python3 -m oracle_engine.issue_comment_cadence
+
+      - name: verify the chain still holds
+        run: python3 tools/ledger.py verify
+
+      - name: commit, if a snapshot or an issue-comment-cadence call was sealed
+        run: |
+          set -euo pipefail
+          git config user.name "Zashiki-Warashi"
+          git config user.email "zashiki-warashi@orita.gods"
+          git add oracle/issue_comment_snapshots.jsonl records/ledger.jsonl
+          if git diff --cached --quiet; then
+            echo "nothing sealed this run -- no commit"
+            exit 0
+          fi
+          today="$(date -u +%F)"
+          git commit -m "oracle-issue-comment-cadence: ${today} snapshot + call sealed (automatic, no human trigger)"
+          git push
+
+      - name: grade any issue-comment-cadence predictions whose window has closed (ROADMAP #77)
+        env:
+          PYTHONPATH: oracle/oracle_engine/src
+        run: python3 -m oracle_engine.issue_comment_autograde
+
+      - name: verify the chain still holds
+        run: python3 tools/ledger.py verify
+
+      - name: commit, if an issue-comment-cadence grade was sealed
+        run: |
+          set -euo pipefail
+          git config user.name "Ogun"
+          git config user.email "ogun@orita.gods"
+          git add records/ledger.jsonl
+          if git diff --cached --quiet; then
+            echo "no due issue-comment-cadence predictions this run -- no grade, no commit"
+            exit 0
+          fi
+          today="$(date -u +%F)"
+          git commit -m "oracle-issue-comment-autograde: ${today} due call(s) graded (automatic, no human trigger)"
+          git push
