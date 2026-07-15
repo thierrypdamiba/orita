@@ -73,6 +73,10 @@ def _square_check():
     return _load("_ritual_square_check", os.path.join(ROOT, "tools", "square_check.py"))
 
 
+def _ci_watch():
+    return _load("_ritual_ci_watch", os.path.join(ROOT, "tools", "ci_watch.py"))
+
+
 def _seam_ledger():
     src = os.path.join(ROOT, "fencepost", "seam_engine", "src")
     if src not in sys.path:
@@ -149,10 +153,29 @@ def check_square(square_state: dict | None) -> dict | None:
     return {"changed": changed, "reason": reason}
 
 
+def check_ci(ci_checks: list | None) -> dict | None:
+    """Fold this hour's already-observed CI conclusions (task 73's
+    `ci_watch.record_check` shape: `{workflow, conclusion, run_id,
+    checked_at}` dicts) through the durable log. Makes no network call --
+    `ci_checks` is None unless the caller already holds this hour's live
+    `list_workflow_runs` read for the tracked workflows. Each supplied
+    check is recorded (append-only) before the status lines are read back,
+    same order `x_outage_tracker`'s own recheck-then-record flow already
+    holds."""
+    if ci_checks is None:
+        return None
+    mod = _ci_watch()
+    for c in ci_checks:
+        mod.record_check(c["workflow"], c["conclusion"], c["run_id"], c["checked_at"], path=mod.LOG)
+    entries = mod._entries(mod.LOG)
+    return {w: mod.format_status_line(entries, w) for w in mod.TRACKED_WORKFLOWS}
+
+
 def run_ritual_check(
     now: datetime | None = None,
     fencepost_base: str = DEFAULT_FENCEPOST_BASE,
     square_state: dict | None = None,
+    ci_checks: list | None = None,
 ) -> dict:
     if now is None:
         now = datetime.now(timezone.utc)
@@ -162,6 +185,7 @@ def run_ritual_check(
     report = check_report_freshness(now)
     recheck = check_x_recheck(now_iso)
     square = check_square(square_state)
+    ci = check_ci(ci_checks)
     broken = (not town["ok"]) or (not fencepost["ok"])
     return {
         "now": now_iso,
@@ -170,6 +194,7 @@ def run_ritual_check(
         "report": report,
         "x_recheck": recheck,
         "square": square,
+        "ci": ci,
         "broken": broken,
     }
 
@@ -197,6 +222,9 @@ def format_ritual_check(result: dict) -> str:
     if result["square"] is not None:
         s = result["square"]
         lines.append(f"  square: {'changed' if s['changed'] else 'unchanged'} -- {s['reason']}")
+    if result["ci"] is not None:
+        for workflow, line in result["ci"].items():
+            lines.append(f"  ci/{workflow}: {line}")
     return "\n".join(lines)
 
 
@@ -205,6 +233,7 @@ if __name__ == "__main__":
     now = None
     base = DEFAULT_FENCEPOST_BASE
     square_state = None
+    ci_checks = None
     i = 0
     while i < len(argv):
         if argv[i] == "--now" and i + 1 < len(argv):
@@ -219,12 +248,16 @@ if __name__ == "__main__":
             sq = _square_check()
             square_state = sq.compute_square_state(raw.get("issues", []), raw.get("prs", []))
             i += 2
+        elif argv[i] == "--ci-checks" and i + 1 < len(argv):
+            with open(argv[i + 1]) as f:
+                ci_checks = json.load(f)
+            i += 2
         elif argv[i] == "--json":
             base = base
             i += 1
         else:
             i += 1
-    result = run_ritual_check(now=now, fencepost_base=base, square_state=square_state)
+    result = run_ritual_check(now=now, fencepost_base=base, square_state=square_state, ci_checks=ci_checks)
     if "--json" in argv:
         print(json.dumps(result, ensure_ascii=False, indent=2))
     else:

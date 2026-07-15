@@ -268,6 +268,69 @@ class SquareFoldCase(unittest.TestCase):
         self.assertNotIn("square:", without_square)
 
 
+class CIFoldCase(unittest.TestCase):
+    """Task 73: run_ritual_check(ci_checks=...) folds ci_watch.py's durable
+    CI-conclusion log into the same structured result, the same shape task
+    71 already gave the square. Unlike the square, ci_checks are recorded
+    (not just compared) so the printed status line always reflects this
+    hour's real observation -- the one durable write ritual_check.py makes,
+    scoped to a local append-only log, no network call of its own."""
+
+    def setUp(self):
+        self.tmpdir = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.tmpdir, ignore_errors=True)
+        self.ciw = _load(f"_test_ritual_ci_watch_{id(self)}", os.path.join(ROOT, "tools", "ci_watch.py"))
+        self.ciw.LOG = os.path.join(self.tmpdir, "ci-watch-log.jsonl")
+        original_loader = rc._ci_watch
+        rc._ci_watch = lambda: self.ciw
+        self.addCleanup(setattr, rc, "_ci_watch", original_loader)
+
+    def test_no_ci_checks_is_none(self):
+        self.assertIsNone(rc.check_ci(None))
+
+    def test_recording_a_success_reports_it(self):
+        result = rc.check_ci(
+            [{"workflow": "dawn-run", "conclusion": "success", "run_id": 1, "checked_at": "2026-07-14T23:08:01Z"}]
+        )
+        self.assertEqual(result["dawn-run"], "dawn-run: success as of 2026-07-14T23:08:01Z (run 1)")
+
+    def test_only_supplied_workflows_move_the_others_stay_unrecorded(self):
+        result = rc.check_ci(
+            [{"workflow": "dawn-run", "conclusion": "success", "run_id": 1, "checked_at": "2026-07-14T23:08:01Z"}]
+        )
+        self.assertEqual(result["pages"], "pages: no checks recorded")
+
+    def test_a_recorded_failure_streak_survives_across_calls(self):
+        rc.check_ci([{"workflow": "dawn-run", "conclusion": "failure", "run_id": 1, "checked_at": "2026-07-14T11:00:00Z"}])
+        result = rc.check_ci(
+            [{"workflow": "dawn-run", "conclusion": "failure", "run_id": 2, "checked_at": "2026-07-14T12:00:00Z"}]
+        )
+        self.assertIn("2 consecutive failure checks", result["dawn-run"])
+
+    def test_run_ritual_check_folds_ci_key(self):
+        result = rc.run_ritual_check(
+            ci_checks=[
+                {"workflow": "dawn-run", "conclusion": "success", "run_id": 1, "checked_at": "2026-07-14T23:08:01Z"},
+                {"workflow": "pages", "conclusion": "success", "run_id": 2, "checked_at": "2026-07-14T23:08:01Z"},
+            ]
+        )
+        self.assertIsNotNone(result["ci"])
+        self.assertIn("dawn-run", result["ci"])
+        self.assertIn("pages", result["ci"])
+
+    def test_run_ritual_check_ci_none_when_omitted(self):
+        result = rc.run_ritual_check()
+        self.assertIsNone(result["ci"])
+
+    def test_format_includes_ci_lines_only_when_present(self):
+        with_ci = rc.format_ritual_check(
+            {**rc.run_ritual_check(), "ci": {"dawn-run": "dawn-run: success as of X (run 1)"}}
+        )
+        self.assertIn("ci/dawn-run: dawn-run: success as of X (run 1)", with_ci)
+        without_ci = rc.format_ritual_check(rc.run_ritual_check())
+        self.assertNotIn("ci/", without_ci)
+
+
 class RunRitualCheckCase(unittest.TestCase):
     """End-to-end: broken=True iff either ledger is broken, regardless of
     report/recheck state -- mirrors sync_checkout.sh's refuse discipline."""

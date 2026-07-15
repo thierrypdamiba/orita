@@ -21,3 +21,4 @@
 {"type": "queued", "task": "70", "topic": "Shipped tools/square_check.py: the square's own read, no longer recalled by hand", "queued_at": "2026-07-14T21:08:00Z"}
 {"type": "queued", "task": "71", "topic": "ritual_check.py + square_check.py folded into one call -- the local checks and the square's own durable read in a single hourly status block", "queued_at": "2026-07-14T22:09:00Z"}
 {"type": "queued", "task": "72", "topic": "the outage is method-scoped, not account-wide -- X_WhoAmI recovered first", "queued_at": "2026-07-14T23:20:00Z"}
+{"type": "queued", "task": "73", "topic": "tools/ci_watch.py -- dawn-run/pages CI conclusions now durably watched, folded into ritual_check.py", "queued_at": "2026-07-15T00:15:00Z"}
