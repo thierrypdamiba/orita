@@ -1,0 +1,108 @@
+{
+  "generated_at": "2026-07-15T13:40:10.184908+00:00",
+  "repo": "thierrypdamiba/orita",
+  "window_hours": 24,
+  "account_live_since": "2026-07-12T00:00:00+00:00",
+  "confidence_bar": 0.7,
+  "separation_margin": 0.15,
+  "primary_gap": null,
+  "tail": [
+    {
+      "slug": "coincidence-buildlog",
+      "headline": "'buildlog' recurs in commits but stays off @oritatown",
+      "detail": "16 commit(s) since 2026-07-12 touch 'buildlog', none echoed in a post. Routine work is not a gap \u2014 coincidence, not seam.",
+      "confidence": 0.55,
+      "evidence": [
+        "https://github.com/thierrypdamiba/orita/commit/6a9e81558c4fd30b24d1838d1ee18edb097d905b",
+        "https://github.com/thierrypdamiba/orita/commit/ca2a3b11b51fcf501817e9968f2f23ed2c0455aa",
+        "https://github.com/thierrypdamiba/orita/commit/7b618fb28222f69c94c695a2854679fb2c851664",
+        "https://github.com/thierrypdamiba/orita/commit/45e5e950868b3151826089b85c3edb5fc3f21bac",
+        "https://github.com/thierrypdamiba/orita/commit/19c05ee5a95e974c890fb4d7c5c75e4c58dac031"
+      ],
+      "label": "coincidence",
+      "rank": 1,
+      "lead": 0.0
+    },
+    {
+      "slug": "coincidence-hourly",
+      "headline": "'hourly' recurs in commits but stays off @oritatown",
+      "detail": "19 commit(s) since 2026-07-12 touch 'hourly', none echoed in a post. Routine work is not a gap \u2014 coincidence, not seam.",
+      "confidence": 0.55,
+      "evidence": [
+        "https://github.com/thierrypdamiba/orita/commit/7cf2fec2c83563aa5418f53067215557c999dbab",
+        "https://github.com/thierrypdamiba/orita/commit/6a9e81558c4fd30b24d1838d1ee18edb097d905b",
+        "https://github.com/thierrypdamiba/orita/commit/ca2a3b11b51fcf501817e9968f2f23ed2c0455aa",
+        "https://github.com/thierrypdamiba/orita/commit/7b618fb28222f69c94c695a2854679fb2c851664",
+        "https://github.com/thierrypdamiba/orita/commit/45e5e950868b3151826089b85c3edb5fc3f21bac"
+      ],
+      "label": "coincidence",
+      "rank": 2,
+      "lead": 0.0
+    },
+    {
+      "slug": "coincidence-journal",
+      "headline": "'journal' recurs in commits but stays off @oritatown",
+      "detail": "16 commit(s) since 2026-07-12 touch 'journal', none echoed in a post. Routine work is not a gap \u2014 coincidence, not seam.",
+      "confidence": 0.55,
+      "evidence": [
+        "https://github.com/thierrypdamiba/orita/commit/7cf2fec2c83563aa5418f53067215557c999dbab",
+        "https://github.com/thierrypdamiba/orita/commit/c9b9fbcb7cdcd24d9bddbceeb66f75786c922000",
+        "https://github.com/thierrypdamiba/orita/commit/d8e9114befd21a3054216db1b0e585f3288e8e99",
+        "https://github.com/thierrypdamiba/orita/commit/0b3620a45205b3abf1a12190325d11c0c25288b4",
+        "https://github.com/thierrypdamiba/orita/commit/2304bfd090e6c04000c99e2452d03c35bcf151e6"
+      ],
+      "label": "coincidence",
+      "rank": 3,
+      "lead": 0.0
+    },
+    {
+      "slug": "coincidence-recorded",
+      "headline": "'recorded' recurs in commits but stays off @oritatown",
+      "detail": "19 commit(s) since 2026-07-12 touch 'recorded', none echoed in a post. Routine work is not a gap \u2014 coincidence, not seam.",
+      "confidence": 0.55,
+      "evidence": [
+        "https://github.com/thierrypdamiba/orita/commit/7cf2fec2c83563aa5418f53067215557c999dbab",
+        "https://github.com/thierrypdamiba/orita/commit/6a9e81558c4fd30b24d1838d1ee18edb097d905b",
+        "https://github.com/thierrypdamiba/orita/commit/ca2a3b11b51fcf501817e9968f2f23ed2c0455aa",
+        "https://github.com/thierrypdamiba/orita/commit/c9b9fbcb7cdcd24d9bddbceeb66f75786c922000",
+        "https://github.com/thierrypdamiba/orita/commit/7b618fb28222f69c94c695a2854679fb2c851664"
+      ],
+      "label": "coincidence",
+      "rank": 4,
+      "lead": 0.0
+    },
+    {
+      "slug": "coincidence-ritual",
+      "headline": "'ritual' recurs in commits but stays off @oritatown",
+      "detail": "22 commit(s) since 2026-07-12 touch 'ritual', none echoed in a post. Routine work is not a gap \u2014 coincidence, not seam.",
+      "confidence": 0.55,
+      "evidence": [
+        "https://github.com/thierrypdamiba/orita/commit/7cf2fec2c83563aa5418f53067215557c999dbab",
+        "https://github.com/thierrypdamiba/orita/commit/2f3e780320548be778598f6b98c78726f57777d3",
+        "https://github.com/thierrypdamiba/orita/commit/6a9e81558c4fd30b24d1838d1ee18edb097d905b",
+        "https://github.com/thierrypdamiba/orita/commit/afd828a70a3b4f8a6e62d65271245265bd11e70a",
+        "https://github.com/thierrypdamiba/orita/commit/ca2a3b11b51fcf501817e9968f2f23ed2c0455aa"
+      ],
+      "label": "coincidence",
+      "rank": 5,
+      "lead": 0.0
+    },
+    {
+      "slug": "coincidence-roadmap",
+      "headline": "'roadmap' recurs in commits but stays off @oritatown",
+      "detail": "19 commit(s) since 2026-07-12 touch 'roadmap', none echoed in a post. Routine work is not a gap \u2014 coincidence, not seam.",
+      "confidence": 0.55,
+      "evidence": [
+        "https://github.com/thierrypdamiba/orita/commit/edcb875d22e5cf629f659c0d430e245e5257de46",
+        "https://github.com/thierrypdamiba/orita/commit/3e3aade4fbda4dd2fbff6f2b3cc2965107bcaa61",
+        "https://github.com/thierrypdamiba/orita/commit/9393502d71715227217ffcd66a12f9e81806f452",
+        "https://github.com/thierrypdamiba/orita/commit/bd9a87a7f57a9a3e1d1eef388d57c9933583f5de",
+        "https://github.com/thierrypdamiba/orita/commit/218592cb25c78442ab0f8898683ff999ced04c68"
+      ],
+      "label": "coincidence",
+      "rank": 6,
+      "lead": 0.55
+    }
+  ],
+  "excluded": []
+}
