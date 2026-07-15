@@ -77,6 +77,10 @@ def _ci_watch():
     return _load("_ritual_ci_watch", os.path.join(ROOT, "tools", "ci_watch.py"))
 
 
+def _word_watch():
+    return _load("_ritual_word_watch", os.path.join(ROOT, "tools", "word_watch.py"))
+
+
 def _seam_ledger():
     src = os.path.join(ROOT, "fencepost", "seam_engine", "src")
     if src not in sys.path:
@@ -171,11 +175,28 @@ def check_ci(ci_checks: list | None) -> dict | None:
     return {w: mod.format_status_line(entries, w) for w in mod.TRACKED_WORKFLOWS}
 
 
+def check_words(check_words_flag: bool) -> dict | None:
+    """Read the four places Thierry's words land (task 74's
+    `word_watch.compute_word_state`) and fold through `word_delta`.
+    Local filesystem only -- no network call, unlike `check_square`/
+    `check_ci` which take a caller-supplied live API read. Off by
+    default (`check_words_flag=False`) so a caller who doesn't want the
+    filesystem walk this hour gets `None`, unchanged from before this
+    task."""
+    if not check_words_flag:
+        return None
+    mod = _word_watch()
+    state = mod.compute_word_state(root=mod.ROOT)
+    changed, reason = mod.word_delta(state, path=mod.LOG)
+    return {"changed": changed, "reason": reason}
+
+
 def run_ritual_check(
     now: datetime | None = None,
     fencepost_base: str = DEFAULT_FENCEPOST_BASE,
     square_state: dict | None = None,
     ci_checks: list | None = None,
+    check_words_flag: bool = False,
 ) -> dict:
     if now is None:
         now = datetime.now(timezone.utc)
@@ -186,6 +207,7 @@ def run_ritual_check(
     recheck = check_x_recheck(now_iso)
     square = check_square(square_state)
     ci = check_ci(ci_checks)
+    words = check_words(check_words_flag)
     broken = (not town["ok"]) or (not fencepost["ok"])
     return {
         "now": now_iso,
@@ -195,6 +217,7 @@ def run_ritual_check(
         "x_recheck": recheck,
         "square": square,
         "ci": ci,
+        "words": words,
         "broken": broken,
     }
 
@@ -225,6 +248,9 @@ def format_ritual_check(result: dict) -> str:
     if result["ci"] is not None:
         for workflow, line in result["ci"].items():
             lines.append(f"  ci/{workflow}: {line}")
+    if result["words"] is not None:
+        w = result["words"]
+        lines.append(f"  words: {'changed' if w['changed'] else 'unchanged'} -- {w['reason']}")
     return "\n".join(lines)
 
 
@@ -234,6 +260,7 @@ if __name__ == "__main__":
     base = DEFAULT_FENCEPOST_BASE
     square_state = None
     ci_checks = None
+    check_words_flag = False
     i = 0
     while i < len(argv):
         if argv[i] == "--now" and i + 1 < len(argv):
@@ -255,9 +282,18 @@ if __name__ == "__main__":
         elif argv[i] == "--json":
             base = base
             i += 1
+        elif argv[i] == "--check-words":
+            check_words_flag = True
+            i += 1
         else:
             i += 1
-    result = run_ritual_check(now=now, fencepost_base=base, square_state=square_state, ci_checks=ci_checks)
+    result = run_ritual_check(
+        now=now,
+        fencepost_base=base,
+        square_state=square_state,
+        ci_checks=ci_checks,
+        check_words_flag=check_words_flag,
+    )
     if "--json" in argv:
         print(json.dumps(result, ensure_ascii=False, indent=2))
     else:

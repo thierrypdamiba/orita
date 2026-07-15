@@ -331,6 +331,54 @@ class CIFoldCase(unittest.TestCase):
         self.assertNotIn("ci/", without_ci)
 
 
+class WordFoldCase(unittest.TestCase):
+    """Task 74: run_ritual_check(check_words_flag=True) folds word_watch.py's
+    durable "has a new word from Thierry landed" check into the same
+    structured result, the same shape tasks 71/73 already gave the square
+    and CI. Local filesystem only, no network call -- default False so a
+    caller who omits it gets result["words"] == None, unchanged from
+    before this task."""
+
+    def setUp(self):
+        self.tmpdir = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.tmpdir, ignore_errors=True)
+        os.makedirs(os.path.join(self.tmpdir, "DECREES"))
+        os.makedirs(os.path.join(self.tmpdir, "HAND", "verdicts"))
+        with open(os.path.join(self.tmpdir, "DECREES", "001.md"), "w") as f:
+            f.write("a decree\n")
+        self.ww = _load(f"_test_ritual_word_watch_{id(self)}", os.path.join(ROOT, "tools", "word_watch.py"))
+        self.ww.ROOT = self.tmpdir
+        self.ww.LOG = os.path.join(self.tmpdir, "HAND", "word-check-log.jsonl")
+        original_loader = rc._word_watch
+        rc._word_watch = lambda: self.ww
+        self.addCleanup(setattr, rc, "_word_watch", original_loader)
+
+    def test_words_none_when_flag_omitted(self):
+        self.assertIsNone(rc.check_words(False))
+
+    def test_first_check_is_due(self):
+        result = rc.check_words(True)
+        self.assertTrue(result["changed"])
+        self.assertIn("no prior word check", result["reason"])
+
+    def test_run_ritual_check_words_none_when_omitted(self):
+        result = rc.run_ritual_check()
+        self.assertIsNone(result["words"])
+
+    def test_run_ritual_check_folds_words_key_when_enabled(self):
+        result = rc.run_ritual_check(check_words_flag=True)
+        self.assertIsNotNone(result["words"])
+        self.assertIn("changed", result["words"])
+
+    def test_format_includes_words_line_only_when_present(self):
+        with_words = rc.format_ritual_check(
+            {**rc.run_ritual_check(), "words": {"changed": False, "reason": "unchanged since X"}}
+        )
+        self.assertIn("words: unchanged -- unchanged since X", with_words)
+        without_words = rc.format_ritual_check(rc.run_ritual_check())
+        self.assertNotIn("words:", without_words)
+
+
 class RunRitualCheckCase(unittest.TestCase):
     """End-to-end: broken=True iff either ledger is broken, regardless of
     report/recheck state -- mirrors sync_checkout.sh's refuse discipline."""
