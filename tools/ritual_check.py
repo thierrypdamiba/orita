@@ -49,6 +49,13 @@ read-only shape as `check_x_recheck` exactly -- this check never calls
 `record_escalation` itself; that only happens when the god on duty
 actually surfaces the escalation to Thierry.
 
+Task 85 folds the one local-filesystem number that never joined `check_words`
+(task 74) despite the identical shape: `x_post_queue.pending_entries` (task
+55), the owed-report backlog count every hourly note had re-derived by hand
+("N now pending") since the queue was built. `check_owed_posts` is
+unconditional, not flag-gated -- reading one append-only jsonl is as cheap
+as `check_town_ledger`'s own ledger read.
+
 Same discipline as sync_checkout.sh: refuse (report broken=True) rather
 than paper over a real problem. A ledger that fails to verify is reported
 broken, never silently skipped.
@@ -95,6 +102,10 @@ def _ci_watch():
 
 def _word_watch():
     return _load("_ritual_word_watch", os.path.join(ROOT, "tools", "word_watch.py"))
+
+
+def _x_post_queue():
+    return _load("_ritual_x_post_queue", os.path.join(ROOT, "tools", "x_post_queue.py"))
 
 
 def _cron_health():
@@ -253,6 +264,18 @@ def check_words(check_words_flag: bool) -> dict | None:
     return {"changed": changed, "reason": reason}
 
 
+def check_owed_posts() -> dict:
+    """Task 55's `x_post_queue.pending_entries` -- the owed-report backlog
+    count every hourly note has re-derived by hand ("N now pending") since
+    task 55 shipped -- folded in the same local-filesystem-only, no-network
+    shape `check_words` already holds (task 74). Unconditional, like
+    `check_town_ledger`/`check_x_recheck`: reading one append-only jsonl is
+    cheap enough that there's no flag to skip it."""
+    mod = _x_post_queue()
+    entries = mod.pending_entries(path=mod.QUEUE)
+    return {"count": len(entries), "tasks": [e["task"] for e in entries]}
+
+
 def run_ritual_check(
     now: datetime | None = None,
     fencepost_base: str = DEFAULT_FENCEPOST_BASE,
@@ -273,6 +296,7 @@ def run_ritual_check(
     ci = check_ci(ci_checks)
     words = check_words(check_words_flag)
     cron = check_cron(cron_checks, now_iso)
+    owed_posts = check_owed_posts()
     broken = (not town["ok"]) or (not fencepost["ok"])
     return {
         "now": now_iso,
@@ -285,6 +309,7 @@ def run_ritual_check(
         "ci": ci,
         "words": words,
         "cron": cron,
+        "owed_posts": owed_posts,
         "broken": broken,
     }
 
@@ -330,6 +355,9 @@ def format_ritual_check(result: dict) -> str:
                     + (f" ({info['hours_late']}h late)" if info["hours_late"] is not None else "")
                     + f" -- due {info['due_at']}, last run {info['last_run_at']}"
                 )
+    op = result["owed_posts"]
+    tasks_str = ",".join(str(t) for t in op["tasks"])
+    lines.append(f"  owed posts: {op['count']} pending" + (f" (tasks: {tasks_str})" if op["count"] else ""))
     return "\n".join(lines)
 
 

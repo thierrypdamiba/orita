@@ -494,6 +494,57 @@ class WordFoldCase(unittest.TestCase):
         self.assertNotIn("words:", without_words)
 
 
+class OwedPostsFoldCase(unittest.TestCase):
+    """Task 85: run_ritual_check() folds x_post_queue.py's durable owed-post
+    backlog count into the same structured result, mirroring WordFoldCase's
+    shape (task 74) but unconditional -- reading one append-only jsonl is
+    cheap enough that there's no flag to skip it, the same class as
+    check_town_ledger/check_x_recheck."""
+
+    def setUp(self):
+        self.tmpdir = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.tmpdir, ignore_errors=True)
+        self.xpq = _load(f"_test_ritual_x_post_queue_{id(self)}", os.path.join(ROOT, "tools", "x_post_queue.py"))
+        self.xpq.QUEUE = os.path.join(self.tmpdir, "x-post-queue.jsonl")
+        original_loader = rc._x_post_queue
+        rc._x_post_queue = lambda: self.xpq
+        self.addCleanup(setattr, rc, "_x_post_queue", original_loader)
+
+    def test_empty_queue_is_zero_pending(self):
+        result = rc.check_owed_posts()
+        self.assertEqual(result, {"count": 0, "tasks": []})
+
+    def test_queued_but_unposted_counted(self):
+        self.xpq.queue_owed_post("50", "subscriber cadence", "2026-07-15T06:12:00Z", path=self.xpq.QUEUE)
+        self.xpq.queue_owed_post("51", "topic cadence", "2026-07-15T07:12:00Z", path=self.xpq.QUEUE)
+        result = rc.check_owed_posts()
+        self.assertEqual(result["count"], 2)
+        self.assertEqual(result["tasks"], ["50", "51"])
+
+    def test_posted_marker_excludes_task(self):
+        self.xpq.queue_owed_post("50", "subscriber cadence", "2026-07-15T06:12:00Z", path=self.xpq.QUEUE)
+        self.xpq.queue_owed_post("51", "topic cadence", "2026-07-15T07:12:00Z", path=self.xpq.QUEUE)
+        self.xpq.mark_posted(["50"], "tw_1", "2026-07-16T11:00:00Z", path=self.xpq.QUEUE)
+        result = rc.check_owed_posts()
+        self.assertEqual(result, {"count": 1, "tasks": ["51"]})
+
+    def test_run_ritual_check_folds_owed_posts_key(self):
+        result = rc.run_ritual_check()
+        self.assertIn("owed_posts", result)
+        self.assertIn("count", result["owed_posts"])
+        self.assertIn("tasks", result["owed_posts"])
+
+    def test_format_includes_owed_posts_line(self):
+        self.xpq.queue_owed_post("50", "subscriber cadence", "2026-07-15T06:12:00Z", path=self.xpq.QUEUE)
+        formatted = rc.format_ritual_check(rc.run_ritual_check())
+        self.assertIn("owed posts: 1 pending (tasks: 50)", formatted)
+
+    def test_format_zero_pending_omits_tasks_paren(self):
+        formatted = rc.format_ritual_check(rc.run_ritual_check())
+        self.assertIn("owed posts: 0 pending", formatted)
+        self.assertNotIn("(tasks:", formatted)
+
+
 class RunRitualCheckCase(unittest.TestCase):
     """End-to-end: broken=True iff either ledger is broken, regardless of
     report/recheck state -- mirrors sync_checkout.sh's refuse discipline."""
@@ -531,6 +582,10 @@ class RunRitualCheckCase(unittest.TestCase):
         formatted = rc.format_ritual_check(result)
         for tool in xot.TRACKED_TOOLS:
             self.assertIn(f"{tool} escalation:", formatted)
+        # Task 85: the real owed-post backlog count folds in without a
+        # separate `x_post_queue.py pending` command.
+        self.assertIn("owed_posts", result)
+        self.assertIn("owed posts:", formatted)
 
 
 if __name__ == "__main__":
