@@ -42,3 +42,4 @@
 {"type": "queued", "task": "91", "topic": "the runbook now names its own one-call ritual tool -- TOWN-OPERATIONS.md corrected to match tools/ritual_check.py instead of describing it from memory", "queued_at": "2026-07-16T17:09:04Z"}
 {"type": "queued", "task": "92", "topic": "escalation tiers (48h/168h) for a long-stuck outage", "queued_at": "2026-07-16T18:15:00Z"}
 {"type": "queued", "task": "93", "topic": "commit-comment cadence -- the third and last of GitHub's repo-wide comment collections", "queued_at": "2026-07-16T20:21:04Z"}
+{"type": "queued", "task": "94", "topic": "wiring a live X-post read path into the seam engine (the future-version TODO since task 3)", "queued_at": "2026-07-16T21:19:47Z"}
