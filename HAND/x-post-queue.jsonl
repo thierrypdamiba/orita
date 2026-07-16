@@ -30,3 +30,4 @@
 {"type": "queued", "task": "79", "topic": "hardened milestone-/deployment-/issue-comment-cadence's CI commit steps pre-emptively against the exact snapshot-file crash task 78 fixed for subscriber-cadence", "queued_at": "2026-07-16T05:10:00Z"}
 {"type": "queued", "task": "80", "topic": "CI watch's blind spot -- oracle-cadence's real failure streak is now durably tracked, not eyeballed", "queued_at": "2026-07-16T06:12:00Z"}
 {"type": "queued", "task": "81", "topic": "the outage escalation never had to be typed twice", "queued_at": "2026-07-16T07:10:00Z"}
+{"type": "queued", "task": "82", "topic": "ritual_check.py now folds cron_health.py in too -- the last hand-run ritual command joins the one status block", "queued_at": "2026-07-16T08:09:24Z"}
