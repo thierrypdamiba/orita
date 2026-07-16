@@ -19,12 +19,13 @@ from pathlib import Path
 
 import pytest
 
-from seam_engine import report
+from seam_engine import draftback, report
 from seam_engine.wall import TEASER_LINE, WallInvariantViolation, wall_for
 
 FENCEPOST_ROOT = Path(__file__).resolve().parents[2]
 LEDGER_SRC = FENCEPOST_ROOT / "seam_engine" / "src" / "seam_engine" / "ledger.py"
 REPORT_SRC = FENCEPOST_ROOT / "seam_engine" / "src" / "seam_engine" / "report.py"
+DRAFTBACK_SRC = FENCEPOST_ROOT / "seam_engine" / "src" / "seam_engine" / "draftback.py"
 
 
 # --- the guard: wall_for never lets the wall reach parity -----------------
@@ -75,6 +76,34 @@ def test_report_does_not_inline_the_wall_formula():
     assert "max(recorded - 1, 0)" not in src
     assert "wall_for(recorded)" in src
     assert "from seam_engine.wall import" in src
+
+
+def test_draftback_does_not_inline_the_wall_formula():
+    # The third caller wall.py's own docstring warned about (ROADMAP.md #95):
+    # render_notion_page (task 17) predates wall_for (task 21) and kept its
+    # own inlined copy of the formula until now.
+    src = DRAFTBACK_SRC.read_text(encoding="utf-8")
+    assert "max(recorded - 1, 0)" not in src
+    assert "wall_for(recorded)" in src
+    assert "from seam_engine.wall import wall_for" in src
+
+
+def test_notion_page_wall_matches_wall_for_for_the_same_recorded():
+    # Same regression test_ledger_and_report_produce_the_same_wall_for_the_
+    # same_recorded already runs for ledger/report, now covering the third
+    # caller: the rendered Notion draft must never disagree with wall_for.
+    for recorded in [0, 1, 2, 7, 40]:
+        sealed = {
+            "date": "2026-07-12",
+            "generated_at": "2026-07-12T00:00:00+00:00",
+            "repo": "x/orita",
+            "primary_gap": None,
+            "fenceposts_recorded_total": recorded,
+        }
+        page = draftback.render_notion_page(sealed)
+        combined = "\n".join(b.text for b in page.blocks)
+        expected = wall_for(recorded)
+        assert f"The wall reads {expected}" in combined
 
 
 def test_ledger_and_report_produce_the_same_wall_for_the_same_recorded():

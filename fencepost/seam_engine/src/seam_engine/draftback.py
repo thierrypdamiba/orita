@@ -79,6 +79,7 @@ from pathlib import Path
 from typing import Any, Callable
 
 from seam_engine import report
+from seam_engine.wall import wall_for
 
 # fencepost/  (…/fencepost/seam_engine/src/seam_engine/draftback.py → parents[3])
 _FENCEPOST_ROOT = Path(__file__).resolve().parents[3]
@@ -184,7 +185,7 @@ def render_notion_page(sealed: dict[str, Any]) -> NotionPageDraft:
     repo = sealed.get("repo", "unknown")
     primary = sealed.get("primary_gap")
     recorded = sealed.get("fenceposts_recorded_total", 0)
-    wall = max(recorded - 1, 0)
+    wall = wall_for(recorded)
 
     blocks: list[NotionBlock] = [
         NotionBlock("heading", f"Fencepost Report — {date}"),
