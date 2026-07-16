@@ -84,30 +84,60 @@ class TestSubscriberCadenceIsGuarded(unittest.TestCase):
             )
 
 
-def _commit_step_run_script():
+def _commit_step_run_script(name_prefix):
     steps = _load_steps()
-    step = next(
-        s
-        for s in steps
-        if s.get("name", "").startswith(
-            "commit, if a snapshot or a subscriber-cadence call was sealed"
-        )
-    )
+    step = next(s for s in steps if s.get("name", "").startswith(name_prefix))
     return step["run"]
 
 
-class TestSubscriberCadenceCommitSurvivesAMissingSnapshot(unittest.TestCase):
-    """ROADMAP #78: task 64's continue-on-error on the SEAL step wasn't enough --
-    the COMMIT step right after it did `git add oracle/subscriber_snapshots.jsonl`
-    unconditionally, and that file has never once been created (every real run
-    of subscriber_cadence.py crashes on the endpoint's genuine 403 before it can
-    write one). `git add` on a nonexistent pathspec exits 128, uncaught by any
-    continue-on-error, and killed the whole job -- silently skipping every
-    cadence step declared after it in file order (tag-51 through
-    issue-comment-77, ten sources) on every single real CI run since task 64
-    shipped. This proves the fix survives the exact missing-file case live CI
-    hit (run 29424866577, 2026-07-15T14:44Z), by actually executing the
-    step's own script against a real temp git repo -- not a fixture guess."""
+# ROADMAP #79: task 78 fixed subscriber-cadence's own commit step; this table
+# covers the same crash class in every commit step whose snapshot file has
+# never once been created in production (subscriber, plus milestone/
+# deployment/issue-comment -- confirmed absent via `ls oracle/*.jsonl` at
+# both task 78 and task 79).
+GUARDED_CADENCES = [
+    ("commit, if a snapshot or a subscriber-cadence call was sealed", "oracle/subscriber_snapshots.jsonl"),
+    ("commit, if a snapshot or a milestone-cadence call was sealed", "oracle/milestone_snapshots.jsonl"),
+    ("commit, if a snapshot or a deployment-cadence call was sealed", "oracle/deployment_snapshots.jsonl"),
+    ("commit, if a snapshot or an issue-comment-cadence call was sealed", "oracle/issue_comment_snapshots.jsonl"),
+]
+
+SEAL_STEPS_REQUIRING_CONTINUE_ON_ERROR = [
+    "seal one real, timestamped, copylint-clean subscriber-cadence prediction",
+    "seal one real, timestamped, copylint-clean milestone-cadence prediction",
+    "seal one real, timestamped, copylint-clean deployment-cadence prediction",
+    "seal one real, timestamped, copylint-clean issue-comment-cadence prediction",
+]
+
+
+class TestNeverYetSealedCadenceSealStepsToleratePermissionWalls(unittest.TestCase):
+    """ROADMAP #79: milestone-/deployment-/issue-comment-cadence had never run
+    to completion in production (subscriber-cadence's own crash, fixed at
+    task 78, killed the job before execution ever reached them), so whether
+    their endpoints behave like /subscribers' genuine 403 was unconfirmed.
+    Pre-emptively giving their seal steps the same continue-on-error
+    tolerance subscriber-cadence already proved out closes that class of
+    risk before the first real run can hit it."""
+
+    def test_seal_step_has_continue_on_error(self):
+        steps = _load_steps()
+        for prefix in SEAL_STEPS_REQUIRING_CONTINUE_ON_ERROR:
+            with self.subTest(prefix=prefix):
+                step = next(s for s in steps if s.get("name", "").startswith(prefix))
+                self.assertTrue(
+                    step.get("continue-on-error"),
+                    f"{prefix!r} must not be able to take the whole job down "
+                    "if its endpoint turns out to be permission-walled",
+                )
+
+
+class TestNeverYetSealedCadenceCommitStepsSurviveAMissingSnapshot(unittest.TestCase):
+    """ROADMAP #78/#79: a bare `git add oracle/<x>_snapshots.jsonl` in a
+    commit step exits 128 (uncaught by any continue-on-error on the seal
+    step above it) the moment that file has never been created. Proves the
+    fix survives the exact missing-file case for every still-never-sealed
+    cadence, by actually executing each step's own script against a real
+    temp git repo -- not a fixture guess."""
 
     def _run_script_in_repo(self, repo_dir, script):
         return subprocess.run(
@@ -118,71 +148,80 @@ class TestSubscriberCadenceCommitSurvivesAMissingSnapshot(unittest.TestCase):
         )
 
     def test_commit_step_does_not_crash_when_snapshot_file_is_absent(self):
-        script = _commit_step_run_script()
-        with tempfile.TemporaryDirectory() as tmp:
-            subprocess.run(["git", "init", "-q"], cwd=tmp, check=True)
-            subprocess.run(
-                ["git", "config", "user.email", "test@example.com"], cwd=tmp, check=True
-            )
-            subprocess.run(["git", "config", "user.name", "test"], cwd=tmp, check=True)
-            os.makedirs(os.path.join(tmp, "records"))
-            with open(os.path.join(tmp, "records", "ledger.jsonl"), "w") as f:
-                f.write("")
-            subprocess.run(["git", "add", "-A"], cwd=tmp, check=True)
-            subprocess.run(["git", "commit", "-q", "-m", "init"], cwd=tmp, check=True)
+        for name_prefix, snapshot_path in GUARDED_CADENCES:
+            with self.subTest(snapshot_path=snapshot_path):
+                script = _commit_step_run_script(name_prefix)
+                with tempfile.TemporaryDirectory() as tmp:
+                    subprocess.run(["git", "init", "-q"], cwd=tmp, check=True)
+                    subprocess.run(
+                        ["git", "config", "user.email", "test@example.com"],
+                        cwd=tmp,
+                        check=True,
+                    )
+                    subprocess.run(["git", "config", "user.name", "test"], cwd=tmp, check=True)
+                    os.makedirs(os.path.join(tmp, "records"))
+                    with open(os.path.join(tmp, "records", "ledger.jsonl"), "w") as f:
+                        f.write("")
+                    subprocess.run(["git", "add", "-A"], cwd=tmp, check=True)
+                    subprocess.run(["git", "commit", "-q", "-m", "init"], cwd=tmp, check=True)
 
-            # No oracle/subscriber_snapshots.jsonl exists anywhere -- the exact
-            # live-CI shape when the seal step's continue-on-error swallowed a
-            # 403 before any snapshot was ever written.
-            with open(os.path.join(tmp, "records", "ledger.jsonl"), "a") as f:
-                f.write('{"seq": 1}\n')
+                    # No snapshot file exists anywhere -- the exact live-CI
+                    # shape when the seal step's continue-on-error swallowed
+                    # a failure before any snapshot was ever written.
+                    with open(os.path.join(tmp, "records", "ledger.jsonl"), "a") as f:
+                        f.write('{"seq": 1}\n')
 
-            # No `git push` (no remote in this fixture repo) -- swap the real
-            # script's push for a no-op so the test only exercises the add/
-            # diff/commit logic the fix actually touches.
-            script_no_push = script.replace("\ngit push", "\ntrue")
-            result = self._run_script_in_repo(tmp, script_no_push)
+                    # No `git push` (no remote in this fixture repo) -- swap
+                    # the real script's push for a no-op so the test only
+                    # exercises the add/diff/commit logic the fix touches.
+                    script_no_push = script.replace("\ngit push", "\ntrue")
+                    result = self._run_script_in_repo(tmp, script_no_push)
 
-            self.assertEqual(
-                result.returncode,
-                0,
-                f"commit step crashed on a missing snapshot file: {result.stderr}",
-            )
-            self.assertNotIn("did not match any files", result.stderr)
+                    self.assertEqual(
+                        result.returncode,
+                        0,
+                        f"commit step crashed on a missing snapshot file: {result.stderr}",
+                    )
+                    self.assertNotIn("did not match any files", result.stderr)
 
     def test_commit_step_still_stages_snapshot_file_when_present(self):
-        script = _commit_step_run_script()
-        with tempfile.TemporaryDirectory() as tmp:
-            subprocess.run(["git", "init", "-q"], cwd=tmp, check=True)
-            subprocess.run(
-                ["git", "config", "user.email", "test@example.com"], cwd=tmp, check=True
-            )
-            subprocess.run(["git", "config", "user.name", "test"], cwd=tmp, check=True)
-            os.makedirs(os.path.join(tmp, "records"))
-            os.makedirs(os.path.join(tmp, "oracle"))
-            with open(os.path.join(tmp, "records", "ledger.jsonl"), "w") as f:
-                f.write("")
-            subprocess.run(["git", "add", "-A"], cwd=tmp, check=True)
-            subprocess.run(["git", "commit", "-q", "-m", "init"], cwd=tmp, check=True)
+        for name_prefix, snapshot_path in GUARDED_CADENCES:
+            with self.subTest(snapshot_path=snapshot_path):
+                script = _commit_step_run_script(name_prefix)
+                with tempfile.TemporaryDirectory() as tmp:
+                    subprocess.run(["git", "init", "-q"], cwd=tmp, check=True)
+                    subprocess.run(
+                        ["git", "config", "user.email", "test@example.com"],
+                        cwd=tmp,
+                        check=True,
+                    )
+                    subprocess.run(["git", "config", "user.name", "test"], cwd=tmp, check=True)
+                    os.makedirs(os.path.join(tmp, "records"))
+                    os.makedirs(os.path.join(tmp, "oracle"), exist_ok=True)
+                    with open(os.path.join(tmp, "records", "ledger.jsonl"), "w") as f:
+                        f.write("")
+                    subprocess.run(["git", "add", "-A"], cwd=tmp, check=True)
+                    subprocess.run(["git", "commit", "-q", "-m", "init"], cwd=tmp, check=True)
 
-            with open(os.path.join(tmp, "oracle", "subscriber_snapshots.jsonl"), "w") as f:
-                f.write('{"count": 5}\n')
-            with open(os.path.join(tmp, "records", "ledger.jsonl"), "a") as f:
-                f.write('{"seq": 1}\n')
+                    snapshot_file = os.path.join(tmp, snapshot_path)
+                    with open(snapshot_file, "w") as f:
+                        f.write('{"count": 5}\n')
+                    with open(os.path.join(tmp, "records", "ledger.jsonl"), "a") as f:
+                        f.write('{"seq": 1}\n')
 
-            script_no_push = script.replace("\ngit push", "\ntrue")
-            result = self._run_script_in_repo(tmp, script_no_push)
-            self.assertEqual(result.returncode, 0, result.stderr)
+                    script_no_push = script.replace("\ngit push", "\ntrue")
+                    result = self._run_script_in_repo(tmp, script_no_push)
+                    self.assertEqual(result.returncode, 0, result.stderr)
 
-            committed = subprocess.run(
-                ["git", "show", "--name-only", "--pretty=format:", "HEAD"],
-                cwd=tmp,
-                capture_output=True,
-                text=True,
-                check=True,
-            ).stdout.split()
-            self.assertIn("oracle/subscriber_snapshots.jsonl", committed)
-            self.assertIn("records/ledger.jsonl", committed)
+                    committed = subprocess.run(
+                        ["git", "show", "--name-only", "--pretty=format:", "HEAD"],
+                        cwd=tmp,
+                        capture_output=True,
+                        text=True,
+                        check=True,
+                    ).stdout.split()
+                    self.assertIn(snapshot_path, committed)
+                    self.assertIn("records/ledger.jsonl", committed)
 
 
 if __name__ == "__main__":

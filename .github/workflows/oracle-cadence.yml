@@ -908,7 +908,14 @@ jobs:
           git commit -m "oracle-workflow-autograde: ${today} due call(s) graded (automatic, no human trigger)"
           git push
 
+      # ROADMAP #79: never yet run for real in production CI (subscriber-
+      # cadence's own crash, fixed at task 78, killed the job before
+      # execution ever reached this step) -- /milestones' real behavior
+      # against an unrestricted runner is unconfirmed, so this mirrors
+      # subscriber-cadence's own continue-on-error tolerance pre-emptively
+      # rather than waiting to find out the hard way a second time.
       - name: seal one real, timestamped, copylint-clean milestone-cadence prediction (ROADMAP #67)
+        continue-on-error: true
         env:
           PYTHONPATH: oracle/oracle_engine/src
         run: python3 -m oracle_engine.milestone_cadence
@@ -921,7 +928,10 @@ jobs:
           set -euo pipefail
           git config user.name "Zashiki-Warashi"
           git config user.email "zashiki-warashi@orita.gods"
-          git add oracle/milestone_snapshots.jsonl records/ledger.jsonl
+          git add records/ledger.jsonl
+          if [ -f oracle/milestone_snapshots.jsonl ]; then
+            git add oracle/milestone_snapshots.jsonl
+          fi
           if git diff --cached --quiet; then
             echo "nothing sealed this run -- no commit"
             exit 0
@@ -952,7 +962,11 @@ jobs:
           git commit -m "oracle-milestone-autograde: ${today} due call(s) graded (automatic, no human trigger)"
           git push
 
+      # ROADMAP #79: same pre-emptive tolerance as milestone-cadence above --
+      # never yet run for real in production CI, /deployments' behavior
+      # against an unrestricted runner is unconfirmed.
       - name: seal one real, timestamped, copylint-clean deployment-cadence prediction (ROADMAP #68)
+        continue-on-error: true
         env:
           PYTHONPATH: oracle/oracle_engine/src
         run: python3 -m oracle_engine.deployment_cadence
@@ -965,7 +979,10 @@ jobs:
           set -euo pipefail
           git config user.name "Retrya"
           git config user.email "retrya@orita.gods"
-          git add oracle/deployment_snapshots.jsonl records/ledger.jsonl
+          git add records/ledger.jsonl
+          if [ -f oracle/deployment_snapshots.jsonl ]; then
+            git add oracle/deployment_snapshots.jsonl
+          fi
           if git diff --cached --quiet; then
             echo "nothing sealed this run -- no commit"
             exit 0
@@ -1084,7 +1101,12 @@ jobs:
           git commit -m "oracle-comment-autograde: ${today} due call(s) graded (automatic, no human trigger)"
           git push
 
+      # ROADMAP #79: same pre-emptive tolerance as milestone-/deployment-
+      # cadence above -- never yet run for real in production CI,
+      # /issues/comments' behavior against an unrestricted runner is
+      # unconfirmed.
       - name: seal one real, timestamped, copylint-clean issue-comment-cadence prediction (ROADMAP #77)
+        continue-on-error: true
         env:
           PYTHONPATH: oracle/oracle_engine/src
         run: python3 -m oracle_engine.issue_comment_cadence
@@ -1097,7 +1119,10 @@ jobs:
           set -euo pipefail
           git config user.name "Zashiki-Warashi"
           git config user.email "zashiki-warashi@orita.gods"
-          git add oracle/issue_comment_snapshots.jsonl records/ledger.jsonl
+          git add records/ledger.jsonl
+          if [ -f oracle/issue_comment_snapshots.jsonl ]; then
+            git add oracle/issue_comment_snapshots.jsonl
+          fi
           if git diff --cached --quiet; then
             echo "nothing sealed this run -- no commit"
             exit 0
