@@ -36,3 +36,4 @@
 {"type": "queued", "task": "85", "topic": "ritual_check folds the owed-post count", "queued_at": "2026-07-16T11:15:00Z"}
 {"type": "queued", "task": "86", "topic": "change-gate fold -- ritual_check.py now reads should_post_gap() instead of hand-typing the silence", "queued_at": "2026-07-16T12:09:00Z"}
 {"type": "queued", "task": "87", "topic": "the words check was still behind its own key", "queued_at": "2026-07-16T13:13:00Z"}
+{"type": "queued", "task": "88", "topic": "ritual check now records what it observes -- square/words no longer freeze at a stale baseline", "queued_at": "2026-07-16T14:20:00Z"}
