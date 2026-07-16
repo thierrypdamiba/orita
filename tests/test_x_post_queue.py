@@ -168,6 +168,72 @@ class TestComposeBatchedTweets(unittest.TestCase):
             self.assertTrue(b.startswith(f"Owed reports ({i}/{n}): "))
 
 
+class TestBatchEntries(unittest.TestCase):
+    def test_matches_compose_batched_tweets_text_exactly(self):
+        entries = [
+            {"task": "50", "topic": "subscriber cadence -- the town's own GitHub watcher count", "queued_at": "1"},
+            {"task": "51", "topic": "tag cadence -- the town's own GitHub tag count", "queued_at": "2"},
+            {"task": "52", "topic": "label cadence -- the town's own GitHub repository label count", "queued_at": "3"},
+            {"task": "53", "topic": "topic cadence -- the town's own GitHub repository topic count", "queued_at": "4"},
+            {"task": "54", "topic": "open pull-request cadence -- the town's own currently-open PR count", "queued_at": "5"},
+            {"task": "55", "topic": "the owed-post queue itself -- tools/x_post_queue.py", "queued_at": "6"},
+        ]
+        groups = xpq.batch_entries(entries)
+        n = len(groups)
+        rebuilt = [
+            xpq._header(i, n) + "; ".join(xpq._item_text(e) for e in g)
+            for i, g in enumerate(groups, start=1)
+        ]
+        self.assertEqual(rebuilt, xpq.compose_batched_tweets(entries))
+
+    def test_every_entry_appears_in_exactly_one_group_in_order(self):
+        entries = [{"task": str(n), "topic": "y" * 60, "queued_at": str(n)} for n in range(10)]
+        groups = xpq.batch_entries(entries)
+        flattened = [e["task"] for g in groups for e in g]
+        self.assertEqual(flattened, [e["task"] for e in entries])
+
+
+class TestNextPostPlan(unittest.TestCase):
+    def test_raises_on_no_pending_entries(self):
+        with self.assertRaises(ValueError):
+            xpq.next_post_plan([])
+
+    def test_single_batch_backlog_has_zero_remaining(self):
+        entries = [
+            {"task": "50", "topic": "subscriber cadence", "queued_at": "x"},
+            {"task": "51", "topic": "tag cadence", "queued_at": "x"},
+        ]
+        plan = xpq.next_post_plan(entries)
+        self.assertEqual(plan["tasks"], ["50", "51"])
+        self.assertEqual(plan["remaining_batches"], 0)
+        self.assertEqual(plan["text"], xpq.compose_combined_tweet(entries))
+
+    def test_multi_batch_backlog_returns_only_the_first_batch(self):
+        entries = [{"task": str(n), "topic": "y" * 60, "queued_at": str(n)} for n in range(10)]
+        full_batches = xpq.compose_batched_tweets(entries)
+        self.assertGreater(len(full_batches), 1)
+
+        plan = xpq.next_post_plan(entries)
+        self.assertEqual(plan["text"], full_batches[0])
+        self.assertEqual(plan["remaining_batches"], len(full_batches) - 1)
+        self.assertLessEqual(len(plan["text"]), xpq.MAX_TWEET_CHARS)
+
+    def test_draining_one_batch_at_a_time_never_posts_more_than_one_per_call(self):
+        entries = [{"task": str(n), "topic": "y" * 60, "queued_at": str(n)} for n in range(18)]
+        remaining = list(entries)
+        posted_order = []
+        calls = 0
+        while remaining:
+            calls += 1
+            plan = xpq.next_post_plan(remaining)
+            self.assertLessEqual(len(plan["text"]), xpq.MAX_TWEET_CHARS)
+            posted_order.extend(plan["tasks"])
+            remaining = [e for e in remaining if e["task"] not in plan["tasks"]]
+            self.assertEqual(plan["remaining_batches"], len(xpq.batch_entries(remaining)) if remaining else 0)
+        self.assertEqual(posted_order, [e["task"] for e in entries])
+        self.assertGreater(calls, 1)  # never drained in a single burst call
+
+
 class TestMarkPosted(_TempQueueCase):
     def test_mark_posted_never_mutates_a_prior_queued_line(self):
         xpq.queue_owed_post("50", "subscriber cadence", "2026-07-14T01:09:00Z", path=self.path)

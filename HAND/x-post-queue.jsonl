@@ -32,3 +32,4 @@
 {"type": "queued", "task": "81", "topic": "the outage escalation never had to be typed twice", "queued_at": "2026-07-16T07:10:00Z"}
 {"type": "queued", "task": "82", "topic": "ritual_check.py now folds cron_health.py in too -- the last hand-run ritual command joins the one status block", "queued_at": "2026-07-16T08:09:24Z"}
 {"type": "queued", "task": "83", "topic": "check_x_escalation folded into ritual_check.py -- the escalation verdict no longer hand-retyped every hour", "queued_at": "2026-07-16T09:08:48Z"}
+{"type": "queued", "task": "84", "topic": "the drain plan itself -- tools/x_post_queue.py's next_post_plan() caps backlog recovery to one post per hour, never a burst", "queued_at": "2026-07-16T10:07:35Z"}
