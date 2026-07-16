@@ -33,12 +33,21 @@ when the god on duty has that hour's square read in hand. Passing nothing
 for `square_state` leaves the result's `square` key `None`, unchanged from
 before -- fully backward compatible for a local-only run.
 
+Task 82 brings in the one live-API-input tool that never joined tasks
+71/73/74's fold: `cron_health.py` (task 62). Its own docstring once claimed
+it "stays a live-API-input tool, not folded into ritual_check.py's local-
+only scope" -- but `check_ci` (task 73) is ALSO a live-API-input the
+caller pre-fetches and hands in, and it folded in fine. `check_cron`
+mirrors `check_ci` exactly: `cron_checks` is `None` unless the caller
+already holds this hour's live `list_workflow_runs` read, folded through
+`cron_health.schedule_status` with no network call of its own.
+
 Same discipline as sync_checkout.sh: refuse (report broken=True) rather
 than paper over a real problem. A ledger that fails to verify is reported
 broken, never silently skipped.
 
 Usage:
-    python3 tools/ritual_check.py [--now ISO_TS] [--fencepost-base DIR] [--square-state PATH]
+    python3 tools/ritual_check.py [--now ISO_TS] [--fencepost-base DIR] [--square-state PATH] [--cron-checks PATH]
 """
 from __future__ import annotations
 
@@ -79,6 +88,10 @@ def _ci_watch():
 
 def _word_watch():
     return _load("_ritual_word_watch", os.path.join(ROOT, "tools", "word_watch.py"))
+
+
+def _cron_health():
+    return _load("_ritual_cron_health", os.path.join(ROOT, "tools", "cron_health.py"))
 
 
 def _seam_ledger():
@@ -175,6 +188,30 @@ def check_ci(ci_checks: list | None) -> dict | None:
     return {w: mod.format_status_line(entries, w) for w in mod.TRACKED_WORKFLOWS}
 
 
+def check_cron(cron_checks: list | None, now_iso: str) -> dict | None:
+    """Fold this hour's already-fetched `{workflow, cron_expr, last_run_at}`
+    dicts through `cron_health.schedule_status`, mirroring `check_ci`'s
+    exact live-API-input-but-no-network-call shape (task 73) rather than
+    `check_words`'s local-filesystem shape (task 74) -- `cron_checks` is
+    `None` unless the caller already holds this hour's live
+    `list_workflow_runs` read for the tracked scheduled workflows. An
+    unparseable cron (`cron_health.parse_daily_cron`'s own rejection)
+    surfaces as `{"status": "error", "error": ...}` for that workflow
+    rather than crashing the whole ritual check -- the same refuse-not-
+    crash discipline `sync_checkout.sh` already holds, scoped to one
+    workflow instead of the whole run."""
+    if cron_checks is None:
+        return None
+    mod = _cron_health()
+    result = {}
+    for c in cron_checks:
+        try:
+            result[c["workflow"]] = mod.schedule_status(c["cron_expr"], c.get("last_run_at"), now_iso)
+        except ValueError as e:
+            result[c["workflow"]] = {"status": "error", "error": str(e)}
+    return result
+
+
 def check_words(check_words_flag: bool) -> dict | None:
     """Read the four places Thierry's words land (task 74's
     `word_watch.compute_word_state`) and fold through `word_delta`.
@@ -197,6 +234,7 @@ def run_ritual_check(
     square_state: dict | None = None,
     ci_checks: list | None = None,
     check_words_flag: bool = False,
+    cron_checks: list | None = None,
 ) -> dict:
     if now is None:
         now = datetime.now(timezone.utc)
@@ -208,6 +246,7 @@ def run_ritual_check(
     square = check_square(square_state)
     ci = check_ci(ci_checks)
     words = check_words(check_words_flag)
+    cron = check_cron(cron_checks, now_iso)
     broken = (not town["ok"]) or (not fencepost["ok"])
     return {
         "now": now_iso,
@@ -218,6 +257,7 @@ def run_ritual_check(
         "square": square,
         "ci": ci,
         "words": words,
+        "cron": cron,
         "broken": broken,
     }
 
@@ -251,6 +291,16 @@ def format_ritual_check(result: dict) -> str:
     if result["words"] is not None:
         w = result["words"]
         lines.append(f"  words: {'changed' if w['changed'] else 'unchanged'} -- {w['reason']}")
+    if result["cron"] is not None:
+        for workflow, info in result["cron"].items():
+            if info["status"] == "error":
+                lines.append(f"  cron/{workflow}: error -- {info['error']}")
+            else:
+                lines.append(
+                    f"  cron/{workflow}: {info['status']}"
+                    + (f" ({info['hours_late']}h late)" if info["hours_late"] is not None else "")
+                    + f" -- due {info['due_at']}, last run {info['last_run_at']}"
+                )
     return "\n".join(lines)
 
 
@@ -261,6 +311,7 @@ if __name__ == "__main__":
     square_state = None
     ci_checks = None
     check_words_flag = False
+    cron_checks = None
     i = 0
     while i < len(argv):
         if argv[i] == "--now" and i + 1 < len(argv):
@@ -279,6 +330,10 @@ if __name__ == "__main__":
             with open(argv[i + 1]) as f:
                 ci_checks = json.load(f)
             i += 2
+        elif argv[i] == "--cron-checks" and i + 1 < len(argv):
+            with open(argv[i + 1]) as f:
+                cron_checks = json.load(f)
+            i += 2
         elif argv[i] == "--json":
             base = base
             i += 1
@@ -293,6 +348,7 @@ if __name__ == "__main__":
         square_state=square_state,
         ci_checks=ci_checks,
         check_words_flag=check_words_flag,
+        cron_checks=cron_checks,
     )
     if "--json" in argv:
         print(json.dumps(result, ensure_ascii=False, indent=2))

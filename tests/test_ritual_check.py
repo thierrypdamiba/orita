@@ -331,6 +331,76 @@ class CIFoldCase(unittest.TestCase):
         self.assertNotIn("ci/", without_ci)
 
 
+class CronFoldCase(unittest.TestCase):
+    """Task 82: run_ritual_check(cron_checks=...) folds cron_health.py's
+    schedule_status() into the same structured result, the identical
+    live-API-input-but-no-network-call shape task 73 already proved for
+    ci_checks -- cron_health's own docstring once claimed it could never
+    join this fold; this proves that claim was wrong."""
+
+    def test_no_cron_checks_is_none(self):
+        self.assertIsNone(rc.check_cron(None, "2026-07-16T08:00:00Z"))
+
+    def test_on_time_workflow_reports_on_time(self):
+        result = rc.check_cron(
+            [{"workflow": "seam-scan", "cron_expr": "0 12 * * *", "last_run_at": "2026-07-15T12:05:00Z"}],
+            "2026-07-16T08:00:00Z",
+        )
+        self.assertEqual(result["seam-scan"]["status"], "on_time")
+
+    def test_overdue_workflow_reports_overdue(self):
+        result = rc.check_cron(
+            [{"workflow": "oracle-cadence", "cron_expr": "0 13 * * *", "last_run_at": "2026-07-14T13:00:00Z"}],
+            "2026-07-16T08:00:00Z",
+        )
+        self.assertEqual(result["oracle-cadence"]["status"], "overdue")
+
+    def test_unparseable_cron_reports_error_not_crash(self):
+        result = rc.check_cron(
+            [{"workflow": "weird", "cron_expr": "0 12 1 * *", "last_run_at": None}],
+            "2026-07-16T08:00:00Z",
+        )
+        self.assertEqual(result["weird"]["status"], "error")
+        self.assertIn("only fixed-hour daily crons", result["weird"]["error"])
+
+    def test_run_ritual_check_folds_cron_key(self):
+        result = rc.run_ritual_check(
+            cron_checks=[
+                {"workflow": "seam-scan", "cron_expr": "0 12 * * *", "last_run_at": "2026-07-15T12:05:00Z"},
+            ]
+        )
+        self.assertIsNotNone(result["cron"])
+        self.assertIn("seam-scan", result["cron"])
+
+    def test_run_ritual_check_cron_none_when_omitted(self):
+        result = rc.run_ritual_check()
+        self.assertIsNone(result["cron"])
+
+    def test_format_includes_cron_lines_only_when_present(self):
+        with_cron = rc.format_ritual_check(
+            {
+                **rc.run_ritual_check(),
+                "cron": {
+                    "seam-scan": {
+                        "status": "on_time",
+                        "due_at": "2026-07-15T12:00:00+00:00",
+                        "last_run_at": "2026-07-15T12:05:00Z",
+                        "hours_late": None,
+                    }
+                },
+            }
+        )
+        self.assertIn("cron/seam-scan: on_time", with_cron)
+        without_cron = rc.format_ritual_check(rc.run_ritual_check())
+        self.assertNotIn("cron/", without_cron)
+
+    def test_format_includes_error_line_for_unparseable_cron(self):
+        with_error = rc.format_ritual_check(
+            {**rc.run_ritual_check(), "cron": {"weird": {"status": "error", "error": "bad cron"}}}
+        )
+        self.assertIn("cron/weird: error -- bad cron", with_error)
+
+
 class WordFoldCase(unittest.TestCase):
     """Task 74: run_ritual_check(check_words_flag=True) folds word_watch.py's
     durable "has a new word from Thierry landed" check into the same

@@ -19,6 +19,12 @@ already fetches the real last-run timestamp via `mcp__github__actions_list`
 plus the workflow's own declared cron, into a rule-based verdict instead
 of a felt one.
 
+Task 82 folds this module into `tools/ritual_check.py`'s one structured
+status block via `check_cron(cron_checks, now_iso)`, mirroring how task 73
+already folded `ci_watch.py` in despite both taking the identical
+live-API-input-but-no-network-call shape. Calling `cron_health.py`
+directly, as below, still works standalone -- the fold is additive.
+
 Usage:
     python3 tools/cron_health.py <cron_expr> <last_run_iso|-> <now_iso> [grace_hours]
 """
