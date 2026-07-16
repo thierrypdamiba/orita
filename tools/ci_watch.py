@@ -33,7 +33,12 @@ import os
 
 LOG = os.path.join(os.path.dirname(__file__), "..", "HAND", "ci-watch-log.jsonl")
 CONCLUSIONS = ("success", "failure")
-TRACKED_WORKFLOWS = ("dawn-run", "pages")
+# Task 80: dawn-run/pages essentially never fail -- seam-scan and
+# oracle-cadence are the two workflows that actually have (tasks 63/64/65/
+# 78/79 each fixed a real live crash in one of them). Watching only the
+# two quiet doors left the two loud ones unwatched; this closes that gap
+# the same way task 72 closed it for x_outage_tracker.py's TRACKED_TOOLS.
+TRACKED_WORKFLOWS = ("dawn-run", "pages", "seam-scan", "oracle-cadence")
 
 
 def _entries(path=LOG):

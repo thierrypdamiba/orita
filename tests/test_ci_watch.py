@@ -117,7 +117,39 @@ class TestFormatStatusLine(_TempLogCase):
 
 class TestTrackedWorkflows(unittest.TestCase):
     def test_dawn_run_and_pages_are_tracked(self):
-        self.assertEqual(ciw.TRACKED_WORKFLOWS, ("dawn-run", "pages"))
+        self.assertIn("dawn-run", ciw.TRACKED_WORKFLOWS)
+        self.assertIn("pages", ciw.TRACKED_WORKFLOWS)
+
+    def test_seam_scan_and_oracle_cadence_are_tracked(self):
+        """Task 80: the two workflows that actually fail in production were
+        never watched -- dawn-run/pages essentially never do. This is the
+        identical gap task 72 closed for x_outage_tracker.py's
+        TRACKED_TOOLS, applied here."""
+        self.assertIn("seam-scan", ciw.TRACKED_WORKFLOWS)
+        self.assertIn("oracle-cadence", ciw.TRACKED_WORKFLOWS)
+
+    def test_status_cli_output_includes_all_four_workflows(self):
+        import subprocess
+        import sys
+
+        fd, path = tempfile.mkstemp(suffix=".jsonl")
+        os.close(fd)
+        os.remove(path)
+        try:
+            ciw.record_check("seam-scan", "success", 1, "2026-07-15T13:39:54Z", path=path)
+            ciw.record_check("oracle-cadence", "failure", 2, "2026-07-15T14:43:50Z", path=path)
+            script = (
+                "import sys; sys.path.insert(0, %r); import importlib.util as u; "
+                "spec = u.spec_from_file_location('ci_watch', %r); m = u.module_from_spec(spec); "
+                "spec.loader.exec_module(m); entries = m._entries(%r); "
+                "[print(m.format_status_line(entries, w)) for w in m.TRACKED_WORKFLOWS]"
+            ) % (ROOT, os.path.join(ROOT, "tools", "ci_watch.py"), path)
+            out = subprocess.run([sys.executable, "-c", script], capture_output=True, text=True, check=True)
+            self.assertIn("seam-scan:", out.stdout)
+            self.assertIn("oracle-cadence:", out.stdout)
+        finally:
+            if os.path.exists(path):
+                os.remove(path)
 
 
 if __name__ == "__main__":

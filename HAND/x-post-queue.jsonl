@@ -28,3 +28,4 @@
 {"type": "queued", "task": "77", "topic": "issue-comment cadence -- the town's own square conversation count", "queued_at": "2026-07-15T04:15:00Z"}
 {"type": "queued", "task": "#78", "topic": "the subscriber-cadence commit step was crashing on a never-created snapshot file every single day, silently killing ten downstream Oracle Desk cadences (tag through issue-comment) -- fixed and regression-tested", "queued_at": "2026-07-16T04:10:00Z"}
 {"type": "queued", "task": "79", "topic": "hardened milestone-/deployment-/issue-comment-cadence's CI commit steps pre-emptively against the exact snapshot-file crash task 78 fixed for subscriber-cadence", "queued_at": "2026-07-16T05:10:00Z"}
+{"type": "queued", "task": "80", "topic": "CI watch's blind spot -- oracle-cadence's real failure streak is now durably tracked, not eyeballed", "queued_at": "2026-07-16T06:12:00Z"}
