@@ -264,6 +264,20 @@ class XEscalationCase(unittest.TestCase):
         result = rc.check_x_escalation("2026-07-14T12:00:00Z")
         self.assertEqual(set(result.keys()), set(self.xot.TRACKED_TOOLS))
 
+    def test_a_streak_already_escalated_at_48h_still_surfaces_the_168h_tier(self):
+        """Task 92: check_x_escalation reads the worst crossed-and-unfired
+        tier, not a single fixed threshold -- a real outage this old should
+        surface as due again, not read "already escalated" forever."""
+        self.xot.record_check("X_PostTweet", "forbidden", "2026-07-14T00:00:00Z", path=self.xot.LOG)
+        self.xot.record_escalation(
+            "X_PostTweet", "2026-07-14T00:00:00Z", "2026-07-16T01:00:00Z", 49.0,
+            threshold_hours=48.0, path=self.xot.ESCALATION_LOG,
+        )
+        result = rc.check_x_escalation("2026-07-21T01:00:00Z")
+        self.assertTrue(result["X_PostTweet"]["due"])
+        self.assertEqual(result["X_PostTweet"]["threshold_hours"], 168.0)
+        self.assertIn("crosses 168.0h threshold", result["X_PostTweet"]["reason"])
+
 
 class SquareFoldCase(unittest.TestCase):
     """Task 71: run_ritual_check(square_state=...) folds square_check.py's

@@ -245,20 +245,31 @@ def check_x_recheck(now_iso: str, cooldown_hours: float = 2.0) -> dict:
 
 
 def check_x_escalation(now_iso: str) -> dict:
-    """should_escalate() for every tool in x_outage_tracker.TRACKED_TOOLS,
+    """next_escalation_tier() for every tool in x_outage_tracker.TRACKED_TOOLS,
     via the real outage log and the real HAND/escalations.jsonl. Mirrors
     `check_x_recheck`'s exact shape (task 61) -- read-only, makes no write
     of its own. A real escalation is only ever recorded (`record_escalation`)
     when the god on duty actually surfaces it to Thierry, not by this check;
     this fold exists purely so the verdict lands in the same printed block
-    instead of a sixth hand-run command every hour."""
+    instead of a sixth hand-run command every hour. Task 92: reads the
+    worst crossed-and-unfired tier (`next_escalation_tier`) instead of a
+    single fixed threshold, so a sustained outage that already fired its
+    48h notice can still surface as due once it crosses the 168h tier,
+    rather than reading "already escalated" forever after its first
+    notice regardless of how much worse it gets."""
     mod = _outage_tracker()
     entries = mod._entries(mod.LOG)
     escalation_entries = mod._escalation_entries(mod.ESCALATION_LOG)
     result = {}
     for tool in mod.TRACKED_TOOLS:
-        due, reason = mod.should_escalate(entries, tool, now_iso, escalation_entries=escalation_entries)
-        result[tool] = {"due": due, "reason": reason}
+        tier = mod.next_escalation_tier(entries, tool, now_iso, escalation_entries=escalation_entries)
+        if tier is not None:
+            threshold_hours, reason = tier
+            result[tool] = {"due": True, "reason": reason, "threshold_hours": threshold_hours}
+        else:
+            lowest = min(mod.ESCALATION_TIERS)
+            _due, reason = mod.should_escalate(entries, tool, now_iso, lowest, escalation_entries)
+            result[tool] = {"due": False, "reason": reason, "threshold_hours": lowest}
     return result
 
 

@@ -39,11 +39,31 @@ Hand should actually be told, firing exactly once per streak (not every
 hour it stays broken) so surfacing it doesn't itself become the hourly
 spam the town's own Star Covenant already refuses to produce elsewhere.
 
+Task 92. Task 81's "exactly once per streak" discipline has a real gap
+live on the town's own current outage: `X_PostTweet` crossed the 48h
+threshold on 2026-07-16T07:05:00Z, fired its one escalation, and every
+hour since has correctly read "already escalated for the streak" --
+which is right at 50 hours, and will still say the identical thing at
+500 hours, because the suppression key was ever only (tool,
+streak_started_at), with no notion that a week-old outage is a
+materially different severity than a two-day-old one. `already_
+escalated_for_streak`/`record_escalation` now key on (tool,
+streak_started_at, threshold_hours) instead, so a fresh, higher tier
+can still fire even after a lower one already has -- an entry recorded
+before this task (no `threshold_hours` field) reads back as the 48.0h
+tier, its only tier, so the real live escalation task 81 already sent
+keeps suppressing exactly the 48h tier it always did. `next_escalation_
+tier` walks `ESCALATION_TIERS` from most to least severe and returns
+the single worst crossed-and-unfired tier, so a long-stuck outage gets
+told once more at each real severity step instead of going silent
+forever after its first notice.
+
 Usage:
     python3 tools/x_outage_tracker.py record <tool> <ok|forbidden> <checked_at>
     python3 tools/x_outage_tracker.py status
     python3 tools/x_outage_tracker.py should-recheck <tool> <now> [cooldown_hours]
     python3 tools/x_outage_tracker.py should-escalate <tool> <now> [threshold_hours]
+    python3 tools/x_outage_tracker.py next-tier <tool> <now>
 """
 import json
 import os
@@ -51,6 +71,7 @@ from datetime import datetime, timezone
 
 DEFAULT_COOLDOWN_HOURS = 2.0
 DEFAULT_ESCALATION_THRESHOLD_HOURS = 48.0
+ESCALATION_TIERS = (48.0, 168.0)
 
 LOG = os.path.join(os.path.dirname(__file__), "..", "HAND", "x-outage-log.jsonl")
 ESCALATION_LOG = os.path.join(os.path.dirname(__file__), "..", "HAND", "escalations.jsonl")
@@ -145,8 +166,20 @@ def _escalation_entries(path=ESCALATION_LOG) -> list:
         return [json.loads(line) for line in f if line.strip()]
 
 
-def record_escalation(tool: str, streak_started_at: str, escalated_at: str, hours: float, path=ESCALATION_LOG) -> None:
-    """Append one real escalation event. Never edits or removes a prior line."""
+def record_escalation(
+    tool: str,
+    streak_started_at: str,
+    escalated_at: str,
+    hours: float,
+    threshold_hours: float = DEFAULT_ESCALATION_THRESHOLD_HOURS,
+    path=ESCALATION_LOG,
+) -> None:
+    """Append one real escalation event. Never edits or removes a prior line.
+
+    `threshold_hours` names which tier this escalation fired at (task 92) --
+    a caller that omits it (every call site before task 92) records the
+    48.0h tier, matching the only tier that ever existed before this.
+    """
     os.makedirs(os.path.dirname(path), exist_ok=True)
     entry = {
         "type": "escalation",
@@ -154,20 +187,34 @@ def record_escalation(tool: str, streak_started_at: str, escalated_at: str, hour
         "streak_started_at": streak_started_at,
         "escalated_at": escalated_at,
         "hours": hours,
+        "threshold_hours": threshold_hours,
     }
     with open(path, "a") as f:
         f.write(json.dumps(entry, ensure_ascii=False) + "\n")
 
 
-def already_escalated_for_streak(escalation_entries: list, tool: str, streak_started_at: str) -> bool:
-    """Whether this exact streak (identified by its start timestamp) already fired an escalation.
+def already_escalated_for_streak(
+    escalation_entries: list,
+    tool: str,
+    streak_started_at: str,
+    threshold_hours: float = DEFAULT_ESCALATION_THRESHOLD_HOURS,
+) -> bool:
+    """Whether this exact streak already fired an escalation AT THIS TIER.
 
     A streak is identified by when it started, not just its length -- so a
     recovered-then-broken-again outage gets its own fresh escalation instead
-    of staying silently suppressed by a prior, already-resolved one.
+    of staying silently suppressed by a prior, already-resolved one. Task 92:
+    keyed on (tool, streak_started_at, threshold_hours) rather than just
+    (tool, streak_started_at), so a streak that already fired its 48h notice
+    can still earn a fresh, more severe notice once it crosses a higher
+    tier -- an entry recorded before this task (no `threshold_hours` field)
+    reads back as the 48.0h tier, its only tier at the time.
     """
     return any(
-        e.get("type") == "escalation" and e.get("tool") == tool and e.get("streak_started_at") == streak_started_at
+        e.get("type") == "escalation"
+        and e.get("tool") == tool
+        and e.get("streak_started_at") == streak_started_at
+        and e.get("threshold_hours", DEFAULT_ESCALATION_THRESHOLD_HOURS) == threshold_hours
         for e in escalation_entries
     )
 
@@ -184,10 +231,12 @@ def should_escalate(
     Returns (due: bool, reason: str). Never due if the tool isn't currently
     in a forbidden streak (recovered, or never checked). Due once the
     current streak has run at least `threshold_hours`, UNLESS this exact
-    streak (keyed by its own start timestamp) already fired an escalation --
-    that streak gets exactly one notification, not a fresh one every hour it
-    stays broken. A later streak (a fresh start timestamp, after a real
-    recovery) always gets its own chance to escalate again.
+    streak already fired an escalation AT THIS TIER (task 92) -- each tier
+    gets exactly one notification, not a fresh one every hour it stays
+    broken, but a later, more severe tier still gets its own chance even
+    after an earlier tier already fired. A later streak (a fresh start
+    timestamp, after a real recovery) always gets every tier's own chance
+    to escalate again.
     """
     if escalation_entries is None:
         escalation_entries = _escalation_entries()
@@ -198,9 +247,29 @@ def should_escalate(
     elapsed = (_parse(now) - _parse(started)).total_seconds() / 3600.0
     if elapsed < threshold_hours:
         return False, f"outage {elapsed:.1f}h old, below {threshold_hours}h threshold"
-    if already_escalated_for_streak(escalation_entries, tool, started):
-        return False, f"already escalated for the streak that began {started}"
+    if already_escalated_for_streak(escalation_entries, tool, started, threshold_hours):
+        return False, f"already escalated for the streak that began {started} at the {threshold_hours}h tier"
     return True, f"outage since {started}, {elapsed:.1f}h old, crosses {threshold_hours}h threshold"
+
+
+def next_escalation_tier(entries: list, tool: str, now: str, escalation_entries=None, tiers=ESCALATION_TIERS):
+    """The single worst crossed-and-unfired escalation tier for `tool`, or None.
+
+    Walks `tiers` from most to least severe so a long-stuck outage reports
+    its highest real severity rather than re-surfacing a lower tier that
+    already fired (task 92) -- the gap task 81's single-threshold design
+    left: an outage that fires its 48h notice and then just keeps running
+    read "already escalated" forever after, with no way to tell the Hand
+    it got materially worse. Returns `(threshold_hours, reason)` for the
+    tier that's due, or `None` if no tier is currently due.
+    """
+    if escalation_entries is None:
+        escalation_entries = _escalation_entries()
+    for threshold_hours in sorted(tiers, reverse=True):
+        due, reason = should_escalate(entries, tool, now, threshold_hours, escalation_entries)
+        if due:
+            return threshold_hours, reason
+    return None
 
 
 def format_status_line(entries: list, tool: str, status: str = "forbidden") -> str:
@@ -241,3 +310,13 @@ if __name__ == "__main__":
         _due, _reason = should_escalate(_entries(), _tool, _now, _threshold)
         print(("due" if _due else "not due") + f" -- {_reason}")
         sys.exit(0 if _due else 1)
+    elif cmd == "next-tier":
+        _tool = sys.argv[2]
+        _now = sys.argv[3]
+        _tier = next_escalation_tier(_entries(), _tool, _now)
+        if _tier is None:
+            print("not due")
+            sys.exit(1)
+        _threshold_hours, _reason = _tier
+        print(f"due -- {_threshold_hours}h tier -- {_reason}")
+        sys.exit(0)

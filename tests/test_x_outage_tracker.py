@@ -299,6 +299,109 @@ class TestRecordEscalation(_TempLogCase):
         self.assertFalse(xot.already_escalated_for_streak(entries, "X_PostTweet", "2026-07-15T00:00:00Z"))
         self.assertFalse(xot.already_escalated_for_streak(entries, "X_GetUserTweets", "2026-07-14T01:09:00Z"))
 
+    def test_omitted_threshold_defaults_to_the_48h_tier(self):
+        xot.record_escalation("X_PostTweet", "2026-07-14T01:09:00Z", "2026-07-16T02:00:00Z", 48.85, path=self.path)
+        entry = xot._escalation_entries(path=self.path)[0]
+        self.assertEqual(entry["threshold_hours"], 48.0)
+
+
+class TestTieredEscalation(unittest.TestCase):
+    """Task 92: a streak that already fired its 48h notice still earns a
+    fresh, more severe notice once it crosses the 168h tier -- the gap
+    task 81's single (tool, streak_started_at) suppression key left open
+    on the town's own real, still-ongoing X outage."""
+
+    def test_already_escalated_at_48h_does_not_suppress_the_168h_tier(self):
+        entries = [{"type": "check", "tool": "X_PostTweet", "status": "forbidden", "checked_at": "2026-07-14T01:09:00Z"}]
+        prior_escalations = [
+            {
+                "type": "escalation",
+                "tool": "X_PostTweet",
+                "streak_started_at": "2026-07-14T01:09:00Z",
+                "escalated_at": "2026-07-16T02:00:00Z",
+                "hours": 48.85,
+                "threshold_hours": 48.0,
+            }
+        ]
+        due, reason = xot.should_escalate(
+            entries, "X_PostTweet", "2026-07-21T02:00:00Z", threshold_hours=168.0, escalation_entries=prior_escalations
+        )
+        self.assertTrue(due)
+        self.assertIn("crosses 168.0h threshold", reason)
+
+    def test_a_pre_task_92_entry_with_no_threshold_field_reads_as_the_48h_tier(self):
+        entries = [{"type": "check", "tool": "X_PostTweet", "status": "forbidden", "checked_at": "2026-07-14T01:09:00Z"}]
+        legacy_escalation = [
+            {
+                "type": "escalation",
+                "tool": "X_PostTweet",
+                "streak_started_at": "2026-07-14T01:09:00Z",
+                "escalated_at": "2026-07-16T07:05:00Z",
+                "hours": 53.9,
+                # no "threshold_hours" field -- the real shape task 81 wrote.
+            }
+        ]
+        still_suppressed, reason = xot.should_escalate(
+            entries, "X_PostTweet", "2026-07-16T10:00:00Z", threshold_hours=48.0, escalation_entries=legacy_escalation
+        )
+        self.assertFalse(still_suppressed)
+        self.assertIn("already escalated", reason)
+        now_due, _ = xot.should_escalate(
+            entries, "X_PostTweet", "2026-07-23T10:00:00Z", threshold_hours=168.0, escalation_entries=legacy_escalation
+        )
+        self.assertTrue(now_due)
+
+    def test_next_escalation_tier_reports_the_worst_unfired_tier(self):
+        entries = [{"type": "check", "tool": "X_PostTweet", "status": "forbidden", "checked_at": "2026-07-14T01:09:00Z"}]
+        # 200 hours in with nothing escalated yet: both tiers are crossed,
+        # but the caller should only be told the worse one.
+        tier = xot.next_escalation_tier(entries, "X_PostTweet", "2026-07-22T09:09:00Z", escalation_entries=[])
+        self.assertEqual(tier[0], 168.0)
+
+    def test_next_escalation_tier_falls_back_once_the_worst_tier_is_fired(self):
+        entries = [{"type": "check", "tool": "X_PostTweet", "status": "forbidden", "checked_at": "2026-07-14T01:09:00Z"}]
+        fired_168 = [
+            {
+                "type": "escalation",
+                "tool": "X_PostTweet",
+                "streak_started_at": "2026-07-14T01:09:00Z",
+                "escalated_at": "2026-07-22T09:09:00Z",
+                "hours": 200.0,
+                "threshold_hours": 168.0,
+            }
+        ]
+        # 48h was never fired for this streak, 168h just was: the worst
+        # REMAINING unfired tier is 48h, not "nothing left to say".
+        tier = xot.next_escalation_tier(entries, "X_PostTweet", "2026-07-22T09:09:00Z", escalation_entries=fired_168)
+        self.assertEqual(tier[0], 48.0)
+
+    def test_next_escalation_tier_is_none_once_every_tier_has_fired(self):
+        entries = [{"type": "check", "tool": "X_PostTweet", "status": "forbidden", "checked_at": "2026-07-14T01:09:00Z"}]
+        fired_both = [
+            {
+                "type": "escalation",
+                "tool": "X_PostTweet",
+                "streak_started_at": "2026-07-14T01:09:00Z",
+                "escalated_at": "2026-07-16T02:00:00Z",
+                "hours": 48.85,
+                "threshold_hours": 48.0,
+            },
+            {
+                "type": "escalation",
+                "tool": "X_PostTweet",
+                "streak_started_at": "2026-07-14T01:09:00Z",
+                "escalated_at": "2026-07-22T09:09:00Z",
+                "hours": 200.0,
+                "threshold_hours": 168.0,
+            },
+        ]
+        tier = xot.next_escalation_tier(entries, "X_PostTweet", "2026-07-22T09:09:00Z", escalation_entries=fired_both)
+        self.assertIsNone(tier)
+
+    def test_next_escalation_tier_none_with_no_active_outage(self):
+        tier = xot.next_escalation_tier([], "X_PostTweet", "2026-07-22T09:09:00Z", escalation_entries=[])
+        self.assertIsNone(tier)
+
 
 if __name__ == "__main__":
     unittest.main()
