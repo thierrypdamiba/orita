@@ -30,6 +30,30 @@ xot = _load("_test_ritual_outage_tracker", os.path.join(ROOT, "tools", "x_outage
 sys.path.insert(0, os.path.join(ROOT, "fencepost", "seam_engine", "src"))
 import seam_engine.ledger as seam_ledger  # noqa: E402
 
+# Task 88: check_words() now records a durable entry as a side effect on
+# every call, unconditionally (task 87). Most test classes in this file
+# call rc.run_ritual_check() incidentally, without caring about words at
+# all -- before this module-level guard, every one of those calls would
+# have appended a real entry to the REAL HAND/word-check-log.jsonl just
+# from running the test suite, the exact "a test run silently wrote to
+# the real log" bug class tasks 71/83/85/86 already caught and fixed
+# elsewhere. Point the default rc._word_watch() at a throwaway temp LOG
+# for the whole module (ROOT stays the real repo, so reads are still
+# real); WordFoldCase's own setUp overrides this locally with its own
+# fully-isolated module to test word_watch's behavior directly, and
+# restores this module-level default afterward via addCleanup.
+_safe_word_watch_dir = tempfile.mkdtemp()
+_safe_word_watch = _load("_test_module_safe_word_watch", os.path.join(ROOT, "tools", "word_watch.py"))
+_safe_word_watch.LOG = os.path.join(_safe_word_watch_dir, "word-check-log.jsonl")
+
+
+def setUpModule():
+    rc._word_watch = lambda: _safe_word_watch
+
+
+def tearDownModule():
+    shutil.rmtree(_safe_word_watch_dir, ignore_errors=True)
+
 
 def _scan(*, generated_at: str) -> dict:
     return {
@@ -258,13 +282,13 @@ class SquareFoldCase(unittest.TestCase):
         self.addCleanup(setattr, rc, "_square_check", original_loader)
 
     def test_no_square_state_is_none(self):
-        self.assertIsNone(rc.check_square(None))
+        self.assertIsNone(rc.check_square(None, "2026-07-14T21:00:00Z"))
 
     def test_first_check_is_changed(self):
         state = self.sq.compute_square_state(
             [{"number": 1, "updated_at": "2026-07-12T06:43:35Z"}], []
         )
-        result = rc.check_square(state)
+        result = rc.check_square(state, "2026-07-14T21:00:00Z")
         self.assertTrue(result["changed"])
         self.assertIn("no prior square check recorded", result["reason"])
 
@@ -273,7 +297,7 @@ class SquareFoldCase(unittest.TestCase):
             [{"number": 1, "updated_at": "2026-07-12T06:43:35Z"}], []
         )
         self.sq.record_square_check(state, "2026-07-14T21:00:00Z", path=self.sq.LOG)
-        result = rc.check_square(state)
+        result = rc.check_square(state, "2026-07-14T22:00:00Z")
         self.assertFalse(result["changed"])
         self.assertIn("unchanged since", result["reason"])
 
@@ -289,8 +313,40 @@ class SquareFoldCase(unittest.TestCase):
             ],
             [],
         )
-        result = rc.check_square(new)
+        result = rc.check_square(new, "2026-07-14T22:05:00Z")
         self.assertTrue(result["changed"])
+
+    def test_check_square_records_so_next_call_reads_it_back(self):
+        state = self.sq.compute_square_state(
+            [{"number": 1, "updated_at": "2026-07-12T06:43:35Z"}], []
+        )
+        rc.check_square(state, "2026-07-14T21:00:00Z")
+        with open(self.sq.LOG) as f:
+            lines = [line for line in f.read().splitlines() if line.strip()]
+        self.assertEqual(len(lines), 1)
+        self.assertIn('"checked_at": "2026-07-14T21:00:00Z"', lines[0])
+
+    def test_a_real_change_settles_into_new_baseline_next_call(self):
+        """Task 88's regression case: before the fix, `check_square` never
+        recorded, so a real change would compare against the SAME stale
+        pre-change baseline every subsequent hour and report "changed"
+        forever, never settling. It must settle on the very next call."""
+        old = self.sq.compute_square_state(
+            [{"number": 1, "updated_at": "2026-07-12T06:43:35Z"}], []
+        )
+        self.sq.record_square_check(old, "2026-07-14T21:00:00Z", path=self.sq.LOG)
+        new = self.sq.compute_square_state(
+            [
+                {"number": 1, "updated_at": "2026-07-12T06:43:35Z"},
+                {"number": 6, "updated_at": "2026-07-14T22:00:00Z"},
+            ],
+            [],
+        )
+        first = rc.check_square(new, "2026-07-14T22:05:00Z")
+        self.assertTrue(first["changed"])
+        second = rc.check_square(new, "2026-07-14T23:05:00Z")
+        self.assertFalse(second["changed"])
+        self.assertIn("unchanged since", second["reason"])
 
     def test_run_ritual_check_folds_square_key(self):
         state = self.sq.compute_square_state(
@@ -469,9 +525,19 @@ class WordFoldCase(unittest.TestCase):
         self.addCleanup(setattr, rc, "_word_watch", original_loader)
 
     def test_check_words_takes_no_flag(self):
-        result = rc.check_words()
+        result = rc.check_words("2026-07-16T14:00:00Z")
         self.assertTrue(result["changed"])
         self.assertIn("no prior word check", result["reason"])
+
+    def test_check_words_records_so_a_later_unchanged_call_settles(self):
+        """Task 88's regression case for words, mirroring the square one:
+        before the fix, a real word landing would report "changed" every
+        hour forever since nothing ever advanced the baseline."""
+        first = rc.check_words("2026-07-16T14:00:00Z")
+        self.assertTrue(first["changed"])
+        second = rc.check_words("2026-07-16T15:00:00Z")
+        self.assertFalse(second["changed"])
+        self.assertIn("unchanged since", second["reason"])
 
     def test_run_ritual_check_always_folds_words_key(self):
         result = rc.run_ritual_check()
@@ -618,7 +684,11 @@ class ChangeGateFoldCase(unittest.TestCase):
 
 class RunRitualCheckCase(unittest.TestCase):
     """End-to-end: broken=True iff either ledger is broken, regardless of
-    report/recheck state -- mirrors sync_checkout.sh's refuse discipline."""
+    report/recheck state -- mirrors sync_checkout.sh's refuse discipline.
+    test_live_run_against_real_repo_state relies on the module-level
+    setUpModule() above to keep check_words()'s now-durable write (task 88)
+    off the real HAND/word-check-log.jsonl while still reading real ROOT
+    content -- no isolation of its own needed here."""
 
     def test_broken_flag_set_when_town_ledger_broken(self):
         result = {

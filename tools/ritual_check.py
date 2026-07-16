@@ -82,6 +82,26 @@ from Thierry" quietly stopped being checked, with no error and no line in
 the printed block. `check_words()` now takes no flag and always runs,
 mirroring `check_owed_posts` exactly.
 
+Task 88 fixes a real bug `SquareFoldCase.test_unchanged_after_recording`
+exposed in its own setup step: `check_square`/`check_words` compared this
+hour's fresh read against the last DURABLY RECORDED entry, same as
+`check_ci`, but unlike `check_ci` -- which calls `record_check` before
+reading the streak back -- neither ever called `record_square_check`/
+`record_word_check` to persist what they just observed. Calling
+`ritual_check.py` alone (the "one call" tasks 71/74 built) therefore never
+advanced `HAND/square-check-log.jsonl`/`HAND/word-check-log.jsonl` at all;
+every entry those logs actually gained came from a SEPARATE, easy-to-forget
+`square_check.py record ...`/`word_watch.py record ...` call the god on duty
+had to remember to also run by hand. Worse than a stale audit trail: if a
+real change ever landed and only `ritual_check.py` was run afterward, every
+following hour would keep comparing against the SAME pre-change baseline
+forever and report "changed" every single hour, never settling into a new
+"unchanged since <the real new value>" baseline -- the exact false-signal
+shape Ogun's law exists to catch, just inside the town's own ritual instead
+of a Fencepost gap. Both folds now record (after computing the delta, so
+the comparison itself is unaffected) the same `now_iso` `run_ritual_check`
+already threads through `check_x_recheck`/`check_x_escalation`/`check_cron`.
+
 Same discipline as sync_checkout.sh: refuse (report broken=True) rather
 than paper over a real problem. A ledger that fails to verify is reported
 broken, never silently skipped.
@@ -224,15 +244,22 @@ def check_x_escalation(now_iso: str) -> dict:
     return result
 
 
-def check_square(square_state: dict | None) -> dict | None:
+def check_square(square_state: dict | None, now_iso: str) -> dict | None:
     """Fold a caller-supplied, already-computed square state (task 70's
     `square_check.compute_square_state` output) through `square_delta`.
     Makes no network call -- `square_state` is None unless the caller
-    already holds this hour's live `list_issues`/`list_pull_requests` read."""
+    already holds this hour's live `list_issues`/`list_pull_requests` read.
+    Task 88: records this hour's state via `record_square_check` AFTER
+    computing the delta (recording first would make every call compare a
+    state against itself) so the log's baseline actually advances -- calling
+    `ritual_check.py` alone is now enough, no separate `square_check.py
+    record` call required to keep a real change from reporting "changed"
+    forever afterward."""
     if square_state is None:
         return None
     mod = _square_check()
     changed, reason = mod.square_delta(square_state, path=mod.LOG)
+    mod.record_square_check(square_state, now_iso, path=mod.LOG)
     return {"changed": changed, "reason": reason}
 
 
@@ -278,7 +305,7 @@ def check_cron(cron_checks: list | None, now_iso: str) -> dict | None:
     return result
 
 
-def check_words() -> dict:
+def check_words(now_iso: str) -> dict:
     """Read the four places Thierry's words land (task 74's
     `word_watch.compute_word_state`) and fold through `word_delta`.
     Local filesystem only -- no network call, unlike `check_square`/
@@ -287,10 +314,15 @@ def check_words() -> dict:
     reading four small local paths is the identical cheap, no-network,
     local-filesystem-only class, so there's no flag to skip it -- a
     forgotten flag used to mean `words` silently came back `None` with no
-    error and no line in the printed block."""
+    error and no line in the printed block. Task 88: records this hour's
+    state via `record_word_check` AFTER computing the delta, the identical
+    fix `check_square` gets in the same task -- without it a real word
+    landing would report "changed" every hour forever after, never settling
+    into a new baseline, since nothing else ever advanced the log either."""
     mod = _word_watch()
     state = mod.compute_word_state(root=mod.ROOT)
     changed, reason = mod.word_delta(state, path=mod.LOG)
+    mod.record_word_check(state, now_iso, path=mod.LOG)
     return {"changed": changed, "reason": reason}
 
 
@@ -340,9 +372,9 @@ def run_ritual_check(
     report = check_report_freshness(now)
     recheck = check_x_recheck(now_iso)
     escalation = check_x_escalation(now_iso)
-    square = check_square(square_state)
+    square = check_square(square_state, now_iso)
     ci = check_ci(ci_checks)
-    words = check_words()
+    words = check_words(now_iso)
     cron = check_cron(cron_checks, now_iso)
     owed_posts = check_owed_posts()
     change_gate = check_change_gate(report)
