@@ -42,6 +42,13 @@ mirrors `check_ci` exactly: `cron_checks` is `None` unless the caller
 already holds this hour's live `list_workflow_runs` read, folded through
 `cron_health.schedule_status` with no network call of its own.
 
+Task 83 folds the one number `check_x_recheck` (task 61) never covered:
+`x_outage_tracker.should_escalate` (task 81), whether an ongoing X outage
+has crossed its 48h threshold and already fired, or is due to. Same
+read-only shape as `check_x_recheck` exactly -- this check never calls
+`record_escalation` itself; that only happens when the god on duty
+actually surfaces the escalation to Thierry.
+
 Same discipline as sync_checkout.sh: refuse (report broken=True) rather
 than paper over a real problem. A ledger that fails to verify is reported
 broken, never silently skipped.
@@ -158,6 +165,24 @@ def check_x_recheck(now_iso: str, cooldown_hours: float = 2.0) -> dict:
     return result
 
 
+def check_x_escalation(now_iso: str) -> dict:
+    """should_escalate() for every tool in x_outage_tracker.TRACKED_TOOLS,
+    via the real outage log and the real HAND/escalations.jsonl. Mirrors
+    `check_x_recheck`'s exact shape (task 61) -- read-only, makes no write
+    of its own. A real escalation is only ever recorded (`record_escalation`)
+    when the god on duty actually surfaces it to Thierry, not by this check;
+    this fold exists purely so the verdict lands in the same printed block
+    instead of a sixth hand-run command every hour."""
+    mod = _outage_tracker()
+    entries = mod._entries(mod.LOG)
+    escalation_entries = mod._escalation_entries(mod.ESCALATION_LOG)
+    result = {}
+    for tool in mod.TRACKED_TOOLS:
+        due, reason = mod.should_escalate(entries, tool, now_iso, escalation_entries=escalation_entries)
+        result[tool] = {"due": due, "reason": reason}
+    return result
+
+
 def check_square(square_state: dict | None) -> dict | None:
     """Fold a caller-supplied, already-computed square state (task 70's
     `square_check.compute_square_state` output) through `square_delta`.
@@ -243,6 +268,7 @@ def run_ritual_check(
     fencepost = check_fencepost_ledger(fencepost_base)
     report = check_report_freshness(now)
     recheck = check_x_recheck(now_iso)
+    escalation = check_x_escalation(now_iso)
     square = check_square(square_state)
     ci = check_ci(ci_checks)
     words = check_words(check_words_flag)
@@ -254,6 +280,7 @@ def run_ritual_check(
         "fencepost_ledger": fencepost,
         "report": report,
         "x_recheck": recheck,
+        "x_escalation": escalation,
         "square": square,
         "ci": ci,
         "words": words,
@@ -282,6 +309,8 @@ def format_ritual_check(result: dict) -> str:
         lines.append(f"  report: STALE -- no report for {r['date']} or the day before")
     for tool, info in result["x_recheck"].items():
         lines.append(f"  {tool}: {'due' if info['due'] else 'not due'} -- {info['status_line']}")
+    for tool, info in result["x_escalation"].items():
+        lines.append(f"  {tool} escalation: {'due' if info['due'] else 'not due'} -- {info['reason']}")
     if result["square"] is not None:
         s = result["square"]
         lines.append(f"  square: {'changed' if s['changed'] else 'unchanged'} -- {s['reason']}")

@@ -195,6 +195,51 @@ class XRecheckCase(unittest.TestCase):
         return result
 
 
+class XEscalationCase(unittest.TestCase):
+    """Task 83: check_x_escalation folds x_outage_tracker.should_escalate
+    (task 81) into the same structured result check_x_recheck already
+    covers, mirroring its exact read-only shape -- no write of its own."""
+
+    def setUp(self):
+        self.tmpdir = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.tmpdir, ignore_errors=True)
+        self.xot = _load(f"_test_ritual_outage_tracker_{id(self)}", os.path.join(ROOT, "tools", "x_outage_tracker.py"))
+        self.xot.LOG = os.path.join(self.tmpdir, "x-outage-log.jsonl")
+        self.xot.ESCALATION_LOG = os.path.join(self.tmpdir, "escalations.jsonl")
+        original_loader = rc._outage_tracker
+        rc._outage_tracker = lambda: self.xot
+        self.addCleanup(setattr, rc, "_outage_tracker", original_loader)
+
+    def test_no_active_outage_is_not_due(self):
+        self.xot.record_check("X_PostTweet", "ok", "2026-07-14T00:00:00Z", path=self.xot.LOG)
+        result = rc.check_x_escalation("2026-07-14T12:00:00Z")
+        self.assertFalse(result["X_PostTweet"]["due"])
+        self.assertIn("no active outage", result["X_PostTweet"]["reason"])
+
+    def test_below_threshold_is_not_due(self):
+        self.xot.record_check("X_PostTweet", "forbidden", "2026-07-14T00:00:00Z", path=self.xot.LOG)
+        result = rc.check_x_escalation("2026-07-14T10:00:00Z")
+        self.assertFalse(result["X_PostTweet"]["due"])
+        self.assertIn("below", result["X_PostTweet"]["reason"])
+
+    def test_past_threshold_is_due(self):
+        self.xot.record_check("X_PostTweet", "forbidden", "2026-07-14T00:00:00Z", path=self.xot.LOG)
+        result = rc.check_x_escalation("2026-07-16T01:00:00Z")
+        self.assertTrue(result["X_PostTweet"]["due"])
+        self.assertIn("crosses", result["X_PostTweet"]["reason"])
+
+    def test_already_escalated_for_streak_is_not_due(self):
+        self.xot.record_check("X_PostTweet", "forbidden", "2026-07-14T00:00:00Z", path=self.xot.LOG)
+        self.xot.record_escalation("X_PostTweet", "2026-07-14T00:00:00Z", "2026-07-16T01:00:00Z", 49.0, path=self.xot.ESCALATION_LOG)
+        result = rc.check_x_escalation("2026-07-16T02:00:00Z")
+        self.assertFalse(result["X_PostTweet"]["due"])
+        self.assertIn("already escalated", result["X_PostTweet"]["reason"])
+
+    def test_result_covers_all_tracked_tools(self):
+        result = rc.check_x_escalation("2026-07-14T12:00:00Z")
+        self.assertEqual(set(result.keys()), set(self.xot.TRACKED_TOOLS))
+
+
 class SquareFoldCase(unittest.TestCase):
     """Task 71: run_ritual_check(square_state=...) folds square_check.py's
     durable comparison into the same structured result, without either tool
@@ -480,6 +525,12 @@ class RunRitualCheckCase(unittest.TestCase):
         # not a hand-pinned pair -- adding X_WhoAmI there should show up here
         # without this test having to be told about it a second time.
         self.assertEqual(set(result["x_recheck"].keys()), set(xot.TRACKED_TOOLS))
+        # Task 83: x_escalation folds should_escalate's live verdict into the
+        # same result, one entry per TRACKED_TOOLS member, same as x_recheck.
+        self.assertEqual(set(result["x_escalation"].keys()), set(xot.TRACKED_TOOLS))
+        formatted = rc.format_ritual_check(result)
+        for tool in xot.TRACKED_TOOLS:
+            self.assertIn(f"{tool} escalation:", formatted)
 
 
 if __name__ == "__main__":
