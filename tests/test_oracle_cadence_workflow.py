@@ -100,6 +100,7 @@ GUARDED_CADENCES = [
     ("commit, if a snapshot or a milestone-cadence call was sealed", "oracle/milestone_snapshots.jsonl"),
     ("commit, if a snapshot or a deployment-cadence call was sealed", "oracle/deployment_snapshots.jsonl"),
     ("commit, if a snapshot or an issue-comment-cadence call was sealed", "oracle/issue_comment_snapshots.jsonl"),
+    ("commit, if a snapshot or a commit-comment-cadence call was sealed", "oracle/commit_comment_snapshots.jsonl"),
 ]
 
 SEAL_STEPS_REQUIRING_CONTINUE_ON_ERROR = [
@@ -107,6 +108,7 @@ SEAL_STEPS_REQUIRING_CONTINUE_ON_ERROR = [
     "seal one real, timestamped, copylint-clean milestone-cadence prediction",
     "seal one real, timestamped, copylint-clean deployment-cadence prediction",
     "seal one real, timestamped, copylint-clean issue-comment-cadence prediction",
+    "seal one real, timestamped, copylint-clean commit-comment-cadence prediction",
 ]
 
 

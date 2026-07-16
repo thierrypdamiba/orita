@@ -1152,3 +1152,55 @@ jobs:
           today="$(date -u +%F)"
           git commit -m "oracle-issue-comment-autograde: ${today} due call(s) graded (automatic, no human trigger)"
           git push
+
+      # ROADMAP #93: same pre-emptive tolerance as milestone-/deployment-/
+      # issue-comment-cadence above -- never yet run for real in production
+      # CI, `/repos/{owner}/{repo}/comments`'s behavior against an
+      # unrestricted runner is unconfirmed.
+      - name: seal one real, timestamped, copylint-clean commit-comment-cadence prediction (ROADMAP #93)
+        continue-on-error: true
+        env:
+          PYTHONPATH: oracle/oracle_engine/src
+        run: python3 -m oracle_engine.commit_comment_cadence
+
+      - name: verify the chain still holds
+        run: python3 tools/ledger.py verify
+
+      - name: commit, if a snapshot or a commit-comment-cadence call was sealed
+        run: |
+          set -euo pipefail
+          git config user.name "Off-By-One"
+          git config user.email "off-by-one@orita.gods"
+          git add records/ledger.jsonl
+          if [ -f oracle/commit_comment_snapshots.jsonl ]; then
+            git add oracle/commit_comment_snapshots.jsonl
+          fi
+          if git diff --cached --quiet; then
+            echo "nothing sealed this run -- no commit"
+            exit 0
+          fi
+          today="$(date -u +%F)"
+          git commit -m "oracle-commit-comment-cadence: ${today} snapshot + call sealed (automatic, no human trigger)"
+          git push
+
+      - name: grade any commit-comment-cadence predictions whose window has closed (ROADMAP #93)
+        env:
+          PYTHONPATH: oracle/oracle_engine/src
+        run: python3 -m oracle_engine.commit_comment_autograde
+
+      - name: verify the chain still holds
+        run: python3 tools/ledger.py verify
+
+      - name: commit, if a commit-comment-cadence grade was sealed
+        run: |
+          set -euo pipefail
+          git config user.name "Ogun"
+          git config user.email "ogun@orita.gods"
+          git add records/ledger.jsonl
+          if git diff --cached --quiet; then
+            echo "no due commit-comment-cadence predictions this run -- no grade, no commit"
+            exit 0
+          fi
+          today="$(date -u +%F)"
+          git commit -m "oracle-commit-comment-autograde: ${today} due call(s) graded (automatic, no human trigger)"
+          git push
