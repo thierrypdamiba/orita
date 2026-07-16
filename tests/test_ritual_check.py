@@ -545,6 +545,88 @@ class OwedPostsFoldCase(unittest.TestCase):
         self.assertNotIn("(tasks:", formatted)
 
 
+class ChangeGateFoldCase(unittest.TestCase):
+    """Task 86: run_ritual_check() folds change_gate.py's should_post_gap()
+    (task 69) into the same structured result -- the first of the
+    hand-narrated-number tools ever built, and the last one still standing
+    outside this module's fold. Takes no caller-supplied argument of its
+    own: it reads whichever report path check_report_freshness already
+    resolved this call."""
+
+    def setUp(self):
+        self.tmpdir = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.tmpdir, ignore_errors=True)
+        self.cg = _load(f"_test_ritual_change_gate_{id(self)}", os.path.join(ROOT, "tools", "change_gate.py"))
+        self.cg.LOG = os.path.join(self.tmpdir, "posted-gap-log.jsonl")
+        original_loader = rc._change_gate
+        rc._change_gate = lambda: self.cg
+        self.addCleanup(setattr, rc, "_change_gate", original_loader)
+        self.reports_dir = os.path.join(self.tmpdir, "REPORTS")
+        os.makedirs(self.reports_dir)
+
+    def _write_report(self, name, text):
+        path = os.path.join(self.reports_dir, name)
+        with open(path, "w") as f:
+            f.write(text)
+        return path
+
+    def test_stale_report_info_is_none(self):
+        result = rc.check_change_gate({"status": "stale", "date": "2026-07-16", "fallback_path": None})
+        self.assertIsNone(result)
+
+    def test_unparseable_report_is_not_due(self):
+        path = self._write_report("2026-07-16.md", "**Nothing cleared the bar today.**\n")
+        result = rc.check_change_gate({"status": "current", "date": "2026-07-16", "path": path})
+        self.assertFalse(result["due"])
+        self.assertIn("no parseable primary gap", result["reason"])
+
+    def test_first_real_gap_is_due(self):
+        path = self._write_report(
+            "2026-07-16.md", "**A release shipped but never announced.** — confidence 0.82.\n"
+        )
+        result = rc.check_change_gate({"status": "current", "date": "2026-07-16", "path": path})
+        self.assertTrue(result["due"])
+        self.assertIn("no prior post recorded", result["reason"])
+
+    def test_same_gap_as_last_posted_is_not_due(self):
+        self.cg.record_posted_gap("A release shipped but never announced.", "2026-07-16T09:00:00Z", path=self.cg.LOG)
+        path = self._write_report(
+            "2026-07-16.md", "**A release shipped but never announced.** — confidence 0.82.\n"
+        )
+        result = rc.check_change_gate({"status": "current", "date": "2026-07-16", "path": path})
+        self.assertFalse(result["due"])
+        self.assertIn("unchanged", result["reason"])
+
+    def test_different_gap_from_last_posted_is_due(self):
+        self.cg.record_posted_gap("A release shipped but never announced.", "2026-07-16T09:00:00Z", path=self.cg.LOG)
+        path = self._write_report("2026-07-16.md", "**A renewal never became a reminder.** — confidence 0.75.\n")
+        result = rc.check_change_gate({"status": "current", "date": "2026-07-16", "path": path})
+        self.assertTrue(result["due"])
+        self.assertIn("differs", result["reason"])
+
+    def test_pending_status_reads_fallback_path(self):
+        path = self._write_report("2026-07-15.md", "**A doc three threads reference was never updated.** — confidence 0.9.\n")
+        result = rc.check_change_gate({"status": "pending", "date": "2026-07-16", "fallback_path": path})
+        self.assertTrue(result["due"])
+
+    def test_run_ritual_check_folds_change_gate_key(self):
+        result = rc.run_ritual_check()
+        self.assertIn("change_gate", result)
+
+    def test_format_includes_change_gate_line_when_present(self):
+        path = self._write_report("2026-07-16.md", "**A release shipped but never announced.** — confidence 0.82.\n")
+        result = rc.run_ritual_check()
+        result["change_gate"] = rc.check_change_gate({"status": "current", "date": "2026-07-16", "path": path})
+        formatted = rc.format_ritual_check(result)
+        self.assertIn("change gate:", formatted)
+
+    def test_format_omits_change_gate_line_when_none(self):
+        result = rc.run_ritual_check()
+        result["change_gate"] = None
+        formatted = rc.format_ritual_check(result)
+        self.assertNotIn("change gate:", formatted)
+
+
 class RunRitualCheckCase(unittest.TestCase):
     """End-to-end: broken=True iff either ledger is broken, regardless of
     report/recheck state -- mirrors sync_checkout.sh's refuse discipline."""

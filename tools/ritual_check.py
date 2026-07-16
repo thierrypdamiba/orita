@@ -56,6 +56,23 @@ Task 85 folds the one local-filesystem number that never joined `check_words`
 unconditional, not flag-gated -- reading one append-only jsonl is as cheap
 as `check_town_ledger`'s own ledger read.
 
+Task 86 closes the one door left standing from that whole run: `change_gate.py`
+(task 69) -- the FIRST of these hand-narrated-number tools ever built, a full
+sixteen tasks before `square_check.py` (70) started the fold-into-`ritual_check`
+habit -- never itself joined it. Every hourly note since has still hand-read
+"no gap surfaced this hour differs from the last one posted... so staying
+silent on X" instead of calling `should_post_gap()`, the exact function built
+to answer it. `check_change_gate` takes no new argument: it reads whichever
+report text `check_report_freshness` already resolved this call (today's file
+if `current`, yesterday's fallback if `pending`) and folds `should_post_gap`
+through it -- no second file read, no network call, `None` only when there is
+truly no report to compare (`stale`). Hit the same trap task 83's and 85's
+own notes already named: `should_post_gap`'s `path=LOG` default binds at
+module-*definition* time, so `check_change_gate` passes `path=mod.LOG`
+explicitly rather than trusting the bare default -- a monkeypatched test
+log would otherwise be silently ignored, the same class of bug those two
+tasks' live proofs caught before commit.
+
 Same discipline as sync_checkout.sh: refuse (report broken=True) rather
 than paper over a real problem. A ledger that fails to verify is reported
 broken, never silently skipped.
@@ -110,6 +127,10 @@ def _x_post_queue():
 
 def _cron_health():
     return _load("_ritual_cron_health", os.path.join(ROOT, "tools", "cron_health.py"))
+
+
+def _change_gate():
+    return _load("_ritual_change_gate", os.path.join(ROOT, "tools", "change_gate.py"))
 
 
 def _seam_ledger():
@@ -276,6 +297,25 @@ def check_owed_posts() -> dict:
     return {"count": len(entries), "tasks": [e["task"] for e in entries]}
 
 
+def check_change_gate(report_info: dict) -> dict | None:
+    """Fold `change_gate.should_post_gap()` -- task 69's own change-gate
+    rule -- using whichever report text `check_report_freshness` already
+    resolved (its `path` if `current`, its `fallback_path` if `pending`).
+    No second file read of its own, no network call. A `stale` report (no
+    file exists at all, `report_info["path"]` and `["fallback_path"]` both
+    absent/None) has nothing to compare against, so this returns None, the
+    same "nothing to check" shape `check_square`/`check_ci`/`check_cron`
+    already hold when their caller-supplied input is None."""
+    path = report_info.get("path") or report_info.get("fallback_path")
+    if path is None:
+        return None
+    mod = _change_gate()
+    with open(path) as f:
+        text = f.read()
+    due, reason = mod.should_post_gap(text, path=mod.LOG)
+    return {"due": due, "reason": reason}
+
+
 def run_ritual_check(
     now: datetime | None = None,
     fencepost_base: str = DEFAULT_FENCEPOST_BASE,
@@ -297,6 +337,7 @@ def run_ritual_check(
     words = check_words(check_words_flag)
     cron = check_cron(cron_checks, now_iso)
     owed_posts = check_owed_posts()
+    change_gate = check_change_gate(report)
     broken = (not town["ok"]) or (not fencepost["ok"])
     return {
         "now": now_iso,
@@ -310,6 +351,7 @@ def run_ritual_check(
         "words": words,
         "cron": cron,
         "owed_posts": owed_posts,
+        "change_gate": change_gate,
         "broken": broken,
     }
 
@@ -358,6 +400,9 @@ def format_ritual_check(result: dict) -> str:
     op = result["owed_posts"]
     tasks_str = ",".join(str(t) for t in op["tasks"])
     lines.append(f"  owed posts: {op['count']} pending" + (f" (tasks: {tasks_str})" if op["count"] else ""))
+    if result["change_gate"] is not None:
+        cg = result["change_gate"]
+        lines.append(f"  change gate: {'due' if cg['due'] else 'not due'} -- {cg['reason']}")
     return "\n".join(lines)
 
 
