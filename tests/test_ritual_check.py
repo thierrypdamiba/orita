@@ -7,6 +7,7 @@ import importlib.util
 import json
 import os
 import shutil
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -682,6 +683,53 @@ class ChangeGateFoldCase(unittest.TestCase):
         self.assertNotIn("change gate:", formatted)
 
 
+def _git_quiet(repo, *args):
+    subprocess.run(["git", "-C", repo, *args], capture_output=True, text=True, check=True)
+
+
+class CheckoutFoldCase(unittest.TestCase):
+    """Task 90: run_ritual_check() folds sync_checkout.sh's own detached-
+    HEAD signal into the same structured result -- read-only, never calls
+    sync_checkout.sh's actual `checkout -B` recovery itself."""
+
+    def setUp(self):
+        self.tmp = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.tmp, ignore_errors=True)
+        _git_quiet(self.tmp, "init", "--quiet", "--initial-branch=main")
+        _git_quiet(self.tmp, "config", "user.email", "test@test")
+        _git_quiet(self.tmp, "config", "user.name", "test")
+        with open(os.path.join(self.tmp, "f.txt"), "w") as f:
+            f.write("one\n")
+        _git_quiet(self.tmp, "add", "f.txt")
+        _git_quiet(self.tmp, "commit", "--quiet", "-m", "first")
+
+    def test_on_branch_reports_not_detached(self):
+        state = rc.check_checkout((self.tmp,))
+        self.assertEqual(len(state), 1)
+        self.assertFalse(state[0]["detached"])
+        self.assertEqual(state[0]["branch"], "main")
+
+    def test_detached_head_is_reported(self):
+        _git_quiet(self.tmp, "checkout", "--quiet", "--detach", "HEAD")
+        state = rc.check_checkout((self.tmp,))
+        self.assertEqual(len(state), 1)
+        self.assertTrue(state[0]["detached"])
+        self.assertIsNone(state[0]["branch"])
+        formatted = rc.format_ritual_check(rc.run_ritual_check(checkout_dirs=(self.tmp,)))
+        self.assertIn("DETACHED HEAD", formatted)
+        self.assertIn("sync_checkout.sh", formatted)
+
+    def test_missing_repo_dir_is_skipped_not_crashed(self):
+        missing = os.path.join(self.tmp, "does-not-exist")
+        state = rc.check_checkout((missing,))
+        self.assertEqual(state, [])
+
+    def test_run_ritual_check_always_folds_checkout_key(self):
+        result = rc.run_ritual_check(checkout_dirs=(self.tmp,))
+        self.assertIsInstance(result["checkout"], list)
+        self.assertEqual(len(result["checkout"]), 1)
+
+
 class RunRitualCheckCase(unittest.TestCase):
     """End-to-end: broken=True iff either ledger is broken, regardless of
     report/recheck state -- mirrors sync_checkout.sh's refuse discipline.
@@ -709,6 +757,13 @@ class RunRitualCheckCase(unittest.TestCase):
         produces the same status the ritual note would otherwise assemble
         by hand from four separate commands."""
         result = rc.run_ritual_check()
+        # Task 90: the real checkout state (ROOT + the sibling vault repo,
+        # whichever of the two actually exist on this machine) folds in
+        # without a separate `tools/sync_checkout.sh` command.
+        self.assertIsInstance(result["checkout"], list)
+        for c in result["checkout"]:
+            self.assertIn("detached", c)
+            self.assertIn("head_sha", c)
         self.assertTrue(result["town_ledger"]["ok"])
         self.assertTrue(result["fencepost_ledger"]["ok"])
         self.assertFalse(result["broken"])

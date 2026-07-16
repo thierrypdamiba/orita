@@ -106,6 +106,22 @@ Same discipline as sync_checkout.sh: refuse (report broken=True) rather
 than paper over a real problem. A ledger that fails to verify is reported
 broken, never silently skipped.
 
+Task 90 closes the one ritual step that never joined this fold at all:
+`tools/sync_checkout.sh` (task 58) recovers a detached-HEAD checkout, but
+`TOWN-OPERATIONS.md`'s own documented order still runs it as a wholly
+separate command before this script even starts, and every hourly note
+since has typed "both checkouts recovered via tools/sync_checkout.sh...
+no recovery needed" from that command's own stdout rather than this
+block. `check_checkout` does NOT call `sync_checkout.sh`'s actual
+`checkout -B` recovery -- it only reads whether each tracked repo is
+CURRENTLY on a detached HEAD (`git symbolic-ref -q HEAD`, the identical
+probe `sync_checkout.sh` itself uses for its own case-1 check), the same
+"read the state, let the god act on it" boundary `check_x_escalation`
+already holds versus `record_escalation`. Actually recovering a real
+divergence still belongs to `sync_checkout.sh`, run first, same as always
+-- this only makes the CURRENT state visible in the one block instead of
+a separate command's printed line.
+
 Usage:
     python3 tools/ritual_check.py [--now ISO_TS] [--fencepost-base DIR] [--square-state PATH] [--cron-checks PATH]
 """
@@ -114,12 +130,14 @@ from __future__ import annotations
 import importlib.util
 import json
 import os
+import subprocess
 import sys
 from datetime import datetime, timedelta, timezone
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DEFAULT_FENCEPOST_BASE = os.path.join(ROOT, "fencepost")
 DEFAULT_REPORTS_DIR = os.path.join(ROOT, "fencepost", "REPORTS")
+DEFAULT_CHECKOUT_DIRS = (ROOT, os.path.join(os.path.dirname(ROOT), "orita-vault"))
 
 
 def _load(name: str, path: str):
@@ -338,6 +356,38 @@ def check_owed_posts() -> dict:
     return {"count": len(entries), "tasks": [e["task"] for e in entries]}
 
 
+def _checkout_state(repo_dir: str) -> dict | None:
+    """Read-only detached-HEAD probe for one repo dir, mirroring
+    sync_checkout.sh's own case-1 detection exactly, never its recovery.
+    Returns None if repo_dir isn't a git checkout at all -- a missing
+    sibling repo in some environment shouldn't crash the whole ritual
+    check, the same missing-input tolerance check_change_gate holds for a
+    stale report."""
+    if not os.path.isdir(os.path.join(repo_dir, ".git")):
+        return None
+    sym = subprocess.run(
+        ["git", "symbolic-ref", "-q", "HEAD"],
+        cwd=repo_dir, capture_output=True, text=True,
+    )
+    detached = sym.returncode != 0
+    head_sha = subprocess.run(
+        ["git", "rev-parse", "HEAD"],
+        cwd=repo_dir, capture_output=True, text=True,
+    ).stdout.strip()
+    branch = None if detached else sym.stdout.strip().replace("refs/heads/", "")
+    return {"repo": repo_dir, "detached": detached, "head_sha": head_sha, "branch": branch}
+
+
+def check_checkout(repo_dirs: tuple | None = None) -> list:
+    """Task 90: fold sync_checkout.sh's own detached-HEAD signal into the
+    one block. Unconditional, local-filesystem-only (a `git` subprocess
+    call against a local working tree, no network) -- the same cheap class
+    `check_words`/`check_owed_posts` already argued needs no flag."""
+    if repo_dirs is None:
+        repo_dirs = DEFAULT_CHECKOUT_DIRS
+    return [s for s in (_checkout_state(d) for d in repo_dirs) if s is not None]
+
+
 def check_change_gate(report_info: dict) -> dict | None:
     """Fold `change_gate.should_post_gap()` -- task 69's own change-gate
     rule -- using whichever report text `check_report_freshness` already
@@ -363,10 +413,12 @@ def run_ritual_check(
     square_state: dict | None = None,
     ci_checks: list | None = None,
     cron_checks: list | None = None,
+    checkout_dirs: tuple | None = None,
 ) -> dict:
     if now is None:
         now = datetime.now(timezone.utc)
     now_iso = now.isoformat(timespec="seconds")
+    checkout = check_checkout(checkout_dirs)
     town = check_town_ledger()
     fencepost = check_fencepost_ledger(fencepost_base)
     report = check_report_freshness(now)
@@ -381,6 +433,7 @@ def run_ritual_check(
     broken = (not town["ok"]) or (not fencepost["ok"])
     return {
         "now": now_iso,
+        "checkout": checkout,
         "town_ledger": town,
         "fencepost_ledger": fencepost,
         "report": report,
@@ -398,6 +451,11 @@ def run_ritual_check(
 
 def format_ritual_check(result: dict) -> str:
     lines = [f"ritual check @ {result['now']}"]
+    for c in result["checkout"]:
+        if c["detached"]:
+            lines.append(f"  checkout {c['repo']}: DETACHED HEAD @ {c['head_sha'][:12]} -- run tools/sync_checkout.sh")
+        else:
+            lines.append(f"  checkout {c['repo']}: {c['branch']} @ {c['head_sha'][:12]}")
     t = result["town_ledger"]
     lines.append(
         f"  town ledger: {'intact' if t['ok'] else 'BROKEN at seq ' + str(t['broken_at_seq'])}, {t['count']} entries"
