@@ -447,12 +447,12 @@ class CronFoldCase(unittest.TestCase):
 
 
 class WordFoldCase(unittest.TestCase):
-    """Task 74: run_ritual_check(check_words_flag=True) folds word_watch.py's
-    durable "has a new word from Thierry landed" check into the same
-    structured result, the same shape tasks 71/73 already gave the square
-    and CI. Local filesystem only, no network call -- default False so a
-    caller who omits it gets result["words"] == None, unchanged from
-    before this task."""
+    """Task 74: run_ritual_check() folds word_watch.py's durable "has a new
+    word from Thierry landed" check into the same structured result, the
+    same shape tasks 71/73 already gave the square and CI. Task 87 made it
+    unconditional, mirroring OwedPostsFoldCase's own shape exactly -- local
+    filesystem only, no network call, the identical cheap-enough-to-skip-
+    the-flag class task 85's own docstring already argued for."""
 
     def setUp(self):
         self.tmpdir = tempfile.mkdtemp()
@@ -468,30 +468,19 @@ class WordFoldCase(unittest.TestCase):
         rc._word_watch = lambda: self.ww
         self.addCleanup(setattr, rc, "_word_watch", original_loader)
 
-    def test_words_none_when_flag_omitted(self):
-        self.assertIsNone(rc.check_words(False))
-
-    def test_first_check_is_due(self):
-        result = rc.check_words(True)
+    def test_check_words_takes_no_flag(self):
+        result = rc.check_words()
         self.assertTrue(result["changed"])
         self.assertIn("no prior word check", result["reason"])
 
-    def test_run_ritual_check_words_none_when_omitted(self):
+    def test_run_ritual_check_always_folds_words_key(self):
         result = rc.run_ritual_check()
-        self.assertIsNone(result["words"])
-
-    def test_run_ritual_check_folds_words_key_when_enabled(self):
-        result = rc.run_ritual_check(check_words_flag=True)
         self.assertIsNotNone(result["words"])
         self.assertIn("changed", result["words"])
 
-    def test_format_includes_words_line_only_when_present(self):
-        with_words = rc.format_ritual_check(
-            {**rc.run_ritual_check(), "words": {"changed": False, "reason": "unchanged since X"}}
-        )
-        self.assertIn("words: unchanged -- unchanged since X", with_words)
-        without_words = rc.format_ritual_check(rc.run_ritual_check())
-        self.assertNotIn("words:", without_words)
+    def test_format_always_includes_words_line(self):
+        formatted = rc.format_ritual_check(rc.run_ritual_check())
+        self.assertIn("words: changed -- ", formatted)
 
 
 class OwedPostsFoldCase(unittest.TestCase):

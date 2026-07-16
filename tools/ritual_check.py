@@ -73,6 +73,15 @@ explicitly rather than trusting the bare default -- a monkeypatched test
 log would otherwise be silently ignored, the same class of bug those two
 tasks' live proofs caught before commit.
 
+Task 87 closes the one door task 85 itself proved didn't need a key:
+`check_words` (task 74) stayed gated behind `check_words_flag`/
+`--check-words` even after `check_owed_posts` (task 85) used the identical
+local-filesystem-only, no-network shape to argue it needed no flag at all.
+A forgotten flag meant `words` silently came back `None` and "no new words
+from Thierry" quietly stopped being checked, with no error and no line in
+the printed block. `check_words()` now takes no flag and always runs,
+mirroring `check_owed_posts` exactly.
+
 Same discipline as sync_checkout.sh: refuse (report broken=True) rather
 than paper over a real problem. A ledger that fails to verify is reported
 broken, never silently skipped.
@@ -269,16 +278,16 @@ def check_cron(cron_checks: list | None, now_iso: str) -> dict | None:
     return result
 
 
-def check_words(check_words_flag: bool) -> dict | None:
+def check_words() -> dict:
     """Read the four places Thierry's words land (task 74's
     `word_watch.compute_word_state`) and fold through `word_delta`.
     Local filesystem only -- no network call, unlike `check_square`/
-    `check_ci` which take a caller-supplied live API read. Off by
-    default (`check_words_flag=False`) so a caller who doesn't want the
-    filesystem walk this hour gets `None`, unchanged from before this
-    task."""
-    if not check_words_flag:
-        return None
+    `check_ci` which take a caller-supplied live API read. Unconditional
+    since task 87, mirroring `check_owed_posts` (task 85)'s own reasoning:
+    reading four small local paths is the identical cheap, no-network,
+    local-filesystem-only class, so there's no flag to skip it -- a
+    forgotten flag used to mean `words` silently came back `None` with no
+    error and no line in the printed block."""
     mod = _word_watch()
     state = mod.compute_word_state(root=mod.ROOT)
     changed, reason = mod.word_delta(state, path=mod.LOG)
@@ -321,7 +330,6 @@ def run_ritual_check(
     fencepost_base: str = DEFAULT_FENCEPOST_BASE,
     square_state: dict | None = None,
     ci_checks: list | None = None,
-    check_words_flag: bool = False,
     cron_checks: list | None = None,
 ) -> dict:
     if now is None:
@@ -334,7 +342,7 @@ def run_ritual_check(
     escalation = check_x_escalation(now_iso)
     square = check_square(square_state)
     ci = check_ci(ci_checks)
-    words = check_words(check_words_flag)
+    words = check_words()
     cron = check_cron(cron_checks, now_iso)
     owed_posts = check_owed_posts()
     change_gate = check_change_gate(report)
@@ -384,9 +392,8 @@ def format_ritual_check(result: dict) -> str:
     if result["ci"] is not None:
         for workflow, line in result["ci"].items():
             lines.append(f"  ci/{workflow}: {line}")
-    if result["words"] is not None:
-        w = result["words"]
-        lines.append(f"  words: {'changed' if w['changed'] else 'unchanged'} -- {w['reason']}")
+    w = result["words"]
+    lines.append(f"  words: {'changed' if w['changed'] else 'unchanged'} -- {w['reason']}")
     if result["cron"] is not None:
         for workflow, info in result["cron"].items():
             if info["status"] == "error":
@@ -412,7 +419,6 @@ if __name__ == "__main__":
     base = DEFAULT_FENCEPOST_BASE
     square_state = None
     ci_checks = None
-    check_words_flag = False
     cron_checks = None
     i = 0
     while i < len(argv):
@@ -439,9 +445,6 @@ if __name__ == "__main__":
         elif argv[i] == "--json":
             base = base
             i += 1
-        elif argv[i] == "--check-words":
-            check_words_flag = True
-            i += 1
         else:
             i += 1
     result = run_ritual_check(
@@ -449,7 +452,6 @@ if __name__ == "__main__":
         fencepost_base=base,
         square_state=square_state,
         ci_checks=ci_checks,
-        check_words_flag=check_words_flag,
         cron_checks=cron_checks,
     )
     if "--json" in argv:
