@@ -6,6 +6,7 @@ write-capable tool in this file, on purpose: if a tool can change the
 world, it does not belong in this server (Ogun's oath, sworn on iron).
 """
 
+import json
 import sys
 from dataclasses import asdict
 from datetime import datetime, timedelta, timezone
@@ -29,6 +30,7 @@ from seam_engine.scan import (
     compute_candidates,
     fetch_github_activity,
     load_x_posts_from_ledger,
+    load_x_posts_from_live,
 )
 
 app = MCPApp(name="seam_engine", version="0.1.0", log_level="DEBUG")
@@ -74,9 +76,14 @@ def get_recent_x_posts(
 ) -> Annotated[list[dict], "Posts the town has made to @oritatown, oldest first"]:
     """Read-only: the town's own posted X history.
 
-    v0 reads the public HAND/mortal-sky-log.md record. A future version
-    calls Arcade's read-only X toolkit (GetUserTweets) directly through the
-    per-user OAuth-connected gateway once a live session is attached.
+    v0 reads the public HAND/mortal-sky-log.md record. To hand `seam_scan`
+    (below) a live read instead, call your own gateway's X.GetUserTweets
+    directly, normalize each tweet to `{"id", "text", "url", "ts"}`, and pass
+    the list as `seam_scan`'s `x_posts_json` argument — this tool itself
+    stays the ledger-only read it has always been (ROADMAP.md #94: this
+    server dispatches only to tools already registered on itself, never to a
+    connected user's own external toolkit tools, so it cannot call
+    GetUserTweets on your behalf; your MCP client does that part).
     """
     posts: list[XPost] = load_x_posts_from_ledger()
     return [asdict(p) for p in posts]
@@ -87,12 +94,24 @@ def seam_scan(
     owner: Annotated[str, "GitHub owner (user or org)"] = "thierrypdamiba",
     repo: Annotated[str, "GitHub repository name"] = "orita",
     window_hours: Annotated[int, "How far back to look for GitHub activity"] = 24,
+    x_posts_json: Annotated[
+        str | None,
+        "Optional JSON array of your own already-fetched, normalized X posts "
+        "([{\"id\":..,\"text\":..,\"url\":..,\"ts\":..}, ...] — call your "
+        "gateway's X.GetUserTweets yourself first, per CONNECT.md). Omit to "
+        "use the HAND/mortal-sky-log.md ledger fallback, unchanged from v0. "
+        "An empty array is rejected — see load_x_posts_from_live's docstring.",
+    ] = None,
 ) -> Annotated[dict, "The ranked seam scan: one labeled primary gap, a confidence-scored tail, and excluded false positives"]:
     """Read-only seam-scan v0: reconcile @oritatown's X posts against GitHub
     commits/releases and surface the single highest-confidence gap between
     them, labeled and cleared over the confidence bar, plus a confidence-scored
     tail of coincidences. Fixes nothing; writes only the scan result."""
-    x_posts = load_x_posts_from_ledger()
+    x_posts = (
+        load_x_posts_from_ledger()
+        if x_posts_json is None
+        else load_x_posts_from_live(json.loads(x_posts_json))
+    )
     account_live_since = min((p.ts for p in x_posts), default=datetime.now(timezone.utc))
     now = datetime.now(timezone.utc)
     # Reaches back at least to account_live_since, not just window_hours —
@@ -110,6 +129,7 @@ def seam_scan(
         "repo": f"{owner}/{repo}",
         "window_hours": window_hours,
         "account_live_since": account_live_since.isoformat(),
+        "x_posts_source": "ledger" if x_posts_json is None else "live",
         "confidence_bar": ranking.confidence_bar,
         "separation_margin": ranking.separation_margin,
         "primary_gap": asdict(primary) if primary else None,

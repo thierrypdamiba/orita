@@ -1,17 +1,23 @@
-"""Tests for the recurring-gap machinery in scan.py (ROADMAP.md #19).
+"""Tests for the recurring-gap machinery in scan.py (ROADMAP.md #19) and the
+live-X-read wiring (ROADMAP.md #94).
 
 `_effective_since` is the one piece of arithmetic that decides how far back
 `run_scan` looks for GitHub commits. Everything else in scan.py that depends
 on network I/O (`fetch_github_activity`, `run_scan` itself) has no test here,
 same as before this task — this file adds coverage only for the new, pure
-logic, not a retroactive test of the network path.
+logic, not a retroactive test of the network path. `load_x_posts_from_live`
+is pure (no network, no filesystem) so it IS covered here, the same way
+`_effective_since` already is.
 """
 from __future__ import annotations
 
+import json
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
-from seam_engine.scan import _effective_since
+import pytest
+
+from seam_engine.scan import XPost, _effective_since, load_x_posts_from_live
 
 FENCEPOST_ROOT = Path(__file__).resolve().parents[2]
 README_MD = FENCEPOST_ROOT / "README.md"
@@ -79,4 +85,117 @@ def test_the_live_mcp_tool_reuses_the_same_recurring_gap_arithmetic():
 def test_readme_names_the_recurring_gap_machinery():
     text = README_MD.read_text(encoding="utf-8")
     assert "_effective_since" in text
+
+
+# --- load_x_posts_from_live (ROADMAP.md #94) -----------------------------------
+
+
+def test_load_x_posts_from_live_parses_normalized_entries():
+    data = [
+        {"id": "1", "text": "hello seam", "url": "https://x.com/oritatown/status/1", "ts": "2026-07-16T12:00:00Z"},
+        {"id": "2", "text": "second post", "url": "https://x.com/oritatown/status/2", "ts": "2026-07-15T09:30:00+00:00"},
+    ]
+    posts = load_x_posts_from_live(data)
+    assert posts == [
+        XPost(id="1", text="hello seam", url="https://x.com/oritatown/status/1",
+              ts=datetime(2026, 7, 16, 12, 0, tzinfo=timezone.utc)),
+        XPost(id="2", text="second post", url="https://x.com/oritatown/status/2",
+              ts=datetime(2026, 7, 15, 9, 30, tzinfo=timezone.utc)),
+    ]
+
+
+def test_load_x_posts_from_live_matches_xpost_shape_the_ledger_reader_already_produces():
+    # Same dataclass, same four fields, regardless of which reader built it —
+    # compute_candidates/coincidence_candidates must never be able to tell
+    # a live-sourced XPost from a ledger-sourced one.
+    live = load_x_posts_from_live([
+        {"id": "9", "text": "t", "url": "https://x.com/oritatown/status/9", "ts": "2026-07-16T00:00:00Z"},
+    ])[0]
+    hand_built = XPost(id="9", text="t", url="https://x.com/oritatown/status/9",
+                        ts=datetime(2026, 7, 16, tzinfo=timezone.utc))
+    assert live == hand_built
+
+
+def test_load_x_posts_from_live_rejects_empty_list():
+    # An empty live result is refused, not silently accepted as "posted
+    # nothing, ever" — @oritatown has posted before, so an empty read is far
+    # more likely to mean the call failed or was blocked (this town's own
+    # X_GetUserTweets outage returns exactly this shape). Ogun's law: a
+    # false "never posted" would flag every past commit as newly unannounced.
+    with pytest.raises(ValueError, match="empty list"):
+        load_x_posts_from_live([])
+
+
+def test_load_x_posts_from_live_rejects_an_entry_missing_a_required_key():
+    with pytest.raises(ValueError, match=r"entry 1.*ts"):
+        load_x_posts_from_live([
+            {"id": "1", "text": "ok", "url": "https://x.com/oritatown/status/1", "ts": "2026-07-16T00:00:00Z"},
+            {"id": "2", "text": "missing ts", "url": "https://x.com/oritatown/status/2"},
+        ])
+
+
+def test_load_x_posts_from_live_rejects_multiple_missing_keys_naming_all_of_them():
+    with pytest.raises(ValueError, match=r"\['text', 'url'\]"):
+        load_x_posts_from_live([{"id": "1", "ts": "2026-07-16T00:00:00Z"}])
+
+
+# --- the CLI's --x-posts flag ---------------------------------------------------
+
+
+def test_cli_main_rejects_missing_x_posts_path_argument():
+    from seam_engine.scan import main
+    assert main(["--x-posts"]) == 2
+
+
+def test_cli_reads_x_posts_file_and_threads_it_into_run_scan(tmp_path, monkeypatch):
+    # Prove the CLI wiring end to end without touching the real network: stub
+    # fetch_github_activity so the only thing under test is "did --x-posts
+    # actually reach run_scan's x_posts parameter," mirroring how run_scan
+    # itself has no network test in this file (module docstring, above).
+    import seam_engine.scan as scan_mod
+
+    captured = {}
+    original = scan_mod.run_scan
+
+    def fake_run_scan(owner, repo, window_hours=24, x_posts=None):
+        captured["x_posts"] = x_posts
+        return original(owner, repo, window_hours=window_hours, x_posts=x_posts)
+
+    monkeypatch.setattr(scan_mod, "fetch_github_activity", lambda *a, **k: [])
+    monkeypatch.setattr(scan_mod, "run_scan", fake_run_scan)
+
+    live_posts = [
+        {"id": "1", "text": "t", "url": "https://x.com/oritatown/status/1", "ts": "2026-07-16T00:00:00Z"},
+    ]
+    posts_path = tmp_path / "live-posts.json"
+    posts_path.write_text(json.dumps(live_posts))
+    out_path = tmp_path / "out.json"
+
+    rc = scan_mod.main([str(out_path), "--x-posts", str(posts_path)])
+
+    assert rc == 0
+    assert captured["x_posts"] == live_posts
+    result = json.loads(out_path.read_text())
+    assert result["x_posts_source"] == "live"
+
+
+def test_cli_without_x_posts_flag_uses_the_ledger_fallback(tmp_path, monkeypatch):
+    import seam_engine.scan as scan_mod
+
+    monkeypatch.setattr(scan_mod, "fetch_github_activity", lambda *a, **k: [])
+    out_path = tmp_path / "out.json"
+
+    rc = scan_mod.main([str(out_path)])
+
+    assert rc == 0
+    result = json.loads(out_path.read_text())
+    assert result["x_posts_source"] == "ledger"
+
+
+def test_cli_module_entrypoint_is_wired_to_main():
+    # `python -m seam_engine.scan` must exit through the new argparse-lite
+    # main(), not the old bare-script body it replaced (ROADMAP.md #94).
+    src = FENCEPOST_ROOT / "seam_engine" / "src" / "seam_engine" / "scan.py"
+    text = src.read_text()
+    assert 'raise SystemExit(main())' in text
 

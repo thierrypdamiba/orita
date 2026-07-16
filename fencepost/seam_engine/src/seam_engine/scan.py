@@ -11,11 +11,33 @@ Data sources:
   scope beyond List/Get). In a real deployment this is the same call Arcade's
   GitHub read-only toolkit makes (ListRepoCommits, ListIssues, GetLatestRelease).
 - X: in production this is Arcade's read-only X toolkit (GetUserTweets), which
-  requires an OAuth-connected account. This scan runs headless with no live
-  OAuth session, so v0 falls back to the town's own public record of what it
-  posted — HAND/mortal-sky-log.md — which is itself sourced from real tweet
-  URLs. That fallback is used only because no gateway session is attached
-  here; it is not a substitute for the live read scope once one is wired up.
+  requires an OAuth-connected account. `run_scan`'s default (`x_posts=None`)
+  still falls back to the town's own public record of what it posted —
+  HAND/mortal-sky-log.md — which is itself sourced from real tweet URLs. That
+  fallback is used only because no gateway session is attached by default; it
+  is not a substitute for the live read scope once one is wired up.
+
+  ROADMAP.md #94: `load_x_posts_from_live` + `run_scan(..., x_posts=...)` are
+  the wired-up path this module's own docstring and `server.py`'s
+  `get_recent_x_posts` promised as "a future version" since task 3 shipped.
+  A caller already holding a live, per-user OAuth-connected X read (this
+  session's `X_GetUserTweets` via the-hand; a self-hosted fork's own gateway
+  session per CONNECT.md) normalizes that read to the same `id`/`text`/`url`/
+  `ts` shape `XPost` already uses and hands it in — `scan.py` itself never
+  holds or calls an Arcade client directly. That boundary is deliberate, not
+  an oversight: `arcade_mcp_server.Context.tools.call_raw` (the seam engine's
+  own MCP server, `server.py`) only dispatches to tools already registered on
+  THIS server (`list_repo_commits`, `seam_scan`, etc.), never to a connected
+  user's own external toolkit tools like X's `GetUserTweets` — bridging to a
+  live per-user Arcade session is the connecting client's job, same as every
+  other tool call in `CONNECT.md`'s walkthrough, not something this module
+  can fabricate from inside a headless scan. An empty live override is
+  refused rather than silently accepted (see `load_x_posts_from_live`): this
+  account has genuinely posted before (@oritatown, 28 tweets per `X.WhoAmI`),
+  so an empty result almost always means the read failed or was blocked —
+  not that the account has posted nothing, ever — and treating it as "zero
+  posts, ever" would flag every past commit as newly unannounced, exactly
+  the false-positive flood Ogun's law exists to prevent.
 
 Recurring, on purpose (ROADMAP.md #19): `_effective_since` makes `run_scan`
 always reach back at least to `account_live_since`, never merely the last
@@ -146,6 +168,63 @@ def load_x_posts_from_ledger(path: Path = MORTAL_SKY_LOG) -> list[XPost]:
                 url=m.group("url"),
                 ts=_parse_ts(f"{current_date}T00:00:00+00:00"),
             ))
+    return posts
+
+
+_REQUIRED_LIVE_POST_KEYS = ("id", "text", "url", "ts")
+
+
+def load_x_posts_from_live(data: list[dict[str, Any]]) -> list[XPost]:
+    """Parse a caller-normalized live X read into the same `XPost` shape
+    `load_x_posts_from_ledger` already produces.
+
+    This is deliberately NOT a parser for X's/Arcade's own raw `GetUserTweets`
+    response — the caller (whoever holds the live, per-user OAuth-connected
+    session: this session's `X_GetUserTweets` via the-hand, or a self-hosted
+    fork's own gateway per CONNECT.md) normalizes each tweet to the same four
+    fields `XPost` already carries (`id`, `text`, `url`, `ts`, ISO-8601) before
+    handing it in — the identical "pre-fetched live data, already shaped,
+    handed in as JSON" convention `tools/ritual_check.py`'s `--square-state`/
+    `--ci-checks`/`--cron-checks` already established for this town's own
+    hourly ritual (tasks 73/82). Rejects two shapes, both on purpose:
+
+    - A malformed entry (missing one of the four required keys) raises
+      `ValueError` naming the missing key and the entry's index — never
+      silently dropped, per Ogun's precision-over-recall law.
+    - An EMPTY list raises `ValueError` rather than being accepted as "this
+      account has posted nothing, ever." @oritatown has posted before (28
+      tweets per `X.WhoAmI`, confirmed live 2026-07-16) — an empty live
+      result is far more likely to mean the read failed or was blocked (the
+      account's `X_GetUserTweets` outage this town has tracked since
+      2026-07-14 returns exactly this shape: `{"data": [], "errors": [...]}`)
+      than that the account's history is genuinely empty. Silently treating
+      it as "zero posts, ever" would flag every past commit as newly
+      unannounced — the exact false-positive flood Ogun's law forbids. Pass
+      `x_posts=None` to `run_scan` (the default) to use the local ledger
+      fallback instead of an empty live override.
+    """
+    if not data:
+        raise ValueError(
+            "load_x_posts_from_live() received an empty list — refusing to treat "
+            "that as \"this account has posted nothing, ever\" (it has: 28 tweets "
+            "per X.WhoAmI). An empty live read almost always means the call failed "
+            "or was blocked; pass x_posts=None to run_scan to use the local ledger "
+            "fallback instead of an empty override."
+        )
+    posts: list[XPost] = []
+    for i, entry in enumerate(data):
+        missing = [k for k in _REQUIRED_LIVE_POST_KEYS if k not in entry]
+        if missing:
+            raise ValueError(
+                f"load_x_posts_from_live(): entry {i} is missing required key(s) "
+                f"{missing} (expected id/text/url/ts on every normalized post): {entry!r}"
+            )
+        posts.append(XPost(
+            id=str(entry["id"]),
+            text=str(entry["text"]),
+            url=str(entry["url"]),
+            ts=_parse_ts(entry["ts"]) if isinstance(entry["ts"], str) else entry["ts"],
+        ))
     return posts
 
 
@@ -327,11 +406,29 @@ def _effective_since(now: datetime, window_hours: int, account_live_since: datet
     return min(rolling, account_live_since)
 
 
-def run_scan(owner: str, repo: str, window_hours: int = 24) -> dict[str, Any]:
+def run_scan(
+    owner: str,
+    repo: str,
+    window_hours: int = 24,
+    x_posts: list[dict[str, Any]] | None = None,
+) -> dict[str, Any]:
+    """Run the seam scan.
+
+    `x_posts=None` (the default): unchanged behavior — reads the local
+    `HAND/mortal-sky-log.md` fallback via `load_x_posts_from_ledger`, exactly
+    as before ROADMAP.md #94.
+
+    `x_posts=<list of normalized dicts>`: a live-sourced override, parsed via
+    `load_x_posts_from_live` (which itself refuses an empty list — see its
+    own docstring) instead of reading the ledger. This is the wired-up path
+    for a caller already holding a real per-user OAuth-connected X read.
+    """
     from seam_engine.ranking import rank
 
-    x_posts = load_x_posts_from_ledger()
-    account_live_since = min((p.ts for p in x_posts), default=None)
+    x_post_objs = (
+        load_x_posts_from_ledger() if x_posts is None else load_x_posts_from_live(x_posts)
+    )
+    account_live_since = min((p.ts for p in x_post_objs), default=None)
     if account_live_since is None:
         account_live_since = datetime.now(timezone.utc)
 
@@ -339,8 +436,8 @@ def run_scan(owner: str, repo: str, window_hours: int = 24) -> dict[str, Any]:
     since = _effective_since(now, window_hours, account_live_since)
 
     events = fetch_github_activity(owner, repo, since)
-    surfaced, excluded = compute_candidates(events, x_posts, account_live_since)
-    coincidences = coincidence_candidates(events, x_posts, account_live_since)
+    surfaced, excluded = compute_candidates(events, x_post_objs, account_live_since)
+    coincidences = coincidence_candidates(events, x_post_objs, account_live_since)
 
     ranking = rank(surfaced + coincidences)
     primary = ranking.primary
@@ -350,6 +447,7 @@ def run_scan(owner: str, repo: str, window_hours: int = 24) -> dict[str, Any]:
         "repo": f"{owner}/{repo}",
         "window_hours": window_hours,
         "account_live_since": account_live_since.isoformat(),
+        "x_posts_source": "ledger" if x_posts is None else "live",
         "confidence_bar": ranking.confidence_bar,
         "separation_margin": ranking.separation_margin,
         "primary_gap": asdict(primary) if primary else None,
@@ -358,12 +456,37 @@ def run_scan(owner: str, repo: str, window_hours: int = 24) -> dict[str, Any]:
     }
 
 
-if __name__ == "__main__":
+def main(argv: list[str] | None = None) -> int:
+    """CLI: `python -m seam_engine.scan [output.json] [--x-posts <path>]`.
+
+    `--x-posts <path>` reads a JSON file holding a list of normalized live
+    posts (see `load_x_posts_from_live`) and threads it through as `run_scan`'s
+    `x_posts` override; omitted, `run_scan` uses the ledger fallback exactly
+    as it always has.
+    """
     import sys
-    result = run_scan("thierrypdamiba", "orita")
-    out = sys.argv[1] if len(sys.argv) > 1 else None
+
+    argv = list(sys.argv[1:] if argv is None else argv)
+
+    x_posts: list[dict[str, Any]] | None = None
+    if "--x-posts" in argv:
+        i = argv.index("--x-posts")
+        if i + 1 >= len(argv):
+            print("--x-posts needs a path to a JSON file of normalized live posts.")
+            return 2
+        x_posts_path = Path(argv[i + 1])
+        del argv[i : i + 2]
+        x_posts = json.loads(x_posts_path.read_text())
+
+    out = argv[0] if argv else None
+    result = run_scan("thierrypdamiba", "orita", x_posts=x_posts)
     text = json.dumps(result, indent=2, default=str)
     if out:
         Path(out).write_text(text + "\n")
     else:
         print(text)
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
