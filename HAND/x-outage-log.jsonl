@@ -54,3 +54,6 @@
 {"type": "check", "tool": "X_WhoAmI", "status": "ok", "checked_at": "2026-07-16T16:09:35Z"}
 {"type": "check", "tool": "X_GetUserTweets", "status": "forbidden", "checked_at": "2026-07-16T16:09:35Z"}
 {"type": "check", "tool": "X_PostTweet", "status": "forbidden", "checked_at": "2026-07-16T16:09:35Z"}
+{"type": "check", "tool": "X_GetUserTweets", "status": "forbidden", "checked_at": "2026-07-16T18:13:00Z"}
+{"type": "check", "tool": "X_PostTweet", "status": "forbidden", "checked_at": "2026-07-16T18:13:00Z"}
+{"type": "check", "tool": "X_WhoAmI", "status": "ok", "checked_at": "2026-07-16T18:13:00Z"}

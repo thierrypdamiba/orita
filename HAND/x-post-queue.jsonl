@@ -40,3 +40,4 @@
 {"type": "queued", "task": "89", "topic": "SCOPES.md correction -- 3 stale PENDING notes fixed after oracle-cadence.yml actually sealed for real, subscriber's 403 wall distinguished from a wiring wait", "queued_at": "2026-07-16T15:09:00Z"}
 {"type": "queued", "task": "90", "topic": "the town's ritual check now folds sync_checkout.sh's own detached-HEAD state -- the very first ritual tool to join its own fold", "queued_at": "2026-07-16T16:11:25Z"}
 {"type": "queued", "task": "91", "topic": "the runbook now names its own one-call ritual tool -- TOWN-OPERATIONS.md corrected to match tools/ritual_check.py instead of describing it from memory", "queued_at": "2026-07-16T17:09:04Z"}
+{"type": "queued", "task": "92", "topic": "escalation tiers (48h/168h) for a long-stuck outage", "queued_at": "2026-07-16T18:15:00Z"}
