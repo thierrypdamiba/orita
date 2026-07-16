@@ -26,18 +26,34 @@ read (`X_GetUserTweets`) got retested every hour; a write
 real hours running. `should_recheck` replaces the feeling with a fixed
 cooldown so the call is the same every time, for every god.
 
+Task 81. Every hourly note through task 78 has closed with the identical
+hand-written paragraph: "Flagging for the Hand, still: X_PostTweet/
+X_GetUserTweets have now been forbidden for roughly N real hours ...
+Restoring authorization ... remains outside what any god can build from
+this side." Nobody decided *when* to write that paragraph -- it just got
+re-typed every single hour once the outage started, the identical
+repeated-by-feel judgment call tasks 55/57/59/69/70/72/73/74 each already
+closed for their own number. This closes it for the last one: a durable,
+tested rule for when an ongoing outage has crossed the point where the
+Hand should actually be told, firing exactly once per streak (not every
+hour it stays broken) so surfacing it doesn't itself become the hourly
+spam the town's own Star Covenant already refuses to produce elsewhere.
+
 Usage:
     python3 tools/x_outage_tracker.py record <tool> <ok|forbidden> <checked_at>
     python3 tools/x_outage_tracker.py status
     python3 tools/x_outage_tracker.py should-recheck <tool> <now> [cooldown_hours]
+    python3 tools/x_outage_tracker.py should-escalate <tool> <now> [threshold_hours]
 """
 import json
 import os
 from datetime import datetime, timezone
 
 DEFAULT_COOLDOWN_HOURS = 2.0
+DEFAULT_ESCALATION_THRESHOLD_HOURS = 48.0
 
 LOG = os.path.join(os.path.dirname(__file__), "..", "HAND", "x-outage-log.jsonl")
+ESCALATION_LOG = os.path.join(os.path.dirname(__file__), "..", "HAND", "escalations.jsonl")
 STATUSES = ("ok", "forbidden")
 TRACKED_TOOLS = ("X_PostTweet", "X_GetUserTweets", "X_WhoAmI")
 
@@ -122,6 +138,71 @@ def should_recheck(entries: list, tool: str, now: str, cooldown_hours: float = D
     return elapsed >= cooldown_hours
 
 
+def _escalation_entries(path=ESCALATION_LOG) -> list:
+    if not os.path.exists(path):
+        return []
+    with open(path) as f:
+        return [json.loads(line) for line in f if line.strip()]
+
+
+def record_escalation(tool: str, streak_started_at: str, escalated_at: str, hours: float, path=ESCALATION_LOG) -> None:
+    """Append one real escalation event. Never edits or removes a prior line."""
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    entry = {
+        "type": "escalation",
+        "tool": tool,
+        "streak_started_at": streak_started_at,
+        "escalated_at": escalated_at,
+        "hours": hours,
+    }
+    with open(path, "a") as f:
+        f.write(json.dumps(entry, ensure_ascii=False) + "\n")
+
+
+def already_escalated_for_streak(escalation_entries: list, tool: str, streak_started_at: str) -> bool:
+    """Whether this exact streak (identified by its start timestamp) already fired an escalation.
+
+    A streak is identified by when it started, not just its length -- so a
+    recovered-then-broken-again outage gets its own fresh escalation instead
+    of staying silently suppressed by a prior, already-resolved one.
+    """
+    return any(
+        e.get("type") == "escalation" and e.get("tool") == tool and e.get("streak_started_at") == streak_started_at
+        for e in escalation_entries
+    )
+
+
+def should_escalate(
+    entries: list,
+    tool: str,
+    now: str,
+    threshold_hours: float = DEFAULT_ESCALATION_THRESHOLD_HOURS,
+    escalation_entries=None,
+):
+    """Whether an ongoing `tool` outage has crossed the point the Hand should hear about it.
+
+    Returns (due: bool, reason: str). Never due if the tool isn't currently
+    in a forbidden streak (recovered, or never checked). Due once the
+    current streak has run at least `threshold_hours`, UNLESS this exact
+    streak (keyed by its own start timestamp) already fired an escalation --
+    that streak gets exactly one notification, not a fresh one every hour it
+    stays broken. A later streak (a fresh start timestamp, after a real
+    recovery) always gets its own chance to escalate again.
+    """
+    if escalation_entries is None:
+        escalation_entries = _escalation_entries()
+    streak = current_streak(entries, tool, "forbidden")
+    if streak == 0:
+        return False, "no active outage"
+    started = streak_started_at(entries, tool, "forbidden")
+    elapsed = (_parse(now) - _parse(started)).total_seconds() / 3600.0
+    if elapsed < threshold_hours:
+        return False, f"outage {elapsed:.1f}h old, below {threshold_hours}h threshold"
+    if already_escalated_for_streak(escalation_entries, tool, started):
+        return False, f"already escalated for the streak that began {started}"
+    return True, f"outage since {started}, {elapsed:.1f}h old, crosses {threshold_hours}h threshold"
+
+
 def format_status_line(entries: list, tool: str, status: str = "forbidden") -> str:
     last = last_checked_at(entries, tool)
     if last is None:
@@ -152,4 +233,11 @@ if __name__ == "__main__":
         _cooldown = float(sys.argv[4]) if len(sys.argv) > 4 else DEFAULT_COOLDOWN_HOURS
         _due = should_recheck(_entries(), _tool, _now, _cooldown)
         print("due" if _due else "not due")
+        sys.exit(0 if _due else 1)
+    elif cmd == "should-escalate":
+        _tool = sys.argv[2]
+        _now = sys.argv[3]
+        _threshold = float(sys.argv[4]) if len(sys.argv) > 4 else DEFAULT_ESCALATION_THRESHOLD_HOURS
+        _due, _reason = should_escalate(_entries(), _tool, _now, _threshold)
+        print(("due" if _due else "not due") + f" -- {_reason}")
         sys.exit(0 if _due else 1)

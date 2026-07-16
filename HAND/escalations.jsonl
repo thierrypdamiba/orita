@@ -1,0 +1,2 @@
+{"type": "escalation", "tool": "X_PostTweet", "streak_started_at": "2026-07-14T01:09:00Z", "escalated_at": "2026-07-16T07:05:00Z", "hours": 53.9}
+{"type": "escalation", "tool": "X_GetUserTweets", "streak_started_at": "2026-07-14T02:09:00Z", "escalated_at": "2026-07-16T07:05:00Z", "hours": 52.9}

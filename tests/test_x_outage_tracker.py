@@ -194,5 +194,111 @@ class TestTrackedToolsIncludesWhoAmI(unittest.TestCase):
         self.assertIn("OK as of 2026-07-14T23:07:00Z", who_am_i_lines[0])
 
 
+class TestShouldEscalate(unittest.TestCase):
+    """Task 81. An ongoing outage should tell the Hand exactly once when it
+    crosses the threshold -- not every hour it stays broken, and not before
+    it's actually old enough to matter."""
+
+    def test_not_due_with_no_active_outage(self):
+        due, reason = xot.should_escalate([], "X_PostTweet", "2026-07-14T10:00:00Z", escalation_entries=[])
+        self.assertFalse(due)
+        self.assertIn("no active outage", reason)
+
+    def test_not_due_below_threshold(self):
+        entries = [{"type": "check", "tool": "X_PostTweet", "status": "forbidden", "checked_at": "2026-07-14T01:09:00Z"}]
+        due, reason = xot.should_escalate(
+            entries, "X_PostTweet", "2026-07-15T01:00:00Z", threshold_hours=48.0, escalation_entries=[]
+        )
+        self.assertFalse(due)
+        self.assertIn("below 48.0h threshold", reason)
+
+    def test_due_once_the_streak_crosses_the_threshold(self):
+        entries = [{"type": "check", "tool": "X_PostTweet", "status": "forbidden", "checked_at": "2026-07-14T01:09:00Z"}]
+        due, reason = xot.should_escalate(
+            entries, "X_PostTweet", "2026-07-16T02:00:00Z", threshold_hours=48.0, escalation_entries=[]
+        )
+        self.assertTrue(due)
+        self.assertIn("crosses 48.0h threshold", reason)
+
+    def test_boundary_is_exact_not_off_by_one_hour(self):
+        entries = [{"type": "check", "tool": "X_PostTweet", "status": "forbidden", "checked_at": "2026-07-14T01:09:00Z"}]
+        due_before, _ = xot.should_escalate(
+            entries, "X_PostTweet", "2026-07-16T01:08:59Z", threshold_hours=48.0, escalation_entries=[]
+        )
+        due_at, _ = xot.should_escalate(
+            entries, "X_PostTweet", "2026-07-16T01:09:00Z", threshold_hours=48.0, escalation_entries=[]
+        )
+        self.assertFalse(due_before)
+        self.assertTrue(due_at)
+
+    def test_not_due_a_second_time_for_the_same_streak(self):
+        entries = [
+            {"type": "check", "tool": "X_PostTweet", "status": "forbidden", "checked_at": "2026-07-14T01:09:00Z"},
+            {"type": "check", "tool": "X_PostTweet", "status": "forbidden", "checked_at": "2026-07-16T02:00:00Z"},
+        ]
+        prior_escalations = [
+            {
+                "type": "escalation",
+                "tool": "X_PostTweet",
+                "streak_started_at": "2026-07-14T01:09:00Z",
+                "escalated_at": "2026-07-16T02:00:00Z",
+                "hours": 48.85,
+            }
+        ]
+        due, reason = xot.should_escalate(
+            entries,
+            "X_PostTweet",
+            "2026-07-16T10:00:00Z",
+            threshold_hours=48.0,
+            escalation_entries=prior_escalations,
+        )
+        self.assertFalse(due)
+        self.assertIn("already escalated", reason)
+
+    def test_a_fresh_streak_after_recovery_gets_its_own_chance(self):
+        entries = [
+            {"type": "check", "tool": "X_PostTweet", "status": "forbidden", "checked_at": "2026-07-14T01:09:00Z"},
+            {"type": "check", "tool": "X_PostTweet", "status": "ok", "checked_at": "2026-07-16T02:00:00Z"},
+            {"type": "check", "tool": "X_PostTweet", "status": "forbidden", "checked_at": "2026-07-17T00:00:00Z"},
+        ]
+        prior_escalations = [
+            {
+                "type": "escalation",
+                "tool": "X_PostTweet",
+                "streak_started_at": "2026-07-14T01:09:00Z",
+                "escalated_at": "2026-07-16T02:00:00Z",
+                "hours": 48.85,
+            }
+        ]
+        due, reason = xot.should_escalate(
+            entries,
+            "X_PostTweet",
+            "2026-07-19T01:00:00Z",
+            threshold_hours=48.0,
+            escalation_entries=prior_escalations,
+        )
+        self.assertTrue(due)
+        self.assertIn("crosses 48.0h threshold", reason)
+
+
+class TestRecordEscalation(_TempLogCase):
+    def test_records_a_line_and_never_edits_a_prior_one(self):
+        xot.record_escalation("X_PostTweet", "2026-07-14T01:09:00Z", "2026-07-16T02:00:00Z", 48.85, path=self.path)
+        with open(self.path) as f:
+            before = f.readlines()
+        xot.record_escalation("X_GetUserTweets", "2026-07-14T02:09:00Z", "2026-07-16T03:00:00Z", 48.85, path=self.path)
+        with open(self.path) as f:
+            after = f.readlines()
+        self.assertEqual(after[0], before[0])
+        self.assertEqual(len(after), 2)
+
+    def test_already_escalated_for_streak_reads_the_written_entry_back(self):
+        xot.record_escalation("X_PostTweet", "2026-07-14T01:09:00Z", "2026-07-16T02:00:00Z", 48.85, path=self.path)
+        entries = xot._escalation_entries(path=self.path)
+        self.assertTrue(xot.already_escalated_for_streak(entries, "X_PostTweet", "2026-07-14T01:09:00Z"))
+        self.assertFalse(xot.already_escalated_for_streak(entries, "X_PostTweet", "2026-07-15T00:00:00Z"))
+        self.assertFalse(xot.already_escalated_for_streak(entries, "X_GetUserTweets", "2026-07-14T01:09:00Z"))
+
+
 if __name__ == "__main__":
     unittest.main()
