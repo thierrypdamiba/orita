@@ -1,4 +1,6 @@
 import os
+import subprocess
+import tempfile
 import unittest
 
 import yaml
@@ -80,6 +82,107 @@ class TestSubscriberCadenceIsGuarded(unittest.TestCase):
                 downstream_idx,
                 f"expected subscriber-cadence to precede {marker!r} in file order",
             )
+
+
+def _commit_step_run_script():
+    steps = _load_steps()
+    step = next(
+        s
+        for s in steps
+        if s.get("name", "").startswith(
+            "commit, if a snapshot or a subscriber-cadence call was sealed"
+        )
+    )
+    return step["run"]
+
+
+class TestSubscriberCadenceCommitSurvivesAMissingSnapshot(unittest.TestCase):
+    """ROADMAP #78: task 64's continue-on-error on the SEAL step wasn't enough --
+    the COMMIT step right after it did `git add oracle/subscriber_snapshots.jsonl`
+    unconditionally, and that file has never once been created (every real run
+    of subscriber_cadence.py crashes on the endpoint's genuine 403 before it can
+    write one). `git add` on a nonexistent pathspec exits 128, uncaught by any
+    continue-on-error, and killed the whole job -- silently skipping every
+    cadence step declared after it in file order (tag-51 through
+    issue-comment-77, ten sources) on every single real CI run since task 64
+    shipped. This proves the fix survives the exact missing-file case live CI
+    hit (run 29424866577, 2026-07-15T14:44Z), by actually executing the
+    step's own script against a real temp git repo -- not a fixture guess."""
+
+    def _run_script_in_repo(self, repo_dir, script):
+        return subprocess.run(
+            ["bash", "-c", script],
+            cwd=repo_dir,
+            capture_output=True,
+            text=True,
+        )
+
+    def test_commit_step_does_not_crash_when_snapshot_file_is_absent(self):
+        script = _commit_step_run_script()
+        with tempfile.TemporaryDirectory() as tmp:
+            subprocess.run(["git", "init", "-q"], cwd=tmp, check=True)
+            subprocess.run(
+                ["git", "config", "user.email", "test@example.com"], cwd=tmp, check=True
+            )
+            subprocess.run(["git", "config", "user.name", "test"], cwd=tmp, check=True)
+            os.makedirs(os.path.join(tmp, "records"))
+            with open(os.path.join(tmp, "records", "ledger.jsonl"), "w") as f:
+                f.write("")
+            subprocess.run(["git", "add", "-A"], cwd=tmp, check=True)
+            subprocess.run(["git", "commit", "-q", "-m", "init"], cwd=tmp, check=True)
+
+            # No oracle/subscriber_snapshots.jsonl exists anywhere -- the exact
+            # live-CI shape when the seal step's continue-on-error swallowed a
+            # 403 before any snapshot was ever written.
+            with open(os.path.join(tmp, "records", "ledger.jsonl"), "a") as f:
+                f.write('{"seq": 1}\n')
+
+            # No `git push` (no remote in this fixture repo) -- swap the real
+            # script's push for a no-op so the test only exercises the add/
+            # diff/commit logic the fix actually touches.
+            script_no_push = script.replace("\ngit push", "\ntrue")
+            result = self._run_script_in_repo(tmp, script_no_push)
+
+            self.assertEqual(
+                result.returncode,
+                0,
+                f"commit step crashed on a missing snapshot file: {result.stderr}",
+            )
+            self.assertNotIn("did not match any files", result.stderr)
+
+    def test_commit_step_still_stages_snapshot_file_when_present(self):
+        script = _commit_step_run_script()
+        with tempfile.TemporaryDirectory() as tmp:
+            subprocess.run(["git", "init", "-q"], cwd=tmp, check=True)
+            subprocess.run(
+                ["git", "config", "user.email", "test@example.com"], cwd=tmp, check=True
+            )
+            subprocess.run(["git", "config", "user.name", "test"], cwd=tmp, check=True)
+            os.makedirs(os.path.join(tmp, "records"))
+            os.makedirs(os.path.join(tmp, "oracle"))
+            with open(os.path.join(tmp, "records", "ledger.jsonl"), "w") as f:
+                f.write("")
+            subprocess.run(["git", "add", "-A"], cwd=tmp, check=True)
+            subprocess.run(["git", "commit", "-q", "-m", "init"], cwd=tmp, check=True)
+
+            with open(os.path.join(tmp, "oracle", "subscriber_snapshots.jsonl"), "w") as f:
+                f.write('{"count": 5}\n')
+            with open(os.path.join(tmp, "records", "ledger.jsonl"), "a") as f:
+                f.write('{"seq": 1}\n')
+
+            script_no_push = script.replace("\ngit push", "\ntrue")
+            result = self._run_script_in_repo(tmp, script_no_push)
+            self.assertEqual(result.returncode, 0, result.stderr)
+
+            committed = subprocess.run(
+                ["git", "show", "--name-only", "--pretty=format:", "HEAD"],
+                cwd=tmp,
+                capture_output=True,
+                text=True,
+                check=True,
+            ).stdout.split()
+            self.assertIn("oracle/subscriber_snapshots.jsonl", committed)
+            self.assertIn("records/ledger.jsonl", committed)
 
 
 if __name__ == "__main__":

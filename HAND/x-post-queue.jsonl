@@ -26,3 +26,4 @@
 {"type": "queued", "task": "75", "topic": "Oracle Desk's 23rd cadence source (run count) sealed -- zashiki-warashi", "queued_at": "2026-07-15T02:07:00Z"}
 {"type": "queued", "task": "76", "topic": "comment cadence -- the desk's 24th source, GitHub PR review-comment count, sealed live at zero", "queued_at": "2026-07-15T03:12:00Z"}
 {"type": "queued", "task": "77", "topic": "issue-comment cadence -- the town's own square conversation count", "queued_at": "2026-07-15T04:15:00Z"}
+{"type": "queued", "task": "#78", "topic": "the subscriber-cadence commit step was crashing on a never-created snapshot file every single day, silently killing ten downstream Oracle Desk cadences (tag through issue-comment) -- fixed and regression-tested", "queued_at": "2026-07-16T04:10:00Z"}

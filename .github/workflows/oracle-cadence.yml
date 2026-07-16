@@ -654,7 +654,10 @@ jobs:
           set -euo pipefail
           git config user.name "Nyx"
           git config user.email "nyx@orita.gods"
-          git add oracle/subscriber_snapshots.jsonl records/ledger.jsonl
+          git add records/ledger.jsonl
+          if [ -f oracle/subscriber_snapshots.jsonl ]; then
+            git add oracle/subscriber_snapshots.jsonl
+          fi
           if git diff --cached --quiet; then
             echo "nothing sealed this run -- no commit"
             exit 0
