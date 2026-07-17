@@ -238,6 +238,10 @@ def _report_cadence_check():
     return _load("_ritual_report_cadence_check", os.path.join(ROOT, "tools", "report_cadence_check.py"))
 
 
+def _metrics_cadence_check():
+    return _load("_ritual_metrics_cadence_check", os.path.join(ROOT, "tools", "metrics_cadence_check.py"))
+
+
 def _seam_ledger():
     src = os.path.join(ROOT, "fencepost", "seam_engine", "src")
     if src not in sys.path:
@@ -661,6 +665,25 @@ def check_report_cadence(reports_dir: str | None = None) -> dict:
     return mod.compute_cadence(**kwargs)
 
 
+def check_metrics_cadence(metrics_path: str | None = None) -> dict:
+    """Task 117: fold `metrics_cadence_check.py`'s own scan into the one
+    block. Unconditional, local-filesystem-only, the same cheap
+    informational class `check_report_cadence`/`check_petition_cadence`
+    already hold -- TOWN-OPERATIONS.md's daily-aggregate cadence
+    (`records/metrics.jsonl`'s dated reading, appended every 18:00 UTC
+    hour) had never once been computed, and had silently skipped three
+    real days (07-13, 07-15, 07-17) before this task named them. Never
+    flips `broken`: a missed daily aggregate is a fact worth surfacing
+    to the next hour's run, not a currently-live law violation -- the
+    same distinction `report_cadence`/`owed_posts`/`square` already
+    hold."""
+    mod = _metrics_cadence_check()
+    kwargs = {}
+    if metrics_path is not None:
+        kwargs["metrics_path"] = metrics_path
+    return mod.compute_cadence(**kwargs)
+
+
 def check_change_gate(report_info: dict) -> dict | None:
     """Fold `change_gate.should_post_gap()` -- task 69's own change-gate
     rule -- using whichever report text `check_report_freshness` already
@@ -702,6 +725,7 @@ def run_ritual_check(
     voice_window_log: str | None = None,
     petition_cadence_dir: str | None = None,
     report_cadence_dir: str | None = None,
+    metrics_cadence_path: str | None = None,
 ) -> dict:
     if now is None:
         now = datetime.now(timezone.utc)
@@ -733,6 +757,7 @@ def run_ritual_check(
     voice_window = check_voice_window(voice_window_commits, now_iso, path=voice_window_log)
     petition_cadence = check_petition_cadence(orita_dir=petition_cadence_dir)
     report_cadence = check_report_cadence(reports_dir=report_cadence_dir)
+    metrics_cadence = check_metrics_cadence(metrics_path=metrics_cadence_path)
     broken = (
         (not town["ok"])
         or (not fencepost["ok"])
@@ -774,6 +799,7 @@ def run_ritual_check(
         "voice_window": voice_window,
         "petition_cadence": petition_cadence,
         "report_cadence": report_cadence,
+        "metrics_cadence": metrics_cadence,
         "broken": broken,
     }
 
@@ -894,6 +920,15 @@ def format_ritual_check(result: dict) -> str:
         lines.append(
             f"  report cadence: {rcad['current_streak']}-day streak "
             f"(target {rcad['target']}/{rcad['target']}, STRATEGY.md's off-by-one metric){gap_note}"
+        )
+    mcad = result["metrics_cadence"]
+    if mcad["total_shipped"] == 0:
+        lines.append("  metrics cadence: no daily-aggregate reading has ever shipped")
+    else:
+        gap_note = f", {len(mcad['missing_dates'])} historical gap day(s)" if mcad["missing_dates"] else ""
+        lines.append(
+            f"  metrics cadence: {mcad['current_streak']}-day streak "
+            f"(records/metrics.jsonl, daily-aggregate readings){gap_note}"
         )
     return "\n".join(lines)
 

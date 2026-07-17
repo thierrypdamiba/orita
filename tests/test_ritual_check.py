@@ -1261,6 +1261,17 @@ class ReportCadenceFoldCase(unittest.TestCase):
         with open(path, "w") as f:
             f.write(content)
 
+    @staticmethod
+    def _line_starting(formatted, prefix):
+        """The one printed line starting with `prefix`, so a check on one
+        cadence's own line can't be fooled by the sibling cadence line
+        (task 117's metrics cadence sits right below this one and can
+        also say "historical gap day" independently)."""
+        for line in formatted.splitlines():
+            if line.strip().startswith(prefix):
+                return line
+        return None
+
     def test_no_gap_fixture_prints_streak_and_never_flips_broken(self):
         for d in ("2026-07-15", "2026-07-16", "2026-07-17"):
             self._write(self.reports, f"{d}.md", "x")
@@ -1269,8 +1280,9 @@ class ReportCadenceFoldCase(unittest.TestCase):
         self.assertEqual(result["report_cadence"]["missing_dates"], [])
         self.assertFalse(result["broken"])
         formatted = rc.format_ritual_check(result)
-        self.assertIn("report cadence: 3-day streak", formatted)
-        self.assertNotIn("historical gap day", formatted)
+        line = self._line_starting(formatted, "report cadence:")
+        self.assertIn("report cadence: 3-day streak", line)
+        self.assertNotIn("historical gap day", line)
 
     def test_gap_fixture_is_named_but_still_never_flips_broken(self):
         for d in ("2026-07-12", "2026-07-13", "2026-07-15", "2026-07-16", "2026-07-17"):
@@ -1289,6 +1301,70 @@ class ReportCadenceFoldCase(unittest.TestCase):
         result = rc.run_ritual_check()
         self.assertEqual(result["report_cadence"]["total_shipped"], 5)
         self.assertEqual(result["report_cadence"]["missing_dates"], ["2026-07-14"])
+
+
+class MetricsCadenceFoldCase(unittest.TestCase):
+    """Task 117: run_ritual_check() folds metrics_cadence_check.py's own
+    records/metrics.jsonl streak scan (TOWN-OPERATIONS.md's 18:00 UTC
+    daily-aggregate cadence) into the same structured result -- a
+    fixture with no gap prints a clean streak line and never flips
+    `broken` (a missed daily aggregate is a fact worth surfacing to the
+    next hour's run, not a currently-live law violation, the same class
+    `report_cadence`/`square`/`owed_posts` already hold)."""
+
+    def setUp(self):
+        self.tmp = tempfile.mkdtemp()
+        self.path = os.path.join(self.tmp, "metrics.jsonl")
+        self.addCleanup(shutil.rmtree, self.tmp, ignore_errors=True)
+
+    def _write(self, rows):
+        with open(self.path, "w") as f:
+            for row in rows:
+                f.write(row + "\n")
+
+    @staticmethod
+    def _line_starting(formatted, prefix):
+        """Mirrors ReportCadenceFoldCase's own helper: the one printed
+        line starting with `prefix`, so a check on this cadence's own
+        line can't be fooled by the sibling report-cadence line (which
+        can independently say "historical gap day")."""
+        for line in formatted.splitlines():
+            if line.strip().startswith(prefix):
+                return line
+        return None
+
+    def test_no_gap_fixture_prints_streak_and_never_flips_broken(self):
+        rows = [f'{{"date": "2026-07-{d}"}}' for d in ("15", "16", "17")]
+        self._write(rows)
+        result = rc.run_ritual_check(metrics_cadence_path=self.path)
+        self.assertEqual(result["metrics_cadence"]["current_streak"], 3)
+        self.assertEqual(result["metrics_cadence"]["missing_dates"], [])
+        self.assertFalse(result["broken"])
+        formatted = rc.format_ritual_check(result)
+        line = self._line_starting(formatted, "metrics cadence:")
+        self.assertIn("metrics cadence: 3-day streak", line)
+        self.assertNotIn("historical gap day", line)
+
+    def test_gap_fixture_is_named_but_still_never_flips_broken(self):
+        rows = [f'{{"date": "2026-07-{d}"}}' for d in ("12", "13", "15", "16", "17")]
+        self._write(rows)
+        result = rc.run_ritual_check(metrics_cadence_path=self.path)
+        self.assertEqual(result["metrics_cadence"]["current_streak"], 3)
+        self.assertEqual(result["metrics_cadence"]["missing_dates"], ["2026-07-14"])
+        self.assertFalse(result["broken"])
+        formatted = rc.format_ritual_check(result)
+        self.assertIn("metrics cadence: 3-day streak", formatted)
+        self.assertIn("1 historical gap day(s)", formatted)
+
+    def test_default_path_reads_the_real_metrics_jsonl(self):
+        """No override: reads the real records/metrics.jsonl file, the
+        same default `check_metrics_cadence` falls back to. Locked
+        loosely (>=4, not an exact count) since this task's own catch-up
+        entry for 2026-07-17 lands in the same commit as this test."""
+        result = rc.run_ritual_check()
+        self.assertGreaterEqual(result["metrics_cadence"]["total_shipped"], 4)
+        self.assertIn("2026-07-13", result["metrics_cadence"]["missing_dates"])
+        self.assertIn("2026-07-15", result["metrics_cadence"]["missing_dates"])
 
 
 if __name__ == "__main__":

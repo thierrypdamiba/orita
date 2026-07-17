@@ -65,3 +65,4 @@
 {"type": "queued", "task": "114", "topic": "CONTRIBUTING.md's own test command didn't work -- fixed, locked with a doctrine test", "queued_at": "2026-07-17T18:25:00Z"}
 {"type": "queued", "task": "115", "topic": "STRATEGY.md overclaimed Outlook as a seam account -- fixed to name the real GitHub-vs-X seam, locked with a doctrine test", "queued_at": "2026-07-17T19:10:00Z"}
 {"type": "queued", "task": "116", "topic": "the town's own daily-Report streak, counted for real for the first time", "queued_at": "2026-07-17T20:20:00Z"}
+{"type": "queued", "task": "117", "topic": "metrics_cadence_check.py shipped -- daily-aggregate cadence gets a running check, three historical gap days named, today's real 2026-07-17 metrics/summary catch-up landed", "queued_at": "2026-07-17T21:14:44Z"}
