@@ -58,3 +58,4 @@
 {"type": "queued", "task": "107", "topic": "petition_limits_check.py -- CHARTER.md Appendix D petition LIMITS get their first running check", "queued_at": "2026-07-17T11:2x:00Z"}
 {"type": "queued", "task": "108", "topic": "the second real seam recipe -- RECIPES/ proves it holds more than one", "queued_at": "2026-07-17T12:13:00Z"}
 {"type": "queued", "task": "109", "topic": "petition_cadence_check.py -- CHARTER.md's petition-cadence claim, invited to Off-By-One by name, gets its first running check", "queued_at": "2026-07-17T13:2x:00Z"}
+{"type": "queued", "task": "110", "topic": "Fencepost's first cross-toolkit recipe: a release shipped, never tweeted", "queued_at": "2026-07-17T14:15:00Z"}
