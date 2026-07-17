@@ -1008,5 +1008,58 @@ class ChildWorkFoldCase(unittest.TestCase):
         self.assertIn("REVERTED", formatted)
 
 
+class VoiceWindowFoldCase(unittest.TestCase):
+    """Task 103: run_ritual_check() folds voice_window_check.py's Iron Rule
+    #7 window check into the same structured result -- clean by default
+    when logged commits are all pre-fix (grandfathered), and a synthetic
+    post-fix violation both flips `broken` and surfaces in the printed
+    block. Mirrors ChildWorkFoldCase's live-API-input-but-no-network-call
+    shape (voice_window_commits is None unless the caller hands in this
+    hour's live GitHub commit read) -- isolated to a temp log path so it
+    never touches the real HAND/voice-window-log.jsonl."""
+
+    def setUp(self):
+        self.log_dir = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.log_dir, ignore_errors=True)
+        self.log = os.path.join(self.log_dir, "voice-window-log.jsonl")
+
+    def _run(self, voice_window_commits=None, now=None):
+        return rc.run_ritual_check(
+            now=now or datetime(2026, 7, 17, 7, 0, 0, tzinfo=timezone.utc),
+            voice_window_commits=voice_window_commits,
+            voice_window_log=self.log,
+        )
+
+    def test_pre_fix_violation_is_grandfathered_clean(self):
+        result = self._run(
+            voice_window_commits=[{"sha": "a1", "author": "Nyx", "author_date": "2026-07-16T14:55:56Z"}]
+        )
+        self.assertTrue(result["voice_window"]["clean"])
+        self.assertFalse(result["broken"])
+        formatted = rc.format_ritual_check(result)
+        self.assertIn("voice window: clean", formatted)
+        self.assertIn("1 historical", formatted)
+
+    def test_post_fix_violation_flips_broken_and_prints(self):
+        result = self._run(
+            voice_window_commits=[{"sha": "b1", "author": "Zashiki-Warashi", "author_date": "2026-07-20T13:00:00Z"}],
+            now=datetime(2026, 7, 20, 13, 5, 0, tzinfo=timezone.utc),
+        )
+        self.assertFalse(result["voice_window"]["clean"])
+        self.assertTrue(result["broken"])
+        formatted = rc.format_ritual_check(result)
+        self.assertIn("voice window:", formatted)
+        self.assertIn("NEW VIOLATION", formatted)
+
+    def test_no_fresh_commits_still_rechecks_already_logged_ones(self):
+        self._run(
+            voice_window_commits=[{"sha": "c1", "author": "Nyx", "author_date": "2026-07-20T13:00:00Z"}],
+            now=datetime(2026, 7, 20, 13, 5, 0, tzinfo=timezone.utc),
+        )
+        result = self._run(voice_window_commits=None, now=datetime(2026, 7, 20, 14, 0, 0, tzinfo=timezone.utc))
+        self.assertFalse(result["voice_window"]["clean"])
+        self.assertEqual(result["voice_window"]["newly_logged"], [])
+
+
 if __name__ == "__main__":
     unittest.main()

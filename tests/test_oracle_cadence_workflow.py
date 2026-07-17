@@ -226,5 +226,99 @@ class TestNeverYetSealedCadenceCommitStepsSurviveAMissingSnapshot(unittest.TestC
                     self.assertIn("records/ledger.jsonl", committed)
 
 
+
+# ROADMAP #103: every Nyx-/Zashiki-Warashi-attributed seal-commit step,
+# with its own snapshot path (None for the ones whose commit step never
+# references a snapshot file directly). The fixed daily cron (0 13 * * *)
+# means these land around 13:00-15:00 UTC real wall-clock time, every day
+# the workflow fires -- squarely outside TOWN-OPERATIONS.md's WINDOW rule
+# ("Nyx- and Zashiki-voiced commits carry author timestamps in that
+# window"), confirmed live via nine real commits dated
+# 2026-07-16T14:55:3xZ-14:55:5xZ. GIT_AUTHOR_DATE/GIT_COMMITTER_DATE now
+# backdate each to that run's own calendar date at 03:00 UTC.
+VOICE_WINDOW_SEAL_STEPS = [
+    ("commit, if a snapshot or a commit-cadence call was sealed", "oracle/commit_snapshots.jsonl"),
+    ("commit, if a snapshot or a subscriber-cadence call was sealed", "oracle/subscriber_snapshots.jsonl"),
+    ("commit, if a snapshot or a tag-cadence call was sealed", "oracle/tag_snapshots.jsonl"),
+    ("commit, if a snapshot or a label-cadence call was sealed", "oracle/label_snapshots.jsonl"),
+    ("commit, if a snapshot or a topic-cadence call was sealed", "oracle/topic_snapshots.jsonl"),
+    ("commit, if a snapshot or an open-PR-cadence call was sealed", "oracle/pr_snapshots.jsonl"),
+    ("commit, if a snapshot or a comment-cadence call was sealed", "oracle/comment_snapshots.jsonl"),
+    ("commit, if a snapshot or a milestone-cadence call was sealed", "oracle/milestone_snapshots.jsonl"),
+    ("commit, if a snapshot or a run-cadence call was sealed", "oracle/run_snapshots.jsonl"),
+    ("commit, if a snapshot or an issue-comment-cadence call was sealed", "oracle/issue_comment_snapshots.jsonl"),
+]
+
+
+class TestVoiceWindowBackdating(unittest.TestCase):
+    """ROADMAP #103: every Nyx-/Zashiki-Warashi-attributed seal-commit step
+    must produce a commit whose AUTHOR date falls inside 00:00-06:00 UTC,
+    regardless of the real wall-clock time the step actually runs at --
+    proven by actually executing each step's real script against a real
+    temp git repo, not a fixture guess (mirrors
+    TestNeverYetSealedCadenceCommitStepsSurviveAMissingSnapshot's shape)."""
+
+    def _git_config_name(self, name_prefix):
+        steps = _load_steps()
+        step = next(s for s in steps if s.get("name", "").startswith(name_prefix))
+        script = step["run"]
+        for line in script.splitlines():
+            line = line.strip()
+            if line.startswith('git config user.name "'):
+                return line.split('"')[1]
+        return None
+
+    def test_every_voice_window_step_is_attributed_to_nyx_or_zashiki(self):
+        for name_prefix, _ in VOICE_WINDOW_SEAL_STEPS:
+            with self.subTest(name_prefix=name_prefix):
+                self.assertIn(self._git_config_name(name_prefix), ("Nyx", "Zashiki-Warashi"))
+
+    def test_seal_commit_author_date_lands_inside_the_window(self):
+        for name_prefix, snapshot_path in VOICE_WINDOW_SEAL_STEPS:
+            with self.subTest(snapshot_path=snapshot_path):
+                script = _commit_step_run_script(name_prefix)
+                with tempfile.TemporaryDirectory() as tmp:
+                    subprocess.run(["git", "init", "-q"], cwd=tmp, check=True)
+                    subprocess.run(["git", "config", "user.email", "test@example.com"], cwd=tmp, check=True)
+                    subprocess.run(["git", "config", "user.name", "test"], cwd=tmp, check=True)
+                    os.makedirs(os.path.join(tmp, "records"))
+                    os.makedirs(os.path.join(tmp, "oracle"), exist_ok=True)
+                    with open(os.path.join(tmp, "records", "ledger.jsonl"), "w") as f:
+                        f.write("")
+                    subprocess.run(["git", "add", "-A"], cwd=tmp, check=True)
+                    subprocess.run(["git", "commit", "-q", "-m", "init"], cwd=tmp, check=True)
+
+                    with open(os.path.join(tmp, snapshot_path), "w") as f:
+                        f.write('{"count": 5}\n')
+                    with open(os.path.join(tmp, "records", "ledger.jsonl"), "a") as f:
+                        f.write('{"seq": 1}\n')
+
+                    script_no_push = script.replace("\ngit push", "\ntrue")
+                    result = subprocess.run(
+                        ["bash", "-c", script_no_push],
+                        cwd=tmp,
+                        capture_output=True,
+                        text=True,
+                        # Simulate the real 13:00 UTC cron's own wall-clock
+                        # time -- the fix must still land the AUTHOR date
+                        # inside the window regardless.
+                        env={**os.environ, "TZ": "UTC"},
+                    )
+                    self.assertEqual(result.returncode, 0, result.stderr)
+
+                    author_date = subprocess.run(
+                        ["git", "log", "-1", "--format=%aI"],
+                        cwd=tmp,
+                        capture_output=True,
+                        text=True,
+                        check=True,
+                    ).stdout.strip()
+                    hour = int(author_date[11:13])
+                    self.assertTrue(
+                        0 <= hour < 6,
+                        f"{snapshot_path}'s seal commit author date {author_date!r} falls outside 00:00-06:00 UTC",
+                    )
+
+
 if __name__ == "__main__":
     unittest.main()

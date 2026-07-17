@@ -210,6 +210,10 @@ def _verdict_provenance_check():
     return _load("_ritual_verdict_provenance_check", os.path.join(ROOT, "tools", "verdict_provenance_check.py"))
 
 
+def _voice_window_check():
+    return _load("_ritual_voice_window_check", os.path.join(ROOT, "tools", "voice_window_check.py"))
+
+
 def _seam_ledger():
     src = os.path.join(ROOT, "fencepost", "seam_engine", "src")
     if src not in sys.path:
@@ -511,6 +515,24 @@ def check_verdict_provenance(orita_dir: str | None = None) -> dict:
     return {"clean": not mismatches, "count": len(mismatches), "mismatches": mismatches}
 
 
+def check_voice_window(
+    commits: list | None, now_iso: str, path: str | None = None
+) -> dict:
+    """Task 103: fold `voice_window_check.py`'s Iron Rule #7 window check
+    ("Nyx- and Zashiki-voiced commits carry author timestamps in that
+    window") into the one block. Mirrors `check_child_work`'s live-input
+    shape (task 101), not `check_riders`'s unconditional-local one -- the
+    full Nyx/Zashiki-Warashi commit history isn't reachable from this
+    shallow checkout, so `commits` is `None` unless the god on duty holds
+    this hour's live `mcp__github__list_commits` read. Every already-
+    logged commit is still re-derived against the grandfather cutoff
+    regardless of a fresh fetch, so a real new violation is never silently
+    skipped for want of one."""
+    mod = _voice_window_check()
+    kwargs = {"path": path or mod.LOG}
+    return mod.check(commits=commits, now_iso=now_iso, **kwargs)
+
+
 def check_change_gate(report_info: dict) -> dict | None:
     """Fold `change_gate.should_post_gap()` -- task 69's own change-gate
     rule -- using whichever report text `check_report_freshness` already
@@ -544,6 +566,8 @@ def run_ritual_check(
     child_work_log: str | None = None,
     child_work_repo: str | None = None,
     verdict_provenance_dir: str | None = None,
+    voice_window_commits: list | None = None,
+    voice_window_log: str | None = None,
 ) -> dict:
     if now is None:
         now = datetime.now(timezone.utc)
@@ -568,6 +592,7 @@ def run_ritual_check(
     riders = check_riders(orita_dir=rider_dir)
     child_work = check_child_work(child_files, now_iso, path=child_work_log, repo_root=child_work_repo)
     verdict_provenance = check_verdict_provenance(orita_dir=verdict_provenance_dir)
+    voice_window = check_voice_window(voice_window_commits, now_iso, path=voice_window_log)
     broken = (
         (not town["ok"])
         or (not fencepost["ok"])
@@ -576,6 +601,7 @@ def run_ritual_check(
         or (not riders["clean"])
         or (not child_work["clean"])
         or (not verdict_provenance["clean"])
+        or (not voice_window["clean"])
     )
     return {
         "now": now_iso,
@@ -596,6 +622,7 @@ def run_ritual_check(
         "riders": riders,
         "child_work": child_work,
         "verdict_provenance": verdict_provenance,
+        "voice_window": voice_window,
         "broken": broken,
     }
 
@@ -677,6 +704,12 @@ def format_ritual_check(result: dict) -> str:
         lines.append("  verdict provenance: clean (every public verdict backed, Iron Rule #3 holds)")
     else:
         lines.append(f"  verdict provenance: {vp['count']} MISMATCH(ES) -- Iron Rule #3 at risk, escalate now")
+    vw = result["voice_window"]
+    if vw["clean"]:
+        historical = f", {vw['violation_count']} historical" if vw["violation_count"] else ""
+        lines.append(f"  voice window: clean ({vw['known_count']} known commit(s){historical}, Iron Rule #7's window holds)")
+    else:
+        lines.append(f"  voice window: {len(vw['new_violations'])} NEW VIOLATION(S) -- Iron Rule #7's window broken, escalate now")
     return "\n".join(lines)
 
 
@@ -688,6 +721,7 @@ if __name__ == "__main__":
     ci_checks = None
     cron_checks = None
     child_files = None
+    voice_window_commits = None
     i = 0
     while i < len(argv):
         if argv[i] == "--now" and i + 1 < len(argv):
@@ -714,6 +748,10 @@ if __name__ == "__main__":
             with open(argv[i + 1]) as f:
                 child_files = json.load(f)
             i += 2
+        elif argv[i] == "--voice-window-commits" and i + 1 < len(argv):
+            with open(argv[i + 1]) as f:
+                voice_window_commits = json.load(f)
+            i += 2
         elif argv[i] == "--json":
             base = base
             i += 1
@@ -726,6 +764,7 @@ if __name__ == "__main__":
         ci_checks=ci_checks,
         cron_checks=cron_checks,
         child_files=child_files,
+        voice_window_commits=voice_window_commits,
     )
     if "--json" in argv:
         print(json.dumps(result, ensure_ascii=False, indent=2))

@@ -605,6 +605,8 @@ jobs:
             exit 0
           fi
           today="$(date -u +%F)"
+          export GIT_AUTHOR_DATE="${today}T03:00:00Z"
+          export GIT_COMMITTER_DATE="${today}T03:00:00Z"
           git commit -m "oracle-commit-cadence: ${today} snapshot + call sealed (automatic, no human trigger)"
           git push
 
@@ -663,6 +665,8 @@ jobs:
             exit 0
           fi
           today="$(date -u +%F)"
+          export GIT_AUTHOR_DATE="${today}T03:00:00Z"
+          export GIT_COMMITTER_DATE="${today}T03:00:00Z"
           git commit -m "oracle-subscriber-cadence: ${today} snapshot + call sealed (automatic, no human trigger)"
           git push
 
@@ -707,6 +711,8 @@ jobs:
             exit 0
           fi
           today="$(date -u +%F)"
+          export GIT_AUTHOR_DATE="${today}T03:00:00Z"
+          export GIT_COMMITTER_DATE="${today}T03:00:00Z"
           git commit -m "oracle-tag-cadence: ${today} snapshot + call sealed (automatic, no human trigger)"
           git push
 
@@ -751,6 +757,8 @@ jobs:
             exit 0
           fi
           today="$(date -u +%F)"
+          export GIT_AUTHOR_DATE="${today}T03:00:00Z"
+          export GIT_COMMITTER_DATE="${today}T03:00:00Z"
           git commit -m "oracle-label-cadence: ${today} snapshot + call sealed (automatic, no human trigger)"
           git push
 
@@ -795,6 +803,8 @@ jobs:
             exit 0
           fi
           today="$(date -u +%F)"
+          export GIT_AUTHOR_DATE="${today}T03:00:00Z"
+          export GIT_COMMITTER_DATE="${today}T03:00:00Z"
           git commit -m "oracle-topic-cadence: ${today} snapshot + call sealed (automatic, no human trigger)"
           git push
 
@@ -839,6 +849,8 @@ jobs:
             exit 0
           fi
           today="$(date -u +%F)"
+          export GIT_AUTHOR_DATE="${today}T03:00:00Z"
+          export GIT_COMMITTER_DATE="${today}T03:00:00Z"
           git commit -m "oracle-pr-cadence: ${today} snapshot + call sealed (automatic, no human trigger)"
           git push
 
@@ -937,6 +949,8 @@ jobs:
             exit 0
           fi
           today="$(date -u +%F)"
+          export GIT_AUTHOR_DATE="${today}T03:00:00Z"
+          export GIT_COMMITTER_DATE="${today}T03:00:00Z"
           git commit -m "oracle-milestone-cadence: ${today} snapshot + call sealed (automatic, no human trigger)"
           git push
 
@@ -1032,6 +1046,8 @@ jobs:
             exit 0
           fi
           today="$(date -u +%F)"
+          export GIT_AUTHOR_DATE="${today}T03:00:00Z"
+          export GIT_COMMITTER_DATE="${today}T03:00:00Z"
           git commit -m "oracle-run-cadence: ${today} snapshot + call sealed (automatic, no human trigger)"
           git push
 
@@ -1076,6 +1092,8 @@ jobs:
             exit 0
           fi
           today="$(date -u +%F)"
+          export GIT_AUTHOR_DATE="${today}T03:00:00Z"
+          export GIT_COMMITTER_DATE="${today}T03:00:00Z"
           git commit -m "oracle-comment-cadence: ${today} snapshot + call sealed (automatic, no human trigger)"
           git push
 
@@ -1128,6 +1146,8 @@ jobs:
             exit 0
           fi
           today="$(date -u +%F)"
+          export GIT_AUTHOR_DATE="${today}T03:00:00Z"
+          export GIT_COMMITTER_DATE="${today}T03:00:00Z"
           git commit -m "oracle-issue-comment-cadence: ${today} snapshot + call sealed (automatic, no human trigger)"
           git push
 
