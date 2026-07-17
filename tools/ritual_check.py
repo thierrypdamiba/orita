@@ -184,6 +184,10 @@ def _vault_leak_check():
     return _load("_ritual_vault_leak_check", os.path.join(ROOT, "tools", "vault_leak_check.py"))
 
 
+def _star_covenant_check():
+    return _load("_ritual_star_covenant_check", os.path.join(ROOT, "tools", "star_covenant_check.py"))
+
+
 def _seam_ledger():
     src = os.path.join(ROOT, "fencepost", "seam_engine", "src")
     if src not in sys.path:
@@ -420,6 +424,21 @@ def check_vault_leak(orita_dir: str | None = None, vault_dir: str | None = None)
     return {"clean": not leaks, "count": len(leaks), "leaks": leaks}
 
 
+def check_star_covenant(orita_dir: str | None = None) -> dict:
+    """Task 99: fold star_covenant_check.py's own imperative-begging scan
+    into the one block. Unconditional, local-filesystem-only (reads the
+    checkout already on disk, no network) -- the same cheap class
+    `check_checkout`/`check_vault_leak` already hold. Never edits
+    anything; a real violation, if one is ever found, is a god-on-duty
+    escalation, not something this check silently repairs."""
+    mod = _star_covenant_check()
+    kwargs = {}
+    if orita_dir is not None:
+        kwargs["orita_dir"] = orita_dir
+    violations = mod.find_violations(**kwargs)
+    return {"clean": not violations, "count": len(violations), "violations": violations}
+
+
 def check_change_gate(report_info: dict) -> dict | None:
     """Fold `change_gate.should_post_gap()` -- task 69's own change-gate
     rule -- using whichever report text `check_report_freshness` already
@@ -447,6 +466,7 @@ def run_ritual_check(
     cron_checks: list | None = None,
     checkout_dirs: tuple | None = None,
     vault_leak_dirs: tuple | None = None,
+    star_covenant_dir: str | None = None,
 ) -> dict:
     if now is None:
         now = datetime.now(timezone.utc)
@@ -467,7 +487,8 @@ def run_ritual_check(
         vault_leak = check_vault_leak()
     else:
         vault_leak = check_vault_leak(orita_dir=vault_leak_dirs[0], vault_dir=vault_leak_dirs[1])
-    broken = (not town["ok"]) or (not fencepost["ok"]) or (not vault_leak["clean"])
+    star_covenant = check_star_covenant(orita_dir=star_covenant_dir)
+    broken = (not town["ok"]) or (not fencepost["ok"]) or (not vault_leak["clean"]) or (not star_covenant["clean"])
     return {
         "now": now_iso,
         "checkout": checkout,
@@ -483,6 +504,7 @@ def run_ritual_check(
         "owed_posts": owed_posts,
         "change_gate": change_gate,
         "vault_leak": vault_leak,
+        "star_covenant": star_covenant,
         "broken": broken,
     }
 
@@ -543,6 +565,11 @@ def format_ritual_check(result: dict) -> str:
         lines.append("  vault leak: clean (Proclamation 0001 holds)")
     else:
         lines.append(f"  vault leak: {vl['count']} LEAK(S) -- Proclamation 0001 violated, escalate now")
+    sc = result["star_covenant"]
+    if sc["clean"]:
+        lines.append("  star covenant: clean (no begging language found)")
+    else:
+        lines.append(f"  star covenant: {sc['count']} VIOLATION(S) -- Star Covenant broken, escalate now")
     return "\n".join(lines)
 
 

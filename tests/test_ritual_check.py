@@ -765,7 +765,7 @@ class VaultLeakFoldCase(unittest.TestCase):
     def test_clean_fixture_is_not_broken(self):
         self._write(self.vault, "vault/nyx/journal/0001-test.md", "# Vault\n\nA private line nobody ever quotes.\n")
         self._write(self.orita, "houses/nyx/journal/0001-test.md", "# Journal\n\nAn unrelated public line entirely.\n")
-        result = rc.run_ritual_check(vault_leak_dirs=(self.orita, self.vault))
+        result = rc.run_ritual_check(vault_leak_dirs=(self.orita, self.vault), star_covenant_dir=self.orita)
         self.assertTrue(result["vault_leak"]["clean"])
         self.assertFalse(result["broken"])
         self.assertIn("vault leak: clean", rc.format_ritual_check(result))
@@ -774,12 +774,45 @@ class VaultLeakFoldCase(unittest.TestCase):
         secret = "A private sentence long enough to cross the confidence threshold for a real leak."
         self._write(self.vault, "vault/nyx/journal/0001-test.md", f"# Vault\n\n{secret}\n")
         self._write(self.orita, "houses/nyx/journal/0001-test.md", f"# Journal\n\n{secret}\n")
-        result = rc.run_ritual_check(vault_leak_dirs=(self.orita, self.vault))
+        result = rc.run_ritual_check(vault_leak_dirs=(self.orita, self.vault), star_covenant_dir=self.orita)
         self.assertFalse(result["vault_leak"]["clean"])
         self.assertTrue(result["broken"])
         formatted = rc.format_ritual_check(result)
         self.assertIn("LEAK(S)", formatted)
         self.assertIn("Proclamation 0001", formatted)
+
+
+class StarCovenantFoldCase(unittest.TestCase):
+    """Task 99: run_ritual_check() folds star_covenant_check.py's own
+    imperative-begging scan into the same structured result -- clean by
+    default against a fixture with no ask, and a real synthetic violation
+    both flips `broken` and surfaces in the printed block."""
+
+    def setUp(self):
+        self.orita = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.orita, ignore_errors=True)
+
+    def _write(self, base, rel, content):
+        path = os.path.join(base, rel)
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, "w") as f:
+            f.write(content)
+
+    def test_clean_fixture_is_not_broken(self):
+        self._write(self.orita, "docs/report.md", "# Report\n\nA release shipped but was never announced.\n")
+        result = rc.run_ritual_check(star_covenant_dir=self.orita)
+        self.assertTrue(result["star_covenant"]["clean"])
+        self.assertFalse(result["broken"])
+        self.assertIn("star covenant: clean", rc.format_ritual_check(result))
+
+    def test_synthetic_violation_flips_broken_and_prints(self):
+        self._write(self.orita, "docs/report.md", "# Report\n\nGreat news today. Please star us!\n")
+        result = rc.run_ritual_check(star_covenant_dir=self.orita)
+        self.assertFalse(result["star_covenant"]["clean"])
+        self.assertTrue(result["broken"])
+        formatted = rc.format_ritual_check(result)
+        self.assertIn("VIOLATION(S)", formatted)
+        self.assertIn("Star Covenant broken", formatted)
 
 
 class RunRitualCheckCase(unittest.TestCase):
