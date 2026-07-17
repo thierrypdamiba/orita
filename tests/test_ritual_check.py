@@ -744,6 +744,44 @@ class CheckoutFoldCase(unittest.TestCase):
         self.assertEqual(len(result["checkout"]), 1)
 
 
+class VaultLeakFoldCase(unittest.TestCase):
+    """Task 98: run_ritual_check() folds vault_leak_check.py's own
+    Proclamation-0001 compare into the same structured result -- clean by
+    default against a fixture with no overlap, and a real synthetic leak
+    both flips `broken` and surfaces in the printed block."""
+
+    def setUp(self):
+        self.orita = tempfile.mkdtemp()
+        self.vault = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.orita, ignore_errors=True)
+        self.addCleanup(shutil.rmtree, self.vault, ignore_errors=True)
+
+    def _write(self, base, rel, content):
+        path = os.path.join(base, rel)
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, "w") as f:
+            f.write(content)
+
+    def test_clean_fixture_is_not_broken(self):
+        self._write(self.vault, "vault/nyx/journal/0001-test.md", "# Vault\n\nA private line nobody ever quotes.\n")
+        self._write(self.orita, "houses/nyx/journal/0001-test.md", "# Journal\n\nAn unrelated public line entirely.\n")
+        result = rc.run_ritual_check(vault_leak_dirs=(self.orita, self.vault))
+        self.assertTrue(result["vault_leak"]["clean"])
+        self.assertFalse(result["broken"])
+        self.assertIn("vault leak: clean", rc.format_ritual_check(result))
+
+    def test_synthetic_leak_flips_broken_and_prints(self):
+        secret = "A private sentence long enough to cross the confidence threshold for a real leak."
+        self._write(self.vault, "vault/nyx/journal/0001-test.md", f"# Vault\n\n{secret}\n")
+        self._write(self.orita, "houses/nyx/journal/0001-test.md", f"# Journal\n\n{secret}\n")
+        result = rc.run_ritual_check(vault_leak_dirs=(self.orita, self.vault))
+        self.assertFalse(result["vault_leak"]["clean"])
+        self.assertTrue(result["broken"])
+        formatted = rc.format_ritual_check(result)
+        self.assertIn("LEAK(S)", formatted)
+        self.assertIn("Proclamation 0001", formatted)
+
+
 class RunRitualCheckCase(unittest.TestCase):
     """End-to-end: broken=True iff either ledger is broken, regardless of
     report/recheck state -- mirrors sync_checkout.sh's refuse discipline.

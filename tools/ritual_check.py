@@ -180,6 +180,10 @@ def _change_gate():
     return _load("_ritual_change_gate", os.path.join(ROOT, "tools", "change_gate.py"))
 
 
+def _vault_leak_check():
+    return _load("_ritual_vault_leak_check", os.path.join(ROOT, "tools", "vault_leak_check.py"))
+
+
 def _seam_ledger():
     src = os.path.join(ROOT, "fencepost", "seam_engine", "src")
     if src not in sys.path:
@@ -399,6 +403,23 @@ def check_checkout(repo_dirs: tuple | None = None) -> list:
     return [s for s in (_checkout_state(d) for d in repo_dirs) if s is not None]
 
 
+def check_vault_leak(orita_dir: str | None = None, vault_dir: str | None = None) -> dict:
+    """Task 98: fold vault_leak_check.py's own Proclamation-0001 compare
+    into the one block. Unconditional, local-filesystem-only (reads both
+    checkouts already on disk, no network) -- the same cheap class
+    `check_checkout` already holds. Never edits either tree; a real leak,
+    if one is ever found, is a god-on-duty escalation, not something this
+    check silently repairs."""
+    mod = _vault_leak_check()
+    kwargs = {}
+    if orita_dir is not None:
+        kwargs["orita_dir"] = orita_dir
+    if vault_dir is not None:
+        kwargs["vault_dir"] = vault_dir
+    leaks = mod.find_leaks(**kwargs)
+    return {"clean": not leaks, "count": len(leaks), "leaks": leaks}
+
+
 def check_change_gate(report_info: dict) -> dict | None:
     """Fold `change_gate.should_post_gap()` -- task 69's own change-gate
     rule -- using whichever report text `check_report_freshness` already
@@ -425,6 +446,7 @@ def run_ritual_check(
     ci_checks: list | None = None,
     cron_checks: list | None = None,
     checkout_dirs: tuple | None = None,
+    vault_leak_dirs: tuple | None = None,
 ) -> dict:
     if now is None:
         now = datetime.now(timezone.utc)
@@ -441,7 +463,11 @@ def run_ritual_check(
     cron = check_cron(cron_checks, now_iso)
     owed_posts = check_owed_posts()
     change_gate = check_change_gate(report)
-    broken = (not town["ok"]) or (not fencepost["ok"])
+    if vault_leak_dirs is None:
+        vault_leak = check_vault_leak()
+    else:
+        vault_leak = check_vault_leak(orita_dir=vault_leak_dirs[0], vault_dir=vault_leak_dirs[1])
+    broken = (not town["ok"]) or (not fencepost["ok"]) or (not vault_leak["clean"])
     return {
         "now": now_iso,
         "checkout": checkout,
@@ -456,6 +482,7 @@ def run_ritual_check(
         "cron": cron,
         "owed_posts": owed_posts,
         "change_gate": change_gate,
+        "vault_leak": vault_leak,
         "broken": broken,
     }
 
@@ -511,6 +538,11 @@ def format_ritual_check(result: dict) -> str:
     if result["change_gate"] is not None:
         cg = result["change_gate"]
         lines.append(f"  change gate: {'due' if cg['due'] else 'not due'} -- {cg['reason']}")
+    vl = result["vault_leak"]
+    if vl["clean"]:
+        lines.append("  vault leak: clean (Proclamation 0001 holds)")
+    else:
+        lines.append(f"  vault leak: {vl['count']} LEAK(S) -- Proclamation 0001 violated, escalate now")
     return "\n".join(lines)
 
 

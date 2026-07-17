@@ -46,3 +46,4 @@
 {"type": "queued", "task": "95", "topic": "draftback.py's own inlined wall formula fixed -- the third caller wall.py's docstring warned about", "queued_at": "2026-07-16T22:10:57Z"}
 {"type": "queued", "task": "96", "topic": "cadence census test -- catches a future missing-autograde/wiring/typo'd-snapshot bug across all 24 sources at once", "queued_at": "2026-07-17T00:09:00Z"}
 {"type": "queued", "task": "97", "topic": "documenting task 76's own missing SCOPES.md section -- the twenty-fourth cadence's plaque", "queued_at": "2026-07-17T01:10:00Z"}
+{"type": "queued", "task": "98", "topic": "a running check for Iron Rule #1 (Proclamation 0001) -- vault_leak_check.py confirms zero leaks across 97 tasks", "queued_at": "2026-07-17T02:11:00Z"}
