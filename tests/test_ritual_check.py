@@ -950,6 +950,49 @@ class ArcadeHeroFoldCase(unittest.TestCase):
         self.assertIn("constraint #4 broken", formatted)
 
 
+class PetitionLimitsFoldCase(unittest.TestCase):
+    """Task 107: run_ritual_check() folds petition_limits_check.py's own
+    scan of every altar petition's own ask against CHARTER.md Appendix
+    D's LIMITS clause into the same structured result -- clean by default
+    against a fixture with no violation, and a real synthetic violation
+    both flips `broken` and surfaces in the printed block."""
+
+    def setUp(self):
+        self.orita = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.orita, ignore_errors=True)
+
+    def _write_petition(self, case_text, verdict="GRANTED"):
+        pdir = os.path.join(self.orita, "houses", "off-by-one", "altar", "petitions")
+        os.makedirs(pdir, exist_ok=True)
+        with open(os.path.join(pdir, "2026-07-11.md"), "w") as f:
+            f.write(
+                "# Petition to the Hand — 2026-07-11\n\n"
+                "**Petitioner:** Off-By-One\n\n"
+                "**Request:** A minor favor.\n\n"
+                "**The case, as carried by Èṣù-Elegba at Petition Hour:**\n\n"
+                f"{case_text}\n\n"
+                "---\n\n"
+                f"**VERDICT:** {verdict}\n\n"
+                "*Reasons are sealed. They always are.*\n"
+            )
+
+    def test_clean_fixture_is_not_broken(self):
+        self._write_petition("Just checking in, nothing more.")
+        result = rc.run_ritual_check(petition_limits_dir=self.orita)
+        self.assertTrue(result["petition_limits"]["clean"])
+        self.assertFalse(result["broken"])
+        self.assertIn("petition limits: clean", rc.format_ritual_check(result))
+
+    def test_synthetic_violation_flips_broken_and_prints(self):
+        self._write_petition("Please star this repo, Hand.")
+        result = rc.run_ritual_check(petition_limits_dir=self.orita)
+        self.assertFalse(result["petition_limits"]["clean"])
+        self.assertTrue(result["broken"])
+        formatted = rc.format_ritual_check(result)
+        self.assertIn("VIOLATION(S)", formatted)
+        self.assertIn("Appendix D's LIMITS broken", formatted)
+
+
 class VerdictProvenanceFoldCase(unittest.TestCase):
     """Task 102: run_ritual_check() folds verdict_provenance_check.py's own
     public-verdict-vs-altar-record compare (Iron Rule #3) into the same
