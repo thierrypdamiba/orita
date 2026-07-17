@@ -41,8 +41,12 @@ provably real.
 recipe's, converts each recipe's own `primary_gap`/`tail` back into plain
 candidates, and calls `ranking.rank()` once over the whole pool — a recipe's
 candidate really can out-rank or lose to a god's, tested both directions in
-`tests/test_combined_scan.py`. It is **not yet wired into `seam-scan.yml`'s
-live daily run** (the same boundary `gmail_calendar.py` is still WIP on):
+`tests/test_combined_scan.py`. It's also reachable from the live MCP tool
+surface itself now (ROADMAP.md #113): `combined_scan_preview` in
+[`server.py`](seam_engine/src/seam_engine/server.py), registered read-only
+next to `seam_scan`, not just `python -m seam_engine.combined_scan`. Neither
+is **wired into `seam-scan.yml`'s live daily run** (the same boundary
+`gmail_calendar.py` is still WIP on):
 every recipe today reads a `fixture`, per the MOCK ONLY oath below, and a
 fixture's data never changes day to day — folding it into the REAL public
 report before a recipe holds a live Arcade scope would fabricate a gap that

@@ -21,6 +21,7 @@ from arcade_mcp_server.metadata import (
     ToolMetadata,
 )
 
+from seam_engine.combined_scan import run_combined_scan
 from seam_engine.gmail_calendar import run_gmail_calendar_scan
 from seam_engine.ranking import rank
 from seam_engine.scan import (
@@ -157,6 +158,44 @@ def gmail_calendar_scan() -> Annotated[
     loaders for those calls; the detection logic in gmail_calendar.py does
     not change."""
     return run_gmail_calendar_scan()
+
+
+@app.tool(metadata=READ_ONLY)
+def combined_scan_preview(
+    owner: Annotated[str, "GitHub owner (user or org)"] = "thierrypdamiba",
+    repo: Annotated[str, "GitHub repository name"] = "orita",
+    window_hours: Annotated[int, "How far back to look for GitHub activity"] = 24,
+    x_posts_json: Annotated[
+        str | None,
+        "Optional JSON array of your own already-fetched, normalized X posts, "
+        "same shape and same ledger fallback as seam_scan's x_posts_json.",
+    ] = None,
+) -> Annotated[
+    dict,
+    "WIP (ROADMAP.md #113): scan.py's own candidates pooled with every "
+    "discovered RECIPES/ manifest's, ranked once. Every recipe today reads "
+    "a fixture (MOCK ONLY) — this preview can surface a recipe's fixture "
+    "candidate as primary, which would misdescribe the town's live accounts "
+    "if mistaken for seam_scan's real daily report.",
+]:
+    """Read-only preview of `combined_scan.run_combined_scan` (ROADMAP.md
+    #111): the same GitHub-vs-X candidates `seam_scan` computes, plus every
+    community recipe's own candidates from `RECIPES/`, pooled and ranked
+    together exactly once — a recipe's candidate can genuinely out-rank or
+    lose to a god's.
+
+    NOT what `seam-scan.yml`'s daily report runs, and this tool does not
+    change that: every recipe merged so far reads a `fixture` under
+    `RECIPES/<slug>/fixtures/` (the MOCK ONLY oath, `CONTRIBUTING.md`), so a
+    recipe's candidate here can be stale or synthetic in a way `seam_scan`'s
+    own GitHub-vs-X candidates never are. This tool exists so the real,
+    tested `combined_scan.py` machinery is reachable from the live agent
+    surface at all (previously CLI-only, `python -m seam_engine.
+    combined_scan`) — not to make it the report. `combined_scan.py` goes
+    live in `seam-scan.yml` the same day a recipe's own fixture/scopes
+    graduate to a live read, unchanged from task 111's boundary."""
+    x_posts = None if x_posts_json is None else json.loads(x_posts_json)
+    return run_combined_scan(owner, repo, window_hours=window_hours, x_posts=x_posts)
 
 
 # Run with specific transport
