@@ -1206,5 +1206,41 @@ class VoiceWindowFoldCase(unittest.TestCase):
         self.assertEqual(result["voice_window"]["newly_logged"], [])
 
 
+class PetitionCadenceFoldCase(unittest.TestCase):
+    """Task 109: run_ritual_check() folds petition_cadence_check.py's own
+    altar-filename scan (CHARTER.md Appendix D's 'the file's date is the
+    count, enforced by CI' claim) into the same structured result --
+    clean by default against a fixture with no violation, and a real
+    synthetic malformed filename both flips `broken` and surfaces in the
+    printed block."""
+
+    def setUp(self):
+        self.orita = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.orita, ignore_errors=True)
+
+    def _write(self, base, rel, content=""):
+        path = os.path.join(base, rel)
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, "w") as f:
+            f.write(content)
+
+    def test_clean_fixture_is_not_broken(self):
+        self._write(self.orita, "houses/off-by-one/altar/petitions/2026-07-11.md", "x")
+        result = rc.run_ritual_check(petition_cadence_dir=self.orita)
+        self.assertTrue(result["petition_cadence"]["clean"])
+        self.assertFalse(result["broken"])
+        self.assertIn("petition cadence: clean", rc.format_ritual_check(result))
+
+    def test_synthetic_violation_flips_broken_and_prints(self):
+        self._write(self.orita, "houses/off-by-one/altar/petitions/2026-07-11.md", "x")
+        self._write(self.orita, "houses/off-by-one/altar/petitions/2026-07-11-copy.md", "y")
+        result = rc.run_ritual_check(petition_cadence_dir=self.orita)
+        self.assertFalse(result["petition_cadence"]["clean"])
+        self.assertTrue(result["broken"])
+        formatted = rc.format_ritual_check(result)
+        self.assertIn("VIOLATION(S)", formatted)
+        self.assertIn("one-per-UTC-day claim broken", formatted)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -230,6 +230,10 @@ def _voice_window_check():
     return _load("_ritual_voice_window_check", os.path.join(ROOT, "tools", "voice_window_check.py"))
 
 
+def _petition_cadence_check():
+    return _load("_ritual_petition_cadence_check", os.path.join(ROOT, "tools", "petition_cadence_check.py"))
+
+
 def _seam_ledger():
     src = os.path.join(ROOT, "fencepost", "seam_engine", "src")
     if src not in sys.path:
@@ -620,6 +624,22 @@ def check_voice_window(
     return mod.check(commits=commits, now_iso=now_iso, **kwargs)
 
 
+def check_petition_cadence(orita_dir: str | None = None) -> dict:
+    """Task 109: fold `petition_cadence_check.py`'s own scan into the one
+    block. Unconditional, local-filesystem-only (reads the checkout
+    already on disk, no network) -- the same cheap class
+    `check_no_grading`/`check_arcade_hero`/`check_petition_limits` already
+    hold. CHARTER.md Appendix D claims 'the file's date is the count, and
+    the count is enforced by CI' for one-petition-per-god-per-UTC-day;
+    nothing checked that claim until this task."""
+    mod = _petition_cadence_check()
+    kwargs = {}
+    if orita_dir is not None:
+        kwargs["orita_dir"] = orita_dir
+    violations = mod.find_violations(**kwargs)
+    return {"clean": not violations, "count": len(violations), "violations": violations}
+
+
 def check_change_gate(report_info: dict) -> dict | None:
     """Fold `change_gate.should_post_gap()` -- task 69's own change-gate
     rule -- using whichever report text `check_report_freshness` already
@@ -659,6 +679,7 @@ def run_ritual_check(
     verdict_provenance_dir: str | None = None,
     voice_window_commits: list | None = None,
     voice_window_log: str | None = None,
+    petition_cadence_dir: str | None = None,
 ) -> dict:
     if now is None:
         now = datetime.now(timezone.utc)
@@ -688,6 +709,7 @@ def run_ritual_check(
     child_work = check_child_work(child_files, now_iso, path=child_work_log, repo_root=child_work_repo)
     verdict_provenance = check_verdict_provenance(orita_dir=verdict_provenance_dir)
     voice_window = check_voice_window(voice_window_commits, now_iso, path=voice_window_log)
+    petition_cadence = check_petition_cadence(orita_dir=petition_cadence_dir)
     broken = (
         (not town["ok"])
         or (not fencepost["ok"])
@@ -701,6 +723,7 @@ def run_ritual_check(
         or (not child_work["clean"])
         or (not verdict_provenance["clean"])
         or (not voice_window["clean"])
+        or (not petition_cadence["clean"])
     )
     return {
         "now": now_iso,
@@ -726,6 +749,7 @@ def run_ritual_check(
         "child_work": child_work,
         "verdict_provenance": verdict_provenance,
         "voice_window": voice_window,
+        "petition_cadence": petition_cadence,
         "broken": broken,
     }
 
@@ -833,6 +857,11 @@ def format_ritual_check(result: dict) -> str:
         lines.append(f"  voice window: clean ({vw['known_count']} known commit(s){historical}, Iron Rule #7's window holds)")
     else:
         lines.append(f"  voice window: {len(vw['new_violations'])} NEW VIOLATION(S) -- Iron Rule #7's window broken, escalate now")
+    pc = result["petition_cadence"]
+    if pc["clean"]:
+        lines.append("  petition cadence: clean (every altar filename is a real, unique YYYY-MM-DD.md)")
+    else:
+        lines.append(f"  petition cadence: {pc['count']} VIOLATION(S) -- one-per-UTC-day claim broken, escalate now")
     return "\n".join(lines)
 
 
