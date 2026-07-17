@@ -206,6 +206,10 @@ def _hand_lore_check():
     return _load("_ritual_hand_lore_check", os.path.join(ROOT, "tools", "hand_lore_check.py"))
 
 
+def _no_grading_check():
+    return _load("_ritual_no_grading_check", os.path.join(ROOT, "tools", "no_grading_check.py"))
+
+
 def _child_work_check():
     return _load("_ritual_child_work_check", os.path.join(ROOT, "tools", "child_work_check.py"))
 
@@ -502,6 +506,24 @@ def check_hand_lore(orita_dir: str | None = None) -> dict:
     return {"clean": not violations, "count": len(violations), "violations": violations}
 
 
+def check_no_grading(orita_dir: str | None = None) -> dict:
+    """Task 105: fold no_grading_check.py's own blame/grading scan
+    (ROADMAP.md's non-negotiable design constraint #2, "No grading/
+    competing... Name and rank no one") into the one block. Unconditional,
+    local-filesystem-only (reads the checkout already on disk, no
+    network) -- the same cheap class
+    `check_checkout`/`check_vault_leak`/`check_star_covenant`/
+    `check_riders`/`check_hand_lore` already hold. Never edits anything; a
+    real violation, if one is ever found, is a god-on-duty escalation, not
+    something this check silently repairs."""
+    mod = _no_grading_check()
+    kwargs = {}
+    if orita_dir is not None:
+        kwargs["orita_dir"] = orita_dir
+    violations = mod.find_violations(**kwargs)
+    return {"clean": not violations, "count": len(violations), "violations": violations}
+
+
 def check_child_work(
     child_files: list | None, now_iso: str, path: str | None = None, repo_root: str | None = None
 ) -> dict:
@@ -584,6 +606,7 @@ def run_ritual_check(
     star_covenant_dir: str | None = None,
     rider_dir: str | None = None,
     hand_lore_dir: str | None = None,
+    no_grading_dir: str | None = None,
     child_files: list | None = None,
     child_work_log: str | None = None,
     child_work_repo: str | None = None,
@@ -613,6 +636,7 @@ def run_ritual_check(
     star_covenant = check_star_covenant(orita_dir=star_covenant_dir)
     riders = check_riders(orita_dir=rider_dir)
     hand_lore = check_hand_lore(orita_dir=hand_lore_dir)
+    no_grading = check_no_grading(orita_dir=no_grading_dir)
     child_work = check_child_work(child_files, now_iso, path=child_work_log, repo_root=child_work_repo)
     verdict_provenance = check_verdict_provenance(orita_dir=verdict_provenance_dir)
     voice_window = check_voice_window(voice_window_commits, now_iso, path=voice_window_log)
@@ -623,6 +647,7 @@ def run_ritual_check(
         or (not star_covenant["clean"])
         or (not riders["clean"])
         or (not hand_lore["clean"])
+        or (not no_grading["clean"])
         or (not child_work["clean"])
         or (not verdict_provenance["clean"])
         or (not voice_window["clean"])
@@ -645,6 +670,7 @@ def run_ritual_check(
         "star_covenant": star_covenant,
         "riders": riders,
         "hand_lore": hand_lore,
+        "no_grading": no_grading,
         "child_work": child_work,
         "verdict_provenance": verdict_provenance,
         "voice_window": voice_window,
@@ -723,6 +749,11 @@ def format_ritual_check(result: dict) -> str:
         lines.append("  hand lore: clean (Iron Rule #2's theology never confirmed or denied)")
     else:
         lines.append(f"  hand lore: {hl['count']} VIOLATION(S) -- Iron Rule #2 is broken, escalate now")
+    ng = result["no_grading"]
+    if ng["clean"]:
+        lines.append("  no grading: clean (constraint #2 holds, name and rank no one)")
+    else:
+        lines.append(f"  no grading: {ng['count']} VIOLATION(S) -- constraint #2 broken, escalate now")
     cw = result["child_work"]
     if cw["clean"]:
         newly = f", {len(cw['newly_logged'])} newly logged" if cw["newly_logged"] else ""

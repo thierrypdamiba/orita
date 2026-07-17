@@ -50,3 +50,7 @@
 {"type": "queued", "task": "99", "topic": "Star Covenant check -- the town's other absolute rule gets its first running check", "queued_at": "2026-07-17T03:10:00Z"}
 {"type": "queued", "task": "100", "topic": "rider check -- Iron Rule 5's five character riders (Esu/Ogun/Ananse/Nyx/Zashiki) get their first running check", "queued_at": "2026-07-17T04:07:00Z"}
 {"type": "queued", "task": "101", "topic": "child work check -- Iron Rule 6 (the child's work is never reverted) gets its first running check, live GitHub history proving all 18 real files still stand", "queued_at": "2026-07-17T05:11:00Z"}
+{"type": "queued", "task": "102", "topic": "verdict provenance check -- Iron Rule 3 gets its first running check, fixing a real six-day-stale altar-record mismatch found live", "queued_at": "2026-07-17T06:12:00Z"}
+{"type": "queued", "task": "103", "topic": "voice window check -- Iron Rule 7's window clause gets its first running check, fixing oracle-cadence.yml's real out-of-window seal commits", "queued_at": "2026-07-17T07:20:00Z"}
+{"type": "queued", "task": "104", "topic": "hand lore check -- Iron Rule 2 (the Hand's theology) gets its first running check, completing all seven Iron Rules", "queued_at": "2026-07-17T08:20:00Z"}
+{"type": "queued", "task": "105", "topic": "no grading check -- ROADMAP.md's non-negotiable design constraint #2 gets its first running check, the one CONTRIBUTING.md said the code could not do", "queued_at": "2026-07-17T09:20:00Z"}

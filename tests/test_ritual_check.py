@@ -882,6 +882,40 @@ class HandLoreFoldCase(unittest.TestCase):
         self.assertIn("Iron Rule #2 is broken", formatted)
 
 
+class NoGradingFoldCase(unittest.TestCase):
+    """Task 105: run_ritual_check() folds no_grading_check.py's own
+    blame/grading scan (ROADMAP.md's non-negotiable design constraint #2)
+    into the same structured result -- clean by default against a
+    fixture with no violation, and a real synthetic violation both flips
+    `broken` and surfaces in the printed block."""
+
+    def setUp(self):
+        self.orita = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.orita, ignore_errors=True)
+
+    def _write(self, base, rel, content):
+        path = os.path.join(base, rel)
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, "w") as f:
+            f.write(content)
+
+    def test_clean_fixture_is_not_broken(self):
+        self._write(self.orita, "docs/report.md", "# Report\n\nA release shipped but was never announced.\n")
+        result = rc.run_ritual_check(no_grading_dir=self.orita)
+        self.assertTrue(result["no_grading"]["clean"])
+        self.assertFalse(result["broken"])
+        self.assertIn("no grading: clean", rc.format_ritual_check(result))
+
+    def test_synthetic_violation_flips_broken_and_prints(self):
+        self._write(self.orita, "docs/report.md", "# Report\n\nThe other automation dropped the ball again.\n")
+        result = rc.run_ritual_check(no_grading_dir=self.orita)
+        self.assertFalse(result["no_grading"]["clean"])
+        self.assertTrue(result["broken"])
+        formatted = rc.format_ritual_check(result)
+        self.assertIn("VIOLATION(S)", formatted)
+        self.assertIn("constraint #2 broken", formatted)
+
+
 class VerdictProvenanceFoldCase(unittest.TestCase):
     """Task 102: run_ritual_check() folds verdict_provenance_check.py's own
     public-verdict-vs-altar-record compare (Iron Rule #3) into the same
