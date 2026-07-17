@@ -29,6 +29,7 @@ from seam_engine.recipes import (
 FENCEPOST_ROOT = Path(__file__).resolve().parents[2]
 REFERENCE_RECIPE = FENCEPOST_ROOT / RECIPES_DIR_NAME / "example-release-vs-changelog" / "recipe.json"
 SECOND_RECIPE = FENCEPOST_ROOT / RECIPES_DIR_NAME / "merged-pr-issue-still-open" / "recipe.json"
+THIRD_RECIPE = FENCEPOST_ROOT / RECIPES_DIR_NAME / "release-not-tweeted" / "recipe.json"
 
 
 def _manifest(**overrides) -> RecipeManifest:
@@ -150,6 +151,61 @@ def test_discover_recipes_finds_both_real_recipes():
     assert len(slugs) >= 2
     assert "example-release-vs-changelog" in slugs
     assert "merged-pr-issue-still-open" in slugs
+
+
+# --- the third real recipe (ROADMAP.md #110) --------------------------------
+#
+# The first CROSS-TOOLKIT recipe: both recipes above watch a seam entirely
+# inside GitHub. This one reads GitHub releases against X tweets — the exact
+# worked example STRATEGY.md names by hand ("a release shipped but never
+# tweeted"). This block, plus test_discover_recipes_finds_all_three_real_recipes,
+# is the proof a cross-toolkit detector clears the same oath a single-toolkit
+# one does, with no special-casing anywhere in recipes.py.
+
+
+def test_third_recipe_exists():
+    assert THIRD_RECIPE.exists(), "RECIPES/release-not-tweeted/recipe.json must still exist"
+
+
+def test_third_recipe_loads_and_validates():
+    manifest = load_recipe_manifest(THIRD_RECIPE)
+    assert manifest.slug == "release-not-tweeted"
+    assert manifest.toolkit == "github+x"
+    # No new scope beyond SCOPES.md's already-cleared GitHub/X rows.
+    assert set(manifest.scopes) <= {"GetRepository", "ListRepoCommits", "GetUserTweets"}
+
+
+def test_third_recipe_detector_actually_runs_and_finds_its_gap():
+    """Mirrors both prior detector-actually-runs tests: not just
+    schema-valid — a working detector that reads across two fixture files
+    shaped like two different toolkits and finds a real gap between them."""
+    manifest = load_recipe_manifest(THIRD_RECIPE)
+    fn = load_detector(manifest)
+    result = fn(now=datetime(2026, 7, 17, 14, 0, 0, tzinfo=timezone.utc))
+    assert result["source"] == "fixture"
+    assert result["primary_gap"] is not None
+    assert "release-not-tweeted-v0.3.0" == result["primary_gap"]["slug"]
+    assert result["primary_gap"]["confidence"] >= result["confidence_bar"]
+    # v0.4.0 (fresh, <24h) is weighed and shown in the tail, not hidden, but
+    # does not out-rank the stale v0.3.0 gap or break its election.
+    tail_slugs = [g["slug"] for g in result["tail"]]
+    assert any("v0.4.0" in s for s in tail_slugs)
+    # v0.2.1 (tweeted the same day) is named, not hidden, in excluded.
+    excluded_slugs = [g["slug"] for g in result["excluded"]]
+    assert len(excluded_slugs) == 1
+    assert any("v0.2.1" in s for s in excluded_slugs)
+
+
+def test_discover_recipes_finds_all_three_real_recipes():
+    """The actual multiplicity proof ROADMAP.md #110 exists to give:
+    discover_recipes() run against the real repo tree returns all three real
+    recipes together, single-toolkit and cross-toolkit alike."""
+    manifests = discover_recipes(FENCEPOST_ROOT)
+    slugs = [m.slug for m in manifests]
+    assert len(slugs) >= 3
+    assert "example-release-vs-changelog" in slugs
+    assert "merged-pr-issue-still-open" in slugs
+    assert "release-not-tweeted" in slugs
 
 
 # --- schema validation: required fields --------------------------------

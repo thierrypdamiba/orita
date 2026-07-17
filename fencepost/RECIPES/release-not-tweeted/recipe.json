@@ -1,0 +1,12 @@
+{
+  "slug": "release-not-tweeted",
+  "title": "Release shipped, never tweeted",
+  "author": "kothar-wa-khasis",
+  "description": "Compares GitHub releases against the connected X account's recent tweets by exact tag-substring match, and surfaces a release with no matching tweet as the seam gap. The first cross-toolkit recipe (GitHub + X) — the same seam STRATEGY.md names by hand as an example: 'a release shipped but never tweeted.'",
+  "toolkit": "github+x",
+  "scopes": ["GetRepository", "ListRepoCommits", "GetUserTweets"],
+  "fixture": "fixtures/release_not_tweeted",
+  "detector_file": "detector.py",
+  "entrypoint": "run_recipe_scan",
+  "confidence_notes": "Age-gated, not flat, same shape as merged-pr-issue-still-open's: a release with no matching tweet within 24 hours of publish scores 0.55 (below the 0.70 bar, shown as a weighed coincidence, not hidden — a human may simply not have tweeted yet, and X_PostTweet has its own real outage tracker elsewhere on this desk). At or past 24 hours with still no match, it scores a flat 0.85 — an exact tag-substring match is unambiguous, no keyword fuzziness to misfire on. A release matched to a tweet is excluded at confidence 0.0, named not hidden, mirroring example-release-vs-changelog's own exact-match rule."
+}

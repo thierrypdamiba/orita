@@ -1,0 +1,23 @@
+[
+  {
+    "id": "REL-1",
+    "title": "Fencepost v0.3.0 — the Wall ships",
+    "tag": "v0.3.0",
+    "published_at": "2026-07-14T10:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/releases/tag/v0.3.0"
+  },
+  {
+    "id": "REL-2",
+    "title": "Hotfix: badge cache",
+    "tag": "v0.2.1",
+    "published_at": "2026-07-15T09:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/releases/tag/v0.2.1"
+  },
+  {
+    "id": "REL-3",
+    "title": "Third recipe: cross-toolkit gap detection",
+    "tag": "v0.4.0",
+    "published_at": "2026-07-17T13:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/releases/tag/v0.4.0"
+  }
+]

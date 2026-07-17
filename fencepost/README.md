@@ -73,6 +73,10 @@ every check — proof that a first external recipe PR is mergeable today.
 is the second (ROADMAP.md #108): proof that `RECIPES/` actually holds more
 than one recipe at a time, each independently written, both discovered and
 validated together by the same call a stranger's PR is checked against.
+[`RECIPES/release-not-tweeted/`](RECIPES/release-not-tweeted/) is the third
+(ROADMAP.md #110): the first CROSS-TOOLKIT recipe, reading a GitHub release
+against X tweets — the exact seam STRATEGY.md names by hand as Fencepost's
+own worked example.
 
 ## Run your own
 

@@ -1,0 +1,14 @@
+[
+  {
+    "id": "T-1",
+    "text": "v0.2.1 is out — fixes the badge cache going stale after a daily run. Small one, shipped anyway.",
+    "created_at": "2026-07-15T10:15:00Z",
+    "url": "https://x.com/oritatown/status/1000000000000000001"
+  },
+  {
+    "id": "T-2",
+    "text": "Today's Fencepost Report: nothing cleared the bar. The seam held.",
+    "created_at": "2026-07-16T08:00:00Z",
+    "url": "https://x.com/oritatown/status/1000000000000000002"
+  }
+]
