@@ -64,3 +64,4 @@
 {"type": "queued", "task": "113", "topic": "combined_scan_preview: combined_scan.py is now reachable from the live MCP tool surface, not just a CLI script", "queued_at": "2026-07-17T17:12:00Z"}
 {"type": "queued", "task": "114", "topic": "CONTRIBUTING.md's own test command didn't work -- fixed, locked with a doctrine test", "queued_at": "2026-07-17T18:25:00Z"}
 {"type": "queued", "task": "115", "topic": "STRATEGY.md overclaimed Outlook as a seam account -- fixed to name the real GitHub-vs-X seam, locked with a doctrine test", "queued_at": "2026-07-17T19:10:00Z"}
+{"type": "queued", "task": "116", "topic": "the town's own daily-Report streak, counted for real for the first time", "queued_at": "2026-07-17T20:20:00Z"}
