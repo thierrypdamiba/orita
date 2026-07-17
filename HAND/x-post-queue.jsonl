@@ -55,3 +55,4 @@
 {"type": "queued", "task": "104", "topic": "hand lore check -- Iron Rule 2 (the Hand's theology) gets its first running check, completing all seven Iron Rules", "queued_at": "2026-07-17T08:20:00Z"}
 {"type": "queued", "task": "105", "topic": "no grading check -- ROADMAP.md's non-negotiable design constraint #2 gets its first running check, the one CONTRIBUTING.md said the code could not do", "queued_at": "2026-07-17T09:20:00Z"}
 {"type": "queued", "task": "106", "topic": "Arcade hero cadence -- the town's last non-negotiable design constraint gets a running check", "queued_at": "2026-07-17T10:16:00Z"}
+{"type": "queued", "task": "107", "topic": "petition_limits_check.py -- CHARTER.md Appendix D petition LIMITS get their first running check", "queued_at": "2026-07-17T11:2x:00Z"}
