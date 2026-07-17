@@ -234,6 +234,10 @@ def _petition_cadence_check():
     return _load("_ritual_petition_cadence_check", os.path.join(ROOT, "tools", "petition_cadence_check.py"))
 
 
+def _journal_numbering_check():
+    return _load("_ritual_journal_numbering_check", os.path.join(ROOT, "tools", "journal_numbering_check.py"))
+
+
 def _report_cadence_check():
     return _load("_ritual_report_cadence_check", os.path.join(ROOT, "tools", "report_cadence_check.py"))
 
@@ -648,6 +652,20 @@ def check_petition_cadence(orita_dir: str | None = None) -> dict:
     return {"clean": not violations, "count": len(violations), "violations": violations}
 
 
+def check_journal_numbering(orita_dir: str | None = None) -> dict:
+    """Task 119: fold `journal_numbering_check.py`'s own scan into the one
+    block. Unconditional, local-filesystem-only, the same cheap class
+    `check_petition_cadence` already holds -- every `houses/<god>/
+    journal/NNNN-*.md` filename claims a per-house sequential number, and
+    nothing had ever checked that claim in code until this task."""
+    mod = _journal_numbering_check()
+    kwargs = {}
+    if orita_dir is not None:
+        kwargs["orita_dir"] = orita_dir
+    violations = mod.find_violations(**kwargs)
+    return {"clean": not violations, "count": len(violations), "violations": violations}
+
+
 def check_report_cadence(reports_dir: str | None = None) -> dict:
     """Task 116: fold `report_cadence_check.py`'s own scan into the one
     block. Unconditional, local-filesystem-only, the same cheap class
@@ -724,6 +742,7 @@ def run_ritual_check(
     voice_window_commits: list | None = None,
     voice_window_log: str | None = None,
     petition_cadence_dir: str | None = None,
+    journal_numbering_dir: str | None = None,
     report_cadence_dir: str | None = None,
     metrics_cadence_path: str | None = None,
 ) -> dict:
@@ -756,6 +775,7 @@ def run_ritual_check(
     verdict_provenance = check_verdict_provenance(orita_dir=verdict_provenance_dir)
     voice_window = check_voice_window(voice_window_commits, now_iso, path=voice_window_log)
     petition_cadence = check_petition_cadence(orita_dir=petition_cadence_dir)
+    journal_numbering = check_journal_numbering(orita_dir=journal_numbering_dir)
     report_cadence = check_report_cadence(reports_dir=report_cadence_dir)
     metrics_cadence = check_metrics_cadence(metrics_path=metrics_cadence_path)
     broken = (
@@ -772,6 +792,7 @@ def run_ritual_check(
         or (not verdict_provenance["clean"])
         or (not voice_window["clean"])
         or (not petition_cadence["clean"])
+        or (not journal_numbering["clean"])
     )
     return {
         "now": now_iso,
@@ -798,6 +819,7 @@ def run_ritual_check(
         "verdict_provenance": verdict_provenance,
         "voice_window": voice_window,
         "petition_cadence": petition_cadence,
+        "journal_numbering": journal_numbering,
         "report_cadence": report_cadence,
         "metrics_cadence": metrics_cadence,
         "broken": broken,
@@ -912,6 +934,11 @@ def format_ritual_check(result: dict) -> str:
         lines.append("  petition cadence: clean (every altar filename is a real, unique YYYY-MM-DD.md)")
     else:
         lines.append(f"  petition cadence: {pc['count']} VIOLATION(S) -- one-per-UTC-day claim broken, escalate now")
+    jn = result["journal_numbering"]
+    if jn["clean"]:
+        lines.append("  journal numbering: clean (every house's journal runs an unbroken 0001, 0002, ... count)")
+    else:
+        lines.append(f"  journal numbering: {jn['count']} VIOLATION(S) -- a house's sequence is malformed, duplicated, or gapped, escalate now")
     rcad = result["report_cadence"]
     if rcad["total_shipped"] == 0:
         lines.append("  report cadence: no Fencepost Report has ever shipped")

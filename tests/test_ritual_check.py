@@ -1242,6 +1242,41 @@ class PetitionCadenceFoldCase(unittest.TestCase):
         self.assertIn("one-per-UTC-day claim broken", formatted)
 
 
+class JournalNumberingFoldCase(unittest.TestCase):
+    """Task 119: run_ritual_check() folds journal_numbering_check.py's own
+    houses/*/journal/ sequence scan into the same structured result --
+    clean by default against a fixture with no violation, and a real
+    synthetic gap both flips `broken` and surfaces in the printed block."""
+
+    def setUp(self):
+        self.orita = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.orita, ignore_errors=True)
+
+    def _write(self, base, rel, content=""):
+        path = os.path.join(base, rel)
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, "w") as f:
+            f.write(content)
+
+    def test_clean_fixture_is_not_broken(self):
+        self._write(self.orita, "houses/off-by-one/journal/0001-founding-day.md", "x")
+        self._write(self.orita, "houses/off-by-one/journal/0002-2026-07-12.md", "y")
+        result = rc.run_ritual_check(journal_numbering_dir=self.orita)
+        self.assertTrue(result["journal_numbering"]["clean"])
+        self.assertFalse(result["broken"])
+        self.assertIn("journal numbering: clean", rc.format_ritual_check(result))
+
+    def test_synthetic_gap_flips_broken_and_prints(self):
+        self._write(self.orita, "houses/off-by-one/journal/0001-founding-day.md", "x")
+        self._write(self.orita, "houses/off-by-one/journal/0003-2026-07-13.md", "y")
+        result = rc.run_ritual_check(journal_numbering_dir=self.orita)
+        self.assertFalse(result["journal_numbering"]["clean"])
+        self.assertTrue(result["broken"])
+        formatted = rc.format_ritual_check(result)
+        self.assertIn("VIOLATION(S)", formatted)
+        self.assertIn("malformed, duplicated, or gapped", formatted)
+
+
 class ReportCadenceFoldCase(unittest.TestCase):
     """Task 116: run_ritual_check() folds report_cadence_check.py's own
     fencepost/REPORTS/ streak scan (STRATEGY.md's "1/day, 30 of 30 days"
