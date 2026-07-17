@@ -210,6 +210,10 @@ def _no_grading_check():
     return _load("_ritual_no_grading_check", os.path.join(ROOT, "tools", "no_grading_check.py"))
 
 
+def _arcade_hero_check():
+    return _load("_ritual_arcade_hero_check", os.path.join(ROOT, "tools", "arcade_hero_check.py"))
+
+
 def _child_work_check():
     return _load("_ritual_child_work_check", os.path.join(ROOT, "tools", "child_work_check.py"))
 
@@ -524,6 +528,24 @@ def check_no_grading(orita_dir: str | None = None) -> dict:
     return {"clean": not violations, "count": len(violations), "violations": violations}
 
 
+def check_arcade_hero(orita_dir: str | None = None) -> dict:
+    """Task 106: fold arcade_hero_check.py's own direct-credential-handoff
+    scan (ROADMAP.md's non-negotiable design constraint #4, "Arcade is the
+    hero, shown safely -- per-user OAuth, least privilege, revocable,
+    audit-logged") into the one block. Unconditional, local-filesystem-only
+    (reads the checkout already on disk, no network) -- the same cheap
+    class `check_checkout`/`check_vault_leak`/`check_star_covenant`/
+    `check_riders`/`check_hand_lore`/`check_no_grading` already hold. Never
+    edits anything; a real violation, if one is ever found, is a
+    god-on-duty escalation, not something this check silently repairs."""
+    mod = _arcade_hero_check()
+    kwargs = {}
+    if orita_dir is not None:
+        kwargs["orita_dir"] = orita_dir
+    violations = mod.find_violations(**kwargs)
+    return {"clean": not violations, "count": len(violations), "violations": violations}
+
+
 def check_child_work(
     child_files: list | None, now_iso: str, path: str | None = None, repo_root: str | None = None
 ) -> dict:
@@ -607,6 +629,7 @@ def run_ritual_check(
     rider_dir: str | None = None,
     hand_lore_dir: str | None = None,
     no_grading_dir: str | None = None,
+    arcade_hero_dir: str | None = None,
     child_files: list | None = None,
     child_work_log: str | None = None,
     child_work_repo: str | None = None,
@@ -637,6 +660,7 @@ def run_ritual_check(
     riders = check_riders(orita_dir=rider_dir)
     hand_lore = check_hand_lore(orita_dir=hand_lore_dir)
     no_grading = check_no_grading(orita_dir=no_grading_dir)
+    arcade_hero = check_arcade_hero(orita_dir=arcade_hero_dir)
     child_work = check_child_work(child_files, now_iso, path=child_work_log, repo_root=child_work_repo)
     verdict_provenance = check_verdict_provenance(orita_dir=verdict_provenance_dir)
     voice_window = check_voice_window(voice_window_commits, now_iso, path=voice_window_log)
@@ -648,6 +672,7 @@ def run_ritual_check(
         or (not riders["clean"])
         or (not hand_lore["clean"])
         or (not no_grading["clean"])
+        or (not arcade_hero["clean"])
         or (not child_work["clean"])
         or (not verdict_provenance["clean"])
         or (not voice_window["clean"])
@@ -671,6 +696,7 @@ def run_ritual_check(
         "riders": riders,
         "hand_lore": hand_lore,
         "no_grading": no_grading,
+        "arcade_hero": arcade_hero,
         "child_work": child_work,
         "verdict_provenance": verdict_provenance,
         "voice_window": voice_window,
@@ -754,6 +780,11 @@ def format_ritual_check(result: dict) -> str:
         lines.append("  no grading: clean (constraint #2 holds, name and rank no one)")
     else:
         lines.append(f"  no grading: {ng['count']} VIOLATION(S) -- constraint #2 broken, escalate now")
+    ah = result["arcade_hero"]
+    if ah["clean"]:
+        lines.append("  arcade hero: clean (constraint #4 holds, OAuth is the only door)")
+    else:
+        lines.append(f"  arcade hero: {ah['count']} VIOLATION(S) -- constraint #4 broken, escalate now")
     cw = result["child_work"]
     if cw["clean"]:
         newly = f", {len(cw['newly_logged'])} newly logged" if cw["newly_logged"] else ""
