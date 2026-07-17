@@ -234,6 +234,10 @@ def _petition_cadence_check():
     return _load("_ritual_petition_cadence_check", os.path.join(ROOT, "tools", "petition_cadence_check.py"))
 
 
+def _report_cadence_check():
+    return _load("_ritual_report_cadence_check", os.path.join(ROOT, "tools", "report_cadence_check.py"))
+
+
 def _seam_ledger():
     src = os.path.join(ROOT, "fencepost", "seam_engine", "src")
     if src not in sys.path:
@@ -640,6 +644,23 @@ def check_petition_cadence(orita_dir: str | None = None) -> dict:
     return {"clean": not violations, "count": len(violations), "violations": violations}
 
 
+def check_report_cadence(reports_dir: str | None = None) -> dict:
+    """Task 116: fold `report_cadence_check.py`'s own scan into the one
+    block. Unconditional, local-filesystem-only, the same cheap class
+    `check_petition_cadence` already holds -- STRATEGY.md's own leading
+    metric ("Daily Fencepost Report shipped, 1/day, 30 of 30 days,"
+    off-by-one's row) had never once been computed. Informational, like
+    `square`/`owed_posts`: a past, already-explained cron failure
+    (2026-07-14, BUILDLOG.md's own 13:14/14:10 notes, fixed by task 63)
+    is a historical fact on record, not a currently-live law violation,
+    so this never flips `broken`."""
+    mod = _report_cadence_check()
+    kwargs = {}
+    if reports_dir is not None:
+        kwargs["reports_dir"] = reports_dir
+    return mod.compute_cadence(**kwargs)
+
+
 def check_change_gate(report_info: dict) -> dict | None:
     """Fold `change_gate.should_post_gap()` -- task 69's own change-gate
     rule -- using whichever report text `check_report_freshness` already
@@ -680,6 +701,7 @@ def run_ritual_check(
     voice_window_commits: list | None = None,
     voice_window_log: str | None = None,
     petition_cadence_dir: str | None = None,
+    report_cadence_dir: str | None = None,
 ) -> dict:
     if now is None:
         now = datetime.now(timezone.utc)
@@ -710,6 +732,7 @@ def run_ritual_check(
     verdict_provenance = check_verdict_provenance(orita_dir=verdict_provenance_dir)
     voice_window = check_voice_window(voice_window_commits, now_iso, path=voice_window_log)
     petition_cadence = check_petition_cadence(orita_dir=petition_cadence_dir)
+    report_cadence = check_report_cadence(reports_dir=report_cadence_dir)
     broken = (
         (not town["ok"])
         or (not fencepost["ok"])
@@ -750,6 +773,7 @@ def run_ritual_check(
         "verdict_provenance": verdict_provenance,
         "voice_window": voice_window,
         "petition_cadence": petition_cadence,
+        "report_cadence": report_cadence,
         "broken": broken,
     }
 
@@ -862,6 +886,15 @@ def format_ritual_check(result: dict) -> str:
         lines.append("  petition cadence: clean (every altar filename is a real, unique YYYY-MM-DD.md)")
     else:
         lines.append(f"  petition cadence: {pc['count']} VIOLATION(S) -- one-per-UTC-day claim broken, escalate now")
+    rcad = result["report_cadence"]
+    if rcad["total_shipped"] == 0:
+        lines.append("  report cadence: no Fencepost Report has ever shipped")
+    else:
+        gap_note = f", {len(rcad['missing_dates'])} historical gap day(s)" if rcad["missing_dates"] else ""
+        lines.append(
+            f"  report cadence: {rcad['current_streak']}-day streak "
+            f"(target {rcad['target']}/{rcad['target']}, STRATEGY.md's off-by-one metric){gap_note}"
+        )
     return "\n".join(lines)
 
 

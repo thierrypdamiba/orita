@@ -1242,5 +1242,54 @@ class PetitionCadenceFoldCase(unittest.TestCase):
         self.assertIn("one-per-UTC-day claim broken", formatted)
 
 
+class ReportCadenceFoldCase(unittest.TestCase):
+    """Task 116: run_ritual_check() folds report_cadence_check.py's own
+    fencepost/REPORTS/ streak scan (STRATEGY.md's "1/day, 30 of 30 days"
+    row, off-by-one's own metric) into the same structured result --
+    a fixture with no gap prints a clean streak line and never flips
+    `broken` (a historical, already-explained gap day is a fact on
+    record, not a currently-live law violation, the same class
+    `square`/`owed_posts` already hold)."""
+
+    def setUp(self):
+        self.reports = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.reports, ignore_errors=True)
+
+    def _write(self, base, rel, content=""):
+        path = os.path.join(base, rel)
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, "w") as f:
+            f.write(content)
+
+    def test_no_gap_fixture_prints_streak_and_never_flips_broken(self):
+        for d in ("2026-07-15", "2026-07-16", "2026-07-17"):
+            self._write(self.reports, f"{d}.md", "x")
+        result = rc.run_ritual_check(report_cadence_dir=self.reports)
+        self.assertEqual(result["report_cadence"]["current_streak"], 3)
+        self.assertEqual(result["report_cadence"]["missing_dates"], [])
+        self.assertFalse(result["broken"])
+        formatted = rc.format_ritual_check(result)
+        self.assertIn("report cadence: 3-day streak", formatted)
+        self.assertNotIn("historical gap day", formatted)
+
+    def test_gap_fixture_is_named_but_still_never_flips_broken(self):
+        for d in ("2026-07-12", "2026-07-13", "2026-07-15", "2026-07-16", "2026-07-17"):
+            self._write(self.reports, f"{d}.md", "x")
+        result = rc.run_ritual_check(report_cadence_dir=self.reports)
+        self.assertEqual(result["report_cadence"]["current_streak"], 3)
+        self.assertEqual(result["report_cadence"]["missing_dates"], ["2026-07-14"])
+        self.assertFalse(result["broken"])
+        formatted = rc.format_ritual_check(result)
+        self.assertIn("report cadence: 3-day streak", formatted)
+        self.assertIn("1 historical gap day(s)", formatted)
+
+    def test_default_dir_reads_the_real_fencepost_reports(self):
+        """No override: reads the real fencepost/REPORTS/ directory, the
+        same default `check_report_cadence` falls back to."""
+        result = rc.run_ritual_check()
+        self.assertEqual(result["report_cadence"]["total_shipped"], 5)
+        self.assertEqual(result["report_cadence"]["missing_dates"], ["2026-07-14"])
+
+
 if __name__ == "__main__":
     unittest.main()
