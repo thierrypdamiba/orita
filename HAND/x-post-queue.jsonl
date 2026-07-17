@@ -63,3 +63,4 @@
 {"type": "queued", "task": "112", "topic": "the Wall names the recipe system -- docs/fencepost/index.html links CONTRIBUTING.md, combined_scan.py, and all three real recipes", "queued_at": "2026-07-17T16:15:00Z"}
 {"type": "queued", "task": "113", "topic": "combined_scan_preview: combined_scan.py is now reachable from the live MCP tool surface, not just a CLI script", "queued_at": "2026-07-17T17:12:00Z"}
 {"type": "queued", "task": "114", "topic": "CONTRIBUTING.md's own test command didn't work -- fixed, locked with a doctrine test", "queued_at": "2026-07-17T18:25:00Z"}
+{"type": "queued", "task": "115", "topic": "STRATEGY.md overclaimed Outlook as a seam account -- fixed to name the real GitHub-vs-X seam, locked with a doctrine test", "queued_at": "2026-07-17T19:10:00Z"}
