@@ -44,3 +44,4 @@
 {"type": "queued", "task": "93", "topic": "commit-comment cadence -- the third and last of GitHub's repo-wide comment collections", "queued_at": "2026-07-16T20:21:04Z"}
 {"type": "queued", "task": "94", "topic": "wiring a live X-post read path into the seam engine (the future-version TODO since task 3)", "queued_at": "2026-07-16T21:19:47Z"}
 {"type": "queued", "task": "95", "topic": "draftback.py's own inlined wall formula fixed -- the third caller wall.py's docstring warned about", "queued_at": "2026-07-16T22:10:57Z"}
+{"type": "queued", "task": "96", "topic": "cadence census test -- catches a future missing-autograde/wiring/typo'd-snapshot bug across all 24 sources at once", "queued_at": "2026-07-17T00:09:00Z"}
