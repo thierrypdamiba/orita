@@ -24,6 +24,7 @@ ORACLE_ENGINE_SRC = os.path.join(
     REPO_ROOT, "oracle", "oracle_engine", "src", "oracle_engine"
 )
 WORKFLOW_PATH = os.path.join(REPO_ROOT, ".github", "workflows", "oracle-cadence.yml")
+SCOPES_PATH = os.path.join(REPO_ROOT, "oracle", "SCOPES.md")
 
 # oracle_engine.cadence / oracle_engine.autograde (ROADMAP #36) is the one
 # self-referential source: it reads the town's own BUILDLOG.md/ROADMAP.md,
@@ -55,10 +56,16 @@ def _load_steps():
     return job["steps"]
 
 
+def _load_scopes_text():
+    with open(SCOPES_PATH) as f:
+        return f.read()
+
+
 class CadenceCensusCase(unittest.TestCase):
     def setUp(self):
         self.bases = _cadence_base_names()
         self.workflow_text = _load_workflow_text()
+        self.scopes_text = _load_scopes_text()
 
     def test_at_least_the_known_cadence_family_is_present(self):
         # A floor, not a ceiling -- guards against the glob itself silently
@@ -143,4 +150,22 @@ class CadenceCensusCase(unittest.TestCase):
                     f"{base}_cadence's expected snapshot path {expected!r} "
                     "never appears in oracle-cadence.yml -- likely a typo'd "
                     "or copy-pasted-wrong snapshot filename in its commit step",
+                )
+
+    def test_every_cadence_module_is_documented_in_scopes_md(self):
+        # ROADMAP #97: comment_cadence.py (task 76) shipped and sealed live
+        # (records/ledger.jsonl seq 142) with no oracle/SCOPES.md section of
+        # its own -- every one of its 25 siblings got a "## ROADMAP.md #NN:"
+        # writeup, task 76 only ever appeared as a citation inside its
+        # neighbors' paragraphs. This census caught code/workflow wiring
+        # (#96); it never checked the oath doc itself names every cadence.
+        for base in self.bases:
+            with self.subTest(base=base):
+                expected = f"oracle_engine/{base}_cadence.py"
+                self.assertIn(
+                    expected,
+                    self.scopes_text,
+                    f"{expected} has no section of its own in oracle/SCOPES.md "
+                    "-- every cadence must be named there, not just cited "
+                    "inside a sibling's paragraph",
                 )
