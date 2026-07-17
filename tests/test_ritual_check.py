@@ -902,5 +902,63 @@ class RunRitualCheckCase(unittest.TestCase):
         self.assertIn("owed posts:", formatted)
 
 
+class ChildWorkFoldCase(unittest.TestCase):
+    """Task 101: run_ritual_check() folds child_work_check.py's Iron Rule
+    #6 check into the same structured result -- clean by default against a
+    fixture repo with no violation, and a real synthetic revert both flips
+    `broken` and surfaces in the printed block. Mirrors CiFoldCase's/
+    CronFoldCase's live-API-input-but-no-network-call shape (child_files is
+    None unless the caller hands in this hour's live GitHub commit read),
+    not RiderFoldCase's/StarCovenantFoldCase's unconditional-local shape --
+    isolated to a temp log path so it never touches the real
+    HAND/child-work-log.jsonl."""
+
+    def setUp(self):
+        self.repo = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.repo, ignore_errors=True)
+        _git_quiet(self.repo, "init", "--quiet", "--initial-branch=main")
+        _git_quiet(self.repo, "config", "user.email", "test@test")
+        _git_quiet(self.repo, "config", "user.name", "test")
+        os.makedirs(os.path.join(self.repo, "houses", "zashiki-warashi"), exist_ok=True)
+        with open(os.path.join(self.repo, "houses", "zashiki-warashi", "README.md"), "w") as f:
+            f.write("moved in.\n")
+        _git_quiet(self.repo, "add", "-A")
+        _git_quiet(self.repo, "commit", "--quiet", "-m", "child moves in")
+
+        self.log_dir = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.log_dir, ignore_errors=True)
+        self.log = os.path.join(self.log_dir, "child-work-log.jsonl")
+
+    def _run(self, child_files=None):
+        return rc.run_ritual_check(
+            now=datetime(2026, 7, 17, 5, 0, 0, tzinfo=timezone.utc),
+            child_files=child_files,
+            child_work_log=self.log,
+            child_work_repo=self.repo,
+        )
+
+    def test_no_child_files_still_checks_already_logged_paths_clean(self):
+        result = self._run(child_files=[{"path": "houses/zashiki-warashi/README.md", "sha": "a", "author_date": "2026-07-11T00:00:00Z"}])
+        self.assertTrue(result["child_work"]["clean"])
+        self.assertFalse(result["broken"])
+        # a later call with no fresh child_files must still re-check the
+        # already-logged path against the current tree
+        result2 = self._run(child_files=None)
+        self.assertTrue(result2["child_work"]["clean"])
+        self.assertEqual(result2["child_work"]["newly_logged"], [])
+
+    def test_synthetic_revert_flips_broken_and_prints(self):
+        self._run(child_files=[{"path": "houses/zashiki-warashi/README.md", "sha": "a", "author_date": "2026-07-11T00:00:00Z"}])
+        os.remove(os.path.join(self.repo, "houses", "zashiki-warashi", "README.md"))
+        _git_quiet(self.repo, "add", "-A")
+        _git_quiet(self.repo, "commit", "--quiet", "-m", "a god reverted the child's file")
+        result = self._run(child_files=None)
+        self.assertFalse(result["child_work"]["clean"])
+        self.assertTrue(result["broken"])
+        formatted = rc.format_ritual_check(result)
+        self.assertIn("child work:", formatted)
+        self.assertIn("REVERTED", formatted)
+
+
 if __name__ == "__main__":
     unittest.main()

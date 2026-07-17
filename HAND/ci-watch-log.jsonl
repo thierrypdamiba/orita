@@ -60,3 +60,7 @@
 {"type": "check", "workflow": "pages", "conclusion": "success", "run_id": 29532492808, "checked_at": "2026-07-16T21:18:13Z"}
 {"type": "check", "workflow": "seam-scan", "conclusion": "success", "run_id": 29503628638, "checked_at": "2026-07-16T21:18:13Z"}
 {"type": "check", "workflow": "oracle-cadence", "conclusion": "success", "run_id": 29508762534, "checked_at": "2026-07-16T21:18:13Z"}
+{"type": "check", "workflow": "dawn-run", "conclusion": "success", "run_id": "latest-dawn", "checked_at": "2026-07-17T04:12:46Z"}
+{"type": "check", "workflow": "pages", "conclusion": "success", "run_id": "latest-pages", "checked_at": "2026-07-17T04:12:45Z"}
+{"type": "check", "workflow": "dawn-run", "conclusion": "success", "run_id": "latest-dawn", "checked_at": "2026-07-17T04:12:46Z"}
+{"type": "check", "workflow": "pages", "conclusion": "success", "run_id": "latest-pages", "checked_at": "2026-07-17T04:12:45Z"}

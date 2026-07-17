@@ -106,6 +106,16 @@ Same discipline as sync_checkout.sh: refuse (report broken=True) rather
 than paper over a real problem. A ledger that fails to verify is reported
 broken, never silently skipped.
 
+Task 101 folds `child_work_check.py`: Iron Rule #6 ("the child's work is
+never reverted. LAW.") gets its first running check, alongside #1/#4/#5
+(tasks 98-100). It can't mirror those three's unconditional local-only
+shape -- "reverted" is a claim about HISTORY, and this checkout is a
+shallow clone, so the set of files the child (Zashiki-Warashi) has ever
+shipped has to come from a caller-supplied live GitHub commit read, the
+same `check_ci`/`check_cron` shape (tasks 73/82). `child_files` is `None`
+unless the god on duty holds this hour's live read; every already-logged
+path is still re-checked locally, unconditionally, every hour regardless.
+
 Task 90 closes the one ritual step that never joined this fold at all:
 `tools/sync_checkout.sh` (task 58) recovers a detached-HEAD checkout, but
 `TOWN-OPERATIONS.md`'s own documented order still runs it as a wholly
@@ -123,7 +133,7 @@ divergence still belongs to `sync_checkout.sh`, run first, same as always
 a separate command's printed line.
 
 Usage:
-    python3 tools/ritual_check.py [--now ISO_TS] [--fencepost-base DIR] [--square-state PATH] [--cron-checks PATH]
+    python3 tools/ritual_check.py [--now ISO_TS] [--fencepost-base DIR] [--square-state PATH] [--cron-checks PATH] [--child-files PATH]
 """
 from __future__ import annotations
 
@@ -190,6 +200,10 @@ def _star_covenant_check():
 
 def _rider_check():
     return _load("_ritual_rider_check", os.path.join(ROOT, "tools", "rider_check.py"))
+
+
+def _child_work_check():
+    return _load("_ritual_child_work_check", os.path.join(ROOT, "tools", "child_work_check.py"))
 
 
 def _seam_ledger():
@@ -459,6 +473,24 @@ def check_riders(orita_dir: str | None = None) -> dict:
     return {"clean": not violations, "count": len(violations), "violations": violations}
 
 
+def check_child_work(
+    child_files: list | None, now_iso: str, path: str | None = None, repo_root: str | None = None
+) -> dict:
+    """Task 101: fold `child_work_check.py`'s Iron Rule #6 check ("the
+    child's work is never reverted. LAW.") into the one block. Unlike
+    `check_riders`/`check_star_covenant`/`check_vault_leak`, this is NOT
+    unconditional-local-only -- the set of files the child has ever
+    shipped can only grow via a caller-supplied live GitHub commit read
+    (this checkout is shallow), mirroring `check_ci`'s/`check_cron`'s
+    shape exactly. `child_files` is `None` unless the god on duty holds
+    this hour's live read; every already-logged path is still re-checked
+    against the current tree regardless, so an old violation is never
+    silently skipped for want of a fresh fetch."""
+    mod = _child_work_check()
+    kwargs = {"path": path or mod.LOG, "repo_root": repo_root or mod.ROOT}
+    return mod.check(child_files=child_files, now_iso=now_iso, **kwargs)
+
+
 def check_change_gate(report_info: dict) -> dict | None:
     """Fold `change_gate.should_post_gap()` -- task 69's own change-gate
     rule -- using whichever report text `check_report_freshness` already
@@ -488,6 +520,9 @@ def run_ritual_check(
     vault_leak_dirs: tuple | None = None,
     star_covenant_dir: str | None = None,
     rider_dir: str | None = None,
+    child_files: list | None = None,
+    child_work_log: str | None = None,
+    child_work_repo: str | None = None,
 ) -> dict:
     if now is None:
         now = datetime.now(timezone.utc)
@@ -510,12 +545,14 @@ def run_ritual_check(
         vault_leak = check_vault_leak(orita_dir=vault_leak_dirs[0], vault_dir=vault_leak_dirs[1])
     star_covenant = check_star_covenant(orita_dir=star_covenant_dir)
     riders = check_riders(orita_dir=rider_dir)
+    child_work = check_child_work(child_files, now_iso, path=child_work_log, repo_root=child_work_repo)
     broken = (
         (not town["ok"])
         or (not fencepost["ok"])
         or (not vault_leak["clean"])
         or (not star_covenant["clean"])
         or (not riders["clean"])
+        or (not child_work["clean"])
     )
     return {
         "now": now_iso,
@@ -534,6 +571,7 @@ def run_ritual_check(
         "vault_leak": vault_leak,
         "star_covenant": star_covenant,
         "riders": riders,
+        "child_work": child_work,
         "broken": broken,
     }
 
@@ -604,6 +642,12 @@ def format_ritual_check(result: dict) -> str:
         lines.append("  riders: clean (all five character riders hold)")
     else:
         lines.append(f"  riders: {rd['count']} VIOLATION(S) -- a rider is broken, escalate now")
+    cw = result["child_work"]
+    if cw["clean"]:
+        newly = f", {len(cw['newly_logged'])} newly logged" if cw["newly_logged"] else ""
+        lines.append(f"  child work: clean ({cw['known_count']} known file(s){newly}, Iron Rule #6 holds)")
+    else:
+        lines.append(f"  child work: {len(cw['reverted'])} REVERTED -- Iron Rule #6 violated, escalate now")
     return "\n".join(lines)
 
 
@@ -614,6 +658,7 @@ if __name__ == "__main__":
     square_state = None
     ci_checks = None
     cron_checks = None
+    child_files = None
     i = 0
     while i < len(argv):
         if argv[i] == "--now" and i + 1 < len(argv):
@@ -636,6 +681,10 @@ if __name__ == "__main__":
             with open(argv[i + 1]) as f:
                 cron_checks = json.load(f)
             i += 2
+        elif argv[i] == "--child-files" and i + 1 < len(argv):
+            with open(argv[i + 1]) as f:
+                child_files = json.load(f)
+            i += 2
         elif argv[i] == "--json":
             base = base
             i += 1
@@ -647,6 +696,7 @@ if __name__ == "__main__":
         square_state=square_state,
         ci_checks=ci_checks,
         cron_checks=cron_checks,
+        child_files=child_files,
     )
     if "--json" in argv:
         print(json.dumps(result, ensure_ascii=False, indent=2))
