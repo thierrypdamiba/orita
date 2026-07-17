@@ -188,6 +188,10 @@ def _star_covenant_check():
     return _load("_ritual_star_covenant_check", os.path.join(ROOT, "tools", "star_covenant_check.py"))
 
 
+def _rider_check():
+    return _load("_ritual_rider_check", os.path.join(ROOT, "tools", "rider_check.py"))
+
+
 def _seam_ledger():
     src = os.path.join(ROOT, "fencepost", "seam_engine", "src")
     if src not in sys.path:
@@ -439,6 +443,22 @@ def check_star_covenant(orita_dir: str | None = None) -> dict:
     return {"clean": not violations, "count": len(violations), "violations": violations}
 
 
+def check_riders(orita_dir: str | None = None) -> dict:
+    """Task 100: fold rider_check.py's own five-god rider scan (Iron Rule
+    #5) into the one block. Unconditional, local-filesystem-only (reads
+    the checkout already on disk, no network) -- the same cheap class
+    `check_checkout`/`check_vault_leak`/`check_star_covenant` already
+    hold. Never edits anything; a real violation, if one is ever found,
+    is a god-on-duty escalation, not something this check silently
+    repairs."""
+    mod = _rider_check()
+    kwargs = {}
+    if orita_dir is not None:
+        kwargs["orita_dir"] = orita_dir
+    violations = mod.find_violations(**kwargs)
+    return {"clean": not violations, "count": len(violations), "violations": violations}
+
+
 def check_change_gate(report_info: dict) -> dict | None:
     """Fold `change_gate.should_post_gap()` -- task 69's own change-gate
     rule -- using whichever report text `check_report_freshness` already
@@ -467,6 +487,7 @@ def run_ritual_check(
     checkout_dirs: tuple | None = None,
     vault_leak_dirs: tuple | None = None,
     star_covenant_dir: str | None = None,
+    rider_dir: str | None = None,
 ) -> dict:
     if now is None:
         now = datetime.now(timezone.utc)
@@ -488,7 +509,14 @@ def run_ritual_check(
     else:
         vault_leak = check_vault_leak(orita_dir=vault_leak_dirs[0], vault_dir=vault_leak_dirs[1])
     star_covenant = check_star_covenant(orita_dir=star_covenant_dir)
-    broken = (not town["ok"]) or (not fencepost["ok"]) or (not vault_leak["clean"]) or (not star_covenant["clean"])
+    riders = check_riders(orita_dir=rider_dir)
+    broken = (
+        (not town["ok"])
+        or (not fencepost["ok"])
+        or (not vault_leak["clean"])
+        or (not star_covenant["clean"])
+        or (not riders["clean"])
+    )
     return {
         "now": now_iso,
         "checkout": checkout,
@@ -505,6 +533,7 @@ def run_ritual_check(
         "change_gate": change_gate,
         "vault_leak": vault_leak,
         "star_covenant": star_covenant,
+        "riders": riders,
         "broken": broken,
     }
 
@@ -570,6 +599,11 @@ def format_ritual_check(result: dict) -> str:
         lines.append("  star covenant: clean (no begging language found)")
     else:
         lines.append(f"  star covenant: {sc['count']} VIOLATION(S) -- Star Covenant broken, escalate now")
+    rd = result["riders"]
+    if rd["clean"]:
+        lines.append("  riders: clean (all five character riders hold)")
+    else:
+        lines.append(f"  riders: {rd['count']} VIOLATION(S) -- a rider is broken, escalate now")
     return "\n".join(lines)
 
 
