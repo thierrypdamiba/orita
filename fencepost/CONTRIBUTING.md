@@ -165,8 +165,14 @@ treatment as a write-shaped scope, just from a human reviewer instead of
    own fixture and asserts what it finds — the same "prove it runs, don't
    just claim it" discipline `test_recipes_doctrine.py` holds the shipped
    example recipe to.
-4. `cd fencepost/seam_engine && uv run python -m pytest -q` — green, same as
-   every other PR in this repo.
+4. `cd fencepost/seam_engine && uv run --extra dev python -m pytest -q` — green,
+   same as every other PR in this repo. (Not `uv run python -m pytest -q` on its
+   own: unlike `ONBOARDING.md`'s minute 1, which runs `uv sync --extra dev` first,
+   this checklist never syncs the dev group before this step. A bare `uv run`
+   here builds a fresh `.venv` from the base `dependencies` list alone —
+   `pytest` lives only in `[project.optional-dependencies].dev` — and fails
+   with `No module named pytest`. `--extra dev` makes the command correct
+   standing on its own, the same form `ROADMAP.md`'s own task proofs already use.)
 5. Open the PR. State the seam your recipe watches and why it's a real one,
    not a coincidence Ogun's law would tell you to drop.
 
