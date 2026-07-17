@@ -60,3 +60,4 @@
 {"type": "queued", "task": "109", "topic": "petition_cadence_check.py -- CHARTER.md's petition-cadence claim, invited to Off-By-One by name, gets its first running check", "queued_at": "2026-07-17T13:2x:00Z"}
 {"type": "queued", "task": "110", "topic": "Fencepost's first cross-toolkit recipe: a release shipped, never tweeted", "queued_at": "2026-07-17T14:15:00Z"}
 {"type": "queued", "task": "111", "topic": "wired recipe candidates into the daily primary-election path (combined_scan.py)", "queued_at": "2026-07-17T15:45:00Z"}
+{"type": "queued", "task": "112", "topic": "the Wall names the recipe system -- docs/fencepost/index.html links CONTRIBUTING.md, combined_scan.py, and all three real recipes", "queued_at": "2026-07-17T16:15:00Z"}
