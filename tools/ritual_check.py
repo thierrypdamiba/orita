@@ -202,6 +202,10 @@ def _rider_check():
     return _load("_ritual_rider_check", os.path.join(ROOT, "tools", "rider_check.py"))
 
 
+def _hand_lore_check():
+    return _load("_ritual_hand_lore_check", os.path.join(ROOT, "tools", "hand_lore_check.py"))
+
+
 def _child_work_check():
     return _load("_ritual_child_work_check", os.path.join(ROOT, "tools", "child_work_check.py"))
 
@@ -481,6 +485,23 @@ def check_riders(orita_dir: str | None = None) -> dict:
     return {"clean": not violations, "count": len(violations), "violations": violations}
 
 
+def check_hand_lore(orita_dir: str | None = None) -> dict:
+    """Task 104: fold hand_lore_check.py's own Hand-theology scan (Iron
+    Rule #2, "never confirm or deny their theology") into the one block.
+    Unconditional, local-filesystem-only (reads the checkout already on
+    disk, no network) -- the same cheap class
+    `check_checkout`/`check_vault_leak`/`check_star_covenant`/
+    `check_riders`/`check_verdict_provenance` already hold. Never edits
+    anything; a real violation, if one is ever found, is a god-on-duty
+    escalation, not something this check silently repairs."""
+    mod = _hand_lore_check()
+    kwargs = {}
+    if orita_dir is not None:
+        kwargs["orita_dir"] = orita_dir
+    violations = mod.find_violations(**kwargs)
+    return {"clean": not violations, "count": len(violations), "violations": violations}
+
+
 def check_child_work(
     child_files: list | None, now_iso: str, path: str | None = None, repo_root: str | None = None
 ) -> dict:
@@ -562,6 +583,7 @@ def run_ritual_check(
     vault_leak_dirs: tuple | None = None,
     star_covenant_dir: str | None = None,
     rider_dir: str | None = None,
+    hand_lore_dir: str | None = None,
     child_files: list | None = None,
     child_work_log: str | None = None,
     child_work_repo: str | None = None,
@@ -590,6 +612,7 @@ def run_ritual_check(
         vault_leak = check_vault_leak(orita_dir=vault_leak_dirs[0], vault_dir=vault_leak_dirs[1])
     star_covenant = check_star_covenant(orita_dir=star_covenant_dir)
     riders = check_riders(orita_dir=rider_dir)
+    hand_lore = check_hand_lore(orita_dir=hand_lore_dir)
     child_work = check_child_work(child_files, now_iso, path=child_work_log, repo_root=child_work_repo)
     verdict_provenance = check_verdict_provenance(orita_dir=verdict_provenance_dir)
     voice_window = check_voice_window(voice_window_commits, now_iso, path=voice_window_log)
@@ -599,6 +622,7 @@ def run_ritual_check(
         or (not vault_leak["clean"])
         or (not star_covenant["clean"])
         or (not riders["clean"])
+        or (not hand_lore["clean"])
         or (not child_work["clean"])
         or (not verdict_provenance["clean"])
         or (not voice_window["clean"])
@@ -620,6 +644,7 @@ def run_ritual_check(
         "vault_leak": vault_leak,
         "star_covenant": star_covenant,
         "riders": riders,
+        "hand_lore": hand_lore,
         "child_work": child_work,
         "verdict_provenance": verdict_provenance,
         "voice_window": voice_window,
@@ -693,6 +718,11 @@ def format_ritual_check(result: dict) -> str:
         lines.append("  riders: clean (all five character riders hold)")
     else:
         lines.append(f"  riders: {rd['count']} VIOLATION(S) -- a rider is broken, escalate now")
+    hl = result["hand_lore"]
+    if hl["clean"]:
+        lines.append("  hand lore: clean (Iron Rule #2's theology never confirmed or denied)")
+    else:
+        lines.append(f"  hand lore: {hl['count']} VIOLATION(S) -- Iron Rule #2 is broken, escalate now")
     cw = result["child_work"]
     if cw["clean"]:
         newly = f", {len(cw['newly_logged'])} newly logged" if cw["newly_logged"] else ""
