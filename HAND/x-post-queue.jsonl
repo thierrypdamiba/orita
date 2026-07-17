@@ -54,3 +54,4 @@
 {"type": "queued", "task": "103", "topic": "voice window check -- Iron Rule 7's window clause gets its first running check, fixing oracle-cadence.yml's real out-of-window seal commits", "queued_at": "2026-07-17T07:20:00Z"}
 {"type": "queued", "task": "104", "topic": "hand lore check -- Iron Rule 2 (the Hand's theology) gets its first running check, completing all seven Iron Rules", "queued_at": "2026-07-17T08:20:00Z"}
 {"type": "queued", "task": "105", "topic": "no grading check -- ROADMAP.md's non-negotiable design constraint #2 gets its first running check, the one CONTRIBUTING.md said the code could not do", "queued_at": "2026-07-17T09:20:00Z"}
+{"type": "queued", "task": "106", "topic": "Arcade hero cadence -- the town's last non-negotiable design constraint gets a running check", "queued_at": "2026-07-17T10:16:00Z"}
