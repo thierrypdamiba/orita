@@ -31,10 +31,24 @@ it for whatever seam you noticed nobody was watching.
 A recipe does **not** decide the final election — it produces candidates the
 same shape `ranking.rank()` already knows how to score (`CONFIDENCE_BAR`,
 `SEPARATION_MARGIN`, both in
-[`ranking.py`](seam_engine/src/seam_engine/ranking.py)). Wiring a recipe into
-the daily primary-election path is a separate, later step (the same one
-`gmail_calendar.py` is still WIP on) — this document's job is getting a
-recipe *merged*, standing on its own, provably read-only and provably real.
+[`ranking.py`](seam_engine/src/seam_engine/ranking.py)). This document's job
+is getting a recipe *merged*, standing on its own, provably read-only and
+provably real.
+
+**The wiring itself exists** (ROADMAP.md #111,
+[`combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)):
+`run_combined_scan` runs `scan.py`'s own candidates and every discovered
+recipe's, converts each recipe's own `primary_gap`/`tail` back into plain
+candidates, and calls `ranking.rank()` once over the whole pool — a recipe's
+candidate really can out-rank or lose to a god's, tested both directions in
+`tests/test_combined_scan.py`. It is **not yet wired into `seam-scan.yml`'s
+live daily run** (the same boundary `gmail_calendar.py` is still WIP on):
+every recipe today reads a `fixture`, per the MOCK ONLY oath below, and a
+fixture's data never changes day to day — folding it into the REAL public
+report before a recipe holds a live Arcade scope would fabricate a gap that
+isn't actually true of the town's live accounts today, not just risk one.
+`combined_scan.py` goes live in `seam-scan.yml` the same day a recipe's own
+`fixture`/`scopes` graduate to a live read.
 
 ## The directory shape
 

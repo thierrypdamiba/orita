@@ -78,6 +78,15 @@ validated together by the same call a stranger's PR is checked against.
 against X tweets — the exact seam STRATEGY.md names by hand as Fencepost's
 own worked example.
 
+Merging a recipe is one promise; letting it actually compete for the daily
+primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)
+(ROADMAP.md #111) is that second promise, kept: it runs `scan.py`'s own
+candidates alongside every discovered recipe's, ranked once, together — a
+recipe's gap can really out-rank a god's, or lose fairly, both tested in
+`tests/test_combined_scan.py`. It is not yet wired into `seam-scan.yml`'s
+live daily run, same reason `gmail_calendar.py` isn't: every recipe today is
+fixture-only, and a fixture's data never changes day to day.
+
 ## Run your own
 
 Fork Orita, point Fencepost at your own accounts through one Arcade gateway (read-only), and each morning it hands you the one thing you'd have missed. Five-minute setup, no write access asked, revocable in one click. The town itself dogfoods against `the-hand` — a dedicated Arcade demo account, never anyone's personal login; you connect *your own*.
