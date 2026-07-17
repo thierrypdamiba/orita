@@ -848,6 +848,54 @@ class RiderFoldCase(unittest.TestCase):
         self.assertIn("a rider is broken", formatted)
 
 
+class VerdictProvenanceFoldCase(unittest.TestCase):
+    """Task 102: run_ritual_check() folds verdict_provenance_check.py's own
+    public-verdict-vs-altar-record compare (Iron Rule #3) into the same
+    structured result -- clean by default against an agreeing fixture, and
+    a real synthetic mismatch both flips `broken` and surfaces in the
+    printed block."""
+
+    def setUp(self):
+        self.orita = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.orita, ignore_errors=True)
+
+    def _write(self, base, rel, content):
+        path = os.path.join(base, rel)
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, "w") as f:
+            f.write(content)
+
+    def test_agreeing_fixture_is_not_broken(self):
+        self._write(
+            self.orita, "HAND/verdicts/0000.md",
+            "| **Petitioner** | Ogun |\n| **Verdict** | **GRANTED** |\n",
+        )
+        self._write(
+            self.orita, "houses/ogun/altar/petitions/2026-07-11.md",
+            "**Petitioner:** Ogun\n\n**VERDICT:** GRANTED\n",
+        )
+        result = rc.run_ritual_check(verdict_provenance_dir=self.orita)
+        self.assertTrue(result["verdict_provenance"]["clean"])
+        self.assertFalse(result["broken"])
+        self.assertIn("verdict provenance: clean", rc.format_ritual_check(result))
+
+    def test_synthetic_mismatch_flips_broken_and_prints(self):
+        self._write(
+            self.orita, "HAND/verdicts/0006.md",
+            "| **Petitioner** | Retrya |\n| **Verdict** | **GRANTED** |\n",
+        )
+        self._write(
+            self.orita, "houses/retrya/altar/petitions/2026-07-11.md",
+            "**Petitioner:** Retrya\n\n**VERDICT:** UNANSWERED\n",
+        )
+        result = rc.run_ritual_check(verdict_provenance_dir=self.orita)
+        self.assertFalse(result["verdict_provenance"]["clean"])
+        self.assertTrue(result["broken"])
+        formatted = rc.format_ritual_check(result)
+        self.assertIn("MISMATCH(ES)", formatted)
+        self.assertIn("Iron Rule #3 at risk", formatted)
+
+
 class RunRitualCheckCase(unittest.TestCase):
     """End-to-end: broken=True iff either ledger is broken, regardless of
     report/recheck state -- mirrors sync_checkout.sh's refuse discipline.

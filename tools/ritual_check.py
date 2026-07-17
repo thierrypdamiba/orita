@@ -206,6 +206,10 @@ def _child_work_check():
     return _load("_ritual_child_work_check", os.path.join(ROOT, "tools", "child_work_check.py"))
 
 
+def _verdict_provenance_check():
+    return _load("_ritual_verdict_provenance_check", os.path.join(ROOT, "tools", "verdict_provenance_check.py"))
+
+
 def _seam_ledger():
     src = os.path.join(ROOT, "fencepost", "seam_engine", "src")
     if src not in sys.path:
@@ -491,6 +495,22 @@ def check_child_work(
     return mod.check(child_files=child_files, now_iso=now_iso, **kwargs)
 
 
+def check_verdict_provenance(orita_dir: str | None = None) -> dict:
+    """Task 102: fold verdict_provenance_check.py's own public-verdict-vs-
+    altar-record compare (Iron Rule #3) into the one block. Unconditional,
+    local-filesystem-only (reads the checkout already on disk, no network)
+    -- the same cheap class `check_checkout`/`check_vault_leak`/
+    `check_star_covenant`/`check_riders` already hold. Never edits
+    anything; a real mismatch, if one is ever found again, is a
+    god-on-duty escalation, not something this check silently repairs."""
+    mod = _verdict_provenance_check()
+    kwargs = {}
+    if orita_dir is not None:
+        kwargs["orita_dir"] = orita_dir
+    mismatches = mod.find_mismatches(**kwargs)
+    return {"clean": not mismatches, "count": len(mismatches), "mismatches": mismatches}
+
+
 def check_change_gate(report_info: dict) -> dict | None:
     """Fold `change_gate.should_post_gap()` -- task 69's own change-gate
     rule -- using whichever report text `check_report_freshness` already
@@ -523,6 +543,7 @@ def run_ritual_check(
     child_files: list | None = None,
     child_work_log: str | None = None,
     child_work_repo: str | None = None,
+    verdict_provenance_dir: str | None = None,
 ) -> dict:
     if now is None:
         now = datetime.now(timezone.utc)
@@ -546,6 +567,7 @@ def run_ritual_check(
     star_covenant = check_star_covenant(orita_dir=star_covenant_dir)
     riders = check_riders(orita_dir=rider_dir)
     child_work = check_child_work(child_files, now_iso, path=child_work_log, repo_root=child_work_repo)
+    verdict_provenance = check_verdict_provenance(orita_dir=verdict_provenance_dir)
     broken = (
         (not town["ok"])
         or (not fencepost["ok"])
@@ -553,6 +575,7 @@ def run_ritual_check(
         or (not star_covenant["clean"])
         or (not riders["clean"])
         or (not child_work["clean"])
+        or (not verdict_provenance["clean"])
     )
     return {
         "now": now_iso,
@@ -572,6 +595,7 @@ def run_ritual_check(
         "star_covenant": star_covenant,
         "riders": riders,
         "child_work": child_work,
+        "verdict_provenance": verdict_provenance,
         "broken": broken,
     }
 
@@ -648,6 +672,11 @@ def format_ritual_check(result: dict) -> str:
         lines.append(f"  child work: clean ({cw['known_count']} known file(s){newly}, Iron Rule #6 holds)")
     else:
         lines.append(f"  child work: {len(cw['reverted'])} REVERTED -- Iron Rule #6 violated, escalate now")
+    vp = result["verdict_provenance"]
+    if vp["clean"]:
+        lines.append("  verdict provenance: clean (every public verdict backed, Iron Rule #3 holds)")
+    else:
+        lines.append(f"  verdict provenance: {vp['count']} MISMATCH(ES) -- Iron Rule #3 at risk, escalate now")
     return "\n".join(lines)
 
 
