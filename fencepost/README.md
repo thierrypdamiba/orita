@@ -69,6 +69,10 @@ detector. `python -m seam_engine.recipes discover` runs the exact check CI
 runs over a PR. [`RECIPES/example-release-vs-changelog/`](RECIPES/example-release-vs-changelog/)
 is the reference: a real, working, fixture-driven recipe that already clears
 every check — proof that a first external recipe PR is mergeable today.
+[`RECIPES/merged-pr-issue-still-open/`](RECIPES/merged-pr-issue-still-open/)
+is the second (ROADMAP.md #108): proof that `RECIPES/` actually holds more
+than one recipe at a time, each independently written, both discovered and
+validated together by the same call a stranger's PR is checked against.
 
 ## Run your own
 

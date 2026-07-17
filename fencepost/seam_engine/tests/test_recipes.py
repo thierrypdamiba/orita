@@ -10,6 +10,7 @@ aspirational — one already lives in this repo and clears every check.
 from __future__ import annotations
 
 import json
+from datetime import datetime, timezone
 from pathlib import Path
 
 import pytest
@@ -27,6 +28,7 @@ from seam_engine.recipes import (
 
 FENCEPOST_ROOT = Path(__file__).resolve().parents[2]
 REFERENCE_RECIPE = FENCEPOST_ROOT / RECIPES_DIR_NAME / "example-release-vs-changelog" / "recipe.json"
+SECOND_RECIPE = FENCEPOST_ROOT / RECIPES_DIR_NAME / "merged-pr-issue-still-open" / "recipe.json"
 
 
 def _manifest(**overrides) -> RecipeManifest:
@@ -91,6 +93,63 @@ def test_discover_recipes_finds_the_reference_recipe():
     manifests = discover_recipes(FENCEPOST_ROOT)
     slugs = [m.slug for m in manifests]
     assert "example-release-vs-changelog" in slugs
+
+
+# --- the second real recipe (ROADMAP.md #108) -------------------------------
+#
+# RECIPES/ held exactly one real recipe from task 22 through task 107.
+# CONTRIBUTING.md's whole pitch — "a stranger's recipe merges beside a
+# god's" — had never been proven against real multiplicity, only a
+# synthetic tmp_path fixture below. This block, plus
+# `test_discover_recipes_finds_both_real_recipes`, is that proof.
+
+
+def test_second_recipe_exists():
+    assert SECOND_RECIPE.exists(), "RECIPES/merged-pr-issue-still-open/recipe.json must still exist"
+
+
+def test_second_recipe_loads_and_validates():
+    manifest = load_recipe_manifest(SECOND_RECIPE)
+    assert manifest.slug == "merged-pr-issue-still-open"
+    # No new scope beyond SCOPES.md's already-cleared GitHub row.
+    assert set(manifest.scopes) <= {"ListPullRequests", "ListIssues", "GetIssue"}
+
+
+def test_second_recipe_detector_actually_runs_and_finds_its_gap():
+    """Mirrors test_reference_recipe_detector_actually_runs_and_finds_its_gap:
+    not just schema-valid — a working detector that finds a real gap in its
+    own fixture. `now` is passed explicitly (unlike the reference recipe,
+    this one's confidence is age-gated, so its result is only deterministic
+    against a fixed clock, not the real wall-clock a bare `fn()` would use)."""
+    manifest = load_recipe_manifest(SECOND_RECIPE)
+    fn = load_detector(manifest)
+    result = fn(now=datetime(2026, 7, 17, 12, 0, 0, tzinfo=timezone.utc))
+    assert result["source"] == "fixture"
+    assert result["primary_gap"] is not None
+    assert "merged-pr-issue-still-open" in result["primary_gap"]["slug"]
+    assert result["primary_gap"]["confidence"] >= result["confidence_bar"]
+    # PR #104 (fresh, <24h) is weighed and shown in the tail, not hidden,
+    # but does not out-rank the stale #101 gap or break its election.
+    tail_slugs = [g["slug"] for g in result["tail"]]
+    assert any("104" in s for s in tail_slugs)
+    # PR #102 (issue already closed) and PR #103 (no closing keyword) are
+    # both named, not hidden, in excluded.
+    excluded_slugs = [g["slug"] for g in result["excluded"]]
+    assert len(excluded_slugs) == 2
+    assert any("102" in s for s in excluded_slugs)
+    assert any("103" in s for s in excluded_slugs)
+
+
+def test_discover_recipes_finds_both_real_recipes():
+    """The actual multiplicity proof ROADMAP.md #108 exists to give:
+    discover_recipes() run against the real repo tree — the same call a
+    stranger's PR is validated by — returns both real recipes together,
+    not just one."""
+    manifests = discover_recipes(FENCEPOST_ROOT)
+    slugs = [m.slug for m in manifests]
+    assert len(slugs) >= 2
+    assert "example-release-vs-changelog" in slugs
+    assert "merged-pr-issue-still-open" in slugs
 
 
 # --- schema validation: required fields --------------------------------

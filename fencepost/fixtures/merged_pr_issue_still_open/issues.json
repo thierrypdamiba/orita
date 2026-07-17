@@ -1,0 +1,20 @@
+[
+  {
+    "number": 55,
+    "title": "Ledger writer can corrupt the chain on a transient write failure",
+    "state": "open",
+    "url": "https://github.com/example/example-repo/issues/55"
+  },
+  {
+    "number": 56,
+    "title": "Streak counter off by one after a skipped day",
+    "state": "closed",
+    "url": "https://github.com/example/example-repo/issues/56"
+  },
+  {
+    "number": 57,
+    "title": "Badge shows a stale cache after a daily run",
+    "state": "open",
+    "url": "https://github.com/example/example-repo/issues/57"
+  }
+]
