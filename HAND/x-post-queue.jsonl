@@ -70,3 +70,4 @@
 {"type": "queued", "task": "119", "topic": "journal_numbering_check.py: houses/*/journal/ per-house NNNN sequence now checked every hour, all nine houses clean today", "queued_at": "2026-07-17T23:10:05Z"}
 {"type": "queued", "task": "120", "topic": "Shared reports in the wild metric instrumented (0/50, honest), STRATEGY.md metrics table now fully counted", "queued_at": "2026-07-18T00:22:00Z"}
 {"type": "queued", "task": "121", "topic": "ritual completeness cadence -- every check_* function actually wired, returned, and printed", "queued_at": "2026-07-18T02:10:00Z"}
+{"type": "queued", "task": "122", "topic": "arcade_app_watch.py -- the gateway's own connected apps, tracked", "queued_at": "2026-07-18T03:15:00Z"}

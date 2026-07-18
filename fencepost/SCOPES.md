@@ -17,14 +17,31 @@ Concretely, on the toolkits in use:
 | Gmail (v0.2) | ListEmails, GetEmail, SearchThreads | SendEmail, CreateDraft*, Trash*, Modify* |
 | Google Calendar (v0.2) | ListEvents, GetEvent | CreateEvent, UpdateEvent, DeleteEvent |
 
-**WIP note (ROADMAP.md #16):** the-hand gateway does not yet carry the Gmail/Calendar
-rows above, and no demo Gmail/Calendar account is connected. The detector
-(`seam_engine/src/seam_engine/gmail_calendar.py`) is built and tested against a
-fixture that is shaped exactly like what those two read-only tools would
-return (`fencepost/fixtures/gmail_calendar/`) — the same list/read scopes
-this table promises, held to it in advance. It goes live only after the Hand
-runs `Arcade_ModifyGateway` to add the scopes; the detection logic does not
-change when it does.
+**WIP note (ROADMAP.md #16), corrected 2026-07-18T03:1x UTC (task 122):** a live
+`Arcade_ListApps` read this hour showed a Google account (`thierry@arcade.dev`)
+now OAuth-connected at the Arcade account level, carrying `gmail.readonly`/
+`calendar.readonly` among its granted scopes (plus several write scopes —
+`gmail.send`, `gmail.modify`, `gmail.compose`, `calendar.events`, `drive.file`
+— that Fencepost has no use for and does not request). That is a narrower,
+more precise claim than this note used to make ("no demo Gmail/Calendar
+account is connected"), which is now stale on the account-existence half —
+but it is **not** the same as the gateway being live: the same hour's live
+tool search found **zero Gmail/Calendar-capable tools exposed anywhere in
+the-hand's live MCP toolset**. An OAuth grant upstream is not a tool wired
+into the gateway a caller can reach. The detector
+(`seam_engine/src/seam_engine/gmail_calendar.py`) is still built and tested
+only against the fixture (`fencepost/fixtures/gmail_calendar/`), its live-read
+functions (`run_consented_gmail_calendar_scan`) are still unreachable without
+both a real gateway tool AND a double-checked consent record
+(`seam_engine/src/seam_engine/consent.py`'s `enforce_consent_gate`, which
+still fails closed — no `ConsentRecord` exists for this or any other human
+account). Nothing was read from the connected Google account this hour; the
+connection's existence is durably tracked going forward by
+`tools/arcade_app_watch.py`, not re-derived from memory each time someone
+happens to call `Arcade_ListApps`. It goes live only after the Hand runs
+`Arcade_ModifyGateway` to add the Gmail/Calendar tool rows AND the
+intent-gated consent flow (task 20) is completed for that account; the
+detection logic does not change when it does.
 
 ## The oath
 
