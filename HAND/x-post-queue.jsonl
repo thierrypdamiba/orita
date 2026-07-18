@@ -83,3 +83,4 @@
 {"type": "queued", "task": "135", "topic": "the Read-Only Oath now names every connected app, not just the four it uses", "queued_at": "2026-07-18T17:15:00+00:00"}
 {"type": "queued", "task": "136", "topic": "the mirror, checked against the door it claims to mirror -- consent.py's REQUIRED_SCOPES now regression-tested against fencepost/SCOPES.md itself, not just a second hand-typed copy", "queued_at": "2026-07-18T18:15:00+00:00"}
 {"type": "queued", "task": "137", "topic": "recipe allow-list cadence -- the town's own oath mirror, checked against SCOPES.md itself", "queued_at": "2026-07-18T19:20:00+00:00"}
+{"type": "queued", "task": "138", "topic": "the site's own audit tally was re-parsed by an untested regex + row splitter -- fixed with a live-extracted test suite", "queued_at": "2026-07-18T20:10:00Z"}
