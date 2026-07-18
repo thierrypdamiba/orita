@@ -77,3 +77,4 @@
 {"type": "queued", "task": "126", "topic": "ARC.md's own task-21 teaser paragraph drifted from reality -- docs/fencepost/index.html's #teaser was a hand-typed copy of TEASER_LINE, not an import; now regex-extracted live off the same fetch that already reads the wall count", "queued_at": "2026-07-18T07:20:00Z"}
 {"type": "queued", "task": "127", "topic": "extended task 118's tool-count drift check to ONBOARDING.md/CONNECT.md", "queued_at": "2026-07-18T08:14:59+00:00"}
 {"type": "queued", "task": "128", "topic": "task 128: fetch_github_activity got the live-override door x_posts already had -- unblocking the hourly Report from this sandbox's own proxy wall", "queued_at": "2026-07-18T10:17:00Z"}
+{"type": "queued", "task": "129", "topic": "task 129: rewrote report_cadence_check's own tests to stop pinning a magic number the daily ritual's own work was guaranteed to outdate -- closed a real dawn-run break", "queued_at": "2026-07-18T11:13:00Z"}
