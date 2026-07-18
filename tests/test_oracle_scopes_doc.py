@@ -93,20 +93,31 @@ class CommitCommentResolvedCase(unittest.TestCase):
         self.assertIn("**RESOLVED (corrected 2026-07-18, task 131)", section)
 
     def test_resolved_paragraph_cites_live_snapshot_content(self):
+        # Task 133: this used to assert len(live) == 1 -- true the hour task
+        # 131 wrote it, false the moment oracle-cadence.yml's daily cron
+        # sealed a second reading, exactly the growing-real-file-vs-hardcoded
+        # -cardinality mistake task 129 already fixed one file over, in
+        # test_report_cadence_check.py's RealReportsCase. The doc's own
+        # RESOLVED paragraph cites the FIRST sealed reading (the historic
+        # "first live call" moment, ledger seq 287) -- never a claim that it
+        # would stay the only one; the doc's own prose says this cadence
+        # "will keep sealing on every scheduled run." So the right invariant
+        # is "at least one entry exists, and the doc cites the earliest one"
+        # -- true today at 2 entries, true tomorrow at 3, true forever.
         doc = _read_doc()
         idx = doc.index("RESOLVED (corrected 2026-07-18, task 131)")
         paragraph = doc[idx : idx + 1000]
 
         live = _snapshot_lines(COMMIT_COMMENT_SNAPSHOT)
-        self.assertEqual(
-            len(live), 1, "expected exactly one real sealed commit-comment reading"
+        self.assertGreaterEqual(
+            len(live), 1, "expected at least one real sealed commit-comment reading"
         )
-        live_entry = live[0]
+        earliest_entry = live[0]
 
         cited = json.loads(
             re.search(r"holds `(\{.*?\})`", paragraph).group(1)
         )
-        self.assertEqual(cited, live_entry)
+        self.assertEqual(cited, earliest_entry)
 
     def test_resolved_paragraph_cites_a_real_ledger_entry(self):
         doc = _read_doc()
@@ -124,6 +135,61 @@ class CommitCommentResolvedCase(unittest.TestCase):
         self.assertIn("commit comment count", entry["detail"])
 
         self.assertTrue(ledger_module.verify())
+
+
+class SnapshotCardinalityGrowthSafetyCase(unittest.TestCase):
+    """Task 133's regression proof: a snapshot log fed to `_snapshot_lines`
+    keeps naming the same "earliest entry" as more real cadence readings
+    append after it -- an isolated temp fixture, never the real log, so
+    this never depends on how many readings `oracle/commit_comment_snapshots
+    .jsonl` genuinely holds today."""
+
+    def _write_jsonl(self, path, entries):
+        with open(path, "w", encoding="utf-8") as f:
+            for entry in entries:
+                f.write(json.dumps(entry) + "\n")
+
+    def test_earliest_entry_is_stable_as_the_file_grows(self):
+        import tempfile
+
+        entry_0 = {"count": 0, "ts": "2026-07-17T14:28:37+00:00"}
+        entry_1 = {"count": 0, "ts": "2026-07-18T14:18:34+00:00"}
+        entry_2 = {"count": 1, "ts": "2026-07-19T14:20:00+00:00"}
+        entry_3 = {"count": 1, "ts": "2026-07-20T09:00:00+00:00"}
+
+        with tempfile.TemporaryDirectory() as tmp:
+            path = os.path.join(tmp, "commit_comment_snapshots.jsonl")
+
+            # Two lines: the exact real-world shape this task fixed.
+            self._write_jsonl(path, [entry_0, entry_1])
+            self.assertEqual(_snapshot_lines(path)[0], entry_0)
+            self.assertEqual(len(_snapshot_lines(path)), 2)
+
+            # A third and fourth real reading append -- the earliest entry
+            # a doc paragraph would cite never moves, only the count grows.
+            self._write_jsonl(path, [entry_0, entry_1, entry_2])
+            self.assertEqual(_snapshot_lines(path)[0], entry_0)
+            self.assertEqual(len(_snapshot_lines(path)), 3)
+
+            self._write_jsonl(path, [entry_0, entry_1, entry_2, entry_3])
+            self.assertEqual(_snapshot_lines(path)[0], entry_0)
+            self.assertEqual(len(_snapshot_lines(path)), 4)
+
+    def test_old_exactly_one_assertion_would_fail_against_todays_real_file(self):
+        # Hand-verification, kept as a live assertion: proves the bug this
+        # task fixes was real, not assumed. If oracle-cadence.yml's cron
+        # ever gets reset to a single-entry state this would start failing
+        # loudly -- exactly the kind of loud, honest failure this task's
+        # whole point is to prefer over a silent one.
+        live = _snapshot_lines(COMMIT_COMMENT_SNAPSHOT)
+        self.assertGreater(
+            len(live),
+            1,
+            "expected today's real commit-comment snapshot log to hold more "
+            "than one reading (task 133's whole premise) -- if this fails, "
+            "the old exactly-one test would currently pass and this "
+            "regression test is not exercising the real bug",
+        )
 
 
 class PendingAndResolvedStayHonestCase(unittest.TestCase):
