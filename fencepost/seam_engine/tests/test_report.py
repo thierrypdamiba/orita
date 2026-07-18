@@ -6,10 +6,67 @@ is for, or drops the line the whole arc turns on.
 """
 from __future__ import annotations
 
+import ast
+import inspect
+import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
 from seam_engine import ledger, report
+
+# report.py's own docstring makes a safety claim about `suggest_move` (ROADMAP.md
+# #140, retrya): "it holds no credential, calls no tool, and fires nothing. Read
+# it end to end and you will find no verb it can act on." The wording tests above
+# check what a rendered move SAYS; these check what the module's own imports
+# actually ARE -- the mechanism the claim is about, not just its prose.
+
+# report.py's only real, already-audited local dependencies (their own modules
+# are pure-local file I/O, no network, no credential -- ledger.py/streak.py/
+# wall.py never import anything outside this same allow-list either).
+_ALLOWED_LOCAL_IMPORTS = frozenset({"seam_engine", "seam_engine.ledger", "seam_engine.streak", "seam_engine.wall"})
+
+# Anything reaching a credential, the network, a subprocess, or an Arcade/MCP
+# tool call would be a violation of the claim -- named here once, checked
+# against the module's real source text and, via the mutation test below,
+# proven to actually bite rather than merely exist.
+_FORBIDDEN_NAMES = (
+    "requests",
+    "httpx",
+    "urllib",
+    "subprocess",
+    "socket",
+    "os.environ",
+    "getenv",
+    "arcade",
+    "mcp",
+)
+
+
+def _top_level_imports(source: str) -> set[str]:
+    """Every module name `source` imports, structurally, via `ast` -- never a
+    second hand-typed copy of report.py's own import list."""
+    tree = ast.parse(source)
+    found: set[str] = set()
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            found.update(alias.name for alias in node.names)
+        elif isinstance(node, ast.ImportFrom):
+            if node.module:
+                found.add(node.module)
+    return found
+
+
+def _stdlib_or_allowed(module_name: str) -> bool:
+    root = module_name.split(".", 1)[0]
+    if root == "__future__":
+        return True
+    if module_name in _ALLOWED_LOCAL_IMPORTS:
+        return True
+    return root in sys.stdlib_module_names
+
+
+def _forbidden_names_in(source: str) -> list[str]:
+    return [name for name in _FORBIDDEN_NAMES if name in source]
 
 
 def _sealed(*, primary: bool, recorded: int, tail_n: int = 2) -> dict:
@@ -204,3 +261,39 @@ def test_your_move_line_reads_correctly_from_a_live_ledger(tmp_path: Path):
     text = report.render_latest(tmp_path)
     assert text.count("**Your move.**") == 1
     assert "post about it" in text.lower()
+
+
+# --- the docstring's safety claim, checked structurally, not just in prose ----
+
+
+def test_report_module_imports_nothing_but_stdlib_and_its_own_audited_locals():
+    source = inspect.getsource(report)
+    imports = _top_level_imports(source)
+    assert imports, "report.py must import something for this test to mean anything"
+    violations = {name for name in imports if not _stdlib_or_allowed(name)}
+    assert not violations, f"report.py imports beyond stdlib/its own audited locals: {violations}"
+
+
+def test_report_module_source_names_no_network_or_credential_capable_symbol():
+    source = inspect.getsource(report)
+    assert _forbidden_names_in(source) == []
+
+
+def test_the_same_import_checker_flags_a_synthetic_credential_import():
+    # Mutation-based hand-verification (task 135/136/137/138's own discipline):
+    # the SAME extracted checker, run against a deliberately mutated copy of
+    # the real source, must disagree -- proving it actually bites rather than
+    # merely existing. The real, unmutated file is proven clean above.
+    real_source = inspect.getsource(report)
+    mutated = "import requests\n" + real_source
+    imports = _top_level_imports(mutated)
+    violations = {name for name in imports if not _stdlib_or_allowed(name)}
+    assert violations == {"requests"}
+
+
+def test_the_same_forbidden_name_checker_flags_a_synthetic_socket_reference():
+    real_source = inspect.getsource(report)
+    mutated = real_source + "\n# socket.socket() would be the violation here\n"
+    assert "socket" in _forbidden_names_in(mutated)
+    # And the real, unmutated file still reads clean against the same function.
+    assert "socket" not in _forbidden_names_in(real_source)
