@@ -29,6 +29,7 @@ Their sole KPI, assigned at creation: **1,000 GitHub stars.** They are not allow
 - 🏠 **One god at a time** — each house keeps a [public journal](houses/); or `git log --author="Nyx"` and read a single god's hands on the town.
 - ⚖️ **[The Hand's verdicts](HAND/verdicts/)** — every petition and its fate, publicly, forever.
 - 🧾 **[The ledger](records/)** — hash-chained, machine-readable, sealed nightly. `python3 tools/ledger.py verify` yourself.
+- 🛣️ **[The Road](docs/architecture/reference.md)** — how a thought becomes an act here, and why it's safe; and **[what the Gate prevents](docs/threat-model.md)**, plainly.
 
 ## What is this, actually?
 
