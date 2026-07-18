@@ -246,6 +246,10 @@ def _metrics_cadence_check():
     return _load("_ritual_metrics_cadence_check", os.path.join(ROOT, "tools", "metrics_cadence_check.py"))
 
 
+def _shared_reports_check():
+    return _load("_ritual_shared_reports_check", os.path.join(ROOT, "tools", "shared_reports_check.py"))
+
+
 def _seam_ledger():
     src = os.path.join(ROOT, "fencepost", "seam_engine", "src")
     if src not in sys.path:
@@ -702,6 +706,24 @@ def check_metrics_cadence(metrics_path: str | None = None) -> dict:
     return mod.compute_cadence(**kwargs)
 
 
+def check_shared_reports(shared_path: str | None = None) -> dict:
+    """Task 120: fold `shared_reports_check.py`'s own scan into the one
+    block. Unconditional, local-filesystem-only, the same cheap
+    informational class `check_report_cadence`/`check_metrics_cadence`
+    already hold -- STRATEGY.md's own last uninstrumented metrics-table
+    row ("Shared Fencepost Reports in the wild," kwaku-ananse's lagging
+    metric, target 50) had never once been counted anywhere. Never flips
+    `broken`: zero organic shares is the honest, expected state at this
+    stage, not a currently-live law violation -- the same distinction
+    `report_cadence`/`metrics_cadence` already hold for their own zero
+    states."""
+    mod = _shared_reports_check()
+    kwargs = {}
+    if shared_path is not None:
+        kwargs["shared_path"] = shared_path
+    return mod.compute_shared_reports(**kwargs)
+
+
 def check_change_gate(report_info: dict) -> dict | None:
     """Fold `change_gate.should_post_gap()` -- task 69's own change-gate
     rule -- using whichever report text `check_report_freshness` already
@@ -745,6 +767,7 @@ def run_ritual_check(
     journal_numbering_dir: str | None = None,
     report_cadence_dir: str | None = None,
     metrics_cadence_path: str | None = None,
+    shared_reports_path: str | None = None,
 ) -> dict:
     if now is None:
         now = datetime.now(timezone.utc)
@@ -778,6 +801,7 @@ def run_ritual_check(
     journal_numbering = check_journal_numbering(orita_dir=journal_numbering_dir)
     report_cadence = check_report_cadence(reports_dir=report_cadence_dir)
     metrics_cadence = check_metrics_cadence(metrics_path=metrics_cadence_path)
+    shared_reports = check_shared_reports(shared_path=shared_reports_path)
     broken = (
         (not town["ok"])
         or (not fencepost["ok"])
@@ -822,6 +846,7 @@ def run_ritual_check(
         "journal_numbering": journal_numbering,
         "report_cadence": report_cadence,
         "metrics_cadence": metrics_cadence,
+        "shared_reports": shared_reports,
         "broken": broken,
     }
 
@@ -956,6 +981,14 @@ def format_ritual_check(result: dict) -> str:
         lines.append(
             f"  metrics cadence: {mcad['current_streak']}-day streak "
             f"(records/metrics.jsonl, daily-aggregate readings){gap_note}"
+        )
+    sr = result["shared_reports"]
+    if sr["total_shared"] == 0:
+        lines.append(f"  shared reports in the wild: 0/{sr['target']} (kwaku-ananse's lagging metric, none yet)")
+    else:
+        lines.append(
+            f"  shared reports in the wild: {sr['total_shared']}/{sr['target']} "
+            f"(kwaku-ananse's lagging metric), most recent {sr['most_recent_date']}"
         )
     return "\n".join(lines)
 

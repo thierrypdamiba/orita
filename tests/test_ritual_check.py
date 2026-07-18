@@ -1402,5 +1402,55 @@ class MetricsCadenceFoldCase(unittest.TestCase):
         self.assertIn("2026-07-15", result["metrics_cadence"]["missing_dates"])
 
 
+class SharedReportsFoldCase(unittest.TestCase):
+    """Task 120: run_ritual_check() folds shared_reports_check.py's own
+    records/shared-in-the-wild.jsonl count (STRATEGY.md's "Shared
+    Fencepost Reports in the wild" row, kwaku-ananse's lagging metric,
+    target 50) into the same structured result -- an empty fixture prints
+    the honest zero and never flips `broken` (zero organic shares is the
+    expected state this early, not a currently-live law violation, the
+    same class `report_cadence`/`metrics_cadence` already hold for their
+    own zero states); a fixture with real entries prints the real count."""
+
+    def setUp(self):
+        self.tmp = tempfile.mkdtemp()
+        self.path = os.path.join(self.tmp, "shared-in-the-wild.jsonl")
+        self.addCleanup(shutil.rmtree, self.tmp, ignore_errors=True)
+
+    def _write(self, rows):
+        with open(self.path, "w") as f:
+            for row in rows:
+                f.write(row + "\n")
+
+    def test_empty_fixture_prints_zero_and_never_flips_broken(self):
+        result = rc.run_ritual_check(shared_reports_path=self.path)
+        self.assertEqual(result["shared_reports"]["total_shared"], 0)
+        self.assertFalse(result["broken"])
+        formatted = rc.format_ritual_check(result)
+        self.assertIn("shared reports in the wild: 0/50", formatted)
+
+    def test_real_entries_fixture_prints_count_and_never_flips_broken(self):
+        rows = [
+            '{"date": "2026-07-16", "url": "https://x.com/example/status/1"}',
+            '{"date": "2026-07-17", "url": "https://example.com/screenshot.png"}',
+        ]
+        self._write(rows)
+        result = rc.run_ritual_check(shared_reports_path=self.path)
+        self.assertEqual(result["shared_reports"]["total_shared"], 2)
+        self.assertFalse(result["broken"])
+        formatted = rc.format_ritual_check(result)
+        self.assertIn("shared reports in the wild: 2/50", formatted)
+        self.assertIn("most recent 2026-07-17", formatted)
+
+    def test_default_path_reads_the_real_file_honestly_zero(self):
+        """No override: reads the real records/shared-in-the-wild.jsonl,
+        the same default check_shared_reports falls back to. This task
+        creates the file's schema but does not manufacture an entry, so
+        the real, live count is honestly zero."""
+        result = rc.run_ritual_check()
+        self.assertEqual(result["shared_reports"]["total_shared"], 0)
+        self.assertEqual(result["shared_reports"]["target"], 50)
+
+
 if __name__ == "__main__":
     unittest.main()
