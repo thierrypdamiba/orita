@@ -39,6 +39,23 @@ Data sources:
   posts, ever" would flag every past commit as newly unannounced, exactly
   the false-positive flood Ogun's law exists to prevent.
 
+  ROADMAP.md #128: `fetch_github_activity` never got the matching override
+  task 94 built for X — `load_github_events_from_live` + `run_scan(...,
+  github_events=...)` close that gap the same way, for the same reason. A
+  hosted session (like this town's own hourly ritual) can hold an
+  already-authorized `github` MCP channel (`list_commits`, `list_issues`,
+  `get_latest_release`) while its own sandbox proxy layer blocks the direct
+  unauthenticated `httpx` call to `api.github.com` outright — the identical
+  wall the Oracle Desk's cadence sources (tasks 60/63/64/75/78/89/93) have
+  hit and left honestly PENDING, except `scan.py` is the engine the hourly
+  ritual's actual daily deliverable (the Fencepost Report) depends on, not
+  an Oracle cadence row that can wait for the next scheduled CI run. The
+  caller normalizes each commit/release to the same `kind`/`id`/`title`/
+  `url`/`ts`/`author` shape `GithubEvent` already uses and hands it in —
+  same boundary, same discipline, same refuse-empty reasoning (this repo
+  commits most hours of most days; an empty live read is almost always a
+  failed or blocked call, not a quiet one).
+
 Recurring, on purpose (ROADMAP.md #19): `_effective_since` makes `run_scan`
 always reach back at least to `account_live_since`, never merely the last
 `window_hours`. A milestone commit stays a live candidate for as long as it
@@ -134,6 +151,65 @@ def fetch_github_activity(owner: str, repo: str, since: datetime) -> list[Github
                     url=r["html_url"], ts=ts, author=r.get("author", {}).get("login", "unknown"),
                 ))
 
+    return events
+
+
+_REQUIRED_LIVE_EVENT_KEYS = ("kind", "id", "title", "url", "ts", "author")
+
+
+def load_github_events_from_live(data: list[dict[str, Any]]) -> list[GithubEvent]:
+    """Parse a caller-normalized live GitHub read into the same `GithubEvent`
+    shape `fetch_github_activity` already produces.
+
+    ROADMAP.md #128: `load_x_posts_from_live` (task 94) closed this class of
+    gap for X reads; `fetch_github_activity` itself never gained the
+    matching override, so a caller already holding a live, already-
+    authorized GitHub read (this session's `mcp__github__list_commits`/
+    `get_latest_release`; a self-hosted fork's own gateway) had no way to
+    hand it to `run_scan` — the direct `httpx` call to `api.github.com` was
+    the only path in, and a hosted sandbox's own proxy layer can block that
+    outright ("GitHub access is not enabled for this session") while still
+    exposing an already-authorized MCP channel that answers the identical
+    question. This closes it, mirroring `load_x_posts_from_live` line for
+    line:
+
+    - A malformed entry (missing one of the six required keys) raises
+      `ValueError` naming the missing key and the entry's index — never
+      silently dropped, per Ogun's precision-over-recall law.
+    - An EMPTY list raises `ValueError` rather than being accepted as
+      "nothing has shipped since the window opened." This repo commits most
+      hours of most days — an empty live read over any realistic window
+      almost always means the call failed or was blocked, not that the
+      account has genuinely gone quiet. Pass `github_events=None` to
+      `run_scan` (the default) to use the direct `fetch_github_activity`
+      call instead of an empty live override.
+    """
+    if not data:
+        raise ValueError(
+            "load_github_events_from_live() received an empty list — refusing "
+            "to treat that as \"nothing shipped since the window opened\" (this "
+            "repo commits most hours of most days). An empty live read almost "
+            "always means the call failed or was blocked; pass github_events=None "
+            "to run_scan to use the direct fetch_github_activity call instead of "
+            "an empty override."
+        )
+    events: list[GithubEvent] = []
+    for i, entry in enumerate(data):
+        missing = [k for k in _REQUIRED_LIVE_EVENT_KEYS if k not in entry]
+        if missing:
+            raise ValueError(
+                f"load_github_events_from_live(): entry {i} is missing required "
+                f"key(s) {missing} (expected kind/id/title/url/ts/author on "
+                f"every normalized event): {entry!r}"
+            )
+        events.append(GithubEvent(
+            kind=str(entry["kind"]),
+            id=str(entry["id"]),
+            title=str(entry["title"]),
+            url=str(entry["url"]),
+            ts=_parse_ts(entry["ts"]) if isinstance(entry["ts"], str) else entry["ts"],
+            author=str(entry["author"]),
+        ))
     return events
 
 
@@ -411,6 +487,7 @@ def run_scan(
     repo: str,
     window_hours: int = 24,
     x_posts: list[dict[str, Any]] | None = None,
+    github_events: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     """Run the seam scan.
 
@@ -422,6 +499,16 @@ def run_scan(
     `load_x_posts_from_live` (which itself refuses an empty list — see its
     own docstring) instead of reading the ledger. This is the wired-up path
     for a caller already holding a real per-user OAuth-connected X read.
+
+    `github_events=None` (the default): unchanged behavior — calls
+    `fetch_github_activity` directly, exactly as before ROADMAP.md #128.
+
+    `github_events=<list of normalized dicts>`: a live-sourced override,
+    parsed via `load_github_events_from_live` (which itself refuses an empty
+    list — see its own docstring) instead of calling `fetch_github_activity`.
+    This is the wired-up path for a caller already holding a real,
+    already-authorized GitHub read (e.g. this session's `github` MCP
+    channel) when the direct `httpx` path to `api.github.com` is unavailable.
     """
     from seam_engine.ranking import rank
 
@@ -435,7 +522,11 @@ def run_scan(
     now = datetime.now(timezone.utc)
     since = _effective_since(now, window_hours, account_live_since)
 
-    events = fetch_github_activity(owner, repo, since)
+    events = (
+        fetch_github_activity(owner, repo, since)
+        if github_events is None
+        else load_github_events_from_live(github_events)
+    )
     surfaced, excluded = compute_candidates(events, x_post_objs, account_live_since)
     coincidences = coincidence_candidates(events, x_post_objs, account_live_since)
 
@@ -448,6 +539,7 @@ def run_scan(
         "window_hours": window_hours,
         "account_live_since": account_live_since.isoformat(),
         "x_posts_source": "ledger" if x_posts is None else "live",
+        "github_events_source": "direct" if github_events is None else "override",
         "confidence_bar": ranking.confidence_bar,
         "separation_margin": ranking.separation_margin,
         "primary_gap": asdict(primary) if primary else None,
@@ -457,12 +549,17 @@ def run_scan(
 
 
 def main(argv: list[str] | None = None) -> int:
-    """CLI: `python -m seam_engine.scan [output.json] [--x-posts <path>]`.
+    """CLI: `python -m seam_engine.scan [output.json] [--x-posts <path>] [--github-events <path>]`.
 
     `--x-posts <path>` reads a JSON file holding a list of normalized live
     posts (see `load_x_posts_from_live`) and threads it through as `run_scan`'s
     `x_posts` override; omitted, `run_scan` uses the ledger fallback exactly
     as it always has.
+
+    `--github-events <path>` reads a JSON file holding a list of normalized
+    live GitHub events (see `load_github_events_from_live`) and threads it
+    through as `run_scan`'s `github_events` override; omitted, `run_scan`
+    calls `fetch_github_activity` directly exactly as it always has.
     """
     import sys
 
@@ -478,8 +575,18 @@ def main(argv: list[str] | None = None) -> int:
         del argv[i : i + 2]
         x_posts = json.loads(x_posts_path.read_text())
 
+    github_events: list[dict[str, Any]] | None = None
+    if "--github-events" in argv:
+        i = argv.index("--github-events")
+        if i + 1 >= len(argv):
+            print("--github-events needs a path to a JSON file of normalized live events.")
+            return 2
+        github_events_path = Path(argv[i + 1])
+        del argv[i : i + 2]
+        github_events = json.loads(github_events_path.read_text())
+
     out = argv[0] if argv else None
-    result = run_scan("thierrypdamiba", "orita", x_posts=x_posts)
+    result = run_scan("thierrypdamiba", "orita", x_posts=x_posts, github_events=github_events)
     text = json.dumps(result, indent=2, default=str)
     if out:
         Path(out).write_text(text + "\n")
