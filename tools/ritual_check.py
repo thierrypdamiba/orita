@@ -250,6 +250,10 @@ def _shared_reports_check():
     return _load("_ritual_shared_reports_check", os.path.join(ROOT, "tools", "shared_reports_check.py"))
 
 
+def _ritual_completeness_check():
+    return _load("_ritual_completeness_check", os.path.join(ROOT, "tools", "ritual_completeness_check.py"))
+
+
 def _seam_ledger():
     src = os.path.join(ROOT, "fencepost", "seam_engine", "src")
     if src not in sys.path:
@@ -724,6 +728,22 @@ def check_shared_reports(shared_path: str | None = None) -> dict:
     return mod.compute_shared_reports(**kwargs)
 
 
+def check_ritual_completeness(source_path: str | None = None) -> dict:
+    """Task 121: fold `ritual_completeness_check.py`'s own static, AST-only
+    audit of THIS FILE into the one block it audits. Unconditional, like
+    every other doctrine check -- but unlike `report_cadence`/
+    `metrics_cadence`/`shared_reports`, a real hit here DOES flip `broken`:
+    a `check_*` function silently dropped from `run_ritual_check`'s call
+    list, its return dict, or `format_ritual_check`'s printed lines is a
+    live regression in the one tool every hourly run depends on, not an
+    honest zero-state waiting on the calendar."""
+    mod = _ritual_completeness_check()
+    kwargs = {}
+    if source_path is not None:
+        kwargs["source_path"] = source_path
+    return mod.compute_ritual_completeness(**kwargs)
+
+
 def check_change_gate(report_info: dict) -> dict | None:
     """Fold `change_gate.should_post_gap()` -- task 69's own change-gate
     rule -- using whichever report text `check_report_freshness` already
@@ -768,6 +788,7 @@ def run_ritual_check(
     report_cadence_dir: str | None = None,
     metrics_cadence_path: str | None = None,
     shared_reports_path: str | None = None,
+    ritual_completeness_path: str | None = None,
 ) -> dict:
     if now is None:
         now = datetime.now(timezone.utc)
@@ -802,6 +823,7 @@ def run_ritual_check(
     report_cadence = check_report_cadence(reports_dir=report_cadence_dir)
     metrics_cadence = check_metrics_cadence(metrics_path=metrics_cadence_path)
     shared_reports = check_shared_reports(shared_path=shared_reports_path)
+    ritual_completeness = check_ritual_completeness(source_path=ritual_completeness_path)
     broken = (
         (not town["ok"])
         or (not fencepost["ok"])
@@ -817,6 +839,7 @@ def run_ritual_check(
         or (not voice_window["clean"])
         or (not petition_cadence["clean"])
         or (not journal_numbering["clean"])
+        or (not ritual_completeness["clean"])
     )
     return {
         "now": now_iso,
@@ -847,6 +870,7 @@ def run_ritual_check(
         "report_cadence": report_cadence,
         "metrics_cadence": metrics_cadence,
         "shared_reports": shared_reports,
+        "ritual_completeness": ritual_completeness,
         "broken": broken,
     }
 
@@ -990,6 +1014,18 @@ def format_ritual_check(result: dict) -> str:
             f"  shared reports in the wild: {sr['total_shared']}/{sr['target']} "
             f"(kwaku-ananse's lagging metric), most recent {sr['most_recent_date']}"
         )
+    rc = result["ritual_completeness"]
+    if rc["clean"]:
+        lines.append("  ritual completeness: clean (every check_* function is called, returned, and printed)")
+    else:
+        parts = []
+        if rc["missing_from_run"]:
+            parts.append(f"never called: {', '.join(rc['missing_from_run'])}")
+        if rc["missing_from_dict"]:
+            parts.append(f"dropped from return dict: {', '.join(rc['missing_from_dict'])}")
+        if rc["missing_from_format"]:
+            parts.append(f"never printed: {', '.join(rc['missing_from_format'])}")
+        lines.append(f"  ritual completeness: BROKEN -- {'; '.join(parts)}, escalate now")
     return "\n".join(lines)
 
 
