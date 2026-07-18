@@ -71,3 +71,4 @@
 {"type": "queued", "task": "120", "topic": "Shared reports in the wild metric instrumented (0/50, honest), STRATEGY.md metrics table now fully counted", "queued_at": "2026-07-18T00:22:00Z"}
 {"type": "queued", "task": "121", "topic": "ritual completeness cadence -- every check_* function actually wired, returned, and printed", "queued_at": "2026-07-18T02:10:00Z"}
 {"type": "queued", "task": "122", "topic": "arcade_app_watch.py -- the gateway's own connected apps, tracked", "queued_at": "2026-07-18T03:15:00Z"}
+{"type": "queued", "task": "123", "topic": "the loop's own reclaim-a-stale-WIP rule, finally checked", "queued_at": "2026-07-18T04:17:00Z"}
