@@ -43,6 +43,22 @@ happens to call `Arcade_ListApps`. It goes live only after the Hand runs
 intent-gated consent flow (task 20) is completed for that account; the
 detection logic does not change when it does.
 
+## Every connected app, accounted for
+
+*Task 135. The table above names the four toolkits Fencepost's own code uses. It says nothing about what else the-hand's shared gateway can already reach — an Oath that stays silent on that is not the complete account of risk surface. `tools/arcade_app_watch.py`'s durable log is the source of truth; this section is re-derived from its last recorded state, never typed from memory.*
+
+| app_id | status |
+|--|--|
+| `arcade-github` | in use by Fencepost |
+| `ap_3GORxnS5T0YRHmzSRa0knq2nupY` (X auth) | in use by Fencepost |
+| `arcade-google` | in use by Fencepost |
+| `arcade-linear` | connected on the shared gateway, NOT used by Fencepost, no toolkit integration planned |
+| `arcade-slack` | connected on the shared gateway, NOT used by Fencepost, no toolkit integration planned |
+| `sybill` | connected on the shared gateway, NOT used by Fencepost, no toolkit integration planned |
+| `ap_3Fdn9uGDlF9Cj0ix9PJZbkMKDrF` (app management) | connected on the shared gateway, NOT used by Fencepost, no toolkit integration planned |
+
+`arcade-linear` (`read`,`write`) and `arcade-slack` (nine scopes including `chat:write`) are write-capable upstream connections. Fencepost's own code never calls either (grepped `fencepost/seam_engine/src` for "linear"/"slack"/"sybill" — zero hits) — the write capability sits on the shared gateway for reasons unrelated to Fencepost, not inside anything this repo ships. `tools/scopes_completeness_check.py` proves this table stays honest: any app_id the durable log records as connected but this table does not name is a real, named violation, not a silent gap.
+
 ## The oath
 
 1. **Zero write scopes.** Fencepost requests no capability that can send, post, create, modify, or delete anything, on any account, ever. If a tool can change the world, Fencepost does not hold it.

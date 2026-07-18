@@ -281,6 +281,10 @@ def _wip_reclaim_check():
     return _load("_ritual_wip_reclaim_check", os.path.join(ROOT, "tools", "wip_reclaim_check.py"))
 
 
+def _scopes_completeness_check():
+    return _load("_ritual_scopes_completeness_check", os.path.join(ROOT, "tools", "scopes_completeness_check.py"))
+
+
 def _seam_ledger():
     src = os.path.join(ROOT, "fencepost", "seam_engine", "src")
     if src not in sys.path:
@@ -812,6 +816,26 @@ def check_wip_reclaim(now: datetime, roadmap_path: str | None = None) -> dict:
     return mod.find_stale(**kwargs)
 
 
+def check_scopes_completeness(scopes_path: str | None = None, app_log_path: str | None = None) -> dict:
+    """Task 135: fold `scopes_completeness_check.py`'s own cross-check of
+    `fencepost/SCOPES.md`'s `## Every connected app, accounted for`
+    section against `arcade_app_watch.py`'s durable log into the one
+    block. Unconditional, local-filesystem-only, the same cheap always-on
+    class `check_wip_reclaim`/`check_journal_numbering` already hold. A
+    real hit here DOES flip `broken`: a connected app on the shared
+    gateway with no matching row in the Oath's own accounting section is
+    a live governance regression -- the same undocumented-write-capability
+    risk the Oath exists to rule out, not an honest zero-state waiting on
+    the calendar."""
+    mod = _scopes_completeness_check()
+    kwargs = {}
+    if scopes_path is not None:
+        kwargs["scopes_path"] = scopes_path
+    if app_log_path is not None:
+        kwargs["app_log_path"] = app_log_path
+    return mod.check_scopes_completeness(**kwargs)
+
+
 def check_change_gate(report_info: dict) -> dict | None:
     """Fold `change_gate.should_post_gap()` -- task 69's own change-gate
     rule -- using whichever report text `check_report_freshness` already
@@ -859,6 +883,8 @@ def run_ritual_check(
     ritual_completeness_path: str | None = None,
     wip_reclaim_path: str | None = None,
     arcade_apps_state: dict | None = None,
+    scopes_path: str | None = None,
+    app_log_path: str | None = None,
 ) -> dict:
     if now is None:
         now = datetime.now(timezone.utc)
@@ -896,6 +922,7 @@ def run_ritual_check(
     shared_reports = check_shared_reports(shared_path=shared_reports_path)
     ritual_completeness = check_ritual_completeness(source_path=ritual_completeness_path)
     wip_reclaim = check_wip_reclaim(now, roadmap_path=wip_reclaim_path)
+    scopes_completeness = check_scopes_completeness(scopes_path=scopes_path, app_log_path=app_log_path)
     broken = (
         (not town["ok"])
         or (not fencepost["ok"])
@@ -913,6 +940,7 @@ def run_ritual_check(
         or (not journal_numbering["clean"])
         or (not ritual_completeness["clean"])
         or (not wip_reclaim["clean"])
+        or (not scopes_completeness["clean"])
     )
     return {
         "now": now_iso,
@@ -946,6 +974,7 @@ def run_ritual_check(
         "shared_reports": shared_reports,
         "ritual_completeness": ritual_completeness,
         "wip_reclaim": wip_reclaim,
+        "scopes_completeness": scopes_completeness,
         "broken": broken,
     }
 
@@ -1114,6 +1143,13 @@ def format_ritual_check(result: dict) -> str:
             f"  wip reclaim: {len(wr['stale'])} STALE (>= {wr['threshold_hours']}h), "
             f"{len(wr['unknown'])} UNKNOWN-AGE -- reclaim now, escalate"
         )
+    sc = result["scopes_completeness"]
+    if not sc["connected_app_ids"]:
+        lines.append("  scopes completeness: clean (no apps recorded as connected)")
+    elif sc["clean"]:
+        lines.append(f"  scopes completeness: clean ({len(sc['connected_app_ids'])} connected app(s), all accounted for)")
+    else:
+        lines.append(f"  scopes completeness: BROKEN -- undocumented connected app(s): {', '.join(sc['missing'])}, escalate now")
     return "\n".join(lines)
 
 
