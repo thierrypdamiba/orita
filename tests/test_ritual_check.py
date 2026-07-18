@@ -1452,5 +1452,66 @@ class SharedReportsFoldCase(unittest.TestCase):
         self.assertEqual(result["shared_reports"]["target"], 50)
 
 
+class WipReclaimFoldCase(unittest.TestCase):
+    """Task 123: run_ritual_check() folds wip_reclaim_check.py's own
+    ROADMAP.md scan into the same structured result -- clean against a
+    fixture with no WIP row or a fresh one, and a real stale WIP both
+    flips `broken` and surfaces in the printed block, unlike the calendar-
+    bound cadence checks."""
+
+    def setUp(self):
+        self.tmp = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.tmp, ignore_errors=True)
+        self.roadmap_path = os.path.join(self.tmp, "ROADMAP.md")
+
+    def _write(self, content):
+        with open(self.roadmap_path, "w", encoding="utf-8") as f:
+            f.write(content)
+
+    def test_no_wip_row_is_clean(self):
+        self._write("| 5 | DONE | off-by-one | do the thing | it is done |\n")
+        result = rc.run_ritual_check(
+            wip_reclaim_path=self.roadmap_path, now=datetime(2026, 7, 18, 5, 0, tzinfo=timezone.utc)
+        )
+        self.assertTrue(result["wip_reclaim"]["clean"])
+        self.assertFalse(result["broken"])
+        self.assertIn("wip reclaim: clean (no task currently WIP)", rc.format_ritual_check(result))
+
+    def test_fresh_wip_under_two_hours_stays_clean(self):
+        self._write(
+            "*2026-07-18 04:0x UTC, off-by-one: doing the thing. Task 5 → WIP.*\n"
+            "| 5 | WIP | off-by-one | do the thing | it is done |\n"
+        )
+        result = rc.run_ritual_check(
+            wip_reclaim_path=self.roadmap_path, now=datetime(2026, 7, 18, 5, 0, tzinfo=timezone.utc)
+        )
+        self.assertTrue(result["wip_reclaim"]["clean"])
+        self.assertFalse(result["broken"])
+        self.assertIn("wip reclaim: clean (1 WIP task(s)", rc.format_ritual_check(result))
+
+    def test_stale_wip_over_two_hours_flips_broken_and_prints(self):
+        self._write(
+            "*2026-07-18 02:0x UTC, off-by-one: doing the thing. Task 5 → WIP.*\n"
+            "| 5 | WIP | off-by-one | do the thing | it is done |\n"
+        )
+        result = rc.run_ritual_check(
+            wip_reclaim_path=self.roadmap_path, now=datetime(2026, 7, 18, 5, 0, tzinfo=timezone.utc)
+        )
+        self.assertFalse(result["wip_reclaim"]["clean"])
+        self.assertTrue(result["broken"])
+        formatted = rc.format_ritual_check(result)
+        self.assertIn("wip reclaim:", formatted)
+        self.assertIn("STALE", formatted)
+
+    def test_default_path_reads_the_real_roadmap_honestly_clean(self):
+        """No override: reads the real ROADMAP.md, the same default
+        check_wip_reclaim falls back to. Every task shipped so far has
+        gone WIP -> DONE inside the same hour it opened, so the real,
+        live state is honestly zero open WIP rows."""
+        result = rc.run_ritual_check()
+        self.assertEqual(result["wip_reclaim"]["open_count"], 0)
+        self.assertTrue(result["wip_reclaim"]["clean"])
+
+
 if __name__ == "__main__":
     unittest.main()

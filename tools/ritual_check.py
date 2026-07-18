@@ -254,6 +254,10 @@ def _ritual_completeness_check():
     return _load("_ritual_completeness_check", os.path.join(ROOT, "tools", "ritual_completeness_check.py"))
 
 
+def _wip_reclaim_check():
+    return _load("_ritual_wip_reclaim_check", os.path.join(ROOT, "tools", "wip_reclaim_check.py"))
+
+
 def _seam_ledger():
     src = os.path.join(ROOT, "fencepost", "seam_engine", "src")
     if src not in sys.path:
@@ -744,6 +748,24 @@ def check_ritual_completeness(source_path: str | None = None) -> dict:
     return mod.compute_ritual_completeness(**kwargs)
 
 
+def check_wip_reclaim(now: datetime, roadmap_path: str | None = None) -> dict:
+    """Task 123: fold `wip_reclaim_check.py`'s own scan of `ROADMAP.md`'s
+    task table into the one block. Unconditional, local-filesystem-only,
+    the same cheap class `check_journal_numbering`/`check_petition_cadence`
+    already hold -- the continuous-build loop's own step 1 ("take the first
+    TODO task, or reclaim a WIP older than 2h") had never once been checked
+    in code. A real hit here DOES flip `broken`: a WIP task stuck past its
+    own 2h reclaim line, or a WIP row this tool cannot account for at all
+    (`unknown`), is a live block on the loop's own forward progress, the
+    same class of live regression `ritual_completeness`/`journal_numbering`
+    already escalate on, not an honest zero-state waiting on the calendar."""
+    mod = _wip_reclaim_check()
+    kwargs = {"now": now}
+    if roadmap_path is not None:
+        kwargs["roadmap_path"] = roadmap_path
+    return mod.find_stale(**kwargs)
+
+
 def check_change_gate(report_info: dict) -> dict | None:
     """Fold `change_gate.should_post_gap()` -- task 69's own change-gate
     rule -- using whichever report text `check_report_freshness` already
@@ -789,6 +811,7 @@ def run_ritual_check(
     metrics_cadence_path: str | None = None,
     shared_reports_path: str | None = None,
     ritual_completeness_path: str | None = None,
+    wip_reclaim_path: str | None = None,
 ) -> dict:
     if now is None:
         now = datetime.now(timezone.utc)
@@ -824,6 +847,7 @@ def run_ritual_check(
     metrics_cadence = check_metrics_cadence(metrics_path=metrics_cadence_path)
     shared_reports = check_shared_reports(shared_path=shared_reports_path)
     ritual_completeness = check_ritual_completeness(source_path=ritual_completeness_path)
+    wip_reclaim = check_wip_reclaim(now, roadmap_path=wip_reclaim_path)
     broken = (
         (not town["ok"])
         or (not fencepost["ok"])
@@ -840,6 +864,7 @@ def run_ritual_check(
         or (not petition_cadence["clean"])
         or (not journal_numbering["clean"])
         or (not ritual_completeness["clean"])
+        or (not wip_reclaim["clean"])
     )
     return {
         "now": now_iso,
@@ -871,6 +896,7 @@ def run_ritual_check(
         "metrics_cadence": metrics_cadence,
         "shared_reports": shared_reports,
         "ritual_completeness": ritual_completeness,
+        "wip_reclaim": wip_reclaim,
         "broken": broken,
     }
 
@@ -1026,6 +1052,16 @@ def format_ritual_check(result: dict) -> str:
         if rc["missing_from_format"]:
             parts.append(f"never printed: {', '.join(rc['missing_from_format'])}")
         lines.append(f"  ritual completeness: BROKEN -- {'; '.join(parts)}, escalate now")
+    wr = result["wip_reclaim"]
+    if wr["open_count"] == 0:
+        lines.append("  wip reclaim: clean (no task currently WIP)")
+    elif wr["clean"]:
+        lines.append(f"  wip reclaim: clean ({wr['open_count']} WIP task(s), all opened under {wr['threshold_hours']}h ago)")
+    else:
+        lines.append(
+            f"  wip reclaim: {len(wr['stale'])} STALE (>= {wr['threshold_hours']}h), "
+            f"{len(wr['unknown'])} UNKNOWN-AGE -- reclaim now, escalate"
+        )
     return "\n".join(lines)
 
 
