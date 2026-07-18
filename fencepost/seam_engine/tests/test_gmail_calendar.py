@@ -10,6 +10,8 @@ from __future__ import annotations
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
+import pytest
+
 from seam_engine.gmail_calendar import (
     DEFAULT_CALENDAR_FIXTURE,
     DEFAULT_GMAIL_FIXTURE,
@@ -17,7 +19,9 @@ from seam_engine.gmail_calendar import (
     GmailInvite,
     compute_gaps,
     load_calendar_fixture,
+    load_calendar_from_live,
     load_gmail_fixture,
+    load_gmail_from_live,
     run_gmail_calendar_scan,
 )
 from seam_engine.ranking import CONFIDENCE_BAR, Label, rank
@@ -211,6 +215,156 @@ def test_surfaced_gaps_feed_the_shared_ranking_law():
     assert r.primary is not None
     assert r.primary.slug == "gmail-vs-calendar-hi"
     assert r.tail and r.tail[0].label == Label.CONTENDER.value
+
+
+# --- live-override loaders, ROADMAP.md #132 -------------------------------------
+
+
+def test_load_gmail_from_live_parses_a_normalized_entry():
+    invites = load_gmail_from_live([{
+        "id": "live-1",
+        "subject": "Invitation: Real thing",
+        "sender": "someone@example.com",
+        "received_at": "2026-07-18T10:00:00Z",
+        "has_ics": True,
+        "event_title": "Real thing",
+        "event_start": "2026-07-19T10:00:00Z",
+        "rsvp": "none",
+    }])
+    assert len(invites) == 1
+    inv = invites[0]
+    assert inv.id == "live-1"
+    assert inv.thread_id == "live-1"  # defaults to id, same as the fixture loader
+    assert inv.event_title == "Real thing"
+    assert inv.event_start == datetime(2026, 7, 19, 10, 0, tzinfo=timezone.utc)
+
+
+def test_load_gmail_from_live_applies_the_same_optional_defaults_as_the_fixture_loader():
+    invites = load_gmail_from_live([{
+        "id": "live-2",
+        "subject": "Just a note",
+        "sender": "someone@example.com",
+        "received_at": "2026-07-18T10:00:00Z",
+    }])
+    inv = invites[0]
+    assert inv.has_ics is False
+    assert inv.event_title is None
+    assert inv.event_start is None
+    assert inv.rsvp == "none"
+
+
+def test_load_gmail_from_live_rejects_entry_missing_one_required_key():
+    with pytest.raises(ValueError, match=r"entry 0.*sender"):
+        load_gmail_from_live([{"id": "x", "subject": "s", "received_at": "2026-07-18T10:00:00Z"}])
+
+
+def test_load_gmail_from_live_rejects_entry_missing_multiple_required_keys():
+    with pytest.raises(ValueError, match=r"\['sender', 'received_at'\]"):
+        load_gmail_from_live([{"id": "x", "subject": "s"}])
+
+
+def test_load_gmail_from_live_accepts_an_empty_list():
+    # Unlike load_x_posts_from_live/load_github_events_from_live, an empty
+    # inbox read has no known non-zero base rate to reason "probably failed"
+    # from — a real inbox can honestly hold zero qualifying messages.
+    assert load_gmail_from_live([]) == []
+
+
+def test_load_calendar_from_live_parses_a_normalized_entry():
+    events = load_calendar_from_live([{
+        "id": "evt-live-1",
+        "title": "Real thing",
+        "start": "2026-07-19T10:00:00Z",
+        "organizer": "someone@example.com",
+    }])
+    assert len(events) == 1
+    ev = events[0]
+    assert ev.id == "evt-live-1"
+    assert ev.start == datetime(2026, 7, 19, 10, 0, tzinfo=timezone.utc)
+    assert ev.organizer == "someone@example.com"
+    assert ev.source == "live"  # distinguishes it from the fixture loader's "manual" default
+
+
+def test_load_calendar_from_live_applies_defaults():
+    events = load_calendar_from_live([{"id": "e", "title": "t", "start": "2026-07-19T10:00:00Z"}])
+    assert events[0].organizer == "unknown"
+    assert events[0].source == "live"
+
+
+def test_load_calendar_from_live_rejects_entry_missing_one_required_key():
+    with pytest.raises(ValueError, match=r"entry 0.*start"):
+        load_calendar_from_live([{"id": "x", "title": "t"}])
+
+
+def test_load_calendar_from_live_rejects_entry_missing_multiple_required_keys():
+    with pytest.raises(ValueError, match=r"\['title', 'start'\]"):
+        load_calendar_from_live([{"id": "x"}])
+
+
+def test_load_calendar_from_live_accepts_an_empty_list():
+    assert load_calendar_from_live([]) == []
+
+
+# --- run_gmail_calendar_scan override wiring, ROADMAP.md #132 -------------------
+
+
+def _live_gmail_row(id_="live-hi", event_start="2026-07-19T10:00:00Z"):
+    return {
+        "id": id_,
+        "subject": "Invitation: Big milestone thing",
+        "sender": "someone@example.com",
+        "received_at": "2026-07-17T10:00:00Z",
+        "has_ics": True,
+        "event_title": "Big milestone thing",
+        "event_start": event_start,
+        "rsvp": "none",
+    }
+
+
+def test_run_scan_default_stays_on_the_fixture_for_both_sides():
+    result = run_gmail_calendar_scan(now=FIXTURE_NOW)
+    assert result["gmail_source"] == "fixture"
+    assert result["calendar_source"] == "fixture"
+    assert result["source"] == "fixture"
+
+
+def test_run_scan_gmail_override_never_touches_the_gmail_fixture_and_calendar_stays_fixture():
+    result = run_gmail_calendar_scan(now=FIXTURE_NOW, gmail_events=[_live_gmail_row()])
+    assert result["gmail_source"] == "override"
+    assert result["calendar_source"] == "fixture"
+    assert result["source"] == "override"
+    # msg-101..106 from the fixture never appear when gmail_events overrides it
+    all_slugs = (
+        {result["primary_gap"]["slug"]} if result["primary_gap"] else set()
+    ) | {t["slug"] for t in result["tail"]} | {e["slug"] for e in result["excluded"]}
+    assert not any("msg-" in s for s in all_slugs)
+
+
+def test_run_scan_calendar_override_never_touches_the_calendar_fixture_and_gmail_stays_fixture():
+    result = run_gmail_calendar_scan(now=FIXTURE_NOW, calendar_events=[])
+    assert result["gmail_source"] == "fixture"
+    assert result["calendar_source"] == "override"
+    assert result["source"] == "override"
+
+
+def test_run_scan_both_overridden_reports_override_on_both_sides():
+    result = run_gmail_calendar_scan(
+        now=FIXTURE_NOW, gmail_events=[_live_gmail_row()], calendar_events=[],
+    )
+    assert result["gmail_source"] == "override"
+    assert result["calendar_source"] == "override"
+    assert result["source"] == "override"
+
+
+def test_run_scan_override_path_still_finds_the_same_class_of_primary_gap():
+    result = run_gmail_calendar_scan(
+        now=FIXTURE_NOW,
+        gmail_events=[_live_gmail_row(event_start="2026-07-19T10:00:00Z")],
+        calendar_events=[],
+    )
+    assert result["primary_gap"] is not None
+    assert result["primary_gap"]["slug"] == "gmail-vs-calendar-live-hi"
+    assert result["primary_gap"]["confidence"] >= CONFIDENCE_BAR
 
 
 # --- read-only doctrine, same shape as test_gateway.py --------------------------
