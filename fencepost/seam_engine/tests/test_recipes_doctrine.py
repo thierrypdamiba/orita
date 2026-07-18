@@ -13,6 +13,7 @@ proves a write-scoped recipe does not.
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 
 import pytest
@@ -30,6 +31,39 @@ FENCEPOST_ROOT = Path(__file__).resolve().parents[2]
 CONTRIBUTING_MD = FENCEPOST_ROOT / "CONTRIBUTING.md"
 RECIPES_README = FENCEPOST_ROOT / RECIPES_DIR_NAME / "README.md"
 REFERENCE_DIR = FENCEPOST_ROOT / RECIPES_DIR_NAME / "example-release-vs-changelog"
+SCOPES_MD = FENCEPOST_ROOT / "SCOPES.md"
+
+# Structurally parses SCOPES.md's own oath bullet -- never a second hardcoded
+# copy of its six tokens, the same discipline test_consent_doctrine.py's
+# table parser holds (task 136) and scopes_completeness_check.py's app-id
+# parser holds (task 135).
+_OATH_LINE_RE = re.compile(r"^-\s*((?:`[^`]+`,?\s*)+)—\s*and nothing else\.\s*$", re.MULTILINE)
+_BACKTICK_TOKEN_RE = re.compile(r"`([^`]+)`")
+
+
+def _parse_oath_line(text: str) -> tuple[frozenset[str], frozenset[str]]:
+    """Parse SCOPES.md's '`Get*`, `List*`, ..., `WhoAmI` — and nothing else.'
+    bullet into (prefixes, exact_tokens). A backtick-quoted token ending in
+    '*' is a prefix (its '*' stripped); one that doesn't is an exact-match
+    token (WhoAmI)."""
+    match = _OATH_LINE_RE.search(text)
+    assert match, (
+        "SCOPES.md's oath bullet ('...— and nothing else.') was not found or "
+        "has been reshaped -- this parser needs updating before it can be trusted"
+    )
+    tokens = _BACKTICK_TOKEN_RE.findall(match.group(1))
+    assert tokens, "SCOPES.md's oath bullet matched but no backtick-quoted tokens were found inside it"
+    prefixes = frozenset(t[:-1] for t in tokens if t.endswith("*"))
+    exact = frozenset(t for t in tokens if not t.endswith("*"))
+    return prefixes, exact
+
+
+def _scopes_md_text() -> str:
+    assert SCOPES_MD.exists(), "SCOPES.md must exist"
+    return SCOPES_MD.read_text(encoding="utf-8")
+
+
+_OATH_PREFIXES, _OATH_EXACT_TOKENS = _parse_oath_line(_scopes_md_text())
 
 FORBIDDEN_SCOPE_EXAMPLES = (
     "SendEmail", "CreateEvent", "DeleteIssue", "PostTweet", "ModifyLabels",
@@ -171,3 +205,69 @@ def test_reference_recipes_scopes_are_already_on_scopes_md_table():
     )
     for scope in manifest.scopes:
         assert scope in scopes_md, f"{scope!r} isn't on SCOPES.md's table"
+
+
+# --- recipes._ALLOWED_SCOPE_RE must actually mirror SCOPES.md's oath line,
+# not just claim to in a comment (task 137, the mirror consent.py's own
+# fix, task 136, left unchecked one file over) ---------------------------
+
+
+def test_scopes_md_oath_line_parses_to_nonempty_prefix_and_exact_sets():
+    """Guards the parser itself: a silently-zero-matching regex here would
+    make every other test below vacuously pass no matter what recipes.py's
+    allow-list actually does (the exact class of bug task 135's own buildlog
+    names for a missing re.MULTILINE)."""
+    assert _OATH_PREFIXES, "SCOPES.md's oath line parsed to zero prefixes"
+    assert _OATH_EXACT_TOKENS, "SCOPES.md's oath line parsed to zero exact-match tokens"
+
+
+@pytest.mark.parametrize("prefix", sorted(_OATH_PREFIXES))
+def test_every_scopes_md_oath_prefix_is_accepted_by_the_real_regex(prefix: str):
+    sample_scope = f"{prefix}Foo"
+    assert recipes._ALLOWED_SCOPE_RE.match(sample_scope), (
+        f"SCOPES.md's oath line names {prefix!r}* as an allowed prefix, but "
+        f"recipes._ALLOWED_SCOPE_RE rejects {sample_scope!r} — the regex has "
+        "drifted from the oath it claims to mirror"
+    )
+
+
+@pytest.mark.parametrize("token", sorted(_OATH_EXACT_TOKENS))
+def test_every_scopes_md_oath_exact_token_passes_the_real_validator(token: str):
+    """SCOPES.md's oath line names exact-match tokens (WhoAmI) alongside
+    prefixes; recipes._check_scope_is_read_only special-cases them outside
+    _ALLOWED_SCOPE_RE. Call the real validator, not a second hardcoded copy
+    of the string "WhoAmI" — proves the special-case still names the same
+    token the oath actually does."""
+    recipes._check_scope_is_read_only(token, where="test")  # must not raise
+
+
+@pytest.mark.parametrize("candidate", ["Fetch", "Query", "Find", "Load", "Open", "View"])
+def test_plausible_unlisted_prefixes_are_still_rejected(candidate: str):
+    """Proves the parsed prefix set is exhaustive, not just a subset check —
+    a prefix that reads as plausibly read-only but isn't on SCOPES.md's oath
+    line must still be refused by the real regex."""
+    assert candidate not in _OATH_PREFIXES, f"fixture drifted: {candidate!r} is now on the real oath line"
+    assert not recipes._ALLOWED_SCOPE_RE.match(f"{candidate}Foo"), (
+        f"{candidate!r} is not on SCOPES.md's oath line but recipes._ALLOWED_SCOPE_RE "
+        f"accepts {candidate}Foo anyway — the allow-list is broader than the oath"
+    )
+
+
+def test_oath_line_parser_detects_a_real_mutation():
+    """Mutation-based hand-verification (the same before/after discipline
+    task 135's and task 136's own checkers were held to): proves this parser
+    actually bites when the oath line changes, not that it merely exists.
+    Drop the Count* token from a COPY of the real text and prove the parsed
+    prefix set no longer agrees with what the live regex accepts — while the
+    real, unmutated file still parses clean."""
+    real_text = _scopes_md_text()
+    real_prefixes, _ = _parse_oath_line(real_text)
+    assert "Count" in real_prefixes, "fixture assumption drifted: Count* is no longer on the real oath line"
+    assert recipes._ALLOWED_SCOPE_RE.match("CountFoo"), "fixture assumption drifted: regex no longer accepts Count*"
+
+    mutated_text = real_text.replace("`Count*`, ", "", 1)
+    assert mutated_text != real_text, "mutation did not change the text — fixture no longer matches expected shape"
+    mutated_prefixes, _ = _parse_oath_line(mutated_text)
+
+    assert "Count" not in mutated_prefixes, "mutation failed to remove Count* from the parsed set"
+    assert mutated_prefixes != real_prefixes, "mutation was a no-op on the parsed set — the parser doesn't bite"
