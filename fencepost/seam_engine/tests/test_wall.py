@@ -174,6 +174,48 @@ def test_index_html_carries_the_teaser_widget():
     assert "not declared" in index.lower()
 
 
+def test_teaser_extraction_regex_matches_teaser_line_exactly():
+    # ARC.md's task-21 paragraph (corrected by task 126) claims the site's
+    # #teaser div is fetched live off the same report that carries
+    # TEASER_LINE verbatim, not a hand-typed copy that could drift from it.
+    # Prove the extraction regex actually captures TEASER_LINE -- not a
+    # substring, not a paraphrase -- out of a REAL render_report() output,
+    # the same generator the live site fetches from. A regex that merely
+    # looked plausible would not be proof; this locks it to the real thing.
+    import re
+
+    sealed = {
+        "date": "2026-07-12",
+        "generated_at": "2026-07-12T00:00:00+00:00",
+        "repo": "x/orita",
+        "primary_gap": None,
+        "tail": [],
+        "fenceposts_recorded_total": 3,
+    }
+    text = report.render_report(sealed)
+    match = re.search(r"The day it closes:[^\n]*", text)
+    assert match is not None
+    assert match.group(0) == TEASER_LINE
+
+
+def test_index_html_extracts_teaser_from_the_same_fetch_that_updates_wall():
+    # Task 126: the teaser must not be a second, disconnected fetch/handler
+    # that could itself drift out of step with the wall counter -- it has
+    # to live inside the SAME .then() block that already regexes "wall
+    # reads N" out of the fetched report, so both are always read off the
+    # one live document, in the same pass, or neither is.
+    index = (FENCEPOST_ROOT.parent / "docs" / "fencepost" / "index.html").read_text(
+        encoding="utf-8"
+    )
+    wall_idx = index.index("getElementById('wall')")
+    teaser_write_idx = index.index("getElementById('teaser')", wall_idx)
+    # Nothing that starts a new fetch handler sits between the two.
+    between = index[wall_idx:teaser_write_idx]
+    assert ".then(function" not in between
+    assert "The day it closes:" in index
+    assert "esc(tm[0])" in index
+
+
 def test_style_css_styles_the_teaser():
     css = (FENCEPOST_ROOT.parent / "docs" / "style.css").read_text(encoding="utf-8")
     assert ".counter .teaser" in css

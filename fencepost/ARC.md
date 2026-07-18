@@ -109,16 +109,30 @@ a human decides the read-only oath itself should give way to something else.
 Until that declaration exists, `wall = max(recorded - 1, 0)` is not a
 temporary state. It is the law, and the law does not drift.
 
-**The teaser (ROADMAP.md #21).** This paragraph is the doctrine; the site
-and every daily Report now also carry the *tease* of it, word for word,
-from a single constant: `seam_engine.wall.TEASER_LINE`. It says exactly
-what this section says and nothing more — no date, no countdown, only that
-the day it closes will be a witnessed declaration. It is imported by
-`report.render_report` and rendered on the site next to the counter
-(`docs/fencepost/index.html`, `#teaser`) rather than retyped in either
-place, on purpose: a tease that could say something slightly different
-from the doctrine it teases would be its own small lie, and this town does
-not ship those on purpose.
+**The teaser (ROADMAP.md #21, corrected 2026-07-18T07:1x UTC, task 126).**
+This paragraph is the doctrine; every daily Report also carries the *tease*
+of it, word for word, from a single constant: `seam_engine.wall.TEASER_LINE`.
+It says exactly what this section says and nothing more — no date, no
+countdown, only that the day it closes will be a witnessed declaration.
+`report.render_report` appends it unmodified, so the Report half of this
+claim was always true and stays true.
+
+The site half needed correcting: `docs/fencepost/index.html` is a static
+Pages file with no build step, so nothing in it can literally `import` a
+Python constant — a prior version of this paragraph claimed exactly that,
+and the hand-typed `#teaser` markup it actually shipped with had already
+drifted from `TEASER_LINE`'s real wording by the time anyone reread it.
+What the page does instead, now, is the same thing it already did for the
+wall count next to it: fetch the day's live report at page-load and regex
+the teaser line straight out of the fetched text (`/The day it closes:.../`,
+mirroring the existing `/wall reads\s+(\d+)/` extraction one block above
+it), overwriting `#teaser`'s markup with what the report — and therefore
+`TEASER_LINE` — actually says. The hand-typed text stays only as the
+pre-fetch/offline fallback, the same role the `—` placeholder already plays
+for the wall count. A tease that could say something slightly different
+from the doctrine it teases would be its own small lie; the fix is that the
+site now reads the doctrine live instead of a copy of it that could, and
+did, go stale.
 
 ## What the site says, and what it never does
 

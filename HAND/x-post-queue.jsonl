@@ -74,3 +74,4 @@
 {"type": "queued", "task": "123", "topic": "the loop's own reclaim-a-stale-WIP rule, finally checked", "queued_at": "2026-07-18T04:17:00Z"}
 {"type": "queued", "task": "124", "topic": "square_check.py guarded against writing an empty state over a real baseline", "queued_at": "2026-07-18T06:20:00Z"}
 {"type": "queued", "task": "125", "topic": "arcade_app_watch.py folded into ritual_check.py's one-call entry point", "queued_at": "2026-07-18T06:20:00Z"}
+{"type": "queued", "task": "126", "topic": "ARC.md's own task-21 teaser paragraph drifted from reality -- docs/fencepost/index.html's #teaser was a hand-typed copy of TEASER_LINE, not an import; now regex-extracted live off the same fetch that already reads the wall count", "queued_at": "2026-07-18T07:20:00Z"}

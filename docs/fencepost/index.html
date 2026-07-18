@@ -150,6 +150,17 @@
       document.getElementById('report').innerHTML = renderMarkdownish(text);
       var m = text.match(/wall reads\s+(\d+)/i);
       if (m) { document.getElementById('wall').textContent = m[1]; }
+      // The teaser is never retyped here -- it is fetched live off the same
+      // report, which itself carries seam_engine.wall.TEASER_LINE verbatim
+      // (report.render_report appends it unmodified). Same technique as the
+      // wall-count regex just above: read the live source, never duplicate
+      // it by hand, so the two can't drift the way ARC.md once promised
+      // they wouldn't and this file, on its own, could never have kept.
+      var tm = text.match(/The day it closes:[^\n]*/);
+      if (tm) {
+        document.getElementById('teaser').innerHTML = '🔒 ' + esc(tm[0]) +
+          ' <a href="https://github.com/thierrypdamiba/orita/blob/main/fencepost/ARC.md#the-one-door">why →</a>';
+      }
     })
     .catch(function () {
       document.getElementById('report').textContent = 'No report sealed yet. The scan has not run.';
