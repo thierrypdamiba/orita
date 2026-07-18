@@ -1466,10 +1466,27 @@ class ReportCadenceFoldCase(unittest.TestCase):
 
     def test_default_dir_reads_the_real_fencepost_reports(self):
         """No override: reads the real fencepost/REPORTS/ directory, the
-        same default `check_report_cadence` falls back to."""
+        same default `check_report_cadence` falls back to.
+
+        Task 129: this test's real job is proving the fold never
+        duplicates or diverges from the module it wraps -- not
+        re-proving that module's own correctness against real data
+        (`test_report_cadence_check.RealReportsCase` already owns that).
+        The original version pinned a literal count that the hourly
+        ritual's own daily work was guaranteed to outdate; asserting
+        equality against a live, direct `compute_cadence()` call stays
+        correct forever and still catches a real divergence between the
+        fold and the module."""
+        rcc = _load("_test_report_cadence_check", os.path.join(ROOT, "tools", "report_cadence_check.py"))
+        direct = rcc.compute_cadence()
         result = rc.run_ritual_check()
-        self.assertEqual(result["report_cadence"]["total_shipped"], 5)
-        self.assertEqual(result["report_cadence"]["missing_dates"], ["2026-07-14"])
+        self.assertEqual(result["report_cadence"]["total_shipped"], direct["total_shipped"])
+        self.assertEqual(result["report_cadence"]["missing_dates"], direct["missing_dates"])
+        self.assertEqual(result["report_cadence"]["most_recent_date"], direct["most_recent_date"])
+        self.assertEqual(result["report_cadence"]["current_streak"], direct["current_streak"])
+        # 2026-07-14 is a real, permanent, already-documented historical
+        # gap -- always present regardless of how many more tablets ship.
+        self.assertIn("2026-07-14", result["report_cadence"]["missing_dates"])
 
 
 class MetricsCadenceFoldCase(unittest.TestCase):

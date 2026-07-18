@@ -1,16 +1,28 @@
-"""Task 116. Proves tools/report_cadence_check.py's scan actually counts a
-real trailing streak, names a real gap day, ignores a non-conforming
-filename -- and, the real point, confirms the live, current
-fencepost/REPORTS/ directory's honest numbers: a 3-day trailing streak, 5
-tablets shipped total, and the one already-documented gap day
-(2026-07-14, BUILDLOG.md's own 2026-07-14 13:14/14:10 notes) actually
-named instead of only narrated in prose.
+"""Task 116 (fixed by task 129). Proves tools/report_cadence_check.py's
+scan actually counts a real trailing streak, names a real gap day,
+ignores a non-conforming filename -- and, the real point, confirms the
+live, current fencepost/REPORTS/ directory's honest numbers against an
+INDEPENDENT scan written directly in this file, never a pinned literal.
+
+Task 129: the original `RealReportsCase` pinned `compute_cadence()`'s
+output on the real, live `fencepost/REPORTS/` directory to the literal
+numbers true the hour it was written (5 shipped, most recent 07-17, a
+3-day streak). The hourly ritual ships a new dated tablet almost every
+day, so that pin was guaranteed to go stale and break `dawn-run` for
+real the very next time the directory it claims to check actually grew
+-- which is exactly what happened. Fixed the same way
+`tools/wip_reclaim_check.py`'s own `RealCheckoutCase` (task 123)
+already does it: assert against a live, independent recomputation of
+the real directory's real state, never a snapshotted magic number.
 """
+import glob
 import importlib.util
 import os
+import re
 import sys
 import tempfile
 import unittest
+from datetime import date, timedelta
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -90,16 +102,62 @@ class FixtureCadenceCase(unittest.TestCase):
         self.assertIn("2026-07-14", formatted)
 
 
+def _independent_scan(reports_dir):
+    """Reimplements the counting from scratch, deliberately not calling
+    anything in report_cadence_check -- so this stays a real check of
+    the module's correctness against real data, not a tautology, and
+    never goes stale as the directory grows (task 129)."""
+    name_re = re.compile(r"^(\d{4})-(\d{2})-(\d{2})\.md$")
+    dates = []
+    for path in glob.glob(os.path.join(reports_dir, "*.md")):
+        m = name_re.match(os.path.basename(path))
+        if not m:
+            continue
+        try:
+            dates.append(date(*(int(g) for g in m.groups())))
+        except ValueError:
+            continue
+    dates = sorted(set(dates))
+    streak = 0
+    cursor = dates[-1]
+    shipped = set(dates)
+    while cursor in shipped:
+        streak += 1
+        cursor -= timedelta(days=1)
+    missing = []
+    cursor = dates[0] + timedelta(days=1)
+    while cursor < dates[-1]:
+        if cursor not in shipped:
+            missing.append(cursor.isoformat())
+        cursor += timedelta(days=1)
+    return {
+        "total_shipped": len(dates),
+        "most_recent_date": dates[-1].isoformat(),
+        "current_streak": streak,
+        "missing_dates": missing,
+    }
+
+
 class RealReportsCase(unittest.TestCase):
     """The real point: the live checkout's actual fencepost/REPORTS/
-    directory, counted for real -- not a fixture standing in for it."""
+    directory, counted for real -- not a fixture standing in for it, and
+    not pinned to a snapshot the ritual's own daily work will outdate
+    (task 129: the directory grows, so the expectation must be computed
+    live too, independently of the module under test)."""
 
     def test_real_reports_dir_holds_the_true_streak_and_the_real_gap(self):
-        result = rcc.compute_cadence(os.path.join(ROOT, "fencepost", "REPORTS"))
-        self.assertEqual(result["total_shipped"], 5)
-        self.assertEqual(result["most_recent_date"], "2026-07-17")
-        self.assertEqual(result["current_streak"], 3)
-        self.assertEqual(result["missing_dates"], ["2026-07-14"])
+        reports_dir = os.path.join(ROOT, "fencepost", "REPORTS")
+        expected = _independent_scan(reports_dir)
+        result = rcc.compute_cadence(reports_dir)
+        self.assertEqual(result["total_shipped"], expected["total_shipped"])
+        self.assertEqual(result["most_recent_date"], expected["most_recent_date"])
+        self.assertEqual(result["current_streak"], expected["current_streak"])
+        self.assertEqual(result["missing_dates"], expected["missing_dates"])
+        # 2026-07-14 is a real, permanent, already-documented historical
+        # gap (BUILDLOG.md's 2026-07-14 13:14/14:10 notes) -- it can
+        # never be un-missed, so it must always appear here regardless
+        # of how many more tablets ship after it.
+        self.assertIn("2026-07-14", result["missing_dates"])
 
 
 if __name__ == "__main__":
