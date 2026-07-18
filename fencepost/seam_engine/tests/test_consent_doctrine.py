@@ -9,20 +9,93 @@ worst possible failure for a consent flow, since it makes the gate look
 broken rather than working as sworn. This file fails red the day that
 happens, the same discipline `test_connect_doctrine.py` holds
 `READ_ONLY_CAPABILITIES` to.
+
+Task 136 adds a second, older drift this file never checked. `consent.py`'s
+own comment on `REQUIRED_SCOPES` says it is "mirrored verbatim from
+SCOPES.md's 'Fencepost uses' column. Not paraphrased... If SCOPES.md ever
+grows a new toolkit, this dict grows with it or a consent for that toolkit
+can never pass" — a direct claim about `fencepost/SCOPES.md`, the actual
+Read-Only Oath the whole gate exists to enforce. Every test above this
+point proves `REQUIRED_SCOPES` agrees with the issue template — a SECOND
+hand-typed copy of the same list. None of them ever read SCOPES.md itself.
+Two hand-typed copies agreeing with each other says nothing about whether
+either one still agrees with the source both claim to mirror; SCOPES.md
+could gain, drop, or rename a scope on its own table and every test in this
+file would keep passing while the gate quietly checked a confirm against
+scopes the Oath no longer swears to (or refused one the Oath grants). The
+tests below parse SCOPES.md's real table structurally and check the claim
+for the first time — the same class of doc-vs-code drift tasks 130, 131,
+133, and 135 already found and closed, one file over, aimed here at last.
 """
 from __future__ import annotations
 
+import re
 from pathlib import Path
 
 from seam_engine.consent import REQUIRED_SCOPES
 
 REPO_ROOT = Path(__file__).resolve().parents[3]  # .../orita
 TEMPLATE = REPO_ROOT / ".github" / "ISSUE_TEMPLATE" / "point-fencepost.md"
+FENCEPOST_ROOT = Path(__file__).resolve().parents[2]  # .../orita/fencepost
+SCOPES_MD = FENCEPOST_ROOT / "SCOPES.md"
+
+# Matches one three-cell markdown table row (`| a | b | c |`), one line at a
+# time — re.MULTILINE is load-bearing here (task 135's own buildlog entry
+# records shipping a row regex missing exactly this flag, which silently
+# matched zero rows; that mistake is not repeated here).
+_ROW_RE = re.compile(r"^\|\s*([^|]+?)\s*\|\s*([^|]+?)\s*\|\s*([^|]+?)\s*\|\s*$", re.MULTILINE)
 
 
 def _template_text() -> str:
     assert TEMPLATE.exists(), f"missing {TEMPLATE} — task 9's intent-forcing template must still exist"
     return TEMPLATE.read_text(encoding="utf-8")
+
+
+def _scopes_md_text() -> str:
+    assert SCOPES_MD.exists(), f"missing {SCOPES_MD} — the Read-Only Oath itself must still exist"
+    return SCOPES_MD.read_text(encoding="utf-8")
+
+
+def _normalize_toolkit_name(raw: str) -> str:
+    """"Gmail (v0.2)" -> "gmail"; "Google Calendar (v0.2)" -> "google_calendar" —
+    matches `consent.REQUIRED_SCOPES`'s own key convention (lowercase, spaces
+    to underscores). The "(v0.2)" suffix is stripped because it labels the
+    doc row's maturity, not the toolkit's identity — `consent.py` has no
+    separate "v0.2" toolkit key and was never meant to.
+    """
+    name = re.sub(r"\s*\(v0\.2\)\s*$", "", raw.strip())
+    return name.lower().replace(" ", "_")
+
+
+def _parse_toolkit_table(text: str) -> dict[str, frozenset[str]]:
+    """Structurally parse SCOPES.md's "Fencepost uses" column — the exact
+    section `consent.REQUIRED_SCOPES`'s own comment names as its source.
+    Isolated to the "Concretely, on the toolkits in use:" table only; the
+    later "Every connected app, accounted for" table (task 135) is a
+    different shape (app_id/status, not toolkit/scopes) and must not be
+    parsed as one of these rows.
+    """
+    start_marker = "Concretely, on the toolkits in use:"
+    if start_marker not in text:
+        return {}
+    start = text.index(start_marker)
+    end_marker = "**WIP note"
+    end = text.index(end_marker, start) if end_marker in text[start:] else len(text)
+    table_text = text[start:end]
+    rows: dict[str, frozenset[str]] = {}
+    for toolkit_cell, uses_cell, _never_cell in _ROW_RE.findall(table_text):
+        toolkit_cell = toolkit_cell.strip()
+        if not toolkit_cell or set(toolkit_cell) <= {"-"}:
+            continue  # the `|--|--|--|` separator row
+        if toolkit_cell.lower() == "toolkit":
+            continue  # the header row itself
+        key = _normalize_toolkit_name(toolkit_cell)
+        rows[key] = frozenset(s.strip() for s in uses_cell.split(",") if s.strip())
+    return rows
+
+
+def _live_scopes_md_table() -> dict[str, frozenset[str]]:
+    return _parse_toolkit_table(_scopes_md_text())
 
 
 def test_template_file_exists():
@@ -68,3 +141,86 @@ def test_template_never_asks_the_human_to_confirm_a_write_scope():
                 assert not name.startswith(write_prefixes), (
                     f"{name!r} on the scope-confirm table looks write-capable"
                 )
+
+
+def test_scopes_md_table_parses_at_least_one_row():
+    """A parser that silently matches zero rows would make every test below
+    it vacuously true — the exact failure mode task 135's own buildlog names
+    for a row regex missing `re.MULTILINE`. Fail loudly here first."""
+    parsed = _live_scopes_md_table()
+    assert len(parsed) > 0, "the toolkit table parsed to zero rows — check the section markers or the row regex"
+
+
+def test_scopes_md_table_names_exactly_the_toolkits_required_scopes_knows():
+    parsed = _live_scopes_md_table()
+    assert set(parsed) == set(REQUIRED_SCOPES), (
+        f"SCOPES.md's table parses to toolkits {sorted(parsed)}, but "
+        f"consent.REQUIRED_SCOPES holds {sorted(REQUIRED_SCOPES)} — a toolkit "
+        "was added to (or removed from) one side without the other"
+    )
+
+
+def test_required_scopes_matches_scopes_md_table_verbatim_per_toolkit():
+    """The claim `consent.py`'s own comment makes — "mirrored verbatim from
+    SCOPES.md's 'Fencepost uses' column. Not paraphrased" — checked against
+    the real file for the first time. A confirm typed exactly off SCOPES.md
+    must never be refused as "does not match ... verbatim" by
+    `check_scope_confirm`, and a confirm the gate accepts must never grant
+    more (or less) than SCOPES.md actually swears to.
+    """
+    parsed = _live_scopes_md_table()
+    for toolkit, doc_scopes in parsed.items():
+        assert toolkit in REQUIRED_SCOPES, (
+            f"SCOPES.md names toolkit {toolkit!r} with no matching entry in "
+            "consent.REQUIRED_SCOPES — a human could confirm this toolkit's "
+            "scopes exactly as SCOPES.md prints them and enforce_consent_gate "
+            "would still refuse it as an 'unknown toolkit'"
+        )
+        assert doc_scopes == REQUIRED_SCOPES[toolkit], (
+            f"consent.REQUIRED_SCOPES[{toolkit!r}] = {sorted(REQUIRED_SCOPES[toolkit])} "
+            f"has drifted from SCOPES.md's own table = {sorted(doc_scopes)} — the "
+            "gate is no longer checking a confirm against what the Oath actually swears"
+        )
+
+
+def test_every_required_scopes_toolkit_has_a_scopes_md_row():
+    parsed = _live_scopes_md_table()
+    for toolkit in REQUIRED_SCOPES:
+        assert toolkit in parsed, (
+            f"consent.REQUIRED_SCOPES names toolkit {toolkit!r} with no matching "
+            "row in SCOPES.md's own table — the gate is checking a toolkit the "
+            "Oath never actually swore to"
+        )
+
+
+def test_parser_actually_detects_drift_not_just_tautologically_passes():
+    """Hand-verification, in test form. Mutate a COPY of the real table text
+    the way a future SCOPES.md edit genuinely could (here: drop
+    `CountStargazers` from GitHub's row) and prove the same parser used by
+    the tests above disagrees with `REQUIRED_SCOPES` on the mutated text —
+    the same before/after discipline task 135's own hand-verification held
+    its checker to, so this file's silence on a real future drift can't be
+    mistaken for a parser that would pass no matter what the doc said.
+    """
+    real_text = _scopes_md_text()
+    real_row = (
+        "GetRepository, ListRepoCommits, ListIssues, GetIssue, ListPullRequests, "
+        "ListRepositoryActivities, CountStargazers"
+    )
+    mutated_row = (
+        "GetRepository, ListRepoCommits, ListIssues, GetIssue, ListPullRequests, "
+        "ListRepositoryActivities"
+    )
+    assert real_row in real_text, "SCOPES.md's GitHub row text has already changed shape — update this fixture row"
+    mutated_text = real_text.replace(real_row, mutated_row)
+    assert mutated_text != real_text
+
+    mutated_parsed = _parse_toolkit_table(mutated_text)
+    assert "CountStargazers" not in mutated_parsed["github"]
+    assert mutated_parsed["github"] != REQUIRED_SCOPES["github"]
+
+    # And the real, unmutated file still parses clean against REQUIRED_SCOPES
+    # — proving the mutation above is what broke it, not a parser that's
+    # simply broken regardless of input.
+    real_parsed = _parse_toolkit_table(real_text)
+    assert real_parsed["github"] == REQUIRED_SCOPES["github"]
