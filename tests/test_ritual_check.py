@@ -384,6 +384,140 @@ class SquareFoldCase(unittest.TestCase):
         self.assertNotIn("square:", without_square)
 
 
+class ArcadeAppsFoldCase(unittest.TestCase):
+    """Task 125: run_ritual_check(arcade_apps_state=...) folds task 122's
+    arcade_app_watch.py into the same structured result -- SquareFoldCase's
+    exact shape, since check_arcade_apps mirrors check_square line for line
+    (caller-supplied state, no network call of its own, delta computed
+    before the state is recorded so a real change is never compared
+    against itself)."""
+
+    def setUp(self):
+        self.tmpdir = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.tmpdir, ignore_errors=True)
+        self.aw = _load(
+            f"_test_ritual_arcade_app_watch_{id(self)}", os.path.join(ROOT, "tools", "arcade_app_watch.py")
+        )
+        self.aw.LOG = os.path.join(self.tmpdir, "arcade-app-check-log.jsonl")
+        original_loader = rc._arcade_app_watch
+        rc._arcade_app_watch = lambda: self.aw
+        self.addCleanup(setattr, rc, "_arcade_app_watch", original_loader)
+
+    def _state(self, apps):
+        return self.aw.compute_app_state(apps)
+
+    def test_no_arcade_apps_state_is_none(self):
+        self.assertIsNone(rc.check_arcade_apps(None, "2026-07-18T06:00:00Z"))
+
+    def test_first_check_is_changed(self):
+        state = self._state([{"app_id": "arcade-github", "connected": True, "permissions": ["repo"]}])
+        result = rc.check_arcade_apps(state, "2026-07-18T06:00:00Z")
+        self.assertTrue(result["changed"])
+        self.assertIn("no prior app check recorded", result["reason"])
+
+    def test_unchanged_after_recording(self):
+        state = self._state([{"app_id": "arcade-github", "connected": True, "permissions": ["repo"]}])
+        self.aw.record_app_check(state, "2026-07-18T06:00:00Z", path=self.aw.LOG)
+        result = rc.check_arcade_apps(state, "2026-07-18T07:00:00Z")
+        self.assertFalse(result["changed"])
+        self.assertIn("unchanged, still connected", result["reason"])
+
+    def test_newly_connected_app_is_changed(self):
+        old = self._state([{"app_id": "arcade-github", "connected": True, "permissions": ["repo"]}])
+        self.aw.record_app_check(old, "2026-07-18T06:00:00Z", path=self.aw.LOG)
+        new = self._state(
+            [
+                {"app_id": "arcade-github", "connected": True, "permissions": ["repo"]},
+                {"app_id": "arcade-google", "connected": True, "permissions": ["gmail.readonly"]},
+            ]
+        )
+        result = rc.check_arcade_apps(new, "2026-07-18T07:00:00Z")
+        self.assertTrue(result["changed"])
+        self.assertIn("newly connected: arcade-google", result["reason"])
+
+    def test_newly_disconnected_app_is_changed(self):
+        old = self._state(
+            [
+                {"app_id": "arcade-github", "connected": True, "permissions": ["repo"]},
+                {"app_id": "arcade-slack", "connected": True, "permissions": []},
+            ]
+        )
+        self.aw.record_app_check(old, "2026-07-18T06:00:00Z", path=self.aw.LOG)
+        new = self._state([{"app_id": "arcade-github", "connected": True, "permissions": ["repo"]}])
+        result = rc.check_arcade_apps(new, "2026-07-18T07:00:00Z")
+        self.assertTrue(result["changed"])
+        self.assertIn("newly disconnected: arcade-slack", result["reason"])
+
+    def test_scope_change_on_already_connected_app_is_changed(self):
+        old = self._state([{"app_id": "arcade-google", "connected": True, "permissions": ["gmail.readonly"]}])
+        self.aw.record_app_check(old, "2026-07-18T06:00:00Z", path=self.aw.LOG)
+        new = self._state(
+            [{"app_id": "arcade-google", "connected": True, "permissions": ["gmail.readonly", "calendar.readonly"]}]
+        )
+        result = rc.check_arcade_apps(new, "2026-07-18T07:00:00Z")
+        self.assertTrue(result["changed"])
+        self.assertIn("scope change on already-connected app(s)", result["reason"])
+
+    def test_check_arcade_apps_records_so_next_call_reads_it_back(self):
+        state = self._state([{"app_id": "arcade-github", "connected": True, "permissions": ["repo"]}])
+        rc.check_arcade_apps(state, "2026-07-18T06:00:00Z")
+        with open(self.aw.LOG) as f:
+            lines = [line for line in f.read().splitlines() if line.strip()]
+        self.assertEqual(len(lines), 1)
+        self.assertIn('"checked_at": "2026-07-18T06:00:00Z"', lines[0])
+
+    def test_a_real_change_settles_into_new_baseline_next_call(self):
+        """Same regression class task 88 fixed for check_square: the delta
+        must be computed against the PRIOR baseline, then recorded, so a
+        real change settles on the very next call instead of comparing
+        against the same stale pre-change state forever."""
+        old = self._state([{"app_id": "arcade-github", "connected": True, "permissions": ["repo"]}])
+        self.aw.record_app_check(old, "2026-07-18T06:00:00Z", path=self.aw.LOG)
+        new = self._state(
+            [
+                {"app_id": "arcade-github", "connected": True, "permissions": ["repo"]},
+                {"app_id": "arcade-google", "connected": True, "permissions": ["gmail.readonly"]},
+            ]
+        )
+        first = rc.check_arcade_apps(new, "2026-07-18T07:00:00Z")
+        self.assertTrue(first["changed"])
+        second = rc.check_arcade_apps(new, "2026-07-18T08:00:00Z")
+        self.assertFalse(second["changed"])
+        self.assertIn("unchanged, still connected", second["reason"])
+
+    def test_run_ritual_check_folds_arcade_apps_key(self):
+        state = self._state([{"app_id": "arcade-github", "connected": True, "permissions": ["repo"]}])
+        result = rc.run_ritual_check(arcade_apps_state=state)
+        self.assertIsNotNone(result["arcade_apps"])
+        self.assertIn("changed", result["arcade_apps"])
+
+    def test_run_ritual_check_arcade_apps_none_when_omitted(self):
+        result = rc.run_ritual_check()
+        self.assertIsNone(result["arcade_apps"])
+        self.assertFalse(result["broken"])
+
+    def test_format_includes_arcade_apps_line_only_when_present(self):
+        with_state = rc.format_ritual_check(
+            {**rc.run_ritual_check(), "arcade_apps": {"changed": False, "reason": "unchanged, still connected: arcade-github"}}
+        )
+        self.assertIn("arcade apps: unchanged -- unchanged, still connected: arcade-github", with_state)
+        without_state = rc.format_ritual_check(rc.run_ritual_check())
+        self.assertNotIn("arcade apps:", without_state)
+
+    def test_arcade_apps_change_never_flips_broken(self):
+        old = self._state([{"app_id": "arcade-github", "connected": True, "permissions": ["repo"]}])
+        self.aw.record_app_check(old, "2026-07-18T06:00:00Z", path=self.aw.LOG)
+        new = self._state(
+            [
+                {"app_id": "arcade-github", "connected": True, "permissions": ["repo"]},
+                {"app_id": "arcade-google", "connected": True, "permissions": ["gmail.readonly"]},
+            ]
+        )
+        result = rc.run_ritual_check(arcade_apps_state=new)
+        self.assertTrue(result["arcade_apps"]["changed"])
+        self.assertFalse(result["broken"])
+
+
 class CIFoldCase(unittest.TestCase):
     """Task 73: run_ritual_check(ci_checks=...) folds ci_watch.py's durable
     CI-conclusion log into the same structured result, the same shape task

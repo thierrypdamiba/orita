@@ -132,8 +132,27 @@ divergence still belongs to `sync_checkout.sh`, run first, same as always
 -- this only makes the CURRENT state visible in the one block instead of
 a separate command's printed line.
 
+Task 125 folds `arcade_app_watch.py` (task 122, Nisaba's own tool) in --
+the last live-API-input tool built during the 116-124 cadence run that
+never joined the `--square-state`-style fold. `arcade_app_watch.py` was
+already built to the identical caller-supplies-the-state, no-network-call
+shape `square_check.py` holds, but nothing ever wired it into this script:
+the god on duty has had to remember to call `Arcade_ListApps` live AND
+separately run `arcade_app_watch.py record ...` by hand every hour since
+task 122 shipped, the same "recalled, not recorded" gap that module's own
+docstring says it exists to close for everything else. `check_arcade_apps`
+mirrors `check_square` exactly, including the delta-before-record order
+task 88 fixed there: `None` unless `arcade_apps_state` is supplied, else
+`app_delta` is read against the last durably recorded snapshot BEFORE this
+hour's own state is appended, so a real change is never compared against
+itself. Informational only, like `square` -- a new upstream OAuth
+connection on the-hand gateway is not itself a rule violation (task 122's
+own scoping note: no live Gmail/Calendar tool is reachable through it
+regardless, and `consent.py`'s gate still fails closed), so this never
+flips `broken`.
+
 Usage:
-    python3 tools/ritual_check.py [--now ISO_TS] [--fencepost-base DIR] [--square-state PATH] [--cron-checks PATH] [--child-files PATH]
+    python3 tools/ritual_check.py [--now ISO_TS] [--fencepost-base DIR] [--square-state PATH] [--arcade-apps-state PATH] [--cron-checks PATH] [--child-files PATH]
 """
 from __future__ import annotations
 
@@ -188,6 +207,10 @@ def _cron_health():
 
 def _change_gate():
     return _load("_ritual_change_gate", os.path.join(ROOT, "tools", "change_gate.py"))
+
+
+def _arcade_app_watch():
+    return _load("_ritual_arcade_app_watch", os.path.join(ROOT, "tools", "arcade_app_watch.py"))
 
 
 def _vault_leak_check():
@@ -367,6 +390,29 @@ def check_square(square_state: dict | None, now_iso: str) -> dict | None:
     mod = _square_check()
     changed, reason = mod.square_delta(square_state, path=mod.LOG)
     mod.record_square_check(square_state, now_iso, path=mod.LOG)
+    return {"changed": changed, "reason": reason}
+
+
+def check_arcade_apps(arcade_apps_state: dict | None, now_iso: str) -> dict | None:
+    """Fold a caller-supplied, already-computed the-hand app-connection state
+    (task 122's `arcade_app_watch.compute_app_state` output) through
+    `app_delta`, mirroring `check_square` exactly. Makes no network call --
+    `arcade_apps_state` is None unless the caller already holds this hour's
+    live `Arcade_ListApps` read. Records this hour's state via
+    `record_app_check` AFTER computing the delta (same order task 88 fixed
+    for `check_square`) so a real change is compared against the PRIOR
+    baseline, never against itself, and the log's baseline actually advances
+    on a bare `ritual_check.py` call -- no separate, easy-to-forget
+    `arcade_app_watch.py record ...` call required afterward. Informational
+    only: a new upstream OAuth connection is not itself a rule violation
+    (task 122's own scoping note), so this never flips `broken`, the same
+    class `square` already holds.
+    """
+    if arcade_apps_state is None:
+        return None
+    mod = _arcade_app_watch()
+    changed, reason = mod.app_delta(arcade_apps_state, path=mod.LOG)
+    mod.record_app_check(arcade_apps_state, now_iso, path=mod.LOG)
     return {"changed": changed, "reason": reason}
 
 
@@ -812,6 +858,7 @@ def run_ritual_check(
     shared_reports_path: str | None = None,
     ritual_completeness_path: str | None = None,
     wip_reclaim_path: str | None = None,
+    arcade_apps_state: dict | None = None,
 ) -> dict:
     if now is None:
         now = datetime.now(timezone.utc)
@@ -823,6 +870,7 @@ def run_ritual_check(
     recheck = check_x_recheck(now_iso)
     escalation = check_x_escalation(now_iso)
     square = check_square(square_state, now_iso)
+    arcade_apps = check_arcade_apps(arcade_apps_state, now_iso)
     ci = check_ci(ci_checks)
     words = check_words(now_iso)
     cron = check_cron(cron_checks, now_iso)
@@ -875,6 +923,7 @@ def run_ritual_check(
         "x_recheck": recheck,
         "x_escalation": escalation,
         "square": square,
+        "arcade_apps": arcade_apps,
         "ci": ci,
         "words": words,
         "cron": cron,
@@ -931,6 +980,9 @@ def format_ritual_check(result: dict) -> str:
     if result["square"] is not None:
         s = result["square"]
         lines.append(f"  square: {'changed' if s['changed'] else 'unchanged'} -- {s['reason']}")
+    if result["arcade_apps"] is not None:
+        aa = result["arcade_apps"]
+        lines.append(f"  arcade apps: {'changed' if aa['changed'] else 'unchanged'} -- {aa['reason']}")
     if result["ci"] is not None:
         for workflow, line in result["ci"].items():
             lines.append(f"  ci/{workflow}: {line}")
@@ -1070,6 +1122,7 @@ if __name__ == "__main__":
     now = None
     base = DEFAULT_FENCEPOST_BASE
     square_state = None
+    arcade_apps_state = None
     ci_checks = None
     cron_checks = None
     child_files = None
@@ -1087,6 +1140,12 @@ if __name__ == "__main__":
                 raw = json.load(f)
             sq = _square_check()
             square_state = sq.compute_square_state(raw.get("issues", []), raw.get("prs", []))
+            i += 2
+        elif argv[i] == "--arcade-apps-state" and i + 1 < len(argv):
+            with open(argv[i + 1]) as f:
+                raw = json.load(f)
+            aw = _arcade_app_watch()
+            arcade_apps_state = aw.compute_app_state(raw.get("apps", []))
             i += 2
         elif argv[i] == "--ci-checks" and i + 1 < len(argv):
             with open(argv[i + 1]) as f:
@@ -1113,6 +1172,7 @@ if __name__ == "__main__":
         now=now,
         fencepost_base=base,
         square_state=square_state,
+        arcade_apps_state=arcade_apps_state,
         ci_checks=ci_checks,
         cron_checks=cron_checks,
         child_files=child_files,
