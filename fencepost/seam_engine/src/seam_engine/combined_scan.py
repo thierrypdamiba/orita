@@ -92,12 +92,20 @@ def run_combined_scan(
     repo: str,
     window_hours: int = 24,
     x_posts: list[dict[str, Any]] | None = None,
+    github_events: list[dict[str, Any]] | None = None,
     fencepost_root: Path | None = None,
 ) -> dict[str, Any]:
     """Run `scan.py`'s own scan plus every discovered recipe's, ranked once,
     together. Same output shape as `run_scan`, plus `recipe_sources` (which
     recipes actually contributed a candidate) and `recipe_errors` (which
     recipes raised and were skipped, named not hidden).
+
+    `github_events=None` (the default): unchanged behavior — `run_scan` calls
+    `fetch_github_activity` directly, exactly as before this parameter
+    existed. `github_events=<list of normalized dicts>`: threaded straight
+    through as `run_scan`'s own `github_events` override (see its docstring,
+    ROADMAP.md #128) — this module has no live-vs-fixture decision of its
+    own to make here; it only forwards the one `scan.py` already owns.
 
     A recipe manifest that fails the read-only oath itself (`discover_recipes`
     raising `RecipeValidationError`) is treated the same way — named in
@@ -106,7 +114,7 @@ def run_combined_scan(
     that breaks the oath), but the combined scan does not get to assume its
     own input is clean; it only gets to refuse to go down with it.
     """
-    base = run_scan(owner, repo, window_hours=window_hours, x_posts=x_posts)
+    base = run_scan(owner, repo, window_hours=window_hours, x_posts=x_posts, github_events=github_events)
 
     pool: list[GapCandidate] = []
     if base["primary_gap"]:
@@ -143,10 +151,12 @@ def run_combined_scan(
 
 
 def main(argv: list[str] | None = None) -> int:
-    """CLI: `python -m seam_engine.combined_scan [output.json] [--x-posts <path>]`.
+    """CLI: `python -m seam_engine.combined_scan [output.json] [--x-posts <path>]
+    [--github-events <path>]`.
 
-    Mirrors `scan.main`'s CLI shape exactly. Informational only — not wired
-    into `seam-scan.yml` (see module docstring for why).
+    Mirrors `scan.main`'s CLI shape exactly — both flags, not just the first.
+    Informational only — not wired into `seam-scan.yml` (see module
+    docstring for why).
     """
     import json
     import sys
@@ -163,8 +173,18 @@ def main(argv: list[str] | None = None) -> int:
         del argv[i : i + 2]
         x_posts = json.loads(x_posts_path.read_text())
 
+    github_events: list[dict[str, Any]] | None = None
+    if "--github-events" in argv:
+        i = argv.index("--github-events")
+        if i + 1 >= len(argv):
+            print("--github-events needs a path to a JSON file of normalized live events.")
+            return 2
+        github_events_path = Path(argv[i + 1])
+        del argv[i : i + 2]
+        github_events = json.loads(github_events_path.read_text())
+
     out = argv[0] if argv else None
-    result = run_combined_scan("thierrypdamiba", "orita", x_posts=x_posts)
+    result = run_combined_scan("thierrypdamiba", "orita", x_posts=x_posts, github_events=github_events)
     text = json.dumps(result, indent=2, default=str)
     if out:
         Path(out).write_text(text + "\n")

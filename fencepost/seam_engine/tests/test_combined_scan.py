@@ -13,6 +13,7 @@ import json
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
+import seam_engine.combined_scan as combined_scan_mod
 import seam_engine.scan as scan_mod
 from seam_engine.combined_scan import run_combined_scan
 from seam_engine.scan import GithubEvent
@@ -186,3 +187,110 @@ def test_runs_all_real_recipes_in_the_actual_repo_without_error(monkeypatch):
         "merged-pr-issue-still-open",
         "release-not-tweeted",
     }
+
+
+# --- run_combined_scan's github_events override (ROADMAP.md #128, #141) -----
+#
+# `combined_scan.main`'s own docstring has claimed since task 111 that it
+# "Mirrors `scan.main`'s CLI shape exactly" — true the day it was written,
+# false the moment task 128 gave `scan.main` a second flag (`--github-events`)
+# that `combined_scan.main` never gained. Nothing in this file, or anywhere
+# else, ever checked the claim against `scan.main`'s real shape. These
+# scenarios mirror test_scan.py's own github_events override + CLI tests
+# line for line, proving the claim true again now that both flags exist.
+
+
+def test_run_combined_scan_with_github_events_override_never_calls_fetch_github_activity(monkeypatch):
+    def boom(*a, **k):
+        raise AssertionError("fetch_github_activity should not be called when github_events is supplied")
+
+    monkeypatch.setattr(scan_mod, "fetch_github_activity", boom)
+    live_events = [
+        {"kind": "commit", "id": "1", "title": "t",
+         "url": "https://github.com/thierrypdamiba/orita/commit/1",
+         "ts": "2026-07-16T00:00:00Z", "author": "a"},
+    ]
+
+    result = run_combined_scan(
+        "thierrypdamiba", "orita", x_posts=BASE_X_POSTS, github_events=live_events,
+    )
+
+    assert result["github_events_source"] == "override"
+
+
+def test_run_combined_scan_without_github_events_uses_direct_fetch(monkeypatch):
+    called = {}
+
+    def fake_fetch(owner, repo, since):
+        called["hit"] = True
+        return []
+
+    monkeypatch.setattr(scan_mod, "fetch_github_activity", fake_fetch)
+
+    result = run_combined_scan("thierrypdamiba", "orita", x_posts=BASE_X_POSTS)
+
+    assert called.get("hit") is True
+    assert result["github_events_source"] == "direct"
+
+
+# --- the CLI's --github-events flag, threaded through combined_scan.main ----
+
+
+def test_cli_main_rejects_missing_github_events_path_argument():
+    assert combined_scan_mod.main(["--github-events"]) == 2
+
+
+def test_cli_reads_github_events_file_and_threads_it_into_run_combined_scan(tmp_path, monkeypatch):
+    captured = {}
+    original = combined_scan_mod.run_combined_scan
+
+    def fake_run_combined_scan(owner, repo, window_hours=24, x_posts=None, github_events=None, fencepost_root=None):
+        captured["github_events"] = github_events
+        return original(owner, repo, window_hours=window_hours, x_posts=x_posts, github_events=github_events, fencepost_root=fencepost_root)
+
+    monkeypatch.setattr(combined_scan_mod, "run_combined_scan", fake_run_combined_scan)
+    monkeypatch.setattr(scan_mod, "fetch_github_activity", lambda *a, **k: [])
+
+    live_events = [
+        {"kind": "commit", "id": "1", "title": "t",
+         "url": "https://github.com/thierrypdamiba/orita/commit/1",
+         "ts": "2026-07-16T00:00:00Z", "author": "a"},
+    ]
+    events_path = tmp_path / "live-events.json"
+    events_path.write_text(json.dumps(live_events))
+    out_path = tmp_path / "out.json"
+
+    rc = combined_scan_mod.main([str(out_path), "--github-events", str(events_path)])
+
+    assert rc == 0
+    assert captured["github_events"] == live_events
+    result = json.loads(out_path.read_text())
+    assert result["github_events_source"] == "override"
+
+
+def test_cli_without_github_events_flag_uses_direct_fetch(monkeypatch, tmp_path):
+    monkeypatch.setattr(scan_mod, "fetch_github_activity", lambda *a, **k: [])
+    out_path = tmp_path / "out.json"
+
+    rc = combined_scan_mod.main([str(out_path)])
+
+    assert rc == 0
+    result = json.loads(out_path.read_text())
+    assert result["github_events_source"] == "direct"
+
+
+def test_cli_docstring_shape_claim_is_true_both_flags_supported():
+    # A structural check on the claim itself, not just its behavior: the
+    # docstring says combined_scan.main mirrors scan.main's CLI shape
+    # exactly. Prove both modules' main() functions recognize the same two
+    # flags, read straight off their own source rather than a second
+    # hardcoded list -- the class of check tasks 135-140 already applied to
+    # doc-vs-code mirror claims elsewhere in this codebase, aimed here at a
+    # code-vs-code one instead.
+    import inspect
+
+    scan_source = inspect.getsource(scan_mod.main)
+    combined_source = inspect.getsource(combined_scan_mod.main)
+    for flag in ("--x-posts", "--github-events"):
+        assert flag in scan_source, f"scan.main no longer recognizes {flag!r} -- test's own assumption is stale"
+        assert flag in combined_source, f"combined_scan.main does not recognize {flag!r} -- the mirror claim is false"
