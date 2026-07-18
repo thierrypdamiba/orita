@@ -84,3 +84,4 @@
 {"type": "queued", "task": "136", "topic": "the mirror, checked against the door it claims to mirror -- consent.py's REQUIRED_SCOPES now regression-tested against fencepost/SCOPES.md itself, not just a second hand-typed copy", "queued_at": "2026-07-18T18:15:00+00:00"}
 {"type": "queued", "task": "137", "topic": "recipe allow-list cadence -- the town's own oath mirror, checked against SCOPES.md itself", "queued_at": "2026-07-18T19:20:00+00:00"}
 {"type": "queued", "task": "138", "topic": "the site's own audit tally was re-parsed by an untested regex + row splitter -- fixed with a live-extracted test suite", "queued_at": "2026-07-18T20:10:00Z"}
+{"type": "queued", "task": "139", "topic": "the town front door never linked its own safety backbone -- README.md now points at the Road and what the Gate prevents, tested against STRATEGY.md's own claim", "queued_at": "2026-07-18T21:16:00Z"}
