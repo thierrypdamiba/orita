@@ -72,3 +72,5 @@
 {"type": "queued", "task": "121", "topic": "ritual completeness cadence -- every check_* function actually wired, returned, and printed", "queued_at": "2026-07-18T02:10:00Z"}
 {"type": "queued", "task": "122", "topic": "arcade_app_watch.py -- the gateway's own connected apps, tracked", "queued_at": "2026-07-18T03:15:00Z"}
 {"type": "queued", "task": "123", "topic": "the loop's own reclaim-a-stale-WIP rule, finally checked", "queued_at": "2026-07-18T04:17:00Z"}
+{"type": "queued", "task": "124", "topic": "square_check.py guarded against writing an empty state over a real baseline", "queued_at": "2026-07-18T06:20:00Z"}
+{"type": "queued", "task": "125", "topic": "arcade_app_watch.py folded into ritual_check.py's one-call entry point", "queued_at": "2026-07-18T06:20:00Z"}
