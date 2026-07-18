@@ -4,6 +4,7 @@ every BUILDLOG ritual line since `ritual_check.py` explicitly scoped the
 square out -- resolves the same way every time, instead of by recall.
 """
 import importlib.util
+import json
 import os
 import sys
 import tempfile
@@ -23,6 +24,7 @@ def _load():
 
 
 sc = _load()
+LOG_DEFAULT = sc.LOG
 
 ISSUES_BASE = [
     {"number": 1, "updated_at": "2026-07-11T10:58:21Z"},
@@ -84,6 +86,97 @@ class TestRecordSquareCheck(_TempLogCase):
             after = f.readlines()
         self.assertEqual(after[0], before[0])
         self.assertEqual(len(after), len(before) + 1)
+
+
+class TestRecordSquareCheckDegenerateGuard(_TempLogCase):
+    """Task 124: an all-empty state must never silently overwrite a real,
+    non-empty prior baseline -- the exact way four bogus lines landed in the
+    real HAND/square-check-log.jsonl on 2026-07-18."""
+
+    def test_refuses_empty_over_non_empty_baseline(self):
+        real = sc.compute_square_state(ISSUES_BASE, PRS_NONE)
+        sc.record_square_check(real, "2026-07-18T02:11:15Z", path=self.path)
+        empty = sc.compute_square_state([], [])
+        with self.assertRaises(sc.DegenerateSquareStateError):
+            sc.record_square_check(empty, "2026-07-18T04:02:23Z", path=self.path)
+        with open(self.path) as f:
+            lines = [ln for ln in f if ln.strip()]
+        self.assertEqual(len(lines), 1)  # nothing new was written
+
+    def test_force_true_still_allows_it(self):
+        real = sc.compute_square_state(ISSUES_BASE, PRS_NONE)
+        sc.record_square_check(real, "2026-07-18T02:11:15Z", path=self.path)
+        empty = sc.compute_square_state([], [])
+        sc.record_square_check(empty, "2026-07-18T04:02:23Z", path=self.path, force=True)
+        last = sc.last_square_state(path=self.path)
+        self.assertEqual(last["issue_numbers"], [])
+
+    def test_empty_over_no_prior_check_is_allowed(self):
+        empty = sc.compute_square_state([], [])
+        sc.record_square_check(empty, "2026-07-18T04:02:23Z", path=self.path)
+        last = sc.last_square_state(path=self.path)
+        self.assertEqual(last["issue_numbers"], [])
+
+    def test_empty_over_empty_prior_baseline_is_allowed(self):
+        empty = sc.compute_square_state([], [])
+        sc.record_square_check(empty, "2026-07-18T02:00:00Z", path=self.path)
+        sc.record_square_check(empty, "2026-07-18T03:00:00Z", path=self.path)
+        with open(self.path) as f:
+            lines = [ln for ln in f if ln.strip()]
+        self.assertEqual(len(lines), 2)
+
+    def test_ordinary_non_empty_record_is_unaffected(self):
+        state1 = sc.compute_square_state(ISSUES_BASE, PRS_NONE)
+        sc.record_square_check(state1, "2026-07-18T02:11:15Z", path=self.path)
+        state2 = sc.compute_square_state(
+            ISSUES_BASE + [{"number": 6, "updated_at": "2026-07-18T05:00:00Z"}],
+            PRS_NONE,
+        )
+        sc.record_square_check(state2, "2026-07-18T05:00:00Z", path=self.path)
+        last = sc.last_square_state(path=self.path)
+        self.assertEqual(last["issue_numbers"], [1, 2, 3, 5, 6])
+
+
+class TestCliRecordRefusal(_TempLogCase):
+    def _write_state(self, path, payload):
+        with open(path, "w") as f:
+            json.dump(payload, f)
+
+    def test_cli_record_refuses_malformed_state_json(self):
+        real = sc.compute_square_state(ISSUES_BASE, PRS_NONE)
+        sc.record_square_check(real, "2026-07-18T02:11:15Z", path=self.path)
+        sc.LOG = self.path
+        try:
+            fd, state_path = tempfile.mkstemp(suffix=".json")
+            os.close(fd)
+            self._write_state(state_path, {})  # missing issues/prs entirely
+            rc = sc.main(["square_check.py", "record", state_path, "2026-07-18T04:02:23Z"])
+            self.assertEqual(rc, 1)
+            with open(self.path) as f:
+                lines = [ln for ln in f if ln.strip()]
+            self.assertEqual(len(lines), 1)  # still just the real entry
+        finally:
+            sc.LOG = LOG_DEFAULT
+            os.remove(state_path)
+
+    def test_cli_record_force_flag_allows_malformed_state_json(self):
+        real = sc.compute_square_state(ISSUES_BASE, PRS_NONE)
+        sc.record_square_check(real, "2026-07-18T02:11:15Z", path=self.path)
+        sc.LOG = self.path
+        try:
+            fd, state_path = tempfile.mkstemp(suffix=".json")
+            os.close(fd)
+            self._write_state(state_path, {})
+            rc = sc.main(
+                ["square_check.py", "record", state_path, "2026-07-18T04:02:23Z", "--force"]
+            )
+            self.assertEqual(rc, 0)
+            with open(self.path) as f:
+                lines = [ln for ln in f if ln.strip()]
+            self.assertEqual(len(lines), 2)
+        finally:
+            sc.LOG = LOG_DEFAULT
+            os.remove(state_path)
 
 
 class TestLastSquareState(_TempLogCase):

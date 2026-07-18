@@ -19,9 +19,15 @@ folds that read into a state dict and hands it in, mirroring
 durable memory: record what was actually seen, and compare instead of
 recall.
 
+Task 124 closed the one gap this left: `record` trusted whatever
+`state.json` it was handed, so a malformed or empty payload (missing
+`issues`/`prs` keys) got written into the real durable log as if it were a
+genuine all-clear square. `record_square_check` now refuses an all-empty
+state over a non-empty prior baseline unless `force=True` (CLI: `--force`).
+
 Usage:
     python3 tools/square_check.py check <state.json>
-    python3 tools/square_check.py record <state.json> <checked_at>
+    python3 tools/square_check.py record <state.json> <checked_at> [--force]
 
 <state.json> shape: {"issues": [{"number": 1, "updated_at": "..."}, ...],
                       "prs":    [{"number": 7, "updated_at": "..."}, ...]}
@@ -69,8 +75,30 @@ def last_square_state(path=LOG):
     return entries[-1] if entries else None
 
 
-def record_square_check(state: dict, checked_at: str, path=LOG) -> None:
-    """Append one real observed square state. Never edits or removes a prior line."""
+class DegenerateSquareStateError(ValueError):
+    """Raised when a caller tries to record an all-empty square state (no
+    open issues, no open PRs) over a real, non-empty prior baseline. Almost
+    always a malformed or missing `state.json` payload (e.g. `{"issues":
+    []}` from a caller error), not a real GitHub read -- a live square
+    genuinely collapsing from N>0 open issues to zero with no corresponding
+    real close events in between is the rare case, not the common one."""
+
+
+def record_square_check(state: dict, checked_at: str, path=LOG, *, force: bool = False) -> None:
+    """Append one real observed square state. Never edits or removes a prior line.
+
+    Refuses to record an all-empty state when the last recorded real check
+    was non-empty, unless `force=True` -- see `DegenerateSquareStateError`.
+    """
+    is_empty = not state["issue_numbers"] and not state["pr_numbers"]
+    if is_empty and not force:
+        last = last_square_state(path)
+        if last is not None and (last["issue_numbers"] or last["pr_numbers"]):
+            raise DegenerateSquareStateError(
+                "refusing to record an empty square state over a non-empty "
+                f"prior baseline (issues {last['issue_numbers']}, prs {last['pr_numbers']}) "
+                "-- pass force=True if every issue/PR was genuinely closed this hour"
+            )
     entry = dict(state)
     entry["checked_at"] = checked_at
     _append(entry, path)
@@ -115,14 +143,19 @@ def main(argv):
         raw = json.load(f)
     state = compute_square_state(raw.get("issues", []), raw.get("prs", []))
     if cmd == "check":
-        changed, reason = square_delta(state)
+        changed, reason = square_delta(state, path=LOG)
         print(f"{'changed' if changed else 'unchanged'} -- {reason}")
         return 0
     elif cmd == "record":
         if len(argv) < 4:
-            print("usage: record <state.json> <checked_at>")
+            print("usage: record <state.json> <checked_at> [--force]")
             return 1
-        record_square_check(state, argv[3])
+        force = "--force" in argv[4:]
+        try:
+            record_square_check(state, argv[3], path=LOG, force=force)
+        except DegenerateSquareStateError as e:
+            print(f"refused: {e}")
+            return 1
         print(f"recorded: {state}")
         return 0
     print(f"unknown command: {cmd!r}")
