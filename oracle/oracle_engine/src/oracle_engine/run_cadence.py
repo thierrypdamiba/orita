@@ -1,4 +1,4 @@
-"""The Oracle Desk's twenty-third real cadence: a checkable claim about the
+"""The Oracle Desk's twenty-second real cadence: a checkable claim about the
 town's own public GitHub Actions RUN count. (ROADMAP #75)
 
 Task 60 read `GET /repos/{owner}/{repo}/actions/workflows`'s `total_count`

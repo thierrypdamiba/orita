@@ -88,7 +88,7 @@ class CommitCommentResolvedCase(unittest.TestCase):
 
     def test_commit_comment_section_now_resolved(self):
         doc = _read_doc()
-        idx = doc.index("ROADMAP.md #93: a twenty-sixth cadence")
+        idx = doc.index("ROADMAP.md #93: a twenty-fifth cadence")
         section = doc[idx : idx + 2000]
         self.assertIn("**RESOLVED (corrected 2026-07-18, task 131)", section)
 

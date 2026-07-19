@@ -1,4 +1,4 @@
-"""Task 134. The Oracle Desk's twenty-fifth real cadence: one checkable claim
+"""Task 134. The Oracle Desk's twenty-sixth real cadence: one checkable claim
 about the town's own public GitHub collaborator count, sourced with no
 Arcade scope at all (a repo's collaborator list is public data), copylint-
 clean, sealed to a real (scratch, in these tests) ledger before its

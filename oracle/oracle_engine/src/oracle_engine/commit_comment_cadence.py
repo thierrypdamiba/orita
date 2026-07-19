@@ -1,4 +1,4 @@
-"""The Oracle Desk's twenty-sixth real cadence: a checkable claim about
+"""The Oracle Desk's twenty-fifth real cadence: a checkable claim about
 the town's own public GitHub COMMIT comment count. (ROADMAP #93)
 
 Task 76 read `GET /repos/{owner}/{repo}/pulls/comments` (every line-anchored
@@ -17,7 +17,7 @@ GitHub REST API family task 38 already cleared: no credential, no OAuth,
 no toolkit, no per-user account, no new scope of any kind.
 
 Structurally this mirrors `comment_cadence.py`/`issue_comment_cadence.py`
-line for line on purpose -- one shape reused a twenty-sixth time is the
+line for line on purpose -- one shape reused a twenty-fifth time is the
 point, not a missed chance to unify. Sealed by Off-By-One, who has staked
 no Oracle Desk claim of his own until now despite being the Warden who
 counts everything else in this town -- a comment landing on a specific

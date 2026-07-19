@@ -1,4 +1,4 @@
-"""Task 76. The Oracle Desk's twenty-fourth real cadence: one checkable
+"""Task 76. The Oracle Desk's twenty-third real cadence: one checkable
 claim about the town's own public GitHub pull-request review comment
 count, sourced with no Arcade scope at all (a repo's PR review comments
 are public data), copylint-clean, sealed to a real (scratch, in these

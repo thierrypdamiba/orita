@@ -1,4 +1,4 @@
-"""Task 75. The Oracle Desk's twenty-third real cadence: one checkable
+"""Task 75. The Oracle Desk's twenty-second real cadence: one checkable
 claim about the town's own public GitHub Actions total workflow-RUN count,
 sourced with no Arcade scope at all (a repo's run count is public data),
 copylint-clean, sealed to a real (scratch, in these tests) ledger before

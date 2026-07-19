@@ -1,4 +1,4 @@
-"""The Oracle Desk's twenty-fifth real cadence: a checkable claim about
+"""The Oracle Desk's twenty-sixth real cadence: a checkable claim about
 the town's own public GitHub repository-collaborator count. (ROADMAP #134)
 
 Task 47's `contributor_cadence.py` reads `GET /repos/{owner}/{repo}/

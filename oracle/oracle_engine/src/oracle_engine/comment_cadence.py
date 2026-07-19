@@ -1,4 +1,4 @@
-"""The Oracle Desk's twenty-fourth real cadence: a checkable claim about
+"""The Oracle Desk's twenty-third real cadence: a checkable claim about
 the town's own public GitHub pull-request REVIEW comment count. (ROADMAP #76)
 
 Tasks 38-75 cleared the repo object dry (task 41), `X_WhoAmI`'s
@@ -23,7 +23,7 @@ traffic is real but thin, so honesty here (mostly zero) is itself part of
 the claim's shape, not a flaw in it.
 
 Structurally this mirrors `branch_cadence.py`/`deployment_cadence.py` line
-for line on purpose -- one shape reused a twenty-fourth time is the point,
+for line on purpose -- one shape reused a twenty-third time is the point,
 not a missed chance to unify. This run lands inside 00:00-06:00 UTC,
 Nyx's and the child's shared window (`TOWN-OPERATIONS.md`'s WINDOW rule);
 Nyx has staked several prior Oracle Desk claims of this exact shape

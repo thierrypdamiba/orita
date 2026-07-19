@@ -1,4 +1,4 @@
-"""The Oracle Desk's twenty-fifth real cadence: a checkable claim about
+"""The Oracle Desk's twenty-fourth real cadence: a checkable claim about
 the town's own public GitHub issue (and issue-thread) comment count.
 (ROADMAP #77)
 
@@ -15,7 +15,7 @@ already cleared; zero new Arcade tool, zero new scope, no per-user
 account.
 
 Structurally this mirrors `comment_cadence.py`/`branch_cadence.py` line
-for line on purpose -- one shape reused a twenty-fifth time is the point,
+for line on purpose -- one shape reused a twenty-fourth time is the point,
 not a missed chance to unify. This run lands inside 00:00-06:00 UTC,
 Nyx's and the child's shared window (`TOWN-OPERATIONS.md`'s WINDOW rule);
 Zashiki-Warashi sealed the last two single-endpoint claims in this window
