@@ -137,7 +137,8 @@ def format_cadence(result: dict) -> str:
         return "metrics cadence: no daily-aggregate reading has ever shipped -- nothing to count yet"
     lines = [
         f"metrics cadence: {result['current_streak']}-day streak "
-        f"(records/metrics.jsonl, daily-aggregate readings) -- "
+        f"(records/metrics.jsonl, daily-aggregate readings, target {result['target']}/{result['target']}, "
+        f"mirrors report_cadence_check.py's own daily target) -- "
         f"{result['total_shipped']} shipped total, most recent {result['most_recent_date']}"
     ]
     if result["missing_dates"]:

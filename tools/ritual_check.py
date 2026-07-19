@@ -1142,7 +1142,7 @@ def format_ritual_check(result: dict) -> str:
         gap_note = f", {len(mcad['missing_dates'])} historical gap day(s)" if mcad["missing_dates"] else ""
         lines.append(
             f"  metrics cadence: {mcad['current_streak']}-day streak "
-            f"(records/metrics.jsonl, daily-aggregate readings){gap_note}"
+            f"(records/metrics.jsonl, daily-aggregate readings, target {mcad['target']}/{mcad['target']}){gap_note}"
         )
     sr = result["shared_reports"]
     if sr["total_shared"] == 0:

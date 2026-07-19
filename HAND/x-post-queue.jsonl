@@ -101,3 +101,4 @@
 {"type": "queued", "task": "154", "topic": "fetch_github_activity was silently dropping every commit past the newest 100 -- the pagination bug behind today's real seam-scan CI failure, found and fixed", "queued_at": "2026-07-19T14:13:00Z"}
 {"type": "queued", "task": "156", "topic": "Wall's own recipe-count claim guarded against drift", "queued_at": "2026-07-19T16:20:00Z"}
 {"type": "queued", "task": "157", "topic": "server.get_latest_release no longer paginates the whole repo to answer one question", "queued_at": "2026-07-19T17:24:37Z"}
+{"type": "queued", "task": "158", "topic": "cadence-target mirror fix, task 158", "queued_at": "2026-07-19T18:15:48Z"}
