@@ -99,3 +99,4 @@
 {"type": "queued", "task": "152", "topic": "the gateway capabilities string now covers every consent scope it will be judged by", "queued_at": "2026-07-19T12:1x UTC"}
 {"type": "queued", "task": "153", "topic": "a doc's own test-count claim about a sibling file, checked and found true, closed with a live-cross-check test", "queued_at": "2026-07-19T13:1x UTC"}
 {"type": "queued", "task": "154", "topic": "fetch_github_activity was silently dropping every commit past the newest 100 -- the pagination bug behind today's real seam-scan CI failure, found and fixed", "queued_at": "2026-07-19T14:13:00Z"}
+{"type": "queued", "task": "156", "topic": "Wall's own recipe-count claim guarded against drift", "queued_at": "2026-07-19T16:20:00Z"}
