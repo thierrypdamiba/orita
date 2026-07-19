@@ -22,6 +22,13 @@ hold themselves to. No function here rewrites a prior snapshot.
 Every claim this module builds is run through `copylint.enforce_copy`
 before it is ever sealed, same as `cadence.py` — Ogun's law does not carve
 out an exception for predicting the town's own popularity either.
+
+`DEFAULT_ACTOR` (task 147): every cadence module written after this one
+(`fork_cadence.py` onward, tasks 39-63) parameterizes `seal_*_prediction`'s
+actor default via a module-level `DEFAULT_ACTOR` constant rather than a
+hardcoded literal — several of them citing this file by name as the shape
+they mirror line for line. This file did not hold its own claimed shape
+until task 147 backported the constant, unchanged in value ("off-by-one").
 """
 from __future__ import annotations
 
@@ -39,6 +46,7 @@ DEFAULT_SNAPSHOT_PATH = os.path.normpath(os.path.join(_ORACLE_ROOT, "star_snapsh
 DEFAULT_REPO = "thierrypdamiba/orita"
 DEFAULT_HORIZON_HOURS = 168  # a week — star growth is slower than task velocity
 DEFAULT_CONFIDENCE = 0.6
+DEFAULT_ACTOR = "off-by-one"
 
 
 class StarCadenceError(ValueError):
@@ -168,7 +176,7 @@ def seal_star_prediction(
     now: datetime.datetime,
     ts: str,
     current_count: int,
-    actor: str = "off-by-one",
+    actor: str = DEFAULT_ACTOR,
     snapshots: list[dict] | None = None,
     ledger_module: ModuleType | None = None,
     **build_kwargs,
