@@ -64,6 +64,34 @@ something milestone-worthy happening to land inside a rolling window; it
 depends only on whether the town has actually announced its own work yet.
 That is the machinery, not a promise: some days still clear no gap, honestly
 (report.py's own quiet-day branch), because Ogun's law forbids inventing one.
+
+Found and closed 2026-07-19: the paragraph above is true of the direct-fetch
+path (`fetch_github_activity` always receives `_effective_since`'s answer as
+its `since`) but was never actually true of the live-override path
+(`load_github_events_from_live`) — `since` was computed in `run_scan` and
+then simply discarded whenever `github_events` was supplied, and
+`load_github_events_from_live` never checked that the caller's list reached
+back far enough. This was not a hypothetical: task 128's own note already
+admitted its live pull "cap[s] well short of the full history back to
+2026-07-12" when this sandbox's proxy wall forces the override path, and the
+real ledger shows the failure it warned of actually happening — 4 real,
+still-unannounced milestone commits sealed as this town's own primary gap on
+2026-07-18 (`fencepost/GAPS/2026-07-18.md`, evidence
+5110507911296f18…/fab95533935e34db…/d8d98321640fa055…/a53262bfcc4412eb…)
+had vanished from the very next day's override-sourced scan
+(`fencepost/candidates/2026-07-19.json`, `github_events_source: "override"`,
+only 1 unrelated commit) with no real X post ever landing in between to
+explain it (`X_PostTweet`/`X_GetUserTweets` have been forbidden since
+2026-07-14 — `tools/x_outage_tracker.py`'s own log). `run_scan`'s new
+`check_prior_milestones`/`ledger_base` parameters (and
+`_unresolved_prior_milestone_evidence`, below) close it: a caller that asks
+for the check gets a loud `ValueError` naming exactly which previously-sealed
+evidence its supplied `github_events` is missing, rather than a silently
+thinner report. `main()` (the CLI both `seam-scan.yml` and every manual
+override run actually call) turns the check on by default. `run_scan()`
+called directly (as every existing test in this file already does) keeps its
+prior, unchanged behavior — the check is opt-in there, so nothing already
+proven true above regresses.
 """
 from __future__ import annotations
 
@@ -462,6 +490,50 @@ def coincidence_candidates(
     return out
 
 
+def _unresolved_prior_milestone_evidence(
+    x_posts: list[XPost], ledger_base: Path | None = None
+) -> dict[str, str]:
+    """Every evidence URL the Ledger has ever sealed under a
+    `milestone-unannounced` primary gap, narrowed to the ones still
+    genuinely open: no real X post in `x_posts` landed on or after the gap
+    was sealed. Returns `{evidence_url: sealed_generated_at}` so a caller can
+    name *when* each one was sealed, not just that it was.
+
+    Only `primary_gap` entries are readable this way — `ledger.append_scan`
+    seals a tail entry's `slug`/`confidence`/`label` only, never its
+    evidence (see its own `sealed["tail"]` construction), so a
+    `milestone-unannounced` candidate that only ever sat in the tail leaves
+    no evidence trail this function can recover. That is a real, narrower
+    scope than "every milestone gap this town has ever seen" — honest about
+    it rather than pretending to catch more than it can: it closes the
+    specific failure this town's own ledger already lived through (a
+    `primary_gap` silently disappearing the next day with no resolving
+    post), not every theoretically possible variant.
+
+    A post landing after the gap was sealed is treated as a plausible
+    resolution and drops that gap's evidence from the result — this
+    function's job is to catch a truncated events window impersonating a
+    resolved gap, not to relitigate whether a resolution was a good one.
+    """
+    from seam_engine import ledger as _ledger
+
+    out: dict[str, str] = {}
+    for rec in _ledger.read_records(ledger_base):
+        sealed = rec.get("sealed", {})
+        primary = sealed.get("primary_gap")
+        if not primary or primary.get("slug") != "milestone-unannounced":
+            continue
+        sealed_at = sealed.get("generated_at")
+        if not sealed_at:
+            continue
+        sealed_ts = _parse_ts(sealed_at)
+        if any(p.ts >= sealed_ts for p in x_posts):
+            continue
+        for url in primary.get("evidence", []):
+            out.setdefault(url, sealed_at)
+    return out
+
+
 def _effective_since(now: datetime, window_hours: int, account_live_since: datetime) -> datetime:
     """How far back the scan actually reaches for GitHub commits (ROADMAP.md
     #19 — the recurring-gap machinery that keeps the daily cadence sustainable).
@@ -488,6 +560,8 @@ def run_scan(
     window_hours: int = 24,
     x_posts: list[dict[str, Any]] | None = None,
     github_events: list[dict[str, Any]] | None = None,
+    check_prior_milestones: bool = False,
+    ledger_base: Path | None = None,
 ) -> dict[str, Any]:
     """Run the seam scan.
 
@@ -509,6 +583,20 @@ def run_scan(
     This is the wired-up path for a caller already holding a real,
     already-authorized GitHub read (e.g. this session's `github` MCP
     channel) when the direct `httpx` path to `api.github.com` is unavailable.
+
+    `check_prior_milestones=False` (the default): unchanged behavior — every
+    test in this file that calls `run_scan` directly already relies on this,
+    and keeps working exactly as before. `check_prior_milestones=True` turns
+    on `_unresolved_prior_milestone_evidence` (see its own docstring, and the
+    module docstring's "Found and closed 2026-07-19" paragraph, for why this
+    exists): if the resulting `events` — from EITHER source, direct or
+    override — is missing evidence for a `milestone-unannounced` gap the
+    Ledger already sealed as open and nothing has since plausibly resolved,
+    `run_scan` raises `ValueError` naming what is missing, rather than
+    silently reporting a thinner gap (or none at all) than the town's own
+    ledger already knows is real. `ledger_base=None` reads the real
+    `fencepost/GAPS/` ledger (`ledger.read_records`'s own default); pass a
+    directory to point at a fixture ledger in a test.
     """
     from seam_engine.ranking import rank
 
@@ -527,6 +615,26 @@ def run_scan(
         if github_events is None
         else load_github_events_from_live(github_events)
     )
+
+    if check_prior_milestones:
+        unresolved = _unresolved_prior_milestone_evidence(x_post_objs, ledger_base)
+        present = {e.url for e in events}
+        missing = {url: at for url, at in unresolved.items() if url not in present}
+        if missing:
+            example_url, example_sealed_at = next(iter(sorted(missing.items())))
+            raise ValueError(
+                f"run_scan(): the supplied github_events data is missing "
+                f"{len(missing)} previously-sealed, still-unannounced "
+                f"'milestone-unannounced' commit(s) the Ledger already "
+                f"recorded as open (e.g. {example_url}, sealed "
+                f"{example_sealed_at}) — no real X post has landed since any "
+                f"of them was sealed, so this is not a resolved gap, it is an "
+                f"events window that does not reach back far enough "
+                f"(github_events_source={'override' if github_events is not None else 'direct'}). "
+                f"Widen the fetch to cover these commits, or the report will "
+                f"silently under-count a real, still-open gap."
+            )
+
     surfaced, excluded = compute_candidates(events, x_post_objs, account_live_since)
     coincidences = coincidence_candidates(events, x_post_objs, account_live_since)
 
@@ -560,6 +668,13 @@ def main(argv: list[str] | None = None) -> int:
     live GitHub events (see `load_github_events_from_live`) and threads it
     through as `run_scan`'s `github_events` override; omitted, `run_scan`
     calls `fetch_github_activity` directly exactly as it always has.
+
+    Always calls `run_scan(..., check_prior_milestones=True)` — this is the
+    real entrypoint both `seam-scan.yml`'s cron and every manual
+    override run actually invoke, so it is where the 2026-07-19 fix (module
+    docstring, "Found and closed") is switched on: a `--github-events` (or
+    direct-fetch) result that silently drops a still-open, previously-sealed
+    milestone gap raises here rather than quietly shipping a thinner report.
     """
     import sys
 
@@ -586,7 +701,10 @@ def main(argv: list[str] | None = None) -> int:
         github_events = json.loads(github_events_path.read_text())
 
     out = argv[0] if argv else None
-    result = run_scan("thierrypdamiba", "orita", x_posts=x_posts, github_events=github_events)
+    result = run_scan(
+        "thierrypdamiba", "orita", x_posts=x_posts, github_events=github_events,
+        check_prior_milestones=True,
+    )
     text = json.dumps(result, indent=2, default=str)
     if out:
         Path(out).write_text(text + "\n")

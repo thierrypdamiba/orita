@@ -2,12 +2,14 @@
 live-X-read wiring (ROADMAP.md #94).
 
 `_effective_since` is the one piece of arithmetic that decides how far back
-`run_scan` looks for GitHub commits. Everything else in scan.py that depends
-on network I/O (`fetch_github_activity`, `run_scan` itself) has no test here,
-same as before this task — this file adds coverage only for the new, pure
-logic, not a retroactive test of the network path. `load_x_posts_from_live`
-is pure (no network, no filesystem) so it IS covered here, the same way
-`_effective_since` already is.
+`run_scan` looks for GitHub commits. `fetch_github_activity` itself (the one
+piece that makes a real network call) has no test here — that stays true.
+`run_scan` now DOES get exercised below (the "prior-milestone-evidence
+cross-check" section, added 2026-07-19), but only with `github_events`/
+`x_posts` supplied directly and `fetch_github_activity` never reached — the
+network path itself is still untested here, on purpose, same as before.
+`load_x_posts_from_live` is pure (no network, no filesystem) so it IS covered
+here, the same way `_effective_since` already is.
 """
 from __future__ import annotations
 
@@ -21,8 +23,10 @@ from seam_engine.scan import (
     GithubEvent,
     XPost,
     _effective_since,
+    _unresolved_prior_milestone_evidence,
     load_github_events_from_live,
     load_x_posts_from_live,
+    run_scan,
 )
 
 FENCEPOST_ROOT = Path(__file__).resolve().parents[2]
@@ -163,7 +167,11 @@ def test_cli_reads_x_posts_file_and_threads_it_into_run_scan(tmp_path, monkeypat
     captured = {}
     original = scan_mod.run_scan
 
-    def fake_run_scan(owner, repo, window_hours=24, x_posts=None, github_events=None):
+    def fake_run_scan(owner, repo, window_hours=24, x_posts=None, github_events=None, **kwargs):
+        # **kwargs absorbs check_prior_milestones/ledger_base (added after this
+        # test was written, ROADMAP.md's 2026-07-19 fix) without forwarding
+        # them to `original` — this test is only about `--x-posts` wiring, not
+        # the ledger cross-check, so it deliberately keeps that check off.
         captured["x_posts"] = x_posts
         return original(owner, repo, window_hours=window_hours, x_posts=x_posts, github_events=github_events)
 
@@ -189,6 +197,12 @@ def test_cli_without_x_posts_flag_uses_the_ledger_fallback(tmp_path, monkeypatch
     import seam_engine.scan as scan_mod
 
     monkeypatch.setattr(scan_mod, "fetch_github_activity", lambda *a, **k: [])
+    # main()'s check_prior_milestones=True (2026-07-19 fix, see below) reads
+    # the REAL fencepost/GAPS ledger by default; this test stubs an empty
+    # events list purely to test flag routing, not the ledger cross-check —
+    # isolate it from real ledger contents the same way fetch_github_activity
+    # is already stubbed away from the real network.
+    monkeypatch.setattr(scan_mod, "_unresolved_prior_milestone_evidence", lambda *a, **k: {})
     out_path = tmp_path / "out.json"
 
     rc = scan_mod.main([str(out_path)])
@@ -307,7 +321,9 @@ def test_cli_reads_github_events_file_and_threads_it_into_run_scan(tmp_path, mon
     captured = {}
     original = scan_mod.run_scan
 
-    def fake_run_scan(owner, repo, window_hours=24, x_posts=None, github_events=None):
+    def fake_run_scan(owner, repo, window_hours=24, x_posts=None, github_events=None, **kwargs):
+        # See the sibling x-posts test above for why **kwargs is here and why
+        # it is not forwarded to `original`.
         captured["github_events"] = github_events
         return original(owner, repo, window_hours=window_hours, x_posts=x_posts, github_events=github_events)
 
@@ -332,6 +348,12 @@ def test_cli_without_github_events_flag_uses_direct_fetch(monkeypatch, tmp_path)
     import seam_engine.scan as scan_mod
 
     monkeypatch.setattr(scan_mod, "fetch_github_activity", lambda *a, **k: [])
+    # main()'s check_prior_milestones=True (2026-07-19 fix, see below) reads
+    # the REAL fencepost/GAPS ledger by default; this test stubs an empty
+    # events list purely to test flag routing, not the ledger cross-check —
+    # isolate it from real ledger contents the same way fetch_github_activity
+    # is already stubbed away from the real network.
+    monkeypatch.setattr(scan_mod, "_unresolved_prior_milestone_evidence", lambda *a, **k: {})
     out_path = tmp_path / "out.json"
 
     rc = scan_mod.main([str(out_path)])
@@ -339,4 +361,254 @@ def test_cli_without_github_events_flag_uses_direct_fetch(monkeypatch, tmp_path)
     assert rc == 0
     result = json.loads(out_path.read_text())
     assert result["github_events_source"] == "direct"
+
+
+# --- prior-milestone-evidence cross-check (found + closed 2026-07-19) ----------
+#
+# scan.py's own module docstring promised (ROADMAP.md #19) that "a milestone
+# commit stays a live candidate for as long as it remains genuinely
+# unannounced" — but that promise was only ever kept for the direct-fetch
+# path (`_effective_since`'s `since` reaches `fetch_github_activity`); the
+# live-override path (`load_github_events_from_live`) never received `since`
+# at all, so a caller supplying a too-short window could make an
+# already-sealed, still-open milestone gap silently vanish. This is not a
+# hypothetical: `fencepost/GAPS/2026-07-18.md` sealed 4 real, still-
+# unannounced milestone commits as this town's own primary gap; the very
+# next day's override-sourced scan (`fencepost/candidates/2026-07-19.json`)
+# saw only 1, unrelated commit, with no real X post ever landing in between
+# (X posting has been forbidden since 2026-07-14 — `tools/x_outage_tracker.py`).
+# These tests prove `_unresolved_prior_milestone_evidence`/`run_scan`'s new
+# `check_prior_milestones` catch exactly that, against the real ledger data,
+# not a synthetic stand-in for it.
+
+from seam_engine import ledger as _ledger_mod  # noqa: E402 -- grouped with this section on purpose
+
+_REAL_0718_EVIDENCE = [
+    "https://github.com/thierrypdamiba/orita/commit/5110507911296f182115359fafc6dfcffcd23796",
+    "https://github.com/thierrypdamiba/orita/commit/fab95533935e34db435529ffb8028d4bdee6d385",
+    "https://github.com/thierrypdamiba/orita/commit/d8d98321640fa055827928fb6b099e0ef5c217f7",
+    "https://github.com/thierrypdamiba/orita/commit/a53262bfcc4412eb9fd12a26f9992591fda596f6",
+]
+_REAL_0718_SEALED_AT = "2026-07-18T13:10:49.350606+00:00"
+_REAL_0719_ONLY_EVENT_URL = "https://github.com/thierrypdamiba/orita/commit/a4d02f092efb7fe919ad95494d68873f76f78599"
+
+
+def _seal_milestone_gap(base: Path, *, evidence: list[str], generated_at: str, confidence: float = 0.75) -> None:
+    """Seal one scan result carrying a `milestone-unannounced` primary gap
+    into a fixture ledger at `base` — the same shape `ledger.append_scan`
+    always takes, built by hand here only so the test controls `generated_at`
+    and `evidence` exactly.
+    """
+    _ledger_mod.append_scan(
+        {
+            "generated_at": generated_at,
+            "repo": "thierrypdamiba/orita",
+            "window_hours": 24,
+            "confidence_bar": 0.7,
+            "separation_margin": 0.15,
+            "primary_gap": {
+                "slug": "milestone-unannounced",
+                "headline": "Milestone-level work shipped but never reached @oritatown",
+                "detail": f"{len(evidence)} milestone commit(s), none echoed in a post.",
+                "confidence": confidence,
+                "evidence": evidence,
+            },
+            "tail": [],
+            "excluded": [],
+        },
+        base=base,
+    )
+
+
+def test_unresolved_prior_milestone_evidence_finds_open_evidence_with_no_resolving_post(tmp_path):
+    _seal_milestone_gap(tmp_path, evidence=_REAL_0718_EVIDENCE, generated_at=_REAL_0718_SEALED_AT)
+    x_posts = [XPost(id="1", text="unrelated", url="https://x.com/oritatown/status/1",
+                      ts=datetime(2026, 7, 13, tzinfo=timezone.utc))]  # before the gap was sealed
+
+    unresolved = _unresolved_prior_milestone_evidence(x_posts, tmp_path)
+
+    assert set(unresolved) == set(_REAL_0718_EVIDENCE)
+    assert all(at == _REAL_0718_SEALED_AT for at in unresolved.values())
+
+
+def test_unresolved_prior_milestone_evidence_drops_urls_once_a_post_lands_after_sealing(tmp_path):
+    _seal_milestone_gap(tmp_path, evidence=_REAL_0718_EVIDENCE, generated_at=_REAL_0718_SEALED_AT)
+    x_posts = [XPost(id="1", text="fencepost, finally", url="https://x.com/oritatown/status/2",
+                      ts=datetime(2026, 7, 18, 14, tzinfo=timezone.utc))]  # after the gap was sealed
+
+    unresolved = _unresolved_prior_milestone_evidence(x_posts, tmp_path)
+
+    assert unresolved == {}
+
+
+def test_unresolved_prior_milestone_evidence_ignores_non_milestone_primary_gaps(tmp_path):
+    _ledger_mod.append_scan(
+        {
+            "generated_at": _REAL_0718_SEALED_AT, "repo": "thierrypdamiba/orita",
+            "window_hours": 24, "confidence_bar": 0.7, "separation_margin": 0.15,
+            "primary_gap": {
+                "slug": "release-v1", "headline": "Release shipped but never reached @oritatown",
+                "detail": "d", "confidence": 0.9, "evidence": ["https://github.com/thierrypdamiba/orita/releases/tag/v1"],
+            },
+            "tail": [], "excluded": [],
+        },
+        base=tmp_path,
+    )
+    x_posts = [XPost(id="1", text="t", url="https://x.com/oritatown/status/1", ts=datetime(2026, 7, 13, tzinfo=timezone.utc))]
+
+    assert _unresolved_prior_milestone_evidence(x_posts, tmp_path) == {}
+
+
+def test_unresolved_prior_milestone_evidence_cannot_recover_a_tail_only_milestone_gap(tmp_path):
+    # A documented, narrower-than-ideal scope: ledger.append_scan seals a tail
+    # entry's slug/confidence/label only, never its evidence — so a
+    # milestone-unannounced candidate that only ever sat below the bar (like
+    # the real 2026-07-19 entry itself) leaves nothing this function can
+    # recover. This test pins that limitation rather than hiding it.
+    _ledger_mod.append_scan(
+        {
+            "generated_at": "2026-07-19T01:14:35.907870+00:00", "repo": "thierrypdamiba/orita",
+            "window_hours": 24, "confidence_bar": 0.7, "separation_margin": 0.15,
+            "primary_gap": None,
+            "tail": [{"slug": "milestone-unannounced", "confidence": 0.45, "label": "coincidence"}],
+            "excluded": [],
+        },
+        base=tmp_path,
+    )
+    x_posts = [XPost(id="1", text="t", url="https://x.com/oritatown/status/1", ts=datetime(2026, 7, 13, tzinfo=timezone.utc))]
+
+    assert _unresolved_prior_milestone_evidence(x_posts, tmp_path) == {}
+
+
+def _live_x_posts_no_new_activity() -> list[dict]:
+    """A normalized x_posts override with real posts, none after the real
+    2026-07-18 gap was sealed — standing in for "the outage means no new
+    post could possibly have resolved it," without touching the real
+    HAND/mortal-sky-log.md file."""
+    return [{"id": "1", "text": "old news", "url": "https://x.com/oritatown/status/1",
+             "ts": "2026-07-12T00:00:00Z"}]
+
+
+def test_run_scan_raises_reproducing_the_real_2026_07_18_to_07_19_regression(tmp_path):
+    # This is the real incident, replayed: seed the fixture ledger with
+    # exactly what fencepost/GAPS/2026-07-18.md really sealed (4 evidence
+    # commits), then hand run_scan exactly what the real
+    # fencepost/candidates/2026-07-19.json override actually supplied (1
+    # unrelated commit, missing all 4). Before this fix, run_scan accepted
+    # this silently -- that IS what actually happened on 2026-07-19. Now it
+    # must raise.
+    _seal_milestone_gap(tmp_path, evidence=_REAL_0718_EVIDENCE, generated_at=_REAL_0718_SEALED_AT)
+    truncated_events = [
+        {"kind": "commit", "id": "a4d02f0", "title": "unrelated work",
+         "url": _REAL_0719_ONLY_EVENT_URL, "ts": "2026-07-19T00:30:00Z", "author": "someone"},
+    ]
+
+    with pytest.raises(ValueError, match=r"missing 4 previously-sealed"):
+        run_scan(
+            "thierrypdamiba", "orita",
+            x_posts=_live_x_posts_no_new_activity(),
+            github_events=truncated_events,
+            check_prior_milestones=True,
+            ledger_base=tmp_path,
+        )
+
+
+def test_run_scan_does_not_raise_when_the_override_still_carries_all_open_evidence(tmp_path):
+    _seal_milestone_gap(tmp_path, evidence=_REAL_0718_EVIDENCE, generated_at=_REAL_0718_SEALED_AT)
+    complete_events = [
+        {"kind": "commit", "id": url.rsplit("/", 1)[-1][:7], "title": "fencepost milestone work",
+         "url": url, "ts": "2026-07-18T12:00:00Z", "author": "someone"}
+        for url in _REAL_0718_EVIDENCE
+    ] + [
+        {"kind": "commit", "id": "a4d02f0", "title": "unrelated work",
+         "url": _REAL_0719_ONLY_EVENT_URL, "ts": "2026-07-19T00:30:00Z", "author": "someone"},
+    ]
+
+    result = run_scan(
+        "thierrypdamiba", "orita",
+        x_posts=_live_x_posts_no_new_activity(),
+        github_events=complete_events,
+        check_prior_milestones=True,
+        ledger_base=tmp_path,
+    )
+
+    assert result["github_events_source"] == "override"
+
+
+def test_run_scan_check_prior_milestones_defaults_off_preserving_old_behavior(tmp_path):
+    # Backward compatibility: a fixture ledger with real missing evidence is
+    # present, but check_prior_milestones is left at its default (False) --
+    # exactly how every other test in this file already calls run_scan, and
+    # exactly how run_combined_scan.py still calls it today. Must not raise.
+    _seal_milestone_gap(tmp_path, evidence=_REAL_0718_EVIDENCE, generated_at=_REAL_0718_SEALED_AT)
+    truncated_events = [
+        {"kind": "commit", "id": "a4d02f0", "title": "unrelated work",
+         "url": _REAL_0719_ONLY_EVENT_URL, "ts": "2026-07-19T00:30:00Z", "author": "someone"},
+    ]
+
+    result = run_scan(
+        "thierrypdamiba", "orita",
+        x_posts=_live_x_posts_no_new_activity(),
+        github_events=truncated_events,
+        ledger_base=tmp_path,  # supplied but unused -- check_prior_milestones stays False
+    )
+
+    assert result["github_events_source"] == "override"
+
+
+def test_cli_main_activates_the_prior_milestone_check_by_default(monkeypatch):
+    # main() is the real entrypoint seam-scan.yml's cron and every manual
+    # override run actually call — prove it turns the new safety net on
+    # without anyone needing to remember a flag.
+    import seam_engine.scan as scan_mod
+
+    captured = {}
+
+    def fake_run_scan(owner, repo, window_hours=24, x_posts=None, github_events=None, **kwargs):
+        captured.update(kwargs)
+        return {
+            "generated_at": "2026-07-19T00:00:00+00:00", "repo": f"{owner}/{repo}",
+            "window_hours": window_hours, "account_live_since": "2026-07-12T00:00:00+00:00",
+            "x_posts_source": "ledger", "github_events_source": "direct",
+            "confidence_bar": 0.7, "separation_margin": 0.15,
+            "primary_gap": None, "tail": [], "excluded": [],
+        }
+
+    monkeypatch.setattr(scan_mod, "run_scan", fake_run_scan)
+
+    rc = scan_mod.main([])
+
+    assert rc == 0
+    assert captured.get("check_prior_milestones") is True
+
+
+# --- live proof against the real, already-sealed ledger -----------------------
+
+
+def test_real_ledger_has_unresolved_milestone_evidence_right_now():
+    # Not a fixture: reads the REAL fencepost/GAPS/*.md tablets this town has
+    # actually sealed. As of this writing, no real X post has landed since
+    # 2026-07-18T13:10:49Z (the outage tracked in tools/x_outage_tracker.py
+    # is still open), so the 4 commits fencepost/GAPS/2026-07-18.md sealed as
+    # this town's own primary milestone gap are still, genuinely, unresolved
+    # today -- this is the live proof the bug this task fixes is real, not
+    # hypothetical. (This assertion is a live snapshot: once a real X post
+    # finally lands mentioning one of MILESTONE_KEYWORDS, or once this
+    # specific evidence is superseded by a later real primary_gap entry,
+    # it will need updating -- same as every other "live" test in this repo.)
+    from seam_engine.scan import load_x_posts_from_ledger
+
+    real_x_posts = load_x_posts_from_ledger()
+    unresolved = _unresolved_prior_milestone_evidence(real_x_posts, None)
+
+    for url in _REAL_0718_EVIDENCE:
+        assert url in unresolved, f"{url} should still read as unresolved (no real post has landed since it was sealed)"
+
+
+def test_real_ledger_chain_still_verifies_intact_after_this_task():
+    # Confirms this task's changes never touched the real, sealed
+    # fencepost/GAPS/*.md tablets themselves (only scan.py's code and this
+    # test file) -- a tampered tablet would fail this, immediately.
+    problems = _ledger_mod.verify(None)
+    assert problems == []
 
