@@ -38,6 +38,7 @@ REPO_ROOT = Path(__file__).resolve().parents[3]  # .../orita
 TEMPLATE = REPO_ROOT / ".github" / "ISSUE_TEMPLATE" / "point-fencepost.md"
 FENCEPOST_ROOT = Path(__file__).resolve().parents[2]  # .../orita/fencepost
 SCOPES_MD = FENCEPOST_ROOT / "SCOPES.md"
+SCAN_PY = FENCEPOST_ROOT / "seam_engine" / "src" / "seam_engine" / "scan.py"
 
 # Matches one three-cell markdown table row (`| a | b | c |`), one line at a
 # time — re.MULTILINE is load-bearing here (task 135's own buildlog entry
@@ -196,7 +197,7 @@ def test_every_required_scopes_toolkit_has_a_scopes_md_row():
 def test_parser_actually_detects_drift_not_just_tautologically_passes():
     """Hand-verification, in test form. Mutate a COPY of the real table text
     the way a future SCOPES.md edit genuinely could (here: drop
-    `CountStargazers` from GitHub's row) and prove the same parser used by
+    `GetLatestRelease` from GitHub's row) and prove the same parser used by
     the tests above disagrees with `REQUIRED_SCOPES` on the mutated text —
     the same before/after discipline task 135's own hand-verification held
     its checker to, so this file's silence on a real future drift can't be
@@ -205,18 +206,18 @@ def test_parser_actually_detects_drift_not_just_tautologically_passes():
     real_text = _scopes_md_text()
     real_row = (
         "GetRepository, ListRepoCommits, ListIssues, GetIssue, ListPullRequests, "
-        "ListRepositoryActivities, CountStargazers"
+        "ListRepositoryActivities, CountStargazers, GetLatestRelease"
     )
     mutated_row = (
         "GetRepository, ListRepoCommits, ListIssues, GetIssue, ListPullRequests, "
-        "ListRepositoryActivities"
+        "ListRepositoryActivities, CountStargazers"
     )
     assert real_row in real_text, "SCOPES.md's GitHub row text has already changed shape — update this fixture row"
     mutated_text = real_text.replace(real_row, mutated_row)
     assert mutated_text != real_text
 
     mutated_parsed = _parse_toolkit_table(mutated_text)
-    assert "CountStargazers" not in mutated_parsed["github"]
+    assert "GetLatestRelease" not in mutated_parsed["github"]
     assert mutated_parsed["github"] != REQUIRED_SCOPES["github"]
 
     # And the real, unmutated file still parses clean against REQUIRED_SCOPES
@@ -224,3 +225,46 @@ def test_parser_actually_detects_drift_not_just_tautologically_passes():
     # simply broken regardless of input.
     real_parsed = _parse_toolkit_table(real_text)
     assert real_parsed["github"] == REQUIRED_SCOPES["github"]
+
+
+def _scan_py_claimed_github_tools() -> frozenset[str]:
+    """Every test above this point proves REQUIRED_SCOPES agrees with
+    SCOPES.md and the issue template — two hand-typed copies and their
+    shared source doc. None of them ever checks the actual reading code:
+    `scan.py`'s own module docstring names the real GitHub tool calls its
+    live-override path expects (`load_github_events_from_live`'s
+    `get_latest_release` among them, task 128's addition), and
+    `fetch_github_activity` really does call `releases/latest` on every
+    run (proven live by `test_scan.py`'s `kind="release"` cases). That
+    call was missing from REQUIRED_SCOPES/SCOPES.md/the issue template
+    until this test closed the gap — the same doc-vs-code drift class as
+    tasks 130/131/133/135/136, aimed at scan.py's own claim for the first
+    time.
+    """
+    text = SCAN_PY.read_text(encoding="utf-8")
+    marker = "GitHub read-only toolkit makes ("
+    assert marker in text, f"{SCAN_PY} no longer names its own claimed GitHub tool list — update this test's marker"
+    start = text.index(marker) + len(marker)
+    end = text.index(")", start)
+    return frozenset(name.strip() for name in text[start:end].split(",") if name.strip())
+
+
+def test_scan_py_exists():
+    assert SCAN_PY.exists(), f"missing {SCAN_PY} — the seam-scan engine itself must still exist"
+
+
+def test_scan_py_claimed_github_tools_are_all_in_required_scopes():
+    """scan.py's own docstring must never claim to use a GitHub tool the
+    sworn Oath doesn't declare — the exact drift this test file's earlier
+    tests never checked for, because they only ever compared REQUIRED_SCOPES
+    against two OTHER hand-typed copies of the same list, never against the
+    reading code itself.
+    """
+    claimed = _scan_py_claimed_github_tools()
+    assert claimed, "parsed zero claimed GitHub tools from scan.py — check the marker text hasn't moved"
+    missing = claimed - REQUIRED_SCOPES["github"]
+    assert not missing, (
+        f"scan.py's docstring claims GitHub tool(s) {sorted(missing)} that "
+        "consent.REQUIRED_SCOPES['github'] does not declare — the sworn Oath "
+        "is narrower than what the engine actually reads"
+    )

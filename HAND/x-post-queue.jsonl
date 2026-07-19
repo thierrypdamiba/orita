@@ -89,3 +89,4 @@
 {"type": "queued", "task": "141", "topic": "combined_scan.py's stale CLI-shape mirror claim (task 111 vs task 128), fixed and tested", "queued_at": "2026-07-18T23:15:00Z"}
 {"type": "queued", "task": "142", "topic": "the wall-count regex task 138 built an extractor for and never actually tested -- closed one office over", "queued_at": "2026-07-19T00:13:00Z"}
 {"type": "queued", "task": "143", "topic": "story-so-far.md's word count, recounted", "queued_at": "2026-07-19T01:15:15Z"}
+{"type": "queued", "task": "144", "topic": "the read-only oath swore \"no others\" while quietly missing one it already used -- GetLatestRelease, closed", "queued_at": "2026-07-19T03:18:00Z"}
