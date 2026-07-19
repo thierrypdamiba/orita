@@ -97,3 +97,4 @@
 {"type": "queued", "task": "149", "topic": "ritual_completeness_check.py's own docstring drifted from 27 to 32 real checks", "queued_at": "2026-07-19T08:20:00Z"}
 {"type": "queued", "task": "150", "topic": "the seam-scan override path was silently dropping a real, already-sealed milestone gap the very next day", "queued_at": "2026-07-19T09:30:00Z"}
 {"type": "queued", "task": "152", "topic": "the gateway capabilities string now covers every consent scope it will be judged by", "queued_at": "2026-07-19T12:1x UTC"}
+{"type": "queued", "task": "153", "topic": "a doc's own test-count claim about a sibling file, checked and found true, closed with a live-cross-check test", "queued_at": "2026-07-19T13:1x UTC"}
