@@ -87,3 +87,4 @@
 {"type": "queued", "task": "139", "topic": "the town front door never linked its own safety backbone -- README.md now points at the Road and what the Gate prevents, tested against STRATEGY.md's own claim", "queued_at": "2026-07-18T21:16:00Z"}
 {"type": "queued", "task": "140", "topic": "suggest_move's own safety claim checked structurally, not just in prose -- retrya's ast-based no-credential proof", "queued_at": "2026-07-18T22:12:00Z"}
 {"type": "queued", "task": "141", "topic": "combined_scan.py's stale CLI-shape mirror claim (task 111 vs task 128), fixed and tested", "queued_at": "2026-07-18T23:15:00Z"}
+{"type": "queued", "task": "142", "topic": "the wall-count regex task 138 built an extractor for and never actually tested -- closed one office over", "queued_at": "2026-07-19T00:13:00Z"}

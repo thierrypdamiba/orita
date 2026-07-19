@@ -24,7 +24,8 @@ import re
 from datetime import datetime, timezone
 from pathlib import Path
 
-from seam_engine import audit, ledger
+from seam_engine import audit, ledger, report
+from seam_engine.wall import wall_for
 
 FENCEPOST_ROOT = Path(__file__).resolve().parents[2]
 INDEX_HTML = FENCEPOST_ROOT.parent / "docs" / "fencepost" / "index.html"
@@ -155,6 +156,50 @@ def test_tally_regex_is_structurally_distinct_from_the_wall_count_regex():
     tally_source = _extract_tally_regex().pattern
     wall_source = _extract_wall_regex_source()
     assert tally_source != wall_source
+
+
+# --- the wall-count regex, task 138 built the extractor for and never used ---
+# `_extract_wall_regex_source()` above was, until now, called exactly once --
+# only to prove it differs from the Tally regex, never to prove it actually
+# matches the real generator it parses. The teaser (task 126) and the Tally
+# block (task 138) both carry that proof; this block, one line up in the
+# same <script>, never did.
+
+
+def _sealed(recorded: int) -> dict:
+    return {
+        "date": "2026-07-12",
+        "generated_at": "2026-07-12T00:00:00+00:00",
+        "repo": "x/orita",
+        "primary_gap": None,
+        "tail": [],
+        "fenceposts_recorded_total": recorded,
+    }
+
+
+def test_wall_count_regex_matches_real_report_output_with_correct_group():
+    wall_pattern = re.compile(_extract_wall_regex_source(), re.IGNORECASE)
+    for recorded in (0, 1, 7):
+        text = report.render_report(_sealed(recorded))
+        match = wall_pattern.search(text)
+        assert match is not None, (
+            f"the page's own wall-count regex failed to match render_report's "
+            f"real output for fenceposts_recorded_total={recorded}"
+        )
+        assert int(match.group(1)) == wall_for(recorded)
+
+
+def test_wall_count_regex_stops_matching_a_reworded_copy_of_the_real_line():
+    wall_pattern = re.compile(_extract_wall_regex_source(), re.IGNORECASE)
+    text = report.render_report(_sealed(3))
+    assert wall_pattern.search(text) is not None, "sanity: the real line must match before mutating it"
+    mutated = text.replace("The wall reads", "The wall shows")
+    assert "The wall reads" not in mutated
+    assert wall_pattern.search(mutated) is None, (
+        "the extracted wall-count regex still matched a deliberately reworded "
+        "copy of the real line -- it isn't actually anchored to the wording "
+        "index.html depends on"
+    )
 
 
 # --- the regex matches the REAL generator's output, groups included ----------
