@@ -213,15 +213,49 @@ def fetch_github_activity(owner: str, repo: str, since: datetime) -> list[Github
 
         release = client.get(f"{GITHUB_API}/repos/{owner}/{repo}/releases/latest")
         if release.status_code == 200:
-            r = release.json()
-            ts = _parse_ts(r["published_at"])
-            if ts >= since:
-                events.append(GithubEvent(
-                    kind="release", id=r["tag_name"], title=r["name"] or r["tag_name"],
-                    url=r["html_url"], ts=ts, author=r.get("author", {}).get("login", "unknown"),
-                ))
+            event = _release_event_from_json(release.json())
+            if event.ts >= since:
+                events.append(event)
 
     return events
+
+
+def _release_event_from_json(r: dict[str, Any]) -> GithubEvent:
+    """Build the shared `GithubEvent` shape from a raw `/releases/latest`
+    response body — factored out of `fetch_github_activity` so
+    `fetch_latest_release` (below) can reuse the exact same parsing without
+    a second hand-typed copy."""
+    ts = _parse_ts(r["published_at"])
+    return GithubEvent(
+        kind="release", id=r["tag_name"], title=r["name"] or r["tag_name"],
+        url=r["html_url"], ts=ts, author=r.get("author", {}).get("login", "unknown"),
+    )
+
+
+def fetch_latest_release(owner: str, repo: str) -> GithubEvent | None:
+    """Read-only: the single latest release of a public GitHub repo, or
+    `None` if it has none. Exactly one GET, to `/releases/latest` — never
+    touches `/commits`.
+
+    ROADMAP.md #157: `server.get_latest_release` used to answer this same
+    question by calling `fetch_github_activity(owner, repo, EPOCH)` and
+    filtering the result for `kind == "release"` — a shortcut that was
+    merely wasteful before task 154 (one unpaginated 100-commit page,
+    thrown away) and became a real, live-reproducible bug after it: an
+    epoch `since` now forces `fetch_github_activity` to paginate the
+    repo's ENTIRE commit history before it ever reaches the release call,
+    and once that history passes `_MAX_COMMIT_PAGES * 100` commits (5,000
+    — plausible for a repo committing most hours of most days), the call
+    raises `RuntimeError` and never returns a release again. This function
+    answers the release question the way it was always actually asked —
+    one request, no commit pagination, no `since` at all.
+    """
+    headers = github_headers()
+    with httpx.Client(timeout=15.0, headers=headers) as client:
+        release = client.get(f"{GITHUB_API}/repos/{owner}/{repo}/releases/latest")
+        if release.status_code == 200:
+            return _release_event_from_json(release.json())
+    return None
 
 
 _REQUIRED_LIVE_EVENT_KEYS = ("kind", "id", "title", "url", "ts", "author")

@@ -30,6 +30,7 @@ from seam_engine.scan import (
     coincidence_candidates,
     compute_candidates,
     fetch_github_activity,
+    fetch_latest_release,
     load_x_posts_from_ledger,
     load_x_posts_from_live,
 )
@@ -65,10 +66,18 @@ def get_latest_release(
     owner: Annotated[str, "GitHub owner (user or org)"],
     repo: Annotated[str, "GitHub repository name"],
 ) -> Annotated[dict | None, "The latest release, or null if none exists"]:
-    """Read-only: fetch the latest release of a public GitHub repo."""
-    events = fetch_github_activity(owner, repo, datetime(1970, 1, 1, tzinfo=timezone.utc))
-    releases = [e for e in events if e.kind == "release"]
-    return asdict(releases[0]) if releases else None
+    """Read-only: fetch the latest release of a public GitHub repo.
+
+    ROADMAP.md #157: used to call `fetch_github_activity(owner, repo,
+    EPOCH)` and filter for `kind == "release"` — after task 154 turned
+    commit fetching into a real paginating loop, that epoch `since` forced
+    a full-history commit pagination before ever reaching the release call,
+    wasteful at best and (past `_MAX_COMMIT_PAGES * 100` commits) a live
+    `RuntimeError` at worst, for a question that only ever needed one
+    request. `fetch_latest_release` asks it directly.
+    """
+    event = fetch_latest_release(owner, repo)
+    return asdict(event) if event is not None else None
 
 
 @app.tool(metadata=READ_ONLY)
