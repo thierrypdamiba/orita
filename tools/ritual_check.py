@@ -285,6 +285,10 @@ def _scopes_completeness_check():
     return _load("_ritual_scopes_completeness_check", os.path.join(ROOT, "tools", "scopes_completeness_check.py"))
 
 
+def _toolkits_in_use_check():
+    return _load("_ritual_toolkits_in_use_check", os.path.join(ROOT, "tools", "toolkits_in_use_check.py"))
+
+
 def _seam_ledger():
     src = os.path.join(ROOT, "fencepost", "seam_engine", "src")
     if src not in sys.path:
@@ -836,6 +840,26 @@ def check_scopes_completeness(scopes_path: str | None = None, app_log_path: str 
     return mod.check_scopes_completeness(**kwargs)
 
 
+def check_toolkits_in_use(metrics_path: str | None = None, consent_log_path: str | None = None) -> dict:
+    """Task 145: fold `toolkits_in_use_check.py`'s own cross-check of
+    `records/metrics.jsonl`'s last `distinct_toolkits_in_use` reading
+    against `consent_grant_log.py`'s real, gate-verified ground truth
+    into the one block. Unconditional, local-filesystem-only, the same
+    cheap always-on class `check_wip_reclaim`/`check_scopes_completeness`
+    already hold. A real hit here DOES flip `broken`: the flagship's own
+    STRATEGY.md adoption metric silently disagreeing with the truth is a
+    live governance regression, not an honest zero-state waiting on the
+    calendar -- the same law `check_scopes_completeness` already lives
+    by, one metric over."""
+    mod = _toolkits_in_use_check()
+    kwargs = {}
+    if metrics_path is not None:
+        kwargs["metrics_path"] = metrics_path
+    if consent_log_path is not None:
+        kwargs["consent_log_path"] = consent_log_path
+    return mod.check_toolkits_in_use(**kwargs)
+
+
 def check_change_gate(report_info: dict) -> dict | None:
     """Fold `change_gate.should_post_gap()` -- task 69's own change-gate
     rule -- using whichever report text `check_report_freshness` already
@@ -885,6 +909,8 @@ def run_ritual_check(
     arcade_apps_state: dict | None = None,
     scopes_path: str | None = None,
     app_log_path: str | None = None,
+    toolkits_metrics_path: str | None = None,
+    toolkits_consent_log_path: str | None = None,
 ) -> dict:
     if now is None:
         now = datetime.now(timezone.utc)
@@ -923,6 +949,9 @@ def run_ritual_check(
     ritual_completeness = check_ritual_completeness(source_path=ritual_completeness_path)
     wip_reclaim = check_wip_reclaim(now, roadmap_path=wip_reclaim_path)
     scopes_completeness = check_scopes_completeness(scopes_path=scopes_path, app_log_path=app_log_path)
+    toolkits_in_use = check_toolkits_in_use(
+        metrics_path=toolkits_metrics_path, consent_log_path=toolkits_consent_log_path
+    )
     broken = (
         (not town["ok"])
         or (not fencepost["ok"])
@@ -941,6 +970,7 @@ def run_ritual_check(
         or (not ritual_completeness["clean"])
         or (not wip_reclaim["clean"])
         or (not scopes_completeness["clean"])
+        or (not toolkits_in_use["clean"])
     )
     return {
         "now": now_iso,
@@ -975,6 +1005,7 @@ def run_ritual_check(
         "ritual_completeness": ritual_completeness,
         "wip_reclaim": wip_reclaim,
         "scopes_completeness": scopes_completeness,
+        "toolkits_in_use": toolkits_in_use,
         "broken": broken,
     }
 
@@ -1150,6 +1181,16 @@ def format_ritual_check(result: dict) -> str:
         lines.append(f"  scopes completeness: clean ({len(sc['connected_app_ids'])} connected app(s), all accounted for)")
     else:
         lines.append(f"  scopes completeness: BROKEN -- undocumented connected app(s): {', '.join(sc['missing'])}, escalate now")
+    ti = result["toolkits_in_use"]
+    if ti["claimed"] is None:
+        lines.append(f"  toolkits in use: clean (no metrics.jsonl reading yet; real ground truth is {ti['real']})")
+    elif ti["clean"]:
+        lines.append(f"  toolkits in use: clean ({ti['real']} real toolkit(s), metrics.jsonl's {ti['claimed_date']} reading agrees)")
+    else:
+        lines.append(
+            f"  toolkits in use: BROKEN -- metrics.jsonl's {ti['claimed_date']} reading claims {ti['claimed']}, "
+            f"real ground truth is {ti['real']} -- STRATEGY.md's adoption metric is misreporting live, escalate now"
+        )
     return "\n".join(lines)
 
 

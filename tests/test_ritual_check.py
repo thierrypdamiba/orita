@@ -1664,5 +1664,60 @@ class WipReclaimFoldCase(unittest.TestCase):
         self.assertTrue(result["wip_reclaim"]["clean"])
 
 
+class ToolkitsInUseFoldCase(unittest.TestCase):
+    """Task 145: run_ritual_check() folds toolkits_in_use_check.py's own
+    cross-check of records/metrics.jsonl's last distinct_toolkits_in_use
+    reading against consent_grant_log.py's real ground truth into the
+    same structured result -- clean against a fixture where the two
+    agree, BROKEN (and printed) where they don't, and honestly BROKEN
+    against the real, live town state today."""
+
+    def setUp(self):
+        self.tmp = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.tmp, ignore_errors=True)
+        self.metrics_path = os.path.join(self.tmp, "metrics.jsonl")
+        self.consent_path = os.path.join(self.tmp, "consent.jsonl")
+
+    def _write_metrics(self, rows):
+        with open(self.metrics_path, "w", encoding="utf-8") as f:
+            for row in rows:
+                f.write(json.dumps(row) + "\n")
+
+    def test_agreeing_reading_is_clean(self):
+        self._write_metrics([{"date": "2026-07-19", "distinct_toolkits_in_use": 0}])
+        result = rc.run_ritual_check(
+            toolkits_metrics_path=self.metrics_path, toolkits_consent_log_path=self.consent_path
+        )
+        self.assertTrue(result["toolkits_in_use"]["clean"])
+        self.assertFalse(result["broken"])
+        self.assertIn(
+            "toolkits in use: clean (0 real toolkit(s), metrics.jsonl's 2026-07-19 reading agrees)",
+            rc.format_ritual_check(result),
+        )
+
+    def test_disagreeing_reading_flips_broken_and_prints_both_numbers(self):
+        self._write_metrics([{"date": "2026-07-18", "distinct_toolkits_in_use": 2}])
+        result = rc.run_ritual_check(
+            toolkits_metrics_path=self.metrics_path, toolkits_consent_log_path=self.consent_path
+        )
+        self.assertFalse(result["toolkits_in_use"]["clean"])
+        self.assertTrue(result["broken"])
+        formatted = rc.format_ritual_check(result)
+        self.assertIn("toolkits in use: BROKEN", formatted)
+        self.assertIn("claims 2", formatted)
+
+    def test_default_path_reads_the_real_state_and_is_honestly_clean(self):
+        """No override: reads the real records/metrics.jsonl and the real
+        (never-written) HAND/consent-grants-log.jsonl. This task
+        corrected every historical metrics.jsonl entry's
+        distinct_toolkits_in_use from a flattering 2 to the honest 0, so
+        the real, live state this hour now genuinely agrees."""
+        result = rc.run_ritual_check()
+        self.assertEqual(result["toolkits_in_use"]["real"], 0)
+        self.assertEqual(result["toolkits_in_use"]["claimed"], 0)
+        self.assertTrue(result["toolkits_in_use"]["clean"])
+        self.assertFalse(result["broken"])
+
+
 if __name__ == "__main__":
     unittest.main()
