@@ -49,6 +49,27 @@ DEFAULT_POLICY: dict[str, Any] = {
 }
 
 
+def _policy_value_matches(declared_value: Any, policy_value: Any) -> bool:
+    """One declared field satisfies one policy requirement.
+
+    Boolean policy values are checked by IDENTITY (``is``), the same
+    discipline `seam_engine.badge.ToolAudit.ok` (the original this module's
+    own docstring calls "sworn on iron, same as the original") uses for its
+    own ``read_only is True`` / ``destructive is False`` checks — not by
+    equality. Python treats ``1 == True`` and ``0 == False``, so without
+    this, a duck-typed or dict-shaped tool record (the exact "fixture, or a
+    lighter integration" shape this module's own docstring advertises
+    supporting) declaring ``read_only=1`` instead of an actual ``True``
+    would silently pass here while failing the real original's oath.
+    Non-boolean policy values (an ``operations`` tuple, for a fork whose
+    own non-negotiable isn't boolean-shaped) are still checked by equality,
+    unchanged.
+    """
+    if isinstance(policy_value, bool):
+        return declared_value is policy_value
+    return declared_value == policy_value
+
+
 @dataclass(frozen=True)
 class ToolAudit:
     """What one tool's own declared metadata says, checked against a policy."""
@@ -59,7 +80,9 @@ class ToolAudit:
 
     @property
     def ok(self) -> bool:
-        return all(self.declared.get(k) == v for k, v in self.policy.items())
+        return all(
+            _policy_value_matches(self.declared.get(k), v) for k, v in self.policy.items()
+        )
 
     @property
     def violation(self) -> str | None:
@@ -68,7 +91,7 @@ class ToolAudit:
         mismatches = {
             k: self.declared.get(k)
             for k in self.policy
-            if self.declared.get(k) != self.policy[k]
+            if not _policy_value_matches(self.declared.get(k), self.policy[k])
         }
         return f"{self.name}: violates oath {mismatches} (policy wants {self.policy})"
 
