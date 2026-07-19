@@ -3,15 +3,38 @@
 request that asks Arcade's tool matcher for a write is a broken oath even
 if no write tool is ever named directly. These tests exercise the pure
 `is_read_only_capabilities` law, then hold the town's own constant to it.
+
+Task 152 adds a second, previously-untested relationship: the capabilities
+string is also a *floor*. It must name a covering keyword for every tool
+`consent.REQUIRED_SCOPES` will later demand a scope-confirm name verbatim,
+or a real forker who pastes it exactly into Arcade's Gateway Assistant
+could provision a gateway that can never pass its own onboarding consent
+gate. `test_connect_doctrine.py` only ever proved the string is quoted
+verbatim in CONNECT.md/connect.html — never that its own content is
+complete against the scopes it will be judged by.
 """
 from __future__ import annotations
 
 import pytest
 
+from seam_engine.consent import REQUIRED_SCOPES
 from seam_engine.gateway import (
     READ_ONLY_CAPABILITIES,
     gateway_url,
     is_read_only_capabilities,
+    required_scopes_covered_by_capabilities,
+)
+
+# The real, live pre-task-152 string — reconstructed from the actual git
+# history, not invented — used only by the mutation test below to prove the
+# new coverage check would have caught the real historical gap.
+_PRE_TASK_152_CAPABILITIES = (
+    "Read-only seam reconciliation: list and read GitHub commit history, "
+    "releases, issues, and pull requests, and read a connected user's own "
+    "X (Twitter) tweet history and mentions — solely to compare the two "
+    "timelines and surface gaps between what shipped and what was "
+    "announced. Never create, update, merge, label, delete, post, reply, "
+    "send, or modify anything on any connected account."
 )
 
 
@@ -58,3 +81,63 @@ def test_gateway_url_builds_the_real_arcade_mcp_url():
 def test_gateway_url_rejects_malformed_slugs(bad_slug: str):
     with pytest.raises(ValueError):
         gateway_url(bad_slug)
+
+
+# --- Task 152: the capabilities string is a floor, not just a ceiling ------
+
+
+def test_required_scopes_is_a_real_nontrivial_family():
+    # Same non-vacuous-family guard task 147/148's doctrine tests hold —
+    # a broken import or an emptied REQUIRED_SCOPES would make every
+    # coverage assertion below vacuously true.
+    assert len(REQUIRED_SCOPES.get("github", ())) >= 5
+    assert len(REQUIRED_SCOPES.get("x", ())) >= 2
+
+
+def test_the_towns_own_capabilities_string_covers_every_required_scope():
+    missing = required_scopes_covered_by_capabilities(READ_ONLY_CAPABILITIES)
+    assert missing == {}, (
+        f"READ_ONLY_CAPABILITIES is missing a covering keyword for: {missing} "
+        "— a forker who pastes this string could provision a gateway unable "
+        "to satisfy consent.REQUIRED_SCOPES"
+    )
+
+
+def test_coverage_check_defaults_to_the_real_live_constants():
+    # No args at all — proves the function checks the real module-level
+    # READ_ONLY_CAPABILITIES against the real live consent.REQUIRED_SCOPES,
+    # not just whatever the caller happens to hand it.
+    assert required_scopes_covered_by_capabilities() == {}
+
+
+def test_real_pre_task_152_string_would_have_failed_the_coverage_check():
+    # Mutation-based hand-verification: reconstruct the actual pre-fix
+    # string from git history and prove today's checker would have flagged
+    # the real historical gap, not a synthetic one.
+    missing = required_scopes_covered_by_capabilities(_PRE_TASK_152_CAPABILITIES)
+    assert missing == {
+        "github": ["CountStargazers", "GetRepository", "ListRepositoryActivities"],
+        "x": ["WhoAmI"],
+    }
+
+
+def test_missing_a_keyword_for_one_tool_is_reported_precisely():
+    text = "Read GitHub issues and pull requests. Never write anything."
+    missing = required_scopes_covered_by_capabilities(
+        text, required_scopes={"github": frozenset({"ListIssues", "GetRepository"})}
+    )
+    assert missing == {"github": ["GetRepository"]}
+
+
+def test_full_coverage_for_a_synthetic_toolkit_reports_no_gap():
+    text = "Read repository metadata and issues, never anything else."
+    missing = required_scopes_covered_by_capabilities(
+        text, required_scopes={"github": frozenset({"GetRepository", "ListIssues"})}
+    )
+    assert missing == {}
+
+
+def test_the_extended_capabilities_string_still_holds_the_read_only_law():
+    # The fix that closed the coverage gap must not have reopened the
+    # write-verb gap is_read_only_capabilities already guards.
+    assert is_read_only_capabilities(READ_ONLY_CAPABILITIES)

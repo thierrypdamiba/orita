@@ -37,8 +37,18 @@ drifts toward a write verb Arcade's tool matcher could act on. Copy it
 exactly:
 
 ```text
-Read-only seam reconciliation: list and read GitHub commit history, releases, issues, and pull requests, and read a connected user's own X (Twitter) tweet history and mentions — solely to compare the two timelines and surface gaps between what shipped and what was announced. Never create, update, merge, label, delete, post, reply, send, or modify anything on any connected account.
+Read-only seam reconciliation: list and read GitHub repository metadata, commit history, releases, issues, pull requests, repository activity, and stargazer counts, and read a connected user's own X (Twitter) tweet history, mentions, and account identity — solely to compare the two timelines and surface gaps between what shipped and what was announced. Never create, update, merge, label, delete, post, reply, send, or modify anything on any connected account.
 ```
+
+**CORRECTED 2026-07-19, task 152:** the string used to name only 4 of the 8
+GitHub tool concepts and 2 of the 3 X tool concepts `consent.py`'s
+`REQUIRED_SCOPES` actually requires — missing repository metadata,
+repository activity, stargazer counts, and account identity. A forker who
+pasted the old string exactly would have provisioned a gateway that could
+never satisfy its own onboarding consent gate. `gateway.py` now checks the
+two constants against each other directly
+(`required_scopes_covered_by_capabilities`), so this can't drift silently
+again.
 
 That's the whole capabilities argument. You will not need to hand-pick
 individual tools — Arcade's Gateway Assistant reads a natural-language
