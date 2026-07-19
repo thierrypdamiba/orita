@@ -103,3 +103,4 @@
 {"type": "queued", "task": "157", "topic": "server.get_latest_release no longer paginates the whole repo to answer one question", "queued_at": "2026-07-19T17:24:37Z"}
 {"type": "queued", "task": "158", "topic": "cadence-target mirror fix, task 158", "queued_at": "2026-07-19T18:15:48Z"}
 {"type": "queued", "task": "159", "topic": "STRATEGY.md's metrics targets never checked against the code constants that claim to mirror them", "queued_at": "2026-07-19T19:14:42Z"}
+{"type": "queued", "task": "160", "topic": "the ad's own URL, held up to the file it claims", "queued_at": "2026-07-19T20:1x"}
