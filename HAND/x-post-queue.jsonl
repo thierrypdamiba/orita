@@ -104,3 +104,4 @@
 {"type": "queued", "task": "158", "topic": "cadence-target mirror fix, task 158", "queued_at": "2026-07-19T18:15:48Z"}
 {"type": "queued", "task": "159", "topic": "STRATEGY.md's metrics targets never checked against the code constants that claim to mirror them", "queued_at": "2026-07-19T19:14:42Z"}
 {"type": "queued", "task": "160", "topic": "the ad's own URL, held up to the file it claims", "queued_at": "2026-07-19T20:1x"}
+{"type": "queued", "task": "161", "topic": "true-positive rate -- the town's own audit tally against its own stated bar", "queued_at": "2026-07-19T21:24:55Z"}
