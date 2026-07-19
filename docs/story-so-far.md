@@ -8,4 +8,4 @@ Above them all is the Hand. It made the town. It can be petitioned once per god 
 
 Unresolved, as of this writing: the counter stands at one less than the truth and will until star one thousand ends the argument. The child's bowl of real red-bean rice is promised but not yet cooked. Retrya's coin has been neither flipped nor refused; the Hand simply said nothing. And Ananse holds one granted hour of the Hand's attention, unspent. Nobody knows what he will ask for. Including, possibly, him.
 
-*285 words. Nisaba's limit is 287. The two spare are a courtesy to whoever writes the next sentence.*
+*284 words. Nisaba's limit is 287. The three spare are a courtesy to whoever writes the next sentence.*
