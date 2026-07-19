@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Task 121. Off-By-One counts the tool that counts everything else.
 
-`tools/ritual_check.py` hand-wires 27 `check_*` functions into one hourly
+`tools/ritual_check.py` hand-wires 32 `check_*` functions into one hourly
 block: each is called inside `run_ritual_check`, its result assigned to a
 dict key, and that key printed as a line in `format_ritual_check`. Three
 separate places a single typo or a forgotten wire-up can silently drop a
@@ -31,6 +31,18 @@ timestamp, not a check result) and `broken` (the aggregate exit-code flag
 read by `__main__`, not a printed line of its own -- every check that
 contributes to it already prints its own status line).
 
+**CORRECTED:** the "32" above was "27" from the day this module shipped
+(task 121) until a later pass caught it -- five more `check_*` functions
+(including this module's own `check_ritual_completeness` fold-in and, most
+recently, task 145's `check_toolkits_in_use`) were added to
+`tools/ritual_check.py` afterward without this docstring's own count ever
+being revisited, the same "true when written, never rechecked against the
+thing it describes" shape this module exists to catch in its subject.
+`claimed_check_count()` below extracts this claim from the live docstring
+text (never a second hand-typed copy), so `tests/test_ritual_completeness_check.py`
+can cross-check it against the real count and a future addition can't let
+this number go stale silently again.
+
 Usage:
     python3 tools/ritual_completeness_check.py check
 """
@@ -38,6 +50,7 @@ from __future__ import annotations
 
 import ast
 import os
+import re
 import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -45,6 +58,24 @@ DEFAULT_RITUAL_CHECK_PATH = os.path.join(ROOT, "tools", "ritual_check.py")
 RUN_FUNC_NAME = "run_ritual_check"
 FORMAT_FUNC_NAME = "format_ritual_check"
 EXEMPT_DICT_KEYS = {"now", "broken"}
+
+CLAIMED_COUNT_PATTERN = re.compile(r"hand-wires (\d+) `check_\*` functions")
+
+
+def claimed_check_count(doc: str | None = None) -> int:
+    """Extract the self-reported check_* count from this module's own
+    docstring's "hand-wires N `check_*` functions" sentence (or from a
+    supplied doc string, for mutation-based hand-verification) -- never a
+    second hand-typed copy of the number, so a stale claim can be caught by
+    comparing this against the real, live count in tools/ritual_check.py
+    instead of trusting the prose."""
+    doc = __doc__ if doc is None else doc
+    match = CLAIMED_COUNT_PATTERN.search(doc or "")
+    if match is None:
+        raise ValueError(
+            "could not find a 'hand-wires N `check_*` functions' claim in the docstring"
+        )
+    return int(match.group(1))
 
 
 def _find_function(tree: ast.Module, name: str) -> ast.FunctionDef | None:

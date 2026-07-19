@@ -211,5 +211,59 @@ class RealRitualCheckCase(unittest.TestCase):
         self.assertGreaterEqual(len(names), 27)
 
 
+class DocstringClaimDoctrineCase(unittest.TestCase):
+    """ritual_completeness_check.py's own module docstring self-reports how
+    many check_* functions ritual_check.py hand-wires -- proves that claim
+    is live-extracted (never a second hand-typed copy) and actually equals
+    the real, live count, the exact "true when written, never rechecked"
+    shape this module exists to catch in its subject.
+    """
+
+    def _real_check_count(self) -> int:
+        import ast
+
+        path = os.path.join(ROOT, "tools", "ritual_check.py")
+        with open(path, encoding="utf-8") as f:
+            tree = ast.parse(f.read(), filename=path)
+        return len(src._check_function_names(tree))
+
+    def test_docstring_claim_is_live_extracted_not_hardcoded(self):
+        # The claim comes from the module's real __doc__ text, not a second
+        # hand-typed literal in this test file.
+        self.assertEqual(src.claimed_check_count(), src.claimed_check_count(src.__doc__))
+
+    def test_docstring_claim_equals_the_real_live_check_count(self):
+        self.assertEqual(src.claimed_check_count(), self._real_check_count())
+
+    def test_real_check_count_is_currently_32(self):
+        # Regression pin: task 121 shipped this module claiming 27. Five
+        # more check_* functions (this module's own check_ritual_completeness
+        # fold-in among them, plus task 145's check_toolkits_in_use) were
+        # added to ritual_check.py afterward with nobody revisiting the
+        # docstring's number -- naming the real count here so a future
+        # addition that forgets the docstring trips a second, independent
+        # assertion, not just the live cross-check above.
+        self.assertEqual(self._real_check_count(), 32)
+
+    def test_stale_27_claim_would_have_been_flagged_against_todays_real_count(self):
+        # Mutation-based hand-verification: reconstruct the module's own
+        # real pre-fix docstring sentence (the literal "27" claim task 121
+        # actually shipped) and prove it disagrees with today's real,
+        # live count -- the exact historical bug this task fixes, proven
+        # catchable rather than assumed fixed.
+        stale_doc = (
+            "Task 121. Off-By-One counts the tool that counts everything else.\n\n"
+            "`tools/ritual_check.py` hand-wires 27 `check_*` functions into one "
+            "hourly\nblock: each is called inside `run_ritual_check`...\n"
+        )
+        stale_claim = src.claimed_check_count(stale_doc)
+        self.assertEqual(stale_claim, 27)
+        self.assertNotEqual(stale_claim, self._real_check_count())
+
+    def test_missing_claim_sentence_raises_instead_of_silently_passing(self):
+        with self.assertRaises(ValueError):
+            src.claimed_check_count("no claim sentence here at all")
+
+
 if __name__ == "__main__":
     unittest.main()
