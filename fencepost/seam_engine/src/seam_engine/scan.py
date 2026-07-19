@@ -148,26 +148,68 @@ def _parse_ts(s: str) -> datetime:
     return datetime.fromisoformat(s.replace("Z", "+00:00"))
 
 
+_MAX_COMMIT_PAGES = 50  # 5,000 commits' worth of headroom -- a real safety valve, not a
+# soft cap: see fetch_github_activity's own docstring for why hitting it raises instead
+# of silently truncating.
+
+
 def fetch_github_activity(owner: str, repo: str, since: datetime) -> list[GithubEvent]:
-    """Read-only: commits + the latest release, since `since`. GET only."""
+    """Read-only: commits + the latest release, since `since`. GET only.
+
+    Found and closed 2026-07-19: this call used to fetch a single
+    `per_page=100` page of `/commits` and stop, silently keeping only the
+    100 MOST RECENT commits since `since` -- correct for a young repo,
+    silently wrong the moment the real commit count between `since` and now
+    passed 100 (exactly what `_effective_since` reaching back to
+    `account_live_since` guarantees will eventually happen). That is what
+    surfaced as a live `seam-scan` CI failure this hour: task 150's own new
+    `check_prior_milestones` gate (shipped the night before) went looking
+    for 14 previously-sealed, still-unannounced milestone commits back to
+    2026-07-12 and found the direct-fetch path's real `github_events`
+    missing every one of them -- not because they'd been announced or fallen
+    out of the ledger's memory, but because they'd fallen off page 1. Now
+    paginated: keeps requesting successive pages until GitHub returns one
+    shorter than `per_page` (the real last page), so `since` reaching back
+    further always means fetching more, never quietly capping at the newest
+    100 regardless of `since`. `_MAX_COMMIT_PAGES` raises rather than
+    silently truncating if GitHub ever returns `_MAX_COMMIT_PAGES` full
+    pages in a row -- the same refuse-to-guess discipline
+    `load_github_events_from_live`'s empty-list refusal already holds one
+    function up.
+    """
     events: list[GithubEvent] = []
     headers = github_headers()
 
     with httpx.Client(timeout=15.0, headers=headers) as client:
-        commits = client.get(
-            f"{GITHUB_API}/repos/{owner}/{repo}/commits",
-            params={"since": since.isoformat(), "per_page": 100},
-        )
-        commits.raise_for_status()
-        for c in commits.json():
-            events.append(GithubEvent(
-                kind="commit",
-                id=c["sha"][:7],
-                title=c["commit"]["message"].splitlines()[0],
-                url=c["html_url"],
-                ts=_parse_ts(c["commit"]["author"]["date"]),
-                author=c["commit"]["author"]["name"],
-            ))
+        page = 1
+        while True:
+            commits = client.get(
+                f"{GITHUB_API}/repos/{owner}/{repo}/commits",
+                params={"since": since.isoformat(), "per_page": 100, "page": page},
+            )
+            commits.raise_for_status()
+            batch = commits.json()
+            for c in batch:
+                events.append(GithubEvent(
+                    kind="commit",
+                    id=c["sha"][:7],
+                    title=c["commit"]["message"].splitlines()[0],
+                    url=c["html_url"],
+                    ts=_parse_ts(c["commit"]["author"]["date"]),
+                    author=c["commit"]["author"]["name"],
+                ))
+            if len(batch) < 100:
+                break
+            page += 1
+            if page > _MAX_COMMIT_PAGES:
+                raise RuntimeError(
+                    f"fetch_github_activity(): still receiving full 100-commit pages "
+                    f"after {_MAX_COMMIT_PAGES} pages since {since.isoformat()} -- "
+                    "refusing to keep paginating silently. Either GitHub's API is "
+                    "behaving unexpectedly, or this repo genuinely has more than "
+                    f"{_MAX_COMMIT_PAGES * 100} commits in the window; raise "
+                    "_MAX_COMMIT_PAGES deliberately if the latter, don't just retry."
+                )
 
         release = client.get(f"{GITHUB_API}/repos/{owner}/{repo}/releases/latest")
         if release.status_code == 200:

@@ -3,7 +3,12 @@ live-X-read wiring (ROADMAP.md #94).
 
 `_effective_since` is the one piece of arithmetic that decides how far back
 `run_scan` looks for GitHub commits. `fetch_github_activity` itself (the one
-piece that makes a real network call) has no test here — that stays true.
+piece that makes a real network call) has no test HERE — that stays true —
+but as of ROADMAP.md #154 it does have tests, in
+`test_fetch_github_activity.py`, using `httpx.MockTransport` instead of a
+real network call: the pagination bug that claim's own complacency helped
+hide (a single unpaginated page silently dropped every commit past the
+newest 100) is closed there, not in this file.
 `run_scan` now DOES get exercised below (the "prior-milestone-evidence
 cross-check" section, added 2026-07-19), but only with `github_events`/
 `x_posts` supplied directly and `fetch_github_activity` never reached — the
