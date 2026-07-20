@@ -27,6 +27,7 @@ from seam_engine.ranking import rank
 from seam_engine.scan import (
     XPost,
     _effective_since,
+    _unresolved_prior_milestone_evidence,
     coincidence_candidates,
     compute_candidates,
     fetch_github_activity,
@@ -129,7 +130,26 @@ def seam_scan(
     """Read-only seam-scan v0: reconcile @oritatown's X posts against GitHub
     commits/releases and surface the single highest-confidence gap between
     them, labeled and cleared over the confidence bar, plus a confidence-scored
-    tail of coincidences. Fixes nothing; writes only the scan result."""
+    tail of coincidences. Fixes nothing; writes only the scan result.
+
+    ROADMAP.md #179: `scan.py`'s module docstring records "Found and closed
+    2026-07-19" — a truncated `github_events` override can silently drop a
+    previously-sealed, still-unannounced `milestone-unannounced` gap the real
+    Ledger already knows is open, reporting a thinner (or empty) result
+    instead of raising. `run_scan`'s `check_prior_milestones` flag closes it,
+    and `scan.main()` (the CLI) turns it on unconditionally because the CLI is
+    a real entrypoint, not a test harness calling `run_scan` directly. This
+    tool is the OTHER real entrypoint — the one a connecting agent session
+    actually calls — but it never delegates to `run_scan` (it hand-copies the
+    same steps so `github_events_json`'s own tests can monkeypatch
+    `fetch_github_activity` in this module's namespace, not `scan`'s), so it
+    never inherited the check. Reproduced live before this fix: handed a
+    truncated `github_events_json` missing a real, still-open, previously-
+    sealed milestone gap, this tool returned `primary_gap: null` with no
+    error — a false "no gap" answer for a gap the town's own ledger already
+    recorded as real. Runs the identical check `run_scan` runs when asked,
+    unconditionally (same discipline as the CLI, not opt-in like a test
+    harness's direct `run_scan` call)."""
     x_posts = (
         load_x_posts_from_ledger()
         if x_posts_json is None
@@ -147,6 +167,23 @@ def seam_scan(
         if github_events_json is None
         else load_github_events_from_live(json.loads(github_events_json))
     )
+    unresolved = _unresolved_prior_milestone_evidence(x_posts)
+    present = {e.url for e in events}
+    missing = {url: at for url, at in unresolved.items() if url not in present}
+    if missing:
+        example_url, example_sealed_at = next(iter(sorted(missing.items())))
+        raise ValueError(
+            f"seam_scan(): the supplied github_events data is missing "
+            f"{len(missing)} previously-sealed, still-unannounced "
+            f"'milestone-unannounced' commit(s) the Ledger already "
+            f"recorded as open (e.g. {example_url}, sealed "
+            f"{example_sealed_at}) — no real X post has landed since any "
+            f"of them was sealed, so this is not a resolved gap, it is an "
+            f"events window that does not reach back far enough "
+            f"(github_events_source={'override' if github_events_json is not None else 'direct'}). "
+            f"Widen the fetch to cover these commits, or the report will "
+            f"silently under-count a real, still-open gap."
+        )
     surfaced, excluded = compute_candidates(events, x_posts, account_live_since)
     coincidences = coincidence_candidates(events, x_posts, account_live_since)
     ranking = rank(surfaced + coincidences)
