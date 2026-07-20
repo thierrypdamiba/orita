@@ -106,3 +106,4 @@
 {"type": "queued", "task": "160", "topic": "the ad's own URL, held up to the file it claims", "queued_at": "2026-07-19T20:1x"}
 {"type": "queued", "task": "161", "topic": "true-positive rate -- the town's own audit tally against its own stated bar", "queued_at": "2026-07-19T21:24:55Z"}
 {"type": "queued", "task": "162", "topic": "oath_badge.py's own template checked against the original it swears to mirror, verbatim", "queued_at": "2026-07-19T22:16:51Z"}
+{"type": "queued", "task": "164", "topic": "network boundary check extended to fencepost's consent.py/draftback.py", "queued_at": "2026-07-20T00:12:34+00:00"}

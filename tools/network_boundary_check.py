@@ -44,6 +44,30 @@ passes; a module that imports `requests`, `httpx`, `urllib.request`,
 `urllib3`, `http.client`, `socket`, `aiohttp`, `ftplib`, `smtplib`,
 `telnetlib`, `poplib`, `imaplib`, or `nntplib` does not.
 
+ROADMAP task 164: `tools/*.py` was never the only place this exact claim
+lives. `fencepost/seam_engine/src/seam_engine/consent.py` (the double-
+checked consent gate -- "This module reads nothing and writes nothing
+itself... it is pure judgment, not action") and `draftback.py` (the
+write-back module -- "No adapter, no network, by default... this file
+cannot reach a real account on its own, because it does not know how to")
+both carry the identical "no network" trust-boundary claim, true today
+(grepped), and -- until this task -- checked by nothing: this module's own
+`find_claiming_files`/`check_network_boundary` only ever globbed
+`tools/*.py`, so the eighteen-file sweep task 163 shipped never actually
+reached Fencepost's own safety-critical source, the two files load-bearing
+for STRATEGY.md's "read-only scopes only" and "the final action is ALWAYS
+the human's" guarantees -- a quieter version of the exact "claims a
+boundary, the checker built to guard it doesn't actually reach that far"
+gap this module exists to close. `find_claiming_files`/`check_network_
+boundary` already took a directory argument, so no signature changed; this
+task adds `SEAM_ENGINE_SRC_DIR` and the multi-directory `find_claiming_
+files_all`/`check_network_boundary_all` that scan `tools/` AND `fencepost/
+seam_engine/src/seam_engine/` together, keyed by path relative to the repo
+root so a same-named file in two directories could never silently collide.
+The CLI now runs the combined check; every existing single-directory
+function keeps its original default and behavior, so nothing that already
+called `check_network_boundary()` (unqualified, tools/-only) changes.
+
 Usage:
     python3 tools/network_boundary_check.py check
 """
@@ -57,6 +81,14 @@ import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TOOLS_DIR = os.path.join(ROOT, "tools")
+SEAM_ENGINE_SRC_DIR = os.path.join(ROOT, "fencepost", "seam_engine", "src", "seam_engine")
+
+# Every real source directory this repo's own "no network" trust-boundary
+# claims live in today -- tools/'s eighteen (task 163) plus Fencepost's own
+# consent.py/draftback.py (task 164). A future third directory only needs
+# adding here; find_claiming_files_all/check_network_boundary_all already
+# fold over however many are listed.
+SEARCH_DIRS = (TOOLS_DIR, SEAM_ENGINE_SRC_DIR)
 
 # Matches "no network" even when line-wrapped inside a docstring (e.g.
 # petition_limits_check.py's own "...scan (no\nnetwork, mirrors...") --
@@ -154,6 +186,33 @@ def check_network_boundary(tools_dir: str = TOOLS_DIR) -> dict:
     return results
 
 
+def find_claiming_files_all(dirs: tuple[str, ...] = SEARCH_DIRS) -> list[str]:
+    """Every claiming file across every directory in `dirs`, as paths
+    relative to the repo root (e.g. `tools/vault_leak_check.py`,
+    `fencepost/seam_engine/src/seam_engine/consent.py`) -- relative so two
+    directories can never collide on a shared basename, sorted so the
+    result is stable. Delegates entirely to `find_claiming_files` per
+    directory; never re-implements the discovery."""
+    hits = []
+    for d in dirs:
+        for name in find_claiming_files(d):
+            hits.append(os.path.relpath(os.path.join(d, name), ROOT))
+    return sorted(hits)
+
+
+def check_network_boundary_all(dirs: tuple[str, ...] = SEARCH_DIRS) -> dict:
+    """Cross-checks every real, live-discovered "no network" claim across
+    every directory in `dirs`, keyed by repo-root-relative path. Delegates
+    entirely to `check_network_boundary` per directory; never re-implements
+    the AST check."""
+    results = {}
+    for d in dirs:
+        for name, r in check_network_boundary(d).items():
+            key = os.path.relpath(os.path.join(d, name), ROOT)
+            results[key] = r
+    return results
+
+
 def format_network_boundary(result: dict) -> str:
     total = len(result)
     broken = {name: r for name, r in result.items() if not r["ok"]}
@@ -170,6 +229,6 @@ if __name__ == "__main__":
     if not argv or argv[0] != "check":
         print(__doc__)
         sys.exit(1)
-    out = check_network_boundary()
+    out = check_network_boundary_all()
     print(format_network_boundary(out))
     sys.exit(0 if all(r["ok"] for r in out.values()) else 1)

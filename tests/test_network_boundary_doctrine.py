@@ -5,6 +5,17 @@ list), really checks each one's real, live-loaded imports rather than
 trusting the docstring's word for it, and really would have caught a claim
 gone false -- both a synthetic module built to fail and a real, live file
 from this repo mutated to break the same way.
+
+Task 164 extends this: `find_claiming_files`/`check_network_boundary` only
+ever globbed `tools/*.py`, so the same "no network" claim in Fencepost's own
+`consent.py`/`draftback.py` (`fencepost/seam_engine/src/seam_engine/`) went
+unchecked by anything -- the flagship's own safety-critical trust-boundary
+claims, not just the meta-tooling's. `RealSeamEngineDirCase` and
+`RealMultiDirCase` below pin and prove the multi-directory extension the
+same way `RealToolsDirCase` already pins tools/ alone; `MutationRealSeam
+EngineFileCase` proves a real seam_engine file drifted to import a network
+module is caught, the same discipline `MutationRealFileCase` already holds
+for `vault_leak_check.py`.
 """
 from __future__ import annotations
 
@@ -16,6 +27,7 @@ import unittest
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TOOLS_DIR = os.path.join(ROOT, "tools")
+SEAM_ENGINE_SRC_DIR = os.path.join(ROOT, "fencepost", "seam_engine", "src", "seam_engine")
 
 
 def _load(name, path):
@@ -275,14 +287,136 @@ class MutationRealFileCase(unittest.TestCase):
         self.assertIn("httpx", result["vault_leak_check.py"]["reason"])
 
 
+# --- the live regression pin: today's real Fencepost seam_engine src dir ----
+
+class RealSeamEngineDirCase(unittest.TestCase):
+    """Pins today's real, live-discovered "no network" claims in Fencepost's
+    own `seam_engine` source -- the flagship's safety-critical files, not
+    tools/'s meta-checkers -- and proves the real, unqualified
+    `check_network_boundary(SEAM_ENGINE_SRC_DIR)` finds both clean.
+    Deliberately updatable, same discipline as `RealToolsDirCase.
+    EXPECTED_TODAY`: a future third claiming file landing in this directory
+    should grow this set the same hour, not silently pass a stale
+    assertion."""
+
+    EXPECTED_TODAY = {"consent.py", "draftback.py"}
+
+    def test_live_discovery_matches_todays_real_set(self):
+        found = set(nbc.find_claiming_files(SEAM_ENGINE_SRC_DIR))
+        self.assertEqual(found, self.EXPECTED_TODAY)
+
+    def test_every_real_claiming_file_holds_the_boundary_today(self):
+        result = nbc.check_network_boundary(SEAM_ENGINE_SRC_DIR)
+        broken = {name: r["reason"] for name, r in result.items() if not r["ok"]}
+        self.assertEqual(
+            broken,
+            {},
+            f"the following seam_engine files claim \"no network\" but really "
+            f"import a network-capable module: {broken}",
+        )
+
+
+class RealMultiDirCase(unittest.TestCase):
+    """Proves the multi-directory fold (`find_claiming_files_all`/`check_
+    network_boundary_all`, task 164) really combines tools/ and seam_engine's
+    real, live claims -- keyed by repo-root-relative path, no collision, no
+    file silently dropped by one side or the other -- and that the CLI's own
+    exit-code contract still holds across the combined set."""
+
+    def test_combined_discovery_is_the_union_of_both_directories_relative_paths(self):
+        combined = set(nbc.find_claiming_files_all())
+        tools_only = {
+            os.path.relpath(os.path.join(TOOLS_DIR, n), ROOT)
+            for n in nbc.find_claiming_files(TOOLS_DIR)
+        }
+        seam_only = {
+            os.path.relpath(os.path.join(SEAM_ENGINE_SRC_DIR, n), ROOT)
+            for n in nbc.find_claiming_files(SEAM_ENGINE_SRC_DIR)
+        }
+        self.assertEqual(combined, tools_only | seam_only)
+        self.assertIn("fencepost/seam_engine/src/seam_engine/consent.py", combined)
+        self.assertIn("fencepost/seam_engine/src/seam_engine/draftback.py", combined)
+        self.assertIn("tools/vault_leak_check.py", combined)
+
+    def test_combined_check_is_clean_and_keys_match_combined_discovery(self):
+        result = nbc.check_network_boundary_all()
+        self.assertEqual(set(result.keys()), set(nbc.find_claiming_files_all()))
+        broken = {k: r["reason"] for k, r in result.items() if not r["ok"]}
+        self.assertEqual(broken, {})
+
+    def test_combined_result_count_is_the_sum_of_both_directories(self):
+        result = nbc.check_network_boundary_all()
+        tools_count = len(nbc.check_network_boundary(TOOLS_DIR))
+        seam_count = len(nbc.check_network_boundary(SEAM_ENGINE_SRC_DIR))
+        self.assertEqual(len(result), tools_count + seam_count)
+
+    def test_format_reports_clean_for_the_combined_tree(self):
+        text = nbc.format_network_boundary(nbc.check_network_boundary_all())
+        self.assertIn("clean", text)
+
+
+# --- mutation: proves the checker bites on a real seam_engine file too ------
+
+class MutationRealSeamEngineFileCase(unittest.TestCase):
+    """Reconstructs a REAL Fencepost file (consent.py) with a plausible
+    future drift applied -- a network import added, its own "no network"
+    claim left untouched -- the identical shape `MutationRealFileCase`
+    already proves for `vault_leak_check.py`, found here in the flagship's
+    own source instead of tools/'s meta-checkers."""
+
+    def setUp(self):
+        real_path = os.path.join(SEAM_ENGINE_SRC_DIR, "consent.py")
+        with open(real_path, encoding="utf-8") as f:
+            self.real_source = f.read()
+        self.assertRegex(self.real_source, nbc.CLAIM_PATTERN)
+
+    def test_real_file_passes_unmutated(self):
+        ok, reason = nbc.check_source_has_no_network_import(self.real_source)
+        self.assertTrue(ok, reason)
+
+    def test_mutated_copy_with_an_added_network_import_is_caught(self):
+        marker = "from __future__ import annotations\n"
+        self.assertIn(marker, self.real_source, "fixture premise: real file's own import block")
+        mutated = self.real_source.replace(
+            marker,
+            marker + "import httpx  # drift: a hypothetical live scope-check call\n",
+            1,
+        )
+        self.assertRegex(mutated, nbc.CLAIM_PATTERN)
+        ok, reason = nbc.check_source_has_no_network_import(mutated)
+        self.assertFalse(ok, "a real seam_engine file drifted to import httpx must be flagged")
+        self.assertIn("httpx", reason)
+
+    def test_checker_flags_the_mutated_file_end_to_end_via_check_network_boundary_all(self):
+        marker = "from __future__ import annotations\n"
+        mutated = self.real_source.replace(
+            marker, marker + "import socket  # drift\n", 1
+        )
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmp:
+            with open(os.path.join(tmp, "consent.py"), "w", encoding="utf-8") as f:
+                f.write(mutated)
+            result = nbc.check_network_boundary_all((tmp,))
+        key = os.path.relpath(os.path.join(tmp, "consent.py"), nbc.ROOT)
+        self.assertFalse(result[key]["ok"])
+        self.assertIn("socket", result[key]["reason"])
+
+
 class CLIEntrypointCase(unittest.TestCase):
     """The module's own __main__ exit-code contract: 0 when every claim
     holds, 1 when at least one is broken -- proven by direct call, no
-    subprocess needed since check_network_boundary is a pure function of
-    the directory it's given."""
+    subprocess needed since check_network_boundary/check_network_boundary_all
+    are pure functions of the directories they're given. `__main__` (task
+    164) now calls the combined `check_network_boundary_all()`, so this
+    proves the exit-code contract against the same function the CLI itself
+    runs, not just the tools/-only one."""
 
     def test_exit_code_is_zero_when_all_real_claims_hold(self):
         result = nbc.check_network_boundary()
+        self.assertTrue(all(r["ok"] for r in result.values()))
+
+    def test_exit_code_is_zero_when_all_real_combined_claims_hold(self):
+        result = nbc.check_network_boundary_all()
         self.assertTrue(all(r["ok"] for r in result.values()))
 
     def test_all_ok_computation_flips_false_on_one_broken_entry(self):
