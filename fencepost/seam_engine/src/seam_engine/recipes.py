@@ -94,6 +94,34 @@ _FORBIDDEN_VERBS: frozenset[str] = frozenset({
 
 _PASCAL_WORD_RE = re.compile(r"[A-Z][a-z0-9]*")
 
+# The allow-list prefixes (check 1), lowercased once for the glued-verb check
+# below. Every scope that reaches check 2 is already guaranteed (by check 1)
+# to start with one of these -- which makes the very first PascalCase word
+# the one place a scope author is forced to put something, and so the most
+# natural place to hide a write verb if the tokenizer can be fooled.
+_ALLOWED_PREFIXES_LOWER: tuple[str, ...] = ("get", "list", "read", "search", "count")
+
+
+def _word_hides_glued_verb(word: str) -> str | None:
+    """`_pascal_words` only starts a new word at an uppercase letter, so a
+    forbidden verb spelled in lowercase right after an allowed prefix -- with
+    no capital letter to mark where the prefix ends and the verb begins --
+    is swallowed into one word and never reaches the exact-match check below.
+    `"GetdeleteIssues"` tokenizes as `["Getdelete", "Issues"]`; `"Getdelete"`
+    equals neither `"Get"` nor `"Delete"`, so the write verb inside it was
+    never checked at all. Returns the forbidden verb found glued this way, or
+    `None` if `word` doesn't start with an allowed prefix immediately
+    followed by one."""
+    lowered = word.lower()
+    for prefix in _ALLOWED_PREFIXES_LOWER:
+        if not lowered.startswith(prefix):
+            continue
+        remainder = lowered[len(prefix):]
+        for verb in _FORBIDDEN_VERBS:
+            if remainder.startswith(verb.lower()):
+                return verb
+    return None
+
 
 class RecipeValidationError(ValueError):
     """Raised when a recipe manifest fails the oath or the schema. Fails
@@ -143,6 +171,15 @@ def _check_scope_is_read_only(scope: str, *, where: str) -> None:
                 "label, draft, trash, invite, revoke, publish, or share is "
                 "not a Fencepost recipe. Refused before a human reviewer "
                 "ever reads the detector code."
+            )
+        glued_verb = _word_hides_glued_verb(word)
+        if glued_verb is not None:
+            raise RecipeValidationError(
+                f"{where}: scope {scope!r} glues the write verb {glued_verb!r} "
+                f"directly onto its allowed prefix inside the word {word!r}, "
+                "with no capital letter marking where one ends and the other "
+                "begins. Shaped exactly to slip past the exact-word check -- "
+                "refused before a human reviewer ever reads the detector code."
             )
 
 

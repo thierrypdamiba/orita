@@ -304,11 +304,48 @@ def test_a_scope_that_starts_read_only_but_hides_a_write_word_is_rejected():
         validate_recipe(_manifest(scopes=("ListAndDeleteIssues",)))
 
 
+@pytest.mark.parametrize(
+    "scope",
+    [
+        "GetdeleteIssues",
+        "ListmodifyPRs",
+        "ReadremoveComments",
+        "SearchpostTweets",
+        "Countsharefiles",
+    ],
+)
+def test_a_write_verb_glued_lowercase_onto_the_allowed_prefix_is_rejected(scope):
+    # No capital letter marks where the allowed prefix ends and the write
+    # verb begins, so `_pascal_words` swallows both into one word that
+    # equals neither -- the exact-word deny-list alone would wave this
+    # through. Proves the glued-verb check has independent value, the same
+    # way ListAndDeleteIssues proves the deny-list does above.
+    with pytest.raises(RecipeValidationError, match="glues the write verb"):
+        validate_recipe(_manifest(scopes=(scope,)))
+
+
 def test_read_only_scopes_are_accepted():
     manifest = validate_recipe(
         _manifest(scopes=("GetRepository", "ListRepoCommits", "WhoAmI", "CountStargazers"))
     )
     assert manifest.scopes == ("GetRepository", "ListRepoCommits", "WhoAmI", "CountStargazers")
+
+
+def test_real_scopes_from_scopes_md_still_accepted_after_glued_verb_check():
+    # SCOPES.md's real read-only rows, including plural nouns that happen to
+    # share a prefix with a forbidden verb (Labels/Label) -- the glued-verb
+    # check must not start refusing scopes that were always legitimate.
+    manifest = validate_recipe(
+        _manifest(
+            scopes=(
+                "ListRepositoryActivities",
+                "GetLatestRelease",
+                "CountStargazers",
+                "ListRepoCommits",
+            )
+        )
+    )
+    assert "ListRepositoryActivities" in manifest.scopes
 
 
 def test_no_scopes_at_all_is_rejected():
