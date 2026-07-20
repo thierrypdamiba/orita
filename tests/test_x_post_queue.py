@@ -233,6 +233,44 @@ class TestNextPostPlan(unittest.TestCase):
         self.assertEqual(posted_order, [e["task"] for e in entries])
         self.assertGreater(calls, 1)  # never drained in a single burst call
 
+    def test_one_permanently_unpostable_entry_does_not_block_the_rest(self):
+        """Reproduces the real live bug found on HAND/x-post-queue.jsonl:
+        task 185's real, already-queued topic string (295 chars) cannot fit
+        in a single tweet no matter how it is packed. Before the fix,
+        next_post_plan(entries) handed the WHOLE list straight to
+        batch_entries(), which raised ValueError the moment it found that
+        one entry -- silently blocking every other, perfectly postable
+        entry in the backlog from ever being planned or drained."""
+        unpostable_topic = "x" * 295  # mirrors the real task 185 topic length
+        entries = [
+            {"task": "50", "topic": "subscriber cadence", "queued_at": "1"},
+            {"task": "185", "topic": unpostable_topic, "queued_at": "2"},
+            {"task": "51", "topic": "tag cadence", "queued_at": "3"},
+        ]
+        # The unpostable entry alone still correctly raises via batch_entries
+        # / compose_batched_tweets -- this fix does not weaken that contract.
+        with self.assertRaises(ValueError):
+            xpq.compose_batched_tweets(entries)
+
+        plan = xpq.next_post_plan(entries)
+        self.assertEqual(plan["tasks"], ["50", "51"])
+        self.assertEqual(plan["blocked_tasks"], ["185"])
+        self.assertLessEqual(len(plan["text"]), xpq.MAX_TWEET_CHARS)
+
+    def test_all_entries_unpostable_raises_a_distinct_clear_message(self):
+        entries = [{"task": "1", "topic": "x" * 295, "queued_at": "a"}]
+        with self.assertRaises(ValueError) as ctx:
+            xpq.next_post_plan(entries)
+        self.assertIn("unpostable", str(ctx.exception))
+
+    def test_fits_in_any_batch_matches_batch_entries_own_raise_condition(self):
+        short = {"task": "1", "topic": "short topic", "queued_at": "a"}
+        long_ = {"task": "2", "topic": "x" * 295, "queued_at": "b"}
+        self.assertTrue(xpq._fits_in_any_batch(short))
+        self.assertFalse(xpq._fits_in_any_batch(long_))
+        with self.assertRaises(ValueError):
+            xpq.batch_entries([long_])
+
 
 class TestMarkPosted(_TempQueueCase):
     def test_mark_posted_never_mutates_a_prior_queued_line(self):

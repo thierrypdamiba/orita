@@ -177,6 +177,22 @@ def compose_batched_tweets(entries: list, max_chars: int = MAX_TWEET_CHARS) -> l
     return [_header(i, n) + "; ".join(_item_text(e) for e in g) for i, g in enumerate(groups, start=1)]
 
 
+def _fits_in_any_batch(entry: dict, max_chars: int = MAX_TWEET_CHARS) -> bool:
+    """Whether `entry` could ever appear in SOME tweet on its own, under the
+    most generous header `_header` ever produces.
+
+    `_header(1, 1)`'s "now caught up" phrasing is actually the LONGEST
+    header this module renders -- every n >= 2 header is shorter -- so the
+    shortest possible header, across every n `_pack_entries_into` could
+    ever try, is `min(len(_header(1, 1)), len(_header(1, 2)))`. If an
+    entry's own item text does not fit under max_chars even with that much
+    room, no value of n will ever fit it either: it is a permanently
+    unpostable topic string, not merely a hard one to pack.
+    """
+    shortest_possible_header = min(len(_header(1, 1)), len(_header(1, 2)))
+    return len(_item_text(entry)) <= max_chars - shortest_possible_header
+
+
 def next_post_plan(entries: list, max_chars: int = MAX_TWEET_CHARS) -> dict:
     """The single next tweet to post this hour -- never the whole backlog at once.
 
@@ -188,8 +204,27 @@ def next_post_plan(entries: list, max_chars: int = MAX_TWEET_CHARS) -> dict:
     backlog drains at one post per call -- the on-duty god posts this
     plan's text, marks its tasks posted, and the NEXT hourly ritual run
     calls this again for the next batch.
+
+    A queued entry whose own topic string can never fit in a tweet by
+    itself (`_fits_in_any_batch` is False for it, per `batch_entries`'
+    own "no splitting can save this one" rule) is set aside into
+    `blocked_tasks` instead of being handed to `batch_entries` at all --
+    otherwise a single unpostably long topic anywhere in the backlog
+    would raise `ValueError` here and silently block every OTHER,
+    perfectly postable entry from ever being planned, the exact
+    hourly-drain chokepoint this function exists to prevent. Nothing is
+    dropped: `blocked_tasks` names every task id set aside this way, so a
+    human still has to shorten that topic and re-queue it before it
+    posts, and it stays visible on every call until they do.
     """
-    groups = batch_entries(entries, max_chars)
+    postable = [e for e in entries if _fits_in_any_batch(e, max_chars)]
+    blocked = [e for e in entries if not _fits_in_any_batch(e, max_chars)]
+    if entries and not postable:
+        raise ValueError(
+            "every pending entry is unpostable on its own -- shorten at least "
+            "one topic string before this backlog can drain"
+        )
+    groups = batch_entries(postable, max_chars)
     n = len(groups)
     first = groups[0]
     text = _header(1, n) + "; ".join(_item_text(e) for e in first)
@@ -197,6 +232,7 @@ def next_post_plan(entries: list, max_chars: int = MAX_TWEET_CHARS) -> dict:
         "text": text,
         "tasks": [e["task"] for e in first],
         "remaining_batches": n - 1,
+        "blocked_tasks": [e["task"] for e in blocked],
     }
 
 
@@ -228,6 +264,8 @@ if __name__ == "__main__":
         print(_plan["text"])
         print(f"tasks: {','.join(_plan['tasks'])}")
         print(f"remaining_batches: {_plan['remaining_batches']}")
+        if _plan["blocked_tasks"]:
+            print(f"blocked_tasks (topic too long to ever post, shorten and re-queue): {','.join(_plan['blocked_tasks'])}")
     elif cmd == "mark-posted":
         _tweet_id, _posted_at = sys.argv[2], sys.argv[3]
         _tasks = sys.argv[4:]
