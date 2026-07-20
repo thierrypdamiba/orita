@@ -32,17 +32,36 @@ the same file:
    order. `status` is read verbatim; a row's CURRENT state is always the
    table's, never the prose's (an interlude is a snapshot of a moment
    that has already passed, the table is now).
-2. `parse_wip_open_times` -- every interlude block (`*YYYY-MM-DD HH:Mx
-   UTC, <god>: ...*`) is scanned for a `Task N -> WIP` mention inside it,
-   keyed to that interlude's own opening timestamp. The convention this
-   town has used since Founding Day only ever writes the TENS digit of
-   the minute (`04:0x UTC`, never a false `04:07 UTC` it doesn't actually
-   mean) -- so this floors to the start of that ten-minute bucket rather
-   than inventing precision the source never claimed. That floor is a
-   deliberate UNDER-estimate of elapsed time: it can only make a real
-   stale WIP look slightly younger than it is, never hide one that would
-   otherwise clear the 2h line, since a WIP that is genuinely stuck is
-   stuck for hours, not minutes.
+2. `parse_wip_open_times` -- an open time for each task number, from
+   TWO conventions:
+   (a) the legacy interlude block (`*YYYY-MM-DD HH:Mx UTC, <god>: ...*`)
+   this town used before task 170, scanned for a `Task N -> WIP` mention
+   inside it, keyed to that interlude's own opening timestamp, floored to
+   the start of the written ten-minute bucket (the source only ever wrote
+   the tens digit of the minute, e.g. `04:0x UTC` -- never a false
+   `04:07 UTC` it doesn't actually mean). That floor is a deliberate
+   UNDER-estimate of elapsed time: it can only make a real stale WIP look
+   slightly younger than it is, never hide one that would otherwise clear
+   the 2h line, since a WIP that is genuinely stuck is stuck for hours,
+   not minutes. This convention only survives today inside archived
+   history (`ROADMAP-ARCHIVE-*.md`); task 170's `roadmap_archive.py`
+   rewrote the live document's own shape to one "extending the queue"
+   section per task, and the interlude preamble line never appears in it
+   at all -- task 182 found this had silently made `parse_wip_open_times`
+   return nothing for any row in the live file, so every WIP row (however
+   fresh) fell through to `unknown`, not `fresh`, the exact false
+   "escalate now" this module exists to avoid.
+   (b) the explicit marker task 182 added for the live, post-170 format:
+   an HTML comment `<!-- wip-opened: N YYYY-MM-DDTHH:MM:SS+00:00 -->`
+   written into the row's own section the moment it is marked `WIP`
+   (step 2 of the continuous-build loop -- "mark it WIP ... with the UTC
+   timestamp"). Unlike the table's `status` cell, a comment carries no
+   risk of breaking `open_wip`'s own exact `== "WIP"` match (the mistake
+   task 170 caught and undid for itself), and unlike the retired
+   preamble line it needs no shared "interlude" grouping -- one row, one
+   marker, exact precision, no flooring needed. When both conventions
+   name the same task number, the explicit marker wins (it is written
+   deliberately, not inferred from a nearby line).
 
 `find_stale` joins the two: for every row the table currently marks `WIP`,
 look up when it opened and how long ago that was. Three outcomes, not two
@@ -73,6 +92,9 @@ RECLAIM_THRESHOLD_HOURS = 2.0
 _TABLE_ROW = re.compile(r"^\|\s*(\d+)\s*\|\s*([^|]+?)\s*\|\s*([^|]+?)\s*\|", re.MULTILINE)
 _INTERLUDE_START = re.compile(r"\*(\d{4}-\d{2}-\d{2}) (\d{2}):(\d)x? UTC, ([\w-]+):")
 _TASK_WIP_MENTION = re.compile(r"[Tt]ask\s+(\d+)\s*(?:→|->)\s*WIP\b")
+_WIP_OPENED_MARKER = re.compile(
+    r"<!--\s*wip-opened:\s*(\d+)\s+(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:Z|[+-]\d{2}:\d{2}))\s*-->"
+)
 
 
 def parse_table_rows(text: str) -> list:
@@ -86,11 +108,13 @@ def parse_table_rows(text: str) -> list:
 
 
 def parse_wip_open_times(text: str) -> dict:
-    """{task_number: iso_timestamp} for the LAST time each task number was
-    marked `Task N -> WIP` inside an interlude, keyed to that interlude's
-    own `*YYYY-MM-DD HH:Mx UTC, <god>:` opening line, floored to the start
-    of the written ten-minute bucket. Later mentions in file order win, so
-    a task reopened after being reclaimed would key off its newest open."""
+    """{task_number: iso_timestamp} for when each task was marked WIP, from
+    either convention this file recognizes (see module docstring). Legacy
+    interludes are read first (later mentions in file order win, so a task
+    reopened after being reclaimed keys off its newest open); explicit
+    `wip-opened` markers are read second and OVERRIDE a legacy entry for
+    the same task number, since a deliberate marker is more precise than
+    an inferred one."""
     opens = {}
     interludes = list(_INTERLUDE_START.finditer(text))
     for i, m in enumerate(interludes):
@@ -101,6 +125,11 @@ def parse_wip_open_times(text: str) -> dict:
         ts = f"{date}T{hour}:{minute_tens}0:00+00:00"
         for tm in _TASK_WIP_MENTION.finditer(block):
             opens[int(tm.group(1))] = ts
+    for mm in _WIP_OPENED_MARKER.finditer(text):
+        ts = mm.group(2)
+        if ts.endswith("Z"):
+            ts = ts[:-1] + "+00:00"
+        opens[int(mm.group(1))] = ts
     return opens
 
 

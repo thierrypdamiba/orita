@@ -69,6 +69,30 @@ class OpenTimeParsingCase(unittest.TestCase):
         opens = wrc.parse_wip_open_times(text)
         self.assertNotIn(121, opens)
 
+    def test_explicit_marker_convention_is_found_with_no_interlude_present(self):
+        # The post-task-170 live ROADMAP.md format never writes the legacy
+        # interlude preamble at all -- this is the convention task 182 added
+        # so a WIP row's open time is still recoverable in that format.
+        text = (
+            "| 182 | WIP | nisaba | fix the thing | it is fixed |\n\n"
+            "<!-- wip-opened: 182 2026-07-20T18:30:00+00:00 -->\n"
+        )
+        opens = wrc.parse_wip_open_times(text)
+        self.assertEqual(opens[182], "2026-07-20T18:30:00+00:00")
+
+    def test_explicit_marker_z_suffix_normalizes_to_utc_offset(self):
+        text = "<!-- wip-opened: 55 2026-07-20T18:30:00Z -->\n"
+        opens = wrc.parse_wip_open_times(text)
+        self.assertEqual(opens[55], "2026-07-20T18:30:00+00:00")
+
+    def test_explicit_marker_overrides_a_legacy_interlude_for_the_same_task(self):
+        text = (
+            "*2026-07-18 01:0x UTC, nyx: Task 9 → WIP.*\n"
+            "<!-- wip-opened: 9 2026-07-18T04:45:00+00:00 -->\n"
+        )
+        opens = wrc.parse_wip_open_times(text)
+        self.assertEqual(opens[9], "2026-07-18T04:45:00+00:00")
+
 
 class FindStaleCase(unittest.TestCase):
     def _text(self, opened_hour="02:0x"):
@@ -110,6 +134,45 @@ class FindStaleCase(unittest.TestCase):
         result = wrc.find_stale(text=self._text("03:0x"), now=_now("2026-07-18T05:00:00+00:00"))
         self.assertEqual(result["stale"][0]["elapsed_hours"], 2.0)
         self.assertFalse(result["clean"])
+
+    def _post_170_text(self, opened="2026-07-20T18:30:00+00:00"):
+        # Shaped like the LIVE ROADMAP.md format since task 170: a single
+        # per-task table with no legacy interlude preamble line at all.
+        return (
+            "## Extending the queue past 181 (this hour)\n\n"
+            "| # | status | owner | task | done when |\n"
+            "|--:|:--|:--|:--|:--|\n"
+            "| 182 | WIP | nisaba | fix the thing | it is fixed |\n\n"
+            f"<!-- wip-opened: 182 {opened} -->\n"
+        )
+
+    def test_post_170_format_wip_row_under_two_hours_is_fresh_not_unknown(self):
+        # Task 182's own regression pin: before the fix, a WIP row in the
+        # CURRENT (post-170) file shape always fell through to `unknown`
+        # ("escalate now"), no matter how fresh it actually was, because
+        # parse_wip_open_times found no legacy interlude to key off of.
+        result = wrc.find_stale(text=self._post_170_text(), now=_now("2026-07-20T18:31:00+00:00"))
+        self.assertTrue(result["clean"], result)
+        self.assertEqual(result["unknown"], [], result)
+        self.assertEqual(len(result["fresh"]), 1)
+
+    def test_post_170_format_wip_row_over_two_hours_is_stale_not_unknown(self):
+        result = wrc.find_stale(text=self._post_170_text(), now=_now("2026-07-20T20:31:00+00:00"))
+        self.assertFalse(result["clean"])
+        self.assertEqual(result["unknown"], [], result)
+        self.assertEqual(len(result["stale"]), 1)
+        self.assertEqual(result["stale"][0]["number"], 182)
+
+    def test_post_170_format_wip_row_with_no_marker_at_all_is_still_unknown(self):
+        # No regression on the existing safety net: a WIP row that names
+        # NEITHER convention must still escalate as unknown, not silently
+        # pass.
+        text = (
+            "| 182 | WIP | nisaba | fix the thing | it is fixed |\n\n"
+        )
+        result = wrc.find_stale(text=text, now=_now("2026-07-20T18:31:00+00:00"))
+        self.assertFalse(result["clean"])
+        self.assertEqual(len(result["unknown"]), 1)
 
 
 class FormatResultCase(unittest.TestCase):
