@@ -65,6 +65,26 @@ def _raising_recipe() -> str:
     return "def run_recipe_scan():\n    raise RuntimeError('fixture is missing')\n"
 
 
+def _malformed_recipe() -> str:
+    # Returns cleanly (no exception) but its primary_gap is missing the
+    # headline/detail/confidence keys _candidate_from_recipe_gap requires —
+    # a schema-valid recipe.json (recipes.py never runs or type-checks a
+    # detector's return value) whose detector nonetheless hands back a
+    # malformed gap at runtime. ROADMAP.md #172.
+    return (
+        "def run_recipe_scan():\n"
+        "    return {\n"
+        "        'generated_at': '2026-07-17T15:00:00Z',\n"
+        "        'source': 'fixture',\n"
+        "        'confidence_bar': 0.70,\n"
+        "        'separation_margin': 0.15,\n"
+        "        'primary_gap': {'slug': 'oops'},\n"
+        "        'tail': [],\n"
+        "        'excluded': [],\n"
+        "    }\n"
+    )
+
+
 def _milestone_events(n: int) -> list[GithubEvent]:
     """`n` milestone-tagged commits since account_live_since, by a real
     (non-quiet-voice) author, none overlapping BASE_X_POSTS' keywords —
@@ -148,6 +168,36 @@ def test_one_broken_recipe_is_named_and_does_not_stop_the_others(monkeypatch, tm
     assert len(result["recipe_errors"]) == 1
     assert result["recipe_errors"][0]["slug"] == "broken-recipe"
     assert "fixture is missing" in result["recipe_errors"][0]["error"]
+
+    healthy_sources = [s for s in result["recipe_sources"] if s["slug"] == "healthy-recipe"]
+    assert healthy_sources == [{"slug": "healthy-recipe", "author": "test", "candidates": 1}]
+
+    assert result["primary_gap"] is not None
+    assert result["primary_gap"]["slug"] == "recipe-healthy-recipe-gap"
+
+
+def test_a_malformed_non_raising_recipe_return_is_named_and_does_not_stop_the_others(monkeypatch, tmp_path):
+    # ROADMAP.md #172: a recipe whose detector returns cleanly (no
+    # exception) but hands back a primary_gap missing required keys used to
+    # crash run_combined_scan outright with an uncaught KeyError, because
+    # _run_one_recipe's try/except wrapped only the detector() call, not the
+    # GapCandidate-construction that follows it. Same shape as the
+    # already-covered raising-recipe case above: one bad recipe must never
+    # take down the whole combined scan, whether it raises or just returns
+    # garbage.
+    monkeypatch.setattr(scan_mod, "fetch_github_activity", lambda *a, **k: [])
+
+    recipes_dir = tmp_path / "RECIPES"
+    _write_recipe(recipes_dir, "malformed-recipe", _malformed_recipe())
+    _write_recipe(recipes_dir, "healthy-recipe", _recipe_returning("a healthy gap", 0.95))
+
+    result = run_combined_scan(
+        "thierrypdamiba", "orita", x_posts=BASE_X_POSTS, fencepost_root=tmp_path,
+    )
+
+    assert len(result["recipe_errors"]) == 1
+    assert result["recipe_errors"][0]["slug"] == "malformed-recipe"
+    assert "KeyError" in result["recipe_errors"][0]["error"]
 
     healthy_sources = [s for s in result["recipe_sources"] if s["slug"] == "healthy-recipe"]
     assert healthy_sources == [{"slug": "healthy-recipe", "author": "test", "candidates": 1}]

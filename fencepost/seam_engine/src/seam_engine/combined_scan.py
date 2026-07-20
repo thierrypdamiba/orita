@@ -71,19 +71,25 @@ def _run_one_recipe(manifest: RecipeManifest) -> tuple[list[GapCandidate], dict[
     """Run one recipe's entrypoint. Returns (candidates, error).
 
     `error` is `None` on success; on any exception (bad fixture, missing
-    import, a detector that raises), `candidates` is empty and `error`
-    names the recipe and the exception — the caller folds this into
-    `recipe_errors` rather than letting one bad recipe take the whole
-    combined scan down.
+    import, a detector that raises, OR a detector that returns cleanly but
+    hands back a `primary_gap`/`tail` entry missing a required key —
+    ROADMAP.md #172, `recipes.py`'s own validator only ever checks a
+    recipe's `recipe.json` manifest, never what its `detector()` actually
+    returns at runtime), `candidates` is empty and `error` names the recipe
+    and the exception — the caller folds this into `recipe_errors` rather
+    than letting one bad recipe take the whole combined scan down. Building
+    `candidates` from `result` therefore stays inside the same try as
+    calling `detector()`: a malformed-but-non-raising return is exactly as
+    recoverable as a raising one, and must be caught the same way.
     """
     try:
         detector = load_detector(manifest)
         result = detector()
+        gaps = [g for g in [result.get("primary_gap")] + list(result.get("tail", [])) if g]
+        candidates = [_candidate_from_recipe_gap(g, recipe_slug=manifest.slug) for g in gaps]
     except Exception as exc:  # noqa: BLE001 -- a third-party recipe's own code; anything can raise
         return [], {"slug": manifest.slug, "error": f"{type(exc).__name__}: {exc}"}
 
-    gaps = [g for g in [result.get("primary_gap")] + list(result.get("tail", [])) if g]
-    candidates = [_candidate_from_recipe_gap(g, recipe_slug=manifest.slug) for g in gaps]
     return candidates, None
 
 
