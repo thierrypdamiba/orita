@@ -290,7 +290,15 @@ def test_readme_names_seven_consecutive_days_as_the_proof():
 
 
 def test_roadmap_row_19_names_seven_consecutive_reports():
+    # Task 170 (tools/roadmap_archive.py, run for real) moved tasks 1-169
+    # out of ROADMAP.md byte-for-byte into a dated archive file, so row 19's
+    # own text now lives in whichever ROADMAP-ARCHIVE-*.md covers it, not
+    # necessarily the live file -- same fix shape task 170 already applied
+    # to tests/test_wip_reclaim_check.py's continuity check.
     text = ROADMAP_MD.read_text(encoding="utf-8")
+    repo_root = ROADMAP_MD.parent
+    for path in repo_root.glob("ROADMAP-ARCHIVE-*.md"):
+        text += path.read_text(encoding="utf-8")
     assert "Seven consecutive daily reports posted" in text
 
 
