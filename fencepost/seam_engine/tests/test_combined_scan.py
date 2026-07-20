@@ -13,6 +13,8 @@ import json
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
+import pytest
+
 import seam_engine.combined_scan as combined_scan_mod
 import seam_engine.scan as scan_mod
 from seam_engine.combined_scan import run_combined_scan
@@ -281,6 +283,96 @@ def test_run_combined_scan_without_github_events_uses_direct_fetch(monkeypatch):
 
     assert called.get("hit") is True
     assert result["github_events_source"] == "direct"
+
+
+# --- ROADMAP.md #180: check_prior_milestones/ledger_base threaded through --
+
+# `run_combined_scan` delegated to `run_scan` but never passed
+# `check_prior_milestones`/`ledger_base`, so it never inherited `run_scan`'s
+# own guard against a truncated `github_events` silently under-reporting a
+# real, ledger-sealed `milestone-unannounced` gap (`scan.py`'s own "Found
+# and closed 2026-07-19" paragraph, ROADMAP.md #179's `seam_scan` fix).
+# Reproduced live before this fix: handed a truncated override missing a
+# sealed gap's evidence, `run_combined_scan` returned `primary_gap: None`
+# with no error. These tests seed a fixture ledger the same way
+# `test_scan.py`'s own `check_prior_milestones` tests do and prove the
+# guard now reaches this entrypoint too.
+
+from seam_engine import ledger as _ledger_mod  # noqa: E402 -- grouped with this section on purpose
+
+_SEALED_EVIDENCE_URL = "https://github.com/thierrypdamiba/orita/commit/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+_SEALED_AT = "2026-07-18T13:10:49.350606+00:00"
+_UNRELATED_EVENT_URL = "https://github.com/thierrypdamiba/orita/commit/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+
+_OLD_X_POSTS = [
+    {"id": "1", "text": "old news", "url": "https://x.com/oritatown/status/1",
+     "ts": "2026-07-12T00:00:00Z"},
+]
+
+
+def _seal_milestone_gap(base: Path) -> None:
+    _ledger_mod.append_scan(
+        {
+            "generated_at": _SEALED_AT, "repo": "thierrypdamiba/orita",
+            "window_hours": 24, "confidence_bar": 0.7, "separation_margin": 0.15,
+            "primary_gap": {
+                "slug": "milestone-unannounced", "headline": "h", "detail": "d",
+                "confidence": 0.75, "evidence": [_SEALED_EVIDENCE_URL],
+            },
+            "tail": [], "excluded": [],
+        },
+        base=base,
+    )
+
+
+def test_run_combined_scan_check_prior_milestones_defaults_off_preserving_old_behavior(tmp_path):
+    # Backward compatibility: every scenario above this section calls
+    # run_combined_scan without check_prior_milestones and must keep working
+    # unchanged -- a fixture ledger with real missing evidence is present,
+    # but the default (False) means it is never even consulted.
+    _seal_milestone_gap(tmp_path)
+    truncated_events = [
+        {"kind": "commit", "id": "unrelated", "title": "chore", "url": _UNRELATED_EVENT_URL,
+         "ts": "2026-07-19T00:30:00Z", "author": "someone"},
+    ]
+
+    result = run_combined_scan(
+        "thierrypdamiba", "orita", x_posts=_OLD_X_POSTS, github_events=truncated_events,
+        ledger_base=tmp_path,
+    )
+
+    assert result["primary_gap"] is None  # the same silent miss -- unchanged, opt-in only
+
+
+def test_run_combined_scan_raises_when_check_prior_milestones_true_and_evidence_missing(tmp_path):
+    _seal_milestone_gap(tmp_path)
+    truncated_events = [
+        {"kind": "commit", "id": "unrelated", "title": "chore", "url": _UNRELATED_EVENT_URL,
+         "ts": "2026-07-19T00:30:00Z", "author": "someone"},
+    ]
+
+    with pytest.raises(ValueError, match=r"missing 1 previously-sealed"):
+        run_combined_scan(
+            "thierrypdamiba", "orita", x_posts=_OLD_X_POSTS, github_events=truncated_events,
+            check_prior_milestones=True, ledger_base=tmp_path,
+        )
+
+
+def test_run_combined_scan_does_not_raise_when_the_override_still_carries_all_open_evidence(tmp_path):
+    _seal_milestone_gap(tmp_path)
+    complete_events = [
+        {"kind": "commit", "id": "a", "title": "fencepost milestone work", "url": _SEALED_EVIDENCE_URL,
+         "ts": "2026-07-18T12:00:00Z", "author": "someone"},
+        {"kind": "commit", "id": "unrelated", "title": "chore", "url": _UNRELATED_EVENT_URL,
+         "ts": "2026-07-19T00:30:00Z", "author": "someone"},
+    ]
+
+    result = run_combined_scan(
+        "thierrypdamiba", "orita", x_posts=_OLD_X_POSTS, github_events=complete_events,
+        check_prior_milestones=True, ledger_base=tmp_path,
+    )
+
+    assert result["github_events_source"] == "override"
 
 
 # --- the CLI's --github-events flag, threaded through combined_scan.main ----

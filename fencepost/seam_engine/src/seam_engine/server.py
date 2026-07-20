@@ -263,11 +263,21 @@ def combined_scan_preview(
     surface at all (previously CLI-only, `python -m seam_engine.
     combined_scan`) — not to make it the report. `combined_scan.py` goes
     live in `seam-scan.yml` the same day a recipe's own fixture/scopes
-    graduate to a live read, unchanged from task 111's boundary."""
+    graduate to a live read, unchanged from task 111's boundary.
+
+    ROADMAP.md #180: `run_combined_scan` delegates straight to `run_scan`
+    but, unlike `seam_scan` (ROADMAP.md #179), never turned on `run_scan`'s
+    own `check_prior_milestones` guard — so this tool inherited the exact
+    same silent-under-report failure mode `seam_scan` was already fixed for:
+    a truncated `github_events_json` could report `primary_gap: null` for a
+    real, ledger-sealed, still-unannounced milestone gap instead of raising.
+    Reproduced live before this fix. Runs the identical check unconditionally
+    now, mirroring `seam_scan`'s own discipline."""
     x_posts = None if x_posts_json is None else json.loads(x_posts_json)
     github_events = None if github_events_json is None else json.loads(github_events_json)
     return run_combined_scan(
         owner, repo, window_hours=window_hours, x_posts=x_posts, github_events=github_events,
+        check_prior_milestones=True,
     )
 
 

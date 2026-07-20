@@ -100,6 +100,8 @@ def run_combined_scan(
     x_posts: list[dict[str, Any]] | None = None,
     github_events: list[dict[str, Any]] | None = None,
     fencepost_root: Path | None = None,
+    check_prior_milestones: bool = False,
+    ledger_base: Path | None = None,
 ) -> dict[str, Any]:
     """Run `scan.py`'s own scan plus every discovered recipe's, ranked once,
     together. Same output shape as `run_scan`, plus `recipe_sources` (which
@@ -113,6 +115,19 @@ def run_combined_scan(
     ROADMAP.md #128) — this module has no live-vs-fixture decision of its
     own to make here; it only forwards the one `scan.py` already owns.
 
+    `check_prior_milestones`/`ledger_base` (ROADMAP.md #180): threaded
+    straight through to `run_scan` the same way — this module had no guard
+    of its own against `run_scan`'s own documented failure mode (a truncated
+    `github_events` silently under-reporting a real, ledger-sealed
+    `milestone-unannounced` gap, see `run_scan`'s "Found and closed
+    2026-07-19" paragraph and ROADMAP.md #179's `seam_scan` fix), even
+    though `combined_scan_preview` exposes the identical `github_events_json`
+    escape hatch on the live MCP surface. Default `check_prior_milestones=
+    False` preserves every existing caller's behavior unchanged (every test
+    in this file that calls `run_combined_scan` directly already relies on
+    this); the live tool surface (`server.combined_scan_preview`) turns it
+    on unconditionally, mirroring `seam_scan`'s own discipline.
+
     A recipe manifest that fails the read-only oath itself (`discover_recipes`
     raising `RecipeValidationError`) is treated the same way — named in
     `recipe_errors` as a single entry, `scan.py`'s own candidates still rank.
@@ -120,7 +135,10 @@ def run_combined_scan(
     that breaks the oath), but the combined scan does not get to assume its
     own input is clean; it only gets to refuse to go down with it.
     """
-    base = run_scan(owner, repo, window_hours=window_hours, x_posts=x_posts, github_events=github_events)
+    base = run_scan(
+        owner, repo, window_hours=window_hours, x_posts=x_posts, github_events=github_events,
+        check_prior_milestones=check_prior_milestones, ledger_base=ledger_base,
+    )
 
     pool: list[GapCandidate] = []
     if base["primary_gap"]:

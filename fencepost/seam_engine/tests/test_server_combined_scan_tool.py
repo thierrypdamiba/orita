@@ -64,6 +64,11 @@ def test_combined_scan_preview_returns_run_combined_scan_shape(monkeypatch, tmp_
         ),
     ]
     monkeypatch.setattr(scan_mod, "fetch_github_activity", lambda owner, repo, since: events)
+    # ROADMAP.md #180's own new prior-milestone check reads the real,
+    # ever-growing ledger by default -- isolate this test (about the tool's
+    # output shape, not about that check) from live ledger state, same
+    # pattern used in test_server_github_events_override.py.
+    monkeypatch.setattr(scan_mod, "_unresolved_prior_milestone_evidence", lambda *a, **k: {})
 
     result = combined_scan_preview(
         owner="thierrypdamiba",

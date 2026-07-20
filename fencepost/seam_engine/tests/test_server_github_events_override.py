@@ -90,6 +90,11 @@ def test_combined_scan_preview_crashes_without_the_override_when_direct_fetch_is
 
 def test_combined_scan_preview_succeeds_with_github_events_json_even_when_direct_fetch_is_blocked(monkeypatch):
     monkeypatch.setattr(scan_mod, "fetch_github_activity", _blocked_fetch)
+    # ROADMAP.md #180's own new prior-milestone check reads the real, ever-
+    # growing ledger by default -- isolate this test (about the direct-fetch
+    # override, not about that check) from live ledger state, same pattern
+    # used for seam_scan's sibling test above.
+    monkeypatch.setattr(scan_mod, "_unresolved_prior_milestone_evidence", lambda *a, **k: {})
     result = combined_scan_preview(github_events_json=LIVE_EVENTS_JSON)
     assert result["repo"] == "thierrypdamiba/orita"
     assert "primary_gap" in result
@@ -168,4 +173,61 @@ def test_seam_scan_default_direct_fetch_path_still_runs_the_check(monkeypatch):
     )
     with pytest.raises(FatalToolError) as exc_info:
         seam_scan()
+    assert "github_events_source=direct" in exc_info.value.developer_message
+
+
+# ROADMAP.md #180: `combined_scan_preview` never inherited `run_scan`'s
+# `check_prior_milestones` guard either -- `run_combined_scan` delegates
+# straight to `run_scan` but never passed the flag through, so this live
+# tool silently returned `primary_gap: None` for a real, ledger-sealed,
+# still-open milestone gap instead of raising. Reproduced live against the
+# real ledger before this fix. `run_combined_scan` calls `run_scan` inside
+# `scan.py` itself (not a hand-copy like `seam_scan`), so these patch
+# `scan_mod`, not `server_mod` -- see this file's own module docstring.
+
+
+def test_combined_scan_preview_raises_when_github_events_json_misses_open_milestone_evidence(monkeypatch):
+    """Mirrors test_seam_scan_raises_when_github_events_json_misses_open_
+    milestone_evidence: pins the pre-fix symptom this task closes for the
+    OTHER live tool that shares the same escape hatch."""
+    monkeypatch.setattr(
+        scan_mod,
+        "_unresolved_prior_milestone_evidence",
+        lambda *a, **k: {
+            "https://github.com/thierrypdamiba/orita/commit/still-open": "2026-07-18T12:00:00+00:00",
+        },
+    )
+    with pytest.raises(FatalToolError) as exc_info:
+        combined_scan_preview(github_events_json=_STALE_EVENT_JSON)
+    assert "ValueError" in exc_info.value.developer_message
+    assert "still-unannounced" in exc_info.value.developer_message
+    assert "still-open" in exc_info.value.developer_message
+
+
+def test_combined_scan_preview_does_not_raise_when_the_supplied_events_already_cover_the_open_evidence(monkeypatch):
+    """No false alarm: if the caller's events already include the
+    previously-sealed evidence URL, the gap isn't missing -- no raise."""
+    covered_url = "https://github.com/thierrypdamiba/orita/commit/c1"
+    monkeypatch.setattr(
+        scan_mod,
+        "_unresolved_prior_milestone_evidence",
+        lambda *a, **k: {covered_url: "2026-07-18T12:00:00+00:00"},
+    )
+    result = combined_scan_preview(github_events_json=LIVE_EVENTS_JSON)  # LIVE_EVENTS_JSON's commit url is c1
+    assert result["github_events_source"] == "override"
+
+
+def test_combined_scan_preview_default_direct_fetch_path_still_runs_the_check(monkeypatch):
+    """The check applies on the default (direct-fetch) path too, not only
+    when github_events_json is supplied."""
+    monkeypatch.setattr(scan_mod, "fetch_github_activity", lambda owner, repo, since: [])
+    monkeypatch.setattr(
+        scan_mod,
+        "_unresolved_prior_milestone_evidence",
+        lambda *a, **k: {
+            "https://github.com/thierrypdamiba/orita/commit/still-open": "2026-07-18T12:00:00+00:00",
+        },
+    )
+    with pytest.raises(FatalToolError) as exc_info:
+        combined_scan_preview()
     assert "github_events_source=direct" in exc_info.value.developer_message
