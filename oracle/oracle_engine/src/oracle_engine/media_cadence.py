@@ -155,6 +155,11 @@ def build_prediction(
         raise MediaCadenceError("now must be timezone-aware")
     if isinstance(current_count, bool) or not isinstance(current_count, int) or current_count < 0:
         raise MediaCadenceError("current_count must be a non-negative integer")
+    if horizon_hours <= 0:
+        raise MediaCadenceError(
+            "horizon_hours must be positive — a target at or before the sealing "
+            "moment is not a prediction, it is hindsight"
+        )
     baseline_when = now - datetime.timedelta(hours=horizon_hours)
     baseline = media_count_at_or_before(snapshots, baseline_when)
     delta = None if baseline is None else current_count - baseline

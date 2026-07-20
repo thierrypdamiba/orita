@@ -138,6 +138,19 @@ class TestBuildPrediction(unittest.TestCase):
         with self.assertRaises(issue_cadence.IssueCadenceError):
             issue_cadence.build_prediction(_NOW, [], current_count=-1)
 
+    def test_rejects_zero_horizon_hours(self):
+        # A zero horizon puts the claim's own target at the exact sealing
+        # moment -- no "then" at all, already knowable the instant it would
+        # be sealed.
+        with self.assertRaises(issue_cadence.IssueCadenceError):
+            issue_cadence.build_prediction(_NOW, [], current_count=1, horizon_hours=0)
+
+    def test_rejects_negative_horizon_hours(self):
+        # A negative horizon puts the claim's own target BEFORE the sealing
+        # moment -- hindsight wearing a prediction's clothes.
+        with self.assertRaises(issue_cadence.IssueCadenceError):
+            issue_cadence.build_prediction(_NOW, [], current_count=1, horizon_hours=-24)
+
 
 class TestSealIssuePrediction(unittest.TestCase):
     def test_seals_a_real_predict_entry_to_a_scratch_ledger(self):

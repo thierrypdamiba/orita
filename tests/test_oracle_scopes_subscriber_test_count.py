@@ -127,11 +127,13 @@ class RealClaimCrossCheckedAgainstLiveTestsCase(unittest.TestCase):
             f"+ test_subscriber_autograde.py is {result['real']}",
         )
 
-    def test_regression_pin_todays_real_total_is_34(self):
+    def test_regression_pin_todays_real_total_is_36(self):
         # Named so a future test added/removed from either file trips this
         # pin FIRST, distinct from (and in addition to) the doc cross-check
-        # above -- exactly task 149's own "regression pin" discipline.
-        self.assertEqual(real_subscriber_test_count(), 34)
+        # above -- exactly task 149's own "regression pin" discipline. Moved
+        # 34 -> 36 by task 186's own two new test_subscriber_cadence.py
+        # cases (test_rejects_zero_horizon_hours/test_rejects_negative_horizon_hours).
+        self.assertEqual(real_subscriber_test_count(), 36)
 
 
 class MutationProvesTheCheckerBitesCase(unittest.TestCase):
