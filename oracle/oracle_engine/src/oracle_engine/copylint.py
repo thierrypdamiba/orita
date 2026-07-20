@@ -45,7 +45,7 @@ _INSTRUCTION_PATTERNS = [
 
 # Certainty claimed in prose rather than in the sealed confidence field.
 _CERTAINTY_PATTERNS = [
-    re.compile(r"\bguaranteed?\b", re.IGNORECASE),
+    re.compile(r"\bguarantee[sd]?\b", re.IGNORECASE),
     re.compile(r"\bwill definitely\b", re.IGNORECASE),
     re.compile(r"\bcertain(ly)?\b", re.IGNORECASE),
     re.compile(r"\bsure thing\b", re.IGNORECASE),

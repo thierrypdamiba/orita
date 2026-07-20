@@ -51,6 +51,10 @@ class TestUnlabeledCertaintyRejected(unittest.TestCase):
         with self.assertRaises(copylint.CopyRejected):
             copylint.enforce_copy("It is certain to happen by Friday.", 0.6)
 
+    def test_guarantees_verb_form_rejected(self):
+        with self.assertRaises(copylint.CopyRejected):
+            copylint.enforce_copy("History guarantees this trend continues through Friday.", 0.8)
+
     def test_cant_lose_rejected(self):
         with self.assertRaises(copylint.CopyRejected):
             copylint.enforce_copy("This can't lose over the next quarter.", 0.6)
