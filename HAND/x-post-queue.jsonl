@@ -109,3 +109,4 @@
 {"type": "queued", "task": "164", "topic": "network boundary check extended to fencepost's consent.py/draftback.py", "queued_at": "2026-07-20T00:12:34+00:00"}
 {"type": "queued", "task": "165", "topic": "ONBOARDING.md's stale test-count claim, fixed and cross-checked against the live suite", "queued_at": "2026-07-20T01:14:50Z"}
 {"type": "queued", "task": "169", "topic": "the archive scalpel tools/roadmap_archive.py -- proven, not yet run against the live 168-row backlog", "queued_at": "2026-07-20T05:14:33Z"}
+{"type": "queued", "task": "177", "topic": "oracle_engine cadence.py silently dropping x-obscured-minute BUILDLOG lines, fixed", "queued_at": "2026-07-20T13:22:16Z"}

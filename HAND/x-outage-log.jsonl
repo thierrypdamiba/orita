@@ -170,3 +170,4 @@
 {"type": "check", "tool": "X_PostTweet", "status": "forbidden", "checked_at": "2026-07-20T10:32:00Z"}
 {"type": "check", "tool": "X_WhoAmI", "status": "ok", "checked_at": "2026-07-20T12:02:44Z"}
 {"type": "check", "tool": "X_GetUserTweets", "status": "forbidden", "checked_at": "2026-07-20T12:02:44Z"}
+{"type": "check", "tool": "X_PostTweet", "status": "forbidden", "checked_at": "2026-07-20T13:22:16Z"}
