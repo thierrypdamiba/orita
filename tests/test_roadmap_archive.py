@@ -320,12 +320,24 @@ class CLICase(unittest.TestCase):
 class RealRoadmapLiveReadOnlyCase(unittest.TestCase):
     """Proves the parser holds against the REAL, live ROADMAP.md -- read
     only, nothing is ever written back to the real repo by this test.
+
+    Task 170 ran the scalpel task 169 only forged: tasks 1-169 now live,
+    byte-for-byte, in the dated archive file this class also reads --
+    ROADMAP.md itself is deliberately thin from here on (a preamble, an
+    archive pointer, and whatever is currently live). The archive-header
+    wrapper (`build_archive_file_content`'s fixed `---\\n\\n` marker) is
+    stripped the same way a caller reconstructing the original would.
     """
 
     def setUp(self):
         self.real_path = os.path.join(ROOT, "ROADMAP.md")
         with open(self.real_path, encoding="utf-8") as f:
             self.real_text = f.read()
+        self.archive_path = os.path.join(ROOT, "ROADMAP-ARCHIVE-001-169.md")
+        with open(self.archive_path, encoding="utf-8") as f:
+            archive_content = f.read()
+        marker = "---\n\n"
+        self.archived_text = archive_content[archive_content.index(marker) + len(marker):]
 
     def test_sections_reconstruct_the_real_file_exactly(self):
         sections = ra.split_sections(self.real_text)
@@ -334,17 +346,19 @@ class RealRoadmapLiveReadOnlyCase(unittest.TestCase):
             self.assertEqual(a["end"], b["start"])
 
     def test_finds_every_real_task_number_exactly_once_one_through_at_least_168(self):
-        sections = ra.split_sections(self.real_text)
+        # Tasks 1-169's rows now live in the archive file, not the live
+        # ROADMAP.md -- that migration is the entire point of task 170.
+        sections = ra.split_sections(self.archived_text)
         all_rows = [row for sec in sections for row in ra.section_task_rows(sec["text"])]
         nums = [n for n, _ in all_rows]
         self.assertEqual(len(nums), len(set(nums)), "a task number was parsed twice")
         found = set(nums)
         expected = set(range(1, 169))
         missing = expected - found
-        self.assertEqual(missing, set(), f"real ROADMAP.md is missing rows: {sorted(missing)}")
+        self.assertEqual(missing, set(), f"archive file is missing rows: {sorted(missing)}")
 
     def test_a_real_sentence_shaped_status_cell_task_19_is_recognized_as_done(self):
-        sections = ra.split_sections(self.real_text)
+        sections = ra.split_sections(self.archived_text)
         all_rows = [row for sec in sections for row in ra.section_task_rows(sec["text"])]
         by_num = dict(all_rows)
         self.assertIn(19, by_num)
@@ -352,33 +366,43 @@ class RealRoadmapLiveReadOnlyCase(unittest.TestCase):
         self.assertTrue(ra.is_done_status(by_num[19]))
 
     def test_a_contiguous_prefix_up_to_task_100_is_selectable_and_round_trips(self):
-        result = ra.archive_text(self.real_text, up_to_task_num=100)
+        result = ra.archive_text(self.archived_text, up_to_task_num=100)
         self.assertIsNotNone(result["task_range"])
         lo, hi = result["task_range"]
         self.assertEqual(lo, 1)
         self.assertLessEqual(hi, 100)
         # The real round trip: the exact span this would cut out of the
-        # real file, spliced back, reconstructs the real file exactly.
-        start = self.real_text.index(result["archived_text"][:200])
+        # archived text, spliced back, reconstructs the archived text
+        # exactly.
+        start = self.archived_text.index(result["archived_text"][:200])
         end = start + len(result["archived_text"])
-        reconstructed = self.real_text[:start] + result["archived_text"] + self.real_text[end:]
-        self.assertEqual(reconstructed, self.real_text)
+        reconstructed = (
+            self.archived_text[:start] + result["archived_text"] + self.archived_text[end:]
+        )
+        self.assertEqual(reconstructed, self.archived_text)
 
-    def test_nothing_referenced_by_ritual_completeness_or_wip_reclaim_lives_only_in_an_archivable_row(self):
+    def test_wip_rows_are_never_swept_by_an_archive_up_to_their_own_ceiling(self):
         # A cheap, real guard against the "archiving deletes something a
         # doctrine test still needs" risk the task description names:
         # every WIP-reclaim/ritual-completeness check reads ROADMAP.md
         # for OPEN work (WIP rows, the table header), never for closed
         # task prose -- so archiving only ever fully-DONE, sub-ceiling
-        # sections can never remove a row those checkers still need. This
-        # test proves today's real file currently has zero WIP rows (so
-        # an archive run right now would have nothing live-in-progress to
-        # accidentally sweep up), matching ritual_check.py's own
-        # `wip_reclaim: clean (no task currently WIP)` verdict this hour.
+        # sections can never remove a row those checkers still need.
+        # Structural, not a snapshot: today's real file has task 170 WIP
+        # (matching `ritual_check.py`'s own `wip_reclaim` fold), and this
+        # proves that even a ceiling AT OR ABOVE 170 would still refuse
+        # to sweep it up, because its section never reads fully-done.
         sections = ra.split_sections(self.real_text)
         all_rows = [row for sec in sections for row in ra.section_task_rows(sec["text"])]
         wip_rows = [n for n, status in all_rows if not ra.is_done_status(status)]
-        self.assertEqual(wip_rows, [])
+        if not wip_rows:
+            return
+        highest_wip = max(wip_rows)
+        result = ra.archive_text(self.real_text, up_to_task_num=highest_wip)
+        if result["task_range"] is None:
+            return
+        _, hi = result["task_range"]
+        self.assertLess(hi, highest_wip)
 
 
 if __name__ == "__main__":
