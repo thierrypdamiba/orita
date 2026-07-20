@@ -129,6 +129,11 @@ def build_prediction(
         raise CadenceError("now must be timezone-aware")
     if threshold < 1:
         raise CadenceError("threshold must be at least 1 — a call that always passes is not a call")
+    if horizon_hours <= 0:
+        raise CadenceError(
+            "horizon_hours must be positive — a target at or before the sealing "
+            "moment is not a prediction, it is hindsight"
+        )
     velocity = recent_task_velocity(entries, now, window_hours=horizon_hours)
     target = now + datetime.timedelta(hours=horizon_hours)
     claim = (

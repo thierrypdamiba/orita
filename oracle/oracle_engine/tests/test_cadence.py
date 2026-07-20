@@ -153,6 +153,23 @@ class TestBuildPrediction(unittest.TestCase):
         with self.assertRaises(cadence.CadenceError):
             cadence.build_prediction(_NOW, entries, threshold=0)
 
+    def test_rejects_zero_horizon_hours(self):
+        # A zero horizon puts the claim's own target at the exact sealing
+        # moment -- "By {now}, ... between now and then" with no "then" at
+        # all, already knowable the instant it would be sealed.
+        entries = cadence.parse_buildlog(_SAMPLE_LOG)
+        with self.assertRaises(cadence.CadenceError):
+            cadence.build_prediction(_NOW, entries, horizon_hours=0)
+
+    def test_rejects_negative_horizon_hours(self):
+        # A negative horizon puts the claim's own target BEFORE the sealing
+        # moment -- a "prediction" about a window that already closed is
+        # hindsight, exactly what prediction.py's own doctrine ("no
+        # hindsight edits -- the timestamp is the whole point") forbids.
+        entries = cadence.parse_buildlog(_SAMPLE_LOG)
+        with self.assertRaises(cadence.CadenceError):
+            cadence.build_prediction(_NOW, entries, horizon_hours=-24)
+
 
 class TestSealCadencePrediction(unittest.TestCase):
     def test_seals_a_real_predict_entry_to_a_scratch_ledger(self):
