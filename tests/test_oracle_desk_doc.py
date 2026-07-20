@@ -69,12 +69,27 @@ def _doc_text():
 def _roadmap_task_status(task_num):
     """The status word of ROADMAP.md's own `| N | STATUS | ... |` table row
     for task_num -- the table's CURRENT state, never the prose's, the same
-    discipline tools/wip_reclaim_check.py's parse_table_rows already holds."""
+    discipline tools/wip_reclaim_check.py's parse_table_rows already holds.
+
+    ROADMAP #170 (`tools/roadmap_archive.py`, run for real) moved every
+    fully-DONE row up to task 169 out of ROADMAP.md byte-for-byte into a
+    dated `ROADMAP-ARCHIVE-*.md` file -- a gating task like 24-27 now
+    lives there, not in the live table, so a miss on the live file falls
+    back to scanning every archive before giving up.
+    """
     pattern = re.compile(r"^\|\s*" + str(task_num) + r"\s*\|\s*(\S+)\s*\|", re.MULTILINE)
     with open(ROADMAP_PATH, encoding="utf-8") as f:
         text = f.read()
     m = pattern.search(text)
-    return m.group(1) if m else None
+    if m:
+        return m.group(1)
+    for name in sorted(os.listdir(REPO_ROOT)):
+        if name.startswith("ROADMAP-ARCHIVE-") and name.endswith(".md"):
+            with open(os.path.join(REPO_ROOT, name), encoding="utf-8") as f:
+                m = pattern.search(f.read())
+            if m:
+                return m.group(1)
+    return None
 
 
 class OracleDeskGatingConditionCase(unittest.TestCase):

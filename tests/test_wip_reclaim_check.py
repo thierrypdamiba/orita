@@ -158,9 +158,18 @@ class RealCheckoutCase(unittest.TestCase):
         self.assertTrue(result["clean"], result)
 
     def test_real_roadmap_has_no_row_number_gaps_up_to_its_own_highest_task(self):
+        # Task 170 (tools/roadmap_archive.py, run for real) moved tasks
+        # 1-169 out of ROADMAP.md byte-for-byte into a dated archive file,
+        # leaving only current/recent rows live -- so continuity now has
+        # to be checked across the live file PLUS every archive it points
+        # at, not the live file alone.
         with open(os.path.join(ROOT, "ROADMAP.md"), encoding="utf-8") as f:
             text = f.read()
         rows = wrc.parse_table_rows(text)
+        for name in os.listdir(ROOT):
+            if name.startswith("ROADMAP-ARCHIVE-") and name.endswith(".md"):
+                with open(os.path.join(ROOT, name), encoding="utf-8") as f:
+                    rows.extend(wrc.parse_table_rows(f.read()))
         nums = sorted(r["number"] for r in rows)
         self.assertEqual(nums, list(range(1, nums[-1] + 1)), nums)
 
