@@ -72,7 +72,15 @@ REQUIRED_SCOPES: dict[str, frozenset[str]] = {
 # deliberately generic (any owner/repo) so a fork's own consent issues still
 # pass; what makes it "public" is the github.com/.../issues/<n> shape itself,
 # not which repo it lives in.
-_ISSUE_URL_RE = re.compile(r"^https://github\.com/[\w.-]+/[\w.-]+/issues/\d+$")
+#
+# Anchored with `\Z`, not `$` — Python's `$` matches at the end of the
+# string OR immediately before a single trailing "\n", so a record whose
+# `issue_url` carries a trailing newline (e.g. read via `readline()`/a form
+# field and never `.strip()`-ed) would silently pass this "exact URL" check
+# with content the regex never actually validated. `check_scope_confirm`'s
+# own docstring swears this gate never lets "close enough" stand in for
+# "confirmed" — `\Z` is what actually holds that line for check 1 too.
+_ISSUE_URL_RE = re.compile(r"^https://github\.com/[\w.-]+/[\w.-]+/issues/\d+\Z")
 
 
 class ConsentRequiredError(PermissionError):

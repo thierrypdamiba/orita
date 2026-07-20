@@ -201,6 +201,30 @@ def test_fake_or_private_issue_urls_fail_check_one(url: str):
     assert why
 
 
+@pytest.mark.parametrize(
+    "url",
+    [
+        GOOD_ISSUE + "\n",  # a trailing newline (e.g. an un-stripped readline())
+        GOOD_ISSUE + "\n\n",
+        GOOD_ISSUE + "\nrm -rf /",  # content smuggled in after a "clean" URL line
+    ],
+)
+def test_a_url_with_trailing_content_after_a_newline_fails_check_one(url: str):
+    # Python's `re` treats `$` as matching either the true end of the string
+    # OR the position just before a single trailing "\n" — so a naive
+    # `^...$` pattern would let `GOOD_ISSUE + "\n"` (and worse, real content
+    # hidden after a newline) silently pass as if it were the exact, clean
+    # URL the docstring promises this check enforces "verbatim." Reproduced
+    # live pre-fix: `_ISSUE_URL_RE` compiled with a trailing `$` matched
+    # `GOOD_ISSUE + "\n"` via `.match()`, letting `check_public_issue` return
+    # `(True, ...)` for a record that was not actually the bare URL it
+    # claimed to be. `\Z` (matches only the true end of the string, no
+    # newline exception) is what the exact-match doctrine actually requires.
+    ok, why = check_public_issue(_record(issue_url=url))
+    assert not ok, f"{url!r} should not pass the exact-URL check but did: {why}"
+    assert why
+
+
 # --- check_scope_confirm: check 2 of 2 ---------------------------------------
 
 
