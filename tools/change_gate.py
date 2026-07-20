@@ -50,6 +50,42 @@ def extract_primary_gap(report_text: str):
     return m.group(1).strip() if m else None
 
 
+def _gap_detail(report_text: str, headline_end: int) -> str:
+    """The first non-blank line following the primary-gap headline -- the
+    detail paragraph carrying the gap's actual identifying evidence (a
+    commit count, an evidence list) -- or '' if nothing follows (a minimal
+    report shape with no detail line at all)."""
+    for line in report_text[headline_end:].splitlines():
+        stripped = line.strip()
+        if stripped:
+            return stripped
+    return ""
+
+
+def extract_gap_identity(report_text: str):
+    """The fingerprint should_post_gap/record_posted_gap actually compare.
+
+    The bare headline alone is not enough: several gap kinds (the
+    milestone-gap in particular) render a static category headline every
+    day it fires, so two days with completely different underlying
+    evidence -- a different commit count, a disjoint set of commit hashes
+    -- would otherwise collapse to "the same gap" and silence a post that
+    genuinely had something new to say. Combining the headline with the
+    detail line immediately below it (where that evidence lives) fixes
+    this without requiring every report shape to carry one: a report with
+    no detail line falls back to the bare headline, unchanged from before.
+
+    Returns None under the same condition extract_primary_gap does: no
+    parseable primary gap in the report at all.
+    """
+    m = _GAP_RE.search(report_text)
+    if m is None:
+        return None
+    headline = m.group(1).strip()
+    detail = _gap_detail(report_text, m.end())
+    return f"{headline} :: {detail}" if detail else headline
+
+
 def _entries(path=LOG):
     if not os.path.exists(path):
         return []
@@ -80,11 +116,11 @@ def should_post_gap(report_text: str, path=LOG):
     """Whether this report's primary gap clears TOWN-OPERATIONS.md's change-gate.
 
     Returns (due: bool, reason: str). No parseable gap in the report: never
-    due (nothing to post). Never posted before: due. Same gap text as the
-    last real post: not due (the exact case that has been silently correct,
-    by hand, every hour of this outage). Different text: due.
+    due (nothing to post). Never posted before: due. Same gap identity
+    (headline + detail, see extract_gap_identity) as the last real post:
+    not due. Different identity: due.
     """
-    gap = extract_primary_gap(report_text)
+    gap = extract_gap_identity(report_text)
     if gap is None:
         return False, "report carries no parseable primary gap"
     last = last_posted_gap(path)
@@ -110,7 +146,7 @@ if __name__ == "__main__":
         report_path, posted_at = sys.argv[2], sys.argv[3]
         with open(report_path) as f:
             text = f.read()
-        gap = extract_primary_gap(text)
+        gap = extract_gap_identity(text)
         if gap is None:
             print("refusing to record -- report carries no parseable primary gap")
             sys.exit(1)

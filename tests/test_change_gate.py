@@ -53,6 +53,22 @@ REPORT_EMPTY = """# Fencepost Report — 2026-07-11
 No gap surfaced yet.
 """
 
+# Same category headline/confidence as REPORT_A (the milestone-gap kind
+# renders this static headline every day it fires) but different evidence
+# below it -- mirrors the real, live 2026-07-19 vs 2026-07-20 REPORTS/ pair
+# that exposed this bug: same "Milestone-level..." headline, 15 vs 32
+# commits, disjoint commit hashes.
+REPORT_A_SAME_HEADLINE_DIFFERENT_EVIDENCE = """# Fencepost Report — 2026-07-14
+
+*The one thing that fell between accounts yesterday.*
+
+**Milestone-level work shipped but never reached @oritatown** — confidence 0.85.
+
+32 milestone commit(s) since 2026-07-12, none echoed in a post.
+
+**The count.** 3 fenceposts named to date. The wall reads 2.
+"""
+
 
 class _TempLogCase(unittest.TestCase):
     def setUp(self):
@@ -80,6 +96,40 @@ class TestExtractPrimaryGap(unittest.TestCase):
 
     def test_none_when_no_parseable_gap(self):
         self.assertIsNone(cg.extract_primary_gap(REPORT_EMPTY))
+
+
+class TestExtractGapIdentity(unittest.TestCase):
+    def test_combines_headline_and_detail_line(self):
+        self.assertEqual(
+            cg.extract_gap_identity(REPORT_A),
+            "Milestone-level work shipped but never reached @oritatown :: "
+            "11 milestone commit(s) since 2026-07-12, none echoed in a post.",
+        )
+
+    def test_falls_back_to_bare_headline_when_no_detail_line(self):
+        # A minimal report shape (headline only, nothing below it) must
+        # still produce a usable identity -- unchanged from the pre-fix
+        # bare-headline behavior in this case.
+        report = "**A release shipped but never announced.** — confidence 0.82.\n"
+        self.assertEqual(
+            cg.extract_gap_identity(report),
+            "A release shipped but never announced.",
+        )
+
+    def test_same_headline_different_evidence_yields_different_identity(self):
+        # The real, live bug this closes: REPORT_A and this fixture share
+        # the exact same bolded headline and confidence (the milestone-gap
+        # kind renders a static category headline every day it fires) but
+        # carry different evidence (15 vs 32 commits in the real incident,
+        # 11 vs 32 here) -- extract_primary_gap alone cannot tell them
+        # apart; extract_gap_identity must.
+        self.assertNotEqual(
+            cg.extract_gap_identity(REPORT_A),
+            cg.extract_gap_identity(REPORT_A_SAME_HEADLINE_DIFFERENT_EVIDENCE),
+        )
+
+    def test_none_when_no_parseable_gap(self):
+        self.assertIsNone(cg.extract_gap_identity(REPORT_EMPTY))
 
 
 class TestRecordPostedGap(_TempLogCase):
@@ -123,7 +173,7 @@ class TestShouldPostGap(_TempLogCase):
 
     def test_not_due_when_gap_unchanged_from_last_posted(self):
         cg.record_posted_gap(
-            "Milestone-level work shipped but never reached @oritatown",
+            cg.extract_gap_identity(REPORT_A),
             "2026-07-13T12:00:00Z",
             path=self.path,
         )
@@ -133,11 +183,30 @@ class TestShouldPostGap(_TempLogCase):
 
     def test_due_when_gap_differs_from_last_posted(self):
         cg.record_posted_gap(
-            "Milestone-level work shipped but never reached @oritatown",
+            cg.extract_gap_identity(REPORT_A),
             "2026-07-13T12:00:00Z",
             path=self.path,
         )
         due, reason = cg.should_post_gap(REPORT_B, path=self.path)
+        self.assertTrue(due)
+        self.assertIn("differs", reason)
+
+    def test_due_when_same_headline_but_evidence_differs(self):
+        # The real, live bug this closes (reproduced against the actual
+        # 2026-07-19/2026-07-20 REPORTS/ pair before this fix): the
+        # milestone-gap kind renders the identical bolded headline every
+        # day it fires, so a bare-headline comparison wrongly reported
+        # "unchanged" even though the underlying evidence (commit count,
+        # commit hashes) was completely different. Same category headline,
+        # different evidence -- must be due, not silently suppressed.
+        cg.record_posted_gap(
+            cg.extract_gap_identity(REPORT_A),
+            "2026-07-13T12:00:00Z",
+            path=self.path,
+        )
+        due, reason = cg.should_post_gap(
+            REPORT_A_SAME_HEADLINE_DIFFERENT_EVIDENCE, path=self.path
+        )
         self.assertTrue(due)
         self.assertIn("differs", reason)
 
