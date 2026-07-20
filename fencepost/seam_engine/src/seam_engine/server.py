@@ -31,6 +31,7 @@ from seam_engine.scan import (
     compute_candidates,
     fetch_github_activity,
     fetch_latest_release,
+    load_github_events_from_live,
     load_x_posts_from_ledger,
     load_x_posts_from_live,
 )
@@ -112,6 +113,18 @@ def seam_scan(
         "use the HAND/mortal-sky-log.md ledger fallback, unchanged from v0. "
         "An empty array is rejected — see load_x_posts_from_live's docstring.",
     ] = None,
+    github_events_json: Annotated[
+        str | None,
+        "Optional JSON array of your own already-fetched, normalized GitHub "
+        "events ([{\"kind\":..,\"id\":..,\"title\":..,\"url\":..,\"ts\":..,"
+        "\"author\":..}, ...] — call your gateway's GitHub read yourself "
+        "first, per scan.py's load_github_events_from_live). Omit to fetch "
+        "directly from api.github.com, unchanged from v0 — but that direct "
+        "fetch fails with an UpstreamError in any sandbox whose egress to "
+        "GitHub is blocked, which is exactly when this override exists. "
+        "An empty array is rejected — see load_github_events_from_live's "
+        "docstring.",
+    ] = None,
 ) -> Annotated[dict, "The ranked seam scan: one labeled primary gap, a confidence-scored tail, and excluded false positives"]:
     """Read-only seam-scan v0: reconcile @oritatown's X posts against GitHub
     commits/releases and surface the single highest-confidence gap between
@@ -129,7 +142,11 @@ def seam_scan(
     # live MCP tool and the daily Action never disagree about how far a
     # still-unannounced gap can recur before it silently ages out of view.
     since = _effective_since(now, window_hours, account_live_since)
-    events = fetch_github_activity(owner, repo, since)
+    events = (
+        fetch_github_activity(owner, repo, since)
+        if github_events_json is None
+        else load_github_events_from_live(json.loads(github_events_json))
+    )
     surfaced, excluded = compute_candidates(events, x_posts, account_live_since)
     coincidences = coincidence_candidates(events, x_posts, account_live_since)
     ranking = rank(surfaced + coincidences)
@@ -140,6 +157,7 @@ def seam_scan(
         "window_hours": window_hours,
         "account_live_since": account_live_since.isoformat(),
         "x_posts_source": "ledger" if x_posts_json is None else "live",
+        "github_events_source": "direct" if github_events_json is None else "override",
         "confidence_bar": ranking.confidence_bar,
         "separation_margin": ranking.separation_margin,
         "primary_gap": asdict(primary) if primary else None,
@@ -179,6 +197,12 @@ def combined_scan_preview(
         "Optional JSON array of your own already-fetched, normalized X posts, "
         "same shape and same ledger fallback as seam_scan's x_posts_json.",
     ] = None,
+    github_events_json: Annotated[
+        str | None,
+        "Optional JSON array of your own already-fetched, normalized GitHub "
+        "events, same shape and same direct-fetch fallback as seam_scan's "
+        "github_events_json.",
+    ] = None,
 ) -> Annotated[
     dict,
     "WIP (ROADMAP.md #113): scan.py's own candidates pooled with every "
@@ -204,7 +228,10 @@ def combined_scan_preview(
     live in `seam-scan.yml` the same day a recipe's own fixture/scopes
     graduate to a live read, unchanged from task 111's boundary."""
     x_posts = None if x_posts_json is None else json.loads(x_posts_json)
-    return run_combined_scan(owner, repo, window_hours=window_hours, x_posts=x_posts)
+    github_events = None if github_events_json is None else json.loads(github_events_json)
+    return run_combined_scan(
+        owner, repo, window_hours=window_hours, x_posts=x_posts, github_events=github_events,
+    )
 
 
 # Run with specific transport
