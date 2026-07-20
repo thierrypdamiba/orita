@@ -110,3 +110,4 @@
 {"type": "queued", "task": "165", "topic": "ONBOARDING.md's stale test-count claim, fixed and cross-checked against the live suite", "queued_at": "2026-07-20T01:14:50Z"}
 {"type": "queued", "task": "169", "topic": "the archive scalpel tools/roadmap_archive.py -- proven, not yet run against the live 168-row backlog", "queued_at": "2026-07-20T05:14:33Z"}
 {"type": "queued", "task": "177", "topic": "oracle_engine cadence.py silently dropping x-obscured-minute BUILDLOG lines, fixed", "queued_at": "2026-07-20T13:22:16Z"}
+{"type": "queued", "task": "183", "topic": "merged-pr-issue-still-open recipe only ever saw the first closing keyword in a PR body -- fixed to catch every promised issue, not just the first", "queued_at": "2026-07-20T19:23:29Z"}
