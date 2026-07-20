@@ -213,6 +213,10 @@ def _arcade_app_watch():
     return _load("_ritual_arcade_app_watch", os.path.join(ROOT, "tools", "arcade_app_watch.py"))
 
 
+def _scribe_growth_check():
+    return _load("_ritual_scribe_growth_check", os.path.join(ROOT, "tools", "scribe_growth_check.py"))
+
+
 def _vault_leak_check():
     return _load("_ritual_vault_leak_check", os.path.join(ROOT, "tools", "vault_leak_check.py"))
 
@@ -422,6 +426,25 @@ def check_arcade_apps(arcade_apps_state: dict | None, now_iso: str) -> dict | No
     changed, reason = mod.app_delta(arcade_apps_state, path=mod.LOG)
     mod.record_app_check(arcade_apps_state, now_iso, path=mod.LOG)
     return {"changed": changed, "reason": reason}
+
+
+def check_scribe_growth(now_iso: str, scribe_root: str | None = None) -> dict:
+    """Task 168: ROADMAP.md/BUILDLOG.md's real byte size, watched. Unlike
+    `check_square`/`check_arcade_apps`, a tracked file's size is local
+    filesystem state, not a live API call behind this sandbox's proxy
+    wall -- `compute_scribe_sizes` makes its own read and this runs
+    unconditionally, every call, no caller-supplied state required.
+    Records this hour's sizes via `record_scribe_check` AFTER computing
+    growth against the prior baseline (same order task 88 fixed for
+    `check_square`), so growth is never compared against itself.
+    Informational only: crossing `WARN_BYTES` is not a rule violation, the
+    same class `square`/`arcade_apps` already hold -- this never flips
+    `broken`."""
+    mod = _scribe_growth_check()
+    sizes = mod.compute_scribe_sizes(root=scribe_root or ROOT)
+    result = mod.check_scribe_growth(sizes, threshold_bytes=mod.WARN_BYTES, path=mod.LOG)
+    mod.record_scribe_check(sizes, now_iso, path=mod.LOG)
+    return result
 
 
 def check_ci(ci_checks: list | None) -> dict | None:
@@ -883,6 +906,7 @@ def run_ritual_check(
     now: datetime | None = None,
     fencepost_base: str = DEFAULT_FENCEPOST_BASE,
     square_state: dict | None = None,
+    scribe_root: str | None = None,
     ci_checks: list | None = None,
     cron_checks: list | None = None,
     checkout_dirs: tuple | None = None,
@@ -923,6 +947,7 @@ def run_ritual_check(
     escalation = check_x_escalation(now_iso)
     square = check_square(square_state, now_iso)
     arcade_apps = check_arcade_apps(arcade_apps_state, now_iso)
+    scribe_growth = check_scribe_growth(now_iso, scribe_root=scribe_root)
     ci = check_ci(ci_checks)
     words = check_words(now_iso)
     cron = check_cron(cron_checks, now_iso)
@@ -982,6 +1007,7 @@ def run_ritual_check(
         "x_escalation": escalation,
         "square": square,
         "arcade_apps": arcade_apps,
+        "scribe_growth": scribe_growth,
         "ci": ci,
         "words": words,
         "cron": cron,
@@ -1043,6 +1069,12 @@ def format_ritual_check(result: dict) -> str:
     if result["arcade_apps"] is not None:
         aa = result["arcade_apps"]
         lines.append(f"  arcade apps: {'changed' if aa['changed'] else 'unchanged'} -- {aa['reason']}")
+    sg = result["scribe_growth"]
+    lines.append(
+        "  scribe growth: "
+        + ("clean" if sg["clean"] else f"OVER THRESHOLD ({', '.join(sg['over_threshold'])})")
+        + f" -- sizes: {sg['sizes']}, growth: {sg['growth_since_last_check']}"
+    )
     if result["ci"] is not None:
         for workflow, line in result["ci"].items():
             lines.append(f"  ci/{workflow}: {line}")

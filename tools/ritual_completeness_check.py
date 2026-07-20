@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Task 121. Off-By-One counts the tool that counts everything else.
 
-`tools/ritual_check.py` hand-wires 32 `check_*` functions into one hourly
+`tools/ritual_check.py` hand-wires 33 `check_*` functions into one hourly
 block: each is called inside `run_ritual_check`, its result assigned to a
 dict key, and that key printed as a line in `format_ritual_check`. Three
 separate places a single typo or a forgotten wire-up can silently drop a
@@ -41,7 +41,9 @@ thing it describes" shape this module exists to catch in its subject.
 `claimed_check_count()` below extracts this claim from the live docstring
 text (never a second hand-typed copy), so `tests/test_ritual_completeness_check.py`
 can cross-check it against the real count and a future addition can't let
-this number go stale silently again.
+this number go stale silently again. **Updated to 33** the same hour task
+168's `check_scribe_growth` was wired in -- the first real test of whether
+that promise holds.
 
 Usage:
     python3 tools/ritual_completeness_check.py check

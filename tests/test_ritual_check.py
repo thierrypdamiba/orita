@@ -518,6 +518,69 @@ class ArcadeAppsFoldCase(unittest.TestCase):
         self.assertFalse(result["broken"])
 
 
+class ScribeGrowthFoldCase(unittest.TestCase):
+    """Task 168: run_ritual_check() folds tools/scribe_growth_check.py's
+    real ROADMAP.md/BUILDLOG.md byte sizes in -- unlike square/arcade_apps,
+    this makes its OWN filesystem read (no caller-supplied live-API state
+    needed) so it runs unconditionally on every call, including a bare
+    rc.run_ritual_check() with no arguments."""
+
+    def setUp(self):
+        self.tmpdir = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.tmpdir, ignore_errors=True)
+        with open(os.path.join(self.tmpdir, "ROADMAP.md"), "w") as f:
+            f.write("x" * 100)
+        with open(os.path.join(self.tmpdir, "BUILDLOG.md"), "w") as f:
+            f.write("x" * 50)
+        self.sgc = _load(
+            f"_test_ritual_scribe_growth_check_{id(self)}", os.path.join(ROOT, "tools", "scribe_growth_check.py")
+        )
+        self.sgc.LOG = os.path.join(self.tmpdir, "scribe-growth-log.jsonl")
+        original_loader = rc._scribe_growth_check
+        rc._scribe_growth_check = lambda: self.sgc
+        self.addCleanup(setattr, rc, "_scribe_growth_check", original_loader)
+
+    def test_reads_real_sizes_off_the_given_root(self):
+        result = rc.check_scribe_growth("2026-07-20T06:00:00Z", scribe_root=self.tmpdir)
+        self.assertEqual(result["sizes"], {"ROADMAP.md": 100, "BUILDLOG.md": 50})
+        self.assertTrue(result["clean"])
+
+    def test_records_so_next_call_reads_it_back(self):
+        rc.check_scribe_growth("2026-07-20T06:00:00Z", scribe_root=self.tmpdir)
+        with open(self.sgc.LOG) as f:
+            lines = [line for line in f.read().splitlines() if line.strip()]
+        self.assertEqual(len(lines), 1)
+        self.assertIn('"checked_at": "2026-07-20T06:00:00Z"', lines[0])
+
+    def test_growth_settles_against_the_prior_baseline_next_call(self):
+        rc.check_scribe_growth("2026-07-20T06:00:00Z", scribe_root=self.tmpdir)
+        with open(os.path.join(self.tmpdir, "ROADMAP.md"), "w") as f:
+            f.write("x" * 140)
+        result = rc.check_scribe_growth("2026-07-20T07:00:00Z", scribe_root=self.tmpdir)
+        self.assertEqual(result["growth_since_last_check"]["ROADMAP.md"], 40)
+
+    def test_run_ritual_check_folds_scribe_growth_key_with_no_arguments(self):
+        # No scribe_root override: proves a bare rc.run_ritual_check() call
+        # (the same shape tests elsewhere in this file already make) reads
+        # the real repo's ROADMAP.md/BUILDLOG.md without erroring.
+        result = rc.run_ritual_check()
+        self.assertIn("ROADMAP.md", result["scribe_growth"]["sizes"])
+        self.assertIn("BUILDLOG.md", result["scribe_growth"]["sizes"])
+
+    def test_scribe_growth_over_threshold_never_flips_broken(self):
+        original_warn = self.sgc.WARN_BYTES
+        self.sgc.WARN_BYTES = 10
+        self.addCleanup(setattr, self.sgc, "WARN_BYTES", original_warn)
+        result = rc.run_ritual_check(scribe_root=self.tmpdir)
+        self.assertFalse(result["scribe_growth"]["clean"])
+        self.assertFalse(result["broken"])
+
+    def test_format_includes_scribe_growth_line(self):
+        formatted = rc.format_ritual_check(rc.run_ritual_check(scribe_root=self.tmpdir))
+        self.assertIn("scribe growth: clean", formatted)
+        self.assertIn("ROADMAP.md", formatted)
+
+
 class CIFoldCase(unittest.TestCase):
     """Task 73: run_ritual_check(ci_checks=...) folds ci_watch.py's durable
     CI-conclusion log into the same structured result, the same shape task
