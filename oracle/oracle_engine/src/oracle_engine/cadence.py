@@ -49,7 +49,7 @@ DEFAULT_HORIZON_HOURS = 24
 DEFAULT_CONFIDENCE = 0.7
 
 _LOG_LINE_RE = re.compile(
-    r"^(?P<date>\d{4}-\d{2}-\d{2}) (?P<time>\d{2}:\d{2}) UTC \| (?P<god>[^|]+) \| (?P<task>[^|]+) \| "
+    r"^(?P<date>\d{4}-\d{2}-\d{2}) (?P<time>\d{2}:\d[\dx]) UTC \| (?P<god>[^|]+) \| (?P<task>[^|]+) \| "
 )
 
 
@@ -66,6 +66,23 @@ def parse_buildlog(text: str) -> list[dict]:
         if m:
             entries.append(m.groupdict())
     return entries
+
+
+def _minute_floor(time_str: str) -> str:
+    """Normalize a BUILDLOG.md `HH:MM` field into something `strptime` can
+    parse.
+
+    The town's own convention -- visible throughout the real
+    `BUILDLOG.md` (e.g. "19:2x UTC", "03:0x UTC") -- obscures a line's
+    exact minute by replacing its ones digit with a literal 'x'; the real
+    minute is only known to within a ten-minute window. `%H:%M` cannot
+    parse 'x' as a digit, so this floors the ambiguous digit to '0' -- the
+    earliest minute consistent with what was actually recorded, never a
+    guessed-at specific one. The resulting imprecision is at most nine
+    minutes, negligible against every window this module is ever called
+    with (hours, not minutes), and it is a documented approximation, not
+    the silent drop this function replaces."""
+    return time_str.replace("x", "0")
 
 
 def load_buildlog_entries(path: str = DEFAULT_BUILDLOG_PATH) -> list[dict]:
@@ -91,7 +108,7 @@ def recent_task_velocity(
         if not task.isdigit():
             continue
         ts = datetime.datetime.strptime(
-            f"{e['date']} {e['time']}", "%Y-%m-%d %H:%M"
+            f"{e['date']} {_minute_floor(e['time'])}", "%Y-%m-%d %H:%M"
         ).replace(tzinfo=datetime.timezone.utc)
         if cutoff <= ts <= now:
             seen.add(task)

@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import datetime
 import os
+import re
 import sys
 import tempfile
 import unittest
@@ -54,6 +55,64 @@ class TestParseBuildlog(unittest.TestCase):
         tasks = {e["task"].strip() for e in entries}
         self.assertIn("31", tasks)
         self.assertIn("roadmap", tasks)
+
+
+class TestObscuredMinuteConvention(unittest.TestCase):
+    """The real BUILDLOG.md obscures many lines' exact minute with a
+    literal 'x' (e.g. "19:2x UTC", "03:0x UTC") -- a real, live convention
+    used throughout the file (grep confirms it), never exercised by
+    `_SAMPLE_LOG` above since that fixture predates the convention. Before
+    the fix this task shipped, `_LOG_LINE_RE` required `\\d{2}:\\d{2}` and
+    every such line was silently dropped by `parse_buildlog` -- more than
+    a third of the real file's lines, undercounting
+    `recent_task_velocity` (and therefore every cadence claim and
+    autograde re-derivation built on it) without raising anything."""
+
+    _OBSCURED_LOG = (
+        "2026-07-13 07:10 UTC | nisaba | 31 | Prediction schema shipped\n"
+        "2026-07-13 09:2x UTC | ogun | 32 | Self-scoring pass shipped\n"
+        "2026-07-13 11:0x UTC | esu-elegba | 35 | Shipped oracle/INTENT.md\n"
+    )
+
+    def test_parses_lines_with_obscured_minute(self):
+        entries = cadence.parse_buildlog(self._OBSCURED_LOG)
+        self.assertEqual(len(entries), 3)
+        tasks = {e["task"].strip() for e in entries}
+        self.assertEqual(tasks, {"31", "32", "35"})
+
+    def test_minute_floor_replaces_trailing_x_with_zero(self):
+        self.assertEqual(cadence._minute_floor("19:2x"), "19:20")
+        self.assertEqual(cadence._minute_floor("03:0x"), "03:00")
+        self.assertEqual(cadence._minute_floor("11:16"), "11:16")
+
+    def test_recent_task_velocity_counts_obscured_minute_lines(self):
+        entries = cadence.parse_buildlog(self._OBSCURED_LOG)
+        now = datetime.datetime(2026, 7, 13, 11, 30, tzinfo=datetime.timezone.utc)
+        # All three tasks (31 at 07:10, 32 at 09:2x, 35 at 11:0x) fall
+        # inside the 24h window -- the pre-fix code silently dropped the
+        # two obscured-minute lines and returned 1, not 3.
+        velocity = cadence.recent_task_velocity(entries, now, window_hours=24)
+        self.assertEqual(velocity, 3)
+
+    def test_real_buildlog_has_no_lines_the_parser_silently_drops(self):
+        """A live, read-only check against the real BUILDLOG.md: every
+        line shaped like a dated entry (`YYYY-MM-DD HH:` at the start)
+        must be one `_LOG_LINE_RE` actually recognizes. This is the
+        regression pin against the real file the bug was found in, not
+        just the synthetic fixture above."""
+        with open(cadence.DEFAULT_BUILDLOG_PATH, encoding="utf-8") as f:
+            raw = f.read()
+        shaped = [
+            line
+            for line in raw.splitlines()
+            if re.match(r"^\d{4}-\d{2}-\d{2} \d{2}:", line)
+        ]
+        parsed = cadence.parse_buildlog(raw)
+        self.assertEqual(
+            len(parsed),
+            len(shaped),
+            "parse_buildlog silently dropped a real, dated BUILDLOG.md line",
+        )
 
 
 class TestRecentTaskVelocity(unittest.TestCase):
