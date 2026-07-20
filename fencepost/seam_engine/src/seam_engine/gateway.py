@@ -122,6 +122,8 @@ _WRITE_VERBS = (
     "trash",
     "invite",
     "revoke",
+    "publish",
+    "share",
 )
 
 # A verb only counts as a live ask if it isn't itself being ruled out.

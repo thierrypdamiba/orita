@@ -55,10 +55,24 @@ def test_read_only_string_of_gets_and_lists_passes():
         "Merge the pull request once the gap is confirmed.",
         "Delete stale draft events on the calendar.",
         "Reply to mentions with the daily report.",
+        "Publish the daily summary to a public Notion page automatically.",
+        "Share the dashboard with everyone on the team.",
     ],
 )
 def test_an_unnegated_write_ask_fails_the_law(text: str):
     assert not is_read_only_capabilities(text)
+
+
+def test_write_verbs_cover_the_sibling_forbidden_verb_vocabularies():
+    """gateway._WRITE_VERBS claims to mirror draftback.FORBIDDEN_DELIVERY_ACTIONS
+    and recipes._FORBIDDEN_VERBS (recipes.py's own comment says so). Both
+    siblings forbid Publish/Share; this pins that gateway.py can't silently
+    drift back out of step with them.
+    """
+    from seam_engine import gateway
+
+    assert "publish" in gateway._WRITE_VERBS
+    assert "share" in gateway._WRITE_VERBS
 
 
 def test_a_negated_write_verb_does_not_fail_the_law():
