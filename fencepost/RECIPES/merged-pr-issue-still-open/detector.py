@@ -92,9 +92,8 @@ def load_issues(path: Path | None = None) -> list[Issue]:
     return [Issue(number=r["number"], title=r["title"], state=r["state"], url=r["url"]) for r in rows]
 
 
-def _closed_issue_number(body: str) -> int | None:
-    m = _CLOSES_RE.search(body)
-    return int(m.group(1)) if m else None
+def _closed_issue_numbers(body: str) -> list[int]:
+    return [int(n) for n in _CLOSES_RE.findall(body)]
 
 
 def _find_issue(number: int, issues: list[Issue]) -> Issue | None:
@@ -117,8 +116,8 @@ def compute_gaps(
     excluded: list[GapCandidate] = []
 
     for pr in pulls:
-        number = _closed_issue_number(pr.body)
-        if number is None:
+        numbers = _closed_issue_numbers(pr.body)
+        if not numbers:
             excluded.append(GapCandidate(
                 slug=f"no-closing-keyword-{pr.number}",
                 headline=f"PR #{pr.number} names no closing keyword",
@@ -128,29 +127,30 @@ def compute_gaps(
             ))
             continue
 
-        issue = _find_issue(number, issues)
-        if issue is None or issue.state == "closed":
-            excluded.append(GapCandidate(
-                slug=f"issue-already-closed-{pr.number}",
-                headline=f"PR #{pr.number}'s promised issue #{number} is already closed",
-                detail=f"'{pr.title}' promised to close #{number}; it already reads closed. No seam here.",
-                confidence=0.0,
-                evidence=[pr.url] + ([issue.url] if issue else []),
-            ))
-            continue
+        for number in numbers:
+            issue = _find_issue(number, issues)
+            if issue is None or issue.state == "closed":
+                excluded.append(GapCandidate(
+                    slug=f"issue-already-closed-{pr.number}-{number}",
+                    headline=f"PR #{pr.number}'s promised issue #{number} is already closed",
+                    detail=f"'{pr.title}' promised to close #{number}; it already reads closed. No seam here.",
+                    confidence=0.0,
+                    evidence=[pr.url] + ([issue.url] if issue else []),
+                ))
+                continue
 
-        age_hours = (now - pr.merged_at).total_seconds() / 3600.0
-        confidence = 0.85 if age_hours >= _STALE_HOURS else 0.55
-        surfaced.append(GapCandidate(
-            slug=f"merged-pr-issue-still-open-{pr.number}",
-            headline=f"PR #{pr.number} promised to close #{number}, but #{number} is still open",
-            detail=(
-                f"'{pr.title}' merged {pr.merged_at.isoformat()} ({age_hours:.1f}h ago) "
-                f"naming #{number} ('{issue.title}'); the issue still reads open."
-            ),
-            confidence=confidence,
-            evidence=[pr.url, issue.url],
-        ))
+            age_hours = (now - pr.merged_at).total_seconds() / 3600.0
+            confidence = 0.85 if age_hours >= _STALE_HOURS else 0.55
+            surfaced.append(GapCandidate(
+                slug=f"merged-pr-issue-still-open-{pr.number}-{number}",
+                headline=f"PR #{pr.number} promised to close #{number}, but #{number} is still open",
+                detail=(
+                    f"'{pr.title}' merged {pr.merged_at.isoformat()} ({age_hours:.1f}h ago) "
+                    f"naming #{number} ('{issue.title}'); the issue still reads open."
+                ),
+                confidence=confidence,
+                evidence=[pr.url, issue.url],
+            ))
 
     surfaced.sort(key=lambda g: g.confidence, reverse=True)
     return surfaced, excluded
