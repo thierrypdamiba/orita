@@ -324,6 +324,28 @@ def test_a_write_verb_glued_lowercase_onto_the_allowed_prefix_is_rejected(scope)
         validate_recipe(_manifest(scopes=(scope,)))
 
 
+@pytest.mark.parametrize(
+    "scope",
+    [
+        "ListAnddeleteIssues",
+        "ListIssuesremove",
+        "GetRepoAndtrash",
+        "ListMydeleteQueue",
+    ],
+)
+def test_a_write_verb_glued_onto_a_non_prefix_word_is_rejected(scope):
+    # task 175's fix only ever checks the leading allowed-prefix word for a
+    # glued verb (_word_hides_glued_verb requires the word to start with
+    # get/list/read/search/count). A verb glued in lowercase onto the END of
+    # any OTHER word -- "Anddelete", "Issuesremove", "Andtrash", "Mydelete"
+    # -- never starts with an allowed prefix, so that check never even looks
+    # at it, and none of these words equal a forbidden verb exactly either.
+    # Proves the end-anchored glue check has independent value beyond the
+    # prefix-anchored one task 175 shipped.
+    with pytest.raises(RecipeValidationError, match="glues the write verb"):
+        validate_recipe(_manifest(scopes=(scope,)))
+
+
 def test_read_only_scopes_are_accepted():
     manifest = validate_recipe(
         _manifest(scopes=("GetRepository", "ListRepoCommits", "WhoAmI", "CountStargazers"))

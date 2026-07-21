@@ -104,14 +104,28 @@ _ALLOWED_PREFIXES_LOWER: tuple[str, ...] = ("get", "list", "read", "search", "co
 
 def _word_hides_glued_verb(word: str) -> str | None:
     """`_pascal_words` only starts a new word at an uppercase letter, so a
-    forbidden verb spelled in lowercase right after an allowed prefix -- with
-    no capital letter to mark where the prefix ends and the verb begins --
-    is swallowed into one word and never reaches the exact-match check below.
-    `"GetdeleteIssues"` tokenizes as `["Getdelete", "Issues"]`; `"Getdelete"`
-    equals neither `"Get"` nor `"Delete"`, so the write verb inside it was
-    never checked at all. Returns the forbidden verb found glued this way, or
-    `None` if `word` doesn't start with an allowed prefix immediately
-    followed by one."""
+    forbidden verb spelled in lowercase with no capital letter marking its
+    own boundary is swallowed into whichever word it's glued onto and never
+    reaches the exact-match check below. Two glue shapes, both checked here:
+
+    1. Glued onto the front of the allowed prefix (task 175):
+       `"GetdeleteIssues"` tokenizes as `["Getdelete", "Issues"]`;
+       `"Getdelete"` equals neither `"Get"` nor `"Delete"`.
+    2. Glued onto the END of any word, not just the prefix word (this task):
+       `"ListAnddeleteIssues"` tokenizes as `["List", "Anddelete", "Issues"]`
+       -- `"Anddelete"` doesn't start with an allowed prefix at all, so shape
+       1's check never even looked at it, and it equals no forbidden verb
+       exactly either. Same for `"ListIssuesremove"` -> `["List",
+       "Issuesremove"]` and `"GetRepoAndtrash"` -> `["Get", "Repo",
+       "Andtrash"]`. The end-anchor deliberately does NOT flag a verb glued
+       onto the FRONT of a non-prefix word (`"Labels"` starts with the
+       forbidden verb `"Label"` but is a legitimate plural noun, not a
+       glued verb -- SCOPES.md's real `ListRepositoryLabels` must keep
+       passing); only a verb sitting at the true end of a word is safe to
+       treat as unambiguously glued-in.
+
+    Returns the forbidden verb found glued either way, or `None` if `word`
+    hides no forbidden verb behind a missing capital letter."""
     lowered = word.lower()
     for prefix in _ALLOWED_PREFIXES_LOWER:
         if not lowered.startswith(prefix):
@@ -120,6 +134,10 @@ def _word_hides_glued_verb(word: str) -> str | None:
         for verb in _FORBIDDEN_VERBS:
             if remainder.startswith(verb.lower()):
                 return verb
+    for verb in _FORBIDDEN_VERBS:
+        verb_lower = verb.lower()
+        if lowered != verb_lower and lowered.endswith(verb_lower):
+            return verb
     return None
 
 
