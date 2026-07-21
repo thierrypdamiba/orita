@@ -59,6 +59,19 @@ class TestUnlabeledCertaintyRejected(unittest.TestCase):
         with self.assertRaises(copylint.CopyRejected):
             copylint.enforce_copy("This can't lose over the next quarter.", 0.6)
 
+    def test_standalone_definitely_rejected(self):
+        # Previously only "will definitely" (the literal bigram) was
+        # caught -- "definitely" unglued from "will" sailed through
+        # uncaught, even though it is the same unlabeled-certainty class.
+        with self.assertRaises(copylint.CopyRejected):
+            copylint.enforce_copy("This metric is definitely going to rise by Friday.", 0.6)
+
+    def test_will_definitely_still_rejected(self):
+        # The original bigram case must keep working now that the
+        # standalone pattern subsumes it.
+        with self.assertRaises(copylint.CopyRejected):
+            copylint.enforce_copy("This will definitely happen by Friday.", 0.6)
+
     def test_uncertain_is_not_a_false_positive(self):
         # "uncertain" contains "certain" but asserts the opposite claim.
         result = copylint.lint_claim("The outcome is genuinely uncertain here.", 0.4)
