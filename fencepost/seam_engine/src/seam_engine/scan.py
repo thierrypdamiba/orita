@@ -469,12 +469,37 @@ def compute_candidates(
                 confidence=0.0, evidence=[r.url],
             ))
             continue
-        overlap = _keywords(r.title) & all_post_keywords
-        if not overlap:
+        title_keywords = _keywords(r.title)
+        overlap = title_keywords & all_post_keywords
+        # A bare version-string title ("v1.0", "v0.2.0") yields NO extractable
+        # keywords -- `_keywords` needs a letter followed by two-or-more word
+        # chars, which a plain release version never carries -- so `overlap` is
+        # empty for a reason that has nothing to do with whether the release was
+        # announced. Judging announcement by keyword overlap ALONE would then
+        # flag every such release as unannounced even when a post names it
+        # verbatim: a 0.9-confidence false positive, exactly the crying-wolf
+        # failure Ogun's law calls fatal. So when (and only when) the title
+        # yields no keywords to match on, fall back to a raw case-insensitive
+        # substring of the title against post text -- you announce "v1.0" by
+        # literally writing "v1.0". Titles that DO yield keywords keep the exact
+        # overlap behavior, unchanged.
+        if title_keywords:
+            announced = bool(overlap)
+        else:
+            title_needle = r.title.strip().lower()
+            announced = bool(title_needle) and any(
+                title_needle in p.text.lower() for p in x_posts
+            )
+        if not announced:
+            reason = (
+                "no X post shares a keyword with its title"
+                if title_keywords
+                else "its title carries no keyword to match, and no X post names it verbatim"
+            )
             surfaced.append(GapCandidate(
                 slug=f"release-{r.id}",
                 headline=f"Release '{r.title}' shipped but never reached @oritatown",
-                detail=f"Published {r.ts.isoformat()}; no X post shares a keyword with its title.",
+                detail=f"Published {r.ts.isoformat()}; {reason}.",
                 confidence=0.9, evidence=[r.url],
             ))
 

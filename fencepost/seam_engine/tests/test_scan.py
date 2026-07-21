@@ -29,6 +29,7 @@ from seam_engine.scan import (
     XPost,
     _effective_since,
     _unresolved_prior_milestone_evidence,
+    compute_candidates,
     load_github_events_from_live,
     load_x_posts_from_live,
     run_scan,
@@ -617,3 +618,77 @@ def test_real_ledger_chain_still_verifies_intact_after_this_task():
     problems = _ledger_mod.verify(None)
     assert problems == []
 
+
+
+# --- release-title keyword-extraction boundary (ROADMAP.md #209) --------------
+#
+# `compute_candidates` decides a release was announced by the keyword overlap
+# between its title and the town's X posts. A bare version-string title
+# ("v1.0", "v0.2.0") yields NO extractable keywords -- `_keywords` needs a
+# letter followed by 2+ word chars, which a version number never has -- so the
+# overlap is empty for a reason that has nothing to do with whether the release
+# was actually announced. Off-By-One's boundary: the release branch must not
+# read "empty title keywords" as "nobody tweeted it."
+
+_LIVE = datetime(2026, 7, 1, tzinfo=timezone.utc)
+
+
+def _release(title: str, rid: str = "v1.0") -> GithubEvent:
+    return GithubEvent(
+        kind="release",
+        id=rid,
+        title=title,
+        url=f"https://github.com/thierrypdamiba/orita/releases/tag/{rid}",
+        ts=datetime(2026, 7, 10, tzinfo=timezone.utc),
+        author="nisaba",
+    )
+
+
+def _post(text: str, pid: str = "1") -> XPost:
+    return XPost(
+        id=pid,
+        text=text,
+        url=f"https://x.com/oritatown/status/{pid}",
+        ts=datetime(2026, 7, 10, 1, 0, tzinfo=timezone.utc),
+    )
+
+
+def test_bare_version_release_named_verbatim_in_a_post_is_not_a_gap():
+    # The bug: "v1.0" has no extractable keywords, so keyword overlap can
+    # never match, so this release was ALWAYS surfaced at 0.9 even though the
+    # post literally announces it. Pre-fix this asserted the opposite; a
+    # stash-and-rerun of the pre-fix scan.py fails here with a stray
+    # `release-v1.0` in `surfaced`.
+    release = _release("v1.0")
+    posts = [_post("Fencepost v1.0 is live today -- connect your own accounts!")]
+    surfaced, _excluded = compute_candidates([release], posts, _LIVE)
+    assert not any(g.slug == "release-v1.0" for g in surfaced), (
+        "a release announced verbatim in a post must not be a gap -- a "
+        "0.9-confidence false positive is the crying-wolf failure Ogun's law forbids"
+    )
+
+
+def test_bare_version_release_named_in_no_post_is_still_surfaced():
+    # The fallback must not swing the other way into a false NEGATIVE: a
+    # bare-version release that no post mentions is still a real gap.
+    release = _release("v1.0")
+    posts = [_post("good morning from the town, a quiet day at the crossroads")]
+    surfaced, _excluded = compute_candidates([release], posts, _LIVE)
+    gaps = [g for g in surfaced if g.slug == "release-v1.0"]
+    assert len(gaps) == 1 and gaps[0].confidence == 0.9, (
+        "an unannounced release is still the gap it always was"
+    )
+
+
+def test_keyword_bearing_release_title_keeps_the_exact_pre_fix_overlap_behavior():
+    # The fallback fires ONLY when the title yields no keywords. A descriptive
+    # title keeps the original overlap match, unchanged in both directions.
+    release = _release("The Counter Awakens", rid="ep-3")
+    announced = compute_candidates(
+        [release], [_post("the counter awakens at last, tonight")], _LIVE
+    )[0]
+    silent = compute_candidates(
+        [release], [_post("unrelated chatter about lunch")], _LIVE
+    )[0]
+    assert not any(g.slug == "release-ep-3" for g in announced)
+    assert any(g.slug == "release-ep-3" for g in silent)
