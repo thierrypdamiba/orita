@@ -70,9 +70,9 @@ class FixtureCase(unittest.TestCase):
             _hand_verdict_text(petitioner, verdict, filed),
         )
 
-    def _put_altar(self, slug, petitioner, verdict):
+    def _put_altar(self, slug, petitioner, verdict, filed="2026-07-11"):
         _write(
-            os.path.join(self.orita, "houses", slug, "altar", "petitions", "2026-07-11.md"),
+            os.path.join(self.orita, "houses", slug, "altar", "petitions", f"{filed}.md"),
             _altar_petition_text(petitioner, verdict),
         )
 
@@ -113,6 +113,45 @@ class FixtureCase(unittest.TestCase):
         formatted = vpc.format_mismatches(mismatches)
         self.assertIn("MISMATCH", formatted)
         self.assertIn("Iron Rule #3", formatted)
+
+    def test_a_second_unrelated_petition_does_not_mask_a_real_mismatch(self):
+        # The real gap this hour's fix closes: a petitioner with TWO dated
+        # altar petitions (the normal, one-per-day shape). The HAND verdict
+        # is actually about the 07-11 petition (whose own altar copy reads
+        # GRANTED, disagreeing with the public DENIED) -- but an unrelated,
+        # later 07-12 petition happens to carry the matching DENIED word.
+        # Pre-fix, name-only matching lets the 07-12 coincidence mask the
+        # real 07-11 disagreement entirely.
+        self._put_hand("0000.md", "Test God", "DENIED", filed="2026-07-11")
+        self._put_altar("test-god", "Test God", "GRANTED", filed="2026-07-11")
+        self._put_altar("test-god", "Test God", "DENIED", filed="2026-07-12")
+        mismatches = vpc.find_mismatches(orita_dir=self.orita)
+        self.assertEqual(len(mismatches), 1)
+        self.assertEqual(mismatches[0]["hand_verdict"], "DENIED")
+        self.assertEqual(mismatches[0]["altar_verdict"], "GRANTED")
+        self.assertTrue(mismatches[0]["altar_file"].endswith("2026-07-11.md"))
+
+    def test_dated_match_against_the_correct_sibling_petition_is_clean(self):
+        # Companion to the case above: when the HAND verdict's Filed date
+        # correctly matches ITS OWN altar petition's word, a second,
+        # differently-worded sibling petition on another date must not
+        # cause a false positive.
+        self._put_hand("0000.md", "Test God", "GRANTED", filed="2026-07-11")
+        self._put_altar("test-god", "Test God", "GRANTED", filed="2026-07-11")
+        self._put_altar("test-god", "Test God", "DENIED", filed="2026-07-12")
+        mismatches = vpc.find_mismatches(orita_dir=self.orita)
+        self.assertEqual(mismatches, [])
+
+    def test_no_altar_petition_on_the_filed_date_is_detected(self):
+        # A petitioner has an altar petition, just not one filed on the date
+        # the public HAND verdict claims -- must not silently fall back to
+        # matching against an unrelated date.
+        self._put_hand("0000.md", "Test God", "GRANTED", filed="2026-07-11")
+        self._put_altar("test-god", "Test God", "GRANTED", filed="2026-07-12")
+        mismatches = vpc.find_mismatches(orita_dir=self.orita)
+        self.assertEqual(len(mismatches), 1)
+        self.assertIsNone(mismatches[0]["altar_file"])
+        self.assertIn("filed on 2026-07-11", mismatches[0]["reason"])
 
     def test_verdict_with_no_altar_petition_at_all_is_detected(self):
         self._put_hand("0099.md", "Nobody Filed This", "GRANTED")

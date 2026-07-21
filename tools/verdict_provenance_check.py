@@ -52,6 +52,7 @@ DEFAULT_ORITA_DIR = ROOT
 
 _HAND_PETITIONER_RE = re.compile(r"\|\s*\*\*Petitioner\*\*\s*\|\s*(.+?)\s*\|")
 _HAND_VERDICT_RE = re.compile(r"\|\s*\*\*Verdict\*\*\s*\|\s*\*\*([A-Za-z]+)\*\*")
+_HAND_FILED_RE = re.compile(r"\|\s*\*\*Filed\*\*\s*\|\s*(\d{4}-\d{2}-\d{2})\s*\|")
 _ALTAR_PETITIONER_RE = re.compile(r"\*\*Petitioner:\*\*\s*(.+)")
 _ALTAR_VERDICT_RE = re.compile(r"\*\*VERDICT:\*\*\s*([A-Za-z]+)")
 
@@ -72,7 +73,13 @@ def _parse_hand_verdict(path: str) -> dict | None:
     ver = _HAND_VERDICT_RE.search(text)
     if not pet or not ver:
         return None
-    return {"file": path, "petitioner": pet.group(1).strip(), "verdict": ver.group(1).strip().upper()}
+    filed = _HAND_FILED_RE.search(text)
+    return {
+        "file": path,
+        "petitioner": pet.group(1).strip(),
+        "verdict": ver.group(1).strip().upper(),
+        "filed": filed.group(1) if filed else None,
+    }
 
 
 def _parse_altar_petition(path: str) -> dict | None:
@@ -82,7 +89,11 @@ def _parse_altar_petition(path: str) -> dict | None:
     ver = _ALTAR_VERDICT_RE.search(text)
     if not pet or not ver:
         return None
-    return {"file": path, "petitioner": pet.group(1).strip(), "verdict": ver.group(1).strip().upper()}
+    # The altar petition's own filename IS its filed date (petition_cadence_check.py
+    # already enforces this as exactly YYYY-MM-DD.md), the same signal the HAND
+    # verdict's own **Filed** field carries independently.
+    filed = os.path.splitext(os.path.basename(path))[0]
+    return {"file": path, "petitioner": pet.group(1).strip(), "verdict": ver.group(1).strip().upper(), "filed": filed}
 
 
 def _iter_hand_verdicts(orita_dir: str):
@@ -136,14 +147,36 @@ def find_mismatches(orita_dir: str = DEFAULT_ORITA_DIR) -> list:
                 "reason": "no altar petition found for this petitioner",
             })
             continue
-        if not any(c["verdict"] == hv["verdict"] for c in candidates):
+        # A petitioner can carry more than one dated altar petition (one-per-day
+        # is the normal, expected shape -- petition_cadence_check.py polices it).
+        # When the HAND verdict names its own Filed date, narrow to the ONE
+        # altar petition actually filed that day, so a real disagreement on an
+        # earlier petition can never be masked by a later, unrelated petition
+        # that happens to share the same verdict word.
+        scoped = candidates
+        scope_note = ""
+        if hv["filed"] is not None:
+            dated = [c for c in candidates if c["filed"] == hv["filed"]]
+            if not dated:
+                mismatches.append({
+                    "hand_file": hv["file"],
+                    "petitioner": hv["petitioner"],
+                    "hand_verdict": hv["verdict"],
+                    "altar_file": None,
+                    "altar_verdict": None,
+                    "reason": f"no altar petition found for this petitioner filed on {hv['filed']}",
+                })
+                continue
+            scoped = dated
+            scope_note = f" filed {hv['filed']}"
+        if not any(c["verdict"] == hv["verdict"] for c in scoped):
             mismatches.append({
                 "hand_file": hv["file"],
                 "petitioner": hv["petitioner"],
                 "hand_verdict": hv["verdict"],
-                "altar_file": candidates[0]["file"],
-                "altar_verdict": candidates[0]["verdict"],
-                "reason": "public verdict word disagrees with the god's own altar record",
+                "altar_file": scoped[0]["file"],
+                "altar_verdict": scoped[0]["verdict"],
+                "reason": f"public verdict word disagrees with the god's own altar record{scope_note}",
             })
     return mismatches
 
