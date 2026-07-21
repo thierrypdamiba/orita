@@ -78,11 +78,23 @@ def read_records(base: Path | None = None) -> list[dict[str, Any]]:
     """Every typed record in the whole ledger, in chain order (date, then seq).
 
     Each record is the parsed JSON block: {"seq", "prev", "seal", "sealed"}.
+
+    A record whose JSON block has been hand-edited into something that is not
+    even valid JSON any more (not just a changed value) is not allowed to
+    crash the caller — that is exactly the "tampered tablet" the module
+    docstring promises gets exposed, not an uncaught exception. Such a record
+    comes back as {"_tablet", "_malformed": True, "_error"} instead, so
+    verify() can report it as a problem the same way it reports a mismatched
+    seal.
     """
     records: list[dict[str, Any]] = []
     for path in _tablet_files(base):
         for m in _RECORD_RE.finditer(path.read_text()):
-            rec = json.loads(m.group("json"))
+            try:
+                rec = json.loads(m.group("json"))
+            except json.JSONDecodeError as e:
+                records.append({"_tablet": path.name, "_malformed": True, "_error": str(e)})
+                continue
             rec["_tablet"] = path.name
             records.append(rec)
     return records
@@ -99,6 +111,16 @@ def verify(base: Path | None = None) -> list[str]:
     prev = GENESIS
     for i, rec in enumerate(read_records(base)):
         where = f"{rec.get('_tablet', '?')} entry seq={rec.get('seq')}"
+        if rec.get("_malformed"):
+            problems.append(
+                f"{where}: record is not valid JSON ({rec['_error']}) — "
+                "the tablet was edited after it was sealed."
+            )
+            # Its seal can't be recomputed from unparseable JSON, so the
+            # chain position is unresolved from here on; leaving `prev`
+            # untouched means every entry after this one correctly reports
+            # a broken prev-link too, instead of silently resynchronizing.
+            continue
         if rec.get("seq") != i:
             problems.append(f"{where}: seq is {rec.get('seq')}, expected {i} (out of order or missing).")
         if rec.get("prev") != prev:

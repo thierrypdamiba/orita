@@ -144,6 +144,31 @@ def test_deleting_an_entry_breaks_the_chain(tmp_path: Path):
     assert any("prev-link broken" in p or "seal does not match" in p for p in problems)
 
 
+def test_syntactically_broken_json_record_is_reported_not_a_crash(tmp_path: Path):
+    # A more realistic hand-edit than swapping one JSON value for another
+    # (the two tests above): this one breaks JSON *syntax* inside the sealed
+    # block, the way a stray keystroke or a bad paste actually would. The
+    # module docstring promises "the tampered tablet is exposed" -- that
+    # must mean a reported problem, never an uncaught exception escaping
+    # verify() (or read_records(), which verify() and every other reader
+    # depend on).
+    ledger.append_scan(_scan(primary=True, generated_at="honest"), now=_at(2026, 7, 12), base=tmp_path)
+    tablet = ledger.gaps_dir(tmp_path) / "2026-07-12.md"
+    broken = tablet.read_text().replace('"confidence": 0.85', '"confidence": 0.85,,')
+    tablet.write_text(broken)
+
+    # read_records() must not raise json.JSONDecodeError.
+    recs = ledger.read_records(tmp_path)
+    assert len(recs) == 1
+    assert recs[0]["_malformed"] is True
+
+    # verify() must not raise either -- it must expose the tampering as a
+    # reported problem, same as the value-swap and prev-link cases above.
+    problems = ledger.verify(tmp_path)
+    assert problems, "a syntactically-broken record must be caught, not crash"
+    assert any("not valid JSON" in p for p in problems)
+
+
 # --- the count is honest -----------------------------------------------------
 
 
