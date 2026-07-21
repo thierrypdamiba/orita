@@ -271,6 +271,41 @@ class TestNextPostPlan(unittest.TestCase):
         with self.assertRaises(ValueError):
             xpq.batch_entries([long_])
 
+    def test_a_boundary_entry_alone_is_blocked_cleanly_not_an_uncaught_crash(self):
+        """_fits_in_any_batch used min(len(_header(1,1)), len(_header(1,2)))
+        as its safety margin -- the SHORT n>=2 header's 20 chars of room,
+        not the LONG n==1 header's 29. A 258-char item_text (254-char
+        topic) fits under the 260-char room that wrongly implied, but
+        not under the real 251-char room a lone entry (n forced to 1)
+        actually gets. That let it into `postable`, where batch_entries
+        found n==1 the only value it could ever try for a single-entry
+        list, failed to pack it, and raised ValueError('...does not fit
+        in a single tweet even alone...') straight out of next_post_plan
+        -- the exact uncaught crash blocked_tasks exists to prevent."""
+        boundary_topic = "x" * 254  # item_text is 258 chars: 251 < 258 <= 260
+        entry = {"task": "199", "topic": boundary_topic, "queued_at": "a"}
+        self.assertFalse(xpq._fits_in_any_batch(entry))
+        with self.assertRaises(ValueError) as ctx:
+            xpq.next_post_plan([entry])
+        self.assertIn("unpostable", str(ctx.exception))
+
+    def test_a_boundary_entry_alongside_others_is_blocked_not_a_crash(self):
+        """Same boundary entry as above, but sitting in a real multi-entry
+        backlog (mirrors how it would actually appear in HAND/x-post-queue.jsonl):
+        the two short entries must still plan and post fine, and the
+        boundary entry must land in blocked_tasks rather than taking the
+        whole call down."""
+        boundary_topic = "x" * 254
+        entries = [
+            {"task": "50", "topic": "subscriber cadence", "queued_at": "1"},
+            {"task": "199", "topic": boundary_topic, "queued_at": "2"},
+            {"task": "51", "topic": "tag cadence", "queued_at": "3"},
+        ]
+        plan = xpq.next_post_plan(entries)
+        self.assertEqual(plan["tasks"], ["50", "51"])
+        self.assertEqual(plan["blocked_tasks"], ["199"])
+        self.assertLessEqual(len(plan["text"]), xpq.MAX_TWEET_CHARS)
+
 
 class TestMarkPosted(_TempQueueCase):
     def test_mark_posted_never_mutates_a_prior_queued_line(self):

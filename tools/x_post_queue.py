@@ -178,19 +178,29 @@ def compose_batched_tweets(entries: list, max_chars: int = MAX_TWEET_CHARS) -> l
 
 
 def _fits_in_any_batch(entry: dict, max_chars: int = MAX_TWEET_CHARS) -> bool:
-    """Whether `entry` could ever appear in SOME tweet on its own, under the
-    most generous header `_header` ever produces.
+    """Whether `entry` would survive `batch_entries` if it ended up alone
+    in a single-batch (n == 1) plan -- the header a lone postable entry,
+    or the last entry left after every sibling is blocked, actually gets.
 
-    `_header(1, 1)`'s "now caught up" phrasing is actually the LONGEST
-    header this module renders -- every n >= 2 header is shorter -- so the
-    shortest possible header, across every n `_pack_entries_into` could
-    ever try, is `min(len(_header(1, 1)), len(_header(1, 2)))`. If an
-    entry's own item text does not fit under max_chars even with that much
-    room, no value of n will ever fit it either: it is a permanently
-    unpostable topic string, not merely a hard one to pack.
+    `_header(1, 1)`'s "now caught up" phrasing is the LONGEST header this
+    module ever renders -- every n >= 2 header is shorter. Because n == 1
+    is exactly the case this function has to guard (an entry alone gets
+    no other n to fall back on), the bound has to be that longest header,
+    `max(len(_header(1, 1)), len(_header(1, 2)))`, not the shortest one.
+    A previous version of this function used `min(...)` here, reasoning
+    backwards from its own correct observation that header(1,1) is the
+    longest: that let entries through whose item text fit under the
+    short n>=2 header (20 chars of room to spare) but not under the
+    29-char n==1 header they were actually handed the moment they were
+    the only postable entry left, so `batch_entries` raised `ValueError`
+    straight out of `next_post_plan` -- the exact uncaught crash
+    `blocked_tasks` exists to prevent. If an entry's own item text does
+    not fit under max_chars even with the longest header's room, no
+    value of n will ever fit it either: it is a permanently unpostable
+    topic string, not merely a hard one to pack.
     """
-    shortest_possible_header = min(len(_header(1, 1)), len(_header(1, 2)))
-    return len(_item_text(entry)) <= max_chars - shortest_possible_header
+    longest_possible_header = max(len(_header(1, 1)), len(_header(1, 2)))
+    return len(_item_text(entry)) <= max_chars - longest_possible_header
 
 
 def next_post_plan(entries: list, max_chars: int = MAX_TWEET_CHARS) -> dict:
