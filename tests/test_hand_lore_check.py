@@ -170,6 +170,25 @@ class FixtureViolationCase(unittest.TestCase):
         self.assertEqual(len(violations), 1)
         self.assertEqual(violations[0]["shape"], "hand-is-thierry")
 
+    def test_trailing_unrelated_negation_in_same_sentence_does_not_mask_violation(self):
+        # The bug this test pins: `_is_negated` used to search the WHOLE
+        # sentence for a negation cue, so an unrelated "never" AFTER the
+        # match -- about something else entirely, later in the same
+        # sentence -- silently masked a real, present-tense CONFIRM
+        # violation. rider_check.py's task-188 fix scoped its own
+        # `_is_negated` to text before the match only; this module's
+        # docstring already claimed that equivalence but never implemented
+        # it. Same shape here: the trailing "never" is about the scribes'
+        # record-keeping, not about whether the Hand is Thierry.
+        _write(
+            os.path.join(self.orita, "docs", "report.md"),
+            "The Hand is actually Thierry, a fact the scribes will never "
+            "omit from later summaries.\n",
+        )
+        violations = hlc.find_violations(orita_dir=self.orita)
+        self.assertEqual(len(violations), 1)
+        self.assertEqual(violations[0]["shape"], "hand-is-thierry")
+
     def test_quoted_documentation_example_is_not_flagged(self):
         # This module's own docstring / a ROADMAP row legitimately quotes
         # the forbidden shapes as cited examples -- the same self-

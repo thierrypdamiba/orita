@@ -132,8 +132,13 @@ def _sentences(text: str):
         yield start, len(text)
 
 
-def _is_negated(sentence: str) -> bool:
-    return bool(_NEGATION_CUES.search(sentence))
+def _is_negated(sentence: str, match_start: int) -> bool:
+    """Scope the negation check to the text BEFORE the match, within the
+    current sentence only -- mirroring star_covenant_check's/rider_check's
+    own negation guard (task 100's own fix to this exact whole-sentence
+    bug). An unrelated negation cue AFTER the violation match, elsewhere in
+    the same sentence, must never mask a real, present-tense violation."""
+    return bool(_NEGATION_CUES.search(sentence[:match_start]))
 
 
 def _is_quoted_citation(text: str, match_start: int) -> bool:
@@ -162,7 +167,7 @@ def find_violations(orita_dir: str = DEFAULT_ORITA_DIR) -> list:
                     abs_start = sent_start + m.start()
                     if _is_quoted_citation(text, abs_start):
                         continue
-                    if not is_deny and _is_negated(sentence):
+                    if not is_deny and _is_negated(sentence, m.start()):
                         continue
                     line_no = text.count("\n", 0, abs_start) + 1
                     snippet = sentence.strip().replace("\n", " ")
