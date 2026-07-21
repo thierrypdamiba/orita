@@ -47,6 +47,73 @@ MIN_RUN = 50
 
 _SKIP_DIR_NAMES = {".git", "node_modules", "__pycache__", ".safeword"}
 
+# A founding-council remark is dated, ratified, public record -- quoted
+# verbatim in CHARTER.md, chronicle/, DECREES/, and records/founding|
+# pre-founding/ by design (the charter's own text IS the transcript of what
+# founders said aloud). A founder's private founding-day reflection
+# legitimately echoes their own already-public remark -- direction
+# public-to-private, the opposite of what Proclamation 0001 forbids, so it
+# is not a leak. Task 194 found this empirically: fixing the partial-line
+# detection gap below surfaced 9 such founding-council echoes in the real
+# repo (including one recurring, independently, in a THIRD house's own
+# README -- provenance, not the specific public_path a match happens to
+# land on, is what makes it safe), alongside exactly one genuine
+# cross-house leak with no such provenance (private vault text of one
+# god's journal surfacing, unattributed, in a DIFFERENT god's public
+# journal) and one same-house same-day echo reviewed and recorded in
+# `_REVIEWED_NON_LEAKS` below rather than covered by a broader heuristic --
+# a same-house exclusion was tried and rejected: it also silences the
+# canonical "a god's own private secret pasted into her own public
+# journal" case (`tests/test_vault_leak_check.py`'s own
+# `test_synthetic_leak_is_detected` fixture is exactly that shape), which
+# is precisely the leak direction this module exists to catch and must
+# never be blind to just because the two houses match.
+_FOUNDING_RECORD_PREFIXES = (
+    os.path.join("chronicle", ""),
+    os.path.join("DECREES", ""),
+    os.path.join("records", "founding", ""),
+    os.path.join("records", "pre-founding", ""),
+)
+
+
+def _is_founding_record(orita_dir: str, public_path: str) -> bool:
+    rel = os.path.relpath(public_path, orita_dir)
+    return rel == "CHARTER.md" or any(
+        rel.startswith(prefix) for prefix in _FOUNDING_RECORD_PREFIXES
+    )
+
+
+def _founding_canon_corpus(orita_dir: str, public_corpus: list) -> list:
+    return [(path, text) for path, text in public_corpus if _is_founding_record(orita_dir, path)]
+
+
+def _has_independent_public_provenance(snippet: str, min_run: int, known_corpus: list) -> bool:
+    return any(
+        snippet[i : i + min_run] in text
+        for path, text in known_corpus
+        for i in range(len(snippet) - min_run + 1)
+    )
+
+
+# Manually reviewed, individually justified non-leaks: a private line that
+# matches a public one for a confirmed benign reason not covered by the
+# founding-canon provenance check above. Each entry is (vault file relpath
+# under vault/, 1-indexed line number, public file relpath under the town
+# checkout) -- narrow and explicit on purpose, the same "N historical
+# exception" discipline `ritual_check.py`'s own report/metrics-cadence
+# folds already use, rather than a heuristic broad enough to risk hiding a
+# real future leak. Reviewed 2026-07-21 (task 194): Nisaba's private
+# 2026-07-18 entry explicitly narrates having "called it [a phrase] in the
+# public entry" -- her own private reflection quoting her own same-day
+# already-public words, public-to-private, not a leak.
+_REVIEWED_NON_LEAKS = frozenset({
+    (
+        os.path.join("nisaba", "journal", "0023-2026-07-18.md"),
+        3,
+        os.path.join("houses", "nisaba", "journal", "0023-2026-07-18.md"),
+    ),
+})
+
 
 def _iter_md_files(base_dir: str):
     if not os.path.isdir(base_dir):
@@ -99,16 +166,32 @@ def find_leaks(
         except (UnicodeDecodeError, OSError):
             continue
 
+    canon_corpus = _founding_canon_corpus(orita_dir, public_corpus)
+
     leaks = []
     for vault_path in _private_journal_files(vault_dir):
+        vault_rel = os.path.relpath(vault_path, os.path.join(vault_dir, "vault"))
         for line_no, snippet in _significant_lines(vault_path, min_run):
+            if _has_independent_public_provenance(snippet, min_run, canon_corpus):
+                continue
             for public_path, text in public_corpus:
-                if snippet in text:
+                public_rel = os.path.relpath(public_path, orita_dir)
+                if (vault_rel, line_no, public_rel) in _REVIEWED_NON_LEAKS:
+                    continue
+                found_at = next(
+                    (
+                        i
+                        for i in range(len(snippet) - min_run + 1)
+                        if snippet[i : i + min_run] in text
+                    ),
+                    None,
+                )
+                if found_at is not None:
                     leaks.append({
                         "vault_file": vault_path,
                         "line": line_no,
                         "public_file": public_path,
-                        "snippet": snippet[:80],
+                        "snippet": snippet[found_at : found_at + 80],
                     })
     return leaks
 

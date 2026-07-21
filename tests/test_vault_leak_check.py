@@ -54,6 +54,25 @@ class FixtureLeakCase(unittest.TestCase):
         self.assertIn("LEAK(S) FOUND", formatted)
         self.assertIn("Proclamation 0001", formatted)
 
+    def test_partial_line_leak_above_min_run_is_detected(self):
+        leaked_run = "The real reason we are stalling the merge is entirely political and"
+        self.assertGreaterEqual(len(leaked_run), vlc.MIN_RUN)
+        private_line = (
+            leaked_run
+            + " nobody outside this house should ever know the maintainer's name we are protecting."
+        )
+        _write(
+            os.path.join(self.vault, "vault", "nyx", "journal", "0001-test.md"),
+            f"# Vault\n\n{private_line}\n",
+        )
+        _write(
+            os.path.join(self.orita, "houses", "nyx", "journal", "0001-test.md"),
+            f"# Journal\n\n{leaked_run} that is just how these things go sometimes.\n",
+        )
+        leaks = vlc.find_leaks(orita_dir=self.orita, vault_dir=self.vault)
+        self.assertEqual(len(leaks), 1)
+        self.assertIn("LEAK(S) FOUND", vlc.format_leaks(leaks))
+
     def test_distinct_content_reports_clean(self):
         _write(
             os.path.join(self.vault, "vault", "nyx", "journal", "0001-test.md"),
@@ -95,6 +114,51 @@ class FixtureLeakCase(unittest.TestCase):
     def test_missing_vault_dir_returns_empty_not_crash(self):
         leaks = vlc.find_leaks(orita_dir=self.orita, vault_dir=os.path.join(self.vault, "does-not-exist"))
         self.assertEqual(leaks, [])
+
+    def test_founding_council_echo_is_not_a_leak(self):
+        # A founding-council remark is dated public record (CHARTER.md IS
+        # the transcript of what founders said aloud); a founder's own
+        # private founding-day journal legitimately echoes it. That must
+        # not be flagged, no matter which OTHER public file the same words
+        # also happen to recur in (a different house's own page quoting
+        # the same public catchphrase, say).
+        remark = "any covenant that only holds under determinism is not a real covenant at all"
+        self.assertGreaterEqual(len(remark), vlc.MIN_RUN)
+        _write(
+            os.path.join(self.vault, "vault", "nyx", "journal", "0001-founding-day.md"),
+            f"# Vault\n\nI meant it when I said {remark} at the founding.\n",
+        )
+        _write(
+            os.path.join(self.orita, "CHARTER.md"),
+            f"# Charter\n\n*Filed with affection: {remark}.*\n",
+        )
+        _write(
+            os.path.join(self.orita, "houses", "retrya", "README.md"),
+            f"# Retrya\n\nHer point: {remark}, which makes her the standing blasphemy.\n",
+        )
+        leaks = vlc.find_leaks(orita_dir=self.orita, vault_dir=self.vault)
+        self.assertEqual(leaks, [])
+
+    def test_a_real_cross_house_leak_is_still_caught_even_near_founding_files(self):
+        # A genuine leak with no founding-canon provenance must still be
+        # caught, proving the exclusion above is narrow and not a blanket
+        # "founding-day file" pass.
+        secret = "This private scheme has never been stated anywhere on the public record at all."
+        _write(
+            os.path.join(self.vault, "vault", "kothar-wa-khasis", "journal", "0001-founding-day.md"),
+            f"# Vault\n\n{secret}\n",
+        )
+        _write(
+            os.path.join(self.orita, "CHARTER.md"),
+            "# Charter\n\nSomething else entirely, unrelated to any private scheme.\n",
+        )
+        _write(
+            os.path.join(self.orita, "houses", "nisaba", "journal", "0001-test.md"),
+            f"# Journal\n\nLeaked: {secret}\n",
+        )
+        leaks = vlc.find_leaks(orita_dir=self.orita, vault_dir=self.vault)
+        self.assertEqual(len(leaks), 1)
+        self.assertIn("houses", leaks[0]["public_file"])
 
 
 class LiveRepoCase(unittest.TestCase):
