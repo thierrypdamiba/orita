@@ -254,6 +254,18 @@ def test_bad_slug_shape_is_rejected():
         validate_recipe(_manifest(slug="Not_Kebab_Case"))
 
 
+def test_slug_with_trailing_newline_is_rejected():
+    # _SLUG_RE is anchored with a bare `$`, which (without re.MULTILINE)
+    # matches end-of-string OR immediately before one single trailing `\n`
+    # -- not just true end-of-string. A slug carrying a stray trailing
+    # newline is not "lowercase, starts with a letter, kebab-case" (the
+    # done-condition's own words), so it must be refused exactly like
+    # "Not_Kebab_Case" above, the same discipline consent.py's own
+    # `_ISSUE_URL_RE` already holds with `\Z`.
+    with pytest.raises(RecipeValidationError, match="slug"):
+        validate_recipe(_manifest(slug="valid-slug\n"))
+
+
 def test_empty_title_is_rejected():
     with pytest.raises(RecipeValidationError, match="title"):
         validate_recipe(_manifest(title="  "))
@@ -344,6 +356,17 @@ def test_a_write_verb_glued_onto_a_non_prefix_word_is_rejected(scope):
     # prefix-anchored one task 175 shipped.
     with pytest.raises(RecipeValidationError, match="glues the write verb"):
         validate_recipe(_manifest(scopes=(scope,)))
+
+
+def test_scope_with_trailing_newline_is_rejected():
+    # Same anchoring gap as test_slug_with_trailing_newline_is_rejected,
+    # in _ALLOWED_SCOPE_RE this time: "GetIssues\n" clears the bare-`$`
+    # regex undetected even though a trailing newline is not one of the
+    # oath's allowed [A-Za-z0-9] characters and the error text itself
+    # promises "Get*/List*/Read*/Search*/Count*, or exactly WhoAmI --
+    # nothing else, ever."
+    with pytest.raises(RecipeValidationError, match="not read-only"):
+        validate_recipe(_manifest(scopes=("GetIssues\n",)))
 
 
 def test_read_only_scopes_are_accepted():

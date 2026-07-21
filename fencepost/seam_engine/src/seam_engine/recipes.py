@@ -76,11 +76,18 @@ REQUIRED_FIELDS: tuple[str, ...] = (
     "confidence_notes",
 )
 
-_SLUG_RE = re.compile(r"^[a-z][a-z0-9-]*$")
+# Both patterns below are anchored with `\Z`, not a bare `$`. Without
+# `re.MULTILINE`, `$` matches end-of-string OR immediately before a SINGLE
+# trailing `\n` at the very end of the string -- so `"valid-slug\n"` or
+# `"GetIssues\n"` would clear a bare-`$` pattern's `.match()` even though a
+# trailing newline is not one of either pattern's own allowed characters.
+# `\Z` matches true end-of-string only, no exception. `consent.py`'s own
+# `_ISSUE_URL_RE` already gets this right; these two did not (ROADMAP #201).
+_SLUG_RE = re.compile(r"^[a-z][a-z0-9-]*\Z")
 
 # Check 1/2 — allow-list, by prefix. Mirrors SCOPES.md's oath line verbatim:
 # "Get*, List*, Read*, Search*, Count*, WhoAmI — and nothing else."
-_ALLOWED_SCOPE_RE = re.compile(r"^(Get|List|Read|Search|Count)[A-Za-z0-9]*$")
+_ALLOWED_SCOPE_RE = re.compile(r"^(Get|List|Read|Search|Count)[A-Za-z0-9]*\Z")
 
 # Check 2/2 — deny-list, by PascalCase word. Same spirit as gateway.py's
 # _WRITE_VERBS and draftback.py's FORBIDDEN_DELIVERY_ACTIONS: a word that, if
