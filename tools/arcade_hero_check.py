@@ -86,7 +86,7 @@ _PATTERNS = [
     ),
 ]
 
-_SENTENCE_BOUNDARY = re.compile(r"[.!?]|\n{2,}")
+_SENTENCE_BOUNDARY = re.compile(r"[.!?;]|\n{2,}")
 _NEGATION_CUES = re.compile(
     r"\b(never|not|won't|wasn't|isn't|doesn't|didn't|n't|no|nobody|without)\b",
     re.IGNORECASE,
@@ -111,7 +111,17 @@ def _is_negated_or_predictive(text: str, match_start: int) -> bool:
     your API key") must not itself count as a violation. Scoped to the
     current sentence (or paragraph, for a hard-wrapped one) only, so an
     unrelated negation several sentences earlier can never mask a real,
-    present-tense ask."""
+    present-tense ask.
+
+    `_SENTENCE_BOUNDARY` includes `;` alongside `[.!?]`/`\\n{2,}` -- a
+    semicolon joins two independent clauses exactly the way a period does,
+    and this module's own docstring already claims it "mirrors
+    `no_grading_check.find_violations`'s shape exactly," but it was copied
+    before task 202 added `;` to that module's boundary (task 200 first, in
+    `star_covenant_check.py`), so this copy carried the identical gap
+    forward: an earlier, unrelated negation/prediction cue joined by `;`
+    instead of `.` to a real, present-tense ask on the other side still fell
+    inside the same "sentence" window and silently suppressed it."""
     window_start = 0
     for boundary in _SENTENCE_BOUNDARY.finditer(text, 0, match_start):
         window_start = boundary.end()

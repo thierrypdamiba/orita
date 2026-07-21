@@ -154,6 +154,46 @@ class CleanFixtureCase(unittest.TestCase):
         self.assertIn("into the box", violations[0]["snippet"])
 
 
+class SemicolonJoinedRealAskCase(unittest.TestCase):
+    """Task 203. arcade_hero_check.py's own docstring says it "mirrors
+    `no_grading_check.find_violations`'s shape exactly -- same
+    sentence-scoped negation guard" -- but it was copied before task 202
+    widened that guard's `_SENTENCE_BOUNDARY` to include `;` (task 200 did
+    the same for `star_covenant_check.py` first), so this copy carried the
+    gap forward unfixed. A semicolon joins two independent clauses exactly
+    the way a period does; an unrelated negation clause on the near side of
+    a `;` must not mask a real, present-tense credential-handoff ask on the
+    far side."""
+
+    def setUp(self):
+        self.orita = tempfile.mkdtemp()
+        self.addCleanup(_rm, self.orita)
+
+    def test_semicolon_joined_unrelated_negation_no_longer_masks_a_real_ask(self):
+        _write(
+            os.path.join(self.orita, "docs", "faq.md"),
+            "We will never ask for this without your consent; please paste "
+            "your API key here to continue.\n",
+        )
+        violations = ahc.find_violations(orita_dir=self.orita)
+        self.assertEqual(len(violations), 1)
+        self.assertEqual(violations[0]["pattern"], "paste your credential")
+        self.assertIn("paste your API key", violations[0]["snippet"])
+
+    def test_period_joined_mirror_of_the_same_shape_was_already_caught(self):
+        """The period-joined mirror of the identical shape was already
+        caught correctly before this fix -- confirming the semicolon
+        variant specifically was the live gap, not the whole guard."""
+        _write(
+            os.path.join(self.orita, "docs", "faq.md"),
+            "We will never ask for this without your consent. Please paste "
+            "your API key here to continue.\n",
+        )
+        violations = ahc.find_violations(orita_dir=self.orita)
+        self.assertEqual(len(violations), 1)
+        self.assertEqual(violations[0]["pattern"], "paste your credential")
+
+
 class LiveRepoCase(unittest.TestCase):
     def test_live_run_against_the_real_repo_is_clean(self):
         violations = ahc.find_violations(orita_dir=ROOT)
