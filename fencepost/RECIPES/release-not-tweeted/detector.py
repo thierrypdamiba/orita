@@ -31,6 +31,7 @@ no match, it is.
 from __future__ import annotations
 
 import json
+import re
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 from pathlib import Path
@@ -88,8 +89,15 @@ def load_tweets(path: Path | None = None) -> list[Tweet]:
 
 
 def _find_announcing_tweet(tag: str, tweets: list[Tweet]) -> Tweet | None:
+    # Bare substring containment let a short tag (v0.3) match inside an
+    # unrelated tweet naming a longer tag sharing that prefix (v0.3.0),
+    # silently hiding a real never-announced gap -- fixed to word-boundary
+    # matching so the tag must appear on its own, not as a prefix of a
+    # longer version/token, matching the module's own "exact tag, not
+    # keyword fuzziness" doctrine (see module docstring).
+    pattern = re.compile(r"(?<![\w.])" + re.escape(tag) + r"(?![\w.])", re.IGNORECASE)
     for tweet in tweets:
-        if tag.lower() in tweet.text.lower():
+        if pattern.search(tweet.text):
             return tweet
     return None
 
