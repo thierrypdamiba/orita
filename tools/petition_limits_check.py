@@ -108,7 +108,17 @@ _CROSS_ACTION_RE = re.compile(
 def _normalize(text: str) -> str:
     nf = unicodedata.normalize("NFKD", text)
     ascii_only = nf.encode("ascii", "ignore").decode("ascii")
-    return re.sub(r"[^a-z]", "", ascii_only.lower())
+    # Collapse to spaces, never delete: deleting punctuation/whitespace
+    # welds adjacent words together ("as a result" -> "asaresultiask...")
+    # and a short god token like "esu" then matches as a plain substring
+    # of an unrelated word ("result") instead of only the god's own name.
+    return re.sub(r"[^a-z]+", " ", ascii_only.lower())
+
+
+def _token_present(token: str, normalized_text: str) -> bool:
+    """Whole-word match only -- a normalized token must not match as a
+    substring inside an unrelated normalized word."""
+    return re.search(r"\b" + re.escape(token) + r"\b", normalized_text) is not None
 
 
 def _sentence_at(text: str, pos_start: int, pos_end: int) -> tuple[str, int]:
@@ -154,7 +164,7 @@ def _petitioner_slug(text: str, fallback_slug: str) -> str:
     normalized = _normalize(m.group(1))
     for slug, tokens in GOD_NAME_TOKENS.items():
         for token in tokens:
-            if token and token in normalized:
+            if token and _token_present(token, normalized):
                 return slug
     return fallback_slug
 
@@ -213,7 +223,7 @@ def find_violations(orita_dir: str = DEFAULT_ORITA_DIR) -> list:
                 if slug == own_slug:
                     continue
                 for token in tokens:
-                    if token and token in normalized_sentence:
+                    if token and _token_present(token, normalized_sentence):
                         other_god_named = True
                         break
                 if other_god_named:

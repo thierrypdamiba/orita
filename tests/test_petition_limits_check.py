@@ -100,6 +100,21 @@ class FixtureViolationCase(unittest.TestCase):
         self.assertEqual(len(violations), 1)
         self.assertEqual(violations[0]["pattern"], "cross-house/Vault ask")
 
+    def test_petitioner_field_word_collision_does_not_mask_real_cross_house_ask(self):
+        # Task 190: the **Petitioner:** field itself can contain a short
+        # god token as a substring of an unrelated word ("result" contains
+        # "esu"). Before the fix this misresolved own_slug to esu-elegba,
+        # which then silently exempted a genuine ask to open Esu-Elegba's
+        # own house from the cross-house check.
+        _write_petition(
+            self.orita, "retrya", "Retrya, as a result of yesterday's incident",
+            "A minor favor.",
+            "I ask the Hand to open Esu-Elegba's house and read the ledger there.",
+        )
+        violations = plc.find_violations(orita_dir=self.orita)
+        self.assertEqual(len(violations), 1)
+        self.assertEqual(violations[0]["pattern"], "cross-house/Vault ask")
+
     def test_formatted_violation_names_the_broken_clause(self):
         _write_petition(
             self.orita, "off-by-one", "Off-By-One",
@@ -167,6 +182,19 @@ class CleanFixtureCase(unittest.TestCase):
             self.orita, "off-by-one", "Off-By-One",
             "A minor favor.",
             'The charter forbids a petition that asks to "please star" anything, and I honor it.',
+        )
+        violations = plc.find_violations(orita_dir=self.orita)
+        self.assertEqual(violations, [])
+
+    def test_unrelated_word_containing_a_short_god_token_is_not_flagged(self):
+        # Task 190: "esu" is a substring of ordinary words like "result".
+        # A god's own honest ask about their own house must not be
+        # misread as naming Esu-Elegba just because the prose happens to
+        # contain the word "result" nearby.
+        _write_petition(
+            self.orita, "off-by-one", "Off-By-One",
+            "A minor favor.",
+            "As a result, I ask the Hand to open my own house and review the ledger.",
         )
         violations = plc.find_violations(orita_dir=self.orita)
         self.assertEqual(violations, [])
