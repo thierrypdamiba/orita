@@ -116,6 +116,23 @@ class FixtureViolationCase(unittest.TestCase):
         self.assertEqual(len(violations), 1)
         self.assertEqual(violations[0]["pattern"], "drop a star")
 
+    def test_semicolon_joined_unrelated_will_no_longer_masks_a_real_ask(self):
+        # Task 200: the "current sentence" window used to end only at
+        # `.`/`!`/`?`/newline, so a semicolon-joined independent clause
+        # counted as the SAME sentence as an earlier, unrelated "will" --
+        # masking a real, present-tense imperative that followed the
+        # semicolon. A period-joined version of the identical shape
+        # (test_real_imperative_still_caught_despite_unrelated_will_elsewhere,
+        # above) was already caught correctly; only the semicolon variant
+        # was the live gap.
+        _write(
+            os.path.join(self.orita, "docs", "report.md"),
+            "It will surely happen one day; please star the repo now.\n",
+        )
+        violations = scc.find_violations(orita_dir=self.orita)
+        patterns = {v["pattern"] for v in violations}
+        self.assertIn("please star", patterns)
+
     def test_quoted_documentation_example_is_not_flagged(self):
         # The check's own docs/ROADMAP text legitimately lists the exact
         # phrase-shapes it hunts for as quoted examples -- the real false

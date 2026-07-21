@@ -66,7 +66,7 @@ _PATTERNS = [
 ]
 
 
-_SENTENCE_BOUNDARY = re.compile(r"[.!?\n]")
+_SENTENCE_BOUNDARY = re.compile(r"[.!?;\n]")
 _NEGATION_CUES = re.compile(r"\b(never|not|won't|wasn't|isn't|doesn't|didn't|n't|will|would|wouldn't)\b", re.IGNORECASE)
 _QUOTE_CHARS = set('"\'“‘')
 
@@ -88,8 +88,15 @@ def _is_negated_or_predictive(text: str, match_start: int) -> bool:
     naming the exact thing the town refuses to say) both contain the
     phrase without being a violation of it. Scope the negation/prediction
     check to the CURRENT SENTENCE only (back to the nearest `.`/`!`/`?`/
-    newline before the match) so an unrelated "will" three sentences
-    earlier can never mask a real, present-tense imperative."""
+    `;`/newline before the match) so an unrelated "will" three sentences
+    earlier can never mask a real, present-tense imperative -- semicolon
+    included alongside the original three sentence-enders because a
+    semicolon joins two independent clauses exactly the way a period
+    does; without it, "It will surely happen one day; please star the
+    repo now." reads as ONE window-defining "sentence", so the unrelated,
+    earlier "will" silently masked the real, present-tense ask that
+    followed it. Reproduced live against the untouched code before this
+    widening (see BUILDLOG task 200)."""
     window_start = 0
     for boundary in _SENTENCE_BOUNDARY.finditer(text, 0, match_start):
         window_start = boundary.end()
