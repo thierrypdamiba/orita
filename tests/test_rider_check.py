@@ -210,6 +210,34 @@ class FixtureViolationCase(unittest.TestCase):
         violations = rc.find_violations(orita_dir=self.orita)
         self.assertEqual(violations, [])
 
+    def test_semicolon_joined_unrelated_negation_no_longer_masks_a_real_violation(self):
+        # Task 208: `_SENTENCE_BOUNDARY` split clauses only on `.`/`!`/`?`/
+        # newline, so a semicolon-joined independent clause fell inside the
+        # same "sentence" as a preceding, unrelated negation cue -- the
+        # identical gap tasks 200/202/203/204 already fixed in
+        # star_covenant_check.py/no_grading_check.py/arcade_hero_check.py/
+        # petition_limits_check.py. A period-joined version of each fixture
+        # below was already caught correctly; only the semicolon variant
+        # let the negation leak across the false boundary.
+        _write(
+            os.path.join(self.orita, "docs", "report.md"),
+            "Ogun will never lose his temper; Ogun murders the build every "
+            "single time.\n",
+        )
+        violations = rc.find_violations(orita_dir=self.orita)
+        self.assertEqual(len(violations), 1)
+        self.assertEqual(violations[0]["rider"], "ogun-violence")
+
+    def test_semicolon_joined_unrelated_negation_no_longer_masks_a_second_rider(self):
+        _write(
+            os.path.join(self.orita, "docs", "report.md"),
+            "The town will never forget the schedule; today's bit "
+            "humiliated Nyx in front of the whole square.\n",
+        )
+        violations = rc.find_violations(orita_dir=self.orita)
+        self.assertEqual(len(violations), 1)
+        self.assertEqual(violations[0]["rider"], "nyx-humiliation")
+
     def test_non_md_html_files_are_not_scanned(self):
         _write(
             os.path.join(self.orita, "tools", "scratch.py"),

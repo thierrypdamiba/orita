@@ -77,7 +77,7 @@ _RIDERS = [
     ),
 ]
 
-_SENTENCE_BOUNDARY = re.compile(r"[.!?\n]")
+_SENTENCE_BOUNDARY = re.compile(r"[.!?;\n]")
 # "will"/"would" included alongside the plain negations, matching
 # star_covenant_check.py's own _NEGATION_CUES exactly (this module's
 # docstring, line 24, already claims to reuse "the identical negation ...
