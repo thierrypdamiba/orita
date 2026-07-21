@@ -82,6 +82,22 @@ class KeywordGrammarCase(unittest.TestCase):
     def test_unrelated_word_no_match(self):
         self.assertEqual(ckg.find_closing_refs("enclosed #7 in quotes"), [])
 
+    def test_colon_form(self):
+        # docs.github.com, "Using keywords in issues and pull requests":
+        # "The keywords can be followed by colons or in uppercase. For
+        # example: Closes: #10, CLOSES #10, or CLOSES: #10." GitHub
+        # closes on push for this form exactly like the bare form.
+        for kw in ("close", "closes", "closed", "fix", "fixes", "fixed",
+                   "resolve", "resolves", "resolved"):
+            with self.subTest(kw=kw):
+                self.assertEqual(ckg.find_closing_refs(f"this {kw}: #42"), [42])
+        self.assertEqual(ckg.find_closing_refs("CLOSES: #7"), [7])
+
+    def test_colon_form_flagged_as_dangerous(self):
+        ok, dangerous = ckg.check_message("Closes: #1", [1])
+        self.assertFalse(ok)
+        self.assertEqual(dangerous, [1])
+
 
 class DangerScopeCase(unittest.TestCase):
     """Only currently-open numbers are a live risk; closed/nonexistent

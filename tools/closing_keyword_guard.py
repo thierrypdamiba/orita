@@ -48,13 +48,16 @@ import re
 import sys
 
 # GitHub's real closing-keyword grammar: exactly these 9 forms, each
-# immediately followed by whitespace then #<digits>. Deliberately wider
-# than fencepost/RECIPES/merged-pr-issue-still-open/detector.py's own
+# optionally followed by a colon, then whitespace, then #<digits> --
+# GitHub's own docs name the colon form explicitly ("Closes: #10" closes
+# on push exactly like "Closes #10"; docs.github.com, "Using keywords in
+# issues and pull requests"). Deliberately wider than
+# fencepost/RECIPES/merged-pr-issue-still-open/detector.py's own
 # `closes?|fixes?|resolves?` (that module never needed the past tense,
 # this one must, because "closed #1" and "fixed #2" both close on push
 # exactly as their present-tense siblings do).
 CLOSING_KEYWORD_RE = re.compile(
-    r"\b(?:close[sd]?|fix(?:e[sd])?|resolve[sd]?)\s+#(\d+)\b",
+    r"\b(?:close[sd]?|fix(?:e[sd])?|resolve[sd]?):?\s+#(\d+)\b",
     re.IGNORECASE,
 )
 
