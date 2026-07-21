@@ -169,6 +169,46 @@ def test_syntactically_broken_json_record_is_reported_not_a_crash(tmp_path: Path
     assert any("not valid JSON" in p for p in problems)
 
 
+def test_last_seal_raises_named_error_not_keyerror_when_tip_is_malformed(tmp_path: Path):
+    # read_records()/verify() (task 205) already turn a syntactically broken
+    # sealed record into a reported problem, not a crash -- but last_seal()
+    # still read `records[-1]["seal"]` straight off the tip, and a malformed
+    # marker dict carries no "seal" key at all. On the untouched pre-fix
+    # code this raised a bare `KeyError: 'seal'`, not the named,
+    # ledger-specific error this module's own tampering discipline promises.
+    ledger.append_scan(_scan(primary=True, generated_at="honest"), now=_at(2026, 7, 12), base=tmp_path)
+    tablet = ledger.gaps_dir(tmp_path) / "2026-07-12.md"
+    broken = tablet.read_text().replace('"confidence": 0.85', '"confidence": 0.85,,')
+    tablet.write_text(broken)
+
+    try:
+        ledger.last_seal(tmp_path)
+        assert False, "last_seal() must not silently return a seal for a malformed tip"
+    except ledger.LedgerTamperedError as e:
+        assert "not valid JSON" in str(e)
+
+
+def test_append_scan_raises_named_error_not_keyerror_when_tip_is_malformed(tmp_path: Path):
+    # The same tip-read bug reachable through the ledger's one write path --
+    # the daily cron's own `python -m seam_engine.ledger append` call would
+    # hit this the moment it ran on top of a tampered tablet. Must refuse
+    # loudly and by name, never crash with an opaque KeyError and never
+    # silently chain the new entry from some other seal.
+    ledger.append_scan(_scan(primary=True, generated_at="honest"), now=_at(2026, 7, 12), base=tmp_path)
+    tablet = ledger.gaps_dir(tmp_path) / "2026-07-12.md"
+    broken = tablet.read_text().replace('"confidence": 0.85', '"confidence": 0.85,,')
+    tablet.write_text(broken)
+
+    try:
+        ledger.append_scan(_scan(primary=True, generated_at="next"), now=_at(2026, 7, 13), base=tmp_path)
+        assert False, "append_scan() must not silently append on top of a malformed tip"
+    except ledger.LedgerTamperedError as e:
+        assert "not valid JSON" in str(e)
+
+    # and it must not have written anything for 2026-07-13 while refusing
+    assert not (ledger.gaps_dir(tmp_path) / "2026-07-13.md").exists()
+
+
 # --- the count is honest -----------------------------------------------------
 
 

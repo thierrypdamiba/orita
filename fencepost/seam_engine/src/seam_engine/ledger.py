@@ -132,9 +132,40 @@ def verify(base: Path | None = None) -> list[str]:
     return problems
 
 
+class LedgerTamperedError(RuntimeError):
+    """Raised by `last_seal`/`append_scan` when the chain's current tip is a
+    record `read_records` could not even parse (its `_malformed` marker).
+
+    `read_records`/`verify` (ROADMAP.md #205) already turn a syntactically
+    broken sealed-record block into a named, reported problem instead of an
+    uncaught `json.JSONDecodeError` -- but a malformed marker dict carries no
+    `"seal"` key, and both functions below read `existing[-1]["seal"]`
+    straight off the last record to learn where the chain currently stands.
+    Left unguarded, that is an opaque `KeyError: 'seal'` for `last_seal`, and
+    for `append_scan` -- the one function that writes to the ledger, the
+    daily cron's own write path -- it would either crash the same way or, if
+    ever "fixed" by falling back to some other seal, would silently chain a
+    brand-new entry from the wrong place, resynchronizing straight past the
+    exact corrupted point `verify`'s own docstring already refuses to
+    resynchronize past. Raising this instead keeps that same refusal: a
+    tampered tip is named and stops the operation, never silently patched
+    over or left to surface as an unrelated-looking crash.
+    """
+
+
 def last_seal(base: Path | None = None) -> str:
     records = read_records(base)
-    return records[-1]["seal"] if records else GENESIS
+    if not records:
+        return GENESIS
+    tip = records[-1]
+    if tip.get("_malformed"):
+        raise LedgerTamperedError(
+            f"last_seal(): the most recent record in {tip.get('_tablet', '?')} "
+            f"is not valid JSON ({tip.get('_error')}) -- the tablet was edited "
+            "after it was sealed, so its seal can't be read. Run `python -m "
+            "seam_engine.ledger verify` to see the full chain break."
+        )
+    return tip["seal"]
 
 
 def _fenceposts_recorded(base: Path | None = None) -> int:
@@ -270,6 +301,16 @@ def append_scan(
 
     existing = read_records(base)
     seq = len(existing)
+    if existing and existing[-1].get("_malformed"):
+        tip = existing[-1]
+        raise LedgerTamperedError(
+            f"append_scan(): refusing to append -- the most recent record in "
+            f"{tip.get('_tablet', '?')} is not valid JSON ({tip.get('_error')}) "
+            "-- the tablet was edited after it was sealed. Appending on top of "
+            "an unreadable tip would either crash or silently chain the new "
+            "entry from the wrong seal. Run `python -m seam_engine.ledger "
+            "verify` and repair the ledger by hand before scanning again."
+        )
     prev = existing[-1]["seal"] if existing else GENESIS
 
     p = scan.get("primary_gap")
