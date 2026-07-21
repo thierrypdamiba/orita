@@ -145,7 +145,16 @@ def _imported_module_names(tree: ast.Module) -> list[str]:
     """Every top-level-or-nested module name a file's `import`/`from`
     statements name, walking the WHOLE tree (not just module level) --
     a network import guarded inside a function body is still a network
-    import; hiding it deeper in the file must not defeat this check."""
+    import; hiding it deeper in the file must not defeat this check.
+
+    For `from X import Y`, both `X` (e.g. `"urllib.request"` from
+    `from urllib.request import urlopen`) AND the reconstructed `X.Y`
+    dotted path (e.g. `"urllib.request"` from `from urllib import
+    request`, or `"http.client"` from `from http import client`) are
+    named -- `ast.ImportFrom.module` alone is `"urllib"`/`"http"` for
+    those two real stdlib network-submodule-as-attribute forms, which
+    never matches the deny-list's exact dotted-submodule entries on its
+    own and would otherwise walk straight past NETWORK_MODULES."""
     names = []
     for node in ast.walk(tree):
         if isinstance(node, ast.Import):
@@ -154,6 +163,8 @@ def _imported_module_names(tree: ast.Module) -> list[str]:
         elif isinstance(node, ast.ImportFrom):
             if node.module:
                 names.append(node.module)
+                for alias in node.names:
+                    names.append(f"{node.module}.{alias.name}")
     return names
 
 

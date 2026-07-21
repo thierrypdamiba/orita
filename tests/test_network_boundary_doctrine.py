@@ -128,6 +128,38 @@ class SyntheticImportCheckCase(unittest.TestCase):
                 ok, _ = nbc.check_source_has_no_network_import(f"import {name}\n")
                 self.assertFalse(ok, f"{name} should be on the network deny-list and flagged")
 
+    def test_flags_a_from_import_of_the_urllib_package_naming_request_as_the_attribute(self):
+        # `from urllib import request` sets ast.ImportFrom.module == "urllib"
+        # (not "urllib.request"), yet `request.urlopen(...)` reaches the
+        # network exactly like `import urllib.request` does. The deny-list
+        # only has the exact dotted string "urllib.request", so this form
+        # must be reconstructed (module + "." + alias) before matching, or
+        # it walks straight past the check that claims to catch it.
+        ok, reason = nbc.check_source_has_no_network_import(
+            "from urllib import request\n\n\ndef f():\n    return request.urlopen('https://example.com')\n"
+        )
+        self.assertFalse(ok, "from urllib import request must be flagged as network-capable")
+        self.assertIn("urllib.request", reason)
+
+    def test_flags_a_from_import_of_the_http_package_naming_client_as_the_attribute(self):
+        # Same shape, the other real stdlib case on the deny-list:
+        # "http.client" is on NETWORK_MODULES, but `from http import client`
+        # only ever names module "http" unless module+attribute are combined.
+        ok, reason = nbc.check_source_has_no_network_import(
+            "from http import client\n\n\ndef f():\n    return client.HTTPConnection('example.com')\n"
+        )
+        self.assertFalse(ok, "from http import client must be flagged as network-capable")
+        self.assertIn("http.client", reason)
+
+    def test_does_not_flag_unrelated_from_package_import_attribute_forms(self):
+        # Regression guard: reconstructing "module.attribute" must not turn
+        # into a blanket prefix match -- "os.path" and "typing.Optional"
+        # are not on the deny-list and must keep passing.
+        ok, reason = nbc.check_source_has_no_network_import(
+            "from os import path\nfrom typing import Optional\n"
+        )
+        self.assertTrue(ok, reason)
+
 
 # --- the live regression pin: today's real tools/ tree -----------------------
 
