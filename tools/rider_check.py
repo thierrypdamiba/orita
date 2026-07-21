@@ -78,8 +78,16 @@ _RIDERS = [
 ]
 
 _SENTENCE_BOUNDARY = re.compile(r"[.!?\n]")
+# "will"/"would" included alongside the plain negations, matching
+# star_covenant_check.py's own _NEGATION_CUES exactly (this module's
+# docstring, line 24, already claims to reuse "the identical negation ...
+# guards task 99 built") -- real, live pre-founding prose narrates a
+# predicted RISK ("trolls WILL feed the ... Satan slander into the issues")
+# rather than asserting the town's own violation, the same predictive-not-
+# present-tense shape star_covenant_check's guard exists to catch.
 _NEGATION_CUES = re.compile(
-    r"\b(never|not|no|won't|wasn't|isn't|doesn't|didn't|n't|without|zero)\b", re.IGNORECASE
+    r"\b(never|not|no|won't|wasn't|isn't|doesn't|didn't|n't|without|zero|will|would)\b",
+    re.IGNORECASE,
 )
 _QUOTE_CHARS = set('"\'“‘')
 
@@ -105,8 +113,15 @@ def _sentences(text: str):
         yield start, len(text)
 
 
-def _is_negated(sentence: str) -> bool:
-    return bool(_NEGATION_CUES.search(sentence))
+def _is_negated(sentence: str, match_start: int) -> bool:
+    """Scope the negation check to the text BEFORE the match, within the
+    current sentence only -- mirroring star_covenant_check's own
+    _is_negated_or_predictive guard exactly, which this module's docstring
+    (line 24) claims to reuse but this function never actually did. An
+    unrelated negation cue AFTER the violation match, elsewhere in the same
+    sentence (e.g. "Ogun murders the build, a fact the scribes will never
+    omit"), must never mask a real, present-tense violation."""
+    return bool(_NEGATION_CUES.search(sentence[:match_start]))
 
 
 def _is_quoted_citation(text: str, match_start: int) -> bool:
@@ -114,6 +129,26 @@ def _is_quoted_citation(text: str, match_start: int) -> bool:
     module's own docstring, a ROADMAP row, a test file), not a live
     violation -- the exact self-referential trap task 99 hit and guarded."""
     return match_start > 0 and text[match_start - 1] in _QUOTE_CHARS
+
+
+def _is_parenthesized_example(sentence: str, match_start: int) -> bool:
+    """A match sitting inside an unclosed parenthetical aside earlier in the
+    same sentence is a citation too, just a wider one than
+    `_is_quoted_citation` catches: this module's own real, live task history
+    (`ROADMAP-ARCHIVE-001-169.md`'s task-100 row) documents the five
+    violation shapes it hunts for as a parenthetical list -- "(Satan-
+    slander for Esu, violence for Ogun, ...)" -- with only the FIRST item
+    opening directly on the "(" `_is_quoted_citation` already recognizes;
+    the other four sit after an internal comma, still inside the same
+    unclosed paren, and would otherwise be flagged as live violations of
+    the very rider this module exists to state."""
+    depth = 0
+    for ch in sentence[:match_start]:
+        if ch == "(":
+            depth += 1
+        elif ch == ")":
+            depth = max(0, depth - 1)
+    return depth > 0
 
 
 def find_violations(orita_dir: str = DEFAULT_ORITA_DIR) -> list:
@@ -135,7 +170,11 @@ def find_violations(orita_dir: str = DEFAULT_ORITA_DIR) -> list:
                     continue
                 for m in violation_pattern.finditer(sentence):
                     abs_start = sent_start + m.start()
-                    if _is_negated(sentence) or _is_quoted_citation(text, abs_start):
+                    if (
+                        _is_negated(sentence, m.start())
+                        or _is_quoted_citation(text, abs_start)
+                        or _is_parenthesized_example(sentence, m.start())
+                    ):
                         continue
                     line_no = text.count("\n", 0, abs_start) + 1
                     snippet = sentence.strip().replace("\n", " ")

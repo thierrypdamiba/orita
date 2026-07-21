@@ -131,6 +131,24 @@ class FixtureViolationCase(unittest.TestCase):
         violations = rc.find_violations(orita_dir=self.orita)
         self.assertEqual(violations, [])
 
+    def test_negation_cue_does_not_leak_backward_within_the_same_sentence(self):
+        # A negation cue AFTER the violation match, elsewhere in the SAME
+        # sentence, must not mask a real, present-tense violation -- the
+        # module's own docstring (line 24) claims to reuse "the identical
+        # negation ... guards task 99 built" (star_covenant_check's
+        # _is_negated_or_predictive), which scopes its check to only the
+        # text BEFORE the match. A bare whole-sentence search would let an
+        # unrelated trailing "never" (about the scribes' own record-keeping
+        # habit, not about Ogun's violence) silently launder a live breach.
+        _write(
+            os.path.join(self.orita, "docs", "report.md"),
+            "Ogun murders the blocked build, a fact the scribes will never "
+            "omit from the record.\n",
+        )
+        violations = rc.find_violations(orita_dir=self.orita)
+        self.assertEqual(len(violations), 1)
+        self.assertEqual(violations[0]["rider"], "ogun-violence")
+
     def test_negation_cue_does_not_leak_across_sentences(self):
         # A "never" in an EARLIER, unrelated sentence must not mask a real
         # violation in a later, clean sentence -- sentence-scoped, like
@@ -151,6 +169,43 @@ class FixtureViolationCase(unittest.TestCase):
             os.path.join(self.orita, "ROADMAP.md"),
             'Hunts for a sentence pairing a god with a forbidden shape ("devil", '
             '"spider mascot", "humiliated", "horror trope").\n',
+        )
+        violations = rc.find_violations(orita_dir=self.orita)
+        self.assertEqual(violations, [])
+
+    def test_predictive_will_before_the_match_is_not_flagged(self):
+        # Real, live pre-founding prose (records/pre-founding/ballots.md,
+        # the-casting-session.md) narrates a predicted RISK -- "trolls WILL
+        # feed the ... Satan slander into the issues" -- not the town's own
+        # present-tense violation. Scoping negation to prefix-only (this
+        # fix) would otherwise surface this as a new false positive unless
+        # "will"/"would" join the cue list, mirroring star_covenant_check's
+        # own _NEGATION_CUES exactly, as this module's docstring (line 24)
+        # already claims to do.
+        _write(
+            os.path.join(self.orita, "records", "pre-founding", "ballots.md"),
+            "Trolls WILL feed the missionary-era Satan slander into the "
+            "issues and an improvising agent must answer in character.\n",
+        )
+        violations = rc.find_violations(orita_dir=self.orita)
+        self.assertEqual(violations, [])
+
+    def test_parenthesized_citation_list_is_not_flagged(self):
+        # Real, live task history (ROADMAP-ARCHIVE-001-169.md's task-100
+        # row) documents this module's own five violation shapes as a
+        # parenthetical list: "(Satan-slander for Esu, violence for Ogun,
+        # spider mascot imagery for Ananse, humiliation for Nyx, horror for
+        # Zashiki)". Only the first item opens directly on the "(" that
+        # `_is_quoted_citation` already recognizes -- the other four sit
+        # after an internal comma, still inside the same unclosed paren,
+        # and must not be flagged as five separate live violations of the
+        # very riders this module exists to state.
+        _write(
+            os.path.join(self.orita, "docs", "history.md"),
+            "Hunts for a sentence pairing a rider-bound god's name with the "
+            "specific violation shape their rider forbids (Satan-slander "
+            "for Esu, violence for Ogun, spider mascot imagery for Ananse, "
+            "humiliation for Nyx, horror for Zashiki), never live prose.\n",
         )
         violations = rc.find_violations(orita_dir=self.orita)
         self.assertEqual(violations, [])
