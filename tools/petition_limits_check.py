@@ -76,7 +76,7 @@ _REQUEST_RE = re.compile(r"\*\*Request:\*\*\s*(.*?)(?=\n\*\*The case|\n---|\Z)",
 _CASE_RE = re.compile(r"\*\*The case,.*?\*\*\s*\n\n(.*?)(?=\n---|\Z)", re.DOTALL)
 _PETITIONER_RE = re.compile(r"\*\*Petitioner:\*\*\s*(.+)")
 
-_SENTENCE_BOUNDARY = re.compile(r"[.!?]|\n{2,}")
+_SENTENCE_BOUNDARY = re.compile(r"[.!?;]|\n{2,}")
 _NEGATION_CUES = re.compile(r"\b(never|not|won't|wasn't|isn't|doesn't|didn't|n't|will|would|wouldn't)\b", re.IGNORECASE)
 _QUOTE_CHARS = set('"\'“‘')
 

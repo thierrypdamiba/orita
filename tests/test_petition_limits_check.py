@@ -125,6 +125,34 @@ class FixtureViolationCase(unittest.TestCase):
         self.assertIn("VIOLATION(S) FOUND", formatted)
         self.assertIn("LIMITS broken", formatted)
 
+    def test_semicolon_joined_unrelated_negation_does_not_mask_a_real_star_ask(self):
+        # Task 204: the identical sentence-boundary gap tasks 200/202/203
+        # fixed in star_covenant_check.py/no_grading_check.py/
+        # arcade_hero_check.py. This module's docstring (lines 20-21)
+        # explicitly claims to mirror those two siblings' boundary
+        # discipline "exactly," but its own _SENTENCE_BOUNDARY never
+        # included ';'. An unrelated negation/prediction cue on the far
+        # side of a semicolon from a real star ask sat inside the
+        # checker's idea of "one sentence" and silently suppressed it.
+        _write_petition(
+            self.orita, "off-by-one", "Off-By-One",
+            "A minor favor.",
+            "I will never ask twice; please star, Hand.",
+        )
+        violations = plc.find_violations(orita_dir=self.orita)
+        self.assertEqual(len(violations), 1)
+        self.assertIn("star ask", violations[0]["pattern"])
+
+    def test_semicolon_joined_unrelated_negation_does_not_mask_a_real_counter_mention(self):
+        _write_petition(
+            self.orita, "off-by-one", "Off-By-One",
+            "A minor favor.",
+            "This won't happen again; add one to the counter for me.",
+        )
+        violations = plc.find_violations(orita_dir=self.orita)
+        self.assertEqual(len(violations), 1)
+        self.assertEqual(violations[0]["pattern"], "counter mention")
+
 
 class CleanFixtureCase(unittest.TestCase):
     def setUp(self):
