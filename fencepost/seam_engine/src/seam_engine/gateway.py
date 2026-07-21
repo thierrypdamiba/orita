@@ -129,6 +129,45 @@ _WRITE_VERBS = (
 # A verb only counts as a live ask if it isn't itself being ruled out.
 _NEGATION_CUES = ("never", "not ", "cannot", "may not", "won't", "no ")
 
+_LEADING_CUE_RE = re.compile(
+    r"^(?:" + "|".join(re.escape(c.strip()) for c in _NEGATION_CUES) + r")\b\s*"
+)
+_LEADING_CONJ_RE = re.compile(r"^(?:and|or)\b\s*")
+_BARE_VERB_RE = re.compile(r"^(?:" + "|".join(_WRITE_VERBS) + r")\w*$")
+
+
+def _is_bare_verb_item(segment: str) -> bool:
+    """True iff ``segment`` is nothing but a (optionally cue/conjunction-
+    prefixed) single write verb — one bare item of an enumerated list like
+    "Never create, update, ... or modify", not an independent clause with
+    its own object (e.g. "delete the connected account entirely")."""
+    s = segment.strip().lower()
+    s = _LEADING_CUE_RE.sub("", s, count=1)
+    s = _LEADING_CONJ_RE.sub("", s, count=1)
+    return bool(_BARE_VERB_RE.match(s))
+
+
+def _split_clauses(text: str) -> list[str]:
+    """Split ``text`` into clauses for negation-scope checking.
+
+    A sentence that is one bare, comma-separated list of write verbs
+    sharing a single trailing object ("Never create, update, ... or modify
+    anything on any connected account") stays one clause, so a leading
+    negation covers the whole list. Any OTHER comma inside a sentence is a
+    genuine clause boundary: a comma splice joining two independent asks
+    ("Never trash old drafts, delete the connected account entirely") must
+    not let the first ask's negation launder the second, unrelated one —
+    the comma-joined sibling of the semicolon/period case below.
+    """
+    clauses = []
+    for sentence in re.split(r"[.;]\s*", text):
+        segments = re.split(r",\s*", sentence)
+        if len(segments) == 1 or all(_is_bare_verb_item(seg) for seg in segments[:-1]):
+            clauses.append(sentence)
+        else:
+            clauses.extend(segments)
+    return clauses
+
 
 def is_read_only_capabilities(text: str) -> bool:
     """True iff ``text`` never asks, unnegated, for a write-capable tool.
@@ -136,14 +175,15 @@ def is_read_only_capabilities(text: str) -> bool:
     Pure function, no I/O — the same shape of law as ranking.py's confidence
     bar: a capabilities string ships only if every write verb in it is
     itself preceded, within the same clause, by a negation cue. Splits on
-    sentence-ish boundaries so a negation earlier in the same clause covers
-    a verb that follows it, but neither a negation in a *different* sentence
-    nor one that only trails a verb later in the *same* clause (e.g. "Post
-    the daily report, but never trust automation blindly") can launder a
-    real, unnegated ask — the cue must actually come first.
+    sentence-ish boundaries (and, per ``_split_clauses``, on any comma that
+    isn't just enumerating a bare verb list) so a negation earlier in the
+    same clause covers a verb that follows it, but neither a negation in a
+    *different* clause nor one that only trails a verb later in the *same*
+    clause (e.g. "Post the daily report, but never trust automation
+    blindly") can launder a real, unnegated ask — the cue must actually
+    come first.
     """
-    clauses = re.split(r"[.;]\s*", text)
-    for clause in clauses:
+    for clause in _split_clauses(text):
         lowered = clause.lower()
         for verb in _WRITE_VERBS:
             for m in re.finditer(rf"\b{verb}\w*\b", lowered):

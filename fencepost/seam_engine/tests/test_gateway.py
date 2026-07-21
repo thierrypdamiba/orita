@@ -103,6 +103,36 @@ def test_negation_does_not_launder_a_verb_earlier_in_the_same_clause(text: str):
     assert not is_read_only_capabilities(text)
 
 
+@pytest.mark.parametrize(
+    "text",
+    [
+        # A comma splicing two independent asks together must not let the
+        # first ask's negation launder the second, unrelated one — the
+        # comma-joined sibling of the semicolon/period cases above.
+        "Never trash old drafts, delete the connected account entirely.",
+        "Never trash a, delete b, remove c.",
+        "Never touch the calendar, post the daily report to X.",
+    ],
+)
+def test_negation_does_not_launder_an_unrelated_clause_across_a_comma(text: str):
+    assert not is_read_only_capabilities(text)
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        # A genuine bare, comma-separated enumeration of write verbs
+        # sharing one trailing object must stay covered by a single
+        # leading negation — this must not regress into false positives.
+        "Read commits and releases. Never create, post, or send anything.",
+        "Never create, update, merge, label, delete, post, reply, send, "
+        "or modify anything on any connected account.",
+    ],
+)
+def test_a_bare_verb_enumeration_stays_covered_by_one_leading_negation(text: str):
+    assert is_read_only_capabilities(text)
+
+
 def test_gateway_url_builds_the_real_arcade_mcp_url():
     assert gateway_url("my-fencepost") == "https://api.arcade.dev/mcp/my-fencepost"
 
