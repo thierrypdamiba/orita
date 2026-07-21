@@ -174,6 +174,24 @@ class CleanFixtureCase(unittest.TestCase):
         violations = ngc.find_violations(orita_dir=self.orita)
         self.assertEqual(violations, [])
 
+    def test_semicolon_joined_unrelated_will_no_longer_masks_a_real_ask(self):
+        """The sibling gap task 200 already found and fixed in
+        `star_covenant_check.py` (the checker this module's own docstring
+        says it mirrors "exactly"): a semicolon joins two independent
+        clauses the same way a period does, but `_SENTENCE_BOUNDARY` never
+        included `;`, so an unrelated, earlier future-tense clause on the
+        near side of a semicolon from a real, present-tense blame sentence
+        on the far side still fell inside the same negation window and
+        silently suppressed it."""
+        _write(
+            os.path.join(self.orita, "docs", "report.md"),
+            "This approach will improve over time; the vendor dropped the "
+            "ball on the migration.\n",
+        )
+        violations = ngc.find_violations(orita_dir=self.orita)
+        self.assertEqual(len(violations), 1)
+        self.assertEqual(violations[0]["pattern"], "dropped the ball")
+
     def test_double_newline_paragraph_break_still_ends_the_window(self):
         """The other half of the same fix: a real paragraph break (blank
         line) between an unrelated negation cue and a real, present-tense

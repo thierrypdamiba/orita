@@ -87,7 +87,7 @@ _PATTERNS = [
 ]
 
 
-_SENTENCE_BOUNDARY = re.compile(r"[.!?]|\n{2,}")
+_SENTENCE_BOUNDARY = re.compile(r"[.!?;]|\n{2,}")
 _NEGATION_CUES = re.compile(
     r"\b(never|not|won't|wasn't|isn't|doesn't|didn't|n't|will|would|wouldn't|no)\b",
     re.IGNORECASE,
@@ -120,7 +120,11 @@ def _is_negated_or_predictive(text: str, match_start: int) -> bool:
     its negation cue onto the line above the match. A bare `\\n` boundary
     (star_covenant_check's original shape) would cut the window off
     between "never" and the match and miss it; only a real sentence-ender
-    or a blank-line paragraph break should end the window."""
+    or a blank-line paragraph break should end the window. Task 202 added
+    `;` to the boundary too, the same fix task 200 made to
+    `star_covenant_check.py`: a semicolon joins two independent clauses
+    exactly the way a period does, and an unrelated cue on the near side
+    of one must not mask a real violation on the far side."""
     window_start = 0
     for boundary in _SENTENCE_BOUNDARY.finditer(text, 0, match_start):
         window_start = boundary.end()
