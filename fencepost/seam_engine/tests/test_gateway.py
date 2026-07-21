@@ -87,6 +87,22 @@ def test_negation_does_not_launder_an_unrelated_later_sentence():
     assert not is_read_only_capabilities(text)
 
 
+@pytest.mark.parametrize(
+    "text",
+    [
+        # A negation cue that trails the verb in the SAME clause must not
+        # launder it — the cue negates something else entirely ("trust
+        # automation blindly"), not the "Post" ask that precedes it.
+        "Post the daily report to X, but never trust automation blindly.",
+        "Share the private dashboard with everyone, though we never "
+        "publicized it before.",
+        "Create an issue automatically, not that anyone asked for caution.",
+    ],
+)
+def test_negation_does_not_launder_a_verb_earlier_in_the_same_clause(text: str):
+    assert not is_read_only_capabilities(text)
+
+
 def test_gateway_url_builds_the_real_arcade_mcp_url():
     assert gateway_url("my-fencepost") == "https://api.arcade.dev/mcp/my-fencepost"
 

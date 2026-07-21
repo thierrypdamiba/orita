@@ -134,21 +134,22 @@ def is_read_only_capabilities(text: str) -> bool:
     """True iff ``text`` never asks, unnegated, for a write-capable tool.
 
     Pure function, no I/O — the same shape of law as ranking.py's confidence
-    bar: a capabilities string ships only if every write verb in it appears
-    strictly inside a negating clause (a sentence containing a negation cue).
-    Splits on sentence-ish boundaries so a negation earlier in the same
-    clause covers the verb, but a negation in a *different* sentence does not
-    launder an unrelated ask.
+    bar: a capabilities string ships only if every write verb in it is
+    itself preceded, within the same clause, by a negation cue. Splits on
+    sentence-ish boundaries so a negation earlier in the same clause covers
+    a verb that follows it, but neither a negation in a *different* sentence
+    nor one that only trails a verb later in the *same* clause (e.g. "Post
+    the daily report, but never trust automation blindly") can launder a
+    real, unnegated ask — the cue must actually come first.
     """
     clauses = re.split(r"[.;]\s*", text)
     for clause in clauses:
         lowered = clause.lower()
-        negated = any(cue in lowered for cue in _NEGATION_CUES)
-        if negated:
-            continue
         for verb in _WRITE_VERBS:
-            if re.search(rf"\b{verb}\w*\b", lowered):
-                return False
+            for m in re.finditer(rf"\b{verb}\w*\b", lowered):
+                before = lowered[: m.start()]
+                if not any(cue in before for cue in _NEGATION_CUES):
+                    return False
     return True
 
 

@@ -118,3 +118,4 @@
 {"type": "queued", "task": "190", "topic": "petition-limits check false-positive/false-negative fix -- CHARTER.md Appendix D LIMITS enforcement now word-boundary safe", "queued_at": "2026-07-21T02:20:00Z"}
 {"type": "queued", "task": "191", "topic": "release-not-tweeted's tag-boundary bug fixed -- a real never-announced release was silently hidden behind a longer sibling tag", "queued_at": "2026-07-21T03:15:00Z"}
 {"type": "queued", "task": "197", "topic": "verdict provenance's own date-blind spot -- a second petition could have masked a real Iron Rule 3 violation, closed before it ever happened live", "queued_at": "2026-07-21T09:21:00Z"}
+{"type": "queued", "task": "198", "topic": "gateway.py's is_read_only_capabilities let an unnegated write ask (Post/Share/Create) slip through as read-only whenever a trailing, unrelated negation sat later in the same clause -- fixed to require the negation precede the verb", "queued_at": "2026-07-21T10:15:00Z"}
