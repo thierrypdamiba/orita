@@ -151,6 +151,7 @@ def build_prediction(
     about whether to seal it."""
     if now.tzinfo is None:
         raise TagCadenceError("now must be timezone-aware")
+    now = now.astimezone(datetime.timezone.utc)
     if isinstance(current_count, bool) or not isinstance(current_count, int) or current_count < 0:
         raise TagCadenceError("current_count must be a non-negative integer")
     if horizon_hours <= 0:
