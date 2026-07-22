@@ -152,6 +152,13 @@ def build_prediction(
     about whether to seal it."""
     if now.tzinfo is None:
         raise StarCadenceError("now must be timezone-aware")
+    # The claim's own target is rendered with a literal "Z" (UTC) suffix,
+    # so `now` must actually be normalized to UTC first -- accepting any
+    # aware timezone but never converting it silently mislabels the target
+    # instant by the caller's UTC offset (a non-UTC `now` is a legal aware
+    # datetime, but its wall-clock hour is not the UTC hour this claim
+    # swears the target is). Mirrors `cadence.py`'s task-210 fix.
+    now = now.astimezone(datetime.timezone.utc)
     if isinstance(current_count, bool) or not isinstance(current_count, int) or current_count < 0:
         raise StarCadenceError("current_count must be a non-negative integer")
     if horizon_hours <= 0:

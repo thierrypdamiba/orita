@@ -151,6 +151,24 @@ class TestBuildPrediction(unittest.TestCase):
         with self.assertRaises(star_cadence.StarCadenceError):
             star_cadence.build_prediction(_NOW, [], current_count=1, horizon_hours=-24)
 
+    def test_non_utc_aware_now_still_targets_the_true_utc_instant(self):
+        # `now.tzinfo is None` rejects naive datetimes, but any *other*
+        # aware timezone was passing straight through into a claim string
+        # that hardcodes a literal "Z" (UTC) suffix -- mislabeling the
+        # target by exactly the caller's UTC offset. A non-UTC caller (a
+        # server in another timezone, a manual/ad-hoc seal) must still
+        # produce the same real-world target instant as the equivalent UTC
+        # call, not a claim that lies about which instant it names.
+        eastern = datetime.timezone(datetime.timedelta(hours=-5))
+        now_eastern = _NOW.astimezone(eastern)
+        payload = star_cadence.build_prediction(now_eastern, [], current_count=4, horizon_hours=168)
+        self.assertIn("2026-07-27T12:00:00Z", payload["claim"])
+
+    def test_utc_now_unaffected_by_the_normalization(self):
+        # The fix must be a no-op for every already-passing UTC call site.
+        payload = star_cadence.build_prediction(_NOW, [], current_count=4, horizon_hours=168)
+        self.assertIn("2026-07-27T12:00:00Z", payload["claim"])
+
 
 class TestSealStarPrediction(unittest.TestCase):
     def test_seals_a_real_predict_entry_to_a_scratch_ledger(self):
