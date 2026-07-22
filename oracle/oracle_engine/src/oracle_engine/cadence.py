@@ -127,6 +127,13 @@ def build_prediction(
     and `now`, writes nothing, decides nothing about whether to seal it."""
     if now.tzinfo is None:
         raise CadenceError("now must be timezone-aware")
+    # The claim's own target is rendered with a literal "Z" (UTC) suffix,
+    # so `now` must actually be normalized to UTC first -- accepting any
+    # aware timezone but never converting it silently mislabels the target
+    # instant by the caller's UTC offset (a non-UTC `now` is a legal aware
+    # datetime, but its wall-clock hour is not the UTC hour this claim
+    # swears the target is).
+    now = now.astimezone(datetime.timezone.utc)
     if threshold < 1:
         raise CadenceError("threshold must be at least 1 — a call that always passes is not a call")
     if horizon_hours <= 0:
