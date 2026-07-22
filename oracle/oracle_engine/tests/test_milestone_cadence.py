@@ -160,6 +160,16 @@ class TestBuildPrediction(unittest.TestCase):
                 datetime.datetime(2026, 7, 20, 12, 0), [], current_count=0
             )
 
+    def test_non_utc_now_targets_the_true_utc_instant(self):
+        tz = datetime.timezone(datetime.timedelta(hours=-5))
+        now = datetime.datetime(2026, 7, 20, 12, 0, tzinfo=tz)
+        payload = milestone_cadence.build_prediction(now, [], current_count=9, horizon_hours=336)
+        self.assertIn("2026-08-03T17:00:00Z", payload["claim"])
+
+    def test_utc_now_is_unaffected(self):
+        payload = milestone_cadence.build_prediction(_NOW, [], current_count=9, horizon_hours=336)
+        self.assertIn("2026-08-03T12:00:00Z", payload["claim"])
+
     def test_rejects_a_negative_count(self):
         with self.assertRaises(milestone_cadence.MilestoneCadenceError):
             milestone_cadence.build_prediction(_NOW, [], current_count=-1)
