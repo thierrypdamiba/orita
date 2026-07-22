@@ -170,6 +170,15 @@ class TestBuildPrediction(unittest.TestCase):
         with self.assertRaises(subscriber_cadence.SubscriberCadenceError):
             subscriber_cadence.build_prediction(_NOW, [], current_count=1, horizon_hours=-24)
 
+    def test_non_utc_aware_now_still_targets_the_true_utc_instant(self):
+        non_utc_now = _NOW.astimezone(datetime.timezone(datetime.timedelta(hours=-5)))
+        payload = subscriber_cadence.build_prediction(non_utc_now, [], current_count=1, horizon_hours=336)
+        self.assertIn("2026-08-03T12:00:00Z", payload["claim"])
+
+    def test_utc_now_unaffected_by_the_normalization(self):
+        payload = subscriber_cadence.build_prediction(_NOW, [], current_count=1, horizon_hours=336)
+        self.assertIn("2026-08-03T12:00:00Z", payload["claim"])
+
 
 class TestSealSubscriberPrediction(unittest.TestCase):
     def test_seals_a_real_predict_entry_to_a_scratch_ledger(self):
