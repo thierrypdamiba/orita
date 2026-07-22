@@ -137,6 +137,16 @@ class TestBuildPrediction(unittest.TestCase):
                 datetime.datetime(2026, 7, 20, 12, 0), [], current_count=9
             )
 
+    def test_non_utc_aware_now_still_targets_the_true_utc_instant(self):
+        tz = datetime.timezone(datetime.timedelta(hours=-5))
+        now = datetime.datetime(2026, 7, 20, 12, 0, tzinfo=tz)
+        payload = run_cadence.build_prediction(now, [], current_count=9, horizon_hours=24)
+        self.assertIn("2026-07-21T17:00:00Z", payload["claim"])
+
+    def test_utc_now_unaffected_by_the_normalization(self):
+        payload = run_cadence.build_prediction(_NOW, [], current_count=9, horizon_hours=24)
+        self.assertIn("2026-07-21T12:00:00Z", payload["claim"])
+
     def test_rejects_a_negative_count(self):
         with self.assertRaises(run_cadence.RunCadenceError):
             run_cadence.build_prediction(_NOW, [], current_count=-1)
