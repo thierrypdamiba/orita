@@ -93,6 +93,18 @@ class TestSnapshots(unittest.TestCase):
                 second_write = f.read()
             self.assertTrue(second_write.startswith(first_write))
 
+    def test_load_snapshots_marks_a_malformed_line_instead_of_raising(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = os.path.join(tmp, "snapshots.jsonl")
+            with open(path, "w", encoding="utf-8") as f:
+                f.write('{"ts": "2026-07-13T00:00:00+00:00", "count": 1}\n')
+                f.write("not valid json at all\n")
+            snaps = commit_cadence.load_snapshots(path)
+            self.assertEqual(len(snaps), 2)
+            self.assertEqual(snaps[0]["count"], 1)
+            self.assertTrue(snaps[1]["_malformed"])
+            self.assertIn("_error", snaps[1])
+
 
 class TestCommitCountAtOrBefore(unittest.TestCase):
     def test_returns_none_with_no_early_enough_snapshot(self):
@@ -109,6 +121,15 @@ class TestCommitCountAtOrBefore(unittest.TestCase):
         when = datetime.datetime(2026, 7, 13, tzinfo=datetime.timezone.utc)
         self.assertEqual(commit_cadence.commit_count_at_or_before(snaps, when), 210)
 
+    def test_raises_tampered_error_on_a_malformed_line_instead_of_crashing(self):
+        snaps = [
+            {"ts": "2026-07-11T00:00:00+00:00", "count": 200},
+            {"_malformed": True, "_error": "Expecting value: line 1 column 1 (char 0)"},
+        ]
+        when = datetime.datetime(2026, 7, 13, tzinfo=datetime.timezone.utc)
+        with self.assertRaises(commit_cadence.CommitCadenceTamperedError):
+            commit_cadence.commit_count_at_or_before(snaps, when)
+
 
 class TestCommitCountAtOrAfter(unittest.TestCase):
     def test_returns_none_with_no_late_enough_snapshot(self):
@@ -124,6 +145,28 @@ class TestCommitCountAtOrAfter(unittest.TestCase):
         ]
         when = datetime.datetime(2026, 7, 13, tzinfo=datetime.timezone.utc)
         self.assertEqual(commit_cadence.commit_count_at_or_after(snaps, when), 230)
+
+    def test_raises_tampered_error_on_a_malformed_line_instead_of_crashing(self):
+        snaps = [
+            {"ts": "2026-07-11T00:00:00+00:00", "count": 200},
+            {"_malformed": True, "_error": "Expecting value: line 1 column 1 (char 0)"},
+        ]
+        when = datetime.datetime(2026, 7, 13, tzinfo=datetime.timezone.utc)
+        with self.assertRaises(commit_cadence.CommitCadenceTamperedError):
+            commit_cadence.commit_count_at_or_after(snaps, when)
+
+    def test_a_valid_lookup_after_a_malformed_earlier_line_still_refuses(self):
+        # Even when the malformed line would not have been the winning
+        # match, the guard refuses rather than silently trusting the rest
+        # of the log -- a malformed line anywhere could be masking the
+        # real closest snapshot for a different `when`.
+        snaps = [
+            {"_malformed": True, "_error": "boom"},
+            {"ts": "2026-07-14T00:00:00+00:00", "count": 230},
+        ]
+        when = datetime.datetime(2026, 7, 13, tzinfo=datetime.timezone.utc)
+        with self.assertRaises(commit_cadence.CommitCadenceTamperedError):
+            commit_cadence.commit_count_at_or_after(snaps, when)
 
 
 class TestBuildPrediction(unittest.TestCase):
