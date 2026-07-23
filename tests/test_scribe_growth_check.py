@@ -138,6 +138,39 @@ class TestRecordScribeCheck(_TempFixtureCase):
     def test_last_scribe_state_is_none_for_a_missing_log(self):
         self.assertIsNone(sgc.last_scribe_state(path=self.log_path))
 
+    def test_entries_marks_a_malformed_line_instead_of_raising(self):
+        # A hand-edit, stray merge-conflict marker, or truncated write can
+        # leave a line that isn't valid JSON at all -- _entries() must name
+        # it, not crash with an uncaught json.JSONDecodeError (the exact
+        # crash tools/ledger.py's _entries() had before task 238's fix).
+        sgc.record_scribe_check({"ROADMAP.md": 100}, "2026-07-20T00:00:00Z", path=self.log_path)
+        with open(self.log_path, "a") as f:
+            f.write("not valid json garbage\n")
+        entries = sgc._entries(path=self.log_path)
+        self.assertEqual(len(entries), 2)
+        self.assertTrue(entries[1]["_malformed"])
+        self.assertIn("_error", entries[1])
+
+    def test_raises_tampered_error_on_a_malformed_tip_instead_of_crashing(self):
+        sgc.record_scribe_check({"ROADMAP.md": 100}, "2026-07-20T00:00:00Z", path=self.log_path)
+        with open(self.log_path, "a") as f:
+            f.write("not valid json garbage\n")
+        # Pre-fix this raised an uncaught json.JSONDecodeError; it must now
+        # raise the named, catchable ScribeGrowthLogTamperedError instead.
+        with self.assertRaises(sgc.ScribeGrowthLogTamperedError):
+            sgc.last_scribe_state(path=self.log_path)
+
+    def test_a_valid_tip_after_a_malformed_earlier_line_is_unaffected(self):
+        # Only the TIP matters for last_scribe_state's guess-refusal -- an
+        # older malformed line sitting earlier in the log (already surfaced
+        # by _entries(), just not at the tip) must not block a real read.
+        sgc.record_scribe_check({"ROADMAP.md": 100}, "2026-07-20T00:00:00Z", path=self.log_path)
+        with open(self.log_path, "a") as f:
+            f.write("not valid json garbage\n")
+        sgc.record_scribe_check({"ROADMAP.md": 200}, "2026-07-20T01:00:00Z", path=self.log_path)
+        last = sgc.last_scribe_state(path=self.log_path)
+        self.assertEqual(last["sizes"], {"ROADMAP.md": 200})
+
 
 class TestCLI(_TempFixtureCase):
     def test_check_command_runs_clean_against_the_real_repo(self):
