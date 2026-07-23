@@ -122,6 +122,51 @@ def test_evidence_outside_the_read_only_oath_is_false(tmp_path: Path):
     assert "FAIL every evidence link resolves to a scope Fencepost actually holds" in t.gaps[0].reason
 
 
+# --- _well_formed: the host check itself, not just its FALSE-verdict effect ---
+#
+# `netloc` (the pre-fix comparison target) carries the port and any userinfo
+# prefix along with the host; `hostname` (the fix) strips both and lowercases.
+# A genuinely github.com-hosted evidence URL that happens to carry either
+# must not be punished for it -- Ogun's law is about the REAL host a URL
+# resolves to, not the exact string shape GitHub's API happened to emit.
+
+
+def test_well_formed_accepts_an_explicit_default_port():
+    # https://github.com:443/... is exactly github.com -- the port is the
+    # scheme's own default, not a different host.
+    assert audit._well_formed("https://github.com:443/x/orita/commit/0000000") is True
+
+
+def test_well_formed_accepts_a_userinfo_prefix():
+    # https://user@github.com/... connects to github.com; `user@` is
+    # credential syntax the URL spec carries separately from the host.
+    assert audit._well_formed("https://user@github.com/x/orita/commit/0000000") is True
+
+
+def test_well_formed_still_rejects_a_host_confusable_url():
+    # https://github.com@evil.com/... is a classic confusable: everything
+    # before the LAST @ is userinfo, and the real host is evil.com. Fixing
+    # the false negative above must not open this door.
+    assert audit._well_formed("https://github.com@evil.com/x/orita/commit/0000000") is False
+
+
+def test_well_formed_still_rejects_an_unrelated_host():
+    assert audit._well_formed("https://example.com/not-a-real-scope") is False
+
+
+def test_evidence_with_an_explicit_port_is_confirmed_not_false(tmp_path: Path):
+    # The end-to-end regression: a sound gap whose evidence happens to carry
+    # an explicit default port must be CONFIRMED, not wrongly graded FALSE.
+    ledger.append_scan(
+        _scan(evidence=["https://github.com:443/x/orita/commit/0000000"]),
+        now=_at(2026, 7, 12), base=tmp_path,
+    )
+    t = audit.audit_ledger(tmp_path)
+
+    assert t.gaps[0].verdict == audit.Verdict.CONFIRMED.value
+    assert "OK every evidence link resolves to a scope Fencepost actually holds" in t.gaps[0].reason
+
+
 # --- the tally is honest, not a percentage that hides the count ---------------
 
 

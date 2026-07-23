@@ -100,11 +100,24 @@ class Tally:
 
 
 def _well_formed(url: str) -> bool:
+    """Does `url` resolve to a host Fencepost's read-only oath actually
+    covers? Checked on `hostname`, never `netloc` -- `netloc` carries the
+    port and any userinfo prefix (`user@`) along with the host, so a
+    genuinely github.com URL that happens to name an explicit port
+    (`https://github.com:443/...`) or credential syntax
+    (`https://user@github.com/...`) would fail an exact-`netloc` compare
+    even though it connects to exactly the allowed host. `hostname` already
+    strips both and lowercases, and — unlike a naive split on the first
+    `@` — always resolves to the REAL connecting host per the URL spec: for
+    `https://github.com@evil.com/...` (github.com as bogus userinfo, the
+    actual host after the last `@`), `hostname` correctly reads `evil.com`,
+    so this is strictly a false-negative fix, not a new door for a
+    confusable host to walk through."""
     try:
         u = urlparse(url)
     except ValueError:
         return False
-    return u.scheme in ("http", "https") and u.netloc.lower() in _ALLOWED_EVIDENCE_HOSTS
+    return u.scheme in ("http", "https") and (u.hostname or "").lower() in _ALLOWED_EVIDENCE_HOSTS
 
 
 def _audit_primary(tablet: str, seq: int, date: str, sealed: dict[str, Any]) -> AuditedGap | None:
