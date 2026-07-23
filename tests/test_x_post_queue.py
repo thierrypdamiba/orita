@@ -80,6 +80,47 @@ class TestPendingEntries(_TempQueueCase):
         self.assertEqual([e["task"] for e in pending], ["50", "52"])
 
 
+class TestEntriesMalformedLine(_TempQueueCase):
+    """Task 240: a line that isn't valid JSON any more must not crash
+    _entries() -- mirroring tools/ledger.py's and tools/change_gate.py's
+    own convention from tasks 238/239."""
+
+    def test_entries_marks_a_malformed_line_instead_of_raising(self):
+        xpq.queue_owed_post("50", "subscriber cadence", "2026-07-14T01:09:00Z", path=self.path)
+        with open(self.path, "a") as f:
+            f.write('{"type": "posted", "tasks": ["50"] <<<< not json\n')
+        entries = xpq._entries(self.path)
+        self.assertEqual(len(entries), 2)
+        self.assertTrue(entries[1]["_malformed"])
+        self.assertIn("_error", entries[1])
+
+    def test_pending_entries_raises_on_a_malformed_posted_marker_not_a_crash(self):
+        # Pre-fix this raised an uncaught json.JSONDecodeError; it must now
+        # raise the named QueueTamperedError instead of guessing past a
+        # marker that might be hiding an already-posted task.
+        xpq.queue_owed_post("50", "subscriber cadence", "2026-07-14T01:09:00Z", path=self.path)
+        with open(self.path, "a") as f:
+            f.write('{"type": "posted", "tasks": ["50"] <<<< not json\n')
+        with self.assertRaises(xpq.QueueTamperedError):
+            xpq.pending_entries(path=self.path)
+
+    def test_pending_entries_raises_on_a_malformed_queued_line_too(self):
+        # Not just a posted marker -- a malformed line anywhere is refused,
+        # since a queued line and a posted marker look identical once broken.
+        xpq.queue_owed_post("50", "subscriber cadence", "2026-07-14T01:09:00Z", path=self.path)
+        with open(self.path, "a") as f:
+            f.write('{"type": "queued", "task": "51" <<<< not json\n')
+        with self.assertRaises(xpq.QueueTamperedError):
+            xpq.pending_entries(path=self.path)
+
+    def test_a_clean_queue_is_unaffected_by_the_new_guard(self):
+        xpq.queue_owed_post("50", "subscriber cadence", "2026-07-14T01:09:00Z", path=self.path)
+        xpq.queue_owed_post("51", "tag cadence", "2026-07-14T02:05:50Z", path=self.path)
+        xpq.mark_posted(["50"], "999", "2026-07-14T06:30:00Z", path=self.path)
+        pending = xpq.pending_entries(path=self.path)
+        self.assertEqual([e["task"] for e in pending], ["51"])
+
+
 class TestComposeCombinedTweet(unittest.TestCase):
     def test_raises_on_no_pending_entries(self):
         with self.assertRaises(ValueError):

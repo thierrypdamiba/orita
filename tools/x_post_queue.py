@@ -46,10 +46,37 @@ MAX_TWEET_CHARS = 280
 
 
 def _entries(path=QUEUE):
+    """Every line in the queue, parsed.
+
+    A line that is not even valid JSON any more (a bad hand-edit, a stray
+    merge-conflict marker, a truncated write) is not allowed to crash the
+    caller -- it comes back as {"_malformed": True, "_error": ...} instead,
+    mirroring tools/ledger.py's and tools/change_gate.py's own convention
+    (tasks 238, 239). pending_entries() is the one that decides whether a
+    malformed line here is safe to ignore or must refuse outright.
+    """
     if not os.path.exists(path):
         return []
+    entries = []
     with open(path) as f:
-        return [json.loads(line) for line in f if line.strip()]
+        for line in f:
+            if not line.strip():
+                continue
+            try:
+                entries.append(json.loads(line))
+            except json.JSONDecodeError as exc:
+                entries.append({"_malformed": True, "_error": str(exc)})
+    return entries
+
+
+class QueueTamperedError(RuntimeError):
+    """Raised by pending_entries() when any line in the queue is unreadable.
+
+    Unlike tools/ledger.py's hash chain, a "posted" marker here can sit
+    anywhere in the file, not just at the tip -- silently dropping just the
+    unreadable line could make an already-posted task look pending again,
+    risking a duplicate real tweet to the connected X account. Refusing
+    beats guessing which tasks are actually already posted."""
 
 
 def _append(entry, path=QUEUE):
@@ -81,8 +108,19 @@ def _posted_tasks(entries) -> set:
 
 
 def pending_entries(path=QUEUE) -> list:
-    """Every queued task not yet named by a posted marker, oldest first."""
+    """Every queued task not yet named by a posted marker, oldest first.
+
+    Refuses via QueueTamperedError if any line in the queue is malformed --
+    see that class's docstring for why a partial read here is unsafe."""
     entries = _entries(path)
+    malformed = [e for e in entries if e.get("_malformed")]
+    if malformed:
+        raise QueueTamperedError(
+            f"pending_entries(): refusing -- {len(malformed)} unreadable line(s) in "
+            f"{path} could be hiding a real 'posted' marker, and guessing past that "
+            "risks a duplicate real tweet. Repair the queue by hand, then re-run. "
+            f"First error: {malformed[0]['_error']}"
+        )
     posted = _posted_tasks(entries)
     by_task = {}
     for e in entries:
