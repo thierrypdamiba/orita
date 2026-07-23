@@ -67,11 +67,40 @@ def compute_word_state(root: str = ROOT) -> dict:
     return {"files": dict(sorted(files.items()))}
 
 
+class WordWatchTamperedError(RuntimeError):
+    """Raised by last_word_state() when the log's most recent line is not
+    valid JSON. Mirrors tools/change_gate.py's PostedGapLogTamperedError:
+    skipping past a corrupted tip and falling back to an older valid entry
+    would let word_delta() silently guess -- and guessing wrong either
+    masks real new words from Thierry (guesses "unchanged" when the last
+    real check no longer reflects the tracked files) or manufactures a
+    false ritual note (guesses "changed" on stale, no-longer-true state).
+    Run this tool's `check` command by hand to see the break, then repair
+    the log before the next real check/record."""
+
+
 def _entries(path: str = LOG) -> list:
+    """Every line in the word-check log, parsed.
+
+    A line that is not even valid JSON any more (a bad hand-edit, a stray
+    merge-conflict marker, a truncated write) is not allowed to crash the
+    caller with an uncaught json.JSONDecodeError -- it comes back marked
+    {"_malformed": True, "_error": ...} instead, the same convention
+    tools/ledger.py's _entries() already uses for its own tampered-tablet
+    case (mirrored since in change_gate.py and x_post_queue.py).
+    """
     if not os.path.exists(path):
         return []
+    entries = []
     with open(path) as f:
-        return [json.loads(line) for line in f if line.strip()]
+        for line in f:
+            if not line.strip():
+                continue
+            try:
+                entries.append(json.loads(line))
+            except json.JSONDecodeError as exc:
+                entries.append({"_malformed": True, "_error": str(exc)})
+    return entries
 
 
 def _append(entry: dict, path: str = LOG) -> None:
@@ -81,9 +110,22 @@ def _append(entry: dict, path: str = LOG) -> None:
 
 
 def last_word_state(path: str = LOG):
-    """The most recently recorded real word check, or None."""
+    """The most recently recorded real word check, or None.
+
+    Raises WordWatchTamperedError if the log's last line isn't valid
+    JSON -- word_delta() must never guess past a corrupted tip.
+    """
     entries = _entries(path)
-    return entries[-1] if entries else None
+    if not entries:
+        return None
+    if entries[-1].get("_malformed"):
+        raise WordWatchTamperedError(
+            f"last_word_state(): the most recent line in {path} is not "
+            f"valid JSON ({entries[-1]['_error']}) -- refusing to guess "
+            "whether Thierry's words changed. Repair the log by hand, "
+            "then rerun."
+        )
+    return entries[-1]
 
 
 def record_word_check(state: dict, checked_at: str, path: str = LOG) -> None:

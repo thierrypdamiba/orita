@@ -99,6 +99,45 @@ class TestLastWordState(_TempTownCase):
         last = ww.last_word_state(path=self.log)
         self.assertEqual(last["checked_at"], "2026-07-15T01:00:00Z")
 
+    def test_entries_marks_a_malformed_line_instead_of_raising(self):
+        # A hand-edit, stray merge-conflict marker, or truncated write can
+        # leave a line that isn't valid JSON at all -- _entries() must name
+        # it, not crash with an uncaught json.JSONDecodeError (the exact
+        # crash tools/ledger.py's _entries() had before task 238's fix).
+        state = ww.compute_word_state(root=self.tmp)
+        ww.record_word_check(state, "2026-07-15T00:00:00Z", path=self.log)
+        with open(self.log, "a") as f:
+            f.write('{"files": {}, "checked_at": broken <<<< not json\n')
+        entries = ww._entries(path=self.log)
+        self.assertEqual(len(entries), 2)
+        self.assertTrue(entries[1]["_malformed"])
+        self.assertIn("_error", entries[1])
+
+    def test_raises_tampered_error_on_a_malformed_tip_instead_of_crashing(self):
+        state = ww.compute_word_state(root=self.tmp)
+        ww.record_word_check(state, "2026-07-15T00:00:00Z", path=self.log)
+        with open(self.log, "a") as f:
+            f.write('{"files": {}, "checked_at": broken <<<< not json\n')
+        # Pre-fix this raised an uncaught json.JSONDecodeError; it must now
+        # raise the named, catchable WordWatchTamperedError instead.
+        with self.assertRaises(ww.WordWatchTamperedError):
+            ww.last_word_state(path=self.log)
+
+    def test_a_valid_tip_after_a_malformed_earlier_line_is_unaffected(self):
+        # Only the TIP matters for last_word_state's guess-refusal -- an
+        # older malformed line sitting earlier in the log (already surfaced
+        # by _entries(), just not at the tip) must not block a real read.
+        state1 = ww.compute_word_state(root=self.tmp)
+        ww.record_word_check(state1, "2026-07-15T00:00:00Z", path=self.log)
+        with open(self.log, "a") as f:
+            f.write('{"broken <<<< not json\n')
+        with open(os.path.join(self.tmp, "HAND", "queue.md"), "a") as f:
+            f.write("a new petition\n")
+        state2 = ww.compute_word_state(root=self.tmp)
+        ww.record_word_check(state2, "2026-07-15T01:00:00Z", path=self.log)
+        last = ww.last_word_state(path=self.log)
+        self.assertEqual(last["checked_at"], "2026-07-15T01:00:00Z")
+
 
 class TestWordDelta(_TempTownCase):
     def test_due_when_never_checked_before(self):
