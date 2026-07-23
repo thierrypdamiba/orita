@@ -2,8 +2,13 @@
 drifts by one, the exact class of bug skipped.md's hand-narrated
 "N consecutive hours" already committed (claimed SEVENTH when six real
 checks had happened; claimed eighth while skipping that hour's check).
+
+Task 246 adds the json.loads-guard campaign's eighth sibling fix: a
+malformed line in either log must not crash the caller with an uncaught
+json.JSONDecodeError.
 """
 import importlib.util
+import json
 import os
 import sys
 import tempfile
@@ -401,6 +406,105 @@ class TestTieredEscalation(unittest.TestCase):
     def test_next_escalation_tier_none_with_no_active_outage(self):
         tier = xot.next_escalation_tier([], "X_PostTweet", "2026-07-22T09:09:00Z", escalation_entries=[])
         self.assertIsNone(tier)
+
+
+class TestTamperedCheckLog(_TempLogCase):
+    """Task 246: a malformed line (bad hand-edit, stray merge-conflict
+    marker, truncated write) in the check log must not crash
+    current_streak()/streak_started_at()/should_recheck() with an
+    uncaught json.JSONDecodeError -- the exact crash tools/ledger.py's
+    _entries() had before task 238's fix, mirrored here since task 245's
+    hour named this file as a remaining sibling."""
+
+    def test_entries_marks_a_malformed_line_instead_of_raising(self):
+        xot.record_check("X_PostTweet", "forbidden", "2026-07-14T01:09:00Z", path=self.path)
+        with open(self.path, "a", encoding="utf-8") as f:
+            f.write('{"tool": "broken", broken <<<< not json\n')
+        entries = xot._entries(self.path)
+        self.assertEqual(len(entries), 2)
+        self.assertTrue(entries[1]["_malformed"])
+        self.assertIn("_error", entries[1])
+
+    def test_current_streak_raises_tampered_error_when_a_malformed_line_exists_anywhere(self):
+        # The malformed line sits BEFORE the tip, not at it -- current_streak
+        # can walk arbitrarily far back through a long trailing streak, so it
+        # must refuse rather than silently skip a line that could belong to
+        # the tool it's counting.
+        xot.record_check("X_PostTweet", "forbidden", "2026-07-14T01:09:00Z", path=self.path)
+        with open(self.path, "a", encoding="utf-8") as f:
+            f.write('{"tool": "broken", broken <<<< not json\n')
+            f.write(
+                json.dumps(
+                    {
+                        "type": "check",
+                        "tool": "X_PostTweet",
+                        "status": "forbidden",
+                        "checked_at": "2026-07-14T02:09:00Z",
+                    }
+                )
+                + "\n"
+            )
+        entries = xot._entries(self.path)
+        with self.assertRaises(xot.XOutageTrackerTamperedError):
+            xot.current_streak(entries, "X_PostTweet")
+
+    def test_streak_started_at_raises_tampered_error_on_a_malformed_existing_line(self):
+        xot.record_check("X_PostTweet", "forbidden", "2026-07-14T01:09:00Z", path=self.path)
+        with open(self.path, "a", encoding="utf-8") as f:
+            f.write('{"tool": "broken", broken <<<< not json\n')
+        entries = xot._entries(self.path)
+        with self.assertRaises(xot.XOutageTrackerTamperedError):
+            xot.streak_started_at(entries, "X_PostTweet")
+
+    def test_should_recheck_raises_tampered_error_on_a_malformed_existing_line(self):
+        xot.record_check("X_PostTweet", "forbidden", "2026-07-14T01:09:00Z", path=self.path)
+        with open(self.path, "a", encoding="utf-8") as f:
+            f.write('{"tool": "broken", broken <<<< not json\n')
+        entries = xot._entries(self.path)
+        with self.assertRaises(xot.XOutageTrackerTamperedError):
+            xot.should_recheck(entries, "X_PostTweet", "2026-07-14T10:00:00Z")
+
+
+class TestTamperedEscalationLog(_TempLogCase):
+    """Task 246: the same malformed-line guard, for the escalation log.
+    already_escalated_for_streak must scan the whole escalation history to
+    know whether a given (tool, streak, tier) already fired -- a malformed
+    line anywhere could be hiding exactly that prior escalation, so it must
+    refuse rather than silently treat it as a non-match."""
+
+    def test_escalation_entries_marks_a_malformed_line_instead_of_raising(self):
+        xot.record_escalation("X_PostTweet", "2026-07-14T01:09:00Z", "2026-07-16T02:00:00Z", 48.85, path=self.path)
+        with open(self.path, "a", encoding="utf-8") as f:
+            f.write('{"tool": "broken", broken <<<< not json\n')
+        entries = xot._escalation_entries(path=self.path)
+        self.assertEqual(len(entries), 2)
+        self.assertTrue(entries[1]["_malformed"])
+        self.assertIn("_error", entries[1])
+
+    def test_already_escalated_for_streak_raises_tampered_error_when_a_malformed_line_exists_anywhere(self):
+        xot.record_escalation("X_PostTweet", "2026-07-14T01:09:00Z", "2026-07-16T02:00:00Z", 48.85, path=self.path)
+        with open(self.path, "a", encoding="utf-8") as f:
+            f.write('{"tool": "broken", broken <<<< not json\n')
+        entries = xot._escalation_entries(path=self.path)
+        with self.assertRaises(xot.XOutageTrackerTamperedError):
+            xot.already_escalated_for_streak(entries, "X_PostTweet", "2026-07-14T01:09:00Z")
+
+    def test_should_escalate_raises_tampered_error_on_a_malformed_escalation_line(self):
+        check_entries = [
+            {"type": "check", "tool": "X_PostTweet", "status": "forbidden", "checked_at": "2026-07-14T01:09:00Z"}
+        ]
+        xot.record_escalation("X_PostTweet", "2026-07-14T01:09:00Z", "2026-07-16T02:00:00Z", 48.85, path=self.path)
+        with open(self.path, "a", encoding="utf-8") as f:
+            f.write('{"tool": "broken", broken <<<< not json\n')
+        escalation_entries = xot._escalation_entries(path=self.path)
+        with self.assertRaises(xot.XOutageTrackerTamperedError):
+            xot.should_escalate(
+                check_entries,
+                "X_PostTweet",
+                "2026-07-16T02:00:00Z",
+                threshold_hours=48.0,
+                escalation_entries=escalation_entries,
+            )
 
 
 if __name__ == "__main__":

@@ -79,11 +79,52 @@ STATUSES = ("ok", "forbidden")
 TRACKED_TOOLS = ("X_PostTweet", "X_GetUserTweets", "X_WhoAmI")
 
 
+class XOutageTrackerTamperedError(RuntimeError):
+    """Raised when a tool-filtered read (current_streak/streak_started_at/
+    last_checked_at/hours_since_last_check/should_recheck), or an
+    escalation-history read (already_escalated_for_streak/should_escalate/
+    next_escalation_tier), finds a malformed line anywhere in its log.
+    Mirrors tools/ci_watch.py's CIWatchTamperedError and
+    tools/voice_window_check.py's VoiceWindowTamperedError (task 246): a
+    malformed check-log line has lost its "type"/"tool" fields, so
+    _tool_entries' filter would silently drop it from EVERY tool's view
+    rather than just the one it really belonged to -- guessing which tool's
+    streak it was could stitch two real entries together that shouldn't be
+    adjacent, silently shortening or lengthening a reported outage streak
+    (and, downstream, should_escalate's threshold math). A malformed
+    escalation-log line loses its "tool"/"streak_started_at"/
+    "threshold_hours" fields the same way, so already_escalated_for_streak
+    would silently treat it as a non-match instead of an unreadable prior
+    escalation it can't rule out -- risking a duplicate notification for a
+    tier that already fired. Refuse rather than guess, the same discipline
+    tasks 238-245 already applied to their own logs. Run this tool's
+    `status` command by hand to see the break, then repair the log before
+    the next real check/record."""
+
+
 def _entries(path=LOG):
+    """Every line in the X-outage check log, parsed.
+
+    A line that is not even valid JSON any more (a bad hand-edit, a stray
+    merge-conflict marker, a truncated write) is not allowed to crash the
+    caller with an uncaught json.JSONDecodeError -- it comes back marked
+    {"_malformed": True, "_error": ...} instead, the same convention
+    tools/ledger.py's _entries() uses (mirrored since in change_gate.py,
+    x_post_queue.py, word_watch.py, consent_grant_log.py, ci_watch.py,
+    scribe_growth_check.py, voice_window_check.py).
+    """
     if not os.path.exists(path):
         return []
+    entries = []
     with open(path) as f:
-        return [json.loads(line) for line in f if line.strip()]
+        for line in f:
+            if not line.strip():
+                continue
+            try:
+                entries.append(json.loads(line))
+            except json.JSONDecodeError as exc:
+                entries.append({"_malformed": True, "_error": str(exc)})
+    return entries
 
 
 def _append(entry, path=LOG):
@@ -100,6 +141,13 @@ def record_check(tool: str, status: str, checked_at: str, path=LOG) -> None:
 
 
 def _tool_entries(entries: list, tool: str) -> list:
+    for e in entries:
+        if e.get("_malformed"):
+            raise XOutageTrackerTamperedError(
+                f"_tool_entries({tool!r}): the log holds a line that is not "
+                f"valid JSON ({e.get('_error')}) -- refusing to guess which "
+                "tool it belonged to. Repair the log by hand, then rerun."
+            )
     return [e for e in entries if e.get("type") == "check" and e.get("tool") == tool]
 
 
@@ -160,10 +208,23 @@ def should_recheck(entries: list, tool: str, now: str, cooldown_hours: float = D
 
 
 def _escalation_entries(path=ESCALATION_LOG) -> list:
+    """Every line in the escalation log, parsed.
+
+    Same convention as _entries() above: an unparseable line comes back
+    marked {"_malformed": True, "_error": ...} instead of raising.
+    """
     if not os.path.exists(path):
         return []
+    entries = []
     with open(path) as f:
-        return [json.loads(line) for line in f if line.strip()]
+        for line in f:
+            if not line.strip():
+                continue
+            try:
+                entries.append(json.loads(line))
+            except json.JSONDecodeError as exc:
+                entries.append({"_malformed": True, "_error": str(exc)})
+    return entries
 
 
 def record_escalation(
@@ -210,6 +271,14 @@ def already_escalated_for_streak(
     tier -- an entry recorded before this task (no `threshold_hours` field)
     reads back as the 48.0h tier, its only tier at the time.
     """
+    for e in escalation_entries:
+        if e.get("_malformed"):
+            raise XOutageTrackerTamperedError(
+                f"already_escalated_for_streak({tool!r}): the escalation log "
+                f"holds a line that is not valid JSON ({e.get('_error')}) -- "
+                "refusing to guess whether this tier already fired. Repair "
+                "the log by hand, then rerun."
+            )
     return any(
         e.get("type") == "escalation"
         and e.get("tool") == tool
