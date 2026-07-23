@@ -126,6 +126,45 @@ class AppendOnlyAndCountingCase(unittest.TestCase):
         self.assertEqual(len(second_pass_lines), len(first_pass_lines) + 1)
 
 
+class TamperedLogCase(unittest.TestCase):
+    """A line that is not even valid JSON any more must not crash the
+    reader, but the toolkit count must still refuse rather than guess
+    past it (tasks 238-241's sibling convention)."""
+
+    def setUp(self):
+        self.tmp = tempfile.mkdtemp()
+        self.addCleanup(__import__("shutil").rmtree, self.tmp, ignore_errors=True)
+        self.log_path = os.path.join(self.tmp, "log.jsonl")
+
+    def test_a_malformed_line_does_not_crash_entries(self):
+        cgl.record_grant(
+            "alice", "github", _REAL_ISSUE, REQUIRED_SCOPES["github"], "2026-07-19T01:00:00Z", path=self.log_path
+        )
+        with open(self.log_path, "a", encoding="utf-8") as f:
+            f.write("not valid json at all\n")
+        entries = cgl._entries(self.log_path)
+        self.assertEqual(len(entries), 2)
+        self.assertTrue(entries[1]["_malformed"])
+
+    def test_a_malformed_line_makes_the_toolkit_count_refuse(self):
+        cgl.record_grant(
+            "alice", "github", _REAL_ISSUE, REQUIRED_SCOPES["github"], "2026-07-19T01:00:00Z", path=self.log_path
+        )
+        with open(self.log_path, "a", encoding="utf-8") as f:
+            f.write("not valid json at all\n")
+        with self.assertRaises(cgl.ConsentLogTamperedError):
+            cgl.real_distinct_toolkit_count(self.log_path)
+
+    def test_a_clean_log_is_unaffected_by_the_new_guard(self):
+        cgl.record_grant(
+            "alice", "github", _REAL_ISSUE, REQUIRED_SCOPES["github"], "2026-07-19T01:00:00Z", path=self.log_path
+        )
+        cgl.record_grant(
+            "alice", "x", _REAL_ISSUE, REQUIRED_SCOPES["x"], "2026-07-19T02:00:00Z", path=self.log_path
+        )
+        self.assertEqual(cgl.real_distinct_toolkit_count(self.log_path), 2)
+
+
 class RealLiveStateCase(unittest.TestCase):
     """The real point: as of this task, zero real human consents have
     ever been recorded anywhere in this town -- the actual town log

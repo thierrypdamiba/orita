@@ -63,11 +63,27 @@ def _entries(path: str = LOG) -> list:
     """Every real recorded grant, oldest first. Empty list if the log has
     never been written -- no real consent ever having happened is not an
     error, the same "never checked = honest zero" shape every other
-    durable log in this town already holds."""
+    durable log in this town already holds.
+
+    A line that is not even valid JSON any more (a bad hand-edit, a stray
+    merge-conflict marker, a truncated write) does not crash the caller --
+    it comes back as {"_malformed": True, "_error": ...} instead, mirroring
+    tools/ledger.py's, tools/change_gate.py's, tools/x_post_queue.py's, and
+    tools/word_watch.py's own convention (tasks 238-241).
+    real_distinct_toolkit_count() is the one that decides a malformed line
+    here is never safe to ignore."""
     if not os.path.exists(path):
         return []
+    entries = []
     with open(path, encoding="utf-8") as f:
-        return [json.loads(line) for line in f if line.strip()]
+        for line in f:
+            if not line.strip():
+                continue
+            try:
+                entries.append(json.loads(line))
+            except json.JSONDecodeError as exc:
+                entries.append({"_malformed": True, "_error": str(exc)})
+    return entries
 
 
 def record_grant(
@@ -107,10 +123,34 @@ def record_grant(
     return entry
 
 
+class ConsentLogTamperedError(RuntimeError):
+    """Raised by distinct_toolkits()/real_distinct_toolkit_count() when any
+    line in the log is unreadable.
+
+    Unlike tools/ledger.py's hash chain, a toolkit-bearing grant here can
+    sit anywhere in the file, not just at the tip -- mirroring
+    tools/x_post_queue.py's own stricter any-line rule (task 240):
+    silently skipping just the unreadable line would let STRATEGY.md's
+    leading toolkit-count metric quietly undercount a real recorded grant,
+    the same "guessing past corruption hides real state" risk the sibling
+    fixes already refuse to take."""
+
+
 def distinct_toolkits(entries: list) -> set:
     """The set of distinct toolkit names across every real recorded
     grant -- never a count of grants themselves (one human confirming
-    both Gmail and Calendar is two toolkits, not two "users")."""
+    both Gmail and Calendar is two toolkits, not two "users").
+
+    Refuses via ConsentLogTamperedError if any entry is malformed -- see
+    that class's docstring for why a partial read here is unsafe."""
+    malformed = [e for e in entries if e.get("_malformed")]
+    if malformed:
+        raise ConsentLogTamperedError(
+            f"distinct_toolkits(): refusing -- {len(malformed)} unreadable line(s) "
+            "could be hiding a real recorded grant, and guessing past that risks "
+            "silently undercounting STRATEGY.md's toolkit metric. Repair the log "
+            f"by hand, then re-run. First error: {malformed[0]['_error']}"
+        )
     return {e["toolkit"] for e in entries}
 
 
