@@ -92,6 +92,39 @@ class LedgerCoreCase(unittest.TestCase):
             f.writelines(lines)
         self.assertFalse(self.mod.verify())
 
+    def test_entries_marks_a_malformed_line_instead_of_raising(self):
+        # A hand-edit, stray merge-conflict marker, or truncated write can
+        # leave a line that isn't valid JSON at all -- _entries() must name
+        # it, not crash with an uncaught json.JSONDecodeError.
+        self.mod.append("nisaba", "test", "one", "2026-07-14T00:00:00+00:00")
+        with open(self.mod.LEDGER, "a") as f:
+            f.write('{"seq": 1, "broken": <<<< not json\n')
+        entries = self.mod._entries()
+        self.assertEqual(len(entries), 2)
+        self.assertTrue(entries[1]["_malformed"])
+        self.assertIn("_error", entries[1])
+
+    def test_verify_reports_broken_chain_on_malformed_line_not_a_crash(self):
+        self.mod.append("nisaba", "test", "one", "2026-07-14T00:00:00+00:00")
+        self.mod.append("nisaba", "test", "two", "2026-07-14T00:01:00+00:00")
+        with open(self.mod.LEDGER) as f:
+            lines = f.readlines()
+        lines[1] = lines[1].rstrip("\n") + " <<<< not json\n"
+        with open(self.mod.LEDGER, "w") as f:
+            f.writelines(lines)
+        # Pre-fix this raised json.JSONDecodeError; it must now return False.
+        self.assertFalse(self.mod.verify())
+
+    def test_append_refuses_on_a_malformed_tip_instead_of_crashing(self):
+        self.mod.append("nisaba", "test", "one", "2026-07-14T00:00:00+00:00")
+        with open(self.mod.LEDGER, "a") as f:
+            f.write('{"seq": 1, "broken": <<<< not json\n')
+        with self.assertRaises(self.mod.LedgerTamperedError):
+            self.mod.append("nisaba", "test", "two", "2026-07-14T00:01:00+00:00")
+        # Refusing must not have written a third line on top of the break.
+        with open(self.mod.LEDGER) as f:
+            self.assertEqual(len(f.readlines()), 2)
+
 
 class ParseAppendArgsCase(unittest.TestCase):
     """The CLI guard: rejects flag-shaped actor/act, mirroring the real

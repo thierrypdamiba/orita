@@ -19,10 +19,28 @@ GENESIS = "0" * 64
 
 
 def _entries():
+    """Every line in the ledger, parsed.
+
+    A line that is not even valid JSON any more (a bad hand-edit, a stray
+    merge-conflict marker, a truncated write) is not allowed to crash the
+    caller -- that is exactly the "the record has been touched" case verify()
+    already exists to report, not an uncaught json.JSONDecodeError. Such a
+    line comes back as {"_malformed": True, "_error": ...} instead, mirroring
+    the same convention fencepost/seam_engine/ledger.py's read_records()
+    already uses for its own tampered-tablet case.
+    """
     if not os.path.exists(LEDGER):
         return []
+    entries = []
     with open(LEDGER) as f:
-        return [json.loads(line) for line in f if line.strip()]
+        for line in f:
+            if not line.strip():
+                continue
+            try:
+                entries.append(json.loads(line))
+            except json.JSONDecodeError as exc:
+                entries.append({"_malformed": True, "_error": str(exc)})
+    return entries
 
 
 def _hash(entry_without_hash: dict, prev_hash: str) -> str:
@@ -30,8 +48,24 @@ def _hash(entry_without_hash: dict, prev_hash: str) -> str:
     return hashlib.sha256((prev_hash + payload).encode("utf-8")).hexdigest()
 
 
+class LedgerTamperedError(RuntimeError):
+    """Raised by append() when the chain's current tip is a line _entries()
+    could not even parse. Appending on top of an unreadable tip would either
+    crash on the missing "hash" key or, if silently skipped past, would chain
+    the new entry from the wrong place -- resynchronizing straight over the
+    exact corrupted point verify() exists to report. Refusing instead keeps
+    that same refusal: run `python3 tools/ledger.py verify` to see the break."""
+
+
 def append(actor: str, act: str, detail: str, ts: str) -> dict:
     entries = _entries()
+    if entries and entries[-1].get("_malformed"):
+        raise LedgerTamperedError(
+            f"append(): refusing to append -- the most recent line in {LEDGER} "
+            f"is not valid JSON ({entries[-1]['_error']}) -- the record has "
+            "been touched. Run `python3 tools/ledger.py verify` and repair "
+            "the ledger by hand before appending again."
+        )
     prev = entries[-1]["hash"] if entries else GENESIS
     entry = {
         "seq": len(entries),  # zero-indexed; Off-By-One insisted, Nisaba conceded the point once
@@ -51,6 +85,9 @@ def append(actor: str, act: str, detail: str, ts: str) -> dict:
 def verify() -> bool:
     prev = GENESIS
     for i, e in enumerate(_entries()):
+        if e.get("_malformed"):
+            print(f"CHAIN BROKEN at seq {i}. The record has been touched.")
+            return False
         h = e.pop("hash")
         if e["prev"] != prev or _hash(e, prev) != h:
             print(f"CHAIN BROKEN at seq {i}. The record has been touched.")
