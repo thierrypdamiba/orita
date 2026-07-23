@@ -84,11 +84,40 @@ def in_window(author_date_iso: str) -> bool:
     return WINDOW_START_HOUR <= dt.hour < WINDOW_END_HOUR
 
 
+class VoiceWindowTamperedError(RuntimeError):
+    """Raised when check()/record_commits() finds a malformed line anywhere
+    in the log. Mirrors tools/ci_watch.py's CIWatchTamperedError (task 243)
+    and tools/x_post_queue.py's QueueTamperedError (task 240): check()'s own
+    violation count folds over EVERY known entry, not just the log's tip, so
+    a malformed line anywhere -- not only at the end -- could be masking a
+    real Iron Rule #7 violation. Refuse rather than guess, the same
+    discipline tasks 238-244 already applied to their own logs. Run this
+    tool's `check` command by hand to see the break, then repair the log
+    before the next real check."""
+
+
 def _entries(path: str = LOG) -> list:
     if not os.path.exists(path):
         return []
+    entries = []
     with open(path, encoding="utf-8") as f:
-        return [json.loads(line) for line in f if line.strip()]
+        for line in f:
+            if not line.strip():
+                continue
+            try:
+                entries.append(json.loads(line))
+            except json.JSONDecodeError as exc:
+                entries.append({"_malformed": True, "_error": str(exc)})
+    return entries
+
+
+def _assert_untampered(entries: list) -> None:
+    for e in entries:
+        if e.get("_malformed"):
+            raise VoiceWindowTamperedError(
+                f"voice-window log holds a line that is not valid JSON ({e.get('_error')}) "
+                "-- refusing to guess whether it hid a real violation. Repair the log by hand, then rerun."
+            )
 
 
 def record_commits(commits: list, now_iso: str, path: str = LOG) -> list:
@@ -97,7 +126,9 @@ def record_commits(commits: list, now_iso: str, path: str = LOG) -> list:
     Zashiki-Warashi, live this hour). Idempotent by sha -- repeated or
     overlapping input never duplicates a log line. Returns the entries
     actually appended."""
-    known = {e["sha"] for e in _entries(path)}
+    existing = _entries(path)
+    _assert_untampered(existing)
+    known = {e["sha"] for e in existing}
     new_entries = []
     for c in commits:
         if c["sha"] in known:
@@ -135,6 +166,7 @@ def check(
             raise ValueError("now_iso is required when commits is supplied")
         newly_logged = record_commits(commits, now_iso, path=path)
     known = _entries(path)
+    _assert_untampered(known)
     violations = [e for e in known if not e["in_window"]]
     cutoff = _parse(fix_landed_at)
     new_violations = [e for e in violations if _parse(e["author_date"]) >= cutoff]

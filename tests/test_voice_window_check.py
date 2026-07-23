@@ -1,3 +1,4 @@
+import json
 import os
 import shutil
 import sys
@@ -123,6 +124,74 @@ class VoiceWindowCheckCase(unittest.TestCase):
         self.assertEqual(result["violation_count"], 20)
         self.assertEqual(result["new_violations"], [])
         self.assertTrue(result["clean"])
+
+
+class TestTamperedLog(unittest.TestCase):
+    """Task 245: a malformed line (bad hand-edit, stray merge-conflict
+    marker, truncated write) must not crash record_commits()/check() with
+    an uncaught json.JSONDecodeError -- the exact crash tools/ledger.py's
+    _entries() had before task 238's fix, mirrored here since task 244's
+    hour named this file as a remaining sibling."""
+
+    def setUp(self):
+        self.log = os.path.join(tempfile.mkdtemp(), "voice-window-log.jsonl")
+        self.addCleanup(lambda: shutil.rmtree(os.path.dirname(self.log), ignore_errors=True))
+
+    def test_entries_marks_a_malformed_line_instead_of_raising(self):
+        vwc.record_commits(
+            [{"sha": "a1", "author": "Nyx", "author_date": "2026-07-16T03:00:00Z"}],
+            "2026-07-17T07:00:00Z",
+            path=self.log,
+        )
+        with open(self.log, "a", encoding="utf-8") as f:
+            f.write('{"sha": "broken", broken <<<< not json\n')
+        entries = vwc._entries(self.log)
+        self.assertEqual(len(entries), 2)
+        self.assertTrue(entries[1]["_malformed"])
+        self.assertIn("_error", entries[1])
+
+    def test_check_raises_tampered_error_when_a_malformed_line_exists_anywhere(self):
+        # The malformed line here sits BEFORE the tip, not at it -- check()'s
+        # violation count folds over every known entry, so it must refuse
+        # rather than silently skip a line that could hide a real violation.
+        # Written directly to the file (not via record_commits, which now
+        # guards on its own read too) to isolate check()'s own guard.
+        vwc.record_commits(
+            [{"sha": "a1", "author": "Nyx", "author_date": "2026-07-16T03:00:00Z"}],
+            "2026-07-17T07:00:00Z",
+            path=self.log,
+        )
+        with open(self.log, "a", encoding="utf-8") as f:
+            f.write('{"sha": "broken", broken <<<< not json\n')
+            f.write(
+                json.dumps(
+                    {
+                        "sha": "a2",
+                        "author": "Nyx",
+                        "author_date": "2026-07-16T14:55:56Z",
+                        "in_window": False,
+                        "logged_at": "2026-07-17T07:05:00Z",
+                    }
+                )
+                + "\n"
+            )
+        with self.assertRaises(vwc.VoiceWindowTamperedError):
+            vwc.check(commits=None, now_iso=None, path=self.log)
+
+    def test_record_commits_raises_tampered_error_on_a_malformed_existing_line(self):
+        vwc.record_commits(
+            [{"sha": "a1", "author": "Nyx", "author_date": "2026-07-16T03:00:00Z"}],
+            "2026-07-17T07:00:00Z",
+            path=self.log,
+        )
+        with open(self.log, "a", encoding="utf-8") as f:
+            f.write('{"sha": "broken", broken <<<< not json\n')
+        with self.assertRaises(vwc.VoiceWindowTamperedError):
+            vwc.record_commits(
+                [{"sha": "a2", "author": "Nyx", "author_date": "2026-07-16T14:55:56Z"}],
+                "2026-07-17T07:05:00Z",
+                path=self.log,
+            )
 
 
 if __name__ == "__main__":
