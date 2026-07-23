@@ -164,6 +164,38 @@ class TestLastPostedGap(_TempLogCase):
         cg.record_posted_gap("second gap", "2026-07-14T02:00:00Z", path=self.path)
         self.assertEqual(cg.last_posted_gap(path=self.path), "second gap")
 
+    def test_entries_marks_a_malformed_line_instead_of_raising(self):
+        # A hand-edit, stray merge-conflict marker, or truncated write can
+        # leave a line that isn't valid JSON at all -- _entries() must name
+        # it, not crash with an uncaught json.JSONDecodeError (the exact
+        # crash tools/ledger.py's _entries() had before task 238's fix).
+        cg.record_posted_gap("first gap", "2026-07-14T01:00:00Z", path=self.path)
+        with open(self.path, "a") as f:
+            f.write('{"type": "posted", "gap": "broken <<<< not json\n')
+        entries = cg._entries(path=self.path)
+        self.assertEqual(len(entries), 2)
+        self.assertTrue(entries[1]["_malformed"])
+        self.assertIn("_error", entries[1])
+
+    def test_raises_tampered_error_on_a_malformed_tip_instead_of_crashing(self):
+        cg.record_posted_gap("first gap", "2026-07-14T01:00:00Z", path=self.path)
+        with open(self.path, "a") as f:
+            f.write('{"type": "posted", "gap": "broken <<<< not json\n')
+        # Pre-fix this raised an uncaught json.JSONDecodeError; it must now
+        # raise the named, catchable PostedGapLogTamperedError instead.
+        with self.assertRaises(cg.PostedGapLogTamperedError):
+            cg.last_posted_gap(path=self.path)
+
+    def test_a_valid_tip_after_a_malformed_earlier_line_is_unaffected(self):
+        # Only the TIP matters for last_posted_gap's guess-refusal -- an
+        # older malformed line sitting earlier in the log (already surfaced
+        # by _entries(), just not at the tip) must not block a real read.
+        cg.record_posted_gap("first gap", "2026-07-14T01:00:00Z", path=self.path)
+        with open(self.path, "a") as f:
+            f.write('{"broken <<<< not json\n')
+        cg.record_posted_gap("second gap", "2026-07-14T02:00:00Z", path=self.path)
+        self.assertEqual(cg.last_posted_gap(path=self.path), "second gap")
+
 
 class TestShouldPostGap(_TempLogCase):
     def test_due_when_never_posted_before(self):

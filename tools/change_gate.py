@@ -86,11 +86,39 @@ def extract_gap_identity(report_text: str):
     return f"{headline} :: {detail}" if detail else headline
 
 
+class PostedGapLogTamperedError(RuntimeError):
+    """Raised by last_posted_gap() when the log's most recent line is not
+    valid JSON. Mirrors tools/ledger.py's LedgerTamperedError: skipping past
+    a corrupted tip and falling back to an older valid entry would let the
+    change gate silently guess -- and guessing wrong either duplicates a
+    post (guesses "due" when the real last post already covered this gap)
+    or suppresses one (guesses "not due" on stale, no-longer-true evidence).
+    Run this tool's `check` command by hand to see the break, then repair
+    the log before the next real check/record."""
+
+
 def _entries(path=LOG):
+    """Every line in the posted-gap log, parsed.
+
+    A line that is not even valid JSON any more (a bad hand-edit, a stray
+    merge-conflict marker, a truncated write) is not allowed to crash the
+    caller with an uncaught json.JSONDecodeError -- it comes back marked
+    {"_malformed": True, "_error": ...} instead, the same convention
+    tools/ledger.py's _entries() already uses for its own tampered-tablet
+    case (itself mirroring fencepost/seam_engine/ledger.py's read_records()).
+    """
     if not os.path.exists(path):
         return []
+    entries = []
     with open(path) as f:
-        return [json.loads(line) for line in f if line.strip()]
+        for line in f:
+            if not line.strip():
+                continue
+            try:
+                entries.append(json.loads(line))
+            except json.JSONDecodeError as exc:
+                entries.append({"_malformed": True, "_error": str(exc)})
+    return entries
 
 
 def _append(entry, path=LOG):
@@ -100,9 +128,21 @@ def _append(entry, path=LOG):
 
 
 def last_posted_gap(path=LOG):
-    """The gap text of the most recently recorded real post, or None."""
+    """The gap text of the most recently recorded real post, or None.
+
+    Raises PostedGapLogTamperedError if the log's last line isn't valid
+    JSON -- the change gate must never guess past a corrupted tip.
+    """
     entries = _entries(path)
-    return entries[-1]["gap"] if entries else None
+    if not entries:
+        return None
+    if entries[-1].get("_malformed"):
+        raise PostedGapLogTamperedError(
+            f"last_posted_gap(): the most recent line in {path} is not "
+            f"valid JSON ({entries[-1]['_error']}) -- refusing to guess "
+            "whether a post is due. Repair the log by hand, then rerun."
+        )
+    return entries[-1]["gap"]
 
 
 def record_posted_gap(gap_text: str, posted_at: str, path=LOG) -> None:
