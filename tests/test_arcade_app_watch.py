@@ -105,6 +105,43 @@ class TestLastAppState(_TempLogCase):
         last = aw.last_app_state(path=self.path)
         self.assertEqual(last["connected_app_ids"], ["arcade-github", "arcade-google", "arcade-x"])
 
+    def test_entries_marks_a_malformed_line_instead_of_raising(self):
+        # A hand-edit, stray merge-conflict marker, or truncated write can
+        # leave a line that isn't valid JSON at all -- _entries() must name
+        # it, not crash with an uncaught json.JSONDecodeError (the exact
+        # crash tools/ledger.py's _entries() had before task 238's fix).
+        state = aw.compute_app_state(APPS_GITHUB_X_ONLY)
+        aw.record_app_check(state, "2026-07-18T02:00:00Z", path=self.path)
+        with open(self.path, "a") as f:
+            f.write("not valid json garbage\n")
+        entries = aw._entries(path=self.path)
+        self.assertEqual(len(entries), 2)
+        self.assertTrue(entries[1]["_malformed"])
+        self.assertIn("_error", entries[1])
+
+    def test_raises_tampered_error_on_a_malformed_tip_instead_of_crashing(self):
+        state = aw.compute_app_state(APPS_GITHUB_X_ONLY)
+        aw.record_app_check(state, "2026-07-18T02:00:00Z", path=self.path)
+        with open(self.path, "a") as f:
+            f.write("not valid json garbage\n")
+        # Pre-fix this raised an uncaught json.JSONDecodeError; it must now
+        # raise the named, catchable ArcadeAppWatchTamperedError instead.
+        with self.assertRaises(aw.ArcadeAppWatchTamperedError):
+            aw.last_app_state(path=self.path)
+
+    def test_a_valid_tip_after_a_malformed_earlier_line_is_unaffected(self):
+        # Only the TIP matters for last_app_state's guess-refusal -- an
+        # older malformed line sitting earlier in the log (already surfaced
+        # by _entries(), just not at the tip) must not block a real read.
+        state1 = aw.compute_app_state(APPS_GITHUB_X_ONLY)
+        aw.record_app_check(state1, "2026-07-18T02:00:00Z", path=self.path)
+        with open(self.path, "a") as f:
+            f.write("not valid json garbage\n")
+        state2 = aw.compute_app_state(APPS_PLUS_GOOGLE)
+        aw.record_app_check(state2, "2026-07-18T03:00:00Z", path=self.path)
+        last = aw.last_app_state(path=self.path)
+        self.assertEqual(last["connected_app_ids"], ["arcade-github", "arcade-google", "arcade-x"])
+
 
 class TestAppDelta(_TempLogCase):
     def test_due_when_never_checked_before_and_names_current_apps(self):

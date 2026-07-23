@@ -48,6 +48,19 @@ import os
 LOG = os.path.join(os.path.dirname(__file__), "..", "HAND", "arcade-app-check-log.jsonl")
 
 
+class ArcadeAppWatchTamperedError(RuntimeError):
+    """Raised by last_app_state() when the log's most recent line is not
+    valid JSON. Mirrors tools/change_gate.py's PostedGapLogTamperedError and
+    tools/scribe_growth_check.py's ScribeGrowthLogTamperedError (task 247):
+    last_app_state, like last_posted_gap/last_scribe_state, only ever reads
+    the log's most recent line (app_delta compares this hour's live state
+    against nothing earlier), so skipping past a corrupted tip and falling
+    back to an older valid entry would silently misreport this hour's real
+    connect/disconnect/scope delta against a stale snapshot instead of the
+    true last one. Run this tool's `check` command by hand to see the
+    break, then repair the log before the next real check/record."""
+
+
 def compute_app_state(apps: list[dict]) -> dict:
     """Fold a live `Arcade_ListApps` read into the durable comparison shape.
 
@@ -68,10 +81,29 @@ def compute_app_state(apps: list[dict]) -> dict:
 
 
 def _entries(path=LOG):
+    """Every line in the arcade-app check log, parsed.
+
+    A line that is not even valid JSON any more (a bad hand-edit, a stray
+    merge-conflict marker, a truncated write) is not allowed to crash the
+    caller with an uncaught json.JSONDecodeError -- it comes back marked
+    {"_malformed": True, "_error": ...} instead, the same convention
+    tools/ledger.py's _entries() already uses (mirrored since in
+    change_gate.py, x_post_queue.py, word_watch.py, consent_grant_log.py,
+    ci_watch.py, scribe_growth_check.py, voice_window_check.py,
+    x_outage_tracker.py).
+    """
     if not os.path.exists(path):
         return []
+    entries = []
     with open(path) as f:
-        return [json.loads(line) for line in f if line.strip()]
+        for line in f:
+            if not line.strip():
+                continue
+            try:
+                entries.append(json.loads(line))
+            except json.JSONDecodeError as exc:
+                entries.append({"_malformed": True, "_error": str(exc)})
+    return entries
 
 
 def _append(entry, path=LOG):
@@ -81,9 +113,22 @@ def _append(entry, path=LOG):
 
 
 def last_app_state(path=LOG):
-    """The most recently recorded real app-connection check, or None."""
+    """The most recently recorded real app-connection check, or None.
+
+    Raises ArcadeAppWatchTamperedError if the log's last line isn't valid
+    JSON -- app_delta must never guess past a corrupted tip.
+    """
     entries = _entries(path)
-    return entries[-1] if entries else None
+    if not entries:
+        return None
+    if entries[-1].get("_malformed"):
+        raise ArcadeAppWatchTamperedError(
+            f"last_app_state(): the most recent line in {path} is not "
+            f"valid JSON ({entries[-1]['_error']}) -- refusing to guess "
+            "this hour's real connect/disconnect/scope delta against a "
+            "stale snapshot. Repair the log by hand, then rerun."
+        )
+    return entries[-1]
 
 
 def record_app_check(state: dict, checked_at: str, path=LOG) -> None:
