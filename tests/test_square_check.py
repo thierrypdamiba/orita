@@ -194,6 +194,46 @@ class TestLastSquareState(_TempLogCase):
         last = sc.last_square_state(path=self.path)
         self.assertEqual(last["issue_numbers"], [1, 2, 3, 5, 6])
 
+    def test_entries_marks_a_malformed_line_instead_of_raising(self):
+        # A hand-edit, stray merge-conflict marker, or truncated write can
+        # leave a line that isn't valid JSON at all -- _entries() must name
+        # it, not crash with an uncaught json.JSONDecodeError (the exact
+        # crash tools/ledger.py's _entries() had before task 238's fix).
+        state = sc.compute_square_state(ISSUES_BASE, PRS_NONE)
+        sc.record_square_check(state, "2026-07-14T20:00:00Z", path=self.path)
+        with open(self.path, "a") as f:
+            f.write("not valid json garbage\n")
+        entries = sc._entries(path=self.path)
+        self.assertEqual(len(entries), 2)
+        self.assertTrue(entries[1]["_malformed"])
+        self.assertIn("_error", entries[1])
+
+    def test_raises_tampered_error_on_a_malformed_tip_instead_of_crashing(self):
+        state = sc.compute_square_state(ISSUES_BASE, PRS_NONE)
+        sc.record_square_check(state, "2026-07-14T20:00:00Z", path=self.path)
+        with open(self.path, "a") as f:
+            f.write("not valid json garbage\n")
+        # Pre-fix this raised an uncaught json.JSONDecodeError; it must now
+        # raise the named, catchable SquareCheckTamperedError instead.
+        with self.assertRaises(sc.SquareCheckTamperedError):
+            sc.last_square_state(path=self.path)
+
+    def test_a_valid_tip_after_a_malformed_earlier_line_is_unaffected(self):
+        # Only the TIP matters for last_square_state's guess-refusal -- an
+        # older malformed line sitting earlier in the log (already surfaced
+        # by _entries(), just not at the tip) must not block a real read.
+        state1 = sc.compute_square_state(ISSUES_BASE, PRS_NONE)
+        sc.record_square_check(state1, "2026-07-14T20:00:00Z", path=self.path)
+        with open(self.path, "a") as f:
+            f.write("not valid json garbage\n")
+        state2 = sc.compute_square_state(
+            ISSUES_BASE + [{"number": 6, "updated_at": "2026-07-14T21:00:00Z"}],
+            PRS_NONE,
+        )
+        sc.record_square_check(state2, "2026-07-14T21:00:00Z", path=self.path)
+        last = sc.last_square_state(path=self.path)
+        self.assertEqual(last["issue_numbers"], [1, 2, 3, 5, 6])
+
 
 class TestSquareDelta(_TempLogCase):
     def test_due_when_never_checked_before(self):

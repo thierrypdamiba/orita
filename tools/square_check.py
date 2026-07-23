@@ -56,11 +56,43 @@ def compute_square_state(issues, prs):
     }
 
 
+class SquareCheckTamperedError(RuntimeError):
+    """Raised by last_square_state() when the log's most recent line is not
+    valid JSON. Mirrors tools/change_gate.py's PostedGapLogTamperedError and
+    tools/arcade_app_watch.py's ArcadeAppWatchTamperedError (tasks 239/247):
+    last_square_state, like last_posted_gap/last_app_state, only ever reads
+    the log's most recent line (square_delta compares this hour's live read
+    against nothing earlier), so skipping past a corrupted tip and falling
+    back to an older valid entry would silently misreport this hour's real
+    square delta against a stale snapshot instead of the true last one. Run
+    this tool's `check` command by hand to see the break, then repair the
+    log before the next real check/record."""
+
+
 def _entries(path=LOG):
+    """Every line in the square-check log, parsed.
+
+    A line that is not even valid JSON any more (a bad hand-edit, a stray
+    merge-conflict marker, a truncated write) is not allowed to crash the
+    caller with an uncaught json.JSONDecodeError -- it comes back marked
+    {"_malformed": True, "_error": ...} instead, the same convention
+    tools/ledger.py's _entries() already uses (mirrored since in
+    change_gate.py, x_post_queue.py, word_watch.py, consent_grant_log.py,
+    ci_watch.py, scribe_growth_check.py, voice_window_check.py,
+    x_outage_tracker.py, arcade_app_watch.py).
+    """
     if not os.path.exists(path):
         return []
+    entries = []
     with open(path) as f:
-        return [json.loads(line) for line in f if line.strip()]
+        for line in f:
+            if not line.strip():
+                continue
+            try:
+                entries.append(json.loads(line))
+            except json.JSONDecodeError as exc:
+                entries.append({"_malformed": True, "_error": str(exc)})
+    return entries
 
 
 def _append(entry, path=LOG):
@@ -70,9 +102,22 @@ def _append(entry, path=LOG):
 
 
 def last_square_state(path=LOG):
-    """The most recently recorded real square check, or None."""
+    """The most recently recorded real square check, or None.
+
+    Raises SquareCheckTamperedError if the log's last line isn't valid
+    JSON -- square_delta must never guess past a corrupted tip.
+    """
     entries = _entries(path)
-    return entries[-1] if entries else None
+    if not entries:
+        return None
+    if entries[-1].get("_malformed"):
+        raise SquareCheckTamperedError(
+            f"last_square_state(): the most recent line in {path} is not "
+            f"valid JSON ({entries[-1]['_error']}) -- refusing to guess "
+            "this hour's real square delta against a stale snapshot. "
+            "Repair the log by hand, then rerun."
+        )
+    return entries[-1]
 
 
 class DegenerateSquareStateError(ValueError):
