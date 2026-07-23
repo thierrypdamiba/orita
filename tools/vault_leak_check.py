@@ -87,11 +87,47 @@ def _founding_canon_corpus(orita_dir: str, public_corpus: list) -> list:
     return [(path, text) for path, text in public_corpus if _is_founding_record(orita_dir, path)]
 
 
-def _has_independent_public_provenance(snippet: str, min_run: int, known_corpus: list) -> bool:
+# Task 236: a polynomial rolling hash (Rabin-Karp) turns "does any
+# length-min_run window of snippet appear in haystack" from an O(offsets
+# * len(haystack)) repeated substring search into an O(len(haystack))
+# one-time hash-set build plus O(1) membership checks per window -- the
+# hash set is built ONCE per haystack (the full public corpus, or the
+# small founding-canon subset) and reused for every one of the hundreds
+# of vault lines checked against it, instead of rescanning the haystack
+# from byte zero for every single line. A hash hit is always confirmed
+# against the real string before being trusted (`_window_at` inside
+# `haystack`), so a hash collision can only ever cost a little extra
+# work, never produce a false leak or hide a real one.
+_HASH_MOD = (1 << 61) - 1
+_HASH_BASE = 1_000_003
+
+
+def _window_hashes(s: str, k: int):
+    """Yield (offset, hash) for every length-k window of s, in order,
+    via one O(len(s)) rolling-hash pass. Empty when len(s) < k."""
+    n = len(s)
+    if n < k:
+        return
+    power = pow(_HASH_BASE, k - 1, _HASH_MOD)
+    h = 0
+    for ch in s[:k]:
+        h = (h * _HASH_BASE + ord(ch)) % _HASH_MOD
+    yield 0, h
+    for i in range(k, n):
+        h = ((h - ord(s[i - k]) * power) * _HASH_BASE + ord(s[i])) % _HASH_MOD
+        yield i - k + 1, h
+
+
+def _haystack_hash_set(haystack: str, k: int) -> frozenset:
+    return frozenset(h for _offset, h in _window_hashes(haystack, k))
+
+
+def _has_independent_public_provenance(
+    snippet: str, min_run: int, canon_haystack: str, canon_hash_set: frozenset
+) -> bool:
     return any(
-        snippet[i : i + min_run] in text
-        for path, text in known_corpus
-        for i in range(len(snippet) - min_run + 1)
+        h in canon_hash_set and snippet[offset : offset + min_run] in canon_haystack
+        for offset, h in _window_hashes(snippet, min_run)
     )
 
 
@@ -146,6 +182,17 @@ def _significant_lines(path: str, min_run: int):
                 yield line_no, text
 
 
+def _build_combined_haystack(public_corpus: list, min_run: int) -> str:
+    """Task 236: one boundary-safe concatenation of every public file's
+    text, used as a cheap global pre-filter before ever touching an
+    individual file. The separator is NUL repeated min_run times -- NUL
+    never appears in a real utf-8 markdown file, and at min_run chars long
+    no window of length min_run can straddle two files' real content and
+    accidentally read as a match that exists in neither file alone."""
+    sep = "\x00" * min_run
+    return sep.join(text for _, text in public_corpus)
+
+
 def find_leaks(
     orita_dir: str = DEFAULT_ORITA_DIR,
     vault_dir: str = DEFAULT_VAULT_DIR,
@@ -156,7 +203,30 @@ def find_leaks(
     Returns a list of leak records, empty when the town's own blind-write
     discipline has genuinely held. Never writes, never calls sync_checkout.sh
     or any recovery -- the same "read the state, let a god act" boundary
-    check_checkout already holds."""
+    check_checkout already holds.
+
+    Task 236: the per-file inner loop used to redo the SAME len(snippet)
+    offset scan once per public file (offsets_per_line * num_public_files
+    substring searches per vault line, with each search itself costing
+    O(len(file_text))) -- with ROADMAP.md and ROADMAP-ARCHIVE-001-169.md
+    now over a megabyte combined and 460 public files total, this took
+    3+ minutes for a check `ritual_check.py` runs every single hour (and
+    that `tests/test_vault_leak_check.py`'s own
+    `test_real_checkouts_hold_zero_leaks_today` runs every CI run). An
+    earlier attempt at this fix just moved the same total bytes-scanned
+    into one combined string instead of 460 separate ones -- same
+    aggregate work, no real speedup. The actual fix builds a rolling-hash
+    set of the full public corpus ONCE (`_haystack_hash_set`, one
+    O(len(corpus)) pass), then every vault line's offset scan is O(1)
+    hash lookups against that set instead of O(len(corpus)) substring
+    scans -- the corpus is scanned once per run, not once per line. A
+    hash hit only ever triggers extra confirmation work (a real substring
+    check against the combined text, then only if that also hits does it
+    resolve which specific file(s) matched); a hash miss is trusted
+    outright, since `_haystack_hash_set` recording every real window means
+    a genuine leak can never produce an all-miss result. Same
+    offset-order, first-match-per-file result as the original nested
+    loop."""
     public_files = list(_iter_md_files(orita_dir))
     public_corpus = []
     for path in public_files:
@@ -167,32 +237,52 @@ def find_leaks(
             continue
 
     canon_corpus = _founding_canon_corpus(orita_dir, public_corpus)
+    canon_haystack = _build_combined_haystack(canon_corpus, min_run)
+    canon_hash_set = _haystack_hash_set(canon_haystack, min_run)
+
+    combined_haystack = _build_combined_haystack(public_corpus, min_run)
+    public_hash_set = _haystack_hash_set(combined_haystack, min_run)
 
     leaks = []
     for vault_path in _private_journal_files(vault_dir):
         vault_rel = os.path.relpath(vault_path, os.path.join(vault_dir, "vault"))
         for line_no, snippet in _significant_lines(vault_path, min_run):
-            if _has_independent_public_provenance(snippet, min_run, canon_corpus):
+            if _has_independent_public_provenance(
+                snippet, min_run, canon_haystack, canon_hash_set
+            ):
                 continue
-            for public_path, text in public_corpus:
-                public_rel = os.path.relpath(public_path, orita_dir)
-                if (vault_rel, line_no, public_rel) in _REVIEWED_NON_LEAKS:
+
+            candidates = [
+                (public_path, text)
+                for public_path, text in public_corpus
+                if (vault_rel, line_no, os.path.relpath(public_path, orita_dir))
+                not in _REVIEWED_NON_LEAKS
+            ]
+            offsets_by_file = {}
+            for offset, h in _window_hashes(snippet, min_run):
+                if len(offsets_by_file) == len(candidates):
+                    break
+                if h not in public_hash_set:
                     continue
-                found_at = next(
-                    (
-                        i
-                        for i in range(len(snippet) - min_run + 1)
-                        if snippet[i : i + min_run] in text
-                    ),
-                    None,
-                )
-                if found_at is not None:
-                    leaks.append({
-                        "vault_file": vault_path,
-                        "line": line_no,
-                        "public_file": public_path,
-                        "snippet": snippet[found_at : found_at + 80],
-                    })
+                window = snippet[offset : offset + min_run]
+                if window not in combined_haystack:
+                    continue
+                for public_path, text in candidates:
+                    if public_path in offsets_by_file:
+                        continue
+                    if window in text:
+                        offsets_by_file[public_path] = offset
+
+            for public_path, _text in candidates:
+                if public_path not in offsets_by_file:
+                    continue
+                found_at = offsets_by_file[public_path]
+                leaks.append({
+                    "vault_file": vault_path,
+                    "line": line_no,
+                    "public_file": public_path,
+                    "snippet": snippet[found_at : found_at + 80],
+                })
     return leaks
 
 
