@@ -138,6 +138,23 @@ class PrintedTargetSymmetryCase(unittest.TestCase):
             for d in ("15", "16", "17"):
                 f.write(f'{{"date": "2026-07-{d}"}}\n')
 
+        # Task 249: a bare rc.run_ritual_check() call writes durably and
+        # unconditionally via check_words()/check_scribe_growth() (task 87/168)
+        # -- this file's own _load() gives back a module instance untouched by
+        # test_ritual_check.py's module-level word_watch guard, so without this
+        # override this call would silently append a real line to the REAL
+        # HAND/word-check-log.jsonl and HAND/scribe-growth-log.jsonl on every
+        # test run, the exact "a test run silently wrote to the real log" bug
+        # class tasks 71/83/85/86/88 already caught elsewhere but never closed
+        # here. Point both at throwaway temp logs, same shape test_ritual_check
+        # .py's setUpModule() already uses for word_watch.
+        safe_word_watch = _load("_t158_safe_word_watch", "tools/word_watch.py")
+        safe_word_watch.LOG = os.path.join(tmp, "word-check-log.jsonl")
+        rc._word_watch = lambda: safe_word_watch
+        safe_scribe_growth = _load("_t158_safe_scribe_growth", "tools/scribe_growth_check.py")
+        safe_scribe_growth.LOG = os.path.join(tmp, "scribe-growth-log.jsonl")
+        rc._scribe_growth_check = lambda: safe_scribe_growth
+
         result = rc.run_ritual_check(metrics_cadence_path=metrics_path)
         formatted = rc.format_ritual_check(result)
         metrics_line = next(
@@ -154,6 +171,43 @@ class PrintedTargetSymmetryCase(unittest.TestCase):
         self.assertIsNotNone(report_line)
         self.assertIn("target", report_line)
         self.assertIn("target", metrics_line)
+
+    def test_run_ritual_check_here_never_touches_the_real_hand_logs(self):
+        """Task 249's regression pin: reproduces the exact pollution live-
+        caught this hour (a background `python3 -m unittest discover`
+        run appended real entries to HAND/word-check-log.jsonl and
+        HAND/scribe-growth-log.jsonl mid-run) by calling this file's own
+        `rc.run_ritual_check()` -- unguarded, pre-fix, this appends a real
+        line to both on every call -- and asserting the real files come
+        back byte-identical."""
+        real_word_log = os.path.join(ROOT, "HAND", "word-check-log.jsonl")
+        real_scribe_log = os.path.join(ROOT, "HAND", "scribe-growth-log.jsonl")
+        before = {}
+        for p in (real_word_log, real_scribe_log):
+            if os.path.exists(p):
+                with open(p, "rb") as f:
+                    before[p] = f.read()
+
+        rc = _load("_t249_ritual_no_pollute", "tools/ritual_check.py")
+        import shutil
+        import tempfile
+
+        tmp = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, tmp, ignore_errors=True)
+        safe_word_watch = _load("_t249_safe_word_watch", "tools/word_watch.py")
+        safe_word_watch.LOG = os.path.join(tmp, "word-check-log.jsonl")
+        rc._word_watch = lambda: safe_word_watch
+        safe_scribe_growth = _load("_t249_safe_scribe_growth", "tools/scribe_growth_check.py")
+        safe_scribe_growth.LOG = os.path.join(tmp, "scribe-growth-log.jsonl")
+        rc._scribe_growth_check = lambda: safe_scribe_growth
+
+        rc.run_ritual_check()
+
+        for p, contents in before.items():
+            with open(p, "rb") as f:
+                self.assertEqual(f.read(), contents, f"{p} was written to by a test run")
+        self.assertTrue(os.path.exists(safe_word_watch.LOG))
+        self.assertTrue(os.path.exists(safe_scribe_growth.LOG))
 
 
 if __name__ == "__main__":

@@ -172,5 +172,53 @@ class ChildWorkCheckCase(unittest.TestCase):
         self.assertEqual(reverted, [], f"Iron Rule #6 violated for: {reverted}")
 
 
+class TamperedChildWorkLogCase(unittest.TestCase):
+    """Task 249: a malformed line in HAND/child-work-log.jsonl (bad hand-edit,
+    stray merge-conflict marker, truncated write) must not crash
+    load_known_files() with an uncaught json.JSONDecodeError -- Iron Rule #6
+    ("the child's work is never reverted. LAW.") has no other running check,
+    so a single bad line silently taking this one down is the worst place
+    this shape could hide."""
+
+    def setUp(self):
+        self.d = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.d, ignore_errors=True)
+        self.log = os.path.join(self.d, "child-work-log.jsonl")
+
+    def test_entries_marks_a_malformed_line_instead_of_raising(self):
+        with open(self.log, "w") as f:
+            f.write('{"path": "a.md", "sha": "s1", "author_date": "2026-07-11T00:00:00Z"}\n')
+            f.write("<<<<<<< HEAD garbage not json\n")
+        entries = cwc._entries(self.log)
+        self.assertEqual(len(entries), 2)
+        self.assertEqual(entries[0]["path"], "a.md")
+        self.assertTrue(entries[1]["_malformed"])
+
+    def test_raises_tampered_error_on_a_malformed_line_anywhere_not_just_the_tip(self):
+        with open(self.log, "w") as f:
+            f.write("<<<<<<< HEAD garbage not json\n")
+            f.write('{"path": "a.md", "sha": "s1", "author_date": "2026-07-11T00:00:00Z"}\n')
+        with self.assertRaises(cwc.ChildWorkLogTamperedError):
+            cwc.load_known_files(self.log)
+
+    def test_a_malformed_earlier_line_is_not_masked_by_a_valid_tip(self):
+        # the tip alone reading fine must not be mistaken for the whole log
+        # being fine -- find_reverted needs every known path, not just the
+        # newest, so an earlier bad line still has to refuse, not slide by.
+        with open(self.log, "w") as f:
+            f.write('{"path": "a.md", "sha": "s1", "author_date": "2026-07-11T00:00:00Z"}\n')
+            f.write("not json at all\n")
+            f.write('{"path": "b.md", "sha": "s2", "author_date": "2026-07-12T00:00:00Z"}\n')
+        with self.assertRaises(cwc.ChildWorkLogTamperedError):
+            cwc.load_known_files(self.log)
+
+    def test_a_fully_valid_log_is_unaffected(self):
+        with open(self.log, "w") as f:
+            f.write('{"path": "a.md", "sha": "s1", "author_date": "2026-07-11T00:00:00Z"}\n')
+            f.write('{"path": "b.md", "sha": "s2", "author_date": "2026-07-12T00:00:00Z"}\n')
+        known = cwc.load_known_files(self.log)
+        self.assertEqual(set(known), {"a.md", "b.md"})
+
+
 if __name__ == "__main__":
     unittest.main()

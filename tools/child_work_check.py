@@ -45,17 +45,41 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 LOG = os.path.join(ROOT, "HAND", "child-work-log.jsonl")
 
 
-def load_known_files(path: str = LOG) -> dict:
+class ChildWorkLogTamperedError(RuntimeError):
+    """Raised by load_known_files() when ANY line in HAND/child-work-log.jsonl
+    is unparseable. find_reverted() checks EVERY known path against HEAD, not
+    just the newest -- a malformed line anywhere could be hiding a previously
+    -logged child-authored path, silently dropping it from Iron Rule #6's
+    revert check. Refuse rather than guess past a corrupted line, mirroring
+    ci_watch.py's/voice_window_check.py's any-line convention (not
+    change_gate.py's tip-only one, which is safe only when a check ever
+    consults just the log's newest line)."""
+
+
+def _entries(path: str) -> list[dict]:
     if not os.path.exists(path):
-        return {}
-    known = {}
+        return []
+    entries = []
     with open(path, encoding="utf-8") as fh:
         for line in fh:
             line = line.strip()
             if not line:
                 continue
-            entry = json.loads(line)
-            known[entry["path"]] = entry
+            try:
+                entries.append(json.loads(line))
+            except json.JSONDecodeError as exc:
+                entries.append({"_malformed": True, "_error": str(exc)})
+    return entries
+
+
+def load_known_files(path: str = LOG) -> dict:
+    known = {}
+    for entry in _entries(path):
+        if entry.get("_malformed"):
+            raise ChildWorkLogTamperedError(
+                f"{path} contains an unparseable line: {entry['_error']}"
+            )
+        known[entry["path"]] = entry
     return known
 
 
