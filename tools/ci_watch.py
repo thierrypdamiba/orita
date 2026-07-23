@@ -32,6 +32,20 @@ import json
 import os
 
 LOG = os.path.join(os.path.dirname(__file__), "..", "HAND", "ci-watch-log.jsonl")
+
+
+class CIWatchTamperedError(RuntimeError):
+    """Raised when a workflow-filtered read (current_streak/streak_started_at/
+    last_check/format_status_line) finds a malformed line anywhere in the log.
+    Mirrors tools/x_post_queue.py's QueueTamperedError (task 240): a malformed
+    line has lost its "type"/"workflow" fields, so _workflow_entries' filter
+    would silently drop it from EVERY workflow's view rather than just the one
+    it really belonged to -- guessing which workflow's streak it was could
+    stitch two real entries together that shouldn't be adjacent, silently
+    shortening or lengthening a reported failure streak. Refuse rather than
+    guess, the same discipline tasks 238-242 already applied to their own
+    logs. Run this tool's `status` command by hand to see the break, then
+    repair the log before the next real check/record."""
 CONCLUSIONS = ("success", "failure")
 # Task 80: dawn-run/pages essentially never fail -- seam-scan and
 # oracle-cadence are the two workflows that actually have (tasks 63/64/65/
@@ -42,10 +56,27 @@ TRACKED_WORKFLOWS = ("dawn-run", "pages", "seam-scan", "oracle-cadence")
 
 
 def _entries(path=LOG):
+    """Every line in the CI-watch log, parsed.
+
+    A line that is not even valid JSON any more (a bad hand-edit, a stray
+    merge-conflict marker, a truncated write) is not allowed to crash the
+    caller with an uncaught json.JSONDecodeError -- it comes back marked
+    {"_malformed": True, "_error": ...} instead, the same convention
+    tools/ledger.py's _entries() uses (mirrored since in change_gate.py,
+    x_post_queue.py, word_watch.py, consent_grant_log.py).
+    """
     if not os.path.exists(path):
         return []
+    entries = []
     with open(path) as f:
-        return [json.loads(line) for line in f if line.strip()]
+        for line in f:
+            if not line.strip():
+                continue
+            try:
+                entries.append(json.loads(line))
+            except json.JSONDecodeError as exc:
+                entries.append({"_malformed": True, "_error": str(exc)})
+    return entries
 
 
 def _append(entry, path=LOG):
@@ -71,6 +102,14 @@ def record_check(workflow: str, conclusion: str, run_id, checked_at: str, path=L
 
 
 def _workflow_entries(entries: list, workflow: str) -> list:
+    for e in entries:
+        if e.get("_malformed"):
+            raise CIWatchTamperedError(
+                f"_workflow_entries({workflow!r}): the log holds a line that "
+                f"is not valid JSON ({e.get('_error')}) -- refusing to guess "
+                "which workflow it belonged to. Repair the log by hand, "
+                "then rerun."
+            )
     return [e for e in entries if e.get("type") == "check" and e.get("workflow") == workflow]
 
 

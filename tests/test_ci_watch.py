@@ -115,6 +115,38 @@ class TestFormatStatusLine(_TempLogCase):
         )
 
 
+class TestTamperedLog(_TempLogCase):
+    def test_entries_marks_a_malformed_line_instead_of_raising(self):
+        # A hand-edit, stray merge-conflict marker, or truncated write can
+        # leave a line that isn't valid JSON at all -- _entries() must name
+        # it, not crash with an uncaught json.JSONDecodeError (the exact
+        # crash tools/ledger.py's _entries() had before task 238's fix).
+        ciw.record_check("dawn-run", "success", 1, "2026-07-14T00:00:00Z", path=self.path)
+        with open(self.path, "a") as f:
+            f.write('{"type": "check", broken <<<< not json\n')
+        entries = ciw._entries(path=self.path)
+        self.assertEqual(len(entries), 2)
+        self.assertTrue(entries[1]["_malformed"])
+        self.assertIn("_error", entries[1])
+
+    def test_raises_tampered_error_when_a_malformed_line_exists_anywhere(self):
+        # Unlike change_gate.py/word_watch.py's tip-only check, a malformed
+        # entry here has lost its "workflow" field, so it could be silently
+        # dropped from ANY workflow's view -- refuse rather than guess which
+        # workflow's streak it belonged to, even if it isn't the last line.
+        ciw.record_check("dawn-run", "success", 1, "2026-07-14T00:00:00Z", path=self.path)
+        with open(self.path, "a") as f:
+            f.write('{"type": "check", broken <<<< not json\n')
+        ciw.record_check("dawn-run", "failure", 2, "2026-07-14T01:00:00Z", path=self.path)
+        entries = ciw._entries(path=self.path)
+        with self.assertRaises(ciw.CIWatchTamperedError):
+            ciw.current_streak(entries, "dawn-run", "failure")
+        with self.assertRaises(ciw.CIWatchTamperedError):
+            ciw.last_check(entries, "dawn-run")
+        with self.assertRaises(ciw.CIWatchTamperedError):
+            ciw.format_status_line(entries, "dawn-run")
+
+
 class TestTrackedWorkflows(unittest.TestCase):
     def test_dawn_run_and_pages_are_tracked(self):
         self.assertIn("dawn-run", ciw.TRACKED_WORKFLOWS)
