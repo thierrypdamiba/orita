@@ -127,16 +127,20 @@ class RealClaimCrossCheckedAgainstLiveTestsCase(unittest.TestCase):
             f"+ test_subscriber_autograde.py is {result['real']}",
         )
 
-    def test_regression_pin_todays_real_total_is_38(self):
+    def test_regression_pin_todays_real_total_is_42(self):
         # Named so a future test added/removed from either file trips this
         # pin FIRST, distinct from (and in addition to) the doc cross-check
         # above -- exactly task 149's own "regression pin" discipline. Moved
         # 34 -> 36 by task 186's own two new test_subscriber_cadence.py
         # cases (test_rejects_zero_horizon_hours/test_rejects_negative_horizon_hours),
-        # then 36 -> 38 by task 231's own two new test_subscriber_cadence.py
+        # 36 -> 38 by task 231's own two new test_subscriber_cadence.py
         # cases (test_non_utc_aware_now_still_targets_the_true_utc_instant/
-        # test_utc_now_unaffected_by_the_normalization).
-        self.assertEqual(real_subscriber_test_count(), 38)
+        # test_utc_now_unaffected_by_the_normalization), then 38 -> 42 by
+        # task 270's own four new test_subscriber_cadence.py malformed-line
+        # guard cases (test_load_snapshots_marks_a_malformed_line_instead_of_raising/
+        # test_raises_tampered_error_on_a_malformed_line_instead_of_crashing x2/
+        # test_a_valid_lookup_after_a_malformed_earlier_line_still_refuses).
+        self.assertEqual(real_subscriber_test_count(), 42)
 
 
 class MutationProvesTheCheckerBitesCase(unittest.TestCase):
