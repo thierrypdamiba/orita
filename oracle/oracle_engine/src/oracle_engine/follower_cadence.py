@@ -58,6 +58,22 @@ class FollowerCadenceError(ValueError):
     well-formed."""
 
 
+class FollowerCadenceTamperedError(RuntimeError):
+    """Raised by follower_count_at_or_before/follower_count_at_or_after
+    when the snapshot log holds a malformed line anywhere in it. Mirrors
+    branch_cadence.py's/collaborator_cadence.py's/comment_cadence.py's
+    /commit_cadence.py's/commit_comment_cadence.py's/contributor_cadence.py's
+    /deployment_cadence.py's BranchCadenceTamperedError
+    /CollaboratorCadenceTamperedError/CommentCadenceTamperedError
+    /CommitCadenceTamperedError/CommitCommentCadenceTamperedError
+    /ContributorCadenceTamperedError/DeploymentCadenceTamperedError
+    (tasks 250-256): both lookup functions walk EVERY snapshot looking for
+    the closest one before/after `when`, not just the tip, so a malformed
+    line anywhere could be hiding the real closest snapshot and silently
+    skipping it would misreport the delta/baseline. Refuse rather than
+    guess -- repair the log before the next real call."""
+
+
 def _default_whoami_get() -> dict:
     """No pluggable default exists for this getter the way
     `star_cadence._default_http_get` reaches a public, unauthenticated
@@ -88,8 +104,14 @@ def fetch_follower_count(x_whoami_get=None) -> int:
 
 
 def load_snapshots(path: str = DEFAULT_SNAPSHOT_PATH) -> list[dict]:
-    """Every well-formed snapshot line, in file order. Read-only: never
-    touches the file, takes its path and hands back plain dicts."""
+    """Every snapshot line, in file order. Read-only: never touches the
+    file, takes its path and hands back plain dicts. A line that is not
+    even valid JSON any more (a bad hand-edit, a stray merge-conflict
+    marker, a truncated write) is not allowed to crash the caller with an
+    uncaught json.JSONDecodeError -- it comes back marked
+    {"_malformed": True, "_error": ...} instead, the same convention
+    tools/ledger.py's _entries() established (task 238) and tasks 239-256
+    mirrored across every sibling."""
     if not os.path.exists(path):
         return []
     out = []
@@ -98,7 +120,10 @@ def load_snapshots(path: str = DEFAULT_SNAPSHOT_PATH) -> list[dict]:
             line = line.strip()
             if not line:
                 continue
-            out.append(json.loads(line))
+            try:
+                out.append(json.loads(line))
+            except json.JSONDecodeError as exc:
+                out.append({"_malformed": True, "_error": str(exc)})
     return out
 
 
@@ -124,9 +149,24 @@ def _parse_ts(ts: str) -> datetime.datetime:
     return dt
 
 
+def _reject_malformed(snapshots: list[dict], caller: str) -> None:
+    """Raise FollowerCadenceTamperedError if any snapshot line came back
+    marked _malformed by load_snapshots() -- both callers below walk every
+    snapshot, not just the tip, so a malformed line anywhere could be
+    hiding the real closest one."""
+    for s in snapshots:
+        if s.get("_malformed"):
+            raise FollowerCadenceTamperedError(
+                f"{caller}: the snapshot log holds a line that is not "
+                f"valid JSON ({s.get('_error')}) -- refusing rather than "
+                "silently skipping it."
+            )
+
+
 def follower_count_at_or_before(snapshots: list[dict], when: datetime.datetime) -> int | None:
     """The most recently recorded count at or before `when`; `None` if no
     snapshot that early exists yet — never guessed at, never interpolated."""
+    _reject_malformed(snapshots, "follower_count_at_or_before")
     best = None
     for s in snapshots:
         ts = _parse_ts(s["ts"])
@@ -142,6 +182,7 @@ def follower_count_at_or_after(snapshots: list[dict], when: datetime.datetime) -
     outcome is the first real observation once the window is actually
     over, not a later one that could quietly wait for a friendlier
     number."""
+    _reject_malformed(snapshots, "follower_count_at_or_after")
     best = None
     for s in snapshots:
         ts = _parse_ts(s["ts"])
