@@ -300,3 +300,5 @@
 {"type": "check", "workflow": "pages", "conclusion": "success", "run_id": 466, "checked_at": "2026-07-24T16:05:00Z"}
 {"type": "check", "workflow": "seam-scan", "conclusion": "success", "run_id": 12, "checked_at": "2026-07-24T16:05:00Z"}
 {"type": "check", "workflow": "oracle-cadence", "conclusion": "success", "run_id": 12, "checked_at": "2026-07-24T16:05:00Z"}
+{"type": "check", "workflow": "dawn-run", "conclusion": "success", "run_id": 30126617999, "checked_at": "2026-07-24T21:07:28Z"}
+{"type": "check", "workflow": "pages", "conclusion": "success", "run_id": 30126617166, "checked_at": "2026-07-24T21:07:28Z"}

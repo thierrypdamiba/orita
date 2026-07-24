@@ -103,6 +103,22 @@ class TestFindDueCalls(AutogradeTestBase):
         due = comment_autograde.find_due_calls(self.mod._entries(), now)
         self.assertEqual(due, [])
 
+    def test_a_schema_mismatched_prior_grade_is_ignored_not_raised(self):
+        # A tampered/malformed prior grade record (valid JSON, but not the
+        # exact {"call_seq", "outcome"} shape grading.parse_grade_detail
+        # enforces) must not crash find_due_calls -- it should be treated
+        # like existing_grades already treats an unparseable one: ignored.
+        import json as _json
+
+        call = self._seal_comment_call(sealed_at="2026-07-20T12:00:00+00:00", target="2026-08-03T12:00:00Z")
+        tampered_detail = _json.dumps(
+            {"call_seq": call["seq"], "outcome": "pending", "note": "tampered"}, sort_keys=True
+        )
+        self.mod.append("ogun", grading.GRADE_ACT, tampered_detail, "2026-07-21T00:00:00+00:00")
+        now = datetime.datetime(2026, 8, 4, tzinfo=datetime.timezone.utc)
+        due = comment_autograde.find_due_calls(self.mod._entries(), now)
+        self.assertEqual(len(due), 1)
+
 
 class TestScoreCall(AutogradeTestBase):
     def test_scores_correct_when_the_recorded_snapshot_meets_threshold(self):
