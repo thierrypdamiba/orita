@@ -30,12 +30,35 @@ prevent. next_post_plan() hands back only the first batch plus how
 many more are waiting, so a real drain takes as many hourly ritual
 runs as it takes batches, one post per run, never a burst.
 
+Task 275 clarifies what task 262's hourly note ("compose/compose-batches
+error against the live backlog... a separate pre-existing snag left for a
+dedicated hour") almost turned into a fix: it isn't one. `compose` and
+`compose-batches` raising the moment ANY pending entry is permanently
+unpostable (tasks 185/188's over-length topics) is the documented,
+tested contract of `compose_combined_tweet`/`compose_batched_tweets`/
+`batch_entries` -- see `test_a_single_entry_too_long_for_one_tweet_raises`
+and the comment at the top of `test_one_permanently_unpostable_entry_
+does_not_block_the_rest` in tests/test_x_post_queue.py, which says outright
+"this fix does not weaken that contract." `next_post_plan()` (task 84) is
+the one function that adds the skip-and-report-blocked-tasks behavior on
+top, precisely so the rest of a real backlog can still drain one batch per
+hour. `next-post` is the command an on-duty god actually runs before a
+real post (task 274 and its predecessors record checking it this way);
+`ritual_check.py`'s own `check_owed_posts` only ever calls
+`pending_entries` for the backlog count, never `compose`/`compose-batches`
+/`next-post`, so neither of those two crashing was ever silently breaking
+the hourly ritual itself. `compose`/`compose-batches` stay as lower-level,
+intentionally-strict CLI commands for composing a batch by hand once a
+blocked topic has been shortened. Confirmed live: `next-post` against the
+real 123-entry, 2-blocked-task backlog returns a clean plan; `compose`/
+`compose-batches` against the same backlog raise exactly as designed.
+
 Usage:
     python3 tools/x_post_queue.py queue <task> <topic> <queued_at>
     python3 tools/x_post_queue.py pending
-    python3 tools/x_post_queue.py compose
-    python3 tools/x_post_queue.py compose-batches
-    python3 tools/x_post_queue.py next-post
+    python3 tools/x_post_queue.py next-post   -- the hourly ritual's real entry point; skips permanently-unpostable entries into blocked_tasks
+    python3 tools/x_post_queue.py compose     -- one tweet for ALL pending entries; raises if it can't fit or any entry is unpostable (by design, not a bug -- use next-post operationally)
+    python3 tools/x_post_queue.py compose-batches  -- every batch at once, by hand; raises on any permanently-unpostable entry (by design -- use next-post operationally)
     python3 tools/x_post_queue.py mark-posted <tweet_id> <posted_at> <task> [task...]
 """
 import json
