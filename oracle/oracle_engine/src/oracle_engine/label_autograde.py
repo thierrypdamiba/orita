@@ -63,7 +63,13 @@ def _load_claim_payload(detail: str) -> dict:
 def find_due_calls(entries: list[dict], now: datetime.datetime) -> list[dict]:
     """Every `predict` entry, label-cadence-shaped, whose target has already
     passed and that carries no terminal grade yet. Skips (never raises on)
-    entries that aren't label-cadence-shaped."""
+    entries that aren't label-cadence-shaped, and skips (never raises on) a
+    prior grade record that is present but schema-mismatched (e.g. a
+    tampered ledger entry) -- `existing_grades` already tolerates a prior
+    grade whose `detail` isn't valid JSON at all; this extends the same
+    tolerance to one whose JSON parses but fails `grading`'s own stricter
+    well-formedness check, the identical boundary `existing_grades` already
+    owns."""
     due = []
     for entry in entries:
         if entry.get("act") != PREDICTION_ACT:
@@ -75,10 +81,12 @@ def find_due_calls(entries: list[dict], now: datetime.datetime) -> list[dict]:
             continue
         if target > now:
             continue
-        prior_outcomes = [
-            grading.parse_grade_detail(g["detail"])["outcome"]
-            for g in grading.existing_grades(entry["seq"], entries)
-        ]
+        prior_outcomes = []
+        for g in grading.existing_grades(entry["seq"], entries):
+            try:
+                prior_outcomes.append(grading.parse_grade_detail(g["detail"])["outcome"])
+            except (grading.GradingError, KeyError, json.JSONDecodeError):
+                continue
         if any(o in grading.TERMINAL_OUTCOMES for o in prior_outcomes):
             continue
         due.append(entry)
