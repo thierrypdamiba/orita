@@ -73,10 +73,12 @@ def find_due_calls(entries: list[dict], now: datetime.datetime) -> list[dict]:
             continue
         if target > now:
             continue
-        prior_outcomes = [
-            grading.parse_grade_detail(g["detail"])["outcome"]
-            for g in grading.existing_grades(entry["seq"], entries)
-        ]
+        prior_outcomes = []
+        for g in grading.existing_grades(entry["seq"], entries):
+            try:
+                prior_outcomes.append(grading.parse_grade_detail(g["detail"])["outcome"])
+            except (grading.GradingError, KeyError, json.JSONDecodeError):
+                continue
         if any(o in grading.TERMINAL_OUTCOMES for o in prior_outcomes):
             continue
         due.append(entry)
