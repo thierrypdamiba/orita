@@ -191,6 +191,88 @@ class TestNoQuietlyMovingALossIntoADidntCountPile(unittest.TestCase):
                                 ts="2026-07-21T00:00:00+00:00", ledger_module=self.mod)
 
 
+class TestExistingGradesSkipsNonDictPayloads(unittest.TestCase):
+    """ROADMAP.md task 302. `existing_grades()` is the one function every
+    one of the 25 `oracle_engine/*_autograde.py` `find_due_calls()`
+    implementations (tasks 276-301) calls directly and unguarded. Before
+    this task, a `grade`-act entry whose `detail` was syntactically valid
+    JSON but not a JSON object (a list, `null`, a bare number, a bool, a
+    string) parsed cleanly -- so `except (KeyError, json.JSONDecodeError)`
+    never fired -- and the very next line's `payload.get("call_seq")`
+    raised an uncaught `AttributeError`, since none of those types define
+    `.get`. That crashed every already-hardened autograde sibling from
+    underneath, plus `assert_not_already_terminal()`/`seal_grade()`, the
+    function the live `oracle-cadence` cron actually calls to seal a new
+    grade."""
+
+    def _entries_with_malformed_grade(self, malformed_detail: str) -> list[dict]:
+        return [
+            {"seq": 0, "act": prediction.PREDICTION_ACT, "detail": "{}"},
+            {"seq": 1, "act": grading.GRADE_ACT, "detail": malformed_detail},
+        ]
+
+    def test_list_shaped_detail_is_skipped_not_raised(self):
+        entries = self._entries_with_malformed_grade("[1, 2]")
+        self.assertEqual(grading.existing_grades(0, entries), [])
+
+    def test_null_shaped_detail_is_skipped_not_raised(self):
+        entries = self._entries_with_malformed_grade("null")
+        self.assertEqual(grading.existing_grades(0, entries), [])
+
+    def test_bare_number_detail_is_skipped_not_raised(self):
+        entries = self._entries_with_malformed_grade("5")
+        self.assertEqual(grading.existing_grades(0, entries), [])
+
+    def test_bare_bool_detail_is_skipped_not_raised(self):
+        entries = self._entries_with_malformed_grade("true")
+        self.assertEqual(grading.existing_grades(0, entries), [])
+
+    def test_bare_string_detail_is_skipped_not_raised(self):
+        entries = self._entries_with_malformed_grade('"oops"')
+        self.assertEqual(grading.existing_grades(0, entries), [])
+
+    def test_a_real_grade_still_found_alongside_a_malformed_one(self):
+        entries = [
+            {"seq": 0, "act": prediction.PREDICTION_ACT, "detail": "{}"},
+            {"seq": 1, "act": grading.GRADE_ACT, "detail": "[1, 2]"},
+            {
+                "seq": 2,
+                "act": grading.GRADE_ACT,
+                "detail": json.dumps({"call_seq": 0, "outcome": "pending"}, sort_keys=True),
+            },
+        ]
+        found = grading.existing_grades(0, entries)
+        self.assertEqual(len(found), 1)
+        self.assertEqual(found[0]["seq"], 2)
+
+    def test_assert_not_already_terminal_unaffected_by_a_malformed_sibling_grade(self):
+        """The regrade guard `seal_grade()` actually calls in production
+        must keep working normally when a malformed grade entry sits on
+        the chain alongside a real terminal one -- it should still refuse
+        the regrade, not crash and not silently allow it."""
+        tmp_path = os.path.join(_TESTS_DIR, "_scratch_grading_ledger4.jsonl")
+        if os.path.exists(tmp_path):
+            os.remove(tmp_path)
+        mod = _fresh_ledger_module(tmp_path)
+        try:
+            call = prediction.seal_prediction(
+                "ogun", "a fork opens within 30 days", 0.5,
+                ts="2026-07-13T03:00:00+00:00", ledger_module=mod,
+            )
+            grading.seal_grade("ogun", call["seq"], "incorrect",
+                                ts="2026-07-20T00:00:00+00:00", ledger_module=mod)
+            entries = mod._entries()
+            entries.append({"seq": len(entries), "act": grading.GRADE_ACT, "detail": "[1, 2]"})
+            # existing_grades must not crash on the appended malformed entry
+            grades = grading.existing_grades(call["seq"], entries)
+            self.assertEqual(len(grades), 1)
+            with self.assertRaises(grading.GradingError):
+                grading.assert_not_already_terminal(call["seq"], entries)
+        finally:
+            if os.path.exists(tmp_path):
+                os.remove(tmp_path)
+
+
 class TestNoEditPathExists(unittest.TestCase):
     """Doctrine test: this module must not define anything shaped like an
     edit/update/delete/rewrite of a sealed entry -- not disabled, absent.

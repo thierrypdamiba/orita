@@ -76,7 +76,18 @@ def find_call(call_seq: Any, entries: list[dict]) -> dict:
 
 
 def existing_grades(call_seq: int, entries: list[dict]) -> list[dict]:
-    """Every grade entry already sealed for this call_seq, oldest first."""
+    """Every grade entry already sealed for this call_seq, oldest first.
+
+    A `grade`-act entry whose `detail` is syntactically valid JSON but not a
+    JSON *object* (a hand-corrupted ledger line reading e.g. `"[1, 2]"`,
+    `"null"`, `"5"`, or `"true"`) is skipped exactly like unparseable JSON
+    already is -- `payload.get(...)` below would otherwise raise an
+    uncaught `AttributeError` on every non-dict JSON type, since none of
+    them define `.get`. Every one of the 25 `oracle_engine/*_autograde.py`
+    `find_due_calls()` implementations (tasks 276-301) calls this function
+    directly, unguarded, so a crash here crashes all of them -- this is the
+    one root check that protects every leaf at once.
+    """
     out = []
     for entry in entries:
         if entry.get("act") != GRADE_ACT:
@@ -84,6 +95,8 @@ def existing_grades(call_seq: int, entries: list[dict]) -> list[dict]:
         try:
             payload = json.loads(entry["detail"])
         except (KeyError, json.JSONDecodeError):
+            continue
+        if not isinstance(payload, dict):
             continue
         if payload.get("call_seq") == call_seq:
             out.append(entry)
