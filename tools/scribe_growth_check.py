@@ -91,7 +91,11 @@ def _entries(path=LOG):
     {"_malformed": True, "_error": ...} instead, the same convention
     tools/ledger.py's _entries() already uses for its own tampered-tablet
     case (mirrored since in change_gate.py, x_post_queue.py, word_watch.py,
-    consent_grant_log.py, ci_watch.py).
+    consent_grant_log.py, ci_watch.py). A line that parses cleanly but to a
+    non-dict value (a bare number, null, list, or stray string) is marked
+    the same way -- last_scribe_state()'s unconditional entries[-1].get(...)
+    would otherwise crash with an uncaught AttributeError instead of the
+    named ScribeGrowthLogTamperedError below.
     """
     if not os.path.exists(path):
         return []
@@ -101,9 +105,14 @@ def _entries(path=LOG):
             if not line.strip():
                 continue
             try:
-                entries.append(json.loads(line))
+                parsed = json.loads(line)
             except json.JSONDecodeError as exc:
                 entries.append({"_malformed": True, "_error": str(exc)})
+                continue
+            if not isinstance(parsed, dict):
+                entries.append({"_malformed": True, "_error": f"not a JSON object: {parsed!r}"})
+                continue
+            entries.append(parsed)
     return entries
 
 

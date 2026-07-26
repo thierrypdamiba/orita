@@ -171,6 +171,29 @@ class TestRecordScribeCheck(_TempFixtureCase):
         last = sgc.last_scribe_state(path=self.log_path)
         self.assertEqual(last["sizes"], {"ROADMAP.md": 200})
 
+    def test_entries_marks_a_non_dict_line_instead_of_crashing(self):
+        # A line can parse cleanly as JSON but not be an object at all (a
+        # bare number, null, list, or stray string) -- _entries() must name
+        # it the same as a decode failure, not hand back the raw value for
+        # a caller's unconditional .get("_malformed") to crash on.
+        sgc.record_scribe_check({"ROADMAP.md": 100}, "2026-07-20T00:00:00Z", path=self.log_path)
+        with open(self.log_path, "a") as f:
+            f.write("5\n")
+        entries = sgc._entries(path=self.log_path)
+        self.assertEqual(len(entries), 2)
+        self.assertTrue(entries[1]["_malformed"])
+        self.assertIn("_error", entries[1])
+
+    def test_raises_tampered_error_on_a_non_dict_tip_instead_of_crashing(self):
+        # Pre-fix this raised an uncaught AttributeError ('int' object has
+        # no attribute 'get'); it must now raise the named, catchable
+        # ScribeGrowthLogTamperedError instead, same as a decode failure.
+        sgc.record_scribe_check({"ROADMAP.md": 100}, "2026-07-20T00:00:00Z", path=self.log_path)
+        with open(self.log_path, "a") as f:
+            f.write("5\n")
+        with self.assertRaises(sgc.ScribeGrowthLogTamperedError):
+            sgc.last_scribe_state(path=self.log_path)
+
 
 class TestCLI(_TempFixtureCase):
     def test_check_command_runs_clean_against_the_real_repo(self):
