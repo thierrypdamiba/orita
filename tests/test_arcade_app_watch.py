@@ -129,6 +129,31 @@ class TestLastAppState(_TempLogCase):
         with self.assertRaises(aw.ArcadeAppWatchTamperedError):
             aw.last_app_state(path=self.path)
 
+    def test_entries_marks_a_non_dict_json_line_as_malformed_too(self):
+        # A line that parses cleanly (valid JSON) but not to an object -- a
+        # bare number, null, list, or stray string -- is not "well-formed"
+        # just because json.loads() didn't raise. Task 311, mirroring task
+        # 309's change_gate.py / task 310's child_work_check.py fix.
+        state = aw.compute_app_state(APPS_GITHUB_X_ONLY)
+        aw.record_app_check(state, "2026-07-18T02:00:00Z", path=self.path)
+        with open(self.path, "a") as f:
+            f.write("5\n")
+        entries = aw._entries(path=self.path)
+        self.assertEqual(len(entries), 2)
+        self.assertTrue(entries[1]["_malformed"])
+        self.assertIn("_error", entries[1])
+
+    def test_raises_tampered_error_on_a_non_dict_json_tip_instead_of_crashing(self):
+        # Pre-fix this raised an uncaught AttributeError
+        # ('int' object has no attribute 'get'); it must now raise the
+        # named, catchable ArcadeAppWatchTamperedError instead.
+        state = aw.compute_app_state(APPS_GITHUB_X_ONLY)
+        aw.record_app_check(state, "2026-07-18T02:00:00Z", path=self.path)
+        with open(self.path, "a") as f:
+            f.write("5\n")
+        with self.assertRaises(aw.ArcadeAppWatchTamperedError):
+            aw.last_app_state(path=self.path)
+
     def test_a_valid_tip_after_a_malformed_earlier_line_is_unaffected(self):
         # Only the TIP matters for last_app_state's guess-refusal -- an
         # older malformed line sitting earlier in the log (already surfaced

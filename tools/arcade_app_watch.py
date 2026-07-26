@@ -90,7 +90,12 @@ def _entries(path=LOG):
     tools/ledger.py's _entries() already uses (mirrored since in
     change_gate.py, x_post_queue.py, word_watch.py, consent_grant_log.py,
     ci_watch.py, scribe_growth_check.py, voice_window_check.py,
-    x_outage_tracker.py).
+    x_outage_tracker.py). A line that parses cleanly but not to a dict (a
+    bare number, null, list, or stray string) is marked _malformed too
+    (task 311, mirroring task 309's change_gate.py / task 310's
+    child_work_check.py fix) -- last_app_state()'s entries[-1].get(...)
+    call otherwise crashes with an uncaught AttributeError instead of the
+    named ArcadeAppWatchTamperedError.
     """
     if not os.path.exists(path):
         return []
@@ -100,9 +105,17 @@ def _entries(path=LOG):
             if not line.strip():
                 continue
             try:
-                entries.append(json.loads(line))
+                parsed = json.loads(line)
             except json.JSONDecodeError as exc:
                 entries.append({"_malformed": True, "_error": str(exc)})
+                continue
+            if not isinstance(parsed, dict):
+                entries.append({
+                    "_malformed": True,
+                    "_error": f"parsed to {type(parsed).__name__}, not an object",
+                })
+                continue
+            entries.append(parsed)
     return entries
 
 
