@@ -86,9 +86,14 @@ def _entries(path=QUEUE):
             if not line.strip():
                 continue
             try:
-                entries.append(json.loads(line))
+                parsed = json.loads(line)
             except json.JSONDecodeError as exc:
                 entries.append({"_malformed": True, "_error": str(exc)})
+                continue
+            if not isinstance(parsed, dict):
+                entries.append({"_malformed": True, "_error": f"line parsed to {type(parsed).__name__}, not an object"})
+                continue
+            entries.append(parsed)
     return entries
 
 

@@ -120,6 +120,27 @@ class TestEntriesMalformedLine(_TempQueueCase):
         pending = xpq.pending_entries(path=self.path)
         self.assertEqual([e["task"] for e in pending], ["51"])
 
+    def test_entries_marks_a_valid_but_non_dict_line_as_malformed(self):
+        # Task 320: a line that parses cleanly to a non-dict JSON value (a
+        # bare number, null, list, or stray string) must not sail through
+        # unmarked -- it's just as unreadable as a decode failure.
+        xpq.queue_owed_post("50", "subscriber cadence", "2026-07-14T01:09:00Z", path=self.path)
+        with open(self.path, "a") as f:
+            f.write("5\n")
+        entries = xpq._entries(self.path)
+        self.assertEqual(len(entries), 2)
+        self.assertTrue(entries[1]["_malformed"])
+        self.assertIn("_error", entries[1])
+
+    def test_pending_entries_raises_tampered_error_on_a_non_dict_line_instead_of_crashing(self):
+        # Pre-fix this raised an uncaught AttributeError ('int' object has
+        # no attribute 'get'); it must now raise the named QueueTamperedError.
+        xpq.queue_owed_post("50", "subscriber cadence", "2026-07-14T01:09:00Z", path=self.path)
+        with open(self.path, "a") as f:
+            f.write("5\n")
+        with self.assertRaises(xpq.QueueTamperedError):
+            xpq.pending_entries(path=self.path)
+
 
 class TestComposeCombinedTweet(unittest.TestCase):
     def test_raises_on_no_pending_entries(self):
