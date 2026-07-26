@@ -69,7 +69,9 @@ def _entries(path: str = LOG) -> list:
     merge-conflict marker, a truncated write) does not crash the caller --
     it comes back as {"_malformed": True, "_error": ...} instead, mirroring
     tools/ledger.py's, tools/change_gate.py's, tools/x_post_queue.py's, and
-    tools/word_watch.py's own convention (tasks 238-241).
+    tools/word_watch.py's own convention (tasks 238-241). A line that
+    parses cleanly to a non-dict JSON value (a bare number, null, list,
+    or string) gets the same sentinel -- task 313, mirroring 309-312.
     real_distinct_toolkit_count() is the one that decides a malformed line
     here is never safe to ignore."""
     if not os.path.exists(path):
@@ -80,9 +82,14 @@ def _entries(path: str = LOG) -> list:
             if not line.strip():
                 continue
             try:
-                entries.append(json.loads(line))
+                value = json.loads(line)
             except json.JSONDecodeError as exc:
                 entries.append({"_malformed": True, "_error": str(exc)})
+                continue
+            if not isinstance(value, dict):
+                entries.append({"_malformed": True, "_error": f"not a JSON object: {value!r}"})
+                continue
+            entries.append(value)
     return entries
 
 

@@ -164,6 +164,25 @@ class TamperedLogCase(unittest.TestCase):
         )
         self.assertEqual(cgl.real_distinct_toolkit_count(self.log_path), 2)
 
+    def test_a_non_dict_json_line_does_not_crash_entries(self):
+        """Task 313: a line that parses cleanly to a non-dict JSON value
+        (bare number, null, list, string) used to slip past the
+        _malformed guard entirely and crash distinct_toolkits()'s
+        e.get("_malformed") with an uncaught AttributeError -- the same
+        boundary case tasks 309-312 already fixed in their four
+        siblings."""
+        with open(self.log_path, "w", encoding="utf-8") as f:
+            f.write("5\n")
+        entries = cgl._entries(self.log_path)
+        self.assertEqual(len(entries), 1)
+        self.assertTrue(entries[0]["_malformed"])
+
+    def test_a_non_dict_json_line_makes_the_toolkit_count_refuse(self):
+        with open(self.log_path, "w", encoding="utf-8") as f:
+            f.write("5\n")
+        with self.assertRaises(cgl.ConsentLogTamperedError):
+            cgl.real_distinct_toolkit_count(self.log_path)
+
 
 class RealLiveStateCase(unittest.TestCase):
     """The real point: as of this task, zero real human consents have
