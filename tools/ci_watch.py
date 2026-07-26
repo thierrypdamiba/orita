@@ -63,7 +63,9 @@ def _entries(path=LOG):
     caller with an uncaught json.JSONDecodeError -- it comes back marked
     {"_malformed": True, "_error": ...} instead, the same convention
     tools/ledger.py's _entries() uses (mirrored since in change_gate.py,
-    x_post_queue.py, word_watch.py, consent_grant_log.py).
+    x_post_queue.py, word_watch.py, consent_grant_log.py). A line that
+    parses cleanly to a non-dict JSON value (a bare number, null, list,
+    or string) gets the same sentinel -- task 312, mirroring 309-311.
     """
     if not os.path.exists(path):
         return []
@@ -73,9 +75,14 @@ def _entries(path=LOG):
             if not line.strip():
                 continue
             try:
-                entries.append(json.loads(line))
+                value = json.loads(line)
             except json.JSONDecodeError as exc:
                 entries.append({"_malformed": True, "_error": str(exc)})
+                continue
+            if not isinstance(value, dict):
+                entries.append({"_malformed": True, "_error": f"not a JSON object: {value!r}"})
+                continue
+            entries.append(value)
     return entries
 
 

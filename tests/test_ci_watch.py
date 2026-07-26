@@ -146,6 +146,29 @@ class TestTamperedLog(_TempLogCase):
         with self.assertRaises(ciw.CIWatchTamperedError):
             ciw.format_status_line(entries, "dawn-run")
 
+    def test_entries_marks_a_non_dict_json_value_as_malformed_too(self):
+        # task 312: a line that parses cleanly to a non-dict JSON value (a
+        # bare number, null, list, or string -- e.g. a hand-tampered or
+        # truncated write that still happens to be syntactically valid)
+        # must not be treated as a real logged entry, the same gap tasks
+        # 309-311 closed in change_gate.py/child_work_check.py/arcade_app_watch.py.
+        ciw.record_check("dawn-run", "success", 1, "2026-07-14T00:00:00Z", path=self.path)
+        with open(self.path, "a") as f:
+            f.write("5\n")
+        entries = ciw._entries(path=self.path)
+        self.assertEqual(len(entries), 2)
+        self.assertTrue(entries[1]["_malformed"])
+
+    def test_workflow_entries_raises_tampered_error_on_a_non_dict_json_line(self):
+        # pre-fix this crashed with an uncaught AttributeError
+        # ('int' object has no attribute 'get') instead of the named error.
+        ciw.record_check("dawn-run", "success", 1, "2026-07-14T00:00:00Z", path=self.path)
+        with open(self.path, "a") as f:
+            f.write("5\n")
+        entries = ciw._entries(path=self.path)
+        with self.assertRaises(ciw.CIWatchTamperedError):
+            ciw.current_streak(entries, "dawn-run", "success")
+
 
 class TestTrackedWorkflows(unittest.TestCase):
     def test_dawn_run_and_pages_are_tracked(self):
