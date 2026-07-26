@@ -97,9 +97,16 @@ def _entries(path: str = LOG) -> list:
             if not line.strip():
                 continue
             try:
-                entries.append(json.loads(line))
+                parsed = json.loads(line)
             except json.JSONDecodeError as exc:
                 entries.append({"_malformed": True, "_error": str(exc)})
+                continue
+            if not isinstance(parsed, dict):
+                entries.append(
+                    {"_malformed": True, "_error": f"not a JSON object: {parsed!r}"}
+                )
+                continue
+            entries.append(parsed)
     return entries
 
 

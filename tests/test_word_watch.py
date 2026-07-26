@@ -123,6 +123,31 @@ class TestLastWordState(_TempTownCase):
         with self.assertRaises(ww.WordWatchTamperedError):
             ww.last_word_state(path=self.log)
 
+    def test_entries_marks_a_non_dict_line_instead_of_crashing(self):
+        # A line can parse cleanly as JSON but not be an object at all (a
+        # bare number, null, list, or stray string) -- _entries() must name
+        # it the same as a decode failure, not hand back the raw value for
+        # a caller's unconditional .get("_malformed") to crash on.
+        state = ww.compute_word_state(root=self.tmp)
+        ww.record_word_check(state, "2026-07-15T00:00:00Z", path=self.log)
+        with open(self.log, "a") as f:
+            f.write("5\n")
+        entries = ww._entries(path=self.log)
+        self.assertEqual(len(entries), 2)
+        self.assertTrue(entries[1]["_malformed"])
+        self.assertIn("_error", entries[1])
+
+    def test_raises_tampered_error_on_a_non_dict_tip_instead_of_crashing(self):
+        # Pre-fix this raised an uncaught AttributeError ('int' object has
+        # no attribute 'get'); it must now raise the named, catchable
+        # WordWatchTamperedError instead, same as a decode failure.
+        state = ww.compute_word_state(root=self.tmp)
+        ww.record_word_check(state, "2026-07-15T00:00:00Z", path=self.log)
+        with open(self.log, "a") as f:
+            f.write("5\n")
+        with self.assertRaises(ww.WordWatchTamperedError):
+            ww.last_word_state(path=self.log)
+
     def test_a_valid_tip_after_a_malformed_earlier_line_is_unaffected(self):
         # Only the TIP matters for last_word_state's guess-refusal -- an
         # older malformed line sitting earlier in the log (already surfaced
