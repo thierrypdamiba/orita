@@ -125,6 +125,36 @@ class LedgerCoreCase(unittest.TestCase):
         with open(self.mod.LEDGER) as f:
             self.assertEqual(len(f.readlines()), 2)
 
+    def test_entries_marks_a_valid_but_non_dict_line_as_malformed(self):
+        # A line can parse cleanly with json.loads() and still not be the
+        # object every entry must be (a bare number, null, list, or stray
+        # string survives a hand edit or truncation as valid JSON). Pre-fix
+        # this line came back unmarked and later crashed verify()/append()
+        # with an uncaught AttributeError instead of being named tampering.
+        self.mod.append("nisaba", "test", "one", "2026-07-14T00:00:00+00:00")
+        with open(self.mod.LEDGER, "a") as f:
+            f.write("5\n")
+        entries = self.mod._entries()
+        self.assertEqual(len(entries), 2)
+        self.assertTrue(entries[1]["_malformed"])
+        self.assertIn("_error", entries[1])
+
+    def test_verify_reports_broken_chain_on_non_dict_line_not_a_crash(self):
+        self.mod.append("nisaba", "test", "one", "2026-07-14T00:00:00+00:00")
+        with open(self.mod.LEDGER, "a") as f:
+            f.write("null\n")
+        # Pre-fix this raised AttributeError; it must now return False.
+        self.assertFalse(self.mod.verify())
+
+    def test_append_refuses_on_a_non_dict_tip_instead_of_crashing(self):
+        self.mod.append("nisaba", "test", "one", "2026-07-14T00:00:00+00:00")
+        with open(self.mod.LEDGER, "a") as f:
+            f.write("[1, 2]\n")
+        with self.assertRaises(self.mod.LedgerTamperedError):
+            self.mod.append("nisaba", "test", "two", "2026-07-14T00:01:00+00:00")
+        with open(self.mod.LEDGER) as f:
+            self.assertEqual(len(f.readlines()), 2)
+
 
 class ParseAppendArgsCase(unittest.TestCase):
     """The CLI guard: rejects flag-shaped actor/act, mirroring the real

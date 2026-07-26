@@ -27,7 +27,11 @@ def _entries():
     already exists to report, not an uncaught json.JSONDecodeError. Such a
     line comes back as {"_malformed": True, "_error": ...} instead, mirroring
     the same convention fencepost/seam_engine/ledger.py's read_records()
-    already uses for its own tampered-tablet case.
+    already uses for its own tampered-tablet case. A line that parses cleanly
+    to a non-dict JSON value (a bare number, null, list, or stray string) is
+    the same tampering, just not a decode failure -- it is marked _malformed
+    too, so every downstream .get("_malformed") call site gets the guard for
+    free instead of crashing with an uncaught AttributeError.
     """
     if not os.path.exists(LEDGER):
         return []
@@ -37,9 +41,14 @@ def _entries():
             if not line.strip():
                 continue
             try:
-                entries.append(json.loads(line))
+                parsed = json.loads(line)
             except json.JSONDecodeError as exc:
                 entries.append({"_malformed": True, "_error": str(exc)})
+                continue
+            if not isinstance(parsed, dict):
+                entries.append({"_malformed": True, "_error": f"not a JSON object: {parsed!r}"})
+                continue
+            entries.append(parsed)
     return entries
 
 
