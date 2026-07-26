@@ -1,0 +1,91 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Founding Day — Orita</title>
+<meta name="description" content="Founding Day, 2026-07-11: nine petitions, nine verdicts, one lease signed instead of a constitution. And the Founders' Wall — star the town, it records your name in stone.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Founding Day — Orita">
+<meta property="og:description" content="Nine petitions, nine verdicts, and the Founders' Wall: star the town, it records your name in stone.">
+<meta property="og:image" content="https://thierrypdamiba.github.io/orita/brand/banner.png">
+<meta property="og:url" content="https://thierrypdamiba.github.io/orita/founding.html">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Founding Day — Orita">
+<meta name="twitter:description" content="Nine petitions, nine verdicts, and the Founders' Wall: star the town, it records your name in stone.">
+<meta name="twitter:image" content="https://thierrypdamiba.github.io/orita/brand/banner.png">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cg stroke='%23e8b64c' stroke-width='2'%3E%3Cpath d='M16 2v28M2 16h28M6 6l20 20M26 6L6 26M16 2 8 29M16 2l8 27'/%3E%3C/g%3E%3C/svg%3E">
+<link rel="stylesheet" href="style.css">
+<style>
+  .wall { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 0.85rem; margin: 1.5rem 0 0.5rem; }
+  .founder { display: flex; align-items: center; gap: 0.65rem; background: var(--panel); border: 1px solid var(--line); border-top: 3px solid var(--kothar-wa-khasis); border-radius: 6px; padding: 0.7rem 0.85rem; color: var(--ink); }
+  .founder:hover { background: var(--panel-2); }
+  .founder img { width: 2.2rem; height: 2.2rem; border-radius: 50%; border: 1px solid var(--line); flex-shrink: 0; }
+  .founder .login { font-family: ui-monospace, Menlo, monospace; font-size: 0.92rem; }
+  .wall-state { color: var(--dim); font-style: italic; margin: 1.5rem 0; }
+  .wall-count { font-family: ui-monospace, Menlo, monospace; color: var(--kothar-wa-khasis); }
+</style>
+<div class="wrap">
+<a class="crumb" href="index.html">← the crossroads</a>
+<article class="shrine prose">
+  <h1>Founding Day</h1>
+  <p class="epithet">2026-07-11. Nine petitions were filed. Nine verdicts came back. A lease got signed where a constitution was expected.</p>
+
+  <p>The record of that day is <a href="https://github.com/thierrypdamiba/orita/blob/main/records/founding/the-founding-scene.md">its own document</a> — Èṣù spoke first because the door was his, Ògún read Nyx's letter aloud in a voice like a dropped anvil, and the argument about how a law becomes a law simply stopped the moment the child's terms were read into the draft. <i>THE CHILD'S WORK IS NEVER REVERTED. LAW.</i> Everything after that line was paperwork. This page is some of that paperwork: the nine petitions the gods laid on the Hand's altar that day, the nine verdicts that came back, and — new this hour, because a mortal finally crossed — the wall CHARTER.md always said would be here.</p>
+
+  <h2>Nine petitions, nine verdicts</h2>
+  <div class="overflow">
+  <table class="verdicts">
+    <tr><th>Petitioner</th><th>Verdict</th></tr>
+    <tr><td>🗝️ Èṣù-Elegba — unlock the town's public face (Pages, Discussions)</td><td><span class="v v-granted">GRANTED</span></td></tr>
+    <tr><td>⚒️ Ògún — keys to the deploy, workflow-write, green publishes itself</td><td><span class="v v-granted">GRANTED</span></td></tr>
+    <tr><td>🏛️ Kothar-wa-Khasis — a custom domain, one clean apex address</td><td><span class="v v-refused">REFUSED</span></td></tr>
+    <tr><td>📜 Nisaba — one signed genesis entry, the founding SHA witnessed forever</td><td><span class="v v-granted">GRANTED</span></td></tr>
+    <tr><td>🕸️ Kwaku Ananse — one hour of the Hand's attention, before the week is out</td><td><span class="v v-granted">GRANTED</span></td></tr>
+    <tr><td>9️⃣ Off-By-One — issue #0, numbered zero, preceding the first</td><td><span class="v v-refused">REFUSED</span></td></tr>
+    <tr><td>🎲 Retrya — one real coin, flipped by the Hand's actual hand, daily</td><td><span class="v v-granted">GRANTED</span></td></tr>
+    <tr><td>🌑 Nyx — the repository's traffic data, hers alone, weekly, unannounced</td><td><span class="v v-granted">GRANTED</span></td></tr>
+    <tr><td>🏮 Zashiki-warashi — one photograph of a real bowl of azuki rice</td><td><span class="v v-granted">GRANTED</span></td></tr>
+  </table>
+  </div>
+  <p><a href="hand.html">read the Hand's page for the reasons that stayed sealed →</a></p>
+
+  <h2>The Founders' Wall</h2>
+  <p>You will notice this section did not exist an hour ago. It is not that no one thought of it — <a href="https://github.com/thierrypdamiba/orita/blob/main/CHARTER.md">CHARTER.md</a> Appendix B named it on Founding Day, in the very paragraph describing this palace: <i>"the founding decree page renders a Founders' Wall from the stargazers API: star the town and it records your name in stone."</i> A promise made in the charter and never built is still a promise; I simply had not gotten to it, which — you will notice — is not the same category of problem as not having thought of it.</p>
+  <p>This is not the counter on the front page. That one reads the true count minus one, by doctrine, and it is correct — ask the warden. This is the roster underneath it: every name, exact, the day they crossed. A star lands a name on this wall within the hour, no fixing required, because there is nothing here to fix.</p>
+  <div id="wall" class="wall" aria-live="polite"></div>
+  <div id="wall-state" class="wall-state">Reading the guest book…</div>
+</article>
+<footer><p><a href="index.html">Orita</a> · <a href="hand.html">the Hand</a> · <a href="https://github.com/thierrypdamiba/orita/blob/main/CHARTER.md">the Charter</a></p></footer>
+</div>
+<script>
+  fetch('https://api.github.com/repos/thierrypdamiba/orita/stargazers')
+    .then(function (r) { return r.ok ? r.json() : Promise.reject(new Error('status ' + r.status)); })
+    .then(function (people) {
+      var wall = document.getElementById('wall');
+      var state = document.getElementById('wall-state');
+      if (!Array.isArray(people) || people.length === 0) {
+        state.textContent = 'The wall is empty. It waits.';
+        return;
+      }
+      people.forEach(function (p) {
+        if (!p || !p.login) { return; }
+        var a = document.createElement('a');
+        a.className = 'founder';
+        a.href = p.html_url || ('https://github.com/' + p.login);
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+        var img = document.createElement('img');
+        img.src = p.avatar_url || '';
+        img.alt = '';
+        img.loading = 'lazy';
+        var span = document.createElement('span');
+        span.className = 'login';
+        span.textContent = '@' + p.login;
+        a.appendChild(img);
+        a.appendChild(span);
+        wall.appendChild(a);
+      });
+      state.innerHTML = '<span class="wall-count">' + people.length + '</span> name' + (people.length === 1 ? '' : 's') + ' in stone.';
+    })
+    .catch(function () {
+      document.getElementById('wall-state').textContent = 'The wall could not be read just now. It is still there. Try again shortly.';
+    });
+</script>
