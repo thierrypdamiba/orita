@@ -111,7 +111,12 @@ def _entries(path=LOG):
     {"_malformed": True, "_error": ...} instead, the same convention
     tools/ledger.py's _entries() uses (mirrored since in change_gate.py,
     x_post_queue.py, word_watch.py, consent_grant_log.py, ci_watch.py,
-    scribe_growth_check.py, voice_window_check.py).
+    scribe_growth_check.py, voice_window_check.py, square_check.py). A
+    line that parses cleanly but isn't a JSON object (a bare number, null,
+    list, or stray string) gets the same treatment -- otherwise it comes
+    back as e.g. a bare int, and _tool_entries()'s e.get("_malformed")
+    crashes with an uncaught AttributeError instead of the named
+    XOutageTrackerTamperedError this module already promises.
     """
     if not os.path.exists(path):
         return []
@@ -121,9 +126,16 @@ def _entries(path=LOG):
             if not line.strip():
                 continue
             try:
-                entries.append(json.loads(line))
+                parsed = json.loads(line)
             except json.JSONDecodeError as exc:
                 entries.append({"_malformed": True, "_error": str(exc)})
+                continue
+            if not isinstance(parsed, dict):
+                entries.append(
+                    {"_malformed": True, "_error": f"not a JSON object: {parsed!r}"}
+                )
+                continue
+            entries.append(parsed)
     return entries
 
 
@@ -210,8 +222,11 @@ def should_recheck(entries: list, tool: str, now: str, cooldown_hours: float = D
 def _escalation_entries(path=ESCALATION_LOG) -> list:
     """Every line in the escalation log, parsed.
 
-    Same convention as _entries() above: an unparseable line comes back
-    marked {"_malformed": True, "_error": ...} instead of raising.
+    Same convention as _entries() above: an unparseable line, or one that
+    parses cleanly but isn't a JSON object, comes back marked
+    {"_malformed": True, "_error": ...} instead of raising or being handed
+    to already_escalated_for_streak()'s e.get("_malformed") as a bare
+    non-dict value (which would crash with an uncaught AttributeError).
     """
     if not os.path.exists(path):
         return []
@@ -221,9 +236,16 @@ def _escalation_entries(path=ESCALATION_LOG) -> list:
             if not line.strip():
                 continue
             try:
-                entries.append(json.loads(line))
+                parsed = json.loads(line)
             except json.JSONDecodeError as exc:
                 entries.append({"_malformed": True, "_error": str(exc)})
+                continue
+            if not isinstance(parsed, dict):
+                entries.append(
+                    {"_malformed": True, "_error": f"not a JSON object: {parsed!r}"}
+                )
+                continue
+            entries.append(parsed)
     return entries
 
 

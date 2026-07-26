@@ -425,6 +425,26 @@ class TestTamperedCheckLog(_TempLogCase):
         self.assertTrue(entries[1]["_malformed"])
         self.assertIn("_error", entries[1])
 
+    def test_entries_marks_a_valid_but_non_dict_line_as_malformed(self):
+        # A line that parses cleanly to a bare int (not a JSON object) must
+        # not be handed back as-is -- _tool_entries()'s e.get("_malformed")
+        # would crash on it with an uncaught AttributeError.
+        xot.record_check("X_PostTweet", "forbidden", "2026-07-14T01:09:00Z", path=self.path)
+        with open(self.path, "a", encoding="utf-8") as f:
+            f.write("5\n")
+        entries = xot._entries(self.path)
+        self.assertEqual(len(entries), 2)
+        self.assertTrue(entries[1]["_malformed"])
+        self.assertIn("_error", entries[1])
+
+    def test_current_streak_raises_tampered_error_on_a_non_dict_tip_instead_of_crashing(self):
+        xot.record_check("X_PostTweet", "forbidden", "2026-07-14T01:09:00Z", path=self.path)
+        with open(self.path, "a", encoding="utf-8") as f:
+            f.write("5\n")
+        entries = xot._entries(self.path)
+        with self.assertRaises(xot.XOutageTrackerTamperedError):
+            xot.current_streak(entries, "X_PostTweet")
+
     def test_current_streak_raises_tampered_error_when_a_malformed_line_exists_anywhere(self):
         # The malformed line sits BEFORE the tip, not at it -- current_streak
         # can walk arbitrarily far back through a long trailing streak, so it
@@ -480,6 +500,23 @@ class TestTamperedEscalationLog(_TempLogCase):
         self.assertEqual(len(entries), 2)
         self.assertTrue(entries[1]["_malformed"])
         self.assertIn("_error", entries[1])
+
+    def test_escalation_entries_marks_a_valid_but_non_dict_line_as_malformed(self):
+        xot.record_escalation("X_PostTweet", "2026-07-14T01:09:00Z", "2026-07-16T02:00:00Z", 48.85, path=self.path)
+        with open(self.path, "a", encoding="utf-8") as f:
+            f.write("5\n")
+        entries = xot._escalation_entries(path=self.path)
+        self.assertEqual(len(entries), 2)
+        self.assertTrue(entries[1]["_malformed"])
+        self.assertIn("_error", entries[1])
+
+    def test_already_escalated_for_streak_raises_tampered_error_on_a_non_dict_line_instead_of_crashing(self):
+        xot.record_escalation("X_PostTweet", "2026-07-14T01:09:00Z", "2026-07-16T02:00:00Z", 48.85, path=self.path)
+        with open(self.path, "a", encoding="utf-8") as f:
+            f.write("5\n")
+        entries = xot._escalation_entries(path=self.path)
+        with self.assertRaises(xot.XOutageTrackerTamperedError):
+            xot.already_escalated_for_streak(entries, "X_PostTweet", "2026-07-14T01:09:00Z")
 
     def test_already_escalated_for_streak_raises_tampered_error_when_a_malformed_line_exists_anywhere(self):
         xot.record_escalation("X_PostTweet", "2026-07-14T01:09:00Z", "2026-07-16T02:00:00Z", 48.85, path=self.path)
