@@ -193,6 +193,37 @@ class TestTamperedLog(unittest.TestCase):
                 path=self.log,
             )
 
+    def test_entries_marks_a_non_dict_line_instead_of_crashing(self):
+        # A line can parse cleanly as JSON but not be an object at all (a
+        # bare number, null, list, or stray string) -- _entries() must name
+        # it the same as a decode failure, not hand back the raw value for
+        # a caller's unconditional .get("_malformed") to crash on.
+        vwc.record_commits(
+            [{"sha": "a1", "author": "Nyx", "author_date": "2026-07-16T03:00:00Z"}],
+            "2026-07-17T07:00:00Z",
+            path=self.log,
+        )
+        with open(self.log, "a", encoding="utf-8") as f:
+            f.write("5\n")
+        entries = vwc._entries(self.log)
+        self.assertEqual(len(entries), 2)
+        self.assertTrue(entries[1]["_malformed"])
+        self.assertIn("_error", entries[1])
+
+    def test_raises_tampered_error_on_a_non_dict_tip_instead_of_crashing(self):
+        # Pre-fix this raised an uncaught AttributeError ('int' object has
+        # no attribute 'get'); it must now raise the named, catchable
+        # VoiceWindowTamperedError instead, same as a decode failure.
+        vwc.record_commits(
+            [{"sha": "a1", "author": "Nyx", "author_date": "2026-07-16T03:00:00Z"}],
+            "2026-07-17T07:00:00Z",
+            path=self.log,
+        )
+        with open(self.log, "a", encoding="utf-8") as f:
+            f.write("5\n")
+        with self.assertRaises(vwc.VoiceWindowTamperedError):
+            vwc.check(commits=None, now_iso=None, path=self.log)
+
 
 if __name__ == "__main__":
     unittest.main()
