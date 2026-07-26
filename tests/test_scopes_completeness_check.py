@@ -12,6 +12,7 @@ import tempfile
 import unittest
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.join(ROOT, "tools"))
 
 
 def _load(name, path):
@@ -23,6 +24,7 @@ def _load(name, path):
 
 
 scc = _load("scopes_completeness_check", os.path.join(ROOT, "tools", "scopes_completeness_check.py"))
+import arcade_app_watch  # noqa: E402
 
 _SAMPLE_SECTION = """## Every connected app, accounted for
 
@@ -107,6 +109,19 @@ class MissingAppDetectionCase(unittest.TestCase):
             result = scc.check_scopes_completeness(scopes_path=scopes_path, app_log_path=log_path)
             self.assertTrue(result["clean"])
             self.assertEqual(result["connected_app_ids"], ["arcade-github"])
+
+    def test_malformed_last_line_raises_tamper_error_not_json_decode_error(self):
+        """A truncated/malformed last line must never crash this checker
+        with a raw json.JSONDecodeError -- it should read through
+        arcade_app_watch.py's own guarded last_app_state(), which raises
+        the intended ArcadeAppWatchTamperedError instead."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            log_path = os.path.join(tmpdir, "log.jsonl")
+            with open(log_path, "w") as f:
+                f.write(json.dumps({"connected_app_ids": ["arcade-github"]}) + "\n")
+                f.write("{truncated garbage not json")
+            with self.assertRaises(arcade_app_watch.ArcadeAppWatchTamperedError):
+                scc._last_connected_app_ids(log_path)
 
 
 class RealDocCase(unittest.TestCase):

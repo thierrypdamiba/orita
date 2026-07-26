@@ -28,6 +28,9 @@ import os
 import re
 import sys
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import arcade_app_watch  # noqa: E402
+
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DEFAULT_SCOPES_PATH = os.path.join(ROOT, "fencepost", "SCOPES.md")
 DEFAULT_APP_LOG_PATH = os.path.join(ROOT, "HAND", "arcade-app-check-log.jsonl")
@@ -54,18 +57,18 @@ def _accounted_for_app_ids(scopes_text: str) -> set:
 
 
 def _last_connected_app_ids(app_log_path: str) -> list:
-    """The most recently recorded `connected_app_ids` list from
-    `arcade_app_watch.py`'s own durable log. Empty list if the log has
-    never been written -- nothing connected is not an error."""
-    if not os.path.exists(app_log_path):
+    """The most recently recorded `connected_app_ids` list, read through
+    `arcade_app_watch.py`'s own guarded `last_app_state()` rather than a
+    second, unguarded parse of the same file. A malformed last line
+    raises `arcade_app_watch.ArcadeAppWatchTamperedError` -- the same
+    refuse-to-guess-past-a-corrupted-tip guarantee every other reader of
+    this log already gets -- instead of an uncaught
+    `json.JSONDecodeError`. Empty list if the log has never been
+    written -- nothing connected is not an error."""
+    state = arcade_app_watch.last_app_state(path=app_log_path)
+    if state is None:
         return []
-    import json
-
-    with open(app_log_path) as f:
-        lines = [line for line in f if line.strip()]
-    if not lines:
-        return []
-    return json.loads(lines[-1]).get("connected_app_ids", [])
+    return state.get("connected_app_ids", [])
 
 
 def check_scopes_completeness(
