@@ -75,6 +75,26 @@ def test_episode_number_matches_number_of_tablet_files(tmp_path: Path):
     assert streak.episode_number(tmp_path) == len(tablets) == 5
 
 
+def test_episode_number_skips_a_digit_shaped_but_not_a_real_date_tablet(tmp_path: Path):
+    # ledger._tablet_files' own filter is a digit-shape regex, not a real
+    # calendar-date check -- "2026-02-30" and "2026-13-01" both match it.
+    # A hand-edited/typo'd tablet name with that shape must not crash the
+    # whole read; it is skipped like any other malformed entry.
+    _append_day(tmp_path, date(2026, 7, 1))
+    _append_day(tmp_path, date(2026, 7, 2))
+    gaps = ledger.gaps_dir(tmp_path)
+    (gaps / "2026-02-30.md").write_text("# not a real date\n")
+    (gaps / "2026-13-01.md").write_text("# not a real date either\n")
+    assert streak.episode_number(tmp_path) == 2
+
+
+def test_consecutive_days_skips_a_digit_shaped_but_not_a_real_date_tablet(tmp_path: Path):
+    _append_day(tmp_path, date(2026, 7, 1))
+    _append_day(tmp_path, date(2026, 7, 2))
+    (ledger.gaps_dir(tmp_path) / "2026-02-30.md").write_text("# not a real date\n")
+    assert streak.consecutive_days(tmp_path) == 2
+
+
 # --- consecutive_days: an unbroken run, reset by any real gap ------------------
 
 

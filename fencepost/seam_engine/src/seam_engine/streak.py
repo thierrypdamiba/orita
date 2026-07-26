@@ -60,11 +60,26 @@ def _tablet_dates(base: Path | None = None) -> list[date]:
     Reads the same tablet files `ledger.read_records` does (one `.md` per
     UTC day, named `YYYY-MM-DD.md`) but only needs the filenames, not the
     typed records inside them — a day either opened a tablet or it didn't.
+
+    `ledger._tablet_files`' own filter (a fullmatch against four digits,
+    dash, two digits, dash, two digits) is a digit-shape check, not a real
+    calendar-date one — `2026-02-30` and
+    `2026-13-01` both match it. A hand-edited or typo'd tablet name with that
+    shape is skipped here rather than crashing every caller
+    (`episode_number`, `consecutive_days`, `longest_streak`, and
+    `report.render_latest`, which calls this unconditionally for the town's
+    real daily Report) with an uncaught `ValueError` — the same
+    "skip a malformed entry, never let it break the whole read" discipline
+    `metrics_cadence_check._read_dates`/`report_cadence_check._shipped_dates`
+    already hold for their own date-bearing sources.
     """
     dates: set[date] = set()
     for path in ledger._tablet_files(base):
-        year, month, day = (int(part) for part in path.stem.split("-"))
-        dates.add(date(year, month, day))
+        try:
+            year, month, day = (int(part) for part in path.stem.split("-"))
+            dates.add(date(year, month, day))
+        except ValueError:
+            continue
     return sorted(dates)
 
 
