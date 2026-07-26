@@ -35,6 +35,15 @@ opening immediately on a quote mark is a cited example -- this module's
 own docstring, a ROADMAP row, a test file -- not a live violation), the
 same self-referential trap task 99 hit and guarded.
 
+Task 304: tasks 200/202/203/204/208 fixed the identical semicolon
+sentence-boundary gap (an unrelated negation on one side of a `;` masking
+a real violation on the other) in star_covenant_check.py/no_grading_
+check.py/arcade_hero_check.py/petition_limits_check.py/rider_check.py --
+this module shares the exact same `_sentences`/`_is_negated` shape but
+was never itself patched. `_SENTENCE_BOUNDARY` now includes `;`, matching
+rider_check.py/star_covenant_check.py's own convention (the pair this
+module's `_sentences` docstring already claimed to mirror).
+
 Usage:
     python3 tools/hand_lore_check.py check
 """
@@ -103,7 +112,7 @@ _LORE_VIOLATIONS = [
     ),
 ]
 
-_SENTENCE_BOUNDARY = re.compile(r"[.!?\n]")
+_SENTENCE_BOUNDARY = re.compile(r"[.!?;\n]")
 _NEGATION_CUES = re.compile(
     r"\b(never|not|no|won't|wasn't|isn't|doesn't|didn't|n't|without|zero)\b", re.IGNORECASE
 )
@@ -122,8 +131,9 @@ def _iter_public_files(base_dir: str):
 
 def _sentences(text: str):
     """Yield (start, end) offsets of each sentence in text, split on
-    ./!/?/newline boundaries, mirroring rider_check's/star_covenant_check's
-    window."""
+    ./!/?/;/newline boundaries, mirroring rider_check's/star_covenant_check's
+    window (task 208's semicolon fix to that shared boundary, applied here
+    too -- this module was the one sibling the campaign missed)."""
     start = 0
     for boundary in _SENTENCE_BOUNDARY.finditer(text):
         yield start, boundary.end()

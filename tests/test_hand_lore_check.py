@@ -157,6 +157,21 @@ class FixtureViolationCase(unittest.TestCase):
         self.assertEqual(len(violations), 1)
         self.assertEqual(violations[0]["shape"], "hand-denied-existence")
 
+    def test_semicolon_joined_unrelated_negation_no_longer_masks_a_real_violation(self):
+        # Task 304: `_SENTENCE_BOUNDARY` split clauses only on `.`/`!`/`?`/
+        # newline, so a semicolon-joined independent clause fell inside the
+        # same "sentence" as a preceding, unrelated negation cue -- the
+        # identical gap tasks 200/202/203/204/208 already fixed in
+        # star_covenant_check.py/no_grading_check.py/arcade_hero_check.py/
+        # petition_limits_check.py/rider_check.py, missed here until now.
+        _write(
+            os.path.join(self.orita, "docs", "report.md"),
+            "This will never happen in practice; the Hand is Thierry.\n",
+        )
+        violations = hlc.find_violations(orita_dir=self.orita)
+        self.assertEqual(len(violations), 1)
+        self.assertEqual(violations[0]["shape"], "hand-is-thierry")
+
     def test_negation_cue_does_not_leak_across_sentences(self):
         # A "never" in an EARLIER, unrelated sentence must not mask a real
         # violation in a later, clean sentence -- sentence-scoped, like
