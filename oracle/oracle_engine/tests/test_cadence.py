@@ -133,6 +133,21 @@ class TestRecentTaskVelocity(unittest.TestCase):
         with self.assertRaises(cadence.CadenceError):
             cadence.recent_task_velocity(entries, datetime.datetime(2026, 7, 13, 11, 30))
 
+    def test_skips_a_shape_matching_but_calendar_invalid_date(self):
+        # "2026-13-40" matches _LOG_LINE_RE's digit-shape-only date group
+        # (\d{4}-\d{2}-\d{2}) but is not a real calendar date -- month 13,
+        # day 40. A hand-edited or corrupted BUILDLOG.md line like this
+        # must not crash the daily oracle-cadence cron; it should be
+        # skipped like any other unparseable entry, while a real sibling
+        # line in the same log still counts normally.
+        log = (
+            "2026-07-13 07:10 UTC | nisaba | 31 | Prediction schema shipped\n"
+            "2026-13-40 09:10 UTC | someone | 99 | a corrupted BUILDLOG line\n"
+        )
+        entries = cadence.parse_buildlog(log)
+        velocity = cadence.recent_task_velocity(entries, _NOW, window_hours=24)
+        self.assertEqual(velocity, 1)
+
 
 class TestBuildPrediction(unittest.TestCase):
     def test_claim_names_the_threshold_and_horizon(self):

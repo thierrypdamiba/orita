@@ -107,9 +107,17 @@ def recent_task_velocity(
         task = e["task"].strip()
         if not task.isdigit():
             continue
-        ts = datetime.datetime.strptime(
-            f"{e['date']} {_minute_floor(e['time'])}", "%Y-%m-%d %H:%M"
-        ).replace(tzinfo=datetime.timezone.utc)
+        try:
+            ts = datetime.datetime.strptime(
+                f"{e['date']} {_minute_floor(e['time'])}", "%Y-%m-%d %H:%M"
+            ).replace(tzinfo=datetime.timezone.utc)
+        except ValueError:
+            # _LOG_LINE_RE's date group is a digit-shape match only
+            # (\d{4}-\d{2}-\d{2}), not a real calendar-date check -- a
+            # hand-edited or corrupted line like "2026-13-40" matches the
+            # shape and reaches here. Skip it like any other unparseable
+            # entry rather than crashing the daily oracle-cadence cron.
+            continue
         if cutoff <= ts <= now:
             seen.add(task)
     return len(seen)
