@@ -106,6 +106,15 @@ def _entries(path=LOG):
     {"_malformed": True, "_error": ...} instead, the same convention
     tools/ledger.py's _entries() already uses for its own tampered-tablet
     case (itself mirroring fencepost/seam_engine/ledger.py's read_records()).
+
+    A line that parses cleanly but not to a JSON object (a bare number,
+    null, list, or string -- a hand-edit or a truncated write that still
+    happens to be syntactically valid) gets the same {"_malformed": True}
+    sentinel: every real entry this log ever writes (record_posted_gap())
+    is a dict, so a successfully-parsed non-dict is exactly as untrustworthy
+    as a decode failure, and every caller already checks entries[-1].get(
+    "_malformed") -- guarding here means they get that protection for free
+    instead of each needing its own isinstance() check.
     """
     if not os.path.exists(path):
         return []
@@ -115,9 +124,22 @@ def _entries(path=LOG):
             if not line.strip():
                 continue
             try:
-                entries.append(json.loads(line))
+                parsed = json.loads(line)
             except json.JSONDecodeError as exc:
                 entries.append({"_malformed": True, "_error": str(exc)})
+                continue
+            if not isinstance(parsed, dict):
+                entries.append(
+                    {
+                        "_malformed": True,
+                        "_error": (
+                            f"line parsed to {type(parsed).__name__}, "
+                            "not a JSON object"
+                        ),
+                    }
+                )
+                continue
+            entries.append(parsed)
     return entries
 
 

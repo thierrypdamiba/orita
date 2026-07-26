@@ -196,6 +196,32 @@ class TestLastPostedGap(_TempLogCase):
         cg.record_posted_gap("second gap", "2026-07-14T02:00:00Z", path=self.path)
         self.assertEqual(cg.last_posted_gap(path=self.path), "second gap")
 
+    def test_entries_marks_a_non_dict_valid_json_line_as_malformed_too(self):
+        # A line can be syntactically valid JSON (json.loads succeeds) but
+        # not an object at all -- a bare number, null, list, or string, the
+        # shape a truncated-but-still-parseable write or a careless hand-
+        # edit can leave behind. Every real entry this log ever writes
+        # (record_posted_gap()) is a dict, so this is exactly as
+        # untrustworthy as a decode failure and must get the same sentinel.
+        cg.record_posted_gap("first gap", "2026-07-14T01:00:00Z", path=self.path)
+        with open(self.path, "a") as f:
+            f.write("5\n")
+        entries = cg._entries(path=self.path)
+        self.assertEqual(len(entries), 2)
+        self.assertTrue(entries[1]["_malformed"])
+        self.assertIn("_error", entries[1])
+
+    def test_raises_tampered_error_on_a_non_dict_tip_instead_of_crashing(self):
+        # Pre-fix this raised an uncaught AttributeError ('int' object has
+        # no attribute 'get') from last_posted_gap()'s entries[-1].get(
+        # "_malformed") call -- it must now raise the named, catchable
+        # PostedGapLogTamperedError instead, same as a JSON-decode failure.
+        cg.record_posted_gap("first gap", "2026-07-14T01:00:00Z", path=self.path)
+        with open(self.path, "a") as f:
+            f.write("5\n")
+        with self.assertRaises(cg.PostedGapLogTamperedError):
+            cg.last_posted_gap(path=self.path)
+
 
 class TestShouldPostGap(_TempLogCase):
     def test_due_when_never_posted_before(self):
