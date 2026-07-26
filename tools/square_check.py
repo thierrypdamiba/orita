@@ -79,7 +79,12 @@ def _entries(path=LOG):
     tools/ledger.py's _entries() already uses (mirrored since in
     change_gate.py, x_post_queue.py, word_watch.py, consent_grant_log.py,
     ci_watch.py, scribe_growth_check.py, voice_window_check.py,
-    x_outage_tracker.py, arcade_app_watch.py).
+    x_outage_tracker.py, arcade_app_watch.py). A line that parses cleanly to
+    a non-dict JSON value (a bare number, null, list, or stray string) is
+    the same tampering, just not a decode failure -- it is marked
+    _malformed too, so last_square_state()'s unconditional
+    entries[-1].get("_malformed") gets the guard for free instead of
+    crashing with an uncaught AttributeError.
     """
     if not os.path.exists(path):
         return []
@@ -89,9 +94,14 @@ def _entries(path=LOG):
             if not line.strip():
                 continue
             try:
-                entries.append(json.loads(line))
+                parsed = json.loads(line)
             except json.JSONDecodeError as exc:
                 entries.append({"_malformed": True, "_error": str(exc)})
+                continue
+            if not isinstance(parsed, dict):
+                entries.append({"_malformed": True, "_error": f"not a JSON object: {parsed!r}"})
+                continue
+            entries.append(parsed)
     return entries
 
 

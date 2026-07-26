@@ -218,6 +218,32 @@ class TestLastSquareState(_TempLogCase):
         with self.assertRaises(sc.SquareCheckTamperedError):
             sc.last_square_state(path=self.path)
 
+    def test_entries_marks_a_valid_but_non_dict_line_as_malformed(self):
+        # A line can parse cleanly with json.loads() and still not be the
+        # object every entry must be (a bare number, null, list, or stray
+        # string survives a hand edit or truncation as valid JSON). Pre-fix
+        # this line came back unmarked and later crashed last_square_state()
+        # with an uncaught AttributeError instead of being named tampering
+        # (the same shape tasks 309-315 already closed in their own files).
+        state = sc.compute_square_state(ISSUES_BASE, PRS_NONE)
+        sc.record_square_check(state, "2026-07-14T20:00:00Z", path=self.path)
+        with open(self.path, "a") as f:
+            f.write("5\n")
+        entries = sc._entries(path=self.path)
+        self.assertEqual(len(entries), 2)
+        self.assertTrue(entries[1]["_malformed"])
+        self.assertIn("_error", entries[1])
+
+    def test_raises_tampered_error_on_a_non_dict_tip_instead_of_crashing(self):
+        state = sc.compute_square_state(ISSUES_BASE, PRS_NONE)
+        sc.record_square_check(state, "2026-07-14T20:00:00Z", path=self.path)
+        with open(self.path, "a") as f:
+            f.write("null\n")
+        # Pre-fix this raised an uncaught AttributeError; it must now raise
+        # the named, catchable SquareCheckTamperedError instead.
+        with self.assertRaises(sc.SquareCheckTamperedError):
+            sc.last_square_state(path=self.path)
+
     def test_a_valid_tip_after_a_malformed_earlier_line_is_unaffected(self):
         # Only the TIP matters for last_square_state's guess-refusal -- an
         # older malformed line sitting earlier in the log (already surfaced
