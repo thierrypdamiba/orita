@@ -209,6 +209,32 @@ def test_append_scan_raises_named_error_not_keyerror_when_tip_is_malformed(tmp_p
     assert not (ledger.gaps_dir(tmp_path) / "2026-07-13.md").exists()
 
 
+def test_tip_sealed_raises_named_error_not_keyerror_when_tip_is_malformed(tmp_path: Path):
+    # The same tip-read bug reachable through `seam_engine.report`/
+    # `seam_engine.draftback`, which each used to read `records[-1]["sealed"]`
+    # straight off the tip (duplicated three times across two modules) --
+    # a malformed marker dict carries no "sealed" key any more than it
+    # carries a "seal" key, so on the untouched pre-fix code all three
+    # crashed with a bare `KeyError: 'sealed'`, not this named error.
+    ledger.append_scan(_scan(primary=True, generated_at="honest"), now=_at(2026, 7, 12), base=tmp_path)
+    tablet = ledger.gaps_dir(tmp_path) / "2026-07-12.md"
+    broken = tablet.read_text().replace('"confidence": 0.85', '"confidence": 0.85,,')
+    tablet.write_text(broken)
+
+    records = ledger.read_records(tmp_path)
+    try:
+        ledger.tip_sealed(records)
+        assert False, "tip_sealed() must not silently return a sealed payload for a malformed tip"
+    except ledger.LedgerTamperedError as e:
+        assert "not valid JSON" in str(e)
+
+
+def test_tip_sealed_returns_the_real_payload_when_the_tip_is_intact(tmp_path: Path):
+    ledger.append_scan(_scan(primary=True, generated_at="honest"), now=_at(2026, 7, 12), base=tmp_path)
+    records = ledger.read_records(tmp_path)
+    assert ledger.tip_sealed(records) == records[-1]["sealed"]
+
+
 # --- the count is honest -----------------------------------------------------
 
 

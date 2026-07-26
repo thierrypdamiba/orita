@@ -181,6 +181,75 @@ def test_render_latest_on_empty_ledger_raises(tmp_path: Path):
         pass
 
 
+def test_render_latest_raises_named_error_not_keyerror_when_tip_is_malformed(tmp_path: Path):
+    # render_latest() used to read `records[-1]["sealed"]` straight off the
+    # ledger tip -- a malformed marker dict (ledger.py's own tampering
+    # discipline, task 205) carries no "sealed" key, so a hand-edited/
+    # truncated tablet crashed this with a bare `KeyError: 'sealed'`
+    # instead of the named `ledger.LedgerTamperedError` every other tip
+    # reader in this codebase already raises.
+    ledger.append_scan(
+        {
+            "generated_at": "2026-07-12T11:38:10+00:00",
+            "repo": "x/orita",
+            "confidence_bar": 0.7,
+            "primary_gap": {
+                "slug": "milestone-unannounced",
+                "headline": "x",
+                "detail": "x",
+                "confidence": 0.85,
+                "evidence": [],
+            },
+            "tail": [],
+            "excluded": [],
+        },
+        now=_at(2026, 7, 12),
+        base=tmp_path,
+    )
+    tablet = ledger.gaps_dir(tmp_path) / "2026-07-12.md"
+    broken = tablet.read_text().replace('"confidence": 0.85', '"confidence": 0.85,,')
+    tablet.write_text(broken)
+
+    try:
+        report.render_latest(tmp_path)
+        assert False, "expected LedgerTamperedError, not a bare KeyError"
+    except ledger.LedgerTamperedError as e:
+        assert "not valid JSON" in str(e)
+
+
+def test_main_with_no_args_raises_named_error_not_keyerror_when_tip_is_malformed(tmp_path: Path):
+    # Same bug, reached through the CLI's no-arg branch (`main()`'s
+    # `sealed = records[-1]["sealed"]`), the exact path the daily Action
+    # runs (`python3 -m seam_engine.report --write`, seam-scan.yml).
+    ledger.append_scan(
+        {
+            "generated_at": "2026-07-12T11:38:10+00:00",
+            "repo": "x/orita",
+            "confidence_bar": 0.7,
+            "primary_gap": {
+                "slug": "milestone-unannounced",
+                "headline": "x",
+                "detail": "x",
+                "confidence": 0.85,
+                "evidence": [],
+            },
+            "tail": [],
+            "excluded": [],
+        },
+        now=_at(2026, 7, 12),
+        base=tmp_path,
+    )
+    tablet = ledger.gaps_dir(tmp_path) / "2026-07-12.md"
+    broken = tablet.read_text().replace('"confidence": 0.85', '"confidence": 0.85,,')
+    tablet.write_text(broken)
+
+    try:
+        report.main(["--ledger-base", str(tmp_path)])
+        assert False, "expected LedgerTamperedError, not a bare KeyError"
+    except ledger.LedgerTamperedError as e:
+        assert "not valid JSON" in str(e)
+
+
 # --- the single hand-off: one "your move" line, never an action fired ---------
 
 

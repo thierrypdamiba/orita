@@ -168,6 +168,32 @@ def last_seal(base: Path | None = None) -> str:
     return tip["seal"]
 
 
+def tip_sealed(records: list[dict[str, Any]]) -> dict[str, Any]:
+    """Guarded accessor for the most recent record's `sealed` payload.
+
+    Mirrors `last_seal`'s tip guard, for the *other* thing every reader of
+    the ledger's tip wants: `seam_engine.report`'s `render_latest`/`main`
+    and `seam_engine.draftback`'s `main` each used to read
+    `records[-1]["sealed"]` straight off the tip, duplicated three times
+    across two modules -- and a malformed marker dict carries no `"sealed"`
+    key any more than it carries a `"seal"` key, so all three crashed with
+    a bare `KeyError: 'sealed'` on a hand-edited/truncated tablet instead
+    of the named `LedgerTamperedError` this module's tampering discipline
+    promises everywhere else. `records` must already be known non-empty
+    (same contract `last_seal` holds internally); callers keep their own
+    empty-ledger message since it differs between them.
+    """
+    tip = records[-1]
+    if tip.get("_malformed"):
+        raise LedgerTamperedError(
+            f"the most recent record in {tip.get('_tablet', '?')} is not "
+            f"valid JSON ({tip.get('_error')}) -- the tablet was edited "
+            "after it was sealed, so its sealed payload can't be read. Run "
+            "`python -m seam_engine.ledger verify` to see the full chain break."
+        )
+    return tip["sealed"]
+
+
 def _fenceposts_recorded(base: Path | None = None) -> int:
     """How many entries in the whole ledger named a fencepost (a real gap)."""
     return sum(1 for r in read_records(base) if r.get("sealed", {}).get("primary_gap"))

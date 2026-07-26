@@ -242,7 +242,7 @@ def render_latest(base: Path | None = None) -> str:
         raise ValueError("the ledger is empty — nothing to report yet")
     status = streak.streak_status(base)
     return render_report(
-        records[-1]["sealed"],
+        ledger.tip_sealed(records),
         episode_number=status["episode"],
         streak_days=status["streak_days"],
     )
@@ -285,7 +285,7 @@ def main(argv: list[str] | None = None) -> int:
         if not records:
             print("the ledger is empty — nothing to report yet")
             return 1
-        sealed = records[-1]["sealed"]
+        sealed = ledger.tip_sealed(records)
         # This is the path the daily Action actually runs
         # (`python3 -m seam_engine.report --write`, seam-scan.yml) — the one
         # place a report ships for real, off the live Ledger, so it is the

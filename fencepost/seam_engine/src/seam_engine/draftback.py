@@ -347,7 +347,7 @@ def main(argv: list[str] | None = None) -> int:
         if not records:
             print("the ledger is empty — nothing to draft-back yet")
             return 1
-        sealed = records[-1]["sealed"]
+        sealed = ledger.tip_sealed(records)
 
     preview = render_preview(sealed, channel)
     print(preview)

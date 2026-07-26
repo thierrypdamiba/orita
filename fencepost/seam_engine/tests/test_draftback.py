@@ -289,3 +289,43 @@ def test_cli_reads_from_stdin_sentinel_without_crashing(tmp_path, monkeypatch, c
     assert rc == 0
     out = capsys.readouterr().out
     assert "nothing cleared the bar" in out.lower()
+
+
+def test_main_with_no_sealed_arg_raises_named_error_not_keyerror_when_tip_is_malformed(tmp_path: Path):
+    # main()'s no-arg-but-a-ledger-exists branch used to read
+    # `records[-1]["sealed"]` straight off the ledger tip -- a malformed
+    # marker dict (ledger.py's own tampering discipline, task 205) carries
+    # no "sealed" key, so a hand-edited/truncated tablet crashed this with
+    # a bare `KeyError: 'sealed'` instead of the named
+    # `ledger.LedgerTamperedError` every other tip reader already raises.
+    from datetime import datetime, timezone
+
+    from seam_engine import ledger
+
+    ledger.append_scan(
+        {
+            "generated_at": "2026-07-12T11:38:10+00:00",
+            "repo": "x/orita",
+            "confidence_bar": 0.7,
+            "primary_gap": {
+                "slug": "milestone-unannounced",
+                "headline": "x",
+                "detail": "x",
+                "confidence": 0.85,
+                "evidence": [],
+            },
+            "tail": [],
+            "excluded": [],
+        },
+        now=datetime(2026, 7, 12, 12, tzinfo=timezone.utc),
+        base=tmp_path,
+    )
+    tablet = ledger.gaps_dir(tmp_path) / "2026-07-12.md"
+    broken = tablet.read_text().replace('"confidence": 0.85', '"confidence": 0.85,,')
+    tablet.write_text(broken)
+
+    try:
+        draftback.main(["email", "--base", str(tmp_path)])
+        assert False, "expected LedgerTamperedError, not a bare KeyError"
+    except ledger.LedgerTamperedError as e:
+        assert "not valid JSON" in str(e)
