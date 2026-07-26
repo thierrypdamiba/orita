@@ -40,6 +40,16 @@ DEFAULT_SHARED_PATH = os.path.join(ROOT, "records", "shared-in-the-wild.jsonl")
 TARGET_SHARES = 50  # STRATEGY.md: "50 organic links/screenshots"
 
 
+def _parse_date(d: str) -> date:
+    """Parse a `"date"` field into a real `date` object. Raises ValueError/
+    TypeError on anything that isn't a real calendar date -- callers decide
+    whether to skip or propagate. Deliberately tolerant of non-zero-padded
+    input (`"2026-7-9"` parses the same as `"2026-07-09"`, both are July 9)
+    -- `int()` doesn't care about padding, and neither should validation."""
+    year, month, day = (int(x) for x in d.split("-"))
+    return date(year, month, day)
+
+
 def _read_entries(shared_path: str) -> list:
     """Every real, validly-shaped entry in `shared_path`: requires a
     `"date"` field parseable as a real calendar date and a non-empty
@@ -67,8 +77,7 @@ def _read_entries(shared_path: str) -> list:
             if not isinstance(d, str) or not isinstance(url, str) or not url.strip():
                 continue
             try:
-                year, month, day = (int(x) for x in d.split("-"))
-                date(year, month, day)
+                _parse_date(d)
             except (ValueError, TypeError):
                 continue
             entries.append(row)
@@ -80,8 +89,18 @@ def compute_shared_reports(shared_path: str | None = None, target: int = TARGET_
     the wild" row.
 
     - total_shared: count of validly-shaped real entries found.
-    - most_recent_date: the latest `"date"` among them, or None if the log
-      is empty -- expected today, not a violation.
+    - most_recent_date: the latest `"date"` among them in real calendar
+      order, or None if the log is empty -- expected today, not a
+      violation. Compared as parsed `date` objects, never as raw strings:
+      `_read_entries` validates a date field by constructing a real
+      `date(year, month, day)`, which tolerates non-zero-padded input
+      (`"2026-7-9"` is a valid July 9 just as `"2026-07-09"` is) -- but as
+      a bare string `"2026-7-9"` sorts AFTER `"2026-12-25"` lexically
+      (`'7' > '1'`), even though December is chronologically later. A
+      string `max()` over entries would report the wrong date as most
+      recent the moment one entry's date isn't zero-padded; comparing
+      parsed `date` objects instead is the same discipline
+      `metrics_cadence_check.py`/`report_cadence_check.py` already hold.
     - target: STRATEGY.md's own number (50), unchanged by how many are
       recorded.
     - remaining: max(target - total_shared, 0), never negative even past
@@ -89,7 +108,8 @@ def compute_shared_reports(shared_path: str | None = None, target: int = TARGET_
     """
     shared_path = shared_path or DEFAULT_SHARED_PATH
     entries = _read_entries(shared_path)
-    most_recent = max((e["date"] for e in entries), default=None)
+    most_recent_dt = max((_parse_date(e["date"]) for e in entries), default=None)
+    most_recent = most_recent_dt.isoformat() if most_recent_dt else None
     total = len(entries)
     return {
         "total_shared": total,

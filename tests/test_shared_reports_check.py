@@ -106,6 +106,23 @@ class FixtureSharedReportsCase(unittest.TestCase):
         self.assertIn("0/50", formatted)
         self.assertIn("zero organic links/screenshots recorded yet", formatted)
 
+    def test_most_recent_date_compares_calendar_order_not_string_order(self):
+        # "2026-7-9" (unpadded July) is a REAL calendar date -- date(2026, 7, 9)
+        # constructs fine, so _read_entries's own validation accepts it. But as
+        # a plain string it sorts AFTER "2026-12-25" ('7' > '1' lexically),
+        # even though December is chronologically later. most_recent_date must
+        # reflect calendar order, the same discipline metrics_cadence_check.py
+        # and report_cadence_check.py already hold (both sort real date()
+        # objects, never raw strings).
+        rows = [
+            '{"date": "2026-7-9", "url": "https://example.com/a"}',
+            '{"date": "2026-12-25", "url": "https://example.com/b"}',
+        ]
+        _write_jsonl(self.path, rows)
+        result = src.compute_shared_reports(self.path)
+        self.assertEqual(result["total_shared"], 2)
+        self.assertEqual(result["most_recent_date"], "2026-12-25")
+
     def test_format_names_count_and_remaining(self):
         rows = ['{"date": "2026-07-17", "url": "https://example.com/1"}']
         _write_jsonl(self.path, rows)
