@@ -219,6 +219,27 @@ class TamperedChildWorkLogCase(unittest.TestCase):
         known = cwc.load_known_files(self.log)
         self.assertEqual(set(known), {"a.md", "b.md"})
 
+    def test_entries_marks_a_non_dict_json_value_as_malformed_too(self):
+        # task 310: a line that parses cleanly to a non-dict JSON value (a
+        # bare number, null, list, or string -- e.g. a hand-tampered or
+        # truncated write that still happens to be syntactically valid)
+        # must not be treated as a real logged entry.
+        with open(self.log, "w") as f:
+            f.write('{"path": "a.md", "sha": "s1", "author_date": "2026-07-11T00:00:00Z"}\n')
+            f.write("5\n")
+        entries = cwc._entries(self.log)
+        self.assertEqual(len(entries), 2)
+        self.assertTrue(entries[1]["_malformed"])
+
+    def test_load_known_files_raises_tampered_error_on_a_non_dict_json_line(self):
+        # pre-fix this crashed with an uncaught AttributeError
+        # ('int' object has no attribute 'get') instead of the named error.
+        with open(self.log, "w") as f:
+            f.write('{"path": "a.md", "sha": "s1", "author_date": "2026-07-11T00:00:00Z"}\n')
+            f.write("5\n")
+        with self.assertRaises(cwc.ChildWorkLogTamperedError):
+            cwc.load_known_files(self.log)
+
 
 if __name__ == "__main__":
     unittest.main()

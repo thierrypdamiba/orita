@@ -47,8 +47,10 @@ LOG = os.path.join(ROOT, "HAND", "child-work-log.jsonl")
 
 class ChildWorkLogTamperedError(RuntimeError):
     """Raised by load_known_files() when ANY line in HAND/child-work-log.jsonl
-    is unparseable. find_reverted() checks EVERY known path against HEAD, not
-    just the newest -- a malformed line anywhere could be hiding a previously
+    is not a JSON object -- either unparseable, or valid JSON that parses to
+    something other than a dict (a bare number, null, list, or string).
+    find_reverted() checks EVERY known path against HEAD, not just the
+    newest -- a malformed line anywhere could be hiding a previously
     -logged child-authored path, silently dropping it from Iron Rule #6's
     revert check. Refuse rather than guess past a corrupted line, mirroring
     ci_watch.py's/voice_window_check.py's any-line convention (not
@@ -66,9 +68,22 @@ def _entries(path: str) -> list[dict]:
             if not line:
                 continue
             try:
-                entries.append(json.loads(line))
+                parsed = json.loads(line)
             except json.JSONDecodeError as exc:
                 entries.append({"_malformed": True, "_error": str(exc)})
+                continue
+            if not isinstance(parsed, dict):
+                entries.append(
+                    {
+                        "_malformed": True,
+                        "_error": (
+                            f"line parsed to {type(parsed).__name__}, "
+                            "not a JSON object"
+                        ),
+                    }
+                )
+                continue
+            entries.append(parsed)
     return entries
 
 
