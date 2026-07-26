@@ -69,6 +69,22 @@ class FixtureCadenceCase(unittest.TestCase):
         self.assertEqual(result["total_shipped"], 1)
         self.assertEqual(result["current_streak"], 1)
 
+    def test_a_valid_but_non_dict_line_is_ignored_not_a_crash(self):
+        # A line that parses cleanly as JSON but isn't an object (a bare
+        # number, null, list, or stray string) is not caught by the
+        # existing `except json.JSONDecodeError` -- .get() on it used to
+        # raise an uncaught AttributeError instead of being skipped like
+        # any other malformed line.
+        rows = ['{"date": "2026-07-12"}', "5", "null", "[1, 2]", '"just a string"']
+        _write_jsonl(self.path, rows)
+        result = mcc.compute_cadence(self.path)
+        self.assertEqual(result["total_shipped"], 1)
+        self.assertEqual(result["current_streak"], 1)
+
+    def test_read_dates_raises_nothing_on_a_non_dict_only_file(self):
+        _write_jsonl(self.path, ["5"])
+        self.assertEqual(mcc._read_dates(self.path), [])
+
     def test_blank_lines_are_skipped(self):
         _write_jsonl(self.path, ['{"date": "2026-07-12"}', "", "  ", '{"date": "2026-07-13"}'])
         result = mcc.compute_cadence(self.path)

@@ -64,6 +64,8 @@ def _read_dates(metrics_path: str) -> list:
                 row = json.loads(line)
             except json.JSONDecodeError:
                 continue
+            if not isinstance(row, dict):
+                continue
             d = row.get("date")
             if not isinstance(d, str):
                 continue
