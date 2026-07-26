@@ -120,6 +120,41 @@ class MismatchCase(unittest.TestCase):
         self.assertEqual(result["claimed_date"], "2026-07-18")
 
 
+class MalformedLastLineCase(unittest.TestCase):
+    """Task 306: a truncated/malformed trailing line in metrics.jsonl
+    (a crashed daily-aggregate append, a bad hand-edit) must be skipped,
+    not fatal -- `_last_metrics_entry()` used to call `json.loads()` on
+    the last line unguarded and crash with an uncaught JSONDecodeError."""
+
+    def setUp(self):
+        self.tmp = tempfile.mkdtemp()
+        self.addCleanup(__import__("shutil").rmtree, self.tmp, ignore_errors=True)
+        self.metrics_path = os.path.join(self.tmp, "metrics.jsonl")
+        self.consent_path = os.path.join(self.tmp, "consent.jsonl")
+
+    def test_malformed_last_line_does_not_raise(self):
+        with open(self.metrics_path, "w", encoding="utf-8") as f:
+            f.write(json.dumps({"date": "2026-07-20", "distinct_toolkits_in_use": 0}) + "\n")
+            f.write('{"date": "2026-07-21", "distinct_toolkits_in_use"\n')  # truncated, invalid JSON
+        entry = tiu._last_metrics_entry(self.metrics_path)
+        self.assertIsNotNone(entry)
+        self.assertEqual(entry["date"], "2026-07-20")
+
+    def test_malformed_last_line_falls_through_check_toolkits_in_use(self):
+        with open(self.metrics_path, "w", encoding="utf-8") as f:
+            f.write(json.dumps({"date": "2026-07-20", "distinct_toolkits_in_use": 0}) + "\n")
+            f.write("not even json at all {{{\n")
+        result = tiu.check_toolkits_in_use(self.metrics_path, self.consent_path)
+        self.assertTrue(result["clean"])
+        self.assertEqual(result["claimed_date"], "2026-07-20")
+
+    def test_every_line_malformed_returns_none(self):
+        with open(self.metrics_path, "w", encoding="utf-8") as f:
+            f.write("not json\n")
+            f.write("{also not json\n")
+        self.assertIsNone(tiu._last_metrics_entry(self.metrics_path))
+
+
 class RealLiveStateCase(unittest.TestCase):
     """The real point of this task: records/metrics.jsonl had recorded
     `distinct_toolkits_in_use: 2` every single day since 2026-07-12 --

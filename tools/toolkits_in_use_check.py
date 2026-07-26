@@ -55,17 +55,26 @@ DEFAULT_CONSENT_LOG_PATH = consent_grant_log.LOG
 
 def _last_metrics_entry(metrics_path: str) -> dict | None:
     """The most recently recorded dated reading in `records/
-    metrics.jsonl` -- one append-only file, not one file per day, the
-    same read shape `metrics_cadence_check.py` already uses. `None` if
-    no reading has ever shipped (nothing to cross-check yet, not an
-    error)."""
+    metrics.jsonl` -- one append-only file, not one file per day. Walks
+    non-blank lines from the end and returns the first one that parses
+    as valid JSON, the same "ignore what doesn't conform, never crash
+    the scan over it" discipline `metrics_cadence_check.py`'s
+    `_read_dates()` already holds per-line, applied here to finding the
+    most recent WELL-FORMED reading instead of every well-formed one --
+    a truncated/malformed trailing line (a crashed daily-aggregate
+    append, a bad hand-edit) is skipped, not fatal. `None` if no
+    reading has ever shipped, or every line is malformed (nothing to
+    cross-check yet, not an error)."""
     if not os.path.exists(metrics_path):
         return None
     with open(metrics_path, encoding="utf-8") as f:
         lines = [line for line in f if line.strip()]
-    if not lines:
-        return None
-    return json.loads(lines[-1])
+    for line in reversed(lines):
+        try:
+            return json.loads(line)
+        except json.JSONDecodeError:
+            continue
+    return None
 
 
 def check_toolkits_in_use(
