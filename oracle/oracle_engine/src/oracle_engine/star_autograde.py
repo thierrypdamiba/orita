@@ -56,7 +56,10 @@ def parse_star_claim(claim: str) -> tuple[datetime.datetime, int]:
 
 
 def _load_claim_payload(detail: str) -> dict:
-    return json.loads(detail)
+    payload = json.loads(detail)
+    if not isinstance(payload, dict):
+        raise StarAutogradeError(f"claim payload is not a JSON object: {payload!r}")
+    return payload
 
 
 def find_due_calls(entries: list[dict], now: datetime.datetime) -> list[dict]:

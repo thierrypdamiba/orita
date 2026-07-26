@@ -119,6 +119,20 @@ class TestFindDueCalls(AutogradeTestBase):
         due = following_autograde.find_due_calls(self.mod._entries(), now)
         self.assertEqual(due, [])
 
+    def test_a_non_dict_predict_payload_is_skipped_not_raised(self):
+        # A tampered/malformed `predict` entry (valid JSON, but not a JSON
+        # object -- e.g. a bare string) must not crash find_due_calls with
+        # an uncaught TypeError -- skipped like any other malformed entry.
+        import json as _json
+
+        self.mod.append(
+            "off-by-one", prediction.PREDICTION_ACT, _json.dumps("not-a-dict"),
+            "2026-07-20T12:00:00+00:00",
+        )
+        now = datetime.datetime(2026, 8, 4, tzinfo=datetime.timezone.utc)
+        due = following_autograde.find_due_calls(self.mod._entries(), now)
+        self.assertEqual(due, [])
+
 
 class TestScoreCall(AutogradeTestBase):
     def test_scores_correct_when_the_recorded_snapshot_stays_at_or_under_threshold(self):

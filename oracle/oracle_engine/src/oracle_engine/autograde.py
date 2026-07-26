@@ -108,7 +108,10 @@ def find_due_calls(entries: list[dict], now: datetime.datetime) -> list[dict]:
 def _load_claim_payload(detail: str) -> dict:
     import json
 
-    return json.loads(detail)
+    payload = json.loads(detail)
+    if not isinstance(payload, dict):
+        raise AutogradeError(f"claim payload is not a JSON object: {payload!r}")
+    return payload
 
 
 def score_call(
