@@ -107,7 +107,10 @@ def load_snapshots(path: str = DEFAULT_SNAPSHOT_PATH) -> list[dict]:
     uncaught json.JSONDecodeError -- it comes back marked
     {"_malformed": True, "_error": ...} instead, the same convention
     tools/ledger.py's _entries() established (task 238) and tasks 239-251
-    mirrored across every sibling."""
+    mirrored across every sibling. A line that parses cleanly as JSON but
+    is not itself an object (a bare int/float/bool/null/list/string -- a
+    truncated write landing mid-value) is marked the same way instead of
+    sailing through unmarked, mirroring tasks 328-330's identical guard."""
     if not os.path.exists(path):
         return []
     out = []
@@ -117,9 +120,14 @@ def load_snapshots(path: str = DEFAULT_SNAPSHOT_PATH) -> list[dict]:
             if not line:
                 continue
             try:
-                out.append(json.loads(line))
+                value = json.loads(line)
             except json.JSONDecodeError as exc:
                 out.append({"_malformed": True, "_error": str(exc)})
+                continue
+            if not isinstance(value, dict):
+                out.append({"_malformed": True, "_error": "not a JSON object"})
+                continue
+            out.append(value)
     return out
 
 
