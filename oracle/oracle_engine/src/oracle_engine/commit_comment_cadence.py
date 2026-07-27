@@ -130,9 +130,14 @@ def load_snapshots(path: str = DEFAULT_SNAPSHOT_PATH) -> list[dict]:
             if not line:
                 continue
             try:
-                out.append(json.loads(line))
+                value = json.loads(line)
             except json.JSONDecodeError as exc:
                 out.append({"_malformed": True, "_error": str(exc)})
+                continue
+            if not isinstance(value, dict):
+                out.append({"_malformed": True, "_error": "not a JSON object"})
+                continue
+            out.append(value)
     return out
 
 
