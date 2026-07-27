@@ -127,7 +127,7 @@ class RealClaimCrossCheckedAgainstLiveTestsCase(unittest.TestCase):
             f"+ test_subscriber_autograde.py is {result['real']}",
         )
 
-    def test_regression_pin_todays_real_total_is_43(self):
+    def test_regression_pin_todays_real_total_is_44(self):
         # Named so a future test added/removed from either file trips this
         # pin FIRST, distinct from (and in addition to) the doc cross-check
         # above -- exactly task 149's own "regression pin" discipline. Moved
@@ -142,10 +142,13 @@ class RealClaimCrossCheckedAgainstLiveTestsCase(unittest.TestCase):
         # test_a_valid_lookup_after_a_malformed_earlier_line_still_refuses), then
         # 42 -> 43 by task 296's own one new test_subscriber_autograde.py
         # schema-mismatched-prior-grade guard case
-        # (test_a_schema_mismatched_prior_grade_is_ignored_not_raised) -- the doc's
-        # own count claim went un-bumped for one hour until this task caught it
-        # live off a real `dawn-run` failure, not a routine sweep.
-        self.assertEqual(real_subscriber_test_count(), 43)
+        # (test_a_schema_mismatched_prior_grade_is_ignored_not_raised), then
+        # 43 -> 44 by task 325's own 26-file autograde-guard sweep's one new
+        # test_subscriber_autograde.py case
+        # (test_a_non_dict_predict_payload_is_skipped_not_raised) -- the doc's
+        # own count claim went un-bumped past a live `dawn-run` failure
+        # (#563/#564) until task 326 caught it, not a routine sweep.
+        self.assertEqual(real_subscriber_test_count(), 44)
 
 
 class MutationProvesTheCheckerBitesCase(unittest.TestCase):
