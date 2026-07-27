@@ -104,6 +104,22 @@ class TestSnapshots(unittest.TestCase):
             self.assertTrue(snaps[1]["_malformed"])
             self.assertIn("_error", snaps[1])
 
+    def test_load_snapshots_marks_a_valid_json_non_dict_line_as_malformed(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = os.path.join(tmp, "snapshots.jsonl")
+            with open(path, "w", encoding="utf-8") as f:
+                f.write('{"ts": "2026-07-13T00:00:00+00:00", "count": 1}\n')
+                f.write("5\n")
+                f.write("null\n")
+                f.write("[1, 2, 3]\n")
+                f.write("true\n")
+            snaps = branch_cadence.load_snapshots(path)
+            self.assertEqual(len(snaps), 5)
+            self.assertEqual(snaps[0]["count"], 1)
+            for s in snaps[1:]:
+                self.assertTrue(s["_malformed"])
+                self.assertEqual(s["_error"], "not a JSON object")
+
 
 class TestBranchCountAtOrBefore(unittest.TestCase):
     def test_returns_none_with_no_early_enough_snapshot(self):
@@ -128,6 +144,17 @@ class TestBranchCountAtOrBefore(unittest.TestCase):
         when = datetime.datetime(2026, 7, 13, tzinfo=datetime.timezone.utc)
         with self.assertRaises(branch_cadence.BranchCadenceTamperedError):
             branch_cadence.branch_count_at_or_before(snaps, when)
+
+    def test_a_valid_json_non_dict_snapshot_line_refuses_not_crashes(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = os.path.join(tmp, "snapshots.jsonl")
+            with open(path, "w", encoding="utf-8") as f:
+                f.write('{"ts": "2026-07-11T00:00:00+00:00", "count": 1}\n')
+                f.write("5\n")
+            snaps = branch_cadence.load_snapshots(path)
+            when = datetime.datetime(2026, 7, 13, tzinfo=datetime.timezone.utc)
+            with self.assertRaises(branch_cadence.BranchCadenceTamperedError):
+                branch_cadence.branch_count_at_or_before(snaps, when)
 
 
 class TestBranchCountAtOrAfter(unittest.TestCase):
