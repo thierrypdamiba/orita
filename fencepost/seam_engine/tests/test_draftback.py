@@ -328,4 +328,4 @@ def test_main_with_no_sealed_arg_raises_named_error_not_keyerror_when_tip_is_mal
         draftback.main(["email", "--base", str(tmp_path)])
         assert False, "expected LedgerTamperedError, not a bare KeyError"
     except ledger.LedgerTamperedError as e:
-        assert "not valid JSON" in str(e)
+        assert "malformed" in str(e)

@@ -214,7 +214,7 @@ def test_render_latest_raises_named_error_not_keyerror_when_tip_is_malformed(tmp
         report.render_latest(tmp_path)
         assert False, "expected LedgerTamperedError, not a bare KeyError"
     except ledger.LedgerTamperedError as e:
-        assert "not valid JSON" in str(e)
+        assert "malformed" in str(e)
 
 
 def test_main_with_no_args_raises_named_error_not_keyerror_when_tip_is_malformed(tmp_path: Path):
@@ -247,7 +247,7 @@ def test_main_with_no_args_raises_named_error_not_keyerror_when_tip_is_malformed
         report.main(["--ledger-base", str(tmp_path)])
         assert False, "expected LedgerTamperedError, not a bare KeyError"
     except ledger.LedgerTamperedError as e:
-        assert "not valid JSON" in str(e)
+        assert "malformed" in str(e)
 
 
 # --- the single hand-off: one "your move" line, never an action fired ---------

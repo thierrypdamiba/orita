@@ -6,6 +6,7 @@ tablet. A test that cannot fail is a broken oath.
 """
 from __future__ import annotations
 
+import re
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -166,7 +167,40 @@ def test_syntactically_broken_json_record_is_reported_not_a_crash(tmp_path: Path
     # reported problem, same as the value-swap and prev-link cases above.
     problems = ledger.verify(tmp_path)
     assert problems, "a syntactically-broken record must be caught, not crash"
-    assert any("not valid JSON" in p for p in problems)
+    assert any("malformed" in p for p in problems)
+
+
+def test_valid_json_non_dict_record_is_reported_not_a_crash(tmp_path: Path):
+    # A different hand-edit than the syntax-broken case above: the fenced
+    # block still parses cleanly as JSON, it just isn't a JSON *object* any
+    # more (e.g. a stray edit leaves `[1, 2, 3]`, `5`, `null`, or `"oops"`
+    # where the sealed record used to be). json.loads() raises nothing here,
+    # so the syntax-error guard doesn't fire -- but the very next step,
+    # `rec["_tablet"] = path.name`, item-assigns into whatever that value
+    # was and must not crash either. Same "tampered tablet is exposed, not
+    # an uncaught exception" promise, a different way of breaking the shape.
+    ledger.append_scan(_scan(primary=True, generated_at="honest"), now=_at(2026, 7, 12), base=tmp_path)
+    tablet = ledger.gaps_dir(tmp_path) / "2026-07-12.md"
+    text = tablet.read_text()
+    rewritten = re.sub(
+        r"<!-- typed-record -->\n```json\n.*?\n```",
+        "<!-- typed-record -->\n```json\n[1, 2, 3]\n```",
+        text,
+        count=1,
+        flags=re.DOTALL,
+    )
+    assert rewritten != text, "the typed-record fence must actually be replaced"
+    tablet.write_text(rewritten)
+
+    # read_records() must not raise TypeError.
+    recs = ledger.read_records(tmp_path)
+    assert len(recs) == 1
+    assert recs[0]["_malformed"] is True
+
+    # verify() must not raise either -- reported problem, not a crash.
+    problems = ledger.verify(tmp_path)
+    assert problems, "a valid-JSON-but-non-dict record must be caught, not crash"
+    assert any("malformed" in p for p in problems)
 
 
 def test_last_seal_raises_named_error_not_keyerror_when_tip_is_malformed(tmp_path: Path):
@@ -185,7 +219,7 @@ def test_last_seal_raises_named_error_not_keyerror_when_tip_is_malformed(tmp_pat
         ledger.last_seal(tmp_path)
         assert False, "last_seal() must not silently return a seal for a malformed tip"
     except ledger.LedgerTamperedError as e:
-        assert "not valid JSON" in str(e)
+        assert "malformed" in str(e)
 
 
 def test_append_scan_raises_named_error_not_keyerror_when_tip_is_malformed(tmp_path: Path):
@@ -203,7 +237,7 @@ def test_append_scan_raises_named_error_not_keyerror_when_tip_is_malformed(tmp_p
         ledger.append_scan(_scan(primary=True, generated_at="next"), now=_at(2026, 7, 13), base=tmp_path)
         assert False, "append_scan() must not silently append on top of a malformed tip"
     except ledger.LedgerTamperedError as e:
-        assert "not valid JSON" in str(e)
+        assert "malformed" in str(e)
 
     # and it must not have written anything for 2026-07-13 while refusing
     assert not (ledger.gaps_dir(tmp_path) / "2026-07-13.md").exists()
@@ -226,7 +260,7 @@ def test_tip_sealed_raises_named_error_not_keyerror_when_tip_is_malformed(tmp_pa
         ledger.tip_sealed(records)
         assert False, "tip_sealed() must not silently return a sealed payload for a malformed tip"
     except ledger.LedgerTamperedError as e:
-        assert "not valid JSON" in str(e)
+        assert "malformed" in str(e)
 
 
 def test_tip_sealed_returns_the_real_payload_when_the_tip_is_intact(tmp_path: Path):

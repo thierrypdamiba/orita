@@ -86,6 +86,13 @@ def read_records(base: Path | None = None) -> list[dict[str, Any]]:
     comes back as {"_tablet", "_malformed": True, "_error"} instead, so
     verify() can report it as a problem the same way it reports a mismatched
     seal.
+
+    The same is true of a block that parses cleanly but isn't a JSON object
+    (a hand-edited fence now reading `[1, 2, 3]`, `5`, `null`, or `"oops"`):
+    syntactically valid, but not the record shape a sealed entry must be.
+    Left unguarded, `rec["_tablet"] = path.name` a few lines below would
+    crash item-assigning into a list/int/str/None instead of reaching the
+    same reported-problem path. It gets the identical `_malformed` sentinel.
     """
     records: list[dict[str, Any]] = []
     for path in _tablet_files(base):
@@ -94,6 +101,13 @@ def read_records(base: Path | None = None) -> list[dict[str, Any]]:
                 rec = json.loads(m.group("json"))
             except json.JSONDecodeError as e:
                 records.append({"_tablet": path.name, "_malformed": True, "_error": str(e)})
+                continue
+            if not isinstance(rec, dict):
+                records.append({
+                    "_tablet": path.name,
+                    "_malformed": True,
+                    "_error": f"record is valid JSON but not an object (got {type(rec).__name__})",
+                })
                 continue
             rec["_tablet"] = path.name
             records.append(rec)
@@ -113,7 +127,7 @@ def verify(base: Path | None = None) -> list[str]:
         where = f"{rec.get('_tablet', '?')} entry seq={rec.get('seq')}"
         if rec.get("_malformed"):
             problems.append(
-                f"{where}: record is not valid JSON ({rec['_error']}) — "
+                f"{where}: record is malformed ({rec['_error']}) — "
                 "the tablet was edited after it was sealed."
             )
             # Its seal can't be recomputed from unparseable JSON, so the
@@ -161,7 +175,7 @@ def last_seal(base: Path | None = None) -> str:
     if tip.get("_malformed"):
         raise LedgerTamperedError(
             f"last_seal(): the most recent record in {tip.get('_tablet', '?')} "
-            f"is not valid JSON ({tip.get('_error')}) -- the tablet was edited "
+            f"is malformed ({tip.get('_error')}) -- the tablet was edited "
             "after it was sealed, so its seal can't be read. Run `python -m "
             "seam_engine.ledger verify` to see the full chain break."
         )
@@ -186,8 +200,8 @@ def tip_sealed(records: list[dict[str, Any]]) -> dict[str, Any]:
     tip = records[-1]
     if tip.get("_malformed"):
         raise LedgerTamperedError(
-            f"the most recent record in {tip.get('_tablet', '?')} is not "
-            f"valid JSON ({tip.get('_error')}) -- the tablet was edited "
+            f"the most recent record in {tip.get('_tablet', '?')} is "
+            f"malformed ({tip.get('_error')}) -- the tablet was edited "
             "after it was sealed, so its sealed payload can't be read. Run "
             "`python -m seam_engine.ledger verify` to see the full chain break."
         )
@@ -331,7 +345,7 @@ def append_scan(
         tip = existing[-1]
         raise LedgerTamperedError(
             f"append_scan(): refusing to append -- the most recent record in "
-            f"{tip.get('_tablet', '?')} is not valid JSON ({tip.get('_error')}) "
+            f"{tip.get('_tablet', '?')} is malformed ({tip.get('_error')}) "
             "-- the tablet was edited after it was sealed. Appending on top of "
             "an unreadable tip would either crash or silently chain the new "
             "entry from the wrong seal. Run `python -m seam_engine.ledger "
