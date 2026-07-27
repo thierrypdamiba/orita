@@ -57,23 +57,33 @@ def _last_metrics_entry(metrics_path: str) -> dict | None:
     """The most recently recorded dated reading in `records/
     metrics.jsonl` -- one append-only file, not one file per day. Walks
     non-blank lines from the end and returns the first one that parses
-    as valid JSON, the same "ignore what doesn't conform, never crash
-    the scan over it" discipline `metrics_cadence_check.py`'s
-    `_read_dates()` already holds per-line, applied here to finding the
-    most recent WELL-FORMED reading instead of every well-formed one --
-    a truncated/malformed trailing line (a crashed daily-aggregate
-    append, a bad hand-edit) is skipped, not fatal. `None` if no
-    reading has ever shipped, or every line is malformed (nothing to
-    cross-check yet, not an error)."""
+    as valid JSON AND is itself a JSON object, the same "ignore what
+    doesn't conform, never crash the scan over it" discipline
+    `metrics_cadence_check.py`'s `_read_dates()` already holds
+    per-line, applied here to finding the most recent WELL-FORMED
+    reading instead of every well-formed one -- a truncated/malformed
+    trailing line (a crashed daily-aggregate append, a bad hand-edit)
+    is skipped, not fatal. Task 306 closed the decode-failure half of
+    this (invalid JSON); a line that parses cleanly but isn't an
+    object (a bare `true`/`42`/`3.14`/`null`/a JSON array) used to sail
+    past that guard and reach `check_toolkits_in_use()`'s unconditional
+    `"distinct_toolkits_in_use" not in last` membership test, which
+    raises an uncaught `TypeError` for the non-container scalar types
+    (`in` is simply undefined for int/float/bool/None) -- task 328
+    closes that other half at the same reader, same discipline. `None`
+    if no reading has ever shipped, or every line is malformed/non-dict
+    (nothing to cross-check yet, not an error)."""
     if not os.path.exists(metrics_path):
         return None
     with open(metrics_path, encoding="utf-8") as f:
         lines = [line for line in f if line.strip()]
     for line in reversed(lines):
         try:
-            return json.loads(line)
+            value = json.loads(line)
         except json.JSONDecodeError:
             continue
+        if isinstance(value, dict):
+            return value
     return None
 
 

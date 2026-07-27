@@ -155,6 +155,62 @@ class MalformedLastLineCase(unittest.TestCase):
         self.assertIsNone(tiu._last_metrics_entry(self.metrics_path))
 
 
+class ValidJsonNonDictLastLineCase(unittest.TestCase):
+    """Task 328: a trailing line that parses as valid JSON but is not a
+    JSON object (`true`, `42`, `3.14`, `null`, a bare array) sailed past
+    task 306's `json.JSONDecodeError` guard -- `_last_metrics_entry()`
+    happily returned the scalar/list, and `check_toolkits_in_use()`'s
+    unconditional `"distinct_toolkits_in_use" not in last` then raised
+    an uncaught `TypeError` for int/float/bool/None (`in` is undefined
+    for those types), instead of being skipped the same way a
+    JSON-decode failure already is."""
+
+    def setUp(self):
+        self.tmp = tempfile.mkdtemp()
+        self.addCleanup(__import__("shutil").rmtree, self.tmp, ignore_errors=True)
+        self.metrics_path = os.path.join(self.tmp, "metrics.jsonl")
+        self.consent_path = os.path.join(self.tmp, "consent.jsonl")
+
+    def _write_good_then(self, trailing_json_line):
+        with open(self.metrics_path, "w", encoding="utf-8") as f:
+            f.write(json.dumps({"date": "2026-07-20", "distinct_toolkits_in_use": 0}) + "\n")
+            f.write(trailing_json_line + "\n")
+
+    def test_trailing_bool_does_not_raise_and_falls_back_to_prior_reading(self):
+        self._write_good_then("true")
+        entry = tiu._last_metrics_entry(self.metrics_path)
+        self.assertIsNotNone(entry)
+        self.assertEqual(entry["date"], "2026-07-20")
+        result = tiu.check_toolkits_in_use(self.metrics_path, self.consent_path)
+        self.assertTrue(result["clean"])
+        self.assertEqual(result["claimed_date"], "2026-07-20")
+
+    def test_trailing_int_does_not_raise(self):
+        self._write_good_then("42")
+        result = tiu.check_toolkits_in_use(self.metrics_path, self.consent_path)
+        self.assertEqual(result["claimed_date"], "2026-07-20")
+
+    def test_trailing_float_does_not_raise(self):
+        self._write_good_then("3.14")
+        result = tiu.check_toolkits_in_use(self.metrics_path, self.consent_path)
+        self.assertEqual(result["claimed_date"], "2026-07-20")
+
+    def test_trailing_null_does_not_raise(self):
+        self._write_good_then("null")
+        result = tiu.check_toolkits_in_use(self.metrics_path, self.consent_path)
+        self.assertEqual(result["claimed_date"], "2026-07-20")
+
+    def test_trailing_json_array_does_not_raise(self):
+        self._write_good_then("[1, 2, 3]")
+        result = tiu.check_toolkits_in_use(self.metrics_path, self.consent_path)
+        self.assertEqual(result["claimed_date"], "2026-07-20")
+
+    def test_only_scalars_and_dicts_are_ever_returned_never_a_bare_list(self):
+        with open(self.metrics_path, "w", encoding="utf-8") as f:
+            f.write("[1, 2, 3]\n")
+        self.assertIsNone(tiu._last_metrics_entry(self.metrics_path))
+
+
 class RealLiveStateCase(unittest.TestCase):
     """The real point of this task: records/metrics.jsonl had recorded
     `distinct_toolkits_in_use: 2` every single day since 2026-07-12 --
