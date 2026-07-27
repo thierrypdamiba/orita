@@ -305,3 +305,4 @@
 {"type": "check", "tool": "X_PostTweet", "status": "forbidden", "checked_at": "2026-07-26T22:14:32Z"}
 {"type": "check", "tool": "X_WhoAmI", "status": "ok", "checked_at": "2026-07-27T00:10:31Z"}
 {"type": "check", "tool": "X_GetUserTweets", "status": "forbidden", "checked_at": "2026-07-27T00:10:31Z"}
+{"type": "check", "tool": "X_PostTweet", "status": "forbidden", "checked_at": "2026-07-27T01:04:38Z"}
