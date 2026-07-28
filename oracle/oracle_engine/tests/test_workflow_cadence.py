@@ -87,6 +87,29 @@ class TestSnapshots(unittest.TestCase):
             self.assertTrue(snaps[1]["_malformed"])
             self.assertIn("_error", snaps[1])
 
+    def test_load_snapshots_marks_a_valid_json_non_dict_line_as_malformed(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = os.path.join(tmp, "snapshots.jsonl")
+            with open(path, "w", encoding="utf-8") as f:
+                f.write('{"ts": "2026-07-13T00:00:00+00:00", "count": 1}\n')
+                f.write("5\n")
+            snaps = workflow_cadence.load_snapshots(path)
+            self.assertEqual(len(snaps), 2)
+            self.assertEqual(snaps[0]["count"], 1)
+            self.assertTrue(snaps[1]["_malformed"])
+            self.assertEqual(snaps[1]["_error"], "not a JSON object")
+
+    def test_a_valid_json_non_dict_snapshot_line_refuses_not_crashes(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = os.path.join(tmp, "snapshots.jsonl")
+            with open(path, "w", encoding="utf-8") as f:
+                f.write('{"ts": "2026-07-13T00:00:00+00:00", "count": 1}\n')
+                f.write("5\n")
+            snaps = workflow_cadence.load_snapshots(path)
+            when = datetime.datetime(2026, 7, 14, tzinfo=datetime.timezone.utc)
+            with self.assertRaises(workflow_cadence.WorkflowCadenceTamperedError):
+                workflow_cadence.workflow_count_at_or_before(snaps, when)
+
 
 class TestWorkflowCountAtOrBefore(unittest.TestCase):
     def test_returns_none_with_no_early_enough_snapshot(self):
