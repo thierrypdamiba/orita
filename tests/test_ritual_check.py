@@ -1719,11 +1719,16 @@ class WipReclaimFoldCase(unittest.TestCase):
 
     def test_default_path_reads_the_real_roadmap_honestly_clean(self):
         """No override: reads the real ROADMAP.md, the same default
-        check_wip_reclaim falls back to. Every task shipped so far has
-        gone WIP -> DONE inside the same hour it opened, so the real,
-        live state is honestly zero open WIP rows."""
+        check_wip_reclaim falls back to. `clean` (no STALE or UNKNOWN-age
+        WIP row) is the real invariant -- `open_count == 0` is NOT, since a
+        legitimately fresh in-progress WIP row is a normal, healthy state
+        for the continuous-build loop at any given instant. Asserting
+        open_count == 0 here made this suite fail for real, deterministically,
+        the moment dawn-run's own hourly cron happened to land inside a
+        live WIP window (dawn-run #618, 2026-07-28T09:07:31Z, task 360)."""
         result = rc.run_ritual_check()
-        self.assertEqual(result["wip_reclaim"]["open_count"], 0)
+        self.assertFalse(result["wip_reclaim"]["stale"])
+        self.assertFalse(result["wip_reclaim"]["unknown"])
         self.assertTrue(result["wip_reclaim"]["clean"])
 
 

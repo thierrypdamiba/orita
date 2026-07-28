@@ -1,7 +1,15 @@
 """Task 123. Proves tools/wip_reclaim_check.py finds a stale WIP row, stays
 clean on a fresh one, flags a WIP row with no matching open-timestamp as
 `unknown` rather than silently passing it, and -- the real point -- confirms
-the live, current ROADMAP.md holds zero currently-open WIP rows today.
+the live ROADMAP.md is currently clean (no STALE or UNKNOWN-age WIP rows).
+
+Task 360: a legitimately fresh in-progress WIP row is a normal, healthy
+state -- the continuous-build loop is ALWAYS WIP on something for the
+duration of the hour it takes to ship it. `RealCheckoutCase` therefore
+asserts `clean` (find_stale()'s own health signal), never `open_count == 0`;
+asserting the latter made this suite fail for real, deterministically,
+the moment `dawn-run`'s own hourly cron happened to fire while a task was
+mid-flight (dawn-run #618, 2026-07-28T09:07:31Z, caught task 360).
 """
 import importlib.util
 import os
@@ -215,10 +223,31 @@ class FormatResultCase(unittest.TestCase):
 
 
 class RealCheckoutCase(unittest.TestCase):
-    def test_real_roadmap_holds_zero_open_wip_today(self):
+    def test_real_roadmap_holds_no_stale_or_unknown_wip_today(self):
+        # A legitimately fresh in-progress WIP row (open_count > 0, opened
+        # under 2h ago) is a normal, healthy state for the continuous-build
+        # loop -- it is NOT the same thing as zero open WIP rows. Assert the
+        # health signal find_stale() itself computes, not a stricter
+        # invariant this suite has no business enforcing (task 360).
         result = wrc.find_stale(roadmap_path=os.path.join(ROOT, "ROADMAP.md"))
-        self.assertEqual(result["open_count"], 0, result)
+        self.assertFalse(result["stale"], result)
+        self.assertFalse(result["unknown"], result)
         self.assertTrue(result["clean"], result)
+
+    def test_a_fresh_in_progress_wip_row_is_clean_not_a_failure(self):
+        # Regression for task 360: dawn-run #618 failed for real because a
+        # test asserted open_count == 0 while task 359 was legitimately WIP.
+        # A row marked WIP seconds ago must report clean=True.
+        text = (
+            "| # | status | owner | task | done when |\n"
+            "|--:|:--|:--|:--|:--|\n"
+            "| 999 | WIP | nyx | <!-- wip-opened: 999 2026-07-28T09:59:00Z --> x | y |\n"
+        )
+        result = wrc.find_stale(text=text, now=_now("2026-07-28T10:00:00+00:00"))
+        self.assertEqual(result["open_count"], 1, result)
+        self.assertTrue(result["clean"], result)
+        self.assertFalse(result["stale"], result)
+        self.assertFalse(result["unknown"], result)
 
     def test_real_roadmap_has_no_row_number_gaps_up_to_its_own_highest_task(self):
         # Task 170 (tools/roadmap_archive.py, run for real) moved tasks
