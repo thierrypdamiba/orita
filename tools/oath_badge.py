@@ -246,6 +246,14 @@ def render_badge_json(state: BadgeState, label: str = "read-only") -> str:
 # --- CLI ----------------------------------------------------------------
 
 
+class OathBadgeArgError(ValueError):
+    """--policy parsed as valid JSON but not into a dict -- the same
+    valid-JSON-wrong-shape crash class task 364 fixed for ritual_check.py's
+    own CLI, here at oath_badge.py's own CLI (a list or bare scalar reaching
+    `compute_badge_state`'s `ToolAudit.policy.items()` unguarded crashes
+    with a bare AttributeError instead of naming the real problem)."""
+
+
 def main(argv: list[str] | None = None) -> int:
     import sys
 
@@ -272,6 +280,10 @@ def main(argv: list[str] | None = None) -> int:
     policy = DEFAULT_POLICY
     if policy_path:
         policy = json.loads(Path(policy_path).read_text(encoding="utf-8"))
+        if not isinstance(policy, dict):
+            raise OathBadgeArgError(
+                f"--policy: expected a JSON dict, got {type(policy).__name__}"
+            )
         if "operations" in policy:
             policy["operations"] = tuple(policy["operations"])
 

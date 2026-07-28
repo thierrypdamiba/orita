@@ -177,5 +177,59 @@ class TestOathBadgeArcadeShapedCatalog(unittest.TestCase):
             del sys.modules["_oath_badge_fixture_module"]
 
 
+class TestMainCliPolicyArgGuard(unittest.TestCase):
+    """--policy used to hand a bare `json.loads(...)` result straight
+    through to `compute_badge_state`, which crashed with a bare
+    AttributeError (`ToolAudit.policy.items()`) on anything but a real
+    dict -- the same valid-JSON-wrong-shape crash class task 364 fixed for
+    ritual_check.py's own CLI. Must now raise the named OathBadgeArgError
+    instead."""
+
+    def setUp(self):
+        import sys
+
+        class _FakeApp:
+            _catalog = [_MaterializedTool("ListIssues", True, False, ["read"])]
+
+        class _FakeModule:
+            app = _FakeApp()
+
+        sys.modules["_oath_badge_fixture_module"] = _FakeModule
+
+    def tearDown(self):
+        import sys
+        del sys.modules["_oath_badge_fixture_module"]
+
+    def test_list_policy_raises_named_error(self):
+        import json
+        import tempfile
+        fd, policy_path = tempfile.mkstemp(suffix=".json")
+        with os.fdopen(fd, "w") as f:
+            json.dump([1, 2, 3], f)
+        try:
+            with self.assertRaises(oath_badge.OathBadgeArgError):
+                oath_badge.main([
+                    "--catalog", "_oath_badge_fixture_module:app",
+                    "--policy", policy_path,
+                ])
+        finally:
+            os.remove(policy_path)
+
+    def test_well_formed_policy_still_works(self):
+        import json
+        import tempfile
+        fd, policy_path = tempfile.mkstemp(suffix=".json")
+        with os.fdopen(fd, "w") as f:
+            json.dump({"read_only": True}, f)
+        try:
+            rc = oath_badge.main([
+                "--catalog", "_oath_badge_fixture_module:app",
+                "--policy", policy_path,
+            ])
+            self.assertEqual(rc, 0)
+        finally:
+            os.remove(policy_path)
+
+
 if __name__ == "__main__":
     unittest.main()

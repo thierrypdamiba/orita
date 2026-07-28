@@ -201,6 +201,24 @@ def format_check(result: dict) -> str:
     return "\n".join(lines)
 
 
+class VoiceWindowArgError(ValueError):
+    """--commits-json parsed as valid JSON but not into a list -- the same
+    valid-JSON-wrong-shape crash class task 364 fixed for ritual_check.py's
+    own CLI, here at voice_window_check.py's own CLI (a dict or bare scalar
+    reaching `record_commits`'s `for c in commits:`/`c["sha"]` unguarded
+    crashes with a bare TypeError instead of naming the real problem)."""
+
+
+def _load_commits_json(path: str) -> list:
+    with open(path, encoding="utf-8") as f:
+        raw = json.load(f)
+    if not isinstance(raw, list):
+        raise VoiceWindowArgError(
+            f"--commits-json: expected a JSON list, got {type(raw).__name__}"
+        )
+    return raw
+
+
 if __name__ == "__main__":
     argv = sys.argv[1:]
     if not argv or argv[0] != "check":
@@ -211,8 +229,7 @@ if __name__ == "__main__":
     i = 1
     while i < len(argv):
         if argv[i] == "--commits-json" and i + 1 < len(argv):
-            with open(argv[i + 1], encoding="utf-8") as f:
-                commits_json = json.load(f)
+            commits_json = _load_commits_json(argv[i + 1])
             i += 2
         elif argv[i] == "--now" and i + 1 < len(argv):
             now_arg = argv[i + 1]

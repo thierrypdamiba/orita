@@ -250,6 +250,22 @@ class TestMainCLI(_TempLogCase):
             aw.LOG = real_log
             os.remove(apps_path)
 
+    def test_main_raises_named_error_on_non_dict_apps_json(self):
+        # <apps.json> used to hand a bare `json.load(f)` result straight to
+        # `raw.get("apps", [])`, crashing with a bare AttributeError on
+        # anything but a real dict -- the same valid-JSON-wrong-shape crash
+        # class task 364 fixed for ritual_check.py's own CLI. Must now
+        # raise the named ArcadeAppWatchArgError instead.
+        import json
+        fd, apps_path = tempfile.mkstemp(suffix=".json")
+        with os.fdopen(fd, "w") as f:
+            json.dump([1, 2, 3], f)
+        try:
+            with self.assertRaises(aw.ArcadeAppWatchArgError):
+                aw.main(["arcade_app_watch.py", "check", apps_path])
+        finally:
+            os.remove(apps_path)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -101,6 +101,15 @@ def format_result(ok: bool, dangerous: list, message_path: str) -> str:
     )
 
 
+class ClosingKeywordArgError(ValueError):
+    """check-live's <state.json> parsed as valid JSON but not into a dict --
+    the same valid-JSON-wrong-shape crash class task 364 fixed for
+    ritual_check.py's own CLI, here at closing_keyword_guard.py's own
+    check-live mode (a bare list or scalar reaching `state.get("issues",
+    [])` unguarded crashes with a bare AttributeError instead of naming the
+    real problem)."""
+
+
 if __name__ == "__main__":
     argv = sys.argv[1:]
     if len(argv) != 3 or argv[0] not in ("check", "check-live"):
@@ -114,6 +123,10 @@ if __name__ == "__main__":
     else:
         with open(state_arg, encoding="utf-8") as f:
             state = json.load(f)
+        if not isinstance(state, dict):
+            raise ClosingKeywordArgError(
+                f"{state_arg}: expected a JSON dict, got {type(state).__name__}"
+            )
         open_issue_numbers = [i["number"] for i in state.get("issues", [])]
     ok, dangerous = check_message(message, open_issue_numbers)
     print(format_result(ok, dangerous, message_path))

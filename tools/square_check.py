@@ -189,13 +189,30 @@ def square_delta(state: dict, path=LOG):
     return False, f"unchanged since {state['max_updated_at']}"
 
 
+class SquareCheckArgError(ValueError):
+    """<state.json> parsed as valid JSON but not into a dict -- the same
+    valid-JSON-wrong-shape crash class task 364 fixed for ritual_check.py's
+    own CLI, here at square_check.py's own positional argument (a bare list
+    or scalar reaching `raw.get("issues", [])` unguarded crashes with a bare
+    AttributeError instead of naming the real problem)."""
+
+
+def _load_state_json(path: str) -> dict:
+    with open(path) as f:
+        raw = json.load(f)
+    if not isinstance(raw, dict):
+        raise SquareCheckArgError(
+            f"{path}: expected a JSON dict, got {type(raw).__name__}"
+        )
+    return raw
+
+
 def main(argv):
     if len(argv) < 3:
         print(__doc__)
         return 1
     cmd, state_path = argv[1], argv[2]
-    with open(state_path) as f:
-        raw = json.load(f)
+    raw = _load_state_json(state_path)
     state = compute_square_state(raw.get("issues", []), raw.get("prs", []))
     if cmd == "check":
         changed, reason = square_delta(state, path=LOG)

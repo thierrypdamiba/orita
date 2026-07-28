@@ -225,5 +225,44 @@ class TestTamperedLog(unittest.TestCase):
             vwc.check(commits=None, now_iso=None, path=self.log)
 
 
+class TestLoadCommitsJsonArgGuard(unittest.TestCase):
+    """--commits-json used to hand a bare `json.load(f)` result straight to
+    `record_commits`, which crashed with a bare, unhelpful TypeError on
+    anything but a real list -- the same valid-JSON-wrong-shape crash class
+    task 364 fixed for ritual_check.py's own CLI. `_load_commits_json` must
+    now raise the named `VoiceWindowArgError` instead."""
+
+    def setUp(self):
+        fd, self.path = tempfile.mkstemp(suffix=".json")
+        os.close(fd)
+
+    def tearDown(self):
+        os.remove(self.path)
+
+    def _write(self, obj):
+        with open(self.path, "w", encoding="utf-8") as f:
+            json.dump(obj, f)
+
+    def test_dict_payload_raises_named_error(self):
+        self._write({"a": 1})
+        with self.assertRaises(vwc.VoiceWindowArgError):
+            vwc._load_commits_json(self.path)
+
+    def test_int_payload_raises_named_error(self):
+        self._write(5)
+        with self.assertRaises(vwc.VoiceWindowArgError):
+            vwc._load_commits_json(self.path)
+
+    def test_null_payload_raises_named_error(self):
+        self._write(None)
+        with self.assertRaises(vwc.VoiceWindowArgError):
+            vwc._load_commits_json(self.path)
+
+    def test_well_formed_list_still_loads(self):
+        self._write([{"sha": "a1", "author": "Nyx", "author_date": "2026-07-16T03:00:00Z"}])
+        loaded = vwc._load_commits_json(self.path)
+        self.assertEqual(loaded, [{"sha": "a1", "author": "Nyx", "author_date": "2026-07-16T03:00:00Z"}])
+
+
 if __name__ == "__main__":
     unittest.main()

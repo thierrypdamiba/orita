@@ -190,6 +190,27 @@ class CliCase(unittest.TestCase):
         self.assertEqual(result.returncode, 1)
         self.assertIn("DANGEROUS", result.stdout)
 
+    def test_check_live_mode_raises_named_error_on_non_dict_state(self):
+        # check-live's <state.json> used to hand a bare `json.load(f)`
+        # result straight to `state.get("issues", [])`, crashing with a
+        # bare AttributeError on anything but a real dict -- the same
+        # valid-JSON-wrong-shape crash class task 364 fixed for
+        # ritual_check.py's own CLI. Must now raise the named
+        # ClosingKeywordArgError instead, surfaced by the CLI as a
+        # non-zero exit with a traceback naming that class, not a bare
+        # AttributeError.
+        msg_path = self._write("msg.txt", "closes #1")
+        state_path = self._write("state.json", json.dumps([1, 2, 3]))
+        import subprocess
+        result = subprocess.run(
+            [sys.executable, os.path.join(ROOT, "tools", "closing_keyword_guard.py"),
+             "check-live", msg_path, state_path],
+            capture_output=True, text=True,
+        )
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("ClosingKeywordArgError", result.stderr)
+        self.assertNotIn("AttributeError", result.stderr)
+
 
 if __name__ == "__main__":
     unittest.main()

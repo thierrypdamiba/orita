@@ -201,13 +201,30 @@ def app_delta(state: dict, path=LOG):
     return False, f"unchanged, still connected: {apps}"
 
 
+class ArcadeAppWatchArgError(ValueError):
+    """<apps.json> parsed as valid JSON but not into a dict -- the same
+    valid-JSON-wrong-shape crash class task 364 fixed for ritual_check.py's
+    own CLI, here at arcade_app_watch.py's own positional argument (a bare
+    list or scalar reaching `raw.get("apps", [])` unguarded crashes with a
+    bare AttributeError instead of naming the real problem)."""
+
+
+def _load_apps_json(path: str) -> dict:
+    with open(path) as f:
+        raw = json.load(f)
+    if not isinstance(raw, dict):
+        raise ArcadeAppWatchArgError(
+            f"{path}: expected a JSON dict, got {type(raw).__name__}"
+        )
+    return raw
+
+
 def main(argv):
     if len(argv) < 3:
         print(__doc__)
         return 1
     cmd, apps_path = argv[1], argv[2]
-    with open(apps_path) as f:
-        raw = json.load(f)
+    raw = _load_apps_json(apps_path)
     state = compute_app_state(raw.get("apps", []))
     if cmd == "check":
         changed, reason = app_delta(state, path=LOG)

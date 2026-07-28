@@ -1,3 +1,4 @@
+import json
 import os
 import shutil
 import subprocess
@@ -239,6 +240,45 @@ class TamperedChildWorkLogCase(unittest.TestCase):
             f.write("5\n")
         with self.assertRaises(cwc.ChildWorkLogTamperedError):
             cwc.load_known_files(self.log)
+
+
+class TestLoadFilesJsonArgGuard(unittest.TestCase):
+    """--files-json used to hand a bare `json.load(f)` result straight to
+    `record_new_files`, which crashed with a bare, unhelpful TypeError on
+    anything but a real list -- the same valid-JSON-wrong-shape crash class
+    task 364 fixed for ritual_check.py's own CLI. `_load_files_json` must
+    now raise the named `ChildWorkArgError` instead."""
+
+    def setUp(self):
+        fd, self.path = tempfile.mkstemp(suffix=".json")
+        os.close(fd)
+
+    def tearDown(self):
+        os.remove(self.path)
+
+    def _write(self, obj):
+        with open(self.path, "w", encoding="utf-8") as f:
+            json.dump(obj, f)
+
+    def test_dict_payload_raises_named_error(self):
+        self._write({"a": 1})
+        with self.assertRaises(cwc.ChildWorkArgError):
+            cwc._load_files_json(self.path)
+
+    def test_bool_payload_raises_named_error(self):
+        self._write(True)
+        with self.assertRaises(cwc.ChildWorkArgError):
+            cwc._load_files_json(self.path)
+
+    def test_string_payload_raises_named_error(self):
+        self._write("x")
+        with self.assertRaises(cwc.ChildWorkArgError):
+            cwc._load_files_json(self.path)
+
+    def test_well_formed_list_still_loads(self):
+        self._write([{"path": "a.md", "sha": "s1", "author_date": "2026-07-11T00:00:00Z"}])
+        loaded = cwc._load_files_json(self.path)
+        self.assertEqual(loaded, [{"path": "a.md", "sha": "s1", "author_date": "2026-07-11T00:00:00Z"}])
 
 
 if __name__ == "__main__":

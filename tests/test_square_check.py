@@ -178,6 +178,31 @@ class TestCliRecordRefusal(_TempLogCase):
             sc.LOG = LOG_DEFAULT
             os.remove(state_path)
 
+    def test_cli_check_raises_named_error_on_non_dict_state_json(self):
+        # <state.json> used to hand a bare `json.load(f)` result straight
+        # to `raw.get("issues", [])`, crashing with a bare AttributeError
+        # on anything but a real dict -- the same valid-JSON-wrong-shape
+        # crash class task 364 fixed for ritual_check.py's own CLI. Must
+        # now raise the named SquareCheckArgError instead.
+        fd, state_path = tempfile.mkstemp(suffix=".json")
+        os.close(fd)
+        try:
+            self._write_state(state_path, [1, 2, 3])
+            with self.assertRaises(sc.SquareCheckArgError):
+                sc.main(["square_check.py", "check", state_path])
+        finally:
+            os.remove(state_path)
+
+    def test_cli_check_well_formed_state_json_still_works(self):
+        fd, state_path = tempfile.mkstemp(suffix=".json")
+        os.close(fd)
+        try:
+            self._write_state(state_path, {"issues": [], "prs": []})
+            rc = sc.main(["square_check.py", "check", state_path])
+            self.assertEqual(rc, 0)
+        finally:
+            os.remove(state_path)
+
 
 class TestLastSquareState(_TempLogCase):
     def test_none_when_never_checked(self):
