@@ -135,6 +135,42 @@ class TestSealedShape(unittest.TestCase):
         self.assertEqual(lines[call["seq"]]["detail"], call["detail"])
 
 
+class TestParsePredictionDetailRejectsNonDictPayloads(unittest.TestCase):
+    """ROADMAP.md task 363. `parse_prediction_detail()` did a bare
+    `json.loads(detail)` then `payload.keys()` with no shape check -- a
+    valid-JSON-non-dict `detail` (list/null/number/bool/string) raised an
+    uncaught `AttributeError` instead of the module's own named
+    `PredictionError`, mirroring the identical gap `grading.py`'s
+    `parse_grade_detail()` had (task 363's other half)."""
+
+    def test_list_shaped_detail_raises_named_error_not_attributeerror(self):
+        with self.assertRaises(prediction.PredictionError):
+            prediction.parse_prediction_detail("[1, 2]")
+
+    def test_null_shaped_detail_raises_named_error_not_attributeerror(self):
+        with self.assertRaises(prediction.PredictionError):
+            prediction.parse_prediction_detail("null")
+
+    def test_bare_number_detail_raises_named_error_not_attributeerror(self):
+        with self.assertRaises(prediction.PredictionError):
+            prediction.parse_prediction_detail("5")
+
+    def test_bare_bool_detail_raises_named_error_not_attributeerror(self):
+        with self.assertRaises(prediction.PredictionError):
+            prediction.parse_prediction_detail("true")
+
+    def test_bare_string_detail_raises_named_error_not_attributeerror(self):
+        with self.assertRaises(prediction.PredictionError):
+            prediction.parse_prediction_detail('"oops"')
+
+    def test_well_formed_detail_still_parses_normally(self):
+        detail = json.dumps({"claim": "x", "confidence": 0.5}, sort_keys=True)
+        self.assertEqual(
+            prediction.parse_prediction_detail(detail),
+            {"claim": "x", "confidence": 0.5},
+        )
+
+
 class TestNoEditPathExists(unittest.TestCase):
     """Doctrine test: this module must not define anything shaped like an
     edit/update/delete/rewrite of a sealed entry — not disabled, absent.

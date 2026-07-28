@@ -158,6 +158,8 @@ def parse_grade_detail(detail: str) -> dict:
     """Read a sealed grade's detail back out. Read-only — this function
     returns a fresh dict; mutating it does not touch the chain."""
     payload = json.loads(detail)
+    if not isinstance(payload, dict):
+        raise GradingError(f"grade detail is not a JSON object: {payload!r}")
     if set(payload.keys()) != {"call_seq", "outcome"}:
         raise GradingError(f"not a well-formed grade payload: {sorted(payload.keys())}")
     return dict(payload)

@@ -129,6 +129,8 @@ def parse_prediction_detail(detail: str) -> dict:
     """Read a sealed prediction's detail back out. Read-only — this
     function returns a fresh dict; mutating it does not touch the chain."""
     payload = json.loads(detail)
+    if not isinstance(payload, dict):
+        raise PredictionError(f"prediction detail is not a JSON object: {payload!r}")
     if set(payload.keys()) != {"claim", "confidence"}:
         raise PredictionError(f"not a well-formed prediction payload: {sorted(payload.keys())}")
     return dict(payload)

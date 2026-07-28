@@ -273,6 +273,44 @@ class TestExistingGradesSkipsNonDictPayloads(unittest.TestCase):
                 os.remove(tmp_path)
 
 
+class TestParseGradeDetailRejectsNonDictPayloads(unittest.TestCase):
+    """ROADMAP.md task 363. `parse_grade_detail()` is the function every
+    one of the 25 `oracle_engine/*_autograde.py` modules calls to read a
+    prior grade's outcome back out (`grading.parse_grade_detail(g["detail"])
+    ["outcome"]`). Before this task it did a bare `json.loads(detail)` then
+    `payload.keys()` with no shape check -- a valid-JSON-non-dict `detail`
+    (list/null/number/bool/string) raised an uncaught `AttributeError`
+    instead of the module's own named `GradingError`, unlike its sibling
+    `existing_grades()` (task 302) which already guards the same shape."""
+
+    def test_list_shaped_detail_raises_named_error_not_attributeerror(self):
+        with self.assertRaises(grading.GradingError):
+            grading.parse_grade_detail("[1, 2]")
+
+    def test_null_shaped_detail_raises_named_error_not_attributeerror(self):
+        with self.assertRaises(grading.GradingError):
+            grading.parse_grade_detail("null")
+
+    def test_bare_number_detail_raises_named_error_not_attributeerror(self):
+        with self.assertRaises(grading.GradingError):
+            grading.parse_grade_detail("5")
+
+    def test_bare_bool_detail_raises_named_error_not_attributeerror(self):
+        with self.assertRaises(grading.GradingError):
+            grading.parse_grade_detail("true")
+
+    def test_bare_string_detail_raises_named_error_not_attributeerror(self):
+        with self.assertRaises(grading.GradingError):
+            grading.parse_grade_detail('"oops"')
+
+    def test_well_formed_detail_still_parses_normally(self):
+        detail = json.dumps({"call_seq": 0, "outcome": "correct"}, sort_keys=True)
+        self.assertEqual(
+            grading.parse_grade_detail(detail),
+            {"call_seq": 0, "outcome": "correct"},
+        )
+
+
 class TestNoEditPathExists(unittest.TestCase):
     """Doctrine test: this module must not define anything shaped like an
     edit/update/delete/rewrite of a sealed entry -- not disabled, absent.
