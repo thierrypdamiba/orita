@@ -46,7 +46,7 @@ from typing import Any
 
 from seam_engine.ranking import rank
 from seam_engine.recipes import RecipeManifest, RecipeValidationError, discover_recipes, load_detector
-from seam_engine.scan import GapCandidate, run_scan
+from seam_engine.scan import GapCandidate, _load_json_list, run_scan
 
 
 def _candidate_from_recipe_gap(gap: dict[str, Any], *, recipe_slug: str) -> GapCandidate:
@@ -195,7 +195,7 @@ def main(argv: list[str] | None = None) -> int:
             return 2
         x_posts_path = Path(argv[i + 1])
         del argv[i : i + 2]
-        x_posts = json.loads(x_posts_path.read_text())
+        x_posts = _load_json_list(x_posts_path)
 
     github_events: list[dict[str, Any]] | None = None
     if "--github-events" in argv:
@@ -205,7 +205,7 @@ def main(argv: list[str] | None = None) -> int:
             return 2
         github_events_path = Path(argv[i + 1])
         del argv[i : i + 2]
-        github_events = json.loads(github_events_path.read_text())
+        github_events = _load_json_list(github_events_path)
 
     out = argv[0] if argv else None
     result = run_combined_scan("thierrypdamiba", "orita", x_posts=x_posts, github_events=github_events)

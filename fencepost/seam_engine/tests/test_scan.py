@@ -199,6 +199,49 @@ def test_cli_reads_x_posts_file_and_threads_it_into_run_scan(tmp_path, monkeypat
     assert result["x_posts_source"] == "live"
 
 
+@pytest.mark.parametrize("bad_value", [{"a": 1}, 5, None, "x", True])
+def test_load_json_list_raises_named_error_not_typeerror_when_json_is_not_a_list(
+    tmp_path: Path, bad_value: object
+) -> None:
+    """task 361: the same non-list guard the RECIPES/*/detector.py campaign
+    (task 358) and gmail_calendar.py (task 359) closed, on scan.py's own
+    --x-posts/--github-events CLI loaders that scan didn't reach."""
+    from seam_engine.scan import _load_json_list
+
+    bad_file = tmp_path / "bad.json"
+    bad_file.write_text(json.dumps(bad_value))
+    with pytest.raises(ValueError, match="expected a JSON list"):
+        _load_json_list(bad_file)
+
+
+@pytest.mark.parametrize("bad_value", [{"a": 1}, 5, None, "x", True])
+def test_cli_x_posts_with_non_list_json_raises_named_error(tmp_path, bad_value):
+    """Pre-fix, a dict/int/None/string/bool payload reached
+    `load_x_posts_from_live`'s `not data` / `enumerate(data)` unmarked,
+    producing a confusing crash or silently wrong behavior instead of a
+    clear message. Proves the CLI path itself now raises the named error."""
+    from seam_engine.scan import main
+
+    bad_file = tmp_path / "bad.json"
+    bad_file.write_text(json.dumps(bad_value))
+    out_path = tmp_path / "out.json"
+    with pytest.raises(ValueError, match="expected a JSON list"):
+        main([str(out_path), "--x-posts", str(bad_file)])
+
+
+@pytest.mark.parametrize("bad_value", [{"a": 1}, 5, None, "x", True])
+def test_cli_github_events_with_non_list_json_raises_named_error(tmp_path, bad_value):
+    """Mirrors test_cli_x_posts_with_non_list_json_raises_named_error for
+    --github-events."""
+    from seam_engine.scan import main
+
+    bad_file = tmp_path / "bad.json"
+    bad_file.write_text(json.dumps(bad_value))
+    out_path = tmp_path / "out.json"
+    with pytest.raises(ValueError, match="expected a JSON list"):
+        main([str(out_path), "--github-events", str(bad_file)])
+
+
 def test_cli_without_x_posts_flag_uses_the_ledger_fallback(tmp_path, monkeypatch):
     import seam_engine.scan as scan_mod
 

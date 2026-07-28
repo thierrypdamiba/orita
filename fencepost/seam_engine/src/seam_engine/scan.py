@@ -757,6 +757,23 @@ def run_scan(
     }
 
 
+def _load_json_list(path: Path) -> list[Any]:
+    """Load a whole-file JSON list from a CLI-supplied path, refusing a
+    syntactically valid but non-list payload with a named error instead of
+    letting it reach `load_x_posts_from_live`/`load_github_events_from_live`
+    unmarked (both call `enumerate()`/`not data` on the result, which on a
+    dict, string, int, or bool produces a confusing crash or silently wrong
+    behavior rather than a clear message). Mirrors `RECIPES/*/detector.py`'s
+    `_load_rows` (task 358) and `gmail_calendar.py`'s `_load_rows` (task
+    359) exactly — the same bug class, on `scan.py`'s and `combined_scan.py`'s
+    own `--x-posts`/`--github-events` CLI loaders, which that scan's grep
+    for non-guarded `json.loads()` call sites had not yet reached."""
+    data = json.loads(Path(path).read_text())
+    if not isinstance(data, list):
+        raise ValueError(f"{path}: expected a JSON list, got {type(data).__name__}")
+    return data
+
+
 def main(argv: list[str] | None = None) -> int:
     """CLI: `python -m seam_engine.scan [output.json] [--x-posts <path>] [--github-events <path>]`.
 
@@ -789,7 +806,7 @@ def main(argv: list[str] | None = None) -> int:
             return 2
         x_posts_path = Path(argv[i + 1])
         del argv[i : i + 2]
-        x_posts = json.loads(x_posts_path.read_text())
+        x_posts = _load_json_list(x_posts_path)
 
     github_events: list[dict[str, Any]] | None = None
     if "--github-events" in argv:
@@ -799,7 +816,7 @@ def main(argv: list[str] | None = None) -> int:
             return 2
         github_events_path = Path(argv[i + 1])
         del argv[i : i + 2]
-        github_events = json.loads(github_events_path.read_text())
+        github_events = _load_json_list(github_events_path)
 
     out = argv[0] if argv else None
     result = run_scan(

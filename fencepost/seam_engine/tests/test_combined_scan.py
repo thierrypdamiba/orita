@@ -421,6 +421,30 @@ def test_cli_without_github_events_flag_uses_direct_fetch(monkeypatch, tmp_path)
     assert result["github_events_source"] == "direct"
 
 
+@pytest.mark.parametrize("bad_value", [{"a": 1}, 5, None, "x", True])
+def test_cli_x_posts_with_non_list_json_raises_named_error(tmp_path, bad_value):
+    """task 361: mirrors test_scan.py's identical test for scan.main --
+    combined_scan.main shares scan.py's `_load_json_list` helper, closing
+    the same non-list-JSON crash class (RECIPES/*/detector.py, task 358;
+    gmail_calendar.py, task 359) on this module's own CLI loaders."""
+    bad_file = tmp_path / "bad.json"
+    bad_file.write_text(json.dumps(bad_value))
+    out_path = tmp_path / "out.json"
+    with pytest.raises(ValueError, match="expected a JSON list"):
+        combined_scan_mod.main([str(out_path), "--x-posts", str(bad_file)])
+
+
+@pytest.mark.parametrize("bad_value", [{"a": 1}, 5, None, "x", True])
+def test_cli_github_events_with_non_list_json_raises_named_error(tmp_path, bad_value):
+    """Mirrors test_cli_x_posts_with_non_list_json_raises_named_error for
+    --github-events."""
+    bad_file = tmp_path / "bad.json"
+    bad_file.write_text(json.dumps(bad_value))
+    out_path = tmp_path / "out.json"
+    with pytest.raises(ValueError, match="expected a JSON list"):
+        combined_scan_mod.main([str(out_path), "--github-events", str(bad_file)])
+
+
 def test_cli_docstring_shape_claim_is_true_both_flags_supported():
     # A structural check on the claim itself, not just its behavior: the
     # docstring says combined_scan.main mirrors scan.main's CLI shape
