@@ -768,16 +768,29 @@ def check_petition_cadence(orita_dir: str | None = None) -> dict:
     return {"clean": not violations, "count": len(violations), "violations": violations}
 
 
-def check_journal_numbering(orita_dir: str | None = None) -> dict:
-    """Task 119: fold `journal_numbering_check.py`'s own scan into the one
-    block. Unconditional, local-filesystem-only, the same cheap class
-    `check_petition_cadence` already holds -- every `houses/<god>/
-    journal/NNNN-*.md` filename claims a per-house sequential number, and
-    nothing had ever checked that claim in code until this task."""
+def check_journal_numbering(orita_dir: str | None = None, vault_dir: str | None = None) -> dict:
+    """Task 119 (widened task 370): fold `journal_numbering_check.py`'s
+    own scan into the one block. Unconditional, local-filesystem-only,
+    the same cheap class `check_petition_cadence` already holds -- every
+    `houses/<god>/journal/NNNN-*.md` filename claims a per-house
+    sequential number, and nothing had ever checked that claim in code
+    until task 119.
+
+    Task 370 widened the underlying scan to also cover `vault/<god>/
+    journal/`. A bare call (neither argument given -- the real,
+    no-override production path) scans both trees, mirroring
+    `check_vault_leak()`'s own real-default behavior. Passing only
+    `orita_dir` (as the pre-370 `JournalNumberingFoldCase` fixture tests
+    in `tests/test_ritual_check.py` already do) leaves the vault scan
+    skipped, byte-identical to this function's behavior before task 370."""
     mod = _journal_numbering_check()
     kwargs = {}
     if orita_dir is not None:
         kwargs["orita_dir"] = orita_dir
+    if vault_dir is not None:
+        kwargs["vault_dir"] = vault_dir
+    elif orita_dir is None:
+        kwargs["vault_dir"] = mod.DEFAULT_VAULT_DIR
     violations = mod.find_violations(**kwargs)
     return {"clean": not violations, "count": len(violations), "violations": violations}
 
@@ -952,6 +965,7 @@ def run_ritual_check(
     voice_window_log: str | None = None,
     petition_cadence_dir: str | None = None,
     journal_numbering_dir: str | None = None,
+    journal_numbering_dirs: tuple | None = None,
     report_cadence_dir: str | None = None,
     metrics_cadence_path: str | None = None,
     shared_reports_path: str | None = None,
@@ -994,7 +1008,12 @@ def run_ritual_check(
     verdict_provenance = check_verdict_provenance(orita_dir=verdict_provenance_dir)
     voice_window = check_voice_window(voice_window_commits, now_iso, path=voice_window_log)
     petition_cadence = check_petition_cadence(orita_dir=petition_cadence_dir)
-    journal_numbering = check_journal_numbering(orita_dir=journal_numbering_dir)
+    if journal_numbering_dirs is not None:
+        journal_numbering = check_journal_numbering(
+            orita_dir=journal_numbering_dirs[0], vault_dir=journal_numbering_dirs[1]
+        )
+    else:
+        journal_numbering = check_journal_numbering(orita_dir=journal_numbering_dir)
     report_cadence = check_report_cadence(reports_dir=report_cadence_dir)
     metrics_cadence = check_metrics_cadence(metrics_path=metrics_cadence_path)
     shared_reports = check_shared_reports(shared_path=shared_reports_path)

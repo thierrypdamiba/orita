@@ -1474,6 +1474,61 @@ class JournalNumberingFoldCase(unittest.TestCase):
         self.assertIn("malformed, duplicated, or gapped", formatted)
 
 
+class JournalNumberingVaultFoldCase(unittest.TestCase):
+    """Task 370: proves the new `journal_numbering_dirs` tuple actually
+    reaches `journal_numbering_check.py`'s widened vault scan through
+    `run_ritual_check()`, and that the pre-370 single-string
+    `journal_numbering_dir` override (proven clean above by
+    `JournalNumberingFoldCase`) still leaves the vault scan skipped --
+    the same backward-compatibility guarantee `vault_leak_dirs` already
+    holds for `check_vault_leak()`."""
+
+    def setUp(self):
+        self.orita = tempfile.mkdtemp()
+        self.vault = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.orita, ignore_errors=True)
+        self.addCleanup(shutil.rmtree, self.vault, ignore_errors=True)
+
+    def _write(self, base, rel, content=""):
+        path = os.path.join(base, rel)
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, "w") as f:
+            f.write(content)
+
+    def test_clean_public_and_vault_fixtures_are_not_broken(self):
+        self._write(self.orita, "houses/off-by-one/journal/0001-founding-day.md", "x")
+        self._write(self.vault, "vault/off-by-one/journal/0001-founding-day.md", "x")
+        result = rc.run_ritual_check(journal_numbering_dirs=(self.orita, self.vault))
+        self.assertTrue(result["journal_numbering"]["clean"])
+        self.assertFalse(result["broken"])
+
+    def test_synthetic_vault_only_gap_flips_broken(self):
+        self._write(self.orita, "houses/off-by-one/journal/0001-founding-day.md", "x")
+        self._write(self.vault, "vault/off-by-one/journal/0001-founding-day.md", "x")
+        self._write(self.vault, "vault/off-by-one/journal/0003-2026-07-13.md", "y")
+        result = rc.run_ritual_check(journal_numbering_dirs=(self.orita, self.vault))
+        self.assertFalse(result["journal_numbering"]["clean"])
+        self.assertTrue(result["broken"])
+        violations = result["journal_numbering"]["violations"]
+        self.assertEqual(len(violations), 1)
+        self.assertEqual(violations[0]["realm"], "vault")
+        self.assertEqual(violations[0]["file"], "0002-*.md")
+        self.assertIn("journal numbering: 1 VIOLATION(S)", rc.format_ritual_check(result))
+
+    def test_legacy_single_dir_override_still_skips_vault(self):
+        """The vault fixture here carries a real gap, but since only the
+        legacy `journal_numbering_dir` is passed (not the new
+        `journal_numbering_dirs` tuple), the vault scan must stay
+        skipped -- proving task 370 introduced nothing that widens an
+        existing caller's behavior without it opting in."""
+        self._write(self.orita, "houses/off-by-one/journal/0001-founding-day.md", "x")
+        self._write(self.vault, "vault/off-by-one/journal/0001-founding-day.md", "x")
+        self._write(self.vault, "vault/off-by-one/journal/0003-2026-07-13.md", "y")
+        result = rc.run_ritual_check(journal_numbering_dir=self.orita)
+        self.assertTrue(result["journal_numbering"]["clean"])
+        self.assertFalse(result["broken"])
+
+
 class ReportCadenceFoldCase(unittest.TestCase):
     """Task 116: run_ritual_check() folds report_cadence_check.py's own
     fencepost/REPORTS/ streak scan (STRATEGY.md's "1/day, 30 of 30 days"
