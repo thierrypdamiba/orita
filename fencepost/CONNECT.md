@@ -37,7 +37,7 @@ drifts toward a write verb Arcade's tool matcher could act on. Copy it
 exactly:
 
 ```text
-Read-only seam reconciliation: list and read GitHub repository metadata, commit history, releases, issues, pull requests, repository activity, and stargazer counts, and read a connected user's own X (Twitter) tweet history, mentions, and account identity — solely to compare the two timelines and surface gaps between what shipped and what was announced. Never create, update, merge, label, delete, post, reply, send, or modify anything on any connected account.
+Read-only seam reconciliation: list and read GitHub repository metadata, commit history, releases, issues, pull requests, repository activity, individual file contents, and stargazer counts, and read a connected user's own X (Twitter) tweet history, mentions, and account identity — solely to compare the two timelines and surface gaps between what shipped and what was announced. Never create, update, merge, label, delete, post, reply, send, or modify anything on any connected account.
 ```
 
 **CORRECTED 2026-07-19, task 152:** the string used to name only 4 of the 8

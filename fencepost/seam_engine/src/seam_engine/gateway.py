@@ -23,6 +23,16 @@ exactly could have provisioned a gateway missing repository metadata,
 repository activity, stargazer-count, and identity tools.
 ``required_scopes_covered_by_capabilities`` makes that relationship
 checkable instead of two constants that happened to agree.
+
+Task 372: that checker had its own silent gap. ``GetFileContents`` (added
+to ``consent.REQUIRED_SCOPES["github"]`` by task 371 for the fifth recipe)
+had no entry in ``_SCOPE_KEYWORDS`` and no wording anywhere in
+``READ_ONLY_CAPABILITIES`` — yet ``required_scopes_covered_by_capabilities()``
+still returned ``{}`` (fully covered) because a missing keyword defaulted to
+an empty string, and an empty string is a substring of everything. Fixed
+both halves together: the string now names "individual file contents", and
+a ``REQUIRED_SCOPES`` tool with no keyword entry at all is now always
+reported as a gap rather than silently passing.
 """
 from __future__ import annotations
 
@@ -37,12 +47,12 @@ from seam_engine.consent import REQUIRED_SCOPES
 READ_ONLY_CAPABILITIES = (
     "Read-only seam reconciliation: list and read GitHub repository "
     "metadata, commit history, releases, issues, pull requests, "
-    "repository activity, and stargazer counts, and read a connected "
-    "user's own X (Twitter) tweet history, mentions, and account "
-    "identity — solely to compare the two timelines and surface gaps "
-    "between what shipped and what was announced. Never create, update, "
-    "merge, label, delete, post, reply, send, or modify anything on any "
-    "connected account."
+    "repository activity, individual file contents, and stargazer "
+    "counts, and read a connected user's own X (Twitter) tweet history, "
+    "mentions, and account identity — solely to compare the two "
+    "timelines and surface gaps between what shipped and what was "
+    "announced. Never create, update, merge, label, delete, post, "
+    "reply, send, or modify anything on any connected account."
 )
 
 # Every REQUIRED_SCOPES tool (imported live above, never a second hand-typed
@@ -61,6 +71,7 @@ _SCOPE_KEYWORDS: dict[str, dict[str, str]] = {
         "ListRepositoryActivities": "repository activity",
         "CountStargazers": "stargazer",
         "GetLatestRelease": "release",
+        "GetFileContents": "file contents",
     },
     "x": {
         "GetUserTweets": "tweet history",
@@ -80,6 +91,20 @@ def required_scopes_covered_by_capabilities(
 
     Only checks toolkits present in ``_SCOPE_KEYWORDS`` (github, x) — gmail
     and google_calendar are v0.2, not yet part of this gateway's own oath.
+
+    Task 372: a ``REQUIRED_SCOPES`` tool with NO entry at all in
+    ``_SCOPE_KEYWORDS[toolkit]`` used to fall through ``keywords.get(tool,
+    "")`` to an empty-string default — and an empty string is trivially a
+    substring of every string, so ``"" not in lowered`` is always ``False``.
+    A brand-new scope added to ``REQUIRED_SCOPES`` (consent.py) with nobody
+    remembering to also add its keyword here silently read as "covered" by
+    this function instead of "missing" — the exact false negative this
+    function exists to prevent, just one layer up from the string itself.
+    That is precisely what happened: task 371 added ``GetFileContents`` to
+    ``REQUIRED_SCOPES["github"]`` for the fifth recipe but never touched
+    this file, and ``test_the_towns_own_capabilities_string_covers_every_
+    required_scope`` kept passing anyway. A tool absent from ``keywords``
+    is now always a reported gap, never a silent pass.
     """
     text = READ_ONLY_CAPABILITIES if text is None else text
     required_scopes = REQUIRED_SCOPES if required_scopes is None else required_scopes
@@ -89,7 +114,7 @@ def required_scopes_covered_by_capabilities(
         gaps = [
             tool
             for tool in required_scopes.get(toolkit, frozenset())
-            if keywords.get(tool, "").lower() not in lowered
+            if tool not in keywords or keywords[tool].lower() not in lowered
         ]
         if gaps:
             missing[toolkit] = sorted(gaps)
