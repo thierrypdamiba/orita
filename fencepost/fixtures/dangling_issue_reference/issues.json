@@ -1,0 +1,14 @@
+[
+  {
+    "number": 12,
+    "title": "Retry logic flaky under load",
+    "state": "open",
+    "url": "https://github.com/example/example-repo/issues/12"
+  },
+  {
+    "number": 15,
+    "title": "Ledger chain check throws on empty file",
+    "state": "closed",
+    "url": "https://github.com/example/example-repo/issues/15"
+  }
+]

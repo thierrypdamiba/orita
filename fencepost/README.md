@@ -77,6 +77,10 @@ validated together by the same call a stranger's PR is checked against.
 (ROADMAP.md #110): the first CROSS-TOOLKIT recipe, reading a GitHub release
 against X tweets — the exact seam STRATEGY.md names by hand as Fencepost's
 own worked example.
+[`RECIPES/dangling-issue-reference/`](RECIPES/dangling-issue-reference/) is
+the fourth (ROADMAP.md #368): the first recipe watching a seam inside a
+single record rather than between two — a commit message's own `#N` claim,
+checked against whether that issue or pull request actually exists.
 
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)

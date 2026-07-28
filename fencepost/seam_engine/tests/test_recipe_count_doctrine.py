@@ -84,9 +84,12 @@ def test_unrecognized_cardinal_word_raises():
         claimed_recipe_count("Several real recipes stand today:")
 
 
-def test_real_recipe_count_is_currently_three():
-    """Regression pin: today's real, live count under RECIPES/."""
-    assert real_recipe_count(FENCEPOST_ROOT) == 3
+def test_real_recipe_count_is_currently_four():
+    """Regression pin: today's real, live count under RECIPES/. Was 3 until
+    RECIPES/dangling-issue-reference/ merged (the fourth real recipe) --
+    the exact drift this whole doctrine file exists to catch, now caught
+    once for real instead of only rehearsed by the mutation test below."""
+    assert real_recipe_count(FENCEPOST_ROOT) == 4
 
 
 def test_site_claim_matches_the_real_live_count():
@@ -94,12 +97,23 @@ def test_site_claim_matches_the_real_live_count():
     assert claimed_recipe_count(site_text) == real_recipe_count(FENCEPOST_ROOT)
 
 
-def test_a_real_fourth_recipe_would_flip_this_check_red(tmp_path):
+def test_one_more_real_recipe_would_flip_this_check_red(tmp_path):
     """Mutation-based hand-verification: reconstruct the real repo's
-    RECIPES/ tree plus one synthetic fourth recipe, prove
-    `real_recipe_count` sees 4, and prove that 4 disagrees with the site's
-    real, live claim of 3 -- the exact drift this file exists to catch,
-    reproduced against real manifests, not asserted on faith."""
+    RECIPES/ tree plus one synthetic extra recipe, prove `real_recipe_count`
+    sees one more than the live baseline, and prove that disagrees with the
+    site's real, live claim -- the exact drift this file exists to catch,
+    reproduced against real manifests, not asserted on faith.
+
+    Computed against the LIVE baseline (`real_recipe_count(FENCEPOST_ROOT)`),
+    never a second hand-typed cardinal -- this is exactly the fix task 156
+    itself made to the site's own claim, applied here too, so this test
+    does not go stale the next time a real recipe merges (it went stale
+    once already: hand-typed as "4" when a real fourth recipe was still
+    hypothetical, silently wrong the hour dangling-issue-reference actually
+    merged and the live baseline became 4 -- caught before that could ship
+    by making the assertion relative, not absolute)."""
+    baseline = real_recipe_count(FENCEPOST_ROOT)
+
     fake_root = tmp_path / "fencepost"
     recipes_dir = fake_root / "RECIPES"
     recipes_dir.mkdir(parents=True)
@@ -115,18 +129,18 @@ def test_a_real_fourth_recipe_would_flip_this_check_red(tmp_path):
             manifest_src.read_text(encoding="utf-8"), encoding="utf-8"
         )
 
-    fourth = recipes_dir / "a-fourth-recipe"
-    fourth.mkdir()
-    (fourth / "recipe.json").write_text(
+    extra = recipes_dir / "a-synthetic-extra-recipe"
+    extra.mkdir()
+    (extra / "recipe.json").write_text(
         json.dumps(
             {
-                "slug": "a-fourth-recipe",
-                "title": "A synthetic fourth recipe",
+                "slug": "a-synthetic-extra-recipe",
+                "title": "A synthetic extra recipe",
                 "author": "test",
                 "description": "Exists only to prove this doctrine test catches real drift.",
                 "toolkit": "github",
                 "scopes": ["GetRepository"],
-                "fixture": "fixtures/a_fourth_recipe",
+                "fixture": "fixtures/a_synthetic_extra_recipe",
                 "detector_file": "detector.py",
                 "entrypoint": "run_recipe_scan",
                 "confidence_notes": "n/a -- synthetic mutation fixture",
@@ -135,8 +149,8 @@ def test_a_real_fourth_recipe_would_flip_this_check_red(tmp_path):
         encoding="utf-8",
     )
 
-    real_count_with_fourth = real_recipe_count(fake_root)
-    assert real_count_with_fourth == 4
+    real_count_with_extra = real_recipe_count(fake_root)
+    assert real_count_with_extra == baseline + 1
 
     site_text = SITE_PATH.read_text(encoding="utf-8")
-    assert claimed_recipe_count(site_text) != real_count_with_fourth
+    assert claimed_recipe_count(site_text) != real_count_with_extra

@@ -1,0 +1,12 @@
+{
+  "slug": "dangling-issue-reference",
+  "title": "A commit counts on an issue that was never there",
+  "author": "off-by-one",
+  "description": "Extracts every #N reference from commit messages (excluding cross-repo owner/repo#N references, which name a different repo's number space on purpose) and checks each one against the live issue AND pull-request number space, since GitHub shares one sequence between them. A number that matches neither is the seam: a typo, a reference to something deleted, or a number meant for a different repo, left standing uncorrected in the permanent commit log forever.",
+  "toolkit": "github",
+  "scopes": ["ListRepoCommits", "ListIssues", "ListPullRequests"],
+  "fixture": "fixtures/dangling_issue_reference",
+  "detector_file": "detector.py",
+  "entrypoint": "run_recipe_scan",
+  "confidence_notes": "Flat 0.8, deliberately short of the 0.85 the engine's other unambiguous, non-fuzzy matches earn (merged-pr-issue-still-open, release-not-tweeted): a miss against BOTH the live issue list and the live PR list is a real, structural signal with no keyword fuzziness to misfire on, but this recipe cannot see discussions, milestones, or a genuinely different repo's own numbering that a stray reference might legitimately mean -- an honestly bounded uncertainty a flat 0.85 would overclaim. A reference that DOES match a real issue or PR is excluded at confidence 0.0, named not hidden, the same as every other detector in this engine; a cross-repo reference (owner/repo#N) never even reaches the candidate list, because it names a seam this recipe was never asked to watch, not a gap in this one."
+}

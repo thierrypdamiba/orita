@@ -18,11 +18,12 @@ class TestFencepostSiteRecipes(unittest.TestCase):
         with open(SITE_PATH, encoding="utf-8") as f:
             self.text = f.read()
 
-    def test_names_all_three_real_recipes(self):
+    def test_names_all_real_recipes(self):
         for slug in (
             "example-release-vs-changelog",
             "merged-pr-issue-still-open",
             "release-not-tweeted",
+            "dangling-issue-reference",
         ):
             self.assertIn(slug, self.text, f"site never names recipe {slug!r}")
 
