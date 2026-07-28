@@ -127,7 +127,7 @@ class RealClaimCrossCheckedAgainstLiveTestsCase(unittest.TestCase):
             f"+ test_subscriber_autograde.py is {result['real']}",
         )
 
-    def test_regression_pin_todays_real_total_is_44(self):
+    def test_regression_pin_todays_real_total_is_46(self):
         # Named so a future test added/removed from either file trips this
         # pin FIRST, distinct from (and in addition to) the doc cross-check
         # above -- exactly task 149's own "regression pin" discipline. Moved
@@ -147,8 +147,14 @@ class RealClaimCrossCheckedAgainstLiveTestsCase(unittest.TestCase):
         # test_subscriber_autograde.py case
         # (test_a_non_dict_predict_payload_is_skipped_not_raised) -- the doc's
         # own count claim went un-bumped past a live `dawn-run` failure
-        # (#563/#564) until task 326 caught it, not a routine sweep.
-        self.assertEqual(real_subscriber_test_count(), 44)
+        # (#563/#564) until task 326 caught it, not a routine sweep. Then
+        # 44 -> 46 by task 349's own two new test_subscriber_cadence.py
+        # valid-JSON-non-dict guard cases
+        # (test_load_snapshots_marks_a_valid_json_non_dict_line_as_malformed/
+        # test_a_valid_json_non_dict_snapshot_line_refuses_not_crashes) -- the
+        # doc's own count claim went un-bumped past a live `dawn-run` failure
+        # (#598) until task 350 caught it, not a routine sweep.
+        self.assertEqual(real_subscriber_test_count(), 46)
 
 
 class MutationProvesTheCheckerBitesCase(unittest.TestCase):
