@@ -407,10 +407,29 @@ def append_scan(
 
 
 def _load_scan(path: str) -> dict[str, Any]:
+    """Read a scan record for the CLI's `append` command from `path` ('-' for stdin).
+
+    A CLI-supplied file (or stdin stream) can be any syntactically valid
+    JSON -- a bare list, int, bool, null, or string, not just an object --
+    and `append_scan` immediately treats its argument as a dict
+    (`scan.get(...)`). Left unguarded, a non-object payload would crash
+    `main(["append", ...])` with a bare
+    `AttributeError: '<type>' object has no attribute 'get'` instead of a
+    message naming the actual problem -- the same discipline
+    `report.py`'s `_load_sealed_arg` already holds in this package.
+    """
     if path == "-":
         import sys
-        return json.load(sys.stdin)
-    return json.loads(Path(path).read_text())
+        data = json.load(sys.stdin)
+        where = "stdin"
+    else:
+        data = json.loads(Path(path).read_text())
+        where = path
+    if not isinstance(data, dict):
+        raise ValueError(
+            f"{where}: scan record must be a JSON object, got {type(data).__name__}"
+        )
+    return data
 
 
 def main(argv: list[str] | None = None) -> int:
