@@ -12,7 +12,7 @@ Concretely, on the toolkits in use:
 
 | toolkit | Fencepost uses | Fencepost may NEVER use |
 |--|--|--|
-| GitHub | GetRepository, ListRepoCommits, ListIssues, GetIssue, ListPullRequests, ListRepositoryActivities, CountStargazers, GetLatestRelease | CreateFile, UpdateFileLines, CreateIssue, MergePullRequest, CreateRelease, ManageLabels |
+| GitHub | GetRepository, ListRepoCommits, ListIssues, GetIssue, ListPullRequests, ListRepositoryActivities, CountStargazers, GetLatestRelease, GetFileContents | CreateFile, UpdateFileLines, CreateIssue, MergePullRequest, CreateRelease, ManageLabels |
 | X | GetUserTweets, GetMyMentions, WhoAmI | PostTweet, ReplyToTweet |
 | Gmail (v0.2) | ListEmails, GetEmail, SearchThreads | SendEmail, CreateDraft*, Trash*, Modify* |
 | Google Calendar (v0.2) | ListEvents, GetEvent | CreateEvent, UpdateEvent, DeleteEvent |

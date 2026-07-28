@@ -81,6 +81,12 @@ own worked example.
 the fourth (ROADMAP.md #368): the first recipe watching a seam inside a
 single record rather than between two — a commit message's own `#N` claim,
 checked against whether that issue or pull request actually exists.
+[`RECIPES/contributor-thanked-not-credited/`](RECIPES/contributor-thanked-not-credited/)
+is the fifth (ROADMAP.md #371): the second CROSS-TOOLKIT recipe — a
+contributor thanked in a tweet from the connected X account, checked
+against whether that handle is credited in the repo's own README, closing
+the other half of the worked example STRATEGY.md names alongside
+`release-not-tweeted`'s.
 
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)

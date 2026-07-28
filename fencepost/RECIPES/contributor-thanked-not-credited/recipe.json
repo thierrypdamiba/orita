@@ -1,0 +1,12 @@
+{
+  "slug": "contributor-thanked-not-credited",
+  "title": "Contributor thanked on X, not yet in the README",
+  "author": "kwaku-ananse",
+  "description": "Compares thanks-shaped tweets from the connected X account against the repo's own README content, and surfaces a thanked contributor whose handle isn't yet credited as the seam gap. The second cross-toolkit recipe (X + GitHub), closing the other half of the worked example STRATEGY.md names alongside release-not-tweeted's: 'a contributor thanked on X but missing from the README.'",
+  "toolkit": "x+github",
+  "scopes": ["GetUserTweets", "GetFileContents"],
+  "fixture": "fixtures/contributor_thanked_not_credited",
+  "detector_file": "detector.py",
+  "entrypoint": "run_recipe_scan",
+  "confidence_notes": "Age-gated, not flat, same shape as release-not-tweeted's: a thanked handle not yet credited within 72 hours of the tweet scores 0.5 (below the 0.70 bar, shown as a weighed coincidence, not hidden -- a human may simply not have gotten to the README edit yet). At or past 72 hours with still no credit, it scores a flat 0.85 -- an exact @handle-substring match on the README's own content is unambiguous. The 72h window is longer than release-not-tweeted's 24h on purpose: crediting a README is a slower, more deliberate edit than posting an announcement tweet. A tweet with no thanks-shaped language (a bare @mention) never becomes a candidate at all -- no fuzzy matching to misfire on. A thanked handle already credited is excluded at confidence 0.0, named not hidden."
+}

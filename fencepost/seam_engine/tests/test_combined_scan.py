@@ -226,8 +226,8 @@ def test_no_recipes_directory_is_the_same_as_scan_alone(monkeypatch, tmp_path):
 
 
 def test_runs_all_real_recipes_in_the_actual_repo_without_error(monkeypatch):
-    # The integration proof: against the real RECIPES/ tree (all four real
-    # recipes shipped by tasks 22, 108, 110, 368), the combined scan runs clean.
+    # The integration proof: against the real RECIPES/ tree (all five real
+    # recipes shipped by tasks 22, 108, 110, 368, 371), the combined scan runs clean.
     monkeypatch.setattr(scan_mod, "fetch_github_activity", lambda *a, **k: [])
 
     result = run_combined_scan("thierrypdamiba", "orita", x_posts=BASE_X_POSTS)
@@ -239,6 +239,7 @@ def test_runs_all_real_recipes_in_the_actual_repo_without_error(monkeypatch):
         "merged-pr-issue-still-open",
         "release-not-tweeted",
         "dangling-issue-reference",
+        "contributor-thanked-not-credited",
     }
 
 
