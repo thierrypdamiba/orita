@@ -251,6 +251,34 @@ def render_latest(base: Path | None = None) -> str:
 # --- CLI ----------------------------------------------------------------------
 
 
+def _load_sealed_arg(path: str) -> dict[str, Any]:
+    """Read a sealed record for the CLI from `path` ('-' for stdin).
+
+    A CLI-supplied file (or stdin stream) can be any syntactically valid
+    JSON -- a bare list, int, bool, null, or string, not just an object --
+    and `render_report` immediately treats its argument as a dict
+    (`sealed.get("date")`, first line of the function). Left unguarded, a
+    non-object payload would crash `main()` with a bare
+    `AttributeError: '<type>' object has no attribute 'get'` instead of a
+    message naming the actual problem -- the same "malformed input is named,
+    never an opaque crash" discipline this module already holds for a
+    tampered ledger tip via `ledger.LedgerTamperedError`.
+    """
+    if path == "-":
+        import sys
+
+        data = json.load(sys.stdin)
+        where = "stdin"
+    else:
+        data = json.loads(Path(path).read_text())
+        where = path
+    if not isinstance(data, dict):
+        raise ValueError(
+            f"{where}: sealed record must be a JSON object, got {type(data).__name__}"
+        )
+    return data
+
+
 def main(argv: list[str] | None = None) -> int:
     import sys
 
@@ -273,11 +301,11 @@ def main(argv: list[str] | None = None) -> int:
         del argv[i : i + 2]
 
     if argv and argv[0] != "-":
-        sealed = json.loads(Path(argv[0]).read_text())
+        sealed = _load_sealed_arg(argv[0])
         report = render_report(sealed)
         date = sealed.get("date") or sealed.get("generated_at", "")[:10]
     elif argv == ["-"]:
-        sealed = json.load(sys.stdin)
+        sealed = _load_sealed_arg("-")
         report = render_report(sealed)
         date = sealed.get("date") or sealed.get("generated_at", "")[:10]
     else:

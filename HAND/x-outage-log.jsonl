@@ -333,3 +333,5 @@
 {"type": "check", "tool": "X_WhoAmI", "status": "ok", "checked_at": "2026-07-28T02:04:55Z"}
 {"type": "check", "tool": "X_WhoAmI", "status": "ok", "checked_at": "2026-07-28T03:08:18Z"}
 {"type": "check", "tool": "X_GetUserTweets", "status": "forbidden", "checked_at": "2026-07-28T03:08:18Z"}
+{"type": "check", "tool": "WhoAmI", "status": "ok", "checked_at": "2026-07-28T05:03:15Z"}
+{"type": "check", "tool": "GetUserTweets", "status": "forbidden", "checked_at": "2026-07-28T05:03:15Z"}
