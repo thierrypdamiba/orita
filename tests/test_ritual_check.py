@@ -1787,5 +1787,124 @@ class ToolkitsInUseFoldCase(unittest.TestCase):
         self.assertFalse(result["broken"])
 
 
+class LoadJsonArgShapeGuardCase(unittest.TestCase):
+    """ROADMAP.md task 364. `_load_json_arg` is the shared helper the CLI's
+    six file-argument flags (`--square-state`, `--arcade-apps-state`,
+    `--ci-checks`, `--cron-checks`, `--child-files`,
+    `--voice-window-commits`) now all route through. Before this task each
+    flag did a bare `json.load(f)` with no shape check, so a syntactically
+    valid but wrong-shaped JSON file crashed two or three frames deeper
+    with a bare `AttributeError`/`TypeError` instead of a named error --
+    the identical bug class the closed `fencepost/seam_engine` campaigns
+    (tasks 355-362) fixed at their own CLI/MCP entry points, on the one
+    entry point those scans never reached: this file's own CLI."""
+
+    def _write(self, value):
+        f = tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False)
+        json.dump(value, f)
+        f.close()
+        self.addCleanup(os.remove, f.name)
+        return f.name
+
+    def test_bare_int_rejected_when_dict_expected(self):
+        path = self._write(5)
+        with self.assertRaises(rc.RitualCheckArgError):
+            rc._load_json_arg(path, "square-state", "dict")
+
+    def test_bare_list_rejected_when_dict_expected(self):
+        path = self._write([1, 2])
+        with self.assertRaises(rc.RitualCheckArgError):
+            rc._load_json_arg(path, "square-state", "dict")
+
+    def test_null_rejected_when_dict_expected(self):
+        path = self._write(None)
+        with self.assertRaises(rc.RitualCheckArgError):
+            rc._load_json_arg(path, "arcade-apps-state", "dict")
+
+    def test_bare_dict_rejected_when_list_expected(self):
+        path = self._write({"a": 1})
+        with self.assertRaises(rc.RitualCheckArgError):
+            rc._load_json_arg(path, "ci-checks", "list")
+
+    def test_bare_bool_rejected_when_list_expected(self):
+        path = self._write(True)
+        with self.assertRaises(rc.RitualCheckArgError):
+            rc._load_json_arg(path, "cron-checks", "list")
+
+    def test_bare_string_rejected_when_list_expected(self):
+        path = self._write("oops")
+        with self.assertRaises(rc.RitualCheckArgError):
+            rc._load_json_arg(path, "child-files", "list")
+
+    def test_error_message_names_the_flag_and_the_real_type(self):
+        path = self._write(5)
+        with self.assertRaises(rc.RitualCheckArgError) as ctx:
+            rc._load_json_arg(path, "voice-window-commits", "list")
+        self.assertIn("--voice-window-commits", str(ctx.exception))
+        self.assertIn("got int", str(ctx.exception))
+
+    def test_well_formed_dict_still_parses(self):
+        path = self._write({"issues": [], "prs": []})
+        self.assertEqual(rc._load_json_arg(path, "square-state", "dict"), {"issues": [], "prs": []})
+
+    def test_well_formed_list_still_parses(self):
+        path = self._write([{"workflow": "dawn-run"}])
+        self.assertEqual(rc._load_json_arg(path, "ci-checks", "list"), [{"workflow": "dawn-run"}])
+
+
+class CliMainArgShapeGuardCase(unittest.TestCase):
+    """ROADMAP.md task 364, end-to-end through `main(argv)`: live pre-fix
+    reproduction confirmed `--square-state` against a bare JSON int raised
+    `AttributeError: 'int' object has no attribute 'get'`, and `--ci-checks`
+    against a bare JSON int raised `TypeError: 'int' object is not
+    iterable` -- both on the untouched module, before any file here was
+    touched. Proves the CLI path itself now raises the named
+    `RitualCheckArgError` instead."""
+
+    def _write(self, value):
+        f = tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False)
+        json.dump(value, f)
+        f.close()
+        self.addCleanup(os.remove, f.name)
+        return f.name
+
+    def test_square_state_bare_int_raises_named_error_not_attributeerror(self):
+        path = self._write(5)
+        with self.assertRaises(rc.RitualCheckArgError):
+            rc.main(["--square-state", path])
+
+    def test_arcade_apps_state_bare_string_raises_named_error(self):
+        path = self._write("oops")
+        with self.assertRaises(rc.RitualCheckArgError):
+            rc.main(["--arcade-apps-state", path])
+
+    def test_ci_checks_bare_int_raises_named_error_not_typeerror(self):
+        path = self._write(5)
+        with self.assertRaises(rc.RitualCheckArgError):
+            rc.main(["--ci-checks", path])
+
+    def test_cron_checks_bare_dict_raises_named_error(self):
+        path = self._write({"workflow": "dawn-run"})
+        with self.assertRaises(rc.RitualCheckArgError):
+            rc.main(["--cron-checks", path])
+
+    def test_child_files_bare_null_raises_named_error(self):
+        path = self._write(None)
+        with self.assertRaises(rc.RitualCheckArgError):
+            rc.main(["--child-files", path])
+
+    def test_voice_window_commits_bare_bool_raises_named_error(self):
+        path = self._write(True)
+        with self.assertRaises(rc.RitualCheckArgError):
+            rc.main(["--voice-window-commits", path])
+
+    def test_no_flags_runs_through_exactly_as_before(self):
+        """The common no-live-reads path (this session's plain hourly
+        `python3 tools/ritual_check.py`) must still behave identically
+        after the refactor from a bare `__main__` block into `main(argv)`."""
+        exit_code = rc.main([])
+        self.assertIn(exit_code, (0, 1))
+
+
 if __name__ == "__main__":
     unittest.main()

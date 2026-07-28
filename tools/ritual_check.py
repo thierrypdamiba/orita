@@ -1226,8 +1226,35 @@ def format_ritual_check(result: dict) -> str:
     return "\n".join(lines)
 
 
-if __name__ == "__main__":
-    argv = sys.argv[1:]
+class RitualCheckArgError(ValueError):
+    """A --<flag> file argument to this CLI parsed as valid JSON but not
+    into the top-level shape that flag expects. Raised here, naming the
+    flag and the real type, instead of the wrong-shape value reaching
+    `compute_square_state`/`compute_app_state`/`check_ci`/`check_cron`/
+    `check_child_work`/`check_voice_window` unguarded and crashing with a
+    bare `AttributeError`/`TypeError` two or three frames deeper."""
+
+
+def _load_json_arg(path: str, flag: str, expected: str):
+    """Load `path` as JSON and confirm its top-level shape matches
+    `expected` ("dict" or "list"), raising `RitualCheckArgError` naming the
+    flag and the actual type otherwise. A bare scalar (int/bool/null/
+    string), or a dict where a list was expected (or vice versa), is
+    exactly the malformed-CLI-input shape the closed `fencepost/
+    seam_engine` campaigns (tasks 355-362) already guard at their own
+    entry points -- this is the same discipline at the one entry point
+    those scans never reached: this file's own CLI."""
+    with open(path) as f:
+        raw = json.load(f)
+    py_type = {"dict": dict, "list": list}[expected]
+    if not isinstance(raw, py_type):
+        raise RitualCheckArgError(
+            f"--{flag}: expected a JSON {expected}, got {type(raw).__name__}"
+        )
+    return raw
+
+
+def main(argv: list[str]) -> int:
     now = None
     base = DEFAULT_FENCEPOST_BASE
     square_state = None
@@ -1245,32 +1272,26 @@ if __name__ == "__main__":
             base = argv[i + 1]
             i += 2
         elif argv[i] == "--square-state" and i + 1 < len(argv):
-            with open(argv[i + 1]) as f:
-                raw = json.load(f)
+            raw = _load_json_arg(argv[i + 1], "square-state", "dict")
             sq = _square_check()
             square_state = sq.compute_square_state(raw.get("issues", []), raw.get("prs", []))
             i += 2
         elif argv[i] == "--arcade-apps-state" and i + 1 < len(argv):
-            with open(argv[i + 1]) as f:
-                raw = json.load(f)
+            raw = _load_json_arg(argv[i + 1], "arcade-apps-state", "dict")
             aw = _arcade_app_watch()
             arcade_apps_state = aw.compute_app_state(raw.get("apps", []))
             i += 2
         elif argv[i] == "--ci-checks" and i + 1 < len(argv):
-            with open(argv[i + 1]) as f:
-                ci_checks = json.load(f)
+            ci_checks = _load_json_arg(argv[i + 1], "ci-checks", "list")
             i += 2
         elif argv[i] == "--cron-checks" and i + 1 < len(argv):
-            with open(argv[i + 1]) as f:
-                cron_checks = json.load(f)
+            cron_checks = _load_json_arg(argv[i + 1], "cron-checks", "list")
             i += 2
         elif argv[i] == "--child-files" and i + 1 < len(argv):
-            with open(argv[i + 1]) as f:
-                child_files = json.load(f)
+            child_files = _load_json_arg(argv[i + 1], "child-files", "list")
             i += 2
         elif argv[i] == "--voice-window-commits" and i + 1 < len(argv):
-            with open(argv[i + 1]) as f:
-                voice_window_commits = json.load(f)
+            voice_window_commits = _load_json_arg(argv[i + 1], "voice-window-commits", "list")
             i += 2
         elif argv[i] == "--json":
             base = base
@@ -1291,4 +1312,8 @@ if __name__ == "__main__":
         print(json.dumps(result, ensure_ascii=False, indent=2))
     else:
         print(format_ritual_check(result))
-    sys.exit(1 if result["broken"] else 0)
+    return 1 if result["broken"] else 0
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv[1:]))
