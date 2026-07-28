@@ -329,3 +329,43 @@ def test_main_with_no_sealed_arg_raises_named_error_not_keyerror_when_tip_is_mal
         assert False, "expected LedgerTamperedError, not a bare KeyError"
     except ledger.LedgerTamperedError as e:
         assert "malformed" in str(e)
+
+
+def test_main_with_file_arg_raises_named_error_not_attributeerror_when_json_is_not_an_object(tmp_path: Path):
+    # main()'s file-arg branch used to do `_load_sealed(path)` ->
+    # `json.loads(path.read_text())` with no shape check, then hand the
+    # parsed value straight to `render_email_draft`/`render_notion_page`,
+    # which open with `sealed.get(...)`. A CLI-supplied file can be any
+    # syntactically valid JSON -- a bare list, int, bool, null, or string,
+    # not just an object -- so `[1, 2, 3]` on disk crashed this with a bare
+    # `AttributeError: 'list' object has no attribute 'get'` instead of a
+    # message naming the actual problem, the same "malformed input must be
+    # named, never an opaque crash" discipline `report.py`'s
+    # `_load_sealed_arg` and `ledger.py`'s `_load_scan` already hold in
+    # this package.
+    bad = tmp_path / "not_an_object.json"
+    bad.write_text("[1, 2, 3]")
+
+    try:
+        draftback.main(["email", str(bad), "--base", str(tmp_path)])
+        assert False, "expected a named ValueError, not a bare AttributeError"
+    except AttributeError:
+        assert False, "expected a named ValueError, not a bare AttributeError"
+    except ValueError as e:
+        assert "object" in str(e)
+
+
+def test_main_with_stdin_raises_named_error_not_attributeerror_when_json_is_not_an_object(tmp_path: Path, monkeypatch):
+    # Same bug, reached through the CLI's stdin branch (`argv == [channel, "-"]`).
+    import io
+    import sys
+
+    monkeypatch.setattr(sys, "stdin", io.StringIO("null"))
+
+    try:
+        draftback.main(["email", "-", "--base", str(tmp_path)])
+        assert False, "expected a named ValueError, not a bare AttributeError"
+    except AttributeError:
+        assert False, "expected a named ValueError, not a bare AttributeError"
+    except ValueError as e:
+        assert "object" in str(e)

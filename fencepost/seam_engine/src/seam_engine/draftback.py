@@ -309,10 +309,31 @@ def render_preview(sealed: dict[str, Any], channel: str) -> str:
 
 
 def _load_sealed(path: str) -> dict[str, Any]:
+    """Read a sealed record for the CLI from `path` ('-' for stdin).
+
+    A CLI-supplied file (or stdin stream) can be any syntactically valid
+    JSON -- a bare list, int, bool, null, or string, not just an object --
+    and `render_email_draft`/`render_notion_page` immediately treat their
+    argument as a dict (`sealed.get("date")`, first line of each). Left
+    unguarded, a non-object payload would crash `main()` with a bare
+    `AttributeError: '<type>' object has no attribute 'get'` instead of a
+    message naming the actual problem -- the same discipline `report.py`'s
+    `_load_sealed_arg` and `ledger.py`'s `_load_scan` already hold in this
+    same package.
+    """
     if path == "-":
         import sys
-        return json.load(sys.stdin)
-    return json.loads(Path(path).read_text())
+
+        data = json.load(sys.stdin)
+        where = "stdin"
+    else:
+        data = json.loads(Path(path).read_text())
+        where = path
+    if not isinstance(data, dict):
+        raise ValueError(
+            f"{where}: sealed record must be a JSON object, got {type(data).__name__}"
+        )
+    return data
 
 
 def main(argv: list[str] | None = None) -> int:
