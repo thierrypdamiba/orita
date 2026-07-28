@@ -75,6 +75,18 @@ def _parse_ts(s: str) -> datetime:
     return datetime.fromisoformat(s.replace("Z", "+00:00"))
 
 
+def _load_rows(path: Path) -> list[Any]:
+    """Load a whole-file JSON list, refusing a syntactically valid but
+    non-list payload with a named error instead of letting it reach the
+    `for r in rows` loop unmarked. Mirrors `RECIPES/*/detector.py`'s own
+    `_load_rows` helper (task 358) exactly -- the identical bug class, on
+    the two loaders that campaign's own scan didn't reach."""
+    rows = json.loads(Path(path).read_text())
+    if not isinstance(rows, list):
+        raise ValueError(f"{path}: expected a JSON list, got {type(rows).__name__}")
+    return rows
+
+
 @dataclass
 class GmailInvite:
     id: str
@@ -101,7 +113,7 @@ def load_gmail_fixture(path: Path | None = None) -> list[GmailInvite]:
     """Read-only: load invite-shaped emails from the fixture (or a real dump
     of the same shape, once ListEmails/SearchThreads is live)."""
     p = path or DEFAULT_GMAIL_FIXTURE
-    rows = json.loads(Path(p).read_text())
+    rows = _load_rows(p)
     out: list[GmailInvite] = []
     for r in rows:
         out.append(GmailInvite(
@@ -122,7 +134,7 @@ def load_calendar_fixture(path: Path | None = None) -> list[CalendarEvent]:
     """Read-only: load calendar events from the fixture (or a real dump of
     the same shape, once ListEvents is live)."""
     p = path or DEFAULT_CALENDAR_FIXTURE
-    rows = json.loads(Path(p).read_text())
+    rows = _load_rows(p)
     out: list[CalendarEvent] = []
     for r in rows:
         out.append(CalendarEvent(

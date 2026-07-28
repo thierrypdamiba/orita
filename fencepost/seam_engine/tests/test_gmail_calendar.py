@@ -7,6 +7,7 @@ rule breaks, same discipline as test_ranking.py.
 """
 from __future__ import annotations
 
+import json
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -70,6 +71,29 @@ def test_fixture_files_exist_and_load():
     assert DEFAULT_CALENDAR_FIXTURE.exists()
     assert len(invites) == 6
     assert len(events) == 1
+
+
+@pytest.mark.parametrize("bad_value", [{"a": 1}, 5, None, "x", True])
+def test_load_gmail_fixture_raises_named_error_not_typeerror_when_json_is_not_a_list(
+    tmp_path: Path, bad_value: object
+) -> None:
+    """task 359: the same non-list guard the RECIPES/*/detector.py campaign
+    (task 358) closed, on the two loaders that scan didn't reach."""
+    bad_file = tmp_path / "bad.json"
+    bad_file.write_text(json.dumps(bad_value))
+    with pytest.raises(ValueError, match="expected a JSON list"):
+        load_gmail_fixture(bad_file)
+
+
+@pytest.mark.parametrize("bad_value", [{"a": 1}, 5, None, "x", True])
+def test_load_calendar_fixture_raises_named_error_not_typeerror_when_json_is_not_a_list(
+    tmp_path: Path, bad_value: object
+) -> None:
+    """task 359: mirrors test_load_gmail_fixture_raises_named_error_not_typeerror_when_json_is_not_a_list."""
+    bad_file = tmp_path / "bad.json"
+    bad_file.write_text(json.dumps(bad_value))
+    with pytest.raises(ValueError, match="expected a JSON list"):
+        load_calendar_fixture(bad_file)
 
 
 def test_fixture_produces_exactly_one_primary_gap():
