@@ -89,14 +89,18 @@
   fetch('https://raw.githubusercontent.com/thierrypdamiba/orita/main/records/ledger.jsonl')
     .then(function (r) { return r.ok ? r.text() : Promise.reject(); })
     .then(function (text) {
-      var entries = text.split('\n').filter(Boolean).map(function (l) { return JSON.parse(l); });
+      var entries = text.split('\n').filter(Boolean).map(function (l) {
+        try { return JSON.parse(l); } catch (err) { return null; }
+      }).filter(Boolean);
       var predictions = {};
       entries.filter(function (e) { return e.act === 'predict'; }).forEach(function (e) {
-        var d = JSON.parse(e.detail);
+        var d;
+        try { d = JSON.parse(e.detail); } catch (err) { return; }
         predictions[e.seq] = { actor: e.actor, ts: e.ts, claim: d.claim, confidence: d.confidence, grades: [] };
       });
       entries.filter(function (e) { return e.act === 'grade'; }).forEach(function (e) {
-        var d = JSON.parse(e.detail);
+        var d;
+        try { d = JSON.parse(e.detail); } catch (err) { return; }
         if (predictions[d.call_seq]) {
           predictions[d.call_seq].grades.push({ ts: e.ts, outcome: d.outcome, actor: e.actor });
         }
