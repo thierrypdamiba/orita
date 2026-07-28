@@ -177,6 +177,33 @@ def _load(name: str, path: str):
     return mod
 
 
+_LOADED_MODULES_CACHE: dict[str, object] = {}
+
+
+def _load_once(name: str, path: str):
+    """Task 367: like `_load()`, but reuses the same module object across
+    repeated calls for the same `name` within one process, instead of
+    re-`exec_module()`-ing (and so fully re-running) the target file
+    every time. Most `_load()` call sites below deliberately keep the
+    unconditional-reload behavior -- several of these tool modules hold
+    their own mutable module-level state (a log path, a queue file) that
+    tests reach for fresh, uniquely-named instances of on purpose, and
+    `run_ritual_check()` itself only ever calls each loader once per
+    invocation anyway, so reload-vs-reuse makes no difference there. It
+    matters only for the handful of checks below whose own scan function
+    now memoizes its result inside the module (vault_leak_check.py's
+    `find_leaks()`, and the five `find_violations()` siblings it
+    revealed) -- for exactly those, an unconditional reload was silently
+    resetting that memoized cache on every single call, which is what
+    made `check_vault_leak()` still cost ~9s per call even after its own
+    scan gained a cache: `run_ritual_check()`'s test suite calls these
+    loaders far more than once per process, and only a reused module
+    instance lets that memoization actually reach them."""
+    if name not in _LOADED_MODULES_CACHE:
+        _LOADED_MODULES_CACHE[name] = _load(name, path)
+    return _LOADED_MODULES_CACHE[name]
+
+
 def _town_ledger():
     return _load("_ritual_town_ledger", os.path.join(ROOT, "tools", "ledger.py"))
 
@@ -218,27 +245,27 @@ def _scribe_growth_check():
 
 
 def _vault_leak_check():
-    return _load("_ritual_vault_leak_check", os.path.join(ROOT, "tools", "vault_leak_check.py"))
+    return _load_once("_ritual_vault_leak_check", os.path.join(ROOT, "tools", "vault_leak_check.py"))
 
 
 def _star_covenant_check():
-    return _load("_ritual_star_covenant_check", os.path.join(ROOT, "tools", "star_covenant_check.py"))
+    return _load_once("_ritual_star_covenant_check", os.path.join(ROOT, "tools", "star_covenant_check.py"))
 
 
 def _rider_check():
-    return _load("_ritual_rider_check", os.path.join(ROOT, "tools", "rider_check.py"))
+    return _load_once("_ritual_rider_check", os.path.join(ROOT, "tools", "rider_check.py"))
 
 
 def _hand_lore_check():
-    return _load("_ritual_hand_lore_check", os.path.join(ROOT, "tools", "hand_lore_check.py"))
+    return _load_once("_ritual_hand_lore_check", os.path.join(ROOT, "tools", "hand_lore_check.py"))
 
 
 def _no_grading_check():
-    return _load("_ritual_no_grading_check", os.path.join(ROOT, "tools", "no_grading_check.py"))
+    return _load_once("_ritual_no_grading_check", os.path.join(ROOT, "tools", "no_grading_check.py"))
 
 
 def _arcade_hero_check():
-    return _load("_ritual_arcade_hero_check", os.path.join(ROOT, "tools", "arcade_hero_check.py"))
+    return _load_once("_ritual_arcade_hero_check", os.path.join(ROOT, "tools", "arcade_hero_check.py"))
 
 
 def _petition_limits_check():

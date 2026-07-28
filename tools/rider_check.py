@@ -151,7 +151,32 @@ def _is_parenthesized_example(sentence: str, match_start: int) -> bool:
     return depth > 0
 
 
+_VIOLATIONS_CACHE: dict[str, list] = {}
+
+
+def clear_cache() -> None:
+    """Task 367: drop every memoized `find_violations()` result -- same
+    fix, same rationale as `vault_leak_check.py`'s `clear_cache()`. Only
+    real callers are tests that want a forced fresh scan; production's
+    one-call-per-process shape never needs this."""
+    _VIOLATIONS_CACHE.clear()
+
+
 def find_violations(orita_dir: str = DEFAULT_ORITA_DIR) -> list:
+    """Task 367: memoized per `orita_dir` for the lifetime of the process
+    -- same fix, same rationale as `vault_leak_check.py`'s `find_leaks()`.
+    `ritual_check.py`'s own loader now reuses one module instance per
+    check across repeated `run_ritual_check()` calls in one process (its
+    own fix, same task); this memoization is what lets that reuse
+    actually pay off instead of re-scanning the whole public tree on
+    every call regardless of module identity."""
+    key = os.path.realpath(orita_dir)
+    if key not in _VIOLATIONS_CACHE:
+        _VIOLATIONS_CACHE[key] = _find_violations_uncached(orita_dir)
+    return list(_VIOLATIONS_CACHE[key])
+
+
+def _find_violations_uncached(orita_dir: str = DEFAULT_ORITA_DIR) -> list:
     """Task 100: read-only scan of every public .md/.html file in the town
     checkout for a sentence naming a rider-bound god alongside the specific
     violation shape their rider forbids. Returns a list of violation

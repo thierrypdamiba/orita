@@ -263,6 +263,30 @@ class LiveRepoCase(unittest.TestCase):
             f"real rider violation(s) found: {rc.format_violations(violations)}",
         )
 
+    def test_repeated_call_is_memoized(self):
+        # Task 367: find_violations() rescanned the whole public tree on
+        # every call, unconditionally -- one of five siblings sharing the
+        # shape vault_leak_check.py's find_leaks() had. Proves a second
+        # call against the same orita_dir is now cheap and still returns
+        # the identical result.
+        import time
+        rc.clear_cache()
+        start = time.time()
+        first = rc.find_violations()
+        first_elapsed = time.time() - start
+
+        start = time.time()
+        second = rc.find_violations()
+        second_elapsed = time.time() - start
+
+        self.assertEqual(first, second)
+        self.assertLess(
+            second_elapsed, max(first_elapsed / 10, 0.05),
+            f"second call ({second_elapsed:.3f}s) was not meaningfully "
+            f"cheaper than the first ({first_elapsed:.3f}s).",
+        )
+        rc.clear_cache()
+
 
 if __name__ == "__main__":
     unittest.main()

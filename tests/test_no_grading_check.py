@@ -217,6 +217,30 @@ class LiveRepoCase(unittest.TestCase):
             f"real, current checkout has {len(violations)} no-grading violation(s): {violations}",
         )
 
+    def test_repeated_call_is_memoized(self):
+        # Task 367: find_violations() rescanned the whole public tree on
+        # every call, unconditionally -- one of five siblings sharing the
+        # shape vault_leak_check.py's find_leaks() had. Proves a second
+        # call against the same orita_dir is now cheap and still returns
+        # the identical result.
+        import time
+        ngc.clear_cache()
+        start = time.time()
+        first = ngc.find_violations(orita_dir=ROOT)
+        first_elapsed = time.time() - start
+
+        start = time.time()
+        second = ngc.find_violations(orita_dir=ROOT)
+        second_elapsed = time.time() - start
+
+        self.assertEqual(first, second)
+        self.assertLess(
+            second_elapsed, max(first_elapsed / 10, 0.05),
+            f"second call ({second_elapsed:.3f}s) was not meaningfully "
+            f"cheaper than the first ({first_elapsed:.3f}s).",
+        )
+        ngc.clear_cache()
+
 
 if __name__ == "__main__":
     unittest.main()

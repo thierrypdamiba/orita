@@ -331,6 +331,12 @@ class LiveRepoCase(unittest.TestCase):
     held, not just asserted in prose."""
 
     def test_real_checkouts_hold_zero_leaks_today(self):
+        # Task 367: force a genuinely cold cache before timing -- if some
+        # earlier test in the same process already warmed the memoized
+        # result for the real checkouts, an uncleared cache would make
+        # this regression guard pass trivially even if the underlying
+        # scan itself had regressed back toward the pre-236 blowup.
+        vlc.clear_cache()
         start = time.time()
         leaks = vlc.find_leaks()
         elapsed = time.time() - start
@@ -349,6 +355,48 @@ class LiveRepoCase(unittest.TestCase):
             f"find_leaks took {elapsed:.1f}s against the live checkouts -- "
             "task 236's rolling-hash fix may have regressed back toward "
             "the pre-fix O(offsets * files) blowup.",
+        )
+
+    def test_repeated_call_on_same_checkouts_is_memoized(self):
+        # Task 367: `run_ritual_check()`'s `check_vault_leak()` has no way
+        # to skip this check, so any test suite that calls
+        # `run_ritual_check()` many times in one process (e.g.
+        # `tests/test_ritual_check.py`, 97 call sites) re-triggered a full
+        # ~8s scan every single time before this fix. Proves the second
+        # call against the identical (real) directory pair is now cheap
+        # and still returns the identical result -- not just "doesn't
+        # crash," an actual order-of-magnitude speedup.
+        vlc.clear_cache()
+        start = time.time()
+        first = vlc.find_leaks()
+        first_elapsed = time.time() - start
+
+        start = time.time()
+        second = vlc.find_leaks()
+        second_elapsed = time.time() - start
+
+        self.assertEqual(first, second)
+        self.assertLess(
+            second_elapsed, first_elapsed / 10,
+            f"second call ({second_elapsed:.3f}s) was not meaningfully "
+            f"cheaper than the first ({first_elapsed:.3f}s) -- memoization "
+            "may not be working.",
+        )
+
+    def test_clear_cache_forces_a_fresh_scan(self):
+        # A cleared cache must re-scan, not silently keep serving a stale
+        # cached answer forever -- proven by timing a post-clear call and
+        # confirming it costs real time again, not ~0s.
+        vlc.clear_cache()
+        vlc.find_leaks()
+        vlc.clear_cache()
+        start = time.time()
+        vlc.find_leaks()
+        elapsed = time.time() - start
+        self.assertGreater(
+            elapsed, 0.5,
+            f"post-clear call returned in {elapsed:.3f}s -- clear_cache() "
+            "may not actually be dropping the memoized result.",
         )
 
 

@@ -193,7 +193,45 @@ def _build_combined_haystack(public_corpus: list, min_run: int) -> str:
     return sep.join(text for _, text in public_corpus)
 
 
+_LEAKS_CACHE: dict[tuple[str, str, int], list] = {}
+
+
+def clear_cache() -> None:
+    """Task 367: drop every memoized `find_leaks()` result. Only real
+    callers are tests that want to force a genuinely fresh scan (e.g.
+    after rewriting the same directory pair's contents in place) --
+    production's one-call-per-process shape never needs this."""
+    _LEAKS_CACHE.clear()
+
+
 def find_leaks(
+    orita_dir: str = DEFAULT_ORITA_DIR,
+    vault_dir: str = DEFAULT_VAULT_DIR,
+    min_run: int = MIN_RUN,
+) -> list:
+    """Task 367: memoized per (orita_dir, vault_dir, min_run) for the
+    lifetime of the process. `run_ritual_check()`'s `check_vault_leak()`
+    call has no way to skip this check (Iron Rule #1 is unconditional,
+    same class as `check_checkout`), so `tests/test_ritual_check.py`'s
+    97 test methods that call `run_ritual_check()` without a
+    `vault_leak_dirs` override each triggered a fresh ~8.2s full-corpus
+    scan against the real checkouts -- ~795s of purely repeated work
+    for an answer that cannot have changed between calls within one
+    process. A real hourly `ritual_check.py` run is a fresh process
+    that calls this exactly once, so the cache is inert there --
+    production still scans fresh every single hour. Every fixture test
+    in this module's own test file uses a unique `tempfile.mkdtemp()`
+    per test method, so cache keys never collide across tests; no test
+    anywhere mutates a checkout and re-queries the same directory pair
+    expecting a second, different answer -- see `clear_cache()` if that
+    ever becomes untrue."""
+    key = (os.path.realpath(orita_dir), os.path.realpath(vault_dir), min_run)
+    if key not in _LEAKS_CACHE:
+        _LEAKS_CACHE[key] = _find_leaks_uncached(orita_dir, vault_dir, min_run)
+    return list(_LEAKS_CACHE[key])
+
+
+def _find_leaks_uncached(
     orita_dir: str = DEFAULT_ORITA_DIR,
     vault_dir: str = DEFAULT_VAULT_DIR,
     min_run: int = MIN_RUN,
