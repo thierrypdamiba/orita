@@ -69,8 +69,15 @@ class Tweet:
     url: str
 
 
+def _load_rows(path: Path) -> list[Any]:
+    rows = json.loads(path.read_text())
+    if not isinstance(rows, list):
+        raise ValueError(f"{path}: expected a JSON list, got {type(rows).__name__}")
+    return rows
+
+
 def load_releases(path: Path | None = None) -> list[Release]:
-    rows = json.loads(Path(path or DEFAULT_RELEASES_FIXTURE).read_text())
+    rows = _load_rows(path or DEFAULT_RELEASES_FIXTURE)
     return [
         Release(
             id=r["id"], title=r["title"], tag=r["tag"],
@@ -81,7 +88,7 @@ def load_releases(path: Path | None = None) -> list[Release]:
 
 
 def load_tweets(path: Path | None = None) -> list[Tweet]:
-    rows = json.loads(Path(path or DEFAULT_TWEETS_FIXTURE).read_text())
+    rows = _load_rows(path or DEFAULT_TWEETS_FIXTURE)
     return [
         Tweet(id=r["id"], text=r["text"], created_at=_parse_ts(r["created_at"]), url=r["url"])
         for r in rows

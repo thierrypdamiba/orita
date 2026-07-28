@@ -76,8 +76,15 @@ class Issue:
     url: str
 
 
+def _load_rows(path: Path) -> list[Any]:
+    rows = json.loads(path.read_text())
+    if not isinstance(rows, list):
+        raise ValueError(f"{path}: expected a JSON list, got {type(rows).__name__}")
+    return rows
+
+
 def load_pulls(path: Path | None = None) -> list[MergedPull]:
-    rows = json.loads(Path(path or DEFAULT_PULLS_FIXTURE).read_text())
+    rows = _load_rows(path or DEFAULT_PULLS_FIXTURE)
     return [
         MergedPull(
             id=r["id"], title=r["title"], number=r["number"], body=r["body"],
@@ -88,7 +95,7 @@ def load_pulls(path: Path | None = None) -> list[MergedPull]:
 
 
 def load_issues(path: Path | None = None) -> list[Issue]:
-    rows = json.loads(Path(path or DEFAULT_ISSUES_FIXTURE).read_text())
+    rows = _load_rows(path or DEFAULT_ISSUES_FIXTURE)
     return [Issue(number=r["number"], title=r["title"], state=r["state"], url=r["url"]) for r in rows]
 
 

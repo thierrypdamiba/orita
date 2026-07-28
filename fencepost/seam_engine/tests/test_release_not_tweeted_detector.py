@@ -11,9 +11,12 @@ exercises the exact module a live scan would import, not a copy.
 from __future__ import annotations
 
 import importlib.util
+import json
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
+
+import pytest
 
 FENCEPOST_ROOT = Path(__file__).resolve().parents[2]
 DETECTOR_PATH = FENCEPOST_ROOT / "RECIPES" / "release-not-tweeted" / "detector.py"
@@ -87,3 +90,40 @@ class TestComputeGapsTagCollision:
         assert surfaced == []
         excluded_slugs = {g.slug for g in excluded}
         assert "release-tweeted-v0.2.1" in excluded_slugs
+
+
+class TestLoadReleasesAndTweets:
+    """load_releases/load_tweets (task 358) -- no test in this file called
+    either loader directly before this class; test_recipes.py only proves
+    discover_recipes()/load_detector() can import the module. Both crashed
+    with a bare TypeError on syntactically valid but non-list JSON, reproduced
+    live before the fix ({"a": 1} -> "string indices must be integers"; a
+    scalar/None -> "'<type>' object is not iterable")."""
+
+    def test_load_releases_parses_the_real_fixture(self):
+        releases = detector.load_releases()
+        assert len(releases) > 0
+        assert all(isinstance(r, detector.Release) for r in releases)
+
+    def test_load_tweets_parses_the_real_fixture(self):
+        tweets = detector.load_tweets()
+        assert len(tweets) > 0
+        assert all(isinstance(t, detector.Tweet) for t in tweets)
+
+    @pytest.mark.parametrize("bad_value", [{"a": 1}, 5, None, "x", True])
+    def test_load_releases_raises_named_error_not_typeerror_when_json_is_not_a_list(
+        self, tmp_path: Path, bad_value: object
+    ):
+        bad_file = tmp_path / "bad.json"
+        bad_file.write_text(json.dumps(bad_value))
+        with pytest.raises(ValueError, match="expected a JSON list"):
+            detector.load_releases(bad_file)
+
+    @pytest.mark.parametrize("bad_value", [{"a": 1}, 5, None, "x", True])
+    def test_load_tweets_raises_named_error_not_typeerror_when_json_is_not_a_list(
+        self, tmp_path: Path, bad_value: object
+    ):
+        bad_file = tmp_path / "bad.json"
+        bad_file.write_text(json.dumps(bad_value))
+        with pytest.raises(ValueError, match="expected a JSON list"):
+            detector.load_tweets(bad_file)

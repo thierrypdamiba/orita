@@ -52,8 +52,15 @@ class ChangelogEntry:
     url: str
 
 
+def _load_rows(path: Path) -> list[Any]:
+    rows = json.loads(path.read_text())
+    if not isinstance(rows, list):
+        raise ValueError(f"{path}: expected a JSON list, got {type(rows).__name__}")
+    return rows
+
+
 def load_releases(path: Path | None = None) -> list[Release]:
-    rows = json.loads(Path(path or DEFAULT_RELEASES_FIXTURE).read_text())
+    rows = _load_rows(path or DEFAULT_RELEASES_FIXTURE)
     return [
         Release(
             id=r["id"], title=r["title"], tag=r["tag"],
@@ -64,7 +71,7 @@ def load_releases(path: Path | None = None) -> list[Release]:
 
 
 def load_changelog(path: Path | None = None) -> list[ChangelogEntry]:
-    rows = json.loads(Path(path or DEFAULT_CHANGELOG_FIXTURE).read_text())
+    rows = _load_rows(path or DEFAULT_CHANGELOG_FIXTURE)
     return [ChangelogEntry(version=r["version"], text=r["text"], url=r["url"]) for r in rows]
 
 

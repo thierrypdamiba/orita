@@ -10,9 +10,12 @@ exercises the exact module a live scan would import, not a copy.
 from __future__ import annotations
 
 import importlib.util
+import json
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
+
+import pytest
 
 FENCEPOST_ROOT = Path(__file__).resolve().parents[2]
 DETECTOR_PATH = FENCEPOST_ROOT / "RECIPES" / "merged-pr-issue-still-open" / "detector.py"
@@ -88,3 +91,40 @@ class TestComputeGapsMultiIssuePr:
         assert excluded == []
         assert len(surfaced) == 1
         assert surfaced[0].slug == "merged-pr-issue-still-open-100-55"
+
+
+class TestLoadPullsAndIssues:
+    """load_pulls/load_issues (task 358) -- no test in this file called either
+    loader directly before this class; test_recipes.py only proves
+    discover_recipes()/load_detector() can import the module. Both crashed
+    with a bare TypeError on syntactically valid but non-list JSON, reproduced
+    live before the fix ({"a": 1} -> "string indices must be integers"; a
+    scalar/None -> "'<type>' object is not iterable")."""
+
+    def test_load_pulls_parses_the_real_fixture(self):
+        pulls = detector.load_pulls()
+        assert len(pulls) > 0
+        assert all(isinstance(p, detector.MergedPull) for p in pulls)
+
+    def test_load_issues_parses_the_real_fixture(self):
+        issues = detector.load_issues()
+        assert len(issues) > 0
+        assert all(isinstance(i, detector.Issue) for i in issues)
+
+    @pytest.mark.parametrize("bad_value", [{"a": 1}, 5, None, "x", True])
+    def test_load_pulls_raises_named_error_not_typeerror_when_json_is_not_a_list(
+        self, tmp_path: Path, bad_value: object
+    ):
+        bad_file = tmp_path / "bad.json"
+        bad_file.write_text(json.dumps(bad_value))
+        with pytest.raises(ValueError, match="expected a JSON list"):
+            detector.load_pulls(bad_file)
+
+    @pytest.mark.parametrize("bad_value", [{"a": 1}, 5, None, "x", True])
+    def test_load_issues_raises_named_error_not_typeerror_when_json_is_not_a_list(
+        self, tmp_path: Path, bad_value: object
+    ):
+        bad_file = tmp_path / "bad.json"
+        bad_file.write_text(json.dumps(bad_value))
+        with pytest.raises(ValueError, match="expected a JSON list"):
+            detector.load_issues(bad_file)
