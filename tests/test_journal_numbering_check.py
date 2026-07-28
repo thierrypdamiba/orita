@@ -21,6 +21,14 @@ import unittest
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 VAULT_ROOT = os.path.join(os.path.dirname(ROOT), "orita-vault")
+# Task 370's own first CI run caught this the hard way: dawn-run's
+# workflow checks out only this public repo, never the private
+# orita-vault sibling (by design -- a public CI log must never see it).
+# Tests that assert something about the REAL vault's content skip
+# cleanly there instead of failing on a premise that was never true in
+# that environment; tests that only assert "clean"/"empty" don't need
+# this guard, since an absent vault_dir already scans as zero entries.
+_VAULT_CHECKED_OUT = os.path.isdir(os.path.join(VAULT_ROOT, "vault"))
 
 
 def _load(name, path):
@@ -57,6 +65,10 @@ class RealCheckoutCase(unittest.TestCase):
             self.assertTrue(names, house)
             self.assertTrue(all(jnc._NUMBERED_NAME.match(n) for n in names), (house, names))
 
+    @unittest.skipUnless(
+        _VAULT_CHECKED_OUT,
+        "orita-vault sibling checkout not present (expected in public CI, which checks out only orita)",
+    )
     def test_real_vault_holds_zero_violations_today_once_filtered(self):
         """Task 370: the combined public+vault scan against both live
         checkouts, with the known-exceptions filter on (the real,
@@ -64,13 +76,19 @@ class RealCheckoutCase(unittest.TestCase):
         violations = jnc.find_violations(orita_dir=ROOT, vault_dir=VAULT_ROOT)
         self.assertEqual(violations, [], violations)
 
+    @unittest.skipUnless(
+        _VAULT_CHECKED_OUT,
+        "orita-vault sibling checkout not present (expected in public CI, which checks out only orita)",
+    )
     def test_known_vault_exceptions_are_exactly_the_real_unfiltered_violations(self):
         """Task 370: proves KNOWN_VAULT_EXCEPTIONS is neither stale (an
         exception nobody can find in the live vault anymore) nor a
         blanket allowlist (a house/reason it doesn't precisely name is
         still hiding a real, unfiltered violation). Disables filtering
         to see the raw scan, and requires it to name exactly the two
-        documented entries -- nothing more, nothing fewer."""
+        documented entries -- nothing more, nothing fewer. Skipped where
+        the private vault isn't checked out (public CI) rather than
+        passing vacuously on a premise that isn't true there."""
         raw = jnc.find_violations(
             orita_dir=ROOT, vault_dir=VAULT_ROOT, filter_known_exceptions=False
         )
