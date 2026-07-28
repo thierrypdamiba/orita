@@ -173,10 +173,13 @@ def test_coverage_check_defaults_to_the_real_live_constants():
 def test_real_pre_task_152_string_would_have_failed_the_coverage_check():
     # Mutation-based hand-verification: reconstruct the actual pre-fix
     # string from git history and prove today's checker would have flagged
-    # the real historical gap, not a synthetic one.
+    # the real historical gap, not a synthetic one. Checked against the
+    # live REQUIRED_SCOPES (default), so GetFileContents -- added by task
+    # 371, after this pre-152 string was written -- correctly shows up
+    # missing too: this string never named it either.
     missing = required_scopes_covered_by_capabilities(_PRE_TASK_152_CAPABILITIES)
     assert missing == {
-        "github": ["CountStargazers", "GetRepository", "ListRepositoryActivities"],
+        "github": ["CountStargazers", "GetFileContents", "GetRepository", "ListRepositoryActivities"],
         "x": ["WhoAmI"],
     }
 
@@ -195,6 +198,57 @@ def test_full_coverage_for_a_synthetic_toolkit_reports_no_gap():
         text, required_scopes={"github": frozenset({"GetRepository", "ListIssues"})}
     )
     assert missing == {}
+
+
+# --- Task 372: a tool with NO keyword entry must never silently "pass" ----
+
+
+def test_a_required_scope_with_no_keyword_entry_at_all_is_reported_missing():
+    # The real historical bug: keywords.get(tool, "") defaulted an unmapped
+    # tool to "", and "" is a substring of every string, so the coverage
+    # check silently treated "we never even tried to check this" the same
+    # as "checked and covered". A tool this synthetic toolkit has never
+    # heard of must be reported as a gap, not pass by accident.
+    text = "Read repository metadata and issues, never anything else."
+    missing = required_scopes_covered_by_capabilities(
+        text,
+        required_scopes={
+            "github": frozenset({"GetRepository", "ListIssues", "SomeBrandNewTool"})
+        },
+    )
+    assert missing == {"github": ["SomeBrandNewTool"]}
+
+
+def test_getfilecontents_was_the_real_live_instance_of_the_bug():
+    # Task 371 added GetFileContents to consent.REQUIRED_SCOPES["github"]
+    # for the fifth recipe and never touched gateway.py. Reconstruct the
+    # real pre-372 shape (the keyword entry absent, the capabilities string
+    # not naming file access) and prove today's function reports it missing
+    # -- the pre-fix function, run against this same input, returned {}.
+    pre_372_capabilities = (
+        "Read-only seam reconciliation: list and read GitHub repository "
+        "metadata, commit history, releases, issues, pull requests, "
+        "repository activity, and stargazer counts, and read a connected "
+        "user's own X (Twitter) tweet history, mentions, and account "
+        "identity — solely to compare the two timelines and surface gaps "
+        "between what shipped and what was announced. Never create, update, "
+        "merge, label, delete, post, reply, send, or modify anything on any "
+        "connected account."
+    )
+    missing = required_scopes_covered_by_capabilities(pre_372_capabilities)
+    assert "github" in missing
+    assert "GetFileContents" in missing["github"]
+
+
+def test_the_live_capabilities_string_now_names_file_contents():
+    assert "file contents" in READ_ONLY_CAPABILITIES.lower()
+
+
+def test_getfilecontents_now_has_a_real_keyword_entry():
+    from seam_engine.gateway import _SCOPE_KEYWORDS
+
+    assert "GetFileContents" in _SCOPE_KEYWORDS["github"]
+    assert _SCOPE_KEYWORDS["github"]["GetFileContents"]  # non-empty, real phrase
 
 
 def test_the_extended_capabilities_string_still_holds_the_read_only_law():
