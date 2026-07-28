@@ -54,12 +54,14 @@ def _read_entries(shared_path: str) -> list:
     """Every real, validly-shaped entry in `shared_path`: requires a
     `"date"` field parseable as a real calendar date and a non-empty
     `"url"` field naming where the share actually lives. A malformed line
-    (bad JSON, missing/malformed date, missing/blank url) is silently
-    skipped -- the same "ignore what doesn't conform, never crash the scan
-    over it, never count it either" discipline
-    `metrics_cadence_check.py`/`report_cadence_check.py` already hold. No
-    de-duplication beyond exact-line identity: two real, distinct mortals
-    sharing the same URL is two real shares, not one."""
+    (bad JSON, valid JSON that isn't an object, missing/malformed date,
+    missing/blank url) is silently skipped -- the same "ignore what doesn't
+    conform, never crash the scan over it, never count it either"
+    discipline `metrics_cadence_check.py`/`report_cadence_check.py` already
+    hold, and the same valid-JSON-non-dict guard tasks 329-353 closed
+    across every `oracle_engine/*_cadence.py` sibling. No de-duplication
+    beyond exact-line identity: two real, distinct mortals sharing the same
+    URL is two real shares, not one."""
     if not os.path.isfile(shared_path):
         return []
     entries = []
@@ -71,6 +73,8 @@ def _read_entries(shared_path: str) -> list:
             try:
                 row = json.loads(line)
             except json.JSONDecodeError:
+                continue
+            if not isinstance(row, dict):
                 continue
             d = row.get("date")
             url = row.get("url")

@@ -82,6 +82,25 @@ class FixtureSharedReportsCase(unittest.TestCase):
         result = src.compute_shared_reports(self.path)
         self.assertEqual(result["total_shared"], 1)
 
+    def test_valid_json_non_dict_line_is_skipped_not_crashed(self):
+        # A line that parses cleanly to a non-dict JSON value (bare int,
+        # list, string, bool, null) must not crash _read_entries() -- the
+        # same valid-JSON-non-dict guard tasks 329-353 closed across every
+        # oracle_engine/*_cadence.py sibling, applied here.
+        _write_jsonl(
+            self.path,
+            [
+                '{"date": "2026-07-15", "url": "https://example.com/1"}',
+                "5",
+                "null",
+                "true",
+                '"just a string"',
+                "[1, 2, 3]",
+            ],
+        )
+        result = src.compute_shared_reports(self.path)
+        self.assertEqual(result["total_shared"], 1)
+
     def test_blank_lines_are_skipped(self):
         _write_jsonl(self.path, ['{"date": "2026-07-15", "url": "https://example.com/1"}', "", "  "])
         result = src.compute_shared_reports(self.path)
