@@ -6,7 +6,6 @@ write-capable tool in this file, on purpose: if a tool can change the
 world, it does not belong in this server (Ogun's oath, sworn on iron).
 """
 
-import json
 import sys
 from dataclasses import asdict
 from datetime import datetime, timedelta, timezone
@@ -27,6 +26,7 @@ from seam_engine.ranking import rank
 from seam_engine.scan import (
     XPost,
     _effective_since,
+    _parse_json_list,
     _unresolved_prior_milestone_evidence,
     coincidence_candidates,
     compute_candidates,
@@ -153,7 +153,7 @@ def seam_scan(
     x_posts = (
         load_x_posts_from_ledger()
         if x_posts_json is None
-        else load_x_posts_from_live(json.loads(x_posts_json))
+        else load_x_posts_from_live(_parse_json_list(x_posts_json, "x_posts_json"))
     )
     account_live_since = min((p.ts for p in x_posts), default=datetime.now(timezone.utc))
     now = datetime.now(timezone.utc)
@@ -165,7 +165,7 @@ def seam_scan(
     events = (
         fetch_github_activity(owner, repo, since)
         if github_events_json is None
-        else load_github_events_from_live(json.loads(github_events_json))
+        else load_github_events_from_live(_parse_json_list(github_events_json, "github_events_json"))
     )
     unresolved = _unresolved_prior_milestone_evidence(x_posts)
     present = {e.url for e in events}
@@ -273,8 +273,11 @@ def combined_scan_preview(
     real, ledger-sealed, still-unannounced milestone gap instead of raising.
     Reproduced live before this fix. Runs the identical check unconditionally
     now, mirroring `seam_scan`'s own discipline."""
-    x_posts = None if x_posts_json is None else json.loads(x_posts_json)
-    github_events = None if github_events_json is None else json.loads(github_events_json)
+    x_posts = None if x_posts_json is None else _parse_json_list(x_posts_json, "x_posts_json")
+    github_events = (
+        None if github_events_json is None
+        else _parse_json_list(github_events_json, "github_events_json")
+    )
     return run_combined_scan(
         owner, repo, window_hours=window_hours, x_posts=x_posts, github_events=github_events,
         check_prior_milestones=True,

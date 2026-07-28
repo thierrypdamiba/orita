@@ -215,6 +215,20 @@ def test_load_json_list_raises_named_error_not_typeerror_when_json_is_not_a_list
 
 
 @pytest.mark.parametrize("bad_value", [{"a": 1}, 5, None, "x", True])
+def test_parse_json_list_raises_named_error_not_typeerror_when_json_is_not_a_list(
+    bad_value: object,
+) -> None:
+    """task 362: `_load_json_list` (task 361) is now a thin path-reading
+    wrapper around this text-parsing core -- `server.py`'s live MCP tools
+    (`seam_scan`/`combined_scan_preview`) parse a caller-supplied JSON
+    *string*, not a file path, so they call this directly."""
+    from seam_engine.scan import _parse_json_list
+
+    with pytest.raises(ValueError, match="expected a JSON list"):
+        _parse_json_list(json.dumps(bad_value), "some_param")
+
+
+@pytest.mark.parametrize("bad_value", [{"a": 1}, 5, None, "x", True])
 def test_cli_x_posts_with_non_list_json_raises_named_error(tmp_path, bad_value):
     """Pre-fix, a dict/int/None/string/bool payload reached
     `load_x_posts_from_live`'s `not data` / `enumerate(data)` unmarked,

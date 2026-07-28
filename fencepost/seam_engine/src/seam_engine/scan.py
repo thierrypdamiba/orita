@@ -757,21 +757,33 @@ def run_scan(
     }
 
 
-def _load_json_list(path: Path) -> list[Any]:
-    """Load a whole-file JSON list from a CLI-supplied path, refusing a
-    syntactically valid but non-list payload with a named error instead of
-    letting it reach `load_x_posts_from_live`/`load_github_events_from_live`
-    unmarked (both call `enumerate()`/`not data` on the result, which on a
-    dict, string, int, or bool produces a confusing crash or silently wrong
-    behavior rather than a clear message). Mirrors `RECIPES/*/detector.py`'s
-    `_load_rows` (task 358) and `gmail_calendar.py`'s `_load_rows` (task
-    359) exactly — the same bug class, on `scan.py`'s and `combined_scan.py`'s
-    own `--x-posts`/`--github-events` CLI loaders, which that scan's grep
-    for non-guarded `json.loads()` call sites had not yet reached."""
-    data = json.loads(Path(path).read_text())
+def _parse_json_list(raw: str, source: str) -> list[Any]:
+    """Parse a JSON list out of a raw string, refusing a syntactically valid
+    but non-list payload with a named error instead of letting it reach
+    `load_x_posts_from_live`/`load_github_events_from_live` unmarked (both
+    call `enumerate()`/`not data` on the result, which on a dict, string,
+    int, or bool produces a confusing crash or silently wrong behavior
+    rather than a clear message). `source` names the origin (a file path,
+    or a caller's parameter name) purely for the error message. Mirrors
+    `RECIPES/*/detector.py`'s `_load_rows` (task 358) and `gmail_calendar.
+    py`'s `_load_rows` (task 359) exactly — the same bug class.
+    """
+    data = json.loads(raw)
     if not isinstance(data, list):
-        raise ValueError(f"{path}: expected a JSON list, got {type(data).__name__}")
+        raise ValueError(f"{source}: expected a JSON list, got {type(data).__name__}")
     return data
+
+
+def _load_json_list(path: Path) -> list[Any]:
+    """Load a whole-file JSON list from a CLI-supplied path. Task 361 closed
+    this bug class on `scan.py`'s and `combined_scan.py`'s own `--x-posts`/
+    `--github-events` CLI loaders, which that scan's grep for non-guarded
+    `json.loads()` call sites had not yet reached; task 362 found the same
+    gap still open one call-site over, on `server.py`'s live MCP tools
+    (`seam_scan`/`combined_scan_preview`), which parse a caller-supplied
+    JSON *string* rather than a file path — `_parse_json_list` is the shared
+    core both now call, so the guard lives in exactly one place."""
+    return _parse_json_list(Path(path).read_text(), str(path))
 
 
 def main(argv: list[str] | None = None) -> int:
