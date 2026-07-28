@@ -1,0 +1,22 @@
+[
+  {
+    "number": 501,
+    "title": "dawn-run flakes on a fresh checkout",
+    "state": "closed",
+    "closed_at": "2026-07-20T09:00:00Z",
+    "url": "https://github.com/example/example-repo/issues/501"
+  },
+  {
+    "number": 502,
+    "title": "README badge shows the wrong toolkit count",
+    "state": "closed",
+    "closed_at": "2026-07-25T08:00:00Z",
+    "url": "https://github.com/example/example-repo/issues/502"
+  },
+  {
+    "number": 503,
+    "title": "Report generator crashes on an empty ledger",
+    "state": "open",
+    "url": "https://github.com/example/example-repo/issues/503"
+  }
+]

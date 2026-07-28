@@ -1,0 +1,12 @@
+{
+  "slug": "issue-closed-pr-still-open",
+  "title": "Issue closed elsewhere, its PR is still open",
+  "author": "off-by-one",
+  "description": "Compares still-open pull requests against the repository's own issues: a PR names a GitHub closing keyword (closes/fixes/resolves #N) for an issue that has since closed through some OTHER route -- a duplicate, a manual close, a different PR -- so the PR's own promised close never fires (GitHub only auto-closes on merge) and it sits open, orphaned, referencing a seam that already closed without it. The mirror image of merged-pr-issue-still-open (task 108: PR merged, issue didn't close) rather than a restatement of it.",
+  "toolkit": "github",
+  "scopes": ["ListPullRequests", "ListIssues", "GetIssue"],
+  "fixture": "fixtures/issue_closed_pr_still_open",
+  "detector_file": "detector.py",
+  "entrypoint": "run_recipe_scan",
+  "confidence_notes": "Age-gated on how long the referenced issue has been closed while the PR sits open, not flat. Under 48 hours since the issue closed scores 0.5 (below the 0.70 bar, weighed in the tail not hidden -- a human may simply not have had a day yet to notice their open PR's target already closed elsewhere). At or past 48 hours it scores a flat 0.85 -- an unambiguous, non-fuzzy signal, closing-keyword match on an issue number that already reads closed. The 48h window sits between merged-pr-issue-still-open's 24h (a merge-triggered auto-close either fires within hours or it's genuinely broken) and contributor-thanked-not-credited's 72h (crediting a README is a slower, more deliberate edit): closing an issue through an unrelated route rarely prompts an immediate look at every open PR that happens to reference it, but it is not as slow-moving as a documentation credit either. A PR naming no closing keyword, or naming an issue that is still open, is excluded at confidence 0.0, named not hidden -- the identical discipline every recipe before this one holds."
+}

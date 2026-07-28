@@ -87,6 +87,11 @@ contributor thanked in a tweet from the connected X account, checked
 against whether that handle is credited in the repo's own README, closing
 the other half of the worked example STRATEGY.md names alongside
 `release-not-tweeted`'s.
+[`RECIPES/issue-closed-pr-still-open/`](RECIPES/issue-closed-pr-still-open/)
+is the sixth (ROADMAP.md #373): the mirror of `merged-pr-issue-still-open` —
+a still-open pull request names a closing keyword for an issue that has
+since closed through some other route, so the PR's own promised close
+never fires and it sits open, orphaned.
 
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)

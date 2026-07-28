@@ -1,0 +1,38 @@
+[
+  {
+    "id": "PR-601",
+    "title": "Retry the dawn-run checkout step",
+    "number": 601,
+    "body": "Closes #501 -- adds a retry around the git checkout so a transient clone failure doesn't fail the whole run.",
+    "state": "open",
+    "opened_at": "2026-07-19T10:00:00Z",
+    "url": "https://github.com/example/example-repo/pull/601"
+  },
+  {
+    "id": "PR-602",
+    "title": "Recompute the badge's toolkit count each run",
+    "number": 602,
+    "body": "Fixes #502 by rereading SCOPES.md live instead of a cached count.",
+    "state": "open",
+    "opened_at": "2026-07-24T20:00:00Z",
+    "url": "https://github.com/example/example-repo/pull/602"
+  },
+  {
+    "id": "PR-603",
+    "title": "Guard the report generator against an empty ledger",
+    "number": 603,
+    "body": "resolves #503 with an early return instead of an unhandled crash.",
+    "state": "open",
+    "opened_at": "2026-07-23T10:00:00Z",
+    "url": "https://github.com/example/example-repo/pull/603"
+  },
+  {
+    "id": "PR-604",
+    "title": "Tidy the ruff per-file ignore list",
+    "number": 604,
+    "body": "Cosmetic only, no linked issue.",
+    "state": "open",
+    "opened_at": "2026-07-24T09:00:00Z",
+    "url": "https://github.com/example/example-repo/pull/604"
+  }
+]
