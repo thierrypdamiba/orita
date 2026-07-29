@@ -320,6 +320,10 @@ def _toolkits_in_use_check():
     return _load("_ritual_toolkits_in_use_check", os.path.join(ROOT, "tools", "toolkits_in_use_check.py"))
 
 
+def _cluster_day_check():
+    return _load("_ritual_cluster_day_check", os.path.join(ROOT, "tools", "cluster_day_check.py"))
+
+
 def _seam_ledger():
     src = os.path.join(ROOT, "fencepost", "seam_engine", "src")
     if src not in sys.path:
@@ -944,6 +948,29 @@ def check_toolkits_in_use(metrics_path: str | None = None, consent_log_path: str
     return mod.check_toolkits_in_use(**kwargs)
 
 
+def check_cluster_day_cadence(chronicle_dir: str | None = None, today=None) -> dict:
+    """Task 387: fold `cluster_day_check.py`'s own weekly Cluster Day scan
+    into the one block. Unconditional, local-filesystem-only, the same
+    cheap informational class `check_report_cadence`/`check_metrics_cadence`
+    already hold -- TOWN-OPERATIONS.md's weekly ritual (Ananse's chronicle
+    episode, Off-By-One's Gap confession, Zashiki's mystery, Nyx's weekly
+    post) had never once been checked for whether it actually ran, and
+    `orita-vault/hand/skipped.md`'s 2026-07-27 note found three real lapsed
+    Mondays by hand. Printed every hour, not gated on today being a
+    Monday, so a lapsed week is visible long before the next Monday
+    arrives to maybe notice on its own. Never flips `broken`: a missed
+    Cluster Day is a fact worth surfacing to the next hour's run, not a
+    currently-live law violation -- the same distinction
+    `report_cadence`/`metrics_cadence` already hold for their own gaps."""
+    mod = _cluster_day_check()
+    kwargs = {}
+    if chronicle_dir is not None:
+        kwargs["chronicle_dir"] = chronicle_dir
+    if today is not None:
+        kwargs["today"] = today
+    return mod.compute_cadence(**kwargs)
+
+
 def check_change_gate(report_info: dict) -> dict | None:
     """Fold `change_gate.should_post_gap()` -- task 69's own change-gate
     rule -- using whichever report text `check_report_freshness` already
@@ -997,6 +1024,8 @@ def run_ritual_check(
     app_log_path: str | None = None,
     toolkits_metrics_path: str | None = None,
     toolkits_consent_log_path: str | None = None,
+    cluster_day_dir: str | None = None,
+    cluster_day_today=None,
     record_scribe_growth: bool = False,
     record_words: bool = False,
 ) -> dict:
@@ -1063,6 +1092,7 @@ def run_ritual_check(
     toolkits_in_use = check_toolkits_in_use(
         metrics_path=toolkits_metrics_path, consent_log_path=toolkits_consent_log_path
     )
+    cluster_day = check_cluster_day_cadence(chronicle_dir=cluster_day_dir, today=cluster_day_today)
     broken = (
         (not town["ok"])
         or (not fencepost["ok"])
@@ -1118,6 +1148,7 @@ def run_ritual_check(
         "wip_reclaim": wip_reclaim,
         "scopes_completeness": scopes_completeness,
         "toolkits_in_use": toolkits_in_use,
+        "cluster_day": cluster_day,
         "broken": broken,
     }
 
@@ -1309,6 +1340,8 @@ def format_ritual_check(result: dict) -> str:
             f"  toolkits in use: BROKEN -- metrics.jsonl's {ti['claimed_date']} reading claims {ti['claimed']}, "
             f"real ground truth is {ti['real']} -- STRATEGY.md's adoption metric is misreporting live, escalate now"
         )
+    cd = result["cluster_day"]
+    lines.append("  " + _cluster_day_check().format_cadence(cd))
     return "\n".join(lines)
 
 

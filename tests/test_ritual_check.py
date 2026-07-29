@@ -2164,5 +2164,61 @@ class CliMainArgShapeGuardCase(unittest.TestCase):
         self.assertIn(exit_code, (0, 1))
 
 
+class ClusterDayFoldCase(unittest.TestCase):
+    """Task 387: run_ritual_check() folds cluster_day_check.py's own
+    weekly Cluster Day scan (TOWN-OPERATIONS.md's Monday ritual) into the
+    same structured result -- a no-gap fixture prints a clean line, a
+    real-gap fixture names the missed Mondays plainly, and neither ever
+    flips `broken` (a lapsed weekly cadence is a fact worth surfacing to
+    the next hour's run, not a currently-live law violation, the same
+    class `report_cadence`/`metrics_cadence` already hold)."""
+
+    def setUp(self):
+        self.chronicle = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.chronicle, ignore_errors=True)
+
+    def _write(self, rel, content="x"):
+        path = os.path.join(self.chronicle, rel)
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, "w") as f:
+            f.write(content)
+
+    def test_no_gap_fixture_prints_clean_and_never_flips_broken(self):
+        from datetime import date
+
+        self._write("001-the-founding.md")
+        result = rc.run_ritual_check(cluster_day_dir=self.chronicle, cluster_day_today=date(2026, 7, 11))
+        self.assertEqual(result["cluster_day"]["missed_mondays"], [])
+        self.assertFalse(result["broken"])
+        formatted = rc.format_ritual_check(result)
+        self.assertIn("cluster day: current", formatted)
+
+    def test_gap_fixture_is_named_but_still_never_flips_broken(self):
+        from datetime import date
+
+        self._write("001-the-founding.md")
+        result = rc.run_ritual_check(cluster_day_dir=self.chronicle, cluster_day_today=date(2026, 7, 29))
+        self.assertEqual(
+            result["cluster_day"]["missed_mondays"], ["2026-07-13", "2026-07-20", "2026-07-27"]
+        )
+        self.assertFalse(result["broken"])
+        formatted = rc.format_ritual_check(result)
+        self.assertIn("3 Cluster Days lapsed", formatted)
+        self.assertIn("2026-07-27", formatted)
+
+    def test_default_dir_reads_the_real_chronicle_and_matches_direct_call(self):
+        """No override: reads the real chronicle/ directory, the same
+        default check_cluster_day_cadence falls back to -- proves the
+        fold never duplicates or diverges from the module it wraps
+        (`RealChronicleCase` in test_cluster_day_check.py already owns
+        proving that module's own correctness against the real data)."""
+        from datetime import date
+
+        cdc = _load("_test_cluster_day_check", os.path.join(ROOT, "tools", "cluster_day_check.py"))
+        direct = cdc.compute_cadence(today=date(2026, 7, 29))
+        result = rc.run_ritual_check(cluster_day_today=date(2026, 7, 29))
+        self.assertEqual(result["cluster_day"], direct)
+
+
 if __name__ == "__main__":
     unittest.main()
