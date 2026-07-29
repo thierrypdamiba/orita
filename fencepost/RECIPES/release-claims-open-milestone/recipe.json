@@ -1,0 +1,12 @@
+{
+  "slug": "release-claims-open-milestone",
+  "title": "A release's own body claims a milestone shipped that's still open",
+  "author": "off-by-one",
+  "description": "Extracts every 'milestone #N' claim phrase (milestone-closed-never-released's own grammar, reused verbatim) from a release's body text and checks the named milestone's real state. A milestone that exists but is still open is the seam: the release is a permanent public record claiming a bundle of work shipped that, in fact, never closed out.",
+  "toolkit": "github",
+  "scopes": ["GetLatestRelease", "ListMilestones"],
+  "fixture": "fixtures/release_claims_open_milestone",
+  "detector_file": "detector.py",
+  "entrypoint": "run_recipe_scan",
+  "confidence_notes": "Age-gated by hours since the release published, mirroring release-claims-unmerged-pr's and release-claims-unfixed-issue's own reasoning: a claim checked within a few hours of publish might still be a race (release published moments before the milestone is actually closed out) rather than a settled documentation error (0.5, below the 0.70 bar, shown as a weighed-and-dropped coincidence, not hidden); a full day or more past publish with the named milestone still open is unambiguous (flat 0.85, the release body is static once published). A named milestone that does not exist at all is excluded at confidence 0.0 -- a broken reference is not this recipe's own seam. A named milestone that IS closed is excluded too, named not hidden -- the claim was true."
+}

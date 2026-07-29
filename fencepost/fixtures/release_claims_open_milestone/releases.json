@@ -1,0 +1,42 @@
+[
+  {
+    "id": "rel-4001",
+    "title": "Fencepost v1.6.0 — the sixteenth recipe ships",
+    "tag": "v1.6.0",
+    "body": "Ships milestone #4001 and ships milestone #4001 again (should only count once).",
+    "published_at": "2026-07-27T09:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/releases/tag/v1.6.0"
+  },
+  {
+    "id": "rel-4002",
+    "title": "Fencepost v1.6.1 — a fresh claim",
+    "tag": "v1.6.1",
+    "body": "Milestone #4003 is done.",
+    "published_at": "2026-07-29T09:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/releases/tag/v1.6.1"
+  },
+  {
+    "id": "rel-4003",
+    "title": "Fencepost v1.6.2 — dangling claim decoy",
+    "tag": "v1.6.2",
+    "body": "Milestone #4999 shipped.",
+    "published_at": "2026-07-26T09:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/releases/tag/v1.6.2"
+  },
+  {
+    "id": "rel-4004",
+    "title": "Fencepost v1.6.3 — no claim phrase at all",
+    "tag": "v1.6.3",
+    "body": "Housekeeping release. See #4005 for background, no milestone claim here.",
+    "published_at": "2026-07-25T09:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/releases/tag/v1.6.3"
+  },
+  {
+    "id": "rel-4005",
+    "title": "Fencepost v1.6.4 — the true claim",
+    "tag": "v1.6.4",
+    "body": "Milestone #4004 shipped.",
+    "published_at": "2026-07-24T09:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/releases/tag/v1.6.4"
+  }
+]

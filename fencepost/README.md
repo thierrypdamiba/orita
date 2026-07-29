@@ -151,6 +151,13 @@ in a tweet from the connected X account. Gated on two different signals
 than its twin (read-history coverage, and mere-mention vs total silence)
 rather than a copy-pasted age window. Reuses both scopes already
 declared elsewhere; no new scope needed.
+[`RECIPES/release-claims-open-milestone/`](RECIPES/release-claims-open-milestone/)
+is the sixteenth (ROADMAP.md #385): the milestone-side third leg of the
+release-claims-X family alongside `release-claims-unmerged-pr` and
+`release-claims-unfixed-issue` — a release's own body invokes a
+`milestone #N` claim phrase, but the named milestone is still open.
+Reuses `milestone-closed-never-released`'s own claim grammar verbatim;
+no new scope needed.
 
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)

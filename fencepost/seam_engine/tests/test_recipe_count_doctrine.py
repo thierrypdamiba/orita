@@ -38,7 +38,7 @@ SITE_PATH = REPO_ROOT / "docs" / "fencepost" / "index.html"
 _CARDINAL_WORDS = {
     "zero": 0, "one": 1, "two": 2, "three": 3, "four": 4, "five": 5,
     "six": 6, "seven": 7, "eight": 8, "nine": 9, "ten": 10, "eleven": 11,
-    "twelve": 12, "thirteen": 13, "fourteen": 14, "fifteen": 15,
+    "twelve": 12, "thirteen": 13, "fourteen": 14, "fifteen": 15, "sixteen": 16,
 }
 
 _CLAIM_RE = re.compile(r"([A-Za-z]+) real recipes stand today")
@@ -85,13 +85,13 @@ def test_unrecognized_cardinal_word_raises():
         claimed_recipe_count("Several real recipes stand today:")
 
 
-def test_real_recipe_count_is_currently_fifteen():
-    """Regression pin: today's real, live count under RECIPES/. Was 14 until
-    RECIPES/readme-credited-not-thanked/ merged (the fifteenth real
+def test_real_recipe_count_is_currently_sixteen():
+    """Regression pin: today's real, live count under RECIPES/. Was 15 until
+    RECIPES/release-claims-open-milestone/ merged (the sixteenth real
     recipe) -- the exact drift this whole doctrine file exists to catch,
     now caught once for real instead of only rehearsed by the mutation
     test below."""
-    assert real_recipe_count(FENCEPOST_ROOT) == 15
+    assert real_recipe_count(FENCEPOST_ROOT) == 16
 
 
 def test_site_claim_matches_the_real_live_count():
