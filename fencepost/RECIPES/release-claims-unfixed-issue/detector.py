@@ -16,7 +16,13 @@ Deliberately reuses `tools/closing_keyword_guard.py`'s own
 `commit-closes-keyword-issue-still-open` (task 377) already established:
 one law, not a second copy of it drifting apart. "closing #N" (present
 participle, Iron Rule #8's own prescribed safe form) never matches either
-tense -- proven live, not just claimed.
+tense -- proven live, not just claimed. `CLOSING_KEYWORD_RE` is imported
+from `seam_engine.closing_keywords` (task 394), which found this file was
+in fact the THIRD independently-retyped copy of the identical pattern
+(alongside `commit-closes-keyword-issue-still-open` and
+`issue-closed-never-released`), each promising in prose to mirror the
+others without any of them actually importing one -- the exact drift risk
+this paragraph's own words warned about, now closed for real.
 
 Read-only, MOCK ONLY, same as every recipe under CONTRIBUTING.md's law:
 this module only ever reads two local fixture files (`releases.json`,
@@ -39,27 +45,18 @@ the real fix lands) rather than a settled documentation error.
 from __future__ import annotations
 
 import json
-import re
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from seam_engine.closing_keywords import CLOSING_KEYWORD_RE
 from seam_engine.scan import GapCandidate
 
 _HERE = Path(__file__).resolve().parent
 _FIXTURE_DIR = _HERE.parents[1] / "fixtures" / "release_claims_unfixed_issue"
 DEFAULT_RELEASES_FIXTURE = _FIXTURE_DIR / "releases.json"
 DEFAULT_ISSUES_FIXTURE = _FIXTURE_DIR / "issues.json"
-
-# Mirrors tools/closing_keyword_guard.py's CLOSING_KEYWORD_RE verbatim (see
-# the module docstring for why): both tenses, an optional colon, one or
-# more spaces, then the number. "closing #N" (present participle) does not
-# match either form -- Iron Rule #8's prescribed safe phrasing.
-CLOSING_KEYWORD_RE = re.compile(
-    r"\b(?:close[sd]?|fix(?:e[sd])?|resolve[sd]?):?\s+#(\d+)\b",
-    re.IGNORECASE,
-)
 
 # A claim checked within this window of the release's own publish time may
 # just be a race rather than a genuine, settled documentation error.

@@ -32,11 +32,14 @@ than `merged-pr-issue-still-open`'s narrower `closes?|fixes?|resolves?`
 (present tense only) -- that module already proved, live, on this repo's
 own history (task 184: issues #1 and #2 closed themselves on a past-tense
 "closed #1"/"fixes #2" push), that GitHub's real commit-message parser
-accepts past tense too. Reading raw commit messages is exactly that
-module's own job; matching its grammar here, rather than inventing a
-second slightly-different regex, is the same "don't let two copies of the
-same law drift" discipline the isinstance-guard and memoization campaigns
-(tasks 329-367) spent whole hours re-learning the hard way.
+accepts past tense too. `CLOSING_KEYWORD_RE` is imported from
+`seam_engine.closing_keywords` (task 394), not retyped locally -- this
+recipe's own first version defined its own copy, with a comment promising
+to "mirror" the tools/ grammar, and two later recipes retyped a third and
+fourth copy of the identical pattern with the identical unenforced
+promise. `seam_engine.closing_keywords` is now the one real source all
+three import from, closing the drift risk this docstring's own comment
+used to only assert.
 
 A commit naming a closing keyword for an issue number that does not exist
 in this fixture's issue set at all is excluded, not surfaced -- that is
@@ -54,27 +57,18 @@ bar.
 from __future__ import annotations
 
 import json
-import re
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from seam_engine.closing_keywords import CLOSING_KEYWORD_RE
 from seam_engine.scan import GapCandidate
 
 _HERE = Path(__file__).resolve().parent
 _FIXTURE_DIR = _HERE.parents[1] / "fixtures" / "commit_closes_keyword_issue_still_open"
 DEFAULT_COMMITS_FIXTURE = _FIXTURE_DIR / "commits.json"
 DEFAULT_ISSUES_FIXTURE = _FIXTURE_DIR / "issues.json"
-
-# Mirrors tools/closing_keyword_guard.py's CLOSING_KEYWORD_RE verbatim (see
-# the module docstring for why): both tenses, an optional colon, one or
-# more spaces, then the number. "closing #N" (present participle) does not
-# match either form -- Iron Rule #8's prescribed safe phrasing.
-CLOSING_KEYWORD_RE = re.compile(
-    r"\b(?:close[sd]?|fix(?:e[sd])?|resolve[sd]?):?\s+#(\d+)\b",
-    re.IGNORECASE,
-)
 
 # A promise under this age may not have had time to auto-close yet, or
 # nobody has re-checked -- not yet a gap.

@@ -1,0 +1,72 @@
+"""The shared GitHub closing-keyword ("closes/fixes/resolves #N") law.
+
+`commit-closes-keyword-issue-still-open/detector.py` (task 388) first wrote
+`CLOSING_KEYWORD_RE`, its own comment saying it "mirrors
+`tools/closing_keyword_guard.py`'s CLOSING_KEYWORD_RE verbatim". Two more
+recipes needed the identical grammar and said the same thing in their own
+comments -- `issue-closed-never-released/detector.py` (as `CLAIM_RE`) and
+`release-claims-unfixed-issue/detector.py` (as a second `CLOSING_KEYWORD_RE`)
+-- but neither comment was ever backed by an import: the regex was retyped
+a third time, with nothing connecting any of the three copies to each
+other. This is the exact "two [now three] independently written regexes...
+drifting apart" shape task 389 found and fixed for `#N` extraction
+(`references.py`), task 390 found and fixed a second time for the
+"milestone #N" claim phrase (`milestone_claims.py`), and task 393 found and
+fixed a third time for the "ships/includes/merges/via #N" claim phrase
+(`pr_claims.py`) -- found here a fourth time, in the one family none of
+those three sweeps touched, by grepping every `_RE = re.compile`/
+`RE = re.compile` line across all nineteen recipes rather than trusting any
+one recipe's own comment about itself.
+
+Ruled out one lookalike while doing that sweep: `_CLOSES_RE` in
+`issue-closed-pr-still-open` and `merged-pr-issue-still-open` is textually
+identical between those two files, but it is a deliberately DIFFERENT,
+narrower grammar (`closes?|fixes?|resolves?`, present tense only) --
+`tools/closing_keyword_guard.py`'s own module docstring already says so
+explicitly, by name, as an intentional design choice, not an accident. That
+pair is a real working two-copy law already cross-referenced in prose; it
+is not this bug and this task leaves it untouched.
+
+This module is now the one real source for the three recipes above. Each
+imports `CLOSING_KEYWORD_RE`/`closing_keyword_numbers` from here and binds
+them to its own existing module-level name (`CLOSING_KEYWORD_RE` or
+`CLAIM_RE`), so none of their `recipe.json`s, fixtures, or existing tests
+have to change shape. A fourth recipe that ever needs the same
+closing-keyword grammar reuses this module too, rather than writing a
+fourth copy.
+
+Deliberately does NOT import `tools/closing_keyword_guard.py` (the real
+canonical, safety-critical source of this grammar, guarding Iron Rule #8
+against a live GitHub auto-close on push): `seam_engine` is the portable,
+forkable package (STRATEGY.md -- "fork the town, point it at your own
+accounts") and must not depend on this parent repo's own `tools/`
+directory. This module re-states the same law as a documented, intentional
+mirror instead -- exactly what all three recipes already claimed to do in
+prose before this task made it real.
+
+Pure, no I/O, no seam-engine imports of its own -- same shape as
+`references.py`, `milestone_claims.py`, and `pr_claims.py`.
+"""
+from __future__ import annotations
+
+import re
+
+# GitHub's real closing-keyword grammar (see `tools/closing_keyword_guard.
+# py`'s own docstring for the citation): close/closes/closed, fix/fixes/
+# fixed, resolve/resolves/resolved, each optionally followed by a colon,
+# then whitespace, then #<digits>. Both tenses are live triggers -- task
+# 184's own incident (issues #1 and #2 closing themselves on a past-tense
+# "closed #1"/"fixes #2" push) proved that on this repo's real history, not
+# just in a spec. "closing #N" (present participle) does not match either
+# form -- Iron Rule #8's prescribed safe phrasing.
+CLOSING_KEYWORD_RE = re.compile(
+    r"\b(?:close[sd]?|fix(?:e[sd])?|resolve[sd]?):?\s+#(\d+)\b",
+    re.IGNORECASE,
+)
+
+
+def closing_keyword_numbers(text: str) -> list[int]:
+    """Every issue/PR number `text` names via a real GitHub closing keyword,
+    in the order they appear (duplicates kept -- the same number named
+    twice is two real matches, not one deduplicated fact)."""
+    return [int(n) for n in CLOSING_KEYWORD_RE.findall(text)]

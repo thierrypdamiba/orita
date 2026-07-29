@@ -12,7 +12,12 @@ GitHub closing-keyword grammar verbatim (fixes/closes/resolves #N, both
 tenses, `tools/closing_keyword_guard.py`'s own regex) -- an issue is
 neither a PR nor a milestone, and GitHub already gives it a real,
 canonical claim-of-credit phrase; there is no reason to invent a second
-one.
+one. `CLAIM_RE` is imported from `seam_engine.closing_keywords`
+(task 394) rather than retyped locally -- this file's own original regex
+and `release-claims-unfixed-issue`'s were two textually-identical copies
+of the same pattern, each carrying a comment about the other without
+either actually importing it, until task 394 gave both (and a third
+recipe, `commit-closes-keyword-issue-still-open`) one real shared source.
 
 Read-only, MOCK ONLY, same as every recipe under CONTRIBUTING.md's law:
 this module only ever reads two local fixture files (`issues.json`,
@@ -34,27 +39,17 @@ gap, aged by how long it has sat uncredited.
 from __future__ import annotations
 
 import json
-import re
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from seam_engine.closing_keywords import CLOSING_KEYWORD_RE as CLAIM_RE
 from seam_engine.scan import GapCandidate
 
 _HERE = Path(__file__).resolve().parent
 DEFAULT_ISSUES_FIXTURE = _HERE.parents[1] / "fixtures" / "issue_closed_never_released" / "issues.json"
 DEFAULT_RELEASES_FIXTURE = _HERE.parents[1] / "fixtures" / "issue_closed_never_released" / "releases.json"
-
-# Mirrors tools/closing_keyword_guard.py's CLOSING_KEYWORD_RE verbatim (the
-# same regex release-claims-unfixed-issue's own detector already reuses):
-# both tenses, an optional colon, one or more spaces, then the number.
-# "closing #N" (present participle) does not match either form -- Iron
-# Rule #8's prescribed safe phrasing.
-CLAIM_RE = re.compile(
-    r"\b(?:close[sd]?|fix(?:e[sd])?|resolve[sd]?):?\s+#(\d+)\b",
-    re.IGNORECASE,
-)
 
 # An issue closed under this age, with no release having claimed it yet,
 # may simply be waiting on the project's own release cadence to catch up --
