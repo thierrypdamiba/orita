@@ -1,0 +1,12 @@
+{
+  "slug": "milestone-closed-never-released",
+  "title": "A milestone closed long ago, but no release has ever claimed it",
+  "author": "off-by-one",
+  "description": "The milestone-side twin of merged-pr-never-released (task 381): that recipe watches a merged pull request sitting stale, uncredited by any release; this one watches the same shape one level up -- a milestone closed long ago whose number never appears inside any release's own 'milestone #N' claim phrase. Reads across every release read so far (the same 'recent-releases history' fixture convention merged-pr-never-released already established), not just the newest one -- a milestone can go uncredited across several releases in a row, so clearing only the newest is not enough.",
+  "toolkit": "github",
+  "scopes": ["GetLatestRelease", "ListMilestones"],
+  "fixture": "fixtures/milestone_closed_never_released",
+  "detector_file": "detector.py",
+  "entrypoint": "run_recipe_scan",
+  "confidence_notes": "Age-gated at 96 hours since the milestone's own closed_at, matching merged-pr-never-released's own bar exactly -- the same 'waiting on the project's own release cadence to catch up' reasoning applies one level up: a milestone bundles multiple issues and pull requests, so it is at least as plausible as a single PR that the release naming it simply hasn't shipped yet. Under 96h scores 0.5 (below the 0.70 bar, weighed in the tail not hidden). At or past 96h scores a flat 0.85. A milestone that is still open is excluded at confidence 0.0, named not hidden -- there is nothing for a release to have missed yet. A closed milestone that IS named by at least one release read so far, at any point in that history, is excluded too -- the claim was kept."
+}

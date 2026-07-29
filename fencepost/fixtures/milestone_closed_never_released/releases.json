@@ -1,0 +1,26 @@
+[
+  {
+    "id": "rel-1",
+    "title": "v1.0.0",
+    "tag": "v1.0.0",
+    "body": "Ships milestone #2001 launch bundle.",
+    "published_at": "2026-07-16T09:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/releases/tag/v1.0.0"
+  },
+  {
+    "id": "rel-2",
+    "title": "v1.1.0",
+    "tag": "v1.1.0",
+    "body": "Routine release. No milestone claim here.",
+    "published_at": "2026-07-22T09:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/releases/tag/v1.1.0"
+  },
+  {
+    "id": "rel-3",
+    "title": "v1.2.0",
+    "tag": "v1.2.0",
+    "body": "Follow-up patch, nothing milestone-related.",
+    "published_at": "2026-07-28T09:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/releases/tag/v1.2.0"
+  }
+]

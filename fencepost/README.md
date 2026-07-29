@@ -136,6 +136,13 @@ closing keyword (`fixes`/`closes`/`resolves #N`, both tenses, reusing
 `tools/closing_keyword_guard.py`'s own grammar verbatim) against an issue,
 but the issue never actually closed. Reuses both scopes already declared
 elsewhere; no new scope needed.
+[`RECIPES/milestone-closed-never-released/`](RECIPES/milestone-closed-never-released/)
+is the fourteenth (ROADMAP.md #383): the milestone-side twin of
+`merged-pr-never-released` — a milestone closed long ago whose number
+never appears inside any release's own `milestone #N` claim phrase.
+Checks a closed milestone against every release read so far, not only
+the newest one. Reuses both scopes already declared elsewhere; no new
+scope needed.
 
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)
