@@ -117,10 +117,12 @@ class RealChronicleCase(unittest.TestCase):
     independent recomputation of the same real files."""
 
     def test_real_chronicle_dir_matches_the_hand_counted_gap(self):
+        # episode-002 ("Eighteen Days") shipped task 391, satisfying the
+        # first owed Monday (07-13). 07-20 and 07-27 remain owed.
         result = cdc.compute_cadence(today=date(2026, 7, 29))
-        self.assertEqual(result["total_episodes_on_record"], 2)
-        self.assertEqual(result["cluster_day_episodes_shipped"], 0)
-        self.assertEqual(result["missed_mondays"], ["2026-07-13", "2026-07-20", "2026-07-27"])
+        self.assertEqual(result["total_episodes_on_record"], 3)
+        self.assertEqual(result["cluster_day_episodes_shipped"], 1)
+        self.assertEqual(result["missed_mondays"], ["2026-07-20", "2026-07-27"])
 
 
 if __name__ == "__main__":
