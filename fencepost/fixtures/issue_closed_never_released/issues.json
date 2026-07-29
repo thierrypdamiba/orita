@@ -1,0 +1,30 @@
+[
+  {
+    "number": 5001,
+    "title": "Fix broken pagination on the archive index",
+    "state": "closed",
+    "closed_at": "2026-07-15T10:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/issues/5001"
+  },
+  {
+    "number": 5002,
+    "title": "Correct the n-1 counter's off-by-one at midnight UTC rollover",
+    "state": "closed",
+    "closed_at": "2026-07-20T10:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/issues/5002"
+  },
+  {
+    "number": 5003,
+    "title": "Typo in ONBOARDING.md step 3",
+    "state": "closed",
+    "closed_at": "2026-07-27T09:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/issues/5003"
+  },
+  {
+    "number": 5004,
+    "title": "Investigate flaky test_the_tithe roll",
+    "state": "open",
+    "closed_at": null,
+    "url": "https://github.com/thierrypdamiba/orita/issues/5004"
+  }
+]

@@ -1,0 +1,12 @@
+{
+  "slug": "issue-closed-never-released",
+  "title": "An issue closed long ago, but no release has ever claimed it",
+  "author": "off-by-one",
+  "description": "The issue-side twin of merged-pr-never-released (task 381) and milestone-closed-never-released (task 383) -- the third and last leg of the same closed-but-uncredited-by-any-release family, completing the set across all three GitHub record types a release's own body can claim credit for (PR, milestone, issue). Reuses release-claims-unfixed-issue's own real closing-keyword grammar (fixes/closes/resolves #N, both tenses) rather than inventing a fourth claim phrase -- an issue already has a real, canonical GitHub credit phrase. Reads across every release read so far, not just the newest one -- an issue can go uncredited across several releases in a row, so clearing only the newest is not enough.",
+  "toolkit": "github",
+  "scopes": ["GetLatestRelease", "ListIssues"],
+  "fixture": "fixtures/issue_closed_never_released",
+  "detector_file": "detector.py",
+  "entrypoint": "run_recipe_scan",
+  "confidence_notes": "Age-gated at 96 hours since the issue's own closed_at, matching merged-pr-never-released's and milestone-closed-never-released's own bar exactly -- the same family, the same reasoning, the third record type. Under 96h scores 0.5 (below the 0.70 bar, weighed in the tail not hidden). At or past 96h scores a flat 0.85. An issue that is still open is excluded at confidence 0.0, named not hidden -- there is nothing for a release to have missed yet. A closed issue that IS claimed by at least one release read so far, at any point in that history, is excluded too -- the claim was kept. A bare '#N' mention with no real closing keyword (e.g. 'see #N for background') never clears the issue -- it is not a credit claim."
+}

@@ -1,0 +1,26 @@
+[
+  {
+    "id": "rel-1",
+    "title": "v1.0.0",
+    "tag": "v1.0.0",
+    "body": "Fixes #5001, pagination is sane again.",
+    "published_at": "2026-07-16T09:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/releases/tag/v1.0.0"
+  },
+  {
+    "id": "rel-2",
+    "title": "v1.1.0",
+    "tag": "v1.1.0",
+    "body": "Routine release. No closing-keyword claim here.",
+    "published_at": "2026-07-22T09:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/releases/tag/v1.1.0"
+  },
+  {
+    "id": "rel-3",
+    "title": "v1.2.0",
+    "tag": "v1.2.0",
+    "body": "See #5002 for background on the rollover discussion.",
+    "published_at": "2026-07-28T09:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/releases/tag/v1.2.0"
+  }
+]

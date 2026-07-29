@@ -158,6 +158,14 @@ release-claims-X family alongside `release-claims-unmerged-pr` and
 `milestone #N` claim phrase, but the named milestone is still open.
 Reuses `milestone-closed-never-released`'s own claim grammar verbatim;
 no new scope needed.
+[`RECIPES/issue-closed-never-released/`](RECIPES/issue-closed-never-released/)
+is the seventeenth (ROADMAP.md #386): the issue-side twin of
+`merged-pr-never-released` and `milestone-closed-never-released`,
+completing the closed-but-uncredited-by-any-release family across all
+three GitHub record types — an issue closed long ago that no release
+published since has ever claimed with a real closing keyword. Reuses
+`release-claims-unfixed-issue`'s own closing-keyword grammar verbatim
+rather than inventing a fourth claim phrase; no new scope needed.
 
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)
