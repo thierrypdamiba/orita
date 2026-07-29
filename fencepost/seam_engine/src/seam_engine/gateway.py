@@ -47,9 +47,9 @@ from seam_engine.consent import REQUIRED_SCOPES
 READ_ONLY_CAPABILITIES = (
     "Read-only seam reconciliation: list and read GitHub repository "
     "metadata, commit history, releases, issues, pull requests, "
-    "repository activity, individual file contents, and stargazer "
-    "counts, and read a connected user's own X (Twitter) tweet history, "
-    "mentions, and account identity — solely to compare the two "
+    "repository activity, individual file contents, milestones, and "
+    "stargazer counts, and read a connected user's own X (Twitter) tweet "
+    "history, mentions, and account identity — solely to compare the two "
     "timelines and surface gaps between what shipped and what was "
     "announced. Never create, update, merge, label, delete, post, "
     "reply, send, or modify anything on any connected account."
@@ -72,6 +72,7 @@ _SCOPE_KEYWORDS: dict[str, dict[str, str]] = {
         "CountStargazers": "stargazer",
         "GetLatestRelease": "release",
         "GetFileContents": "file contents",
+        "ListMilestones": "milestone",
     },
     "x": {
         "GetUserTweets": "tweet history",

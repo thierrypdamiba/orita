@@ -23,7 +23,7 @@ One door does not open on one key. This issue existing, public, with your intent
 
 | toolkit | paste this back, verbatim, to confirm it |
 |--|--|
-| GitHub | `GetRepository, ListRepoCommits, ListIssues, GetIssue, ListPullRequests, ListRepositoryActivities, CountStargazers, GetLatestRelease, GetFileContents` |
+| GitHub | `GetRepository, ListRepoCommits, ListIssues, GetIssue, ListPullRequests, ListRepositoryActivities, CountStargazers, GetLatestRelease, GetFileContents, ListMilestones` |
 | X | `GetUserTweets, GetMyMentions, WhoAmI` |
 | Gmail | `ListEmails, GetEmail, SearchThreads` |
 | Google Calendar | `ListEvents, GetEvent` |

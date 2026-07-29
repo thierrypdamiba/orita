@@ -1,0 +1,37 @@
+[
+  {
+    "number": 801,
+    "title": "Fix flaky test in the-hand gateway retry logic",
+    "state": "open",
+    "milestone_number": 1,
+    "url": "https://github.com/thierrypdamiba/orita/issues/801"
+  },
+  {
+    "number": 802,
+    "title": "Update README screenshot",
+    "state": "open",
+    "milestone_number": 2,
+    "url": "https://github.com/thierrypdamiba/orita/issues/802"
+  },
+  {
+    "number": 803,
+    "title": "Add dark mode toggle",
+    "state": "closed",
+    "milestone_number": 1,
+    "url": "https://github.com/thierrypdamiba/orita/issues/803"
+  },
+  {
+    "number": 804,
+    "title": "Investigate memory leak",
+    "state": "open",
+    "milestone_number": 3,
+    "url": "https://github.com/thierrypdamiba/orita/issues/804"
+  },
+  {
+    "number": 805,
+    "title": "Improve onboarding copy",
+    "state": "open",
+    "milestone_number": null,
+    "url": "https://github.com/thierrypdamiba/orita/issues/805"
+  }
+]

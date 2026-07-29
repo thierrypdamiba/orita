@@ -29,6 +29,7 @@ class TestFencepostSiteRecipes(unittest.TestCase):
             "duplicate-issue-still-open",
             "commit-closes-keyword-issue-still-open",
             "release-claims-unmerged-pr",
+            "milestone-closed-issue-still-open",
         ):
             self.assertIn(slug, self.text, f"site never names recipe {slug!r}")
 

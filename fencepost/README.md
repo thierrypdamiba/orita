@@ -109,6 +109,12 @@ about a second record that DOES exist but whose real state contradicts the
 claim — a GitHub release's own body says a pull request shipped in it
 (`ships`/`includes`/`merges`/`via #N`), but that PR was never actually
 merged, so the release's permanent public record is simply wrong.
+[`RECIPES/milestone-closed-issue-still-open/`](RECIPES/milestone-closed-issue-still-open/)
+is the tenth (ROADMAP.md #379): the first recipe watching a milestone
+against its own issues — a milestone reads closed, but one of the issues
+assigned to it never did. Closing a milestone is a pure label operation on
+GitHub; it never touches a single issue inside it, so this gap carries no
+auto-close trigger at all, not even a broken one.
 
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)
