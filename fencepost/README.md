@@ -115,6 +115,13 @@ against its own issues — a milestone reads closed, but one of the issues
 assigned to it never did. Closing a milestone is a pure label operation on
 GitHub; it never touches a single issue inside it, so this gap carries no
 auto-close trigger at all, not even a broken one.
+[`RECIPES/milestone-closed-pr-still-open/`](RECIPES/milestone-closed-pr-still-open/)
+is the eleventh (ROADMAP.md #380): the pull-request-side mirror of
+`milestone-closed-issue-still-open`, the same pairing shape
+`merged-pr-issue-still-open`/`issue-closed-pr-still-open` already
+established for issues vs pull requests — a milestone closes, but one of
+its own pull requests is still open, neither merged nor closed some other
+way. Reuses both scopes already declared elsewhere; no new scope needed.
 
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)

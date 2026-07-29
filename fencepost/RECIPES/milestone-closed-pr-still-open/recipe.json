@@ -1,0 +1,12 @@
+{
+  "slug": "milestone-closed-pr-still-open",
+  "title": "Milestone closed, one of its own pull requests never did",
+  "author": "off-by-one",
+  "description": "The PR-side mirror of milestone-closed-issue-still-open (task 379), the same pairing shape merged-pr-issue-still-open/issue-closed-pr-still-open already established for issues vs pull requests: compares a repository's own milestones against its own pull requests, not its issues. A milestone reads state=closed, but a pull request still assigned to it reads state=open (neither merged nor closed some other way). Closing a milestone on GitHub is a pure label operation -- it never touches the state of a single pull request inside it any more than it touches an issue's, so this carries no auto-close wiring at all, not even a broken one. The seam exists only by holding the milestone record and the pull request record at the same instant; neither alone shows it.",
+  "toolkit": "github",
+  "scopes": ["ListMilestones", "ListPullRequests"],
+  "fixture": "fixtures/milestone_closed_pr_still_open",
+  "detector_file": "detector.py",
+  "entrypoint": "run_recipe_scan",
+  "confidence_notes": "Age-gated on how long the milestone has been closed while one of its own pull requests sits open, not flat -- the identical bar milestone-closed-issue-still-open already set, deliberately kept in lockstep rather than drifting into a second number for what is the same underlying seam shape applied to a different record type. Under 24 hours since the milestone closed scores 0.5 (below the 0.70 bar, weighed in the tail not hidden -- whoever closed the milestone may not have swept its pull requests within a day). At or past 24 hours it scores a flat 0.85 -- an unambiguous, non-fuzzy signal: a milestone that reads closed while one of its own pull requests reads open. A pull request that is itself already closed (merged or not), carries no milestone at all, or is assigned to a milestone that is itself still open is excluded at confidence 0.0, named not hidden -- the identical discipline every recipe before this one holds. Whether the closed pull request was merged or simply closed unmerged makes no difference to exclusion: either way it is no longer open, so there is no gap left for this recipe to surface."
+}
