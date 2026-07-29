@@ -103,6 +103,12 @@ is the eighth (ROADMAP.md #377): unlike the two PR-based recipes above,
 this one watches a closing keyword on a commit pushed straight to the
 default branch — this town's own dominant commit shape — that never
 actually closed the issue it named.
+[`RECIPES/release-claims-unmerged-pr/`](RECIPES/release-claims-unmerged-pr/)
+is the ninth (ROADMAP.md #378): a third seam shape, a single record's claim
+about a second record that DOES exist but whose real state contradicts the
+claim — a GitHub release's own body says a pull request shipped in it
+(`ships`/`includes`/`merges`/`via #N`), but that PR was never actually
+merged, so the release's permanent public record is simply wrong.
 
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)
