@@ -522,7 +522,7 @@ def check_cron(cron_checks: list | None, now_iso: str) -> dict | None:
     return result
 
 
-def check_words(now_iso: str) -> dict:
+def check_words(now_iso: str, record: bool = True) -> dict:
     """Read the four places Thierry's words land (task 74's
     `word_watch.compute_word_state`) and fold through `word_delta`.
     Local filesystem only -- no network call, unlike `check_square`/
@@ -535,11 +535,26 @@ def check_words(now_iso: str) -> dict:
     state via `record_word_check` AFTER computing the delta, the identical
     fix `check_square` gets in the same task -- without it a real word
     landing would report "changed" every hour forever after, never settling
-    into a new baseline, since nothing else ever advanced the log either."""
+    into a new baseline, since nothing else ever advanced the log either.
+
+    Task 375: `record` defaults `True` here for the identical reason task
+    374 gave `check_scribe_growth` the same default -- a direct caller of
+    this function (a test, a hand-run one-off check) asks for exactly this
+    function's own documented behavior. `run_ritual_check()` below does NOT
+    default this on -- see its own docstring for why. Before this task,
+    `check_words` was the one sibling among `check_square`/`check_ci`/
+    `check_scribe_growth`/`check_arcade_apps` with no such door at all:
+    every bare call, including every dev-verification `ritual_check.py`
+    run and every one of `tests/test_ritual_check.py`'s own unpatched
+    `run_ritual_check()` calls, wrote a real, ~1.5KB line straight into
+    `HAND/word-check-log.jsonl` -- the same unconditional-record shape task
+    374 had already fixed for `check_scribe_growth` one task earlier, named
+    here in that task's own closing note and left for this hour."""
     mod = _word_watch()
     state = mod.compute_word_state(root=mod.ROOT)
     changed, reason = mod.word_delta(state, path=mod.LOG)
-    mod.record_word_check(state, now_iso, path=mod.LOG)
+    if record:
+        mod.record_word_check(state, now_iso, path=mod.LOG)
     return {"changed": changed, "reason": reason}
 
 
@@ -983,6 +998,7 @@ def run_ritual_check(
     toolkits_metrics_path: str | None = None,
     toolkits_consent_log_path: str | None = None,
     record_scribe_growth: bool = False,
+    record_words: bool = False,
 ) -> dict:
     """Task 374: `record_scribe_growth` defaults `False` -- a bare or
     library call to this function (a dev-verification run, a test, a
@@ -995,7 +1011,12 @@ def run_ritual_check(
     below -- the one real hourly CLI entrypoint this town's actual cadence
     runs -- passes `record_scribe_growth=True`, so real per-hour recording
     is unchanged for the real production cadence; every other caller is
-    safe by default."""
+    safe by default.
+
+    Task 375: `record_words` defaults `False` for the identical reason,
+    against the identical class of bug in `HAND/word-check-log.jsonl`
+    (named in task 374's own closing note and left unfixed there). Only
+    `main()` passes `record_words=True`."""
     if now is None:
         now = datetime.now(timezone.utc)
     now_iso = now.isoformat(timespec="seconds")
@@ -1009,7 +1030,7 @@ def run_ritual_check(
     arcade_apps = check_arcade_apps(arcade_apps_state, now_iso)
     scribe_growth = check_scribe_growth(now_iso, scribe_root=scribe_root, record=record_scribe_growth)
     ci = check_ci(ci_checks)
-    words = check_words(now_iso)
+    words = check_words(now_iso, record=record_words)
     cron = check_cron(cron_checks, now_iso)
     owed_posts = check_owed_posts()
     change_gate = check_change_gate(report)
@@ -1375,6 +1396,8 @@ def main(argv: list[str]) -> int:
         # Task 374: this is the one real hourly CLI entrypoint -- the only
         # caller that should durably record this hour's real scribe sizes.
         record_scribe_growth=True,
+        # Task 375: same reasoning, same one real caller, for words.
+        record_words=True,
     )
     if "--json" in argv:
         print(json.dumps(result, ensure_ascii=False, indent=2))

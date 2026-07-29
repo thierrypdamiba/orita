@@ -850,6 +850,119 @@ class WordFoldCase(unittest.TestCase):
         formatted = rc.format_ritual_check(rc.run_ritual_check())
         self.assertIn("words: changed -- ", formatted)
 
+    def test_run_ritual_check_default_does_not_record(self):
+        """Task 375: a bare/library rc.run_ritual_check() call (the shape
+        every dev-verification and every other test in this file already
+        makes) must not write to the word-check log by default -- mirrors
+        ScribeGrowthFoldCase.test_run_ritual_check_default_does_not_record
+        (task 374), the identical fix for the sibling that task's own
+        closing note named and left unfixed."""
+        rc.run_ritual_check()
+        self.assertFalse(os.path.exists(self.ww.LOG))
+
+    def test_run_ritual_check_records_only_when_asked(self):
+        rc.run_ritual_check(record_words=True)
+        with open(self.ww.LOG) as f:
+            lines = [line for line in f.read().splitlines() if line.strip()]
+        self.assertEqual(len(lines), 1)
+
+    def test_run_ritual_check_default_still_folds_words_even_unrecorded(self):
+        """Not recording must not mean not reading -- the returned dict
+        still carries this hour's real "changed" verdict either way."""
+        result = rc.run_ritual_check()
+        self.assertTrue(result["words"]["changed"])
+        self.assertFalse(os.path.exists(self.ww.LOG))
+
+
+class WordWriteDefaultCase(unittest.TestCase):
+    """Task 375: mirrors ScribeGrowthWriteDefaultCase (task 374) exactly.
+    The real pollution lived in the REAL, unmocked `word_watch` module --
+    every other test in this file (including WordFoldCase above) patches
+    `rc._word_watch` to a tmpdir-scoped copy, which never touched the real
+    repo's `HAND/word-check-log.jsonl` even before this fix. The actual
+    pollution came from the real CLI / a bare `rc.run_ritual_check()` call
+    with NOTHING patched, run against the real repo -- exactly what a god
+    does mid-task to sanity-check state (confirmed live this task: a bare,
+    unpatched `rc.check_words(...)` call against the real repo appended one
+    real line, 744 -> 745). These tests exercise the real, unpatched module
+    directly (still scoped to a tmpdir root/log via module attributes, but
+    NOT via a patched loader) to prove the write-by-default class of bug is
+    closed at its actual source."""
+
+    def setUp(self):
+        self.tmpdir = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.tmpdir, ignore_errors=True)
+        os.makedirs(os.path.join(self.tmpdir, "DECREES"))
+        with open(os.path.join(self.tmpdir, "DECREES", "001.md"), "w") as f:
+            f.write("a decree\n")
+        # scribe_growth_check.compute_scribe_sizes() raises FileNotFoundError
+        # on a missing tracked file -- main() folds it in on every call
+        # (test_cli_main_records_for_real below runs the real main()), so
+        # this tmpdir needs both tracked files to exist, mirroring
+        # ScribeGrowthWriteDefaultCase's own setUp exactly.
+        with open(os.path.join(self.tmpdir, "ROADMAP.md"), "w") as f:
+            f.write("x" * 10)
+        with open(os.path.join(self.tmpdir, "BUILDLOG.md"), "w") as f:
+            f.write("x" * 10)
+        # Real module, real ROOT/LOG constants -- redirected to a tmpdir so
+        # this test can prove "did it write" without ever touching the real
+        # production log, not because the module itself is mocked.
+        real_ww = _load("_test_real_word_watch", os.path.join(ROOT, "tools", "word_watch.py"))
+        real_ww.ROOT = self.tmpdir
+        real_ww.LOG = os.path.join(self.tmpdir, "word-check-log.jsonl")
+        original_word_loader = rc._word_watch
+        rc._word_watch = lambda: real_ww
+        self.addCleanup(setattr, rc, "_word_watch", original_word_loader)
+        self.log_path = real_ww.LOG
+        # test_cli_main_records_for_real below calls the real rc.main([]),
+        # which folds check_scribe_growth in on every call too -- redirect
+        # its LOG the same way, or proving the words fix in isolation would
+        # incidentally write a real line to the production
+        # HAND/scribe-growth-log.jsonl as an untested side effect (caught
+        # live while writing this test: it did, once, before this guard was
+        # added -- reverted, same discipline as every other stray line this
+        # task's own dev-verification runs left behind).
+        real_sgc = _load("_test_real_scribe_growth_check_for_words", os.path.join(ROOT, "tools", "scribe_growth_check.py"))
+        real_sgc.LOG = os.path.join(self.tmpdir, "scribe-growth-log.jsonl")
+        original_scribe_loader = rc._scribe_growth_check
+        rc._scribe_growth_check = lambda: real_sgc
+        self.addCleanup(setattr, rc, "_scribe_growth_check", original_scribe_loader)
+
+    def test_bare_call_against_the_real_module_does_not_write(self):
+        rc.run_ritual_check(scribe_root=self.tmpdir)
+        self.assertFalse(os.path.exists(self.log_path))
+
+    def test_cli_main_records_for_real(self):
+        """main() is the one real hourly entrypoint -- it must still
+        record, exactly once per invocation, unchanged from before this
+        fix. main() takes no words-root flag (words always watches the
+        real repo's own DECREES/HAND/ in production, which this test
+        redirects via the patched `_word_watch` loader above instead), so
+        this wraps run_ritual_check to both capture its kwargs (proving
+        main() explicitly asks for recording) and redirect scribe_root to
+        this test's tmpdir -- the same discipline
+        ScribeGrowthWriteDefaultCase.test_cli_main_records_for_real already
+        holds, needed here too since main() folds both checks every call
+        and this test must not touch the real repo's own
+        HAND/scribe-growth-log.jsonl as a side effect of proving the words
+        fix."""
+        captured = {}
+        original = rc.run_ritual_check
+
+        def capturing(*args, **kwargs):
+            captured.update(kwargs)
+            return original(*args, **{**kwargs, "scribe_root": self.tmpdir})
+
+        rc.run_ritual_check = capturing
+        try:
+            rc.main([])
+        finally:
+            rc.run_ritual_check = original
+        self.assertTrue(captured.get("record_words") is True)
+        with open(self.log_path) as f:
+            lines = [line for line in f.read().splitlines() if line.strip()]
+        self.assertEqual(len(lines), 1)
+
 
 class OwedPostsFoldCase(unittest.TestCase):
     """Task 85: run_ritual_check() folds x_post_queue.py's durable owed-post

@@ -181,16 +181,17 @@ class PrintedTargetSymmetryCase(unittest.TestCase):
         line to both on every call -- and asserting the real files come
         back byte-identical.
 
-        Task 374: `check_words`/`word_watch` still records unconditionally
-        on every call (unchanged, out of this task's scope, named as a
-        real sibling gap for a future hour) so `safe_word_watch.LOG` is
-        still expected to exist after a bare call. `check_scribe_growth`
-        no longer does -- `run_ritual_check()`'s new `record_scribe_growth`
-        parameter defaults `False` specifically so a bare/library call like
-        this one writes to NEITHER the real log NOR a redirected one,
-        closing the actual pollution class one layer earlier than this
-        test originally could reach: not just "never touch the real file"
-        but "don't write at all unless a caller says so." """
+        Task 375: `check_words`/`word_watch` no longer records
+        unconditionally either -- the sibling gap task 374's own closing
+        note named and left unfixed is closed here, the identical shape:
+        `run_ritual_check()`'s new `record_words` parameter also defaults
+        `False`, so `safe_word_watch.LOG` is now expected to NOT exist
+        after a bare call, same as `safe_scribe_growth.LOG` already reads
+        below. Both checks now write to NEITHER the real log NOR a
+        redirected one on a bare/library call, closing the actual
+        pollution class one layer earlier than this test originally could
+        reach: not just "never touch the real file" but "don't write at
+        all unless a caller says so." """
         real_word_log = os.path.join(ROOT, "HAND", "word-check-log.jsonl")
         real_scribe_log = os.path.join(ROOT, "HAND", "scribe-growth-log.jsonl")
         before = {}
@@ -217,7 +218,10 @@ class PrintedTargetSymmetryCase(unittest.TestCase):
         for p, contents in before.items():
             with open(p, "rb") as f:
                 self.assertEqual(f.read(), contents, f"{p} was written to by a test run")
-        self.assertTrue(os.path.exists(safe_word_watch.LOG))
+        # Task 375: a bare run_ritual_check() call no longer records words
+        # anywhere, real or redirected -- record_words defaults False, the
+        # identical guarantee task 374 already gave scribe growth below.
+        self.assertFalse(os.path.exists(safe_word_watch.LOG))
         # Task 374: a bare run_ritual_check() call no longer records scribe
         # growth anywhere, real or redirected -- record_scribe_growth
         # defaults False.
@@ -245,6 +249,30 @@ class PrintedTargetSymmetryCase(unittest.TestCase):
         rc.run_ritual_check(scribe_root=tmp, record_scribe_growth=True)
 
         self.assertTrue(os.path.exists(safe_scribe_growth.LOG))
+
+    def test_run_ritual_check_records_words_only_when_asked(self):
+        """Task 375's own new door, pinned here too, mirroring
+        test_run_ritual_check_records_scribe_growth_only_when_asked
+        exactly: passing record_words=True writes to the redirected
+        (never real) log, proving the capability survives alongside the
+        safe default above."""
+        import shutil
+        import tempfile
+
+        rc = _load("_t375_ritual_record_when_asked", "tools/ritual_check.py")
+        tmp = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, tmp, ignore_errors=True)
+        os.makedirs(os.path.join(tmp, "DECREES"))
+        with open(os.path.join(tmp, "DECREES", "001.md"), "w") as f:
+            f.write("a decree\n")
+        safe_word_watch = _load("_t375_safe_word_watch", "tools/word_watch.py")
+        safe_word_watch.ROOT = tmp
+        safe_word_watch.LOG = os.path.join(tmp, "word-check-log.jsonl")
+        rc._word_watch = lambda: safe_word_watch
+
+        rc.run_ritual_check(record_words=True)
+
+        self.assertTrue(os.path.exists(safe_word_watch.LOG))
 
 
 if __name__ == "__main__":
