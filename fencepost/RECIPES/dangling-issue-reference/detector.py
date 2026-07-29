@@ -29,16 +29,22 @@ the crying-wolf failure Ogun's law calls fatal). A reference of the form
 GitHub's own cross-repo shorthand -- and is never even extracted as a
 candidate here; that is a seam for a recipe watching that other repo, not
 a gap in this one.
+
+The extraction regex and cross-repo exclusion this recipe first wrote now
+live in `seam_engine.references` (task 389), not here -- this module
+imports `referenced_numbers` rather than defining its own copy, so
+`mention-dangling-reference/detector.py`'s identical need (task 388) reads
+the same law instead of a second, independently-typed regex.
 """
 from __future__ import annotations
 
 import json
-import re
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from seam_engine.references import referenced_numbers as _referenced_numbers
 from seam_engine.scan import GapCandidate
 
 _HERE = Path(__file__).resolve().parent
@@ -46,14 +52,17 @@ DEFAULT_COMMITS_FIXTURE = _HERE.parents[1] / "fixtures" / "dangling_issue_refere
 DEFAULT_ISSUES_FIXTURE = _HERE.parents[1] / "fixtures" / "dangling_issue_reference" / "issues.json"
 DEFAULT_PULLS_FIXTURE = _HERE.parents[1] / "fixtures" / "dangling_issue_reference" / "pulls.json"
 
-# A bare `#N`, not preceded by a word character or a slash -- the negative
-# lookbehind is what keeps `owner/repo#42` (a real, valid cross-repo
-# reference) and `repo#42` from ever being extracted at all: the character
-# immediately before their `#` is a letter, caught by `\w`, or the `/`
-# itself. A bare `#42` at the very start of a message, or after whitespace
-# or punctuation, still matches -- there is nothing word-shaped in front of
-# it to exclude.
-_REF_RE = re.compile(r"(?<![\w/])#(\d+)\b")
+# `_referenced_numbers` is bound above, not redefined here --
+# `seam_engine.references` (task 389) is the one real law describing what
+# counts as a same-repo `#N` reference now. This was this recipe's OWN
+# regex first (task 368); `mention-dangling-reference/detector.py` (task
+# 388) copied it a second time with a claim of "not a second copy... drift
+# apart" that the code did not actually back up. Task 389 made the claim
+# true: both recipes import the identical function from here, so a future
+# tightening of the grammar can no longer land in one detector and not the
+# other by accident. The regex itself (`seam_engine.references.REF_RE`) no
+# longer needs a module-level alias here -- nothing in this file calls it
+# directly anymore, only through `_referenced_numbers`.
 
 # Confidence for an unmatched reference. Flat, not age-gated like this
 # engine's other two-list detectors (merged-pr-issue-still-open,
@@ -121,10 +130,6 @@ def load_issues(path: Path | None = None) -> list[Issue]:
 def load_pulls(path: Path | None = None) -> list[PullRequest]:
     rows = _load_rows(path or DEFAULT_PULLS_FIXTURE)
     return [PullRequest(number=r["number"], title=r["title"], state=r["state"], url=r["url"]) for r in rows]
-
-
-def _referenced_numbers(message: str) -> list[int]:
-    return [int(n) for n in _REF_RE.findall(message)]
 
 
 def compute_gaps(

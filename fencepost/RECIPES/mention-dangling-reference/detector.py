@@ -29,24 +29,31 @@ and `ListPullRequests` would actually return. All three scopes already sit
 on SCOPES.md's cleared oath table -- this recipe asks Arcade for nothing
 new.
 
-The extraction regex and the cross-repo `owner/repo#N` exclusion are reused
-verbatim from `dangling-issue-reference/detector.py` -- one law describing
-what counts as a same-repo `#N` reference, not a second copy of it drifting
-apart the next time someone tightens the pattern. GitHub shares one number
-sequence between issues and pull requests, so a reference is checked
-against BOTH lists, exactly as the commit-sourced twin does -- checking
-only one would misfire on a perfectly good reference to a merged PR, the
-exact crying-wolf failure Ogun's law calls fatal.
+The extraction regex and the cross-repo `owner/repo#N` exclusion are the
+same law `dangling-issue-reference/detector.py` already proved for commit
+messages -- what counts as a same-repo `#N` reference. This module shipped
+(task 388) with that law RETYPED a second time as its own local `_REF_RE`,
+under a docstring claim of "not a second copy of it drifting apart" that
+the code did not actually honor: two textually-identical, independently
+defined regexes are not one law. Task 389 fixed that for real: both this
+module and `dangling-issue-reference/detector.py` now import
+`referenced_numbers` from `seam_engine.references`, the one place the
+grammar lives, so a future tightening of the pattern lands in both
+detectors at once or not at all. GitHub shares one number sequence between
+issues and pull requests, so a reference is checked against BOTH lists,
+exactly as the commit-sourced twin does -- checking only one would
+misfire on a perfectly good reference to a merged PR, the exact
+crying-wolf failure Ogun's law calls fatal.
 """
 from __future__ import annotations
 
 import json
-import re
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from seam_engine.references import referenced_numbers as _referenced_numbers
 from seam_engine.scan import GapCandidate
 
 _HERE = Path(__file__).resolve().parent
@@ -54,15 +61,13 @@ DEFAULT_MENTIONS_FIXTURE = _HERE.parents[1] / "fixtures" / "mention_dangling_ref
 DEFAULT_ISSUES_FIXTURE = _HERE.parents[1] / "fixtures" / "mention_dangling_reference" / "issues.json"
 DEFAULT_PULLS_FIXTURE = _HERE.parents[1] / "fixtures" / "mention_dangling_reference" / "pulls.json"
 
-# Identical to `dangling-issue-reference/detector.py`'s own `_REF_RE` --
-# a bare `#N`, not preceded by a word character or a slash. The negative
-# lookbehind is what keeps `owner/repo#42` (a real, valid cross-repo
-# reference) and `repo#42` from ever being extracted at all: the character
-# immediately before their `#` is a letter, caught by `\w`, or the `/`
-# itself. A bare `#42` at the very start of a message, or after whitespace
-# or punctuation, still matches -- there is nothing word-shaped in front of
-# it to exclude.
-_REF_RE = re.compile(r"(?<![\w/])#(\d+)\b")
+# `_referenced_numbers` is bound above, not redefined here -- task 389 made
+# this docstring's own "reused verbatim... not a second copy of it
+# drifting apart" claim true. It was false the hour this recipe shipped
+# (task 388): the code below retyped `_REF_RE` a second time with no
+# import connecting it to `dangling-issue-reference/detector.py`'s
+# original. Both recipes now import the identical function from
+# `seam_engine.references`, the one real place this grammar lives.
 
 # Flat, not age-gated -- the same reasoning `dangling-issue-reference`
 # already gives for its own flat score: a miss against BOTH the live issue
@@ -140,10 +145,6 @@ def load_issues(path: Path | None = None) -> list[Issue]:
 def load_pulls(path: Path | None = None) -> list[PullRequest]:
     rows = _load_rows(path or DEFAULT_PULLS_FIXTURE)
     return [PullRequest(number=r["number"], title=r["title"], state=r["state"], url=r["url"]) for r in rows]
-
-
-def _referenced_numbers(text: str) -> list[int]:
-    return [int(n) for n in _REF_RE.findall(text)]
 
 
 def compute_gaps(
