@@ -523,7 +523,17 @@ class ScribeGrowthFoldCase(unittest.TestCase):
     real ROADMAP.md/BUILDLOG.md byte sizes in -- unlike square/arcade_apps,
     this makes its OWN filesystem read (no caller-supplied live-API state
     needed) so it runs unconditionally on every call, including a bare
-    rc.run_ritual_check() with no arguments."""
+    rc.run_ritual_check() with no arguments.
+
+    Task 374: reading (folding sizes into the result dict) and recording
+    (durably writing this hour's sizes to the log) are two different
+    things. Every test below scopes `self.sgc.LOG` to a tmpdir, so none of
+    them ever risk the real `HAND/scribe-growth-log.jsonl` -- the
+    write-by-default bug this class's own new tests below prove fixed was
+    only ever reachable through the real, unmocked module (a bare hand-run
+    `python3 tools/ritual_check.py`, or `rc.run_ritual_check()` called
+    directly against the real repo with no loader patched in), which is
+    exactly what `WriteDefaultFoldCase` below reproduces and proves fixed."""
 
     def setUp(self):
         self.tmpdir = tempfile.mkdtemp()
@@ -579,6 +589,86 @@ class ScribeGrowthFoldCase(unittest.TestCase):
         formatted = rc.format_ritual_check(rc.run_ritual_check(scribe_root=self.tmpdir))
         self.assertIn("scribe growth: clean", formatted)
         self.assertIn("ROADMAP.md", formatted)
+
+    def test_run_ritual_check_default_does_not_record(self):
+        """Task 374: a bare/library rc.run_ritual_check() call (the shape
+        every dev-verification and every other test in this file already
+        makes) must not write to the scribe-growth log by default."""
+        rc.run_ritual_check(scribe_root=self.tmpdir)
+        self.assertFalse(os.path.exists(self.sgc.LOG))
+
+    def test_run_ritual_check_records_only_when_asked(self):
+        rc.run_ritual_check(scribe_root=self.tmpdir, record_scribe_growth=True)
+        with open(self.sgc.LOG) as f:
+            lines = [line for line in f.read().splitlines() if line.strip()]
+        self.assertEqual(len(lines), 1)
+
+    def test_run_ritual_check_default_still_folds_sizes_even_unrecorded(self):
+        """Not recording must not mean not reading -- the returned dict
+        still carries this hour's real sizes either way."""
+        result = rc.run_ritual_check(scribe_root=self.tmpdir)
+        self.assertEqual(result["scribe_growth"]["sizes"], {"ROADMAP.md": 100, "BUILDLOG.md": 50})
+        self.assertFalse(os.path.exists(self.sgc.LOG))
+
+
+class ScribeGrowthWriteDefaultCase(unittest.TestCase):
+    """Task 374: the real bug lived in the REAL, unmocked module -- every
+    other test in this file (including ScribeGrowthFoldCase above) patches
+    `rc._scribe_growth_check` to a tmpdir-scoped copy, which never touched
+    the real repo's `HAND/scribe-growth-log.jsonl` even before this fix.
+    The actual pollution came from the real CLI / a bare `rc.run_ritual_check()`
+    call with NOTHING patched, run against the real repo -- exactly what a
+    god does mid-task to sanity-check state. These tests exercise the real,
+    unpatched module directly (still scoped to a tmpdir root via
+    `scribe_root`, but NOT via a patched loader) to prove the write-by-default
+    class of bug is closed at its actual source."""
+
+    def setUp(self):
+        self.tmpdir = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.tmpdir, ignore_errors=True)
+        with open(os.path.join(self.tmpdir, "ROADMAP.md"), "w") as f:
+            f.write("x" * 10)
+        with open(os.path.join(self.tmpdir, "BUILDLOG.md"), "w") as f:
+            f.write("x" * 10)
+        # Real module, real LOG constant -- redirected to a tmp file so this
+        # test can prove "did it write" without ever touching the real
+        # production log, not because the module itself is mocked.
+        real_sgc = _load("_test_real_scribe_growth_check", os.path.join(ROOT, "tools", "scribe_growth_check.py"))
+        real_sgc.LOG = os.path.join(self.tmpdir, "scribe-growth-log.jsonl")
+        original_loader = rc._scribe_growth_check
+        rc._scribe_growth_check = lambda: real_sgc
+        self.addCleanup(setattr, rc, "_scribe_growth_check", original_loader)
+        self.log_path = real_sgc.LOG
+
+    def test_bare_call_against_the_real_module_does_not_write(self):
+        rc.run_ritual_check(scribe_root=self.tmpdir)
+        self.assertFalse(os.path.exists(self.log_path))
+
+    def test_cli_main_records_for_real(self):
+        """main() is the one real hourly entrypoint -- it must still
+        record, exactly once per invocation, unchanged from before this
+        fix. main() doesn't take a scribe_root flag (scribe growth always
+        watches the real repo's own ROADMAP.md/BUILDLOG.md in production),
+        so this wraps run_ritual_check to both capture its kwargs (proving
+        main() explicitly asks for recording) and redirect scribe_root to
+        this test's tmpdir (proving the write actually lands, without ever
+        touching the real repo's own tracked files)."""
+        captured = {}
+        original = rc.run_ritual_check
+
+        def capturing(*args, **kwargs):
+            captured.update(kwargs)
+            return original(*args, **{**kwargs, "scribe_root": self.tmpdir})
+
+        rc.run_ritual_check = capturing
+        try:
+            rc.main([])
+        finally:
+            rc.run_ritual_check = original
+        self.assertTrue(captured.get("record_scribe_growth") is True)
+        with open(self.log_path) as f:
+            lines = [line for line in f.read().splitlines() if line.strip()]
+        self.assertEqual(len(lines), 1)
 
 
 class CIFoldCase(unittest.TestCase):

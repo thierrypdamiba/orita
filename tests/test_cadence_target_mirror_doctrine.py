@@ -179,7 +179,18 @@ class PrintedTargetSymmetryCase(unittest.TestCase):
         HAND/scribe-growth-log.jsonl mid-run) by calling this file's own
         `rc.run_ritual_check()` -- unguarded, pre-fix, this appends a real
         line to both on every call -- and asserting the real files come
-        back byte-identical."""
+        back byte-identical.
+
+        Task 374: `check_words`/`word_watch` still records unconditionally
+        on every call (unchanged, out of this task's scope, named as a
+        real sibling gap for a future hour) so `safe_word_watch.LOG` is
+        still expected to exist after a bare call. `check_scribe_growth`
+        no longer does -- `run_ritual_check()`'s new `record_scribe_growth`
+        parameter defaults `False` specifically so a bare/library call like
+        this one writes to NEITHER the real log NOR a redirected one,
+        closing the actual pollution class one layer earlier than this
+        test originally could reach: not just "never touch the real file"
+        but "don't write at all unless a caller says so." """
         real_word_log = os.path.join(ROOT, "HAND", "word-check-log.jsonl")
         real_scribe_log = os.path.join(ROOT, "HAND", "scribe-growth-log.jsonl")
         before = {}
@@ -207,6 +218,32 @@ class PrintedTargetSymmetryCase(unittest.TestCase):
             with open(p, "rb") as f:
                 self.assertEqual(f.read(), contents, f"{p} was written to by a test run")
         self.assertTrue(os.path.exists(safe_word_watch.LOG))
+        # Task 374: a bare run_ritual_check() call no longer records scribe
+        # growth anywhere, real or redirected -- record_scribe_growth
+        # defaults False.
+        self.assertFalse(os.path.exists(safe_scribe_growth.LOG))
+
+    def test_run_ritual_check_records_scribe_growth_only_when_asked(self):
+        """Task 374's own new door, pinned here too: passing
+        record_scribe_growth=True writes to the redirected (never real)
+        log, proving the capability survives alongside the safe default
+        above."""
+        import shutil
+        import tempfile
+
+        rc = _load("_t374_ritual_record_when_asked", "tools/ritual_check.py")
+        tmp = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, tmp, ignore_errors=True)
+        with open(os.path.join(tmp, "ROADMAP.md"), "w") as f:
+            f.write("x" * 10)
+        with open(os.path.join(tmp, "BUILDLOG.md"), "w") as f:
+            f.write("x" * 10)
+        safe_scribe_growth = _load("_t374_safe_scribe_growth", "tools/scribe_growth_check.py")
+        safe_scribe_growth.LOG = os.path.join(tmp, "scribe-growth-log.jsonl")
+        rc._scribe_growth_check = lambda: safe_scribe_growth
+
+        rc.run_ritual_check(scribe_root=tmp, record_scribe_growth=True)
+
         self.assertTrue(os.path.exists(safe_scribe_growth.LOG))
 
 

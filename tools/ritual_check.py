@@ -455,7 +455,7 @@ def check_arcade_apps(arcade_apps_state: dict | None, now_iso: str) -> dict | No
     return {"changed": changed, "reason": reason}
 
 
-def check_scribe_growth(now_iso: str, scribe_root: str | None = None) -> dict:
+def check_scribe_growth(now_iso: str, scribe_root: str | None = None, record: bool = True) -> dict:
     """Task 168: ROADMAP.md/BUILDLOG.md's real byte size, watched. Unlike
     `check_square`/`check_arcade_apps`, a tracked file's size is local
     filesystem state, not a live API call behind this sandbox's proxy
@@ -466,11 +466,17 @@ def check_scribe_growth(now_iso: str, scribe_root: str | None = None) -> dict:
     `check_square`), so growth is never compared against itself.
     Informational only: crossing `WARN_BYTES` is not a rule violation, the
     same class `square`/`arcade_apps` already hold -- this never flips
-    `broken`."""
+    `broken`.
+
+    Task 374: `record` defaults `True` here because direct callers of this
+    function (tests, a hand-run one-off check) ask for exactly this
+    function's own documented behavior. `run_ritual_check()` below does NOT
+    default this on -- see its own docstring for why."""
     mod = _scribe_growth_check()
     sizes = mod.compute_scribe_sizes(root=scribe_root or ROOT)
     result = mod.check_scribe_growth(sizes, threshold_bytes=mod.WARN_BYTES, path=mod.LOG)
-    mod.record_scribe_check(sizes, now_iso, path=mod.LOG)
+    if record:
+        mod.record_scribe_check(sizes, now_iso, path=mod.LOG)
     return result
 
 
@@ -976,7 +982,20 @@ def run_ritual_check(
     app_log_path: str | None = None,
     toolkits_metrics_path: str | None = None,
     toolkits_consent_log_path: str | None = None,
+    record_scribe_growth: bool = False,
 ) -> dict:
+    """Task 374: `record_scribe_growth` defaults `False` -- a bare or
+    library call to this function (a dev-verification run, a test, a
+    notebook exploration) must never silently write a real entry to the
+    production `HAND/scribe-growth-log.jsonl`, which is exactly the bug
+    that put 30 duplicate-timestamp groups (one repeated 328 times) into
+    that file's committed history: every call here used to record
+    unconditionally, including `tests/test_ritual_check.py`'s own bare
+    `rc.run_ritual_check()` calls against the real repo. Only `main()`
+    below -- the one real hourly CLI entrypoint this town's actual cadence
+    runs -- passes `record_scribe_growth=True`, so real per-hour recording
+    is unchanged for the real production cadence; every other caller is
+    safe by default."""
     if now is None:
         now = datetime.now(timezone.utc)
     now_iso = now.isoformat(timespec="seconds")
@@ -988,7 +1007,7 @@ def run_ritual_check(
     escalation = check_x_escalation(now_iso)
     square = check_square(square_state, now_iso)
     arcade_apps = check_arcade_apps(arcade_apps_state, now_iso)
-    scribe_growth = check_scribe_growth(now_iso, scribe_root=scribe_root)
+    scribe_growth = check_scribe_growth(now_iso, scribe_root=scribe_root, record=record_scribe_growth)
     ci = check_ci(ci_checks)
     words = check_words(now_iso)
     cron = check_cron(cron_checks, now_iso)
@@ -1353,6 +1372,9 @@ def main(argv: list[str]) -> int:
         cron_checks=cron_checks,
         child_files=child_files,
         voice_window_commits=voice_window_commits,
+        # Task 374: this is the one real hourly CLI entrypoint -- the only
+        # caller that should durably record this hour's real scribe sizes.
+        record_scribe_growth=True,
     )
     if "--json" in argv:
         print(json.dumps(result, ensure_ascii=False, indent=2))
