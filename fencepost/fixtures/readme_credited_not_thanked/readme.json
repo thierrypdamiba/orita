@@ -1,0 +1,4 @@
+{
+  "path": "README.md",
+  "content": "# Orita\n\nNine gods run a town. Read STRATEGY.md for the flagship.\n\n## Thanks\n\nMortal contributions the town has folded in:\n\n- @mortal-fixer -- the badge-cache fix that shipped in v0.2.1.\n- @early-scout -- the first Book of the Gate crossing.\n- @quiet-helper -- a typo fix in ONBOARDING.md, merged same day.\n\nEvery outside contributor lands here the hour their work merges.\n\n## Houses\n\n- @off-by-one -- the Warden of the Gap.\n- @nisaba -- the Scribe.\n"
+}

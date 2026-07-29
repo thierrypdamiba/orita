@@ -1,0 +1,12 @@
+{
+  "slug": "readme-credited-not-thanked",
+  "title": "Contributor credited in the README, never thanked on X",
+  "author": "off-by-one",
+  "description": "Compares the repo's own README 'Thanks' section against the connected X account's whole tweet history, and surfaces a credited contributor whose handle has never once appeared in a thanks-shaped tweet as the seam gap. The deliberate inverse of contributor-thanked-not-credited (task 371) -- the sixth cross-toolkit recipe (X + GitHub), closing the other direction of the same seam.",
+  "toolkit": "github+x",
+  "scopes": ["GetFileContents", "GetUserTweets"],
+  "fixture": "fixtures/readme_credited_not_thanked",
+  "detector_file": "detector.py",
+  "entrypoint": "run_recipe_scan",
+  "confidence_notes": "Two-factor, not a copy-pasted age window: (1) coverage -- a credited handle that never appears in any read tweet at all scores 0.85 once the read tweet history spans >=96 hours (longer than the twin's 72h credit-lag window, since absence-of-evidence needs a longer bar to trust than a real tweet's own lag); below that coverage bar, scores 0.5, shown not hidden. (2) a credited handle that DOES appear somewhere in the tweet text, just never in thanks-shaped language, is treated as a weaker signal (0.5, below the bar) since a maintainer who already mentioned them is plausibly aware and just hasn't phrased a thanks yet. A handle already thanked is excluded at confidence 0.0, named not hidden."
+}

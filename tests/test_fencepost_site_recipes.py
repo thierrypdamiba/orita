@@ -34,6 +34,7 @@ class TestFencepostSiteRecipes(unittest.TestCase):
             "merged-pr-never-released",
             "release-claims-unfixed-issue",
             "milestone-closed-never-released",
+            "readme-credited-not-thanked",
         ):
             self.assertIn(slug, self.text, f"site never names recipe {slug!r}")
 

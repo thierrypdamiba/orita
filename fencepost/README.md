@@ -143,6 +143,14 @@ never appears inside any release's own `milestone #N` claim phrase.
 Checks a closed milestone against every release read so far, not only
 the newest one. Reuses both scopes already declared elsewhere; no new
 scope needed.
+[`RECIPES/readme-credited-not-thanked/`](RECIPES/readme-credited-not-thanked/)
+is the fifteenth (ROADMAP.md #384): the deliberate inverse of
+`contributor-thanked-not-credited` — a contributor already credited in
+the README's own Thanks section whose handle has never once been thanked
+in a tweet from the connected X account. Gated on two different signals
+than its twin (read-history coverage, and mere-mention vs total silence)
+rather than a copy-pasted age window. Reuses both scopes already
+declared elsewhere; no new scope needed.
 
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)
