@@ -1,0 +1,18 @@
+[
+  {
+    "id": "rel-v0.9.4",
+    "title": "v0.9.4",
+    "tag": "v0.9.4",
+    "body": "This release ships #1003, the changelog rewrite. No other pull requests are named.",
+    "published_at": "2026-07-23T10:00:00Z",
+    "url": "https://github.com/example/example-repo/releases/tag/v0.9.4"
+  },
+  {
+    "id": "rel-v0.9.5",
+    "title": "v0.9.5",
+    "tag": "v0.9.5",
+    "body": "A quiet patch release. Includes #1010, an unrelated pull request not tracked by this fixture.",
+    "published_at": "2026-07-27T10:00:00Z",
+    "url": "https://github.com/example/example-repo/releases/tag/v0.9.5"
+  }
+]

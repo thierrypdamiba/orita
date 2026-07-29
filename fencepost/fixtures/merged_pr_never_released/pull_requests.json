@@ -1,0 +1,42 @@
+[
+  {
+    "number": 1001,
+    "title": "Add the seam ranking margin doc",
+    "state": "closed",
+    "merged": true,
+    "merged_at": "2026-07-22T09:00:00Z",
+    "url": "https://github.com/example/example-repo/pull/1001"
+  },
+  {
+    "number": 1002,
+    "title": "Fix a flaky fixture timestamp",
+    "state": "closed",
+    "merged": true,
+    "merged_at": "2026-07-25T18:00:00Z",
+    "url": "https://github.com/example/example-repo/pull/1002"
+  },
+  {
+    "number": 1003,
+    "title": "Ship the v0.9.4 changelog rewrite",
+    "state": "closed",
+    "merged": true,
+    "merged_at": "2026-07-21T12:00:00Z",
+    "url": "https://github.com/example/example-repo/pull/1003"
+  },
+  {
+    "number": 1004,
+    "title": "WIP: draft the next recipe",
+    "state": "open",
+    "merged": false,
+    "merged_at": null,
+    "url": "https://github.com/example/example-repo/pull/1004"
+  },
+  {
+    "number": 1005,
+    "title": "Abandoned refactor, closed without merging",
+    "state": "closed",
+    "merged": false,
+    "merged_at": null,
+    "url": "https://github.com/example/example-repo/pull/1005"
+  }
+]

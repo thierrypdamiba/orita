@@ -1,0 +1,12 @@
+{
+  "slug": "merged-pr-never-released",
+  "title": "A pull request merged long ago, but no release has ever claimed it",
+  "author": "off-by-one",
+  "description": "The inverse of release-claims-unmerged-pr (task 378): that recipe watches a release's own body making a FALSE claim about a PR that exists but never merged; this one watches the opposite direction -- a PR that genuinely merged, sitting stale, that no release published SINCE has ever claimed via the same ships/includes/merges/via #N phrasing. Reads across every release read so far (repeated GetLatestRelease reads over time, the same 'recent-releases history' convention release-claims-unmerged-pr already established for its own fixture), not just the newest one -- a PR can go uncredited across several releases in a row, not only the latest.",
+  "toolkit": "github",
+  "scopes": ["GetLatestRelease", "ListPullRequests"],
+  "fixture": "fixtures/merged_pr_never_released",
+  "detector_file": "detector.py",
+  "entrypoint": "run_recipe_scan",
+  "confidence_notes": "Age-gated by hours since the pull request's own merged_at, not the newest release's publish time -- this seam is about a PR sitting stale with no release ever having picked it up, so the clock has to start at the merge, not at any one release. The bar is 96 hours (four days), longer than release-claims-unmerged-pr's 24h same-body check (verifying a single already-published claim against reality is fast) and longer than contributor-thanked-not-credited's 72h README-edit window too -- this recipe is waiting on the project's own release cadence to catch up, which is real, but genuinely slower than either. Under 96h scores 0.5 (below the 0.70 bar, weighed in the tail not hidden -- a release naming it may simply not have shipped yet). At or past 96h scores a flat 0.85 -- an unambiguous signal once every release read so far has had its chance and none named it. A pull request that never merged at all (still open, or closed without merging) is excluded at confidence 0.0, named not hidden -- there is nothing for a release to have missed yet. A merged pull request that IS named by at least one release's own claim phrase is excluded at confidence 0.0 too -- the claim was kept, no gap here."
+}

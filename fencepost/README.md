@@ -122,6 +122,13 @@ is the eleventh (ROADMAP.md #380): the pull-request-side mirror of
 established for issues vs pull requests — a milestone closes, but one of
 its own pull requests is still open, neither merged nor closed some other
 way. Reuses both scopes already declared elsewhere; no new scope needed.
+[`RECIPES/merged-pr-never-released/`](RECIPES/merged-pr-never-released/)
+is the twelfth (ROADMAP.md #381): the inverse of `release-claims-unmerged-pr`
+— that recipe watches a release's own body making a FALSE claim about a PR
+that never merged; this one watches a PR that genuinely merged, sitting
+stale, that no release published since has ever claimed at all. Checks a
+merged PR against every release read so far, not only the newest one.
+Reuses both scopes already declared elsewhere; no new scope needed.
 
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)
