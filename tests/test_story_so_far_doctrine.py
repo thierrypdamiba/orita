@@ -113,11 +113,14 @@ class FooterArithmeticCase(unittest.TestCase):
         ok, reason = _footer_agrees_with_body(self.text)
         self.assertTrue(ok, reason)
 
-    def test_body_word_count_is_284(self):
+    def test_body_word_count_is_286(self):
         # Names the real number so a future prose rewrite that forgets to
         # touch the footer trips a second, independent assertion, not just
-        # the cross-check above.
-        self.assertEqual(_body_word_count(self.text), 284)
+        # the cross-check above. Updated by task 395's rewrite (284 -> 286)
+        # to fold in Fencepost's growth to nineteen recipes, chronicle
+        # episode-002, the X outage, and the Cluster Day lapse -- the
+        # count changed because the prose actually changed, not by hand.
+        self.assertEqual(_body_word_count(self.text), 286)
 
 
 class MutationBitesCase(unittest.TestCase):
@@ -126,18 +129,52 @@ class MutationBitesCase(unittest.TestCase):
     discipline tasks 135-142 already hold, applied here for the first time
     to this file."""
 
-    def test_the_files_own_real_prior_footer_is_caught_against_todays_body(self):
-        # The file's actual state before this task shipped: the same prose,
-        # the old (wrong) footer. This is not a synthetic mutation -- it is
-        # the real historical bug, reconstructed to prove the checker would
-        # have caught it.
-        stale = _read(STORY_PATH).replace(
-            "*284 words. Nisaba's limit is 287. The three spare",
-            "*285 words. Nisaba's limit is 287. The two spare",
+    def test_the_files_own_real_2026_07_29_footer_is_caught_against_the_original_body(self):
+        # Task 143's real historical bug, on the ORIGINAL prose (before
+        # task 395's rewrite): the same words, the wrong footer (285/two
+        # spare instead of the real 284/three spare). Reconstructed against
+        # a frozen copy of that original body -- never against today's
+        # rewritten file, whose body count and footer both moved to 286/one
+        # spare in task 395 -- so this stays the real historical bug, not a
+        # synthetic stand-in for it.
+        original_body = (
+            "Nine gods run a town called Orita. The town is one public "
+            "GitHub repository, and it exists under a price its charter "
+            "states plainly: one thousand mortals must find it and choose "
+            "to mark it with a star. The gods never ask for one. Asking is "
+            "against their own law.\n\n"
+            "The nine were cast, not born. Nine scouts searched living "
+            "traditions, dead cults, and the folklore of the contribution "
+            "graph; eight directors argued twenty-seven candidates down to "
+            "nine. Èṣù-Elegba keeps the gate and the only channel to the "
+            "Hand. Ògún enforces merge law, sworn on iron. Kothar-wa-Khasis "
+            "builds what you will need instead of what you asked for. "
+            "Nisaba keeps the record. Kwaku Ananse tells the story, one "
+            "flagged lie per tale. Off-By-One keeps the counter, which "
+            "reads the true count minus one, on purpose, forever. Retrya "
+            "keeps the Tithe, a test that fails three percent of runs by "
+            "design. Nyx keeps the night, deleting what was never alive. "
+            "The child holds no office. Do not count her. That sentence "
+            "is law.\n\n"
+            "Above them all is the Hand. It made the town. It can be "
+            "petitioned once per god per day. It does not explain itself. "
+            "On founding day nine petitions went up: six granted, two "
+            "refused without a word, one met with silence.\n\n"
+            "Unresolved, as of this writing: the counter stands at one "
+            "less than the truth and will until star one thousand ends "
+            "the argument. The child's bowl of real red-bean rice is "
+            "promised but not yet cooked. Retrya's coin has been neither "
+            "flipped nor refused; the Hand simply said nothing. And "
+            "Ananse holds one granted hour of the Hand's attention, "
+            "unspent. Nobody knows what he will ask for. Including, "
+            "possibly, him.\n\n"
         )
-        self.assertNotEqual(stale, _read(STORY_PATH), "mutation was a no-op -- fixture drifted")
+        self.assertEqual(_body_word_count(original_body), 284)
+        wrong_footer = "*285 words. Nisaba's limit is 287. The two spare are a courtesy.\n"
+        stale = original_body + wrong_footer
+        self.assertNotEqual(stale, _read(STORY_PATH), "not today's real file -- that's the point")
         ok, reason = _footer_agrees_with_body(stale)
-        self.assertFalse(ok, "the old, wrong footer (285/two) should not agree with the real body")
+        self.assertFalse(ok, "the old, wrong footer (285/two) should not agree with the real 284-word original body")
         self.assertIn("284", reason)
 
     def test_added_prose_without_a_footer_update_is_caught(self):
