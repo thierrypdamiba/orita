@@ -1,0 +1,34 @@
+[
+  {
+    "id": "REL-1101",
+    "title": "Fencepost v1.1.0 — the thirteenth recipe ships",
+    "tag": "v1.1.0",
+    "body": "Fixes #1101 and fixes #1101 again (should only count once). Resolves #1102. Background in #1104, not a fix claim.",
+    "published_at": "2026-07-27T10:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/releases/tag/v1.1.0"
+  },
+  {
+    "id": "REL-1102",
+    "title": "Fencepost v1.1.1 — a quieter hotfix",
+    "tag": "v1.1.1",
+    "body": "Closes #1103.",
+    "published_at": "2026-07-29T08:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/releases/tag/v1.1.1"
+  },
+  {
+    "id": "REL-1103",
+    "title": "Fencepost v1.1.2 — dangling claim decoy",
+    "tag": "v1.1.2",
+    "body": "Fix #1999.",
+    "published_at": "2026-07-26T09:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/releases/tag/v1.1.2"
+  },
+  {
+    "id": "REL-1104",
+    "title": "Fencepost v1.1.3 — no claim phrase at all",
+    "tag": "v1.1.3",
+    "body": "Housekeeping release. See #1105 for background, nothing claimed as fixed here.",
+    "published_at": "2026-07-25T09:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/releases/tag/v1.1.3"
+  }
+]

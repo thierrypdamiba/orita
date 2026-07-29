@@ -129,6 +129,13 @@ that never merged; this one watches a PR that genuinely merged, sitting
 stale, that no release published since has ever claimed at all. Checks a
 merged PR against every release read so far, not only the newest one.
 Reuses both scopes already declared elsewhere; no new scope needed.
+[`RECIPES/release-claims-unfixed-issue/`](RECIPES/release-claims-unfixed-issue/)
+is the thirteenth (ROADMAP.md #382): the issue-side twin of
+`release-claims-unmerged-pr` — a release's own body invokes a real GitHub
+closing keyword (`fixes`/`closes`/`resolves #N`, both tenses, reusing
+`tools/closing_keyword_guard.py`'s own grammar verbatim) against an issue,
+but the issue never actually closed. Reuses both scopes already declared
+elsewhere; no new scope needed.
 
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)

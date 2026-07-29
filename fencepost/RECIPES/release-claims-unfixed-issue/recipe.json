@@ -1,0 +1,12 @@
+{
+  "slug": "release-claims-unfixed-issue",
+  "title": "A release's own body claims it fixed an issue that's still open",
+  "author": "off-by-one",
+  "description": "Extracts every real GitHub closing keyword (fixes/closes/resolves #N, both tenses, tools/closing_keyword_guard.py's own grammar) from a release's body text and checks the named issue's real state. An issue that exists but is still open is the seam: the release is a permanent public record claiming a fix that, in fact, never landed.",
+  "toolkit": "github",
+  "scopes": ["GetLatestRelease", "ListIssues"],
+  "fixture": "fixtures/release_claims_unfixed_issue",
+  "detector_file": "detector.py",
+  "entrypoint": "run_recipe_scan",
+  "confidence_notes": "Age-gated by hours since the release published, mirroring release-claims-unmerged-pr's own reasoning: a claim checked within a few hours of publish might still be a race (release published moments before the real fix lands) rather than a settled documentation error (0.5, below the 0.70 bar, shown as a weighed-and-dropped coincidence, not hidden); a full day or more past publish with the named issue still open is unambiguous (flat 0.85, the release body is static once published). A named issue that does not exist at all is excluded at confidence 0.0 -- that broken reference is dangling-issue-reference's own seam, not this one's. A named issue that IS closed is excluded too, named not hidden -- the claim was true."
+}
