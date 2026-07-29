@@ -1,23 +1,23 @@
 {
-  "generated_at": "2026-07-29T13:09:36.853045+00:00",
+  "generated_at": "2026-07-29T14:06:38.803089+00:00",
   "repo": "thierrypdamiba/orita",
   "window_hours": 24,
   "account_live_since": "2026-07-12T00:00:00+00:00",
   "x_posts_source": "ledger",
-  "github_events_source": "override",
+  "github_events_source": "direct",
   "confidence_bar": 0.7,
   "separation_margin": 0.15,
   "primary_gap": {
     "slug": "milestone-unannounced",
     "headline": "Milestone-level work shipped but never reached @oritatown",
-    "detail": "58 milestone commit(s) since 2026-07-12 (matching ['fencepost', 'flagship', 'strategy']), none echoed in a post.",
+    "detail": "59 milestone commit(s) since 2026-07-12 (matching ['fencepost', 'flagship', 'strategy']), none echoed in a post.",
     "confidence": 0.85,
     "evidence": [
+      "https://github.com/thierrypdamiba/orita/commit/cd72c4e0443720f41eb67a8f3fb23bf9d3a6a4a6",
       "https://github.com/thierrypdamiba/orita/commit/9372195edd8612cbedf3f853c4e0996c5f92eab2",
       "https://github.com/thierrypdamiba/orita/commit/23b0f9678ce121397d85c5ed0885d431229a57e0",
       "https://github.com/thierrypdamiba/orita/commit/dd12a33dedafa97cab04415a0e4cd17ef2052872",
-      "https://github.com/thierrypdamiba/orita/commit/66b4224d6fc32f3cfaccd1ab90f286ecc947877c",
-      "https://github.com/thierrypdamiba/orita/commit/8d5712d39428200b5604889a56913fbcb8a40118"
+      "https://github.com/thierrypdamiba/orita/commit/66b4224d6fc32f3cfaccd1ab90f286ecc947877c"
     ],
     "label": "primary",
     "rank": 1,
@@ -75,14 +75,14 @@
     {
       "slug": "coincidence-ritual",
       "headline": "'ritual' recurs in commits but stays off @oritatown",
-      "detail": "249 commit(s) since 2026-07-12 touch 'ritual', none echoed in a post. Routine work is not a gap \u2014 coincidence, not seam.",
+      "detail": "250 commit(s) since 2026-07-12 touch 'ritual', none echoed in a post. Routine work is not a gap \u2014 coincidence, not seam.",
       "confidence": 0.55,
       "evidence": [
+        "https://github.com/thierrypdamiba/orita/commit/cd72c4e0443720f41eb67a8f3fb23bf9d3a6a4a6",
         "https://github.com/thierrypdamiba/orita/commit/aa69c9d7a35acfa936f377cc1b71d0541e7ff00a",
         "https://github.com/thierrypdamiba/orita/commit/a70eeeb2cec02d785b979ced830c83d405a7a0c0",
         "https://github.com/thierrypdamiba/orita/commit/e555c084940390855691956e4a596795b3aa375a",
-        "https://github.com/thierrypdamiba/orita/commit/2d7d43edfec8173886cf95e686ceff56a162e2ff",
-        "https://github.com/thierrypdamiba/orita/commit/711e271e7f66c057da51ec92ec8db1649e5ef031"
+        "https://github.com/thierrypdamiba/orita/commit/2d7d43edfec8173886cf95e686ceff56a162e2ff"
       ],
       "label": "coincidence",
       "rank": 5,
@@ -121,15 +121,5 @@
       "lead": 0.55
     }
   ],
-  "excluded": [
-    {
-      "slug": "release-episode-001",
-      "headline": "Release episode-001 predates @oritatown",
-      "detail": "'Episode 1 \u2014 The Founding' published 2026-07-11T10:58:26+00:00, before the account existed (2026-07-12T00:00:00+00:00). No way to have announced it.",
-      "confidence": 0.0,
-      "evidence": [
-        "https://github.com/thierrypdamiba/orita/releases/tag/episode-001"
-      ]
-    }
-  ]
+  "excluded": []
 }
