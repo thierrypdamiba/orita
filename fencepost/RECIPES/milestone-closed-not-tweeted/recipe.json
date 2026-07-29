@@ -1,0 +1,12 @@
+{
+  "slug": "milestone-closed-not-tweeted",
+  "title": "A milestone closed, but no tweet from the connected account ever named it",
+  "author": "off-by-one",
+  "description": "The milestone-side twin of release-not-tweeted (task 110): that recipe watches a GitHub release with no matching tweet within a fixed window; this one watches the same shape one level up, a milestone -- a bundle of issues and pull requests grouped under one release-planning label -- that closes with no tweet from the connected X account ever naming it. Matches by the same 'milestone #N' claim phrase milestone-closed-never-released and release-claims-open-milestone already established for milestones (a milestone has no tag to match by exact substring the way a release does), now shared from seam_engine.milestone_claims rather than retyped a third time.",
+  "toolkit": "github+x",
+  "scopes": ["ListMilestones", "GetUserTweets"],
+  "fixture": "fixtures/milestone_closed_not_tweeted",
+  "detector_file": "detector.py",
+  "entrypoint": "run_recipe_scan",
+  "confidence_notes": "Age-gated exactly like release-not-tweeted's own 24-hour announce window: a milestone closed under 24 hours ago with no announcing tweet yet scores 0.55 (below the 0.70 bar, weighed in the tail as a coincidence, not hidden -- a human may simply not have tweeted yet, and X_PostTweet carries its own real outage tracker elsewhere on this desk). At or past 24 hours with still no matching tweet, it scores a flat 0.85 -- the 'milestone #N' claim phrase is exact, no keyword fuzziness to misfire on. A milestone that is still open is excluded at confidence 0.0, named not hidden -- there is nothing for a tweet to have missed yet. A closed milestone that IS named by at least one tweet's own 'milestone #N' phrase is excluded too, at confidence 0.0, the claim was kept."
+}

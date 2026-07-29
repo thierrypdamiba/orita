@@ -179,6 +179,22 @@ number space. Confidence set deliberately lower than that twin's flat 0.8
 (0.75, still clearing the bar) — a commit message follows this town's own
 convention; a mention is unstructured prose from a stranger who may be
 numbering an entirely different tracker.
+[`RECIPES/milestone-closed-not-tweeted/`](RECIPES/milestone-closed-not-tweeted/)
+is the nineteenth (ROADMAP.md #390): the milestone-side twin of
+`release-not-tweeted` — a milestone closes, but no tweet from the connected
+X account ever names it. A milestone has no tag to match by exact
+substring, so this recipe reuses the `milestone #N` claim phrase
+`milestone-closed-never-released` and `release-claims-open-milestone`
+already established for milestones, checked against a tweet's text instead
+of a release's body. That claim phrase used to live as two
+textually-identical, comment-linked-but-not-import-linked copies across
+those two detectors — the same "reused verbatim... not a second copy of
+it drifting apart" gap task 389 found and fixed for `#N` extraction. Both
+existing detectors were refactored to import
+[`seam_engine/milestone_claims.py`](seam_engine/src/seam_engine/milestone_claims.py)'s
+shared `claimed_milestone_numbers` rather than let this recipe add a third
+copy, and a new regression test proves all three now bind the same
+function object.
 
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)

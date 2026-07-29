@@ -121,3 +121,4 @@
 {"type": "queued", "task": "198", "topic": "gateway.py's is_read_only_capabilities let an unnegated write ask (Post/Share/Create) slip through as read-only whenever a trailing, unrelated negation sat later in the same clause -- fixed to require the negation precede the verb", "queued_at": "2026-07-21T10:15:00Z"}
 {"type": "queued", "task": "199", "topic": "x_post_queue.py's own header-bound inversion, min vs max", "queued_at": "2026-07-21T11:17:04Z"}
 {"type": "queued", "task": "251", "topic": "collaborator cadence -- the Oracle Desk's own snapshot-log guard, second of the json.loads-guard cadence campaign", "queued_at": "2026-07-23T18:07:24Z"}
+{"type": "queued", "task": "390", "topic": "nineteenth Fencepost recipe, milestone-closed-not-tweeted, plus deduping the milestone #N claim-phrase regex into seam_engine.milestone_claims", "queued_at": "2026-07-29T16:18:03Z"}

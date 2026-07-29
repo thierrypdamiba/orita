@@ -1,0 +1,30 @@
+[
+  {
+    "number": 4001,
+    "title": "v1.0 seam widening",
+    "state": "closed",
+    "closed_at": "2026-07-14T10:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/milestone/4001"
+  },
+  {
+    "number": 4002,
+    "title": "v1.1 hotfix batch",
+    "state": "closed",
+    "closed_at": "2026-07-28T18:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/milestone/4002"
+  },
+  {
+    "number": 4003,
+    "title": "v1.2 governance pass",
+    "state": "closed",
+    "closed_at": "2026-07-20T09:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/milestone/4003"
+  },
+  {
+    "number": 4004,
+    "title": "v2.0 future",
+    "state": "open",
+    "closed_at": null,
+    "url": "https://github.com/thierrypdamiba/orita/milestone/4004"
+  }
+]

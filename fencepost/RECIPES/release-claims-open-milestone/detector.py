@@ -34,28 +34,18 @@ out) rather than a settled documentation error.
 from __future__ import annotations
 
 import json
-import re
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from seam_engine.milestone_claims import claimed_milestone_numbers as _claimed_milestone_numbers
 from seam_engine.scan import GapCandidate
 
 _HERE = Path(__file__).resolve().parent
 _FIXTURE_DIR = _HERE.parents[1] / "fixtures" / "release_claims_open_milestone"
 DEFAULT_RELEASES_FIXTURE = _FIXTURE_DIR / "releases.json"
 DEFAULT_MILESTONES_FIXTURE = _FIXTURE_DIR / "milestones.json"
-
-# Mirrors milestone-closed-never-released/detector.py's own _CLAIM_RE
-# verbatim (see the module docstring for why): a release "claims" a
-# milestone by naming its number this way. Neither the PR-claim regex
-# (ships/includes/merges/via #N) nor the issue-side closing-keyword
-# grammar (fixes/closes/resolves #N) applies to a milestone -- GitHub gives
-# it no auto-close-style keyword at all -- so this recipe reuses the one
-# claim phrase already established for milestones rather than inventing a
-# second copy of it.
-_CLAIM_RE = re.compile(r"\bmilestone\s+#(\d+)\b", re.IGNORECASE)
 
 # A claim checked within this window of the release's own publish time may
 # just be a race rather than a genuine, settled documentation error.
@@ -108,10 +98,6 @@ def load_milestones(path: Path | None = None) -> list[Milestone]:
         Milestone(number=r["number"], title=r["title"], state=r["state"], url=r["url"])
         for r in rows
     ]
-
-
-def _claimed_milestone_numbers(body: str) -> list[int]:
-    return [int(n) for n in _CLAIM_RE.findall(body)]
 
 
 def _find_milestone(number: int, milestones: list[Milestone]) -> Milestone | None:

@@ -33,26 +33,17 @@ claimed -- is the gap, aged by how long it has sat uncredited.
 from __future__ import annotations
 
 import json
-import re
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from seam_engine.milestone_claims import claimed_milestone_numbers as _claimed_milestone_numbers
 from seam_engine.scan import GapCandidate
 
 _HERE = Path(__file__).resolve().parent
 DEFAULT_MILESTONES_FIXTURE = _HERE.parents[1] / "fixtures" / "milestone_closed_never_released" / "milestones.json"
 DEFAULT_RELEASES_FIXTURE = _HERE.parents[1] / "fixtures" / "milestone_closed_never_released" / "releases.json"
-
-# A release "claims" a milestone by naming its number this way. Deliberately
-# its own grammar, distinct from release-claims-unmerged-pr's/merged-pr-
-# never-released's PR-claim regex (ships/includes/merges/via #N) and from
-# the closing-keyword grammar (fixes/closes/resolves #N) the issue-side
-# recipes reuse -- a milestone is neither a PR nor an issue, and GitHub
-# gives it no auto-close-style keyword at all, so this recipe names its own
-# claim phrase rather than overloading either existing one.
-_CLAIM_RE = re.compile(r"\bmilestone\s+#(\d+)\b", re.IGNORECASE)
 
 # A milestone closed under this age, with no release having claimed it yet,
 # may simply be waiting on the project's own release cadence to catch up --
@@ -111,10 +102,6 @@ def load_releases(path: Path | None = None) -> list[Release]:
         )
         for r in rows
     ]
-
-
-def _claimed_milestone_numbers(body: str) -> list[int]:
-    return [int(n) for n in _CLAIM_RE.findall(body)]
 
 
 def _claims_by_number(releases: list[Release]) -> dict[int, list[Release]]:
