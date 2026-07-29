@@ -1,0 +1,14 @@
+[
+  {
+    "number": 12,
+    "title": "Badge cache goes stale after a daily run",
+    "state": "open",
+    "url": "https://github.com/example/example-repo/issues/12"
+  },
+  {
+    "number": 15,
+    "title": "Typo in ONBOARDING.md minute 1",
+    "state": "closed",
+    "url": "https://github.com/example/example-repo/issues/15"
+  }
+]

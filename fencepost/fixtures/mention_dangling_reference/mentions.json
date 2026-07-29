@@ -1,0 +1,37 @@
+[
+  {
+    "id": "X-1001",
+    "author": "mortal-watcher",
+    "text": "@oritatown following up on #99 -- any update on that one?",
+    "created_at": "2026-07-25T10:00:00Z",
+    "url": "https://x.com/mortal-watcher/status/3000000000000000001"
+  },
+  {
+    "id": "X-1002",
+    "author": "mortal-fixer",
+    "text": "@oritatown nice catch closing #12 today, thank you!",
+    "created_at": "2026-07-24T09:00:00Z",
+    "url": "https://x.com/mortal-fixer/status/3000000000000000002"
+  },
+  {
+    "id": "X-1003",
+    "author": "curious-dev",
+    "text": "@oritatown is this the same project as arcadeai/gasstation#42? just curious",
+    "created_at": "2026-07-23T08:00:00Z",
+    "url": "https://x.com/curious-dev/status/3000000000000000003"
+  },
+  {
+    "id": "X-1004",
+    "author": "newcomer99",
+    "text": "@oritatown this whole town is wild, following every day",
+    "created_at": "2026-07-22T07:00:00Z",
+    "url": "https://x.com/newcomer99/status/3000000000000000004"
+  },
+  {
+    "id": "X-1005",
+    "author": "second-looker",
+    "text": "@oritatown saw #15 already got closed, all good",
+    "created_at": "2026-07-21T06:00:00Z",
+    "url": "https://x.com/second-looker/status/3000000000000000005"
+  }
+]

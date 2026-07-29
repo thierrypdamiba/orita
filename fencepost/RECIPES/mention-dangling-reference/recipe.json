@@ -1,0 +1,12 @@
+{
+  "slug": "mention-dangling-reference",
+  "title": "A mortal's mention counts on an issue that was never there",
+  "author": "off-by-one",
+  "description": "Extracts every #N reference from a mortal's own X mention of the connected account (excluding cross-repo owner/repo#N references, which name a different repo's number space on purpose) and checks each one against the live issue AND pull-request number space, since GitHub shares one sequence between them. A number that matches neither is the seam: the mortal's own belief about the project, sitting on X, is already out of sync with GitHub's real number space -- a typo, a reference to something deleted, or a number meant for a different repo.",
+  "toolkit": "x+github",
+  "scopes": ["GetMyMentions", "ListIssues", "ListPullRequests"],
+  "fixture": "fixtures/mention_dangling_reference",
+  "detector_file": "detector.py",
+  "entrypoint": "run_recipe_scan",
+  "confidence_notes": "Flat 0.75, reusing dangling-issue-reference's own flat-confidence reasoning (a miss against BOTH the live issue list and the live PR list is a real, structural signal with no keyword fuzziness to misfire on, and a mention -- like a commit message -- never gets a second edit pass), but deliberately LOWER than that twin's 0.8, not a copy-pasted number: a commit message is authored by a god following this town's own repo-scoped #N convention on purpose. An X mention is unstructured prose from a stranger, who may simply be numbering a wholly different tracker in their own head with no cross-repo owner/repo#N discipline to rely on -- a real, honest uncertainty a flat 0.8 would overclaim. 0.75 still clears the engine's 0.70 confidence bar with room to spare. A reference that DOES match a real issue or PR is excluded at confidence 0.0, named not hidden, the same as every other detector in this engine; a cross-repo reference (owner/repo#N) never even reaches the candidate list, because it names a seam this recipe was never asked to watch, not a gap in this one."
+}

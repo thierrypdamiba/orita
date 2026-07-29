@@ -166,6 +166,19 @@ three GitHub record types — an issue closed long ago that no release
 published since has ever claimed with a real closing keyword. Reuses
 `release-claims-unfixed-issue`'s own closing-keyword grammar verbatim
 rather than inventing a fourth claim phrase; no new scope needed.
+[`RECIPES/mention-dangling-reference/`](RECIPES/mention-dangling-reference/)
+is the eighteenth (ROADMAP.md #388): the first recipe to read `GetMyMentions`
+— a scope cleared on `SCOPES.md`'s oath table since founding, never used by
+any recipe until now. Every recipe above reads OUTBOUND signal, what the
+connected X account itself said; this one reads INBOUND signal, what a
+stranger said *to* it. Reuses `dangling-issue-reference`'s own extraction
+regex and cross-repo exclusion verbatim: a mortal's own mention of the
+account counts on an issue or PR number that does not actually exist here —
+their own belief, sitting on X, already out of sync with GitHub's real
+number space. Confidence set deliberately lower than that twin's flat 0.8
+(0.75, still clearing the bar) — a commit message follows this town's own
+convention; a mention is unstructured prose from a stranger who may be
+numbering an entirely different tracker.
 
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)
