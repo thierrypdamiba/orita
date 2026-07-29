@@ -55,6 +55,20 @@ and pull request #1005 (closed without merging — same reason), while pull
 request #1002 (merged only hours before the pinned clock) is weighed and
 shown in the tail as a coincidence, not hidden and not electing itself.
 
+The claim regex (`ships?|includes?|merges?|via #N`) is shared with
+[`../release-claims-unmerged-pr/`](../release-claims-unmerged-pr/), the
+mirror recipe that reads the same claim phrase from the other direction.
+Both detectors now import `claimed_pr_numbers` from
+[`seam_engine/pr_claims.py`](../../seam_engine/src/seam_engine/pr_claims.py)
+rather than each carrying its own independently typed copy — this recipe's
+own docstring used to claim the regex was "identical... on purpose" but
+never actually imported it; task 393 fixed that, the same "two copies that
+happen to agree today" gap tasks 389 and 390 already fixed for `#N`
+extraction and the "milestone #N" claim phrase. See
+`seam_engine/tests/test_pr_claims.py`'s `TestBothDetectorsShareTheLaw` for
+the regression test that would go red if either detector ever went back
+to a local copy.
+
 Check the manifest against the oath and the schema the same way CI will:
 
 ```

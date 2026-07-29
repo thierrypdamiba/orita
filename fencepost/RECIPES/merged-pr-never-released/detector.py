@@ -32,26 +32,31 @@ to have missed yet -- excluded, not a gap. A PR that IS named by at least
 one release's claim phrase kept its promise -- excluded, named not hidden.
 Everything left over -- a merged PR no release has ever claimed -- is the
 gap, aged by how long it has sat uncredited.
+
+That "identical regex, deliberately reused" claim above was not actually
+backed by an import when this recipe shipped: `_CLAIM_RE` was retyped a
+second time here, with nothing connecting it to `release-claims-unmerged-
+pr`'s own copy -- the same "two copies that happen to agree today, nothing
+stopping them from drifting apart" shape task 389 found and fixed for `#N`
+extraction and task 390 found and fixed a second time for the "milestone
+#N" claim phrase. Found here a third time (task 393) and fixed the same
+way: both PR-claim detectors now import `claimed_pr_numbers` from the new
+`seam_engine.pr_claims` module.
 """
 from __future__ import annotations
 
 import json
-import re
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from seam_engine.pr_claims import claimed_pr_numbers as _claimed_pr_numbers
 from seam_engine.scan import GapCandidate
 
 _HERE = Path(__file__).resolve().parent
 DEFAULT_PULL_REQUESTS_FIXTURE = _HERE.parents[1] / "fixtures" / "merged_pr_never_released" / "pull_requests.json"
 DEFAULT_RELEASES_FIXTURE = _HERE.parents[1] / "fixtures" / "merged_pr_never_released" / "releases.json"
-
-# Identical to release-claims-unmerged-pr's own _CLAIM_RE, on purpose: one
-# law for what counts as a release "claiming" a PR, not two copies of it
-# drifting apart between the two recipes that both read release bodies.
-_CLAIM_RE = re.compile(r"\b(?:ships?|includes?|merges?|via)\s+#(\d+)\b", re.IGNORECASE)
 
 # A merged pull request younger than this, with no release having claimed
 # it yet, may simply be waiting on the project's own release cadence to
@@ -112,10 +117,6 @@ def load_releases(path: Path | None = None) -> list[Release]:
         )
         for r in rows
     ]
-
-
-def _claimed_pr_numbers(body: str) -> list[int]:
-    return [int(n) for n in _CLAIM_RE.findall(body)]
 
 
 def _claims_by_number(releases: list[Release]) -> dict[int, list[Release]]:

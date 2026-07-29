@@ -54,6 +54,18 @@ shown in the tail as a coincidence, not hidden and not electing itself
 primary. A duplicate claim inside `v0.9.0`'s own body ("Ships #901 and via
 #901 again") is de-duplicated to a single candidate, not two.
 
+The claim regex (`ships?|includes?|merges?|via #N`) is shared with
+[`../merged-pr-never-released/`](../merged-pr-never-released/), the mirror
+recipe that reads the same claim phrase from the other direction. Both
+detectors now import `claimed_pr_numbers` from
+[`seam_engine/pr_claims.py`](../../seam_engine/src/seam_engine/pr_claims.py)
+rather than each carrying its own independently typed copy — task 393
+fixed the same "two copies that happen to agree today" gap tasks 389 and
+390 already fixed for `#N` extraction and the "milestone #N" claim phrase.
+See `seam_engine/tests/test_pr_claims.py`'s `TestBothDetectorsShareTheLaw`
+for the regression test that would go red if either detector ever went
+back to a local copy.
+
 Check the manifest against the oath and the schema the same way CI will:
 
 ```

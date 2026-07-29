@@ -35,27 +35,31 @@ Confidence is age-gated by the release's own publish time, mirroring
 `merged-pr-issue-still-open`'s reasoning: a claim checked within a few
 hours of publish might still be a race (release published moments before
 the real merge lands) rather than a settled documentation error.
+
+The claim regex itself used to live here as an independently typed copy,
+with `merged-pr-never-released/detector.py` (task 381) carrying a second,
+textually-identical one and merely commenting that it was "identical...
+on purpose" rather than importing it -- the same "two copies that happen
+to agree today, nothing stopping them from drifting apart" shape task 389
+found and fixed for `#N` extraction and task 390 found and fixed a second
+time for the "milestone #N" claim phrase. Found here a third time (task
+393) and fixed the same way: both PR-claim detectors now import
+`claimed_pr_numbers` from the new `seam_engine.pr_claims` module.
 """
 from __future__ import annotations
 
 import json
-import re
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from seam_engine.pr_claims import claimed_pr_numbers as _claimed_pr_numbers
 from seam_engine.scan import GapCandidate
 
 _HERE = Path(__file__).resolve().parent
 DEFAULT_RELEASES_FIXTURE = _HERE.parents[1] / "fixtures" / "release_claims_unmerged_pr" / "releases.json"
 DEFAULT_PULLS_FIXTURE = _HERE.parents[1] / "fixtures" / "release_claims_unmerged_pr" / "pulls.json"
-
-# A claim phrase naming a PR by number. Anchored on a real verb, not a bare
-# "#N" (that broader, unanchored shape is dangling-issue-reference's own
-# regex, watching a different seam) -- a release body mentioning "#N" in
-# passing prose ("see #N for background") is not a shipped-it claim.
-_CLAIM_RE = re.compile(r"\b(?:ships?|includes?|merges?|via)\s+#(\d+)\b", re.IGNORECASE)
 
 # A claim checked within this window of the release's own publish time may
 # just be a race rather than a genuine, settled documentation error.
@@ -109,10 +113,6 @@ def load_pulls(path: Path | None = None) -> list[PullRequest]:
         PullRequest(number=r["number"], title=r["title"], state=r["state"], merged=r["merged"], url=r["url"])
         for r in rows
     ]
-
-
-def _claimed_pr_numbers(body: str) -> list[int]:
-    return [int(n) for n in _CLAIM_RE.findall(body)]
 
 
 def _find_pull(number: int, pulls: list[PullRequest]) -> PullRequest | None:
