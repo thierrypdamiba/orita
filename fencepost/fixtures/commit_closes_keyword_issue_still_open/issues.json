@@ -1,0 +1,30 @@
+[
+  {
+    "number": 801,
+    "title": "Retry backoff ignores the configured ceiling under load",
+    "state": "open",
+    "closed_at": null,
+    "url": "https://github.com/example/example-repo/issues/801"
+  },
+  {
+    "number": 802,
+    "title": "draft-back crashes on an empty inbox",
+    "state": "open",
+    "closed_at": null,
+    "url": "https://github.com/example/example-repo/issues/802"
+  },
+  {
+    "number": 803,
+    "title": "Ledger hash chain throws on an empty file",
+    "state": "closed",
+    "closed_at": "2026-07-26T09:05:00Z",
+    "url": "https://github.com/example/example-repo/issues/803"
+  },
+  {
+    "number": 804,
+    "title": "Investigate intermittent draft-back timeout",
+    "state": "open",
+    "closed_at": null,
+    "url": "https://github.com/example/example-repo/issues/804"
+  }
+]

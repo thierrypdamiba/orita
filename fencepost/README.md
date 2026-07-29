@@ -98,6 +98,11 @@ of another issue whose original has since closed, but a duplicate marker
 is pure prose — GitHub gives it no auto-close trigger at all, unlike a
 PR's closing keyword — so the duplicate can sit open indefinitely with
 nothing that could ever have caught it.
+[`RECIPES/commit-closes-keyword-issue-still-open/`](RECIPES/commit-closes-keyword-issue-still-open/)
+is the eighth (ROADMAP.md #377): unlike the two PR-based recipes above,
+this one watches a closing keyword on a commit pushed straight to the
+default branch — this town's own dominant commit shape — that never
+actually closed the issue it named.
 
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)

@@ -84,12 +84,13 @@ def test_unrecognized_cardinal_word_raises():
         claimed_recipe_count("Several real recipes stand today:")
 
 
-def test_real_recipe_count_is_currently_seven():
-    """Regression pin: today's real, live count under RECIPES/. Was 6 until
-    RECIPES/duplicate-issue-still-open/ merged (the seventh real recipe) --
-    the exact drift this whole doctrine file exists to catch, now caught
-    once for real instead of only rehearsed by the mutation test below."""
-    assert real_recipe_count(FENCEPOST_ROOT) == 7
+def test_real_recipe_count_is_currently_eight():
+    """Regression pin: today's real, live count under RECIPES/. Was 7 until
+    RECIPES/commit-closes-keyword-issue-still-open/ merged (the eighth real
+    recipe) -- the exact drift this whole doctrine file exists to catch,
+    now caught once for real instead of only rehearsed by the mutation
+    test below."""
+    assert real_recipe_count(FENCEPOST_ROOT) == 8
 
 
 def test_site_claim_matches_the_real_live_count():

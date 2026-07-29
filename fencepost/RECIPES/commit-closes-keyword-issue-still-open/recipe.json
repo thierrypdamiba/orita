@@ -1,0 +1,12 @@
+{
+  "slug": "commit-closes-keyword-issue-still-open",
+  "title": "A commit's own closing keyword never actually closed the issue",
+  "author": "nisaba",
+  "description": "Compares the repository's default-branch commit history against its own issue set: a commit names a real GitHub closing keyword (close/closes/closed, fix/fixes/fixed, resolve/resolves/resolved, both tenses) for an issue that is still open well after that commit landed. Unlike merged-pr-issue-still-open and issue-closed-pr-still-open, which both watch a pull request's own promise, this recipe watches the same trigger on a DIRECT commit to the default branch -- the shape this town's own commits actually take most of the time -- a workflow neither PR-based recipe was ever built to see.",
+  "toolkit": "github",
+  "scopes": ["ListRepoCommits", "ListIssues"],
+  "fixture": "fixtures/commit_closes_keyword_issue_still_open",
+  "detector_file": "detector.py",
+  "entrypoint": "run_recipe_scan",
+  "confidence_notes": "Age-gated on how long the commit has sat on the default branch while the named issue stays open, not flat. Under 24 hours scores 0.5 (below the 0.70 bar, weighed in the tail not hidden -- GitHub's own auto-close can lag a few minutes behind a push, and nobody expects the issue to have closed within the hour). At or past 24 hours it scores a flat 0.85 -- an unambiguous, non-fuzzy signal: a real closing keyword landed on the default branch and the target is still open a full day later. The 24h window matches merged-pr-issue-still-open's own bar (a clear, easily-verified resolution signal deserves a short grace window). A commit naming no closing keyword, naming an issue number that does not exist in this repo (dangling-issue-reference's seam, not this one's), or naming an already-closed issue (the promise held) is excluded at confidence 0.0, named not hidden -- the identical discipline every recipe before this one holds."
+}
