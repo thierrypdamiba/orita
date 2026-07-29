@@ -40,6 +40,7 @@ from pathlib import Path
 from typing import Any
 
 from seam_engine.scan import GapCandidate
+from seam_engine.thanks import THANKS_RE
 
 _HERE = Path(__file__).resolve().parent
 DEFAULT_TWEETS_FIXTURE = _HERE.parents[1] / "fixtures" / "contributor_thanked_not_credited" / "tweets.json"
@@ -53,8 +54,11 @@ _CREDIT_WINDOW_HOURS = 72.0
 
 # Requires "thank(s)" or "thank you", loosely followed by an @handle, in the
 # same tweet -- a bare @mention with no thanks-shaped language never
-# matches, so it never becomes a candidate at all.
-_THANKS_RE = re.compile(r"thanks?(?:\s+you)?\b.{0,40}?@(\w[\w-]*)", re.IGNORECASE | re.DOTALL)
+# matches, so it never becomes a candidate at all. Shared with
+# `readme-credited-not-thanked/detector.py`'s own inverse check via
+# `seam_engine.thanks` (task 396) -- see that module for why the two used
+# to carry independent, textually-identical copies.
+_THANKS_RE = THANKS_RE
 
 
 def _parse_ts(s: str) -> datetime:

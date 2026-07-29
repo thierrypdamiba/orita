@@ -50,6 +50,7 @@ from pathlib import Path
 from typing import Any
 
 from seam_engine.scan import GapCandidate
+from seam_engine.thanks import THANKS_RE
 
 _HERE = Path(__file__).resolve().parent
 DEFAULT_README_FIXTURE = _HERE.parents[1] / "fixtures" / "readme_credited_not_thanked" / "readme.json"
@@ -62,11 +63,11 @@ DEFAULT_TWEETS_FIXTURE = _HERE.parents[1] / "fixtures" / "readme_credited_not_th
 _COVERAGE_WINDOW_HOURS = 96.0
 
 # Requires "thank(s)" or "thank you", loosely followed by an @handle, in the
-# same tweet -- identical grammar to contributor-thanked-not-credited's own
-# `_THANKS_RE`, reused verbatim since it answers the same question ("is this
-# tweet a thank-you"), just applied across the whole tweet history here
-# instead of to one tweet at a time.
-_THANKS_RE = re.compile(r"thanks?(?:\s+you)?\b.{0,40}?@(\w[\w-]*)", re.IGNORECASE | re.DOTALL)
+# same tweet -- shared with contributor-thanked-not-credited's own
+# `_THANKS_RE` via `seam_engine.thanks` (task 396), since it answers the
+# same question ("is this tweet a thank-you"), just applied across the
+# whole tweet history here instead of to one tweet at a time.
+_THANKS_RE = THANKS_RE
 
 # Isolates the README's own "## Thanks" section body, from that heading up
 # to (but not including) the next "## " heading or end of string -- so a
