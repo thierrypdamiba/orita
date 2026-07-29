@@ -1,0 +1,82 @@
+[
+  {
+    "number": 700,
+    "title": "Onboarding flow breaks on Windows paths",
+    "state": "closed",
+    "body": "Backslash in the install path crashes the setup script.",
+    "closed_at": "2026-07-18T09:00:00Z",
+    "url": "https://github.com/example/example-repo/issues/700"
+  },
+  {
+    "number": 701,
+    "title": "Setup script crashes when installed under C:\\Users\\...",
+    "state": "open",
+    "body": "Duplicate of #700 -- same crash, different repro steps.",
+    "closed_at": null,
+    "url": "https://github.com/example/example-repo/issues/701"
+  },
+  {
+    "number": 703,
+    "title": "Report generator double-counts a same-day gap",
+    "state": "closed",
+    "body": "Two scans in one UTC day both counted the same primary gap.",
+    "closed_at": "2026-07-27T06:00:00Z",
+    "url": "https://github.com/example/example-repo/issues/703"
+  },
+  {
+    "number": 702,
+    "title": "Daily report shows the same gap counted twice",
+    "state": "open",
+    "body": "dup of #703 -- reported independently before I searched first.",
+    "closed_at": null,
+    "url": "https://github.com/example/example-repo/issues/702"
+  },
+  {
+    "number": 705,
+    "title": "Docs link to a moved architecture page",
+    "state": "open",
+    "body": "The reference doc moved and the old link 404s.",
+    "closed_at": null,
+    "url": "https://github.com/example/example-repo/issues/705"
+  },
+  {
+    "number": 704,
+    "title": "Broken link in ARC.md to the architecture page",
+    "state": "open",
+    "body": "Duplicate of #705.",
+    "closed_at": null,
+    "url": "https://github.com/example/example-repo/issues/704"
+  },
+  {
+    "number": 706,
+    "title": "Ledger append is not atomic on a killed process",
+    "state": "open",
+    "body": "A regular bug report, no duplicate mention at all.",
+    "closed_at": null,
+    "url": "https://github.com/example/example-repo/issues/706"
+  },
+  {
+    "number": 708,
+    "title": "CONNECT.md's OAuth screenshot is stale",
+    "state": "closed",
+    "body": "Screenshot shows an old consent screen layout.",
+    "closed_at": "2026-07-22T10:00:00Z",
+    "url": "https://github.com/example/example-repo/issues/708"
+  },
+  {
+    "number": 707,
+    "title": "OAuth screenshot in the onboarding guide is outdated",
+    "state": "closed",
+    "body": "Duplicate of #708 -- closed this alongside it once I noticed.",
+    "closed_at": "2026-07-22T11:00:00Z",
+    "url": "https://github.com/example/example-repo/issues/707"
+  },
+  {
+    "number": 709,
+    "title": "Gap Ledger site 404s on a direct refresh",
+    "state": "open",
+    "body": "duplicate of #999 -- filed against the wrong number by mistake.",
+    "closed_at": null,
+    "url": "https://github.com/example/example-repo/issues/709"
+  }
+]

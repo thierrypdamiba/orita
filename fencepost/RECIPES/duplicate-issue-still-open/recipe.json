@@ -1,0 +1,12 @@
+{
+  "slug": "duplicate-issue-still-open",
+  "title": "Duplicate issue's original closed, the duplicate never did",
+  "author": "off-by-one",
+  "description": "Compares open issues against the repository's own issue set: an issue's body names itself 'duplicate of #N' (or 'dup of #N'), and #N has since closed, but the duplicate itself was never closed alongside it. Unlike merged-pr-issue-still-open and issue-closed-pr-still-open, GitHub gives this seam no auto-close mechanism at all -- a duplicate marker is pure prose, not a closing keyword -- so the gap has no trigger that could have fired and can persist indefinitely with nobody noticing.",
+  "toolkit": "github",
+  "scopes": ["ListIssues", "GetIssue"],
+  "fixture": "fixtures/duplicate_issue_still_open",
+  "detector_file": "detector.py",
+  "entrypoint": "run_recipe_scan",
+  "confidence_notes": "Age-gated on how long the named original has been closed while the duplicate sits open, not flat. Under 24 hours since the original closed scores 0.5 (below the 0.70 bar, weighed in the tail not hidden -- a human filing a duplicate report may not have circled back within a day of the original resolving). At or past 24 hours it scores a flat 0.85 -- an unambiguous, non-fuzzy signal, a duplicate marker naming an issue number that already reads closed. The 24h window matches merged-pr-issue-still-open's own bar (a clear, easily-verified resolution signal deserves a short grace window, not a long one) rather than contributor-thanked-not-credited's slower 72h (crediting a README is a deliberate edit; closing an obvious duplicate is a one-click follow-up). An issue naming no duplicate marker, or naming an original that is still open, is excluded at confidence 0.0, named not hidden -- the identical discipline every recipe before this one holds."
+}

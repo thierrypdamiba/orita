@@ -92,6 +92,12 @@ is the sixth (ROADMAP.md #373): the mirror of `merged-pr-issue-still-open` —
 a still-open pull request names a closing keyword for an issue that has
 since closed through some other route, so the PR's own promised close
 never fires and it sits open, orphaned.
+[`RECIPES/duplicate-issue-still-open/`](RECIPES/duplicate-issue-still-open/)
+is the seventh (ROADMAP.md #376): an issue's own body names it a duplicate
+of another issue whose original has since closed, but a duplicate marker
+is pure prose — GitHub gives it no auto-close trigger at all, unlike a
+PR's closing keyword — so the duplicate can sit open indefinitely with
+nothing that could ever have caught it.
 
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)
