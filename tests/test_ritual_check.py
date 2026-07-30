@@ -1215,6 +1215,49 @@ class StarCovenantFoldCase(unittest.TestCase):
         self.assertIn("Star Covenant broken", formatted)
 
 
+class DuplicateRegexFoldCase(unittest.TestCase):
+    """Task 397: run_ritual_check() folds duplicate_regex_check.py's own
+    ast-based re.compile duplication scan into the same structured result
+    -- clean by default against a fixture with no duplicate, and a real
+    synthetic hand-typed duplicate both flips `broken` and surfaces in the
+    printed block."""
+
+    def setUp(self):
+        self.orita = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.orita, ignore_errors=True)
+
+    def _write(self, base, rel, content):
+        path = os.path.join(base, rel)
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, "w") as f:
+            f.write(content)
+
+    def test_clean_fixture_is_not_broken(self):
+        self._write(
+            self.orita, "fencepost/RECIPES/recipe-a/detector.py",
+            'import re\n_RE = re.compile(r"@(\\w+)")\n',
+        )
+        result = rc.run_ritual_check(duplicate_regex_dir=self.orita)
+        self.assertTrue(result["duplicate_regex"]["clean"])
+        self.assertFalse(result["broken"])
+        self.assertIn("duplicate regex: clean", rc.format_ritual_check(result))
+
+    def test_synthetic_duplicate_flips_broken_and_prints(self):
+        self._write(
+            self.orita, "fencepost/RECIPES/recipe-a/detector.py",
+            'import re\n_RE = re.compile(r"@(\\w+)")\n',
+        )
+        self._write(
+            self.orita, "fencepost/RECIPES/recipe-b/detector.py",
+            'import re\n_RE = re.compile(r"@(\\w+)")\n',
+        )
+        result = rc.run_ritual_check(duplicate_regex_dir=self.orita)
+        self.assertFalse(result["duplicate_regex"]["clean"])
+        self.assertTrue(result["broken"])
+        formatted = rc.format_ritual_check(result)
+        self.assertIn("DUPLICATE(S)", formatted)
+
+
 class RiderFoldCase(unittest.TestCase):
     """Task 100: run_ritual_check() folds rider_check.py's own five-god
     rider scan (Iron Rule #5) into the same structured result -- clean by

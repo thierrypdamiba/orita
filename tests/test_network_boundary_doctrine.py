@@ -179,6 +179,7 @@ class RealToolsDirCase(unittest.TestCase):
         "arcade_app_watch.py",
         "child_work_check.py",
         "ci_watch.py",
+        "duplicate_regex_check.py",
         "hand_lore_check.py",
         "journal_numbering_check.py",
         "network_boundary_check.py",

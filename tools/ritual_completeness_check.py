@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Task 121. Off-By-One counts the tool that counts everything else.
 
-`tools/ritual_check.py` hand-wires 34 `check_*` functions into one hourly
+`tools/ritual_check.py` hand-wires 35 `check_*` functions into one hourly
 block: each is called inside `run_ritual_check`, its result assigned to a
 dict key, and that key printed as a line in `format_ritual_check`. Three
 separate places a single typo or a forgotten wire-up can silently drop a
@@ -43,7 +43,10 @@ text (never a second hand-typed copy), so `tests/test_ritual_completeness_check.
 can cross-check it against the real count and a future addition can't let
 this number go stale silently again. **Updated to 33** the same hour task
 168's `check_scribe_growth` was wired in -- the first real test of whether
-that promise holds.
+that promise holds. **Updated to 35** the same hour task 397's
+`check_duplicate_regex` was wired in (34 was never itself narrated here,
+just typed straight into the count by whichever prior task moved it last
+-- caught in passing while updating this one, not chased further).
 
 Usage:
     python3 tools/ritual_completeness_check.py check
