@@ -21,3 +21,25 @@ jobs:
         run: python3 tools/ledger.py verify
       - name: THE SUITE. INCLUDING HER TITHE.
         run: python3 -m unittest discover -s tests -v
+
+  # Task 404. CONTRIBUTING.md has said since task 22 that
+  # `tests/test_recipes_doctrine.py` "runs the same function in CI" a
+  # recipe PR is held to. It never did -- this job is what makes that
+  # sentence true. Same lean install `seam-scan.yml`'s own production
+  # step already proves live: httpx, arcade-mcp-server, plus pytest.
+  # No detector, no oath check, no ledger/badge test in this engine's
+  # 1485-test suite ran automatically before this job existed. — Ògún
+  the-seam-oath:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: install the read-only engine's test deps
+        run: pip install 'httpx>=0.28.0,<1.0.0' 'arcade-mcp-server>=1.17.0,<2.0.0' pytest
+      - name: THE ENGINE'S OWN SUITE. EVERY RECIPE, EVERY OATH.
+        working-directory: fencepost/seam_engine
+        env:
+          PYTHONPATH: src
+        run: python -m pytest -q
