@@ -2263,5 +2263,67 @@ class ClusterDayFoldCase(unittest.TestCase):
         self.assertEqual(result["cluster_day"], direct)
 
 
+class StrategyTargetsFoldCase(unittest.TestCase):
+    """Task 407: run_ritual_check() folds strategy_targets_check.py's own
+    STRATEGY.md-vs-code target cross-check (task 159) into the same
+    structured result. Unlike ClusterDayFoldCase's cadence tracker, real
+    drift here IS a violation worth flipping `broken` -- the same class
+    duplicate_regex/riders/hand_lore already hold: STRATEGY.md and the
+    two real modules that quote it (report_cadence_check.py,
+    shared_reports_check.py) claiming different numbers is exactly the
+    "hand-typed copy, never rechecked against the thing it claims to
+    mirror" bug task 159 built this checker to catch."""
+
+    def setUp(self):
+        self.tmp = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.tmp, ignore_errors=True)
+
+    def _write_strategy(self, streak, shares):
+        path = os.path.join(self.tmp, "STRATEGY.md")
+        with open(path, "w") as f:
+            f.write(
+                "# fixture\n\n"
+                "| metric | type | target | owner |\n"
+                "|--|--|--|--|\n"
+                f"| Daily Fencepost Report shipped (town dogfood) | leading | {streak} of {streak} days, 1/day | off-by-one |\n"
+                f"| Shared Fencepost Reports in the wild | lagging | {shares} organic links/screenshots | kwaku-ananse |\n"
+            )
+        return path
+
+    def test_agreeing_fixture_is_clean_and_never_flips_broken(self):
+        # Real code constants are 30/50 (report_cadence_check.py,
+        # shared_reports_check.py) -- a fixture naming the same numbers
+        # must read clean.
+        path = self._write_strategy(30, 50)
+        result = rc.run_ritual_check(strategy_targets_path=path)
+        self.assertTrue(result["strategy_targets"]["clean"])
+        self.assertFalse(result["broken"])
+        formatted = rc.format_ritual_check(result)
+        self.assertIn("strategy target (report cadence): STRATEGY.md=30 code=30 -- agree", formatted)
+        self.assertIn("strategy target (shared reports): STRATEGY.md=50 code=50 -- agree", formatted)
+
+    def test_drifted_fixture_is_named_and_flips_broken(self):
+        # A plausible future decree (STRATEGY.md moves its target, code
+        # never catches up) must be loud, not silent.
+        path = self._write_strategy(60, 100)
+        result = rc.run_ritual_check(strategy_targets_path=path)
+        self.assertFalse(result["strategy_targets"]["clean"])
+        self.assertTrue(result["broken"])
+        formatted = rc.format_ritual_check(result)
+        self.assertIn("strategy target (report cadence): STRATEGY.md=60 code=30 -- DRIFT", formatted)
+        self.assertIn("strategy target (shared reports): STRATEGY.md=100 code=50 -- DRIFT", formatted)
+
+    def test_default_path_reads_the_real_strategy_md_and_matches_direct_call(self):
+        """No override: reads the real STRATEGY.md, the same default
+        check_strategy_targets falls back to -- proves the fold never
+        duplicates or diverges from the module it wraps."""
+        stc = _load("_test_strategy_targets_check", os.path.join(ROOT, "tools", "strategy_targets_check.py"))
+        direct = stc.check_strategy_targets()
+        result = rc.run_ritual_check()
+        self.assertEqual(result["strategy_targets"]["report_streak"], direct["report_streak"])
+        self.assertEqual(result["strategy_targets"]["shared_reports"], direct["shared_reports"])
+        self.assertTrue(result["strategy_targets"]["clean"])
+
+
 if __name__ == "__main__":
     unittest.main()

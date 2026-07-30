@@ -328,6 +328,10 @@ def _cluster_day_check():
     return _load("_ritual_cluster_day_check", os.path.join(ROOT, "tools", "cluster_day_check.py"))
 
 
+def _strategy_targets_check():
+    return _load_once("_ritual_strategy_targets_check", os.path.join(ROOT, "tools", "strategy_targets_check.py"))
+
+
 def _seam_ledger():
     src = os.path.join(ROOT, "fencepost", "seam_engine", "src")
     if src not in sys.path:
@@ -995,6 +999,33 @@ def check_cluster_day_cadence(chronicle_dir: str | None = None, today=None) -> d
     return mod.compute_cadence(**kwargs)
 
 
+def check_strategy_targets(strategy_path: str | None = None) -> dict:
+    """Task 407: fold strategy_targets_check.py's own STRATEGY.md-vs-code
+    target cross-check (task 159) into the one block. Unconditional,
+    local-filesystem-only (reads STRATEGY.md and the two real modules it
+    cross-checks, already on disk, no network) -- the same cheap class
+    `check_checkout`/`check_vault_leak`/`check_star_covenant`/
+    `check_duplicate_regex` already hold.
+
+    Task 159 built this checker and proved it live against STRATEGY.md's
+    metrics table, but never wired it into this hourly block --
+    `ritual_completeness_check.py` only ever audits `check_*` functions
+    ALREADY DEFINED inside this file, so a whole separate, real, passing
+    check tool sat unwired for 248 tasks with nothing catching it, the
+    same "built, tested, never wired in" shape tasks 397/404 already
+    found and closed elsewhere. Never edits anything; a real drift
+    between STRATEGY.md's stated targets and the code that claims to
+    mirror them, if one is ever found, is a god-on-duty escalation, not
+    something this check silently repairs."""
+    mod = _strategy_targets_check()
+    kwargs = {}
+    if strategy_path is not None:
+        kwargs["strategy_path"] = strategy_path
+    result = mod.check_strategy_targets(**kwargs)
+    clean = result["report_streak"]["agree"] and result["shared_reports"]["agree"]
+    return {"clean": clean, **result}
+
+
 def check_change_gate(report_info: dict) -> dict | None:
     """Fold `change_gate.should_post_gap()` -- task 69's own change-gate
     rule -- using whichever report text `check_report_freshness` already
@@ -1051,6 +1082,7 @@ def run_ritual_check(
     toolkits_consent_log_path: str | None = None,
     cluster_day_dir: str | None = None,
     cluster_day_today=None,
+    strategy_targets_path: str | None = None,
     record_scribe_growth: bool = False,
     record_words: bool = False,
 ) -> dict:
@@ -1119,6 +1151,7 @@ def run_ritual_check(
         metrics_path=toolkits_metrics_path, consent_log_path=toolkits_consent_log_path
     )
     cluster_day = check_cluster_day_cadence(chronicle_dir=cluster_day_dir, today=cluster_day_today)
+    strategy_targets = check_strategy_targets(strategy_path=strategy_targets_path)
     broken = (
         (not town["ok"])
         or (not fencepost["ok"])
@@ -1139,6 +1172,7 @@ def run_ritual_check(
         or (not wip_reclaim["clean"])
         or (not scopes_completeness["clean"])
         or (not toolkits_in_use["clean"])
+        or (not strategy_targets["clean"])
     )
     return {
         "now": now_iso,
@@ -1177,6 +1211,7 @@ def run_ritual_check(
         "scopes_completeness": scopes_completeness,
         "toolkits_in_use": toolkits_in_use,
         "cluster_day": cluster_day,
+        "strategy_targets": strategy_targets,
         "broken": broken,
     }
 
@@ -1375,6 +1410,9 @@ def format_ritual_check(result: dict) -> str:
         )
     cd = result["cluster_day"]
     lines.append("  " + _cluster_day_check().format_cadence(cd))
+    st = result["strategy_targets"]
+    for line in _strategy_targets_check().format_strategy_targets(st).split("\n"):
+        lines.append("  " + line)
     return "\n".join(lines)
 
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Task 121. Off-By-One counts the tool that counts everything else.
 
-`tools/ritual_check.py` hand-wires 35 `check_*` functions into one hourly
+`tools/ritual_check.py` hand-wires 36 `check_*` functions into one hourly
 block: each is called inside `run_ritual_check`, its result assigned to a
 dict key, and that key printed as a line in `format_ritual_check`. Three
 separate places a single typo or a forgotten wire-up can silently drop a
@@ -46,6 +46,13 @@ this number go stale silently again. **Updated to 33** the same hour task
 that promise holds. **Updated to 35** the same hour task 397's
 `check_duplicate_regex` was wired in (34 was never itself narrated here,
 just typed straight into the count by whichever prior task moved it last
+along). **Updated to 36** the same hour task 407's `check_strategy_targets`
+was wired in -- task 159 had built and tested `strategy_targets_check.py`
+248 tasks earlier but never called it from `run_ritual_check`, and this
+very module's own audit never caught the gap because it only ever reads
+`check_*` functions already defined inside `ritual_check.py`'s own source,
+never the separate tool files under `tools/` that a future wiring pass
+might still be missing entirely
 -- caught in passing while updating this one, not chased further).
 
 Usage:
