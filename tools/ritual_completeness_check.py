@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Task 121. Off-By-One counts the tool that counts everything else.
 
-`tools/ritual_check.py` hand-wires 39 `check_*` functions into one hourly
+`tools/ritual_check.py` hand-wires 40 `check_*` functions into one hourly
 block: each is called inside `run_ritual_check`, its result assigned to a
 dict key, and that key printed as a line in `format_ritual_check`. Three
 separate places a single typo or a forgotten wire-up can silently drop a
@@ -110,6 +110,17 @@ real, both honestly 0/2 since founding" -- `shared_reports_check.py`
 line 7) but for which no running cross-check had ever actually been
 wired. `find_unwired_tool_files()` (task 409) already covers this file
 going forward, since it lives in `tools/`.
+
+**Updated to 40** the same hour task 413's `check_gap_true_positive_rate`
+was wired in -- `tools/gap_true_positive_check.py` (task 413, the same
+shape tasks 145/412 already proved) cross-checks `records/metrics.jsonl`'s
+`gap_true_positive_rate` field against `seam_engine.audit.audit_ledger()`'s
+real, live tally. Ogun's own highest-stakes leading metric ("false-positive
+gaps... erode the read-trust the whole product rests on") had a sibling
+check (task 410's `check_strategy_true_positive`) for the STRATEGY.md
+TARGET, but nothing ever read the hand-recorded rate itself back against
+the same live Ledger. `find_unwired_tool_files()` (task 409) already
+covers this file going forward, since it lives in `tools/`.
 
 Usage:
     python3 tools/ritual_completeness_check.py check

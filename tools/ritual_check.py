@@ -329,6 +329,12 @@ def _connected_users_check():
     return _load("_ritual_connected_users_check", os.path.join(ROOT, "tools", "connected_users_check.py"))
 
 
+def _gap_true_positive_check():
+    return _load(
+        "_ritual_gap_true_positive_check", os.path.join(ROOT, "tools", "gap_true_positive_check.py")
+    )
+
+
 def _cluster_day_check():
     return _load("_ritual_cluster_day_check", os.path.join(ROOT, "tools", "cluster_day_check.py"))
 
@@ -1123,6 +1129,39 @@ def check_strategy_true_positive(
     return {"clean": clean, **result}
 
 
+def check_gap_true_positive_rate(
+    metrics_path: str | None = None, ledger_base: str | None = None
+) -> dict:
+    """Task 413: fold `gap_true_positive_check.py`'s own cross-check of
+    `records/metrics.jsonl`'s last `gap_true_positive_rate` reading
+    against the real, live `seam_engine.audit.audit_ledger()` tally into
+    the one block -- the same shape `check_toolkits_in_use` (145) and
+    `check_connected_users` (412) already hold for their sibling
+    metrics.jsonl fields, applied here to Ogun's own highest-stakes
+    leading metric ("false-positive gaps... erode the read-trust the
+    whole product rests on"). `check_strategy_true_positive` (410) already
+    cross-checks STRATEGY.md's stated >=90% TARGET against the live
+    tally -- a different comparison, a document's promise against
+    reality -- and never once reads the hand-recorded
+    `gap_true_positive_rate` number itself. Confirmed by grep before this
+    task: zero references to `gap_true_positive_rate` anywhere in
+    `tools/*.py` or `fencepost/seam_engine/src/seam_engine/*.py`.
+    Unconditional, local-filesystem-only (reads `records/metrics.jsonl`
+    and the real fencepost Ledger, both already on disk, no network) --
+    the same cheap class `check_toolkits_in_use`/`check_connected_users`
+    already hold. A real hit here DOES flip `broken`: a stale or
+    hand-copied-forward true-positive number silently disagreeing with
+    the live Ledger is a live governance regression on the flagship's own
+    trust metric, not an honest zero-state waiting on the calendar."""
+    mod = _gap_true_positive_check()
+    kwargs = {}
+    if metrics_path is not None:
+        kwargs["metrics_path"] = metrics_path
+    if ledger_base is not None:
+        kwargs["ledger_base"] = ledger_base
+    return mod.check_gap_true_positive_rate(**kwargs)
+
+
 def check_network_boundary(dirs: tuple | None = None) -> dict:
     """Task 408: fold network_boundary_check.py's own AST-based "no
     network" trust-boundary sweep (tasks 163/164) into the one block.
@@ -1216,6 +1255,8 @@ def run_ritual_check(
     network_boundary_dirs: tuple | None = None,
     strategy_true_positive_path: str | None = None,
     strategy_true_positive_ledger_base: str | None = None,
+    gap_true_positive_metrics_path: str | None = None,
+    gap_true_positive_ledger_base: str | None = None,
     record_scribe_growth: bool = False,
     record_words: bool = False,
 ) -> dict:
@@ -1297,6 +1338,10 @@ def run_ritual_check(
         strategy_path=strategy_true_positive_path,
         ledger_base=strategy_true_positive_ledger_base,
     )
+    gap_true_positive = check_gap_true_positive_rate(
+        metrics_path=gap_true_positive_metrics_path,
+        ledger_base=gap_true_positive_ledger_base,
+    )
     broken = (
         (not town["ok"])
         or (not fencepost["ok"])
@@ -1321,6 +1366,7 @@ def run_ritual_check(
         or (not strategy_targets["clean"])
         or (not network_boundary["clean"])
         or (not strategy_true_positive["clean"])
+        or (not gap_true_positive["clean"])
     )
     return {
         "now": now_iso,
@@ -1363,6 +1409,7 @@ def run_ritual_check(
         "strategy_targets": strategy_targets,
         "network_boundary": network_boundary,
         "strategy_true_positive": strategy_true_positive,
+        "gap_true_positive": gap_true_positive,
         "broken": broken,
     }
 
@@ -1597,6 +1644,26 @@ def format_ritual_check(result: dict) -> str:
             f"  strategy true-positive rate: BROKEN -- live rate {stp['live_rate_pct']}% over "
             f"{stp['live_total']} claim(s) does not meet STRATEGY.md's >={stp['strategy_target_pct']}% "
             "bar, escalate now"
+        )
+    gtp = result["gap_true_positive"]
+    if gtp["claimed"] is None:
+        real = "none audited yet" if gtp["real"] is None else f"{round(gtp['real'] * 100, 4)}%"
+        lines.append(f"  gap true-positive rate: clean (no metrics.jsonl reading yet; real ground truth is {real})")
+    elif gtp["real"] is None:
+        lines.append(
+            f"  gap true-positive rate: BROKEN -- metrics.jsonl's {gtp['claimed_date']} reading claims "
+            f"{gtp['claimed']}, but the real Ledger has audited zero gaps, escalate now"
+        )
+    elif gtp["clean"]:
+        lines.append(
+            f"  gap true-positive rate: clean ({round(gtp['real'] * 100, 4)}% real, "
+            f"metrics.jsonl's {gtp['claimed_date']} reading agrees)"
+        )
+    else:
+        lines.append(
+            f"  gap true-positive rate: BROKEN -- metrics.jsonl's {gtp['claimed_date']} reading claims "
+            f"{round(gtp['claimed'] * 100, 4)}%, real ground truth is {round(gtp['real'] * 100, 4)}% -- "
+            "STRATEGY.md's own Ogun's-law metric is misreporting live, escalate now"
         )
     return "\n".join(lines)
 

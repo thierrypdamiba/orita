@@ -2147,6 +2147,105 @@ class ConnectedUsersFoldCase(unittest.TestCase):
         self.assertFalse(result["broken"])
 
 
+class GapTruePositiveFoldCase(unittest.TestCase):
+    """Task 413: run_ritual_check() folds gap_true_positive_check.py's own
+    cross-check of records/metrics.jsonl's last gap_true_positive_rate
+    reading against seam_engine.audit.audit_ledger()'s real, live tally
+    into the same structured result -- the sibling of
+    ConnectedUsersFoldCase/ToolkitsInUseFoldCase above, same shape,
+    different field: clean against a fixture where the two agree, BROKEN
+    (and printed) where they don't, and honestly clean against the real,
+    live town state today (every recorded reading to date is 1.0, and the
+    real Ledger's every audited gap so far is CONFIRMED)."""
+
+    def setUp(self):
+        self.tmp = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.tmp, ignore_errors=True)
+        self.metrics_path = os.path.join(self.tmp, "metrics.jsonl")
+        self.ledger_base = os.path.join(self.tmp, "ledger")
+        os.mkdir(self.ledger_base)
+
+    def _write_metrics(self, rows):
+        with open(self.metrics_path, "w", encoding="utf-8") as f:
+            for row in rows:
+                f.write(json.dumps(row) + "\n")
+
+    def _scan(self, confidence=0.9, bar=0.70):
+        return {
+            "generated_at": "t",
+            "repo": "x/orita",
+            "window_hours": 24,
+            "confidence_bar": bar,
+            "separation_margin": 0.15,
+            "primary_gap": {
+                "slug": "milestone-unannounced",
+                "headline": "h",
+                "detail": "d",
+                "confidence": confidence,
+                "evidence": ["https://github.com/x/orita/commit/0000000"],
+                "label": "primary",
+            },
+            "tail": [{"slug": "coincidence-a", "confidence": 0.1, "label": "coincidence"}],
+            "excluded": [],
+        }
+
+    def test_agreeing_reading_is_clean(self):
+        seam_ledger.append_scan(
+            self._scan(confidence=0.9), now=datetime(2026, 7, 12, 12, tzinfo=timezone.utc), base=Path(self.ledger_base)
+        )
+        self._write_metrics([{"date": "2026-07-12", "gap_true_positive_rate": 1.0}])
+        result = rc.run_ritual_check(
+            gap_true_positive_metrics_path=self.metrics_path,
+            gap_true_positive_ledger_base=self.ledger_base,
+        )
+        self.assertTrue(result["gap_true_positive"]["clean"])
+        self.assertFalse(result["broken"])
+        self.assertIn(
+            "gap true-positive rate: clean (100.0% real, metrics.jsonl's 2026-07-12 reading agrees)",
+            rc.format_ritual_check(result),
+        )
+
+    def test_disagreeing_reading_flips_broken_and_prints_both_numbers(self):
+        # Real rate is 75% (one genuine false positive), but yesterday's
+        # flattering 1.0 got hand-copied forward instead of updated.
+        seam_ledger.append_scan(
+            self._scan(confidence=0.9), now=datetime(2026, 7, 12, 12, tzinfo=timezone.utc), base=Path(self.ledger_base)
+        )
+        seam_ledger.append_scan(
+            self._scan(confidence=0.9), now=datetime(2026, 7, 13, 12, tzinfo=timezone.utc), base=Path(self.ledger_base)
+        )
+        seam_ledger.append_scan(
+            self._scan(confidence=0.9), now=datetime(2026, 7, 14, 12, tzinfo=timezone.utc), base=Path(self.ledger_base)
+        )
+        seam_ledger.append_scan(
+            self._scan(confidence=0.60, bar=0.70),
+            now=datetime(2026, 7, 15, 12, tzinfo=timezone.utc),
+            base=Path(self.ledger_base),
+        )
+        self._write_metrics([{"date": "2026-07-15", "gap_true_positive_rate": 1.0}])
+        result = rc.run_ritual_check(
+            gap_true_positive_metrics_path=self.metrics_path,
+            gap_true_positive_ledger_base=self.ledger_base,
+        )
+        self.assertFalse(result["gap_true_positive"]["clean"])
+        self.assertTrue(result["broken"])
+        formatted = rc.format_ritual_check(result)
+        self.assertIn("gap true-positive rate: BROKEN", formatted)
+        self.assertIn("claims 100.0%", formatted)
+        self.assertIn("is 75.0%", formatted)
+
+    def test_default_path_reads_the_real_state_and_is_honestly_clean(self):
+        """No override: reads the real records/metrics.jsonl and the real
+        fencepost Ledger. gap_true_positive_rate has read 1.0 every
+        recorded day, and the real Ledger's every audited gap so far is
+        CONFIRMED, so the real, live state this hour genuinely agrees."""
+        result = rc.run_ritual_check()
+        self.assertEqual(result["gap_true_positive"]["claimed"], 1.0)
+        self.assertEqual(result["gap_true_positive"]["real"], 1.0)
+        self.assertTrue(result["gap_true_positive"]["clean"])
+        self.assertFalse(result["broken"])
+
+
 class LoadJsonArgShapeGuardCase(unittest.TestCase):
     """ROADMAP.md task 364. `_load_json_arg` is the shared helper the CLI's
     six file-argument flags (`--square-state`, `--arcade-apps-state`,
