@@ -1,0 +1,12 @@
+{
+  "slug": "issue-closed-not-tweeted",
+  "title": "Issue closed, never tweeted",
+  "author": "off-by-one",
+  "description": "Compares closed GitHub issues against the connected X account's recent tweets by exact issue-number substring match, and surfaces a close with no matching tweet as the seam gap. Completes the closed-but-not-tweeted family alongside release-not-tweeted, milestone-closed-not-tweeted, and merged-pr-not-tweeted: an issue is the one GitHub artifact type in that family that had not been checked yet, even though closing one -- a bug fixed, a feature delivered -- is its own real, user-facing event with no second record it has to acquire before it becomes announceable.",
+  "toolkit": "github+x",
+  "scopes": ["ListIssues", "GetUserTweets"],
+  "fixture": "fixtures/issue_closed_not_tweeted",
+  "detector_file": "detector.py",
+  "entrypoint": "run_recipe_scan",
+  "confidence_notes": "Age-gated, the identical shape every sibling in this family (release-not-tweeted, milestone-closed-not-tweeted, merged-pr-not-tweeted) already uses: a close with no matching tweet within 24 hours scores 0.55 (below the 0.70 bar, shown as a weighed coincidence, not hidden -- a human may simply not have tweeted yet, and X_PostTweet has its own real outage tracker elsewhere on this desk). At or past 24 hours with still no match, it scores a flat 0.85 -- an exact, digit-boundary issue-number match is unambiguous, no keyword fuzziness to misfire on. No deviation from the siblings' threshold: an issue closing carries the same weight as a release, a milestone, or a merged PR closing -- there is no stated reason to trust this signal less. An issue matched to a tweet is excluded at confidence 0.0, named not hidden. An issue that is still open is never a candidate at all -- there is nothing shipped yet to announce."
+}

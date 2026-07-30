@@ -1,0 +1,30 @@
+[
+  {
+    "number": 12,
+    "title": "Fix the vault leak checker's whole-line-only matching gap",
+    "state": "closed",
+    "closed_at": "2026-07-25T00:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/issues/12"
+  },
+  {
+    "number": 13,
+    "title": "Add the duplicate-issue-still-open recipe",
+    "state": "closed",
+    "closed_at": "2026-07-20T00:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/issues/13"
+  },
+  {
+    "number": 14,
+    "title": "Fold the fourteenth cadence into ritual_check.py",
+    "state": "closed",
+    "closed_at": "2026-07-27T06:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/issues/14"
+  },
+  {
+    "number": 15,
+    "title": "Investigate flaky test_the_tithe roll",
+    "state": "open",
+    "closed_at": null,
+    "url": "https://github.com/thierrypdamiba/orita/issues/15"
+  }
+]

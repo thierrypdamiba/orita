@@ -205,6 +205,18 @@ Matching is by exact, digit-boundary PR-number substring, the same
 "exact, not fuzzy" discipline `release-not-tweeted`'s own tag matcher
 established; both scopes (`ListPullRequests`, `GetUserTweets`) already sit
 on `SCOPES.md`'s cleared oath table, no new scope wiring needed.
+[`RECIPES/issue-closed-not-tweeted/`](RECIPES/issue-closed-not-tweeted/)
+is the twenty-first (ROADMAP.md #399): completes the closed-but-not-tweeted
+family alongside `release-not-tweeted`, `milestone-closed-not-tweeted`, and
+`merged-pr-not-tweeted` — a GitHub issue closes, but no tweet from the
+connected X account ever names its number. An issue was the one artifact
+type in that family without this check, even though closing one (a bug
+fixed, a feature delivered) is its own real, user-facing event with no
+second record it has to acquire before it becomes announceable. Same
+exact, digit-boundary number matching and the same 24-hour age gate as
+every sibling in the family, no deviation; both scopes (`ListIssues`,
+`GetUserTweets`) already sit on `SCOPES.md`'s cleared oath table, no new
+scope wiring needed.
 
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)
