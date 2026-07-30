@@ -2246,6 +2246,83 @@ class GapTruePositiveFoldCase(unittest.TestCase):
         self.assertFalse(result["broken"])
 
 
+class ReportShippedFoldCase(unittest.TestCase):
+    """Task 415: run_ritual_check() folds report_shipped_check.py's own
+    cross-check of records/metrics.jsonl's last reports_shipped_today
+    reading against real, live fencepost/REPORTS/ filesystem ground
+    truth into the same structured result -- the sibling of
+    GapTruePositiveFoldCase/ConnectedUsersFoldCase/ToolkitsInUseFoldCase
+    above, same shape, applied to off-by-one's own STRATEGY.md row:
+    clean against a fixture where the claim and the file agree, BROKEN
+    (and printed) where they don't, and honestly clean against the real,
+    live town state today (a real REPORTS/2026-07-30.md exists, and the
+    last recorded reading claims exactly 1)."""
+
+    def setUp(self):
+        self.tmp = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.tmp, ignore_errors=True)
+        self.metrics_path = os.path.join(self.tmp, "metrics.jsonl")
+        self.reports_dir = os.path.join(self.tmp, "REPORTS")
+        os.mkdir(self.reports_dir)
+
+    def _write_metrics(self, rows):
+        with open(self.metrics_path, "w", encoding="utf-8") as f:
+            for row in rows:
+                f.write(json.dumps(row) + "\n")
+
+    def test_agreeing_reading_is_clean(self):
+        with open(os.path.join(self.reports_dir, "2026-07-12.md"), "w", encoding="utf-8") as f:
+            f.write("# report\n")
+        self._write_metrics([{"date": "2026-07-12", "reports_shipped_today": 1}])
+        result = rc.run_ritual_check(
+            report_shipped_metrics_path=self.metrics_path,
+            report_shipped_reports_dir=self.reports_dir,
+        )
+        self.assertTrue(result["report_shipped"]["clean"])
+        self.assertFalse(result["broken"])
+        self.assertIn(
+            "reports shipped today: clean (metrics.jsonl's 2026-07-12 reading claims 1, "
+            "real ground truth agrees)",
+            rc.format_ritual_check(result),
+        )
+
+    def test_disagreeing_reading_flips_broken_and_prints_both_numbers(self):
+        # Claims a report shipped, but seam-scan.yml's run that day never
+        # actually landed a file -- the same class of stale/hand-copied
+        # claim the sibling fold cases each guard against.
+        self._write_metrics([{"date": "2026-07-14", "reports_shipped_today": 1}])
+        result = rc.run_ritual_check(
+            report_shipped_metrics_path=self.metrics_path,
+            report_shipped_reports_dir=self.reports_dir,
+        )
+        self.assertFalse(result["report_shipped"]["clean"])
+        self.assertTrue(result["broken"])
+        formatted = rc.format_ritual_check(result)
+        self.assertIn("reports shipped today: BROKEN", formatted)
+        self.assertIn("claims 1", formatted)
+        self.assertIn("is 0", formatted)
+
+    def test_no_reading_yet_is_clean(self):
+        self._write_metrics([{"date": "2026-07-01"}])
+        result = rc.run_ritual_check(
+            report_shipped_metrics_path=self.metrics_path,
+            report_shipped_reports_dir=self.reports_dir,
+        )
+        self.assertTrue(result["report_shipped"]["clean"])
+        self.assertIsNone(result["report_shipped"]["claimed"])
+        self.assertFalse(result["broken"])
+
+    def test_default_path_reads_the_real_state_and_is_honestly_clean(self):
+        """No override: reads the real records/metrics.jsonl and the real
+        fencepost/REPORTS/ directory. The last recorded reading's date
+        has a real report file on disk, so the real, live state this
+        hour genuinely agrees."""
+        result = rc.run_ritual_check()
+        self.assertEqual(result["report_shipped"]["claimed"], result["report_shipped"]["real"])
+        self.assertTrue(result["report_shipped"]["clean"])
+        self.assertFalse(result["broken"])
+
+
 class LoadJsonArgShapeGuardCase(unittest.TestCase):
     """ROADMAP.md task 364. `_load_json_arg` is the shared helper the CLI's
     six file-argument flags (`--square-state`, `--arcade-apps-state`,

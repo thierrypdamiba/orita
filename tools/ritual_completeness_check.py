@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Task 121. Off-By-One counts the tool that counts everything else.
 
-`tools/ritual_check.py` hand-wires 40 `check_*` functions into one hourly
+`tools/ritual_check.py` hand-wires 41 `check_*` functions into one hourly
 block: each is called inside `run_ritual_check`, its result assigned to a
 dict key, and that key printed as a line in `format_ritual_check`. Three
 separate places a single typo or a forgotten wire-up can silently drop a
@@ -121,6 +121,16 @@ check (task 410's `check_strategy_true_positive`) for the STRATEGY.md
 TARGET, but nothing ever read the hand-recorded rate itself back against
 the same live Ledger. `find_unwired_tool_files()` (task 409) already
 covers this file going forward, since it lives in `tools/`.
+
+**Updated to 41** the same hour task 415's `check_report_shipped` was
+wired in -- `tools/report_shipped_check.py` (task 415, the same shape
+tasks 145/412/413 already proved) cross-checks `records/metrics.jsonl`'s
+`reports_shipped_today` field against `fencepost/REPORTS/<claimed
+date>.md`'s own real existence on disk. Off-By-One's own STRATEGY.md row
+("Daily Fencepost Report shipped (town dogfood)") had sat as the last of
+four sibling metrics.jsonl fields with no live cross-check, closed here
+by the god whose row it actually is. `find_unwired_tool_files()` (task
+409) already covers this file going forward, since it lives in `tools/`.
 
 Usage:
     python3 tools/ritual_completeness_check.py check

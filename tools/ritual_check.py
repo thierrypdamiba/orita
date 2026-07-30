@@ -335,6 +335,12 @@ def _gap_true_positive_check():
     )
 
 
+def _report_shipped_check():
+    return _load(
+        "_ritual_report_shipped_check", os.path.join(ROOT, "tools", "report_shipped_check.py")
+    )
+
+
 def _cluster_day_check():
     return _load("_ritual_cluster_day_check", os.path.join(ROOT, "tools", "cluster_day_check.py"))
 
@@ -1162,6 +1168,38 @@ def check_gap_true_positive_rate(
     return mod.check_gap_true_positive_rate(**kwargs)
 
 
+def check_report_shipped(metrics_path: str | None = None, reports_dir: str | None = None) -> dict:
+    """Task 415: fold `report_shipped_check.py`'s own cross-check of
+    `records/metrics.jsonl`'s last `reports_shipped_today` reading
+    against real, live filesystem ground truth into the one block -- the
+    same shape `check_toolkits_in_use` (145), `check_connected_users`
+    (412), and `check_gap_true_positive_rate` (413) already hold for
+    their sibling metrics.jsonl fields, applied here to STRATEGY.md's
+    off-by-one's own row ("Daily Fencepost Report shipped (town dogfood)
+    | leading | 1/day, 30 of 30 days | off-by-one"). `check_report_cadence`
+    (task 116) already computes the real streak/total off
+    `fencepost/REPORTS/`'s filesystem, but never once asked whether
+    TODAY's specific hand-typed claim agrees with whether that day's file
+    actually exists. Confirmed by grep before this task: zero references
+    to `reports_shipped_today` anywhere in `tools/*.py` or
+    `fencepost/seam_engine/src/seam_engine/*.py`. Unconditional,
+    local-filesystem-only (reads `records/metrics.jsonl` and
+    `fencepost/REPORTS/`, both already on disk, no network) -- the same
+    cheap class `check_toolkits_in_use`/`check_connected_users`/
+    `check_gap_true_positive_rate` already hold. A real hit here DOES
+    flip `broken`: a hand-typed claim disagreeing with whether the report
+    file actually landed is a live governance regression on the
+    flagship's own dogfood cadence, not an honest zero-state waiting on
+    the calendar."""
+    mod = _report_shipped_check()
+    kwargs = {}
+    if metrics_path is not None:
+        kwargs["metrics_path"] = metrics_path
+    if reports_dir is not None:
+        kwargs["reports_dir"] = reports_dir
+    return mod.check_report_shipped(**kwargs)
+
+
 def check_network_boundary(dirs: tuple | None = None) -> dict:
     """Task 408: fold network_boundary_check.py's own AST-based "no
     network" trust-boundary sweep (tasks 163/164) into the one block.
@@ -1257,6 +1295,8 @@ def run_ritual_check(
     strategy_true_positive_ledger_base: str | None = None,
     gap_true_positive_metrics_path: str | None = None,
     gap_true_positive_ledger_base: str | None = None,
+    report_shipped_metrics_path: str | None = None,
+    report_shipped_reports_dir: str | None = None,
     record_scribe_growth: bool = False,
     record_words: bool = False,
 ) -> dict:
@@ -1342,6 +1382,10 @@ def run_ritual_check(
         metrics_path=gap_true_positive_metrics_path,
         ledger_base=gap_true_positive_ledger_base,
     )
+    report_shipped = check_report_shipped(
+        metrics_path=report_shipped_metrics_path,
+        reports_dir=report_shipped_reports_dir,
+    )
     broken = (
         (not town["ok"])
         or (not fencepost["ok"])
@@ -1367,6 +1411,7 @@ def run_ritual_check(
         or (not network_boundary["clean"])
         or (not strategy_true_positive["clean"])
         or (not gap_true_positive["clean"])
+        or (not report_shipped["clean"])
     )
     return {
         "now": now_iso,
@@ -1410,6 +1455,7 @@ def run_ritual_check(
         "network_boundary": network_boundary,
         "strategy_true_positive": strategy_true_positive,
         "gap_true_positive": gap_true_positive,
+        "report_shipped": report_shipped,
         "broken": broken,
     }
 
@@ -1664,6 +1710,20 @@ def format_ritual_check(result: dict) -> str:
             f"  gap true-positive rate: BROKEN -- metrics.jsonl's {gtp['claimed_date']} reading claims "
             f"{round(gtp['claimed'] * 100, 4)}%, real ground truth is {round(gtp['real'] * 100, 4)}% -- "
             "STRATEGY.md's own Ogun's-law metric is misreporting live, escalate now"
+        )
+    rs = result["report_shipped"]
+    if rs["claimed"] is None:
+        lines.append("  reports shipped today: clean (no metrics.jsonl reading yet; nothing to cross-check)")
+    elif rs["clean"]:
+        lines.append(
+            f"  reports shipped today: clean (metrics.jsonl's {rs['claimed_date']} reading claims "
+            f"{rs['claimed']}, real ground truth agrees)"
+        )
+    else:
+        lines.append(
+            f"  reports shipped today: BROKEN -- metrics.jsonl's {rs['claimed_date']} reading claims "
+            f"{rs['claimed']}, real ground truth (fencepost/REPORTS/{rs['claimed_date']}.md's own existence) "
+            f"is {rs['real']} -- STRATEGY.md's off-by-one row is misreporting live, escalate now"
         )
     return "\n".join(lines)
 
