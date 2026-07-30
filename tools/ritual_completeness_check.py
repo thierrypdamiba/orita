@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Task 121. Off-By-One counts the tool that counts everything else.
 
-`tools/ritual_check.py` hand-wires 41 `check_*` functions into one hourly
+`tools/ritual_check.py` hand-wires 42 `check_*` functions into one hourly
 block: each is called inside `run_ritual_check`, its result assigned to a
 dict key, and that key printed as a line in `format_ritual_check`. Three
 separate places a single typo or a forgotten wire-up can silently drop a
@@ -122,7 +122,10 @@ TARGET, but nothing ever read the hand-recorded rate itself back against
 the same live Ledger. `find_unwired_tool_files()` (task 409) already
 covers this file going forward, since it lives in `tools/`.
 
-**Updated to 41** the same hour task 415's `check_report_shipped` was
+**Updated to 42** the same hour task 416's `check_tasks_shipped` was
+wired in -- the last of the four sibling metrics.jsonl fields task 415
+found and left open now has a live cross-check too. **Updated to 41** the
+same hour task 415's `check_report_shipped` was
 wired in -- `tools/report_shipped_check.py` (task 415, the same shape
 tasks 145/412/413 already proved) cross-checks `records/metrics.jsonl`'s
 `reports_shipped_today` field against `fencepost/REPORTS/<claimed

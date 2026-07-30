@@ -341,6 +341,12 @@ def _report_shipped_check():
     )
 
 
+def _tasks_shipped_check():
+    return _load(
+        "_ritual_tasks_shipped_check", os.path.join(ROOT, "tools", "tasks_shipped_check.py")
+    )
+
+
 def _cluster_day_check():
     return _load("_ritual_cluster_day_check", os.path.join(ROOT, "tools", "cluster_day_check.py"))
 
@@ -1200,6 +1206,38 @@ def check_report_shipped(metrics_path: str | None = None, reports_dir: str | Non
     return mod.check_report_shipped(**kwargs)
 
 
+def check_tasks_shipped(metrics_path: str | None = None, buildlog_path: str | None = None) -> dict:
+    """Task 416: fold `tasks_shipped_check.py`'s own cross-check of
+    `records/metrics.jsonl`'s last `tasks_shipped_today` reading against
+    real, live `BUILDLOG.md` ground truth into the one block -- the last
+    of the four sibling metrics.jsonl fields task 415 found and left open
+    (`distinct_toolkits_in_use` (145), `connected_users_oauth` (412),
+    `gap_true_positive_rate` (413), `reports_shipped_today` (415) each
+    already had one; this one didn't). Task 415 called this field's ground
+    truth "messier" because `ROADMAP.md` gets archived out from under
+    itself -- but `BUILDLOG.md` never is, and it is the same file tasks 117
+    and 275 already hand-counted this exact number from. Confirmed by grep
+    before this task: zero references to `tasks_shipped_today` anywhere in
+    `tools/*.py` or `fencepost/seam_engine/src/seam_engine/*.py`.
+    Unconditional, local-filesystem-only (reads `records/metrics.jsonl` and
+    `BUILDLOG.md`, both already on disk, no network) -- the same cheap
+    class every sibling check already holds. Returns clean (not broken)
+    when no daily-aggregate BUILDLOG.md row exists for the claimed reading's
+    date -- a handful of historical catch-up hours phrased that line
+    differently, and guessing a cutoff for those would be worse than
+    naming the gap plainly. A real hit here DOES flip `broken`: a
+    hand-typed claim disagreeing with BUILDLOG.md's own dated rows is a
+    live governance regression on the town's own build-log honesty, not
+    an innocent zero-state waiting on the calendar."""
+    mod = _tasks_shipped_check()
+    kwargs = {}
+    if metrics_path is not None:
+        kwargs["metrics_path"] = metrics_path
+    if buildlog_path is not None:
+        kwargs["buildlog_path"] = buildlog_path
+    return mod.check_tasks_shipped(**kwargs)
+
+
 def check_network_boundary(dirs: tuple | None = None) -> dict:
     """Task 408: fold network_boundary_check.py's own AST-based "no
     network" trust-boundary sweep (tasks 163/164) into the one block.
@@ -1297,6 +1335,8 @@ def run_ritual_check(
     gap_true_positive_ledger_base: str | None = None,
     report_shipped_metrics_path: str | None = None,
     report_shipped_reports_dir: str | None = None,
+    tasks_shipped_metrics_path: str | None = None,
+    tasks_shipped_buildlog_path: str | None = None,
     record_scribe_growth: bool = False,
     record_words: bool = False,
 ) -> dict:
@@ -1386,6 +1426,10 @@ def run_ritual_check(
         metrics_path=report_shipped_metrics_path,
         reports_dir=report_shipped_reports_dir,
     )
+    tasks_shipped = check_tasks_shipped(
+        metrics_path=tasks_shipped_metrics_path,
+        buildlog_path=tasks_shipped_buildlog_path,
+    )
     broken = (
         (not town["ok"])
         or (not fencepost["ok"])
@@ -1412,6 +1456,7 @@ def run_ritual_check(
         or (not strategy_true_positive["clean"])
         or (not gap_true_positive["clean"])
         or (not report_shipped["clean"])
+        or (not tasks_shipped["clean"])
     )
     return {
         "now": now_iso,
@@ -1456,6 +1501,7 @@ def run_ritual_check(
         "strategy_true_positive": strategy_true_positive,
         "gap_true_positive": gap_true_positive,
         "report_shipped": report_shipped,
+        "tasks_shipped": tasks_shipped,
         "broken": broken,
     }
 
@@ -1724,6 +1770,26 @@ def format_ritual_check(result: dict) -> str:
             f"  reports shipped today: BROKEN -- metrics.jsonl's {rs['claimed_date']} reading claims "
             f"{rs['claimed']}, real ground truth (fencepost/REPORTS/{rs['claimed_date']}.md's own existence) "
             f"is {rs['real']} -- STRATEGY.md's off-by-one row is misreporting live, escalate now"
+        )
+    ts = result["tasks_shipped"]
+    if ts["claimed"] is None:
+        lines.append("  tasks shipped today: clean (no metrics.jsonl reading yet; nothing to cross-check)")
+    elif ts["real"] is None:
+        lines.append(
+            f"  tasks shipped today: clean (metrics.jsonl's {ts['claimed_date']} reading claims "
+            f"{ts['claimed']}; no daily-aggregate BUILDLOG.md row found for that date, nothing to cross-check)"
+        )
+    elif ts["clean"]:
+        lines.append(
+            f"  tasks shipped today: clean (metrics.jsonl's {ts['claimed_date']} reading claims "
+            f"{ts['claimed']}, real ground truth (BUILDLOG.md's own dated rows before that day's "
+            "aggregate task) agrees)"
+        )
+    else:
+        lines.append(
+            f"  tasks shipped today: BROKEN -- metrics.jsonl's {ts['claimed_date']} reading claims "
+            f"{ts['claimed']}, real ground truth (BUILDLOG.md's own dated rows before that day's "
+            f"aggregate task) is {ts['real']} -- misreporting live, escalate now"
         )
     return "\n".join(lines)
 
