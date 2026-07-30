@@ -80,6 +80,26 @@ seam_engine/*.py`, so this exact blind spot survives this module's own
 audit even now; found by hand, the same way task 408 was, not by any
 running check.
 
+**Task 411** closes the gap task 410's own note left open, the same way
+task 409 closed the equivalent `tools/*.py` gap for tasks 407/408:
+`find_unwired_strategy_audit_modules()` below now scans
+`fencepost/seam_engine/src/seam_engine/*.py` for real, live
+STRATEGY.md-vs-code cross-check modules -- not by grepping for the string
+"STRATEGY.md" (seven files in that directory quote it in prose:
+`audit.py`, `closing_keywords.py`, `consent.py`, `draftback.py`,
+`report.py`, `streak.py`, plus `strategy_audit_target.py` itself -- a
+prose citation is not a live parse), but by the one precise, structural
+signal the two real instances of this shape share and nothing else does:
+a top-level module constant literally named `STRATEGY_MD` (`strategy_
+audit_target.py` here, and `tools/strategy_targets_check.py`, task 159 --
+already covered by `find_unwired_tool_files` since it lives in `tools/`).
+A module holding that constant and never referenced anywhere in
+`ritual_check.py`'s own source is exactly the shape that let
+`strategy_audit_target.py` sit unwired for 249 tasks -- now a running
+check instead of something found by hand every time. `compute_
+ritual_completeness()` folds its result in as `unwired_strategy_audit_
+modules`, the same class `unwired_tool_files` already holds.
+
 Usage:
     python3 tools/ritual_completeness_check.py check
 """
@@ -93,6 +113,10 @@ import sys
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DEFAULT_RITUAL_CHECK_PATH = os.path.join(ROOT, "tools", "ritual_check.py")
 DEFAULT_TOOLS_DIR = os.path.join(ROOT, "tools")
+DEFAULT_SEAM_ENGINE_DIR = os.path.join(
+    ROOT, "fencepost", "seam_engine", "src", "seam_engine"
+)
+STRATEGY_MD_CONSTANT_NAME = "STRATEGY_MD"
 RUN_FUNC_NAME = "run_ritual_check"
 FORMAT_FUNC_NAME = "format_ritual_check"
 EXEMPT_DICT_KEYS = {"now", "broken"}
@@ -114,6 +138,14 @@ EXEMPT_TOOL_FILES = {
     "closing_keyword_guard.py": "takes a commit-message-and-open-issues-csv argument each call -- a per-commit guard, not the hourly repo-state sweep run_ritual_check folds",
     "consent_grant_log.py": "append-only log library, called by toolkits_in_use_check.py (already wired) rather than loaded standalone",
 }
+
+# Every fencepost/seam_engine/src/seam_engine/*.py file that defines a live
+# STRATEGY_MD constant (see `_defines_strategy_md_constant`) but is NOT
+# expected to be loaded from run_ritual_check, and why. Empty today by
+# design, not by omission -- the one real instance of this shape
+# (`strategy_audit_target.py`) IS wired (task 410). A new entry here needs
+# a reason as honest as `EXEMPT_TOOL_FILES`'s own, not a rubber stamp.
+EXEMPT_SEAM_ENGINE_STRATEGY_MODULES: dict[str, str] = {}
 
 
 def claimed_check_count(doc: str | None = None) -> int:
@@ -229,8 +261,76 @@ def find_unwired_tool_files(
     return unwired
 
 
+def _defines_strategy_md_constant(path: str) -> bool:
+    """Whether `path`'s own top-level source defines a module-level
+    constant literally named STRATEGY_MD -- the exact, structural signal
+    both known STRATEGY.md-live-cross-check modules
+    (`tools/strategy_targets_check.py`, `strategy_audit_target.py`) share,
+    and that the six other seam_engine files which merely quote
+    STRATEGY.md in prose (`audit.py`, `closing_keywords.py`, `consent.py`,
+    `draftback.py`, `report.py`, `streak.py`) do not: a real, live parse of
+    the document's own path, not a citation of it in a docstring."""
+    with open(path, encoding="utf-8") as f:
+        tree = ast.parse(f.read(), filename=path)
+    for node in tree.body:
+        targets = None
+        if isinstance(node, ast.Assign):
+            targets = node.targets
+        elif isinstance(node, ast.AnnAssign):
+            targets = [node.target]
+        if targets is None:
+            continue
+        for target in targets:
+            if isinstance(target, ast.Name) and target.id == STRATEGY_MD_CONSTANT_NAME:
+                return True
+    return False
+
+
+def find_unwired_strategy_audit_modules(
+    seam_engine_dir: str | None = None, ritual_check_path: str | None = None
+) -> list:
+    """Every fencepost/seam_engine/src/seam_engine/*.py file that defines a
+    live STRATEGY_MD constant (`_defines_strategy_md_constant`) and whose
+    bare module stem (e.g. "strategy_audit_target", the name it is
+    imported under -- `import seam_engine.strategy_audit_target`, never a
+    quoted `"<name>.py"` file path the way `tools/*.py` is loaded) never
+    appears anywhere in ritual_check.py's own source, and which isn't
+    named in EXEMPT_SEAM_ENGINE_STRATEGY_MODULES with a reason. Task 410's
+    own closing note named this exact blind spot: `find_unwired_tool_files`
+    (task 409) only ever scans `tools/*.py`, never
+    `fencepost/seam_engine/src/seam_engine/*.py`, so a future module built
+    the same shape `strategy_audit_target.py` was (task 161, unwired for
+    249 tasks) could sit unwired indefinitely and this module's own audit
+    would never catch it. Missing directory (e.g. a fixture ritual_check.py
+    with no matching seam_engine tree) reads as zero violations, not an
+    error -- there is nothing to audit."""
+    seam_engine_dir = seam_engine_dir or DEFAULT_SEAM_ENGINE_DIR
+    ritual_check_path = ritual_check_path or DEFAULT_RITUAL_CHECK_PATH
+    if not os.path.isdir(seam_engine_dir):
+        return []
+    with open(ritual_check_path, encoding="utf-8") as f:
+        source = f.read()
+
+    unwired = []
+    for name in sorted(os.listdir(seam_engine_dir)):
+        if not name.endswith(".py") or name == "__init__.py":
+            continue
+        if name in EXEMPT_SEAM_ENGINE_STRATEGY_MODULES:
+            continue
+        path = os.path.join(seam_engine_dir, name)
+        if not _defines_strategy_md_constant(path):
+            continue
+        stem = name[:-3]
+        if re.search(rf"\b{re.escape(stem)}\b", source):
+            continue
+        unwired.append(name)
+    return unwired
+
+
 def compute_ritual_completeness(
-    source_path: str | None = None, tools_dir: str | None = None
+    source_path: str | None = None,
+    tools_dir: str | None = None,
+    seam_engine_dir: str | None = None,
 ) -> dict:
     source_path = source_path or DEFAULT_RITUAL_CHECK_PATH
     with open(source_path, encoding="utf-8") as f:
@@ -247,6 +347,9 @@ def compute_ritual_completeness(
             "missing_from_dict": [],
             "missing_from_format": [],
             "unwired_tool_files": find_unwired_tool_files(tools_dir, source_path),
+            "unwired_strategy_audit_modules": find_unwired_strategy_audit_modules(
+                seam_engine_dir, source_path
+            ),
             "error": f"could not find {RUN_FUNC_NAME}/{FORMAT_FUNC_NAME} in {source_path}",
         }
 
@@ -264,12 +367,16 @@ def compute_ritual_completeness(
     missing_from_format = sorted(checked_keys - printed)
 
     unwired_tool_files = find_unwired_tool_files(tools_dir, source_path)
+    unwired_strategy_audit_modules = find_unwired_strategy_audit_modules(
+        seam_engine_dir, source_path
+    )
 
     clean = not (
         missing_from_run
         or missing_from_dict
         or missing_from_format
         or unwired_tool_files
+        or unwired_strategy_audit_modules
     )
     return {
         "clean": clean,
@@ -277,6 +384,7 @@ def compute_ritual_completeness(
         "missing_from_dict": missing_from_dict,
         "missing_from_format": missing_from_format,
         "unwired_tool_files": unwired_tool_files,
+        "unwired_strategy_audit_modules": unwired_strategy_audit_modules,
     }
 
 
@@ -292,6 +400,11 @@ def format_ritual_completeness(result: dict) -> str:
         parts.append(f"returned but never printed in {FORMAT_FUNC_NAME}: {', '.join(result['missing_from_format'])}")
     if result.get("unwired_tool_files"):
         parts.append(f"tools/*.py never loaded from {RUN_FUNC_NAME} and not exempt: {', '.join(result['unwired_tool_files'])}")
+    if result.get("unwired_strategy_audit_modules"):
+        parts.append(
+            "seam_engine/*.py STRATEGY.md cross-check module(s) never referenced in "
+            f"{RUN_FUNC_NAME} and not exempt: {', '.join(result['unwired_strategy_audit_modules'])}"
+        )
     return "ritual completeness: BROKEN -- " + "; ".join(parts)
 
 

@@ -147,15 +147,19 @@ def format_ritual_check(result):
 
 class FixtureCompletenessCase(unittest.TestCase):
     """These fixtures exercise the three call/dict/print violations only --
-    each passes an empty tools_dir so the separate unwired_tool_files check
-    (task 409, exercised on its own in UnwiredToolFilesCase below) never
-    fires a false positive here by comparing a bare fixture body against
-    the real, populated tools/ directory."""
+    each passes an empty tools_dir and empty seam_engine_dir so the
+    separate unwired_tool_files/unwired_strategy_audit_modules checks
+    (tasks 409/411, exercised on their own in UnwiredToolFilesCase/
+    UnwiredStrategyAuditModulesCase below) never fire a false positive here
+    by comparing a bare fixture body against the real, populated tools/ or
+    seam_engine/ directories."""
 
     def setUp(self):
         self.tmp = tempfile.mkdtemp()
         self.empty_tools_dir = os.path.join(self.tmp, "tools")
         os.makedirs(self.empty_tools_dir)
+        self.empty_seam_engine_dir = os.path.join(self.tmp, "seam_engine")
+        os.makedirs(self.empty_seam_engine_dir)
 
     def tearDown(self):
         import shutil
@@ -168,7 +172,9 @@ class FixtureCompletenessCase(unittest.TestCase):
         return path
 
     def _compute(self, text):
-        return src.compute_ritual_completeness(self._path(text), self.empty_tools_dir)
+        return src.compute_ritual_completeness(
+            self._path(text), self.empty_tools_dir, self.empty_seam_engine_dir
+        )
 
     def test_clean_fixture_reports_no_violations(self):
         result = self._compute(CLEAN_FIXTURE)
@@ -233,6 +239,8 @@ class UnwiredToolFilesCase(unittest.TestCase):
         self.tmp = tempfile.mkdtemp()
         self.tools_dir = os.path.join(self.tmp, "tools")
         os.makedirs(self.tools_dir)
+        self.empty_seam_engine_dir = os.path.join(self.tmp, "seam_engine")
+        os.makedirs(self.empty_seam_engine_dir)
 
     def tearDown(self):
         import shutil
@@ -280,7 +288,9 @@ class UnwiredToolFilesCase(unittest.TestCase):
     def test_compute_ritual_completeness_folds_in_unwired_tool_files(self):
         self._touch_tool("orphan_check.py")
         result = src.compute_ritual_completeness(
-            self._ritual_check_path(TOOL_FILE_RITUAL_CHECK_FIXTURE), self.tools_dir
+            self._ritual_check_path(TOOL_FILE_RITUAL_CHECK_FIXTURE),
+            self.tools_dir,
+            self.empty_seam_engine_dir,
         )
         self.assertFalse(result["clean"])
         self.assertEqual(result["unwired_tool_files"], ["orphan_check.py"])
@@ -304,6 +314,140 @@ class UnwiredToolFilesCase(unittest.TestCase):
         self.assertEqual(result, [])
 
 
+class UnwiredStrategyAuditModulesCase(unittest.TestCase):
+    """Task 411. find_unwired_tool_files (task 409) only ever scans
+    tools/*.py -- task 410 found strategy_audit_target.py sitting unwired
+    249 tasks in fencepost/seam_engine/src/seam_engine/, a blind spot that
+    checker could never have caught. find_unwired_strategy_audit_modules()
+    closes it: any seam_engine/*.py file defining a live STRATEGY_MD
+    constant (the structural signal both real instances of this shape
+    share) and never referenced in ritual_check.py's source is now a
+    running check instead of something found by hand."""
+
+    SEAM_ENGINE_RITUAL_CHECK_FIXTURE = '''
+def check_alpha():
+    return {"ok": True}
+
+
+def run_ritual_check():
+    import seam_engine.alpha_target as at  # noqa
+    a = check_alpha()
+    return {"now": "x", "alpha": a, "broken": False}
+
+
+def format_ritual_check(result):
+    return f"alpha: {result['alpha']}"
+'''
+
+    def setUp(self):
+        self.tmp = tempfile.mkdtemp()
+        self.seam_engine_dir = os.path.join(self.tmp, "seam_engine")
+        os.makedirs(self.seam_engine_dir)
+
+    def tearDown(self):
+        import shutil
+
+        shutil.rmtree(self.tmp, ignore_errors=True)
+
+    def _ritual_check_path(self, text):
+        path = os.path.join(self.tmp, "fixture_ritual_check.py")
+        _write(path, text)
+        return path
+
+    def _touch_module(self, name, defines_strategy_md=True, extra=""):
+        body = 'STRATEGY_MD = "STRATEGY.md"\n' if defines_strategy_md else ""
+        _write(os.path.join(self.seam_engine_dir, name), body + extra)
+
+    def test_a_referenced_strategy_module_is_not_flagged(self):
+        self._touch_module("alpha_target.py")
+        result = src.find_unwired_strategy_audit_modules(
+            self.seam_engine_dir,
+            self._ritual_check_path(self.SEAM_ENGINE_RITUAL_CHECK_FIXTURE),
+        )
+        self.assertEqual(result, [])
+
+    def test_an_unreferenced_strategy_module_is_caught_and_named(self):
+        self._touch_module("alpha_target.py")
+        self._touch_module("orphan_target.py")
+        result = src.find_unwired_strategy_audit_modules(
+            self.seam_engine_dir,
+            self._ritual_check_path(self.SEAM_ENGINE_RITUAL_CHECK_FIXTURE),
+        )
+        self.assertEqual(result, ["orphan_target.py"])
+
+    def test_a_module_that_only_quotes_strategy_md_in_prose_is_never_flagged(self):
+        # The precise, structural signal is a live STRATEGY_MD constant,
+        # not a prose citation -- mirrors the real audit.py/consent.py/
+        # report.py/etc. shape (seven real files quote "STRATEGY.md" in a
+        # docstring; only two anywhere in the repo hold the constant).
+        self._touch_module(
+            "prose_only.py",
+            defines_strategy_md=False,
+            extra='"""STRATEGY.md swears it plainly: read-only or nothing runs."""\n',
+        )
+        result = src.find_unwired_strategy_audit_modules(
+            self.seam_engine_dir,
+            self._ritual_check_path(self.SEAM_ENGINE_RITUAL_CHECK_FIXTURE),
+        )
+        self.assertEqual(result, [])
+
+    def test_exempt_strategy_modules_are_never_flagged_even_when_unreferenced(self):
+        for name in src.EXEMPT_SEAM_ENGINE_STRATEGY_MODULES:
+            self._touch_module(name)
+        result = src.find_unwired_strategy_audit_modules(
+            self.seam_engine_dir,
+            self._ritual_check_path(self.SEAM_ENGINE_RITUAL_CHECK_FIXTURE),
+        )
+        self.assertEqual(result, [])
+
+    def test_init_and_non_python_files_are_ignored(self):
+        _write(os.path.join(self.seam_engine_dir, "__init__.py"), 'STRATEGY_MD = "x"\n')
+        _write(os.path.join(self.seam_engine_dir, "README.md"), "not a module")
+        result = src.find_unwired_strategy_audit_modules(
+            self.seam_engine_dir,
+            self._ritual_check_path(self.SEAM_ENGINE_RITUAL_CHECK_FIXTURE),
+        )
+        self.assertEqual(result, [])
+
+    def test_missing_seam_engine_dir_reads_as_zero_violations(self):
+        result = src.find_unwired_strategy_audit_modules(
+            os.path.join(self.tmp, "does-not-exist"),
+            self._ritual_check_path(self.SEAM_ENGINE_RITUAL_CHECK_FIXTURE),
+        )
+        self.assertEqual(result, [])
+
+    def test_compute_ritual_completeness_folds_in_unwired_strategy_audit_modules(self):
+        self._touch_module("orphan_target.py")
+        empty_tools_dir = os.path.join(self.tmp, "tools")
+        os.makedirs(empty_tools_dir)
+        result = src.compute_ritual_completeness(
+            self._ritual_check_path(self.SEAM_ENGINE_RITUAL_CHECK_FIXTURE),
+            empty_tools_dir,
+            self.seam_engine_dir,
+        )
+        self.assertFalse(result["clean"])
+        self.assertEqual(result["unwired_strategy_audit_modules"], ["orphan_target.py"])
+
+    def test_format_names_unwired_strategy_audit_modules(self):
+        result = {
+            "clean": False,
+            "missing_from_run": [],
+            "missing_from_dict": [],
+            "missing_from_format": [],
+            "unwired_tool_files": [],
+            "unwired_strategy_audit_modules": ["orphan_target.py"],
+        }
+        formatted = src.format_ritual_completeness(result)
+        self.assertIn("BROKEN", formatted)
+        self.assertIn("orphan_target.py", formatted)
+
+    def test_real_seam_engine_dir_has_zero_unwired_strategy_modules(self):
+        # The real point: the live seam_engine/ directory, audited for
+        # real -- the exact gap task 410's own closing note named.
+        result = src.find_unwired_strategy_audit_modules()
+        self.assertEqual(result, [])
+
+
 class RealRitualCheckCase(unittest.TestCase):
     """The real point: the live tools/ritual_check.py, audited for real."""
 
@@ -313,6 +457,7 @@ class RealRitualCheckCase(unittest.TestCase):
         self.assertEqual(result["missing_from_dict"], [])
         self.assertEqual(result["missing_from_format"], [])
         self.assertEqual(result["unwired_tool_files"], [])
+        self.assertEqual(result["unwired_strategy_audit_modules"], [])
         self.assertTrue(result["clean"])
 
     def test_real_ritual_check_has_at_least_the_known_27_checks(self):

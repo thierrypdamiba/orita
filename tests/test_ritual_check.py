@@ -2513,11 +2513,14 @@ def format_ritual_check(result):
             f.write(self.FIXTURE)
         self.tools_dir = os.path.join(self.dir, "tools")
         os.makedirs(self.tools_dir)
+        self.seam_engine_dir = os.path.join(self.dir, "seam_engine")
+        os.makedirs(self.seam_engine_dir)
 
     def test_empty_tools_dir_is_clean(self):
         result = rc.run_ritual_check(
             ritual_completeness_path=self.fixture_path,
             ritual_completeness_tools_dir=self.tools_dir,
+            ritual_completeness_seam_engine_dir=self.seam_engine_dir,
         )
         self.assertTrue(result["ritual_completeness"]["clean"])
         self.assertFalse(result["broken"])
@@ -2529,12 +2532,86 @@ def format_ritual_check(result):
         result = rc.run_ritual_check(
             ritual_completeness_path=self.fixture_path,
             ritual_completeness_tools_dir=self.tools_dir,
+            ritual_completeness_seam_engine_dir=self.seam_engine_dir,
         )
         self.assertFalse(result["ritual_completeness"]["clean"])
         self.assertTrue(result["broken"])
         formatted = rc.format_ritual_check(result)
         self.assertIn("ritual completeness: BROKEN", formatted)
         self.assertIn("orphan_check.py", formatted)
+
+
+class RitualCompletenessSeamEngineFoldCase(unittest.TestCase):
+    """Task 411: ritual_completeness_check.py's own audit widened again to
+    catch the sibling shape one directory over -- a
+    fencepost/seam_engine/src/seam_engine/*.py module holding a live
+    STRATEGY_MD cross-check that never got wired into run_ritual_check
+    (the exact shape strategy_audit_target.py held for 249 tasks, task
+    410's own closing note left as future work). run_ritual_check()'s new
+    `ritual_completeness_seam_engine_dir` param lets this point that third
+    half of the audit at a fixture directory instead of the real, live
+    seam_engine/, the same pattern
+    RitualCompletenessToolFilesFoldCase already uses for tools_dir."""
+
+    FIXTURE = '''
+def check_alpha():
+    return {"ok": True}
+
+
+def run_ritual_check():
+    import seam_engine.alpha_target as at  # noqa
+    a = check_alpha()
+    return {"now": "x", "alpha": a, "broken": False}
+
+
+def format_ritual_check(result):
+    return f"alpha: {result['alpha']}"
+'''
+
+    def setUp(self):
+        self.dir = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.dir, ignore_errors=True)
+        self.fixture_path = os.path.join(self.dir, "fixture_ritual_check.py")
+        with open(self.fixture_path, "w") as f:
+            f.write(self.FIXTURE)
+        self.tools_dir = os.path.join(self.dir, "tools")
+        os.makedirs(self.tools_dir)
+        self.seam_engine_dir = os.path.join(self.dir, "seam_engine")
+        os.makedirs(self.seam_engine_dir)
+
+    def test_empty_seam_engine_dir_is_clean(self):
+        result = rc.run_ritual_check(
+            ritual_completeness_path=self.fixture_path,
+            ritual_completeness_tools_dir=self.tools_dir,
+            ritual_completeness_seam_engine_dir=self.seam_engine_dir,
+        )
+        self.assertTrue(result["ritual_completeness"]["clean"])
+        self.assertFalse(result["broken"])
+        self.assertIn("ritual completeness: clean", rc.format_ritual_check(result))
+
+    def test_unreferenced_strategy_module_flips_broken_and_prints(self):
+        with open(os.path.join(self.seam_engine_dir, "orphan_target.py"), "w") as f:
+            f.write('STRATEGY_MD = "STRATEGY.md"\n')
+        result = rc.run_ritual_check(
+            ritual_completeness_path=self.fixture_path,
+            ritual_completeness_tools_dir=self.tools_dir,
+            ritual_completeness_seam_engine_dir=self.seam_engine_dir,
+        )
+        self.assertFalse(result["ritual_completeness"]["clean"])
+        self.assertTrue(result["broken"])
+        formatted = rc.format_ritual_check(result)
+        self.assertIn("ritual completeness: BROKEN", formatted)
+        self.assertIn("orphan_target.py", formatted)
+
+    def test_real_ritual_check_path_and_real_seam_engine_dir_agree_clean(self):
+        # Both defaulted to the real, live files: run_ritual_check's own
+        # entry point must read the same zero-violations state
+        # RealRitualCheckCase's direct compute_ritual_completeness() call
+        # proves in tests/test_ritual_completeness_check.py -- no silent
+        # divergence between the two entry points.
+        result = rc.run_ritual_check()
+        self.assertEqual(result["ritual_completeness"]["unwired_strategy_audit_modules"], [])
+        self.assertTrue(result["ritual_completeness"]["clean"])
 
 
 if __name__ == "__main__":
