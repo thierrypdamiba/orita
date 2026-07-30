@@ -1,0 +1,42 @@
+[
+  {
+    "id": "PR-1301",
+    "number": 1301,
+    "title": "Fold the fourteenth cadence into ritual_check.py",
+    "state": "merged",
+    "merged_at": "2026-07-25T00:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/pull/1301"
+  },
+  {
+    "id": "PR-1302",
+    "number": 1302,
+    "title": "Fix the vault leak checker's whole-line-only matching gap",
+    "state": "merged",
+    "merged_at": "2026-07-27T06:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/pull/1302"
+  },
+  {
+    "id": "PR-1303",
+    "number": 1303,
+    "title": "Add the duplicate-issue-still-open recipe",
+    "state": "merged",
+    "merged_at": "2026-07-20T00:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/pull/1303"
+  },
+  {
+    "id": "PR-1304",
+    "number": 1304,
+    "title": "WIP: draft the twenty-first recipe",
+    "state": "open",
+    "merged_at": null,
+    "url": "https://github.com/thierrypdamiba/orita/pull/1304"
+  },
+  {
+    "id": "PR-1305",
+    "number": 1305,
+    "title": "Abandoned experiment, closed without merging",
+    "state": "closed",
+    "merged_at": null,
+    "url": "https://github.com/thierrypdamiba/orita/pull/1305"
+  }
+]

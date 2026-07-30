@@ -195,6 +195,16 @@ existing detectors were refactored to import
 shared `claimed_milestone_numbers` rather than let this recipe add a third
 copy, and a new regression test proves all three now bind the same
 function object.
+[`RECIPES/merged-pr-not-tweeted/`](RECIPES/merged-pr-not-tweeted/)
+is the twentieth (ROADMAP.md #398): watches the seam underneath
+`release-not-tweeted` and `milestone-closed-not-tweeted` — a pull request
+merges into `main`, but no tweet from the connected X account ever names
+its number. Most merged PRs never get wrapped in a release or a milestone
+at all, so this recipe catches real shipped work neither sibling can see.
+Matching is by exact, digit-boundary PR-number substring, the same
+"exact, not fuzzy" discipline `release-not-tweeted`'s own tag matcher
+established; both scopes (`ListPullRequests`, `GetUserTweets`) already sit
+on `SCOPES.md`'s cleared oath table, no new scope wiring needed.
 
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)
