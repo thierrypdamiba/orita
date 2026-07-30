@@ -47,13 +47,16 @@ import re
 import sys
 import unicodedata
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import text_patterns  # noqa: E402
+
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DEFAULT_ORITA_DIR = ROOT
 
 _HAND_PETITIONER_RE = re.compile(r"\|\s*\*\*Petitioner\*\*\s*\|\s*(.+?)\s*\|")
 _HAND_VERDICT_RE = re.compile(r"\|\s*\*\*Verdict\*\*\s*\|\s*\*\*([A-Za-z]+)\*\*")
 _HAND_FILED_RE = re.compile(r"\|\s*\*\*Filed\*\*\s*\|\s*(\d{4}-\d{2}-\d{2})\s*\|")
-_ALTAR_PETITIONER_RE = re.compile(r"\*\*Petitioner:\*\*\s*(.+)")
+_ALTAR_PETITIONER_RE = text_patterns.PETITIONER_LINE
 _ALTAR_VERDICT_RE = re.compile(r"\*\*VERDICT:\*\*\s*([A-Za-z]+)")
 
 

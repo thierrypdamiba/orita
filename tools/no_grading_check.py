@@ -43,6 +43,9 @@ import os
 import re
 import sys
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import text_patterns  # noqa: E402
+
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DEFAULT_ORITA_DIR = ROOT
 
@@ -87,7 +90,7 @@ _PATTERNS = [
 ]
 
 
-_SENTENCE_BOUNDARY = re.compile(r"[.!?;]|\n{2,}")
+_SENTENCE_BOUNDARY = text_patterns.SENTENCE_BOUNDARY_LOOSE
 _NEGATION_CUES = re.compile(
     r"\b(never|not|won't|wasn't|isn't|doesn't|didn't|n't|will|would|wouldn't|no)\b",
     re.IGNORECASE,

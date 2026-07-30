@@ -38,6 +38,9 @@ import os
 import re
 import sys
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import text_patterns  # noqa: E402
+
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DEFAULT_ORITA_DIR = ROOT
 
@@ -77,7 +80,7 @@ _RIDERS = [
     ),
 ]
 
-_SENTENCE_BOUNDARY = re.compile(r"[.!?;\n]")
+_SENTENCE_BOUNDARY = text_patterns.SENTENCE_BOUNDARY_TIGHT
 # "will"/"would" included alongside the plain negations, matching
 # star_covenant_check.py's own _NEGATION_CUES exactly (this module's
 # docstring, line 24, already claims to reuse "the identical negation ...

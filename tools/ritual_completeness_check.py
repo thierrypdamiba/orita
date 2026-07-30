@@ -172,6 +172,7 @@ EXEMPT_TOOL_FILES = {
     "roadmap_archive.py": "one-off length-triggered archival tool run by hand, not a periodic repo-state check",
     "closing_keyword_guard.py": "takes a commit-message-and-open-issues-csv argument each call -- a per-commit guard, not the hourly repo-state sweep run_ritual_check folds",
     "consent_grant_log.py": "append-only log library, called by toolkits_in_use_check.py (already wired) rather than loaded standalone",
+    "text_patterns.py": "shared regex-pattern library (task 418), imported directly by the nine tools/*.py files that use it rather than loaded standalone by ritual_check.py",
 }
 
 # Every fencepost/seam_engine/src/seam_engine/*.py file that defines a live

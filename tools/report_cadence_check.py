@@ -35,15 +35,17 @@ Usage:
 from __future__ import annotations
 
 import os
-import re
 import sys
 from datetime import date, timedelta
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import text_patterns  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DEFAULT_REPORTS_DIR = os.path.join(ROOT, "fencepost", "REPORTS")
 TARGET_STREAK_DAYS = 30  # STRATEGY.md: "1/day, 30 of 30 days"
 
-_DATE_NAME = re.compile(r"^(\d{4})-(\d{2})-(\d{2})\.md$")
+_DATE_NAME = text_patterns.DATE_NAME_MD
 
 
 def _shipped_dates(reports_dir: str) -> list:

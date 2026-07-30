@@ -1,8 +1,12 @@
-"""Task 397. Proves tools/duplicate_regex_check.py actually bites on a
-synthetic hand-typed duplicate, stays clean when a file imports a shared
-name instead of redefining it, does not flag the one seeded/documented
-exception (`_CLOSES_RE`), and -- the real point -- confirms the live,
-current orita checkout holds zero real violations today.
+"""Task 397 (widened by task 418). Proves tools/duplicate_regex_check.py
+actually bites on a synthetic hand-typed duplicate, stays clean when a
+file imports a shared name instead of redefining it, does not flag either
+seeded/documented exception (`_CLOSES_RE`, and task 418's `tools/closing_
+keyword_guard.py`/`seam_engine/closing_keywords.py` mirror), and -- the
+real point -- confirms the live, current orita checkout holds zero real
+violations today. Task 418 also proves the checker's own `tools/*.py`
+glob (added this task, having never scanned its own directory before) is
+actually wired in, not just documented.
 """
 import importlib.util
 import os
@@ -148,6 +152,94 @@ class FixtureViolationCase(unittest.TestCase):
         )
         violations = drc.find_violations(orita_dir=self.orita)
         self.assertEqual(violations, [])
+
+    def test_tools_glob_is_actually_scanned(self):
+        # Task 418: _iter_scanned_files() hard-coded exactly two globs and
+        # never scanned tools/*.py -- the directory this checker itself
+        # lives in -- so a hand-typed duplicate there went undetected.
+        # Proves the fix is real (the glob is wired in), not just claimed
+        # in the docstring: two tools/*.py files with no import between
+        # them, sharing a hand-typed pattern, must be flagged.
+        _write(
+            os.path.join(self.orita, "tools", "fixture_tool_a.py"),
+            'import re\n_MENTION_RE = re.compile(r"@(\\w[\\w-]*)", re.IGNORECASE)\n',
+        )
+        _write(
+            os.path.join(self.orita, "tools", "fixture_tool_b.py"),
+            '# mirrors fixture_tool_a\'s own _MENTION_RE verbatim\n'
+            'import re\n_MENTION_RE = re.compile(r"@(\\w[\\w-]*)", re.IGNORECASE)\n',
+        )
+        violations = drc.find_violations(orita_dir=self.orita)
+        self.assertEqual(len(violations), 1)
+        self.assertEqual(violations[0]["pattern"], r"@(\w[\w-]*)")
+        files = {rel for rel, _lineno in violations[0]["locations"]}
+        self.assertEqual(
+            files,
+            {
+                os.path.join("tools", "fixture_tool_a.py"),
+                os.path.join("tools", "fixture_tool_b.py"),
+            },
+        )
+
+    def test_tools_file_importing_a_shared_name_is_not_flagged(self):
+        # Mirrors test_import_instead_of_redefinition_is_not_flagged, but
+        # for the tools/*.py glob specifically -- proves the fix's other
+        # half (tools/text_patterns.py, task 418) reads clean under the
+        # newly-widened scan, not just that the scan finds a synthetic bug.
+        _write(
+            os.path.join(self.orita, "tools", "fixture_shared.py"),
+            'import re\nSHARED_RE = re.compile(r"@(\\w[\\w-]*)", re.IGNORECASE)\n',
+        )
+        _write(
+            os.path.join(self.orita, "tools", "fixture_consumer_a.py"),
+            'import os, sys\n'
+            'sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))\n'
+            'import fixture_shared\n'
+            '_RE = fixture_shared.SHARED_RE\n',
+        )
+        _write(
+            os.path.join(self.orita, "tools", "fixture_consumer_b.py"),
+            'import os, sys\n'
+            'sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))\n'
+            'import fixture_shared\n'
+            '_RE = fixture_shared.SHARED_RE\n',
+        )
+        violations = drc.find_violations(orita_dir=self.orita)
+        self.assertEqual(violations, [])
+
+    def test_seeded_closing_keyword_guard_mirror_is_not_flagged(self):
+        # The second seeded exception (task 418): tools/closing_keyword_
+        # guard.py and seam_engine/closing_keywords.py define the
+        # identical grammar on purpose -- seam_engine's own docstring
+        # rules it must NOT import the parent repo's tools/ directory, to
+        # stay portable/forkable. This pair only became visible once the
+        # tools/*.py glob existed at all.
+        pattern = r"\b(?:close[sd]?|fix(?:e[sd])?|resolve[sd]?):?\s+#(\d+)\b"
+        allowed = drc._ALLOWED_DUPLICATES[pattern]
+        self.assertEqual(
+            allowed,
+            {
+                os.path.join("tools", "closing_keyword_guard.py"),
+                os.path.join("fencepost", "seam_engine", "src", "seam_engine", "closing_keywords.py"),
+            },
+        )
+        for rel in allowed:
+            _write(os.path.join(self.orita, rel), f'import re\nCLOSING_KEYWORD_RE = re.compile(r"{pattern}", re.IGNORECASE)\n')
+        violations = drc.find_violations(orita_dir=self.orita)
+        self.assertEqual(violations, [])
+
+    def test_closing_keyword_guard_exception_widened_to_a_third_file_is_still_flagged(self):
+        pattern = r"\b(?:close[sd]?|fix(?:e[sd])?|resolve[sd]?):?\s+#(\d+)\b"
+        allowed = drc._ALLOWED_DUPLICATES[pattern]
+        for rel in allowed:
+            _write(os.path.join(self.orita, rel), f'import re\nCLOSING_KEYWORD_RE = re.compile(r"{pattern}", re.IGNORECASE)\n')
+        _write(
+            os.path.join(self.orita, "tools", "fixture_tool_c.py"),
+            f'import re\nCLOSING_KEYWORD_RE = re.compile(r"{pattern}", re.IGNORECASE)\n',
+        )
+        violations = drc.find_violations(orita_dir=self.orita)
+        self.assertEqual(len(violations), 1)
+        self.assertEqual(violations[0]["pattern"], pattern)
 
 
 class LiveRepoCase(unittest.TestCase):

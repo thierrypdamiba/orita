@@ -37,6 +37,9 @@ import os
 import re
 import sys
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import text_patterns  # noqa: E402
+
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DEFAULT_ORITA_DIR = ROOT
 
@@ -47,17 +50,22 @@ _SCAN_EXTENSIONS = (".md", ".html")
 # keyword -- "star" and "follow" appear constantly in this town's own
 # legitimate voice (cadence claims, the n-1 counter, epithets), so only
 # an imperative ask against a reader counts as a Star-Covenant violation.
+# Six of these are the exact shapes petition_limits_check.py's own
+# "(a) Star/follow ask" petition guard copied verbatim (task 418: shared
+# via tools/text_patterns.py instead of retyped in either file). The
+# rest -- aimed at public-post scanning, never copied into the petition
+# guard -- stay local.
 _PATTERNS = [
-    ("please star", re.compile(r"\bplease\s+star\b", re.IGNORECASE)),
-    ("please follow", re.compile(r"\bplease\s+follow\b", re.IGNORECASE)),
+    ("please star", text_patterns.PLEASE_STAR),
+    ("please follow", text_patterns.PLEASE_FOLLOW),
     ("star this/our/the repo", re.compile(r"\bstar\s+(this|our|the)\s+(repo|repository|project)\b", re.IGNORECASE)),
-    ("give us/me a star", re.compile(r"\bgive\s+(us|me)\s+a\s+star\b", re.IGNORECASE)),
-    ("drop a star", re.compile(r"\bdrop\s+a\s+star\b", re.IGNORECASE)),
-    ("leave a star", re.compile(r"\bleave\s+a\s+star\b", re.IGNORECASE)),
+    ("give us/me a star", text_patterns.GIVE_US_A_STAR),
+    ("drop a star", text_patterns.DROP_A_STAR),
+    ("leave a star", text_patterns.LEAVE_A_STAR),
     ("smash that/the star", re.compile(r"\bsmash\s+(that|the)\s+star\b", re.IGNORECASE)),
     ("hit that/the star", re.compile(r"\bhit\s+(that|the)\s+star\b", re.IGNORECASE)),
     ("don't forget to star", re.compile(r"\bdon'?t\s+forget\s+to\s+star\b", re.IGNORECASE)),
-    ("star us/it if", re.compile(r"\bstar\s+(us|it)\s+if\b", re.IGNORECASE)),
+    ("star us/it if", text_patterns.STAR_US_IF),
     ("follow us/@oritatown", re.compile(r"\bfollow\s+(us\b|@\w+)", re.IGNORECASE)),
     ("follow for more", re.compile(r"\bfollow\s+(us\s+)?for\s+more\b", re.IGNORECASE)),
     ("hit that/the follow", re.compile(r"\bhit\s+(that\s+|the\s+)?follow\b", re.IGNORECASE)),
@@ -66,8 +74,8 @@ _PATTERNS = [
 ]
 
 
-_SENTENCE_BOUNDARY = re.compile(r"[.!?;\n]")
-_NEGATION_CUES = re.compile(r"\b(never|not|won't|wasn't|isn't|doesn't|didn't|n't|will|would|wouldn't)\b", re.IGNORECASE)
+_SENTENCE_BOUNDARY = text_patterns.SENTENCE_BOUNDARY_TIGHT
+_NEGATION_CUES = text_patterns.NEGATION_CUES_STANDARD
 _QUOTE_CHARS = set('"\'“‘')
 
 

@@ -39,14 +39,16 @@ Usage:
 from __future__ import annotations
 
 import os
-import re
 import sys
 from datetime import date
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import text_patterns  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DEFAULT_ORITA_DIR = ROOT
 
-_DATE_NAME = re.compile(r"^(\d{4})-(\d{2})-(\d{2})\.md$")
+_DATE_NAME = text_patterns.DATE_NAME_MD
 
 
 def _petition_dirs(orita_dir: str) -> list:

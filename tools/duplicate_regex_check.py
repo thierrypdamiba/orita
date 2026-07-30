@@ -12,15 +12,30 @@ running check -- the same graduation `star_covenant_check.py` (task 99)
 and `vault_leak_check.py` (task 98) already made, from an intention
 narrated each hour to a script that proves it.
 
-It reads every `fencepost/RECIPES/*/detector.py` and every
-`fencepost/seam_engine/src/seam_engine/*.py` (skipping tests and
-`__init__.py`) with `ast` -- no import, no execution, so a real bug in a
-detector's own body can't crash the check that's supposed to catch its
+It reads every `fencepost/RECIPES/*/detector.py`, every `fencepost/
+seam_engine/src/seam_engine/*.py`, and every `tools/*.py` (skipping tests
+and `__init__.py`) with `ast` -- no import, no execution, so a real bug in
+a detector's own body can't crash the check that's supposed to catch its
 regex hygiene. For every `re.compile(...)` call whose first argument is a
 literal string, it records the pattern text and the file it was found in.
 Any pattern text that is DEFINED LOCALLY (not merely referenced by name
 after an import) in two or more distinct files is exactly the bug this
 campaign kept finding: a claimed mirror with nothing backing it.
+
+Task 418: the `tools/*.py` glob was missing entirely until this task --
+this checker never scanned the very directory it lives in. A live sweep
+of that blind spot turned up the identical bug shape, undetected, in
+`tools/`: a sentence-boundary splitter hand-typed two different ways
+across six files, a negation-cue word list byte-identical between two
+files, a `YYYY-MM-DD.md` filename matcher byte-identical between two
+files, a `**Petitioner:**` line matcher byte-identical between two files
+under two different local names, and six of `star_covenant_check.py`'s
+own star/follow-begging shapes copied verbatim into `petition_limits_
+check.py`. All of it moved into `tools/text_patterns.py`, one real
+definition per pattern, with every one of those files now importing it
+instead of retyping it (mirrors this same campaign's own fix shape for
+`fencepost/seam_engine/closing_keywords.py`, `thanks.py`, `references.py`,
+etc.).
 
 One pair is a deliberate, already-documented exception, not a bug:
 `_CLOSES_RE` in `issue-closed-pr-still-open` and `merged-pr-issue-still-
@@ -30,6 +45,13 @@ explicitly as a real, working, narrower grammar that intentionally stays
 a two-copy law (task 394's own closing note ruled it out the same way).
 It is seeded below as `_ALLOWED_DUPLICATES` so this check does not cry
 wolf on a duplicate the town already decided, in writing, to keep.
+`tools/text_patterns.py` needs no such exception: every file that now
+uses one of its constants (e.g. `text_patterns.SENTENCE_BOUNDARY_LOOSE`)
+references it by attribute lookup, never calls `re.compile(...)` again
+locally -- `_local_re_compile_patterns()` only ever counts an actual
+`re.compile(...)` call, so each of task 418's shared patterns is defined
+locally in exactly one file (`text_patterns.py` itself) and correctly
+never flags as a duplicate.
 
 Usage:
     python3 tools/duplicate_regex_check.py check
@@ -46,6 +68,7 @@ DEFAULT_ORITA_DIR = ROOT
 
 _RECIPES_GLOB = "fencepost/RECIPES/*/detector.py"
 _SEAM_ENGINE_GLOB = "fencepost/seam_engine/src/seam_engine/*.py"
+_TOOLS_GLOB = "tools/*.py"
 _SKIP_BASENAMES = {"__init__.py"}
 
 # Pattern text -> the exact set of files it is allowed to be locally
@@ -60,11 +83,22 @@ _ALLOWED_DUPLICATES: dict[str, frozenset[str]] = {
         os.path.join("fencepost", "RECIPES", "issue-closed-pr-still-open", "detector.py"),
         os.path.join("fencepost", "RECIPES", "merged-pr-issue-still-open", "detector.py"),
     }),
+    # Task 418: widening the scan to tools/*.py surfaced this pair for the
+    # first time. seam_engine.closing_keywords's own docstring already
+    # rules deliberately does NOT import tools/closing_keyword_guard.py --
+    # seam_engine must stay portable/forkable and not depend on this
+    # parent repo's own tools/ directory, so it re-states the identical
+    # grammar as a documented, intentional mirror instead of an import.
+    # A real, working two-copy law, same shape as the pair above.
+    r"\b(?:close[sd]?|fix(?:e[sd])?|resolve[sd]?):?\s+#(\d+)\b": frozenset({
+        os.path.join("tools", "closing_keyword_guard.py"),
+        os.path.join("fencepost", "seam_engine", "src", "seam_engine", "closing_keywords.py"),
+    }),
 }
 
 
 def _iter_scanned_files(orita_dir: str):
-    for rel_glob in (_RECIPES_GLOB, _SEAM_ENGINE_GLOB):
+    for rel_glob in (_RECIPES_GLOB, _SEAM_ENGINE_GLOB, _TOOLS_GLOB):
         for path in sorted(glob.glob(os.path.join(orita_dir, rel_glob))):
             if os.path.basename(path) in _SKIP_BASENAMES:
                 continue

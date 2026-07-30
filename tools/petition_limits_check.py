@@ -54,6 +54,9 @@ import re
 import sys
 import unicodedata
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import text_patterns  # noqa: E402
+
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DEFAULT_ORITA_DIR = ROOT
 
@@ -74,23 +77,26 @@ GOD_NAME_TOKENS = {
 
 _REQUEST_RE = re.compile(r"\*\*Request:\*\*\s*(.*?)(?=\n\*\*The case|\n---|\Z)", re.DOTALL)
 _CASE_RE = re.compile(r"\*\*The case,.*?\*\*\s*\n\n(.*?)(?=\n---|\Z)", re.DOTALL)
-_PETITIONER_RE = re.compile(r"\*\*Petitioner:\*\*\s*(.+)")
+_PETITIONER_RE = text_patterns.PETITIONER_LINE
 
-_SENTENCE_BOUNDARY = re.compile(r"[.!?;]|\n{2,}")
-_NEGATION_CUES = re.compile(r"\b(never|not|won't|wasn't|isn't|doesn't|didn't|n't|will|would|wouldn't)\b", re.IGNORECASE)
+_SENTENCE_BOUNDARY = text_patterns.SENTENCE_BOUNDARY_LOOSE
+_NEGATION_CUES = text_patterns.NEGATION_CUES_STANDARD
 _QUOTE_CHARS = set('"\'“‘')
 
 # (a) Star/follow ask -- same curated imperative shapes star_covenant_check
-# uses, aimed at petitions specifically now.
+# uses, aimed at petitions specifically now. Six of these are the exact
+# same shapes star_covenant_check.py already defines (task 418: shared via
+# tools/text_patterns.py instead of retyped); "star this/our/the repo" and
+# "grant us/me a star" are this file's own, not shared.
 _STAR_PATTERNS = [
-    ("please star", re.compile(r"\bplease\s+star\b", re.IGNORECASE)),
-    ("please follow", re.compile(r"\bplease\s+follow\b", re.IGNORECASE)),
+    ("please star", text_patterns.PLEASE_STAR),
+    ("please follow", text_patterns.PLEASE_FOLLOW),
     ("star this/our/the repo", re.compile(r"\bstar\s+(this|our|the)\s+(repo|repository|project|town)\b", re.IGNORECASE)),
-    ("give us/me a star", re.compile(r"\bgive\s+(us|me)\s+a\s+star\b", re.IGNORECASE)),
+    ("give us/me a star", text_patterns.GIVE_US_A_STAR),
     ("grant us/me a star", re.compile(r"\bgrant\s+(us|me)\s+a\s+star\b", re.IGNORECASE)),
-    ("drop a star", re.compile(r"\bdrop\s+a\s+star\b", re.IGNORECASE)),
-    ("leave a star", re.compile(r"\bleave\s+a\s+star\b", re.IGNORECASE)),
-    ("star us/it if", re.compile(r"\bstar\s+(us|it)\s+if\b", re.IGNORECASE)),
+    ("drop a star", text_patterns.DROP_A_STAR),
+    ("leave a star", text_patterns.LEAVE_A_STAR),
+    ("star us/it if", text_patterns.STAR_US_IF),
 ]
 
 # (b) A literal mention of "the counter" -- word-boundary only, so
