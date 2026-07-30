@@ -1,0 +1,50 @@
+[
+  {
+    "id": "PR-201",
+    "title": "Swap the ledger writer's retry backoff for the shared helper",
+    "number": 201,
+    "body": "Closes #150 -- this PR's own retry-backoff branch was cut before the shared helper landed; that work should be superseded by it.",
+    "merged_at": "2026-07-15T14:00:00Z",
+    "url": "https://github.com/example/example-repo/pull/201"
+  },
+  {
+    "id": "PR-202",
+    "title": "Fix the badge cache key",
+    "number": 202,
+    "body": "Fixes #151.",
+    "merged_at": "2026-07-16T09:30:00Z",
+    "url": "https://github.com/example/example-repo/pull/202"
+  },
+  {
+    "id": "PR-203",
+    "title": "Document the draft-back oath, take two",
+    "number": 203,
+    "body": "No linked PR or issue, docs only.",
+    "merged_at": "2026-07-16T11:00:00Z",
+    "url": "https://github.com/example/example-repo/pull/203"
+  },
+  {
+    "id": "PR-204",
+    "title": "Resolve the stale worker-queue depth check",
+    "number": 204,
+    "body": "resolves #152 -- but that draft was itself closed without merging weeks ago, its own promise already settled.",
+    "merged_at": "2026-07-17T08:00:00Z",
+    "url": "https://github.com/example/example-repo/pull/204"
+  },
+  {
+    "id": "PR-205",
+    "title": "Rebase the ranking margin fix",
+    "number": 205,
+    "body": "Closes #205 -- self-note only, nothing else changed here.",
+    "merged_at": "2026-07-18T08:00:00Z",
+    "url": "https://github.com/example/example-repo/pull/205"
+  },
+  {
+    "id": "PR-206",
+    "title": "Point the changelog at the right release tag",
+    "number": 206,
+    "body": "Closes #999 -- was meant to supersede an old draft that never actually got opened here.",
+    "merged_at": "2026-07-19T08:00:00Z",
+    "url": "https://github.com/example/example-repo/pull/206"
+  }
+]

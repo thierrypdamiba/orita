@@ -271,6 +271,21 @@ issue-side sibling (0.5 under 24h, 0.85 at/past it) — no genuine reason
 found to trust a PR-side resolution signal less than an issue-side one.
 Both scopes (`ListRepoCommits`, `ListPullRequests`) already sit on
 `SCOPES.md`'s cleared oath table, no new scope wiring needed.
+[`RECIPES/merged-pr-pr-still-open/`](RECIPES/merged-pr-pr-still-open/)
+is the twenty-sixth (ROADMAP.md #419): the pull-request-target twin of
+`merged-pr-issue-still-open` (the second real recipe), which explicitly
+only ever checked the referenced number against the issue tracker. A
+merged PR's own body naming `closes #N`/`fixes #N`/`resolves #N` against a
+number that is itself a pull request fires the identical auto-close
+trigger, and that promise can silently never hold exactly the same way it
+can against an issue. Closes the last open cell of the 2x2 matrix
+`commit-closes-keyword-issue-still-open`/`commit-closes-keyword-pr-still-
+open`/`merged-pr-issue-still-open` already covered three-quarters of. A
+self-reference (a PR naming its own number) is excluded, not surfaced —
+GitHub's own UI never treats that as a real closing trigger. Same age-
+gated confidence shape as `merged-pr-issue-still-open` (0.55 under 24h,
+0.85 at/past it). The one scope (`ListPullRequests`) already sits on
+`SCOPES.md`'s cleared oath table, no new scope wiring needed.
 
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)

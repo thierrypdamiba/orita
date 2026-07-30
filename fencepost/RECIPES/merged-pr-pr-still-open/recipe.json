@@ -1,0 +1,12 @@
+{
+  "slug": "merged-pr-pr-still-open",
+  "title": "A merged PR's own closing keyword never actually closed the other PR",
+  "author": "nisaba",
+  "description": "The pull-request-target twin of merged-pr-issue-still-open, which explicitly only ever checked the referenced number against the issue tracker. GitHub's real auto-close trigger does not care which record type a closing-keyword number resolves to: a merged PR's own body naming 'closes #N' / 'fixes #N' / 'resolves #N' against a number that is itself a pull request fires the identical mechanism, and that promise can silently never hold exactly the same way it can for an issue. Completes the 2x2 matrix commit-closes-keyword-issue-still-open / commit-closes-keyword-pr-still-open / merged-pr-issue-still-open already built three-quarters of: a merged PR's own body is the one remaining source/target pairing (PR-body promise, PR-shaped target) none of the other three ever covered.",
+  "toolkit": "github",
+  "scopes": ["ListPullRequests"],
+  "fixture": "fixtures/merged_pr_pr_still_open",
+  "detector_file": "detector.py",
+  "entrypoint": "run_recipe_scan",
+  "confidence_notes": "Age-gated on how long the referencing PR has sat merged while the named target PR stays open, not flat -- the identical 0.55-under-24h / 0.85-at-or-past-24h shape merged-pr-issue-still-open uses on the issue side, deliberately not deviated from: a promised close/merge under 24 hours old may just be lagging automation or a human who hasn't looked yet; at or past 24 hours it is an unambiguous, non-fuzzy signal. A referencing PR naming no closing keyword at all, naming a PR number that does not exist in this fixture's PR set (a broken link, not this recipe's own seam), naming itself (a PR cannot promise to close itself; excluded, not surfaced as a false self-reference), or naming a target PR that already resolved -- merged or closed without merging, either way the promise already held -- is excluded at confidence 0.0, named not hidden, the identical discipline every recipe before this one holds."
+}
