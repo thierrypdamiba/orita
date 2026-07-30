@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Task 121. Off-By-One counts the tool that counts everything else.
 
-`tools/ritual_check.py` hand-wires 36 `check_*` functions into one hourly
+`tools/ritual_check.py` hand-wires 37 `check_*` functions into one hourly
 block: each is called inside `run_ritual_check`, its result assigned to a
 dict key, and that key printed as a line in `format_ritual_check`. Three
 separate places a single typo or a forgotten wire-up can silently drop a
@@ -54,6 +54,13 @@ very module's own audit never caught the gap because it only ever reads
 never the separate tool files under `tools/` that a future wiring pass
 might still be missing entirely
 -- caught in passing while updating this one, not chased further).
+**Updated to 37** the same hour task 408's `check_network_boundary` was
+wired in -- tasks 163/164 had built and proved `network_boundary_check.py`
+live but never called it from `run_ritual_check` either, the exact blind
+spot task 407's note above named and left open, found here by directly
+grepping every `tools/*.py` basename against `ritual_check.py`'s own
+source rather than waiting for this module's audit to widen its own
+reach (it still can't -- that remains future work).
 
 Usage:
     python3 tools/ritual_completeness_check.py check

@@ -2325,5 +2325,57 @@ class StrategyTargetsFoldCase(unittest.TestCase):
         self.assertTrue(result["strategy_targets"]["clean"])
 
 
+class NetworkBoundaryFoldCase(unittest.TestCase):
+    """Task 408: run_ritual_check() folds network_boundary_check.py's own
+    AST-based "no network" trust-boundary sweep (tasks 163/164) into the
+    same structured result -- clean by default against a fixture with no
+    violation, and a real synthetic "no network"-claiming file that
+    actually imports a network-capable module both flips `broken` and
+    surfaces in the printed block, the same class duplicate_regex/riders/
+    strategy_targets already hold."""
+
+    def setUp(self):
+        self.dir = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.dir, ignore_errors=True)
+
+    def _write(self, rel, content):
+        path = os.path.join(self.dir, rel)
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, "w") as f:
+            f.write(content)
+
+    def test_clean_fixture_is_not_broken(self):
+        self._write(
+            "clean_tool.py",
+            '"""Reads local state only, no network calls."""\nimport os\n',
+        )
+        result = rc.run_ritual_check(network_boundary_dirs=(self.dir,))
+        self.assertTrue(result["network_boundary"]["clean"])
+        self.assertFalse(result["broken"])
+        self.assertIn("network boundary: clean", rc.format_ritual_check(result))
+
+    def test_synthetic_violation_flips_broken_and_prints(self):
+        self._write(
+            "bad_tool.py",
+            '"""Reads local state only, no network calls."""\nimport httpx\n',
+        )
+        result = rc.run_ritual_check(network_boundary_dirs=(self.dir,))
+        self.assertFalse(result["network_boundary"]["clean"])
+        self.assertTrue(result["broken"])
+        formatted = rc.format_ritual_check(result)
+        self.assertIn("network boundary: BROKEN", formatted)
+        self.assertIn("bad_tool.py", formatted)
+
+    def test_default_dirs_read_the_real_tree_and_match_direct_call(self):
+        """No override: reads the real tools/ + seam_engine/ tree, the same
+        default check_network_boundary falls back to -- proves the fold
+        never duplicates or diverges from the module it wraps."""
+        nbc = _load("_test_network_boundary_check", os.path.join(ROOT, "tools", "network_boundary_check.py"))
+        direct = nbc.check_network_boundary_all()
+        result = rc.run_ritual_check()
+        self.assertEqual(result["network_boundary"]["count"], len(direct))
+        self.assertEqual(result["network_boundary"]["clean"], all(r["ok"] for r in direct.values()))
+
+
 if __name__ == "__main__":
     unittest.main()

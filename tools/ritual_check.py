@@ -332,6 +332,10 @@ def _strategy_targets_check():
     return _load_once("_ritual_strategy_targets_check", os.path.join(ROOT, "tools", "strategy_targets_check.py"))
 
 
+def _network_boundary_check():
+    return _load_once("_ritual_network_boundary_check", os.path.join(ROOT, "tools", "network_boundary_check.py"))
+
+
 def _seam_ledger():
     src = os.path.join(ROOT, "fencepost", "seam_engine", "src")
     if src not in sys.path:
@@ -1026,6 +1030,35 @@ def check_strategy_targets(strategy_path: str | None = None) -> dict:
     return {"clean": clean, **result}
 
 
+def check_network_boundary(dirs: tuple | None = None) -> dict:
+    """Task 408: fold network_boundary_check.py's own AST-based "no
+    network" trust-boundary sweep (tasks 163/164) into the one block.
+    Unconditional, local-filesystem-only (reads `tools/*.py` and
+    `fencepost/seam_engine/src/seam_engine/*.py` already on disk, parses
+    each with `ast`, imports nothing it audits) -- the same cheap class
+    `check_vault_leak`/`check_star_covenant`/`check_duplicate_regex`/
+    `check_strategy_targets` already hold.
+
+    Tasks 163/164 built this checker and proved it live against every
+    "no network" claim in `tools/` and Fencepost's own `consent.py`/
+    `draftback.py` -- the two files load-bearing for STRATEGY.md's
+    read-only guarantee -- but never wired it into this hourly block.
+    `ritual_completeness_check.py` only ever audits `check_*` functions
+    ALREADY DEFINED inside this file, so this real, passing, security-
+    relevant check sat unwired since the hour it shipped, the same
+    "built, tested, never wired in" shape tasks 397/404/407 already found
+    and closed elsewhere in this same file. Never edits anything; a real
+    drift (a claiming file that quietly grew a live network import) is a
+    god-on-duty escalation, not something this check silently repairs."""
+    mod = _network_boundary_check()
+    kwargs = {}
+    if dirs is not None:
+        kwargs["dirs"] = dirs
+    raw = mod.check_network_boundary_all(**kwargs)
+    broken = {name: r for name, r in raw.items() if not r["ok"]}
+    return {"clean": not broken, "count": len(raw), "broken": broken}
+
+
 def check_change_gate(report_info: dict) -> dict | None:
     """Fold `change_gate.should_post_gap()` -- task 69's own change-gate
     rule -- using whichever report text `check_report_freshness` already
@@ -1083,6 +1116,7 @@ def run_ritual_check(
     cluster_day_dir: str | None = None,
     cluster_day_today=None,
     strategy_targets_path: str | None = None,
+    network_boundary_dirs: tuple | None = None,
     record_scribe_growth: bool = False,
     record_words: bool = False,
 ) -> dict:
@@ -1152,6 +1186,7 @@ def run_ritual_check(
     )
     cluster_day = check_cluster_day_cadence(chronicle_dir=cluster_day_dir, today=cluster_day_today)
     strategy_targets = check_strategy_targets(strategy_path=strategy_targets_path)
+    network_boundary = check_network_boundary(dirs=network_boundary_dirs)
     broken = (
         (not town["ok"])
         or (not fencepost["ok"])
@@ -1173,6 +1208,7 @@ def run_ritual_check(
         or (not scopes_completeness["clean"])
         or (not toolkits_in_use["clean"])
         or (not strategy_targets["clean"])
+        or (not network_boundary["clean"])
     )
     return {
         "now": now_iso,
@@ -1212,6 +1248,7 @@ def run_ritual_check(
         "toolkits_in_use": toolkits_in_use,
         "cluster_day": cluster_day,
         "strategy_targets": strategy_targets,
+        "network_boundary": network_boundary,
         "broken": broken,
     }
 
@@ -1413,6 +1450,14 @@ def format_ritual_check(result: dict) -> str:
     st = result["strategy_targets"]
     for line in _strategy_targets_check().format_strategy_targets(st).split("\n"):
         lines.append("  " + line)
+    nb = result["network_boundary"]
+    if nb["clean"]:
+        lines.append(f"  network boundary: clean ({nb['count']} file(s) claiming \"no network\", all hold it)")
+    else:
+        lines.append(
+            f"  network boundary: BROKEN -- {len(nb['broken'])} of {nb['count']} file(s) claim "
+            f"\"no network\" but don't: {sorted(nb['broken'])}, escalate now"
+        )
     return "\n".join(lines)
 
 
