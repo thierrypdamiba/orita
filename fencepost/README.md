@@ -217,6 +217,19 @@ exact, digit-boundary number matching and the same 24-hour age gate as
 every sibling in the family, no deviation; both scopes (`ListIssues`,
 `GetUserTweets`) already sit on `SCOPES.md`'s cleared oath table, no new
 scope wiring needed.
+[`RECIPES/duplicate-pr-still-open/`](RECIPES/duplicate-pr-still-open/)
+is the twenty-second (ROADMAP.md #400): the pull-request-side twin of
+`duplicate-issue-still-open` — an open PR's own body marks itself
+"duplicate of #N", and #N has since merged or closed, but the duplicate PR
+was never closed alongside it. GitHub gives a duplicate marker no
+auto-close mechanism at all, on either side of the issue/PR divide, so the
+gap can persist indefinitely with nothing that could have caught it. The
+shared duplicate-marker extraction now lives in
+`seam_engine.duplicate_markers`, imported by both recipes rather than each
+hand-typing an identical regex — the exact "second file, second copy" shape
+`tools/duplicate_regex_check.py` exists to catch. Both scopes
+(`ListPullRequests`, `GetPullRequest`) already sit on `SCOPES.md`'s cleared
+oath table, no new scope wiring needed.
 
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)

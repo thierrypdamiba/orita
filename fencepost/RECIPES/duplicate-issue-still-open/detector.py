@@ -32,23 +32,25 @@ full reasoning behind the 24-hour bar.
 from __future__ import annotations
 
 import json
-import re
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from seam_engine.duplicate_markers import named_duplicate_of as _named_duplicate_of
 from seam_engine.scan import GapCandidate
 
 _HERE = Path(__file__).resolve().parent
 DEFAULT_ISSUES_FIXTURE = _HERE.parents[1] / "fixtures" / "duplicate_issue_still_open" / "issues.json"
 
-# "Duplicate of #700" / "dup of #703" / "Duplicate: #705" / "duplicate #705"
-# all match. A `\b` boundary right after "dup" rules out "dupe"/"duping" so
-# a false positive on ordinary prose never becomes a candidate at all -- the
-# same "no fuzzy matching to misfire on" discipline every recipe before this
-# one holds.
-_DUP_RE = re.compile(r"\bdup(?:licate)?\s*(?:of|:)?\s+#(\d+)\b", re.IGNORECASE)
+# `_named_duplicate_of` is bound above, not redefined here --
+# `seam_engine.duplicate_markers` (task 400) is the one real law describing
+# a "duplicate of #N" marker now. This was this recipe's own regex first;
+# `duplicate-pr-still-open/detector.py` (task 400) needs the identical
+# grammar for a second data source (a PR body instead of an issue body), so
+# both recipes import the same function rather than each hand-typing their
+# own copy -- the exact duplication `tools/duplicate_regex_check.py` (task
+# 397) exists to catch.
 
 # An original closed under this age may not have been noticed yet by
 # whoever filed the duplicate -- not yet a gap.
@@ -86,11 +88,6 @@ def load_issues(path: Path | None = None) -> list[Issue]:
         )
         for r in rows
     ]
-
-
-def _named_duplicate_of(body: str) -> int | None:
-    match = _DUP_RE.search(body)
-    return int(match.group(1)) if match else None
 
 
 def _find_issue(number: int, issues: list[Issue]) -> Issue | None:

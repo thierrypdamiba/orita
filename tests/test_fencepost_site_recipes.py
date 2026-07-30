@@ -41,6 +41,7 @@ class TestFencepostSiteRecipes(unittest.TestCase):
             "milestone-closed-not-tweeted",
             "merged-pr-not-tweeted",
             "issue-closed-not-tweeted",
+            "duplicate-pr-still-open",
         ):
             self.assertIn(slug, self.text, f"site never names recipe {slug!r}")
 

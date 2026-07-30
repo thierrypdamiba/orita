@@ -1,0 +1,82 @@
+[
+  {
+    "number": 800,
+    "title": "Fold the closing-keyword regex into a shared module",
+    "state": "merged",
+    "body": "Extracts CLOSING_KEYWORD_RE out of three detectors into seam_engine.closing_keywords.",
+    "closed_at": "2026-07-18T09:00:00Z",
+    "url": "https://github.com/example/example-repo/pull/800"
+  },
+  {
+    "number": 801,
+    "title": "Share the closing-keyword regex across detectors",
+    "state": "open",
+    "body": "Duplicate of #800 -- opened before I searched for an existing fix.",
+    "closed_at": null,
+    "url": "https://github.com/example/example-repo/pull/801"
+  },
+  {
+    "number": 803,
+    "title": "Add a confidence age-gate to the milestone recipe",
+    "state": "closed",
+    "body": "Closed without merging -- superseded by a different approach.",
+    "closed_at": "2026-07-27T06:00:00Z",
+    "url": "https://github.com/example/example-repo/pull/803"
+  },
+  {
+    "number": 802,
+    "title": "Age-gate milestone-closed-not-tweeted's confidence score",
+    "state": "open",
+    "body": "dup of #803 -- filed independently, same fix shape.",
+    "closed_at": null,
+    "url": "https://github.com/example/example-repo/pull/802"
+  },
+  {
+    "number": 805,
+    "title": "Widen the recipe-count regex for hyphenated cardinals",
+    "state": "open",
+    "body": "test_recipe_count_doctrine.py's _CLAIM_RE only matched letters, not hyphens.",
+    "closed_at": null,
+    "url": "https://github.com/example/example-repo/pull/805"
+  },
+  {
+    "number": 804,
+    "title": "Fix the hyphenated-cardinal regex in the recipe-count test",
+    "state": "open",
+    "body": "Duplicate of #805.",
+    "closed_at": null,
+    "url": "https://github.com/example/example-repo/pull/804"
+  },
+  {
+    "number": 806,
+    "title": "Add the twenty-second recipe's README",
+    "state": "open",
+    "body": "A regular doc PR, no duplicate mention at all.",
+    "closed_at": null,
+    "url": "https://github.com/example/example-repo/pull/806"
+  },
+  {
+    "number": 808,
+    "title": "Update ONBOARDING.md's claimed test count",
+    "state": "closed",
+    "body": "Screenshot in the onboarding guide referenced a stale count.",
+    "closed_at": "2026-07-22T10:00:00Z",
+    "url": "https://github.com/example/example-repo/pull/808"
+  },
+  {
+    "number": 807,
+    "title": "Fix ONBOARDING.md's test count a second time",
+    "state": "closed",
+    "body": "Duplicate of #808 -- closed this alongside it once I noticed.",
+    "closed_at": "2026-07-22T11:00:00Z",
+    "url": "https://github.com/example/example-repo/pull/807"
+  },
+  {
+    "number": 809,
+    "title": "Regenerate the Gap Ledger site's cached assets",
+    "state": "open",
+    "body": "duplicate of #999 -- filed against the wrong number by mistake.",
+    "closed_at": null,
+    "url": "https://github.com/example/example-repo/pull/809"
+  }
+]
