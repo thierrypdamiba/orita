@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Task 121. Off-By-One counts the tool that counts everything else.
 
-`tools/ritual_check.py` hand-wires 37 `check_*` functions into one hourly
+`tools/ritual_check.py` hand-wires 38 `check_*` functions into one hourly
 block: each is called inside `run_ritual_check`, its result assigned to a
 dict key, and that key printed as a line in `format_ritual_check`. Three
 separate places a single typo or a forgotten wire-up can silently drop a
@@ -69,6 +69,16 @@ referenced anywhere in `ritual_check.py`'s source nor named in
 `EXEMPT_TOOL_FILES` (with a reason) now fails this check the same hour it
 is added, rather than sitting unwired for months the way
 `network_boundary_check.py` and `strategy_targets_check.py` both did.
+**Updated to 38** the same hour task 410's `check_strategy_true_positive`
+was wired in -- task 161 had built and proved `fencepost/seam_engine/src/
+seam_engine/strategy_audit_target.py` live against STRATEGY.md's "Gap
+true-positive rate" row 249 tasks earlier but never called it from
+`run_ritual_check` either. `find_unwired_tool_files()`'s own basename grep
+(task 409, just above) never would have caught this one regardless --
+it only ever scans `tools/*.py`, never `fencepost/seam_engine/src/
+seam_engine/*.py`, so this exact blind spot survives this module's own
+audit even now; found by hand, the same way task 408 was, not by any
+running check.
 
 Usage:
     python3 tools/ritual_completeness_check.py check

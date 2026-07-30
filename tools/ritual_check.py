@@ -162,6 +162,7 @@ import os
 import subprocess
 import sys
 from datetime import datetime, timedelta, timezone
+from pathlib import Path
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DEFAULT_FENCEPOST_BASE = os.path.join(ROOT, "fencepost")
@@ -334,6 +335,14 @@ def _strategy_targets_check():
 
 def _network_boundary_check():
     return _load_once("_ritual_network_boundary_check", os.path.join(ROOT, "tools", "network_boundary_check.py"))
+
+
+def _strategy_audit_target():
+    src = os.path.join(ROOT, "fencepost", "seam_engine", "src")
+    if src not in sys.path:
+        sys.path.insert(0, src)
+    import seam_engine.strategy_audit_target as sat  # noqa: PLC0415
+    return sat
 
 
 def _seam_ledger():
@@ -1037,6 +1046,46 @@ def check_strategy_targets(strategy_path: str | None = None) -> dict:
     return {"clean": clean, **result}
 
 
+def check_strategy_true_positive(
+    strategy_path: str | None = None, ledger_base: str | None = None
+) -> dict:
+    """Task 410: fold `fencepost/seam_engine/src/seam_engine/
+    strategy_audit_target.py`'s own STRATEGY.md-vs-live-Ledger true-positive
+    rate cross-check (task 161) into the one block. Unconditional,
+    local-filesystem-only (reads STRATEGY.md and the real fencepost Ledger,
+    both already on disk, no network) -- the same cheap class
+    `check_strategy_targets`/`check_network_boundary` already hold.
+
+    Task 161 built `strategy_audit_target.py` and its own 13 tests and
+    proved it live against STRATEGY.md's "Gap true-positive rate
+    (self-audited) | leading | >=90% | ogun" row and the real, live
+    `audit.audit_ledger()` tally -- but its own done_when never asked for
+    a wire-up into this hourly block, and `check_strategy_targets` (task
+    407) folded in only its sibling module (`tools/strategy_targets_check.py`,
+    the report-streak/shared-reports rows), never this one. Confirmed by
+    grep before this task: zero references to `strategy_audit_target`
+    anywhere in `tools/*.py`. `find_unwired_tool_files()`
+    (`ritual_completeness_check.py`, task 409) only ever scans `tools/*.py`
+    basenames against this file's own source, never
+    `fencepost/seam_engine/src/seam_engine/*.py` -- so a real, tested,
+    passing checker sat unwired since the hour it shipped, the exact
+    "built, tested, never wired in" shape tasks 397/404/407/408 already
+    found and closed for other files, just one directory over from where
+    those audits look. Never edits anything; a real drop in the live
+    true-positive rate below STRATEGY.md's own stated bar, if one is ever
+    found, is a god-on-duty escalation for Ogun, not something this check
+    silently repairs."""
+    mod = _strategy_audit_target()
+    kwargs = {}
+    if strategy_path is not None:
+        kwargs["strategy_path"] = Path(strategy_path)
+    if ledger_base is not None:
+        kwargs["ledger_base"] = Path(ledger_base)
+    result = mod.check_strategy_true_positive_target(**kwargs)
+    clean = bool(result["meets_target"])
+    return {"clean": clean, **result}
+
+
 def check_network_boundary(dirs: tuple | None = None) -> dict:
     """Task 408: fold network_boundary_check.py's own AST-based "no
     network" trust-boundary sweep (tasks 163/164) into the one block.
@@ -1125,6 +1174,8 @@ def run_ritual_check(
     cluster_day_today=None,
     strategy_targets_path: str | None = None,
     network_boundary_dirs: tuple | None = None,
+    strategy_true_positive_path: str | None = None,
+    strategy_true_positive_ledger_base: str | None = None,
     record_scribe_growth: bool = False,
     record_words: bool = False,
 ) -> dict:
@@ -1197,6 +1248,10 @@ def run_ritual_check(
     cluster_day = check_cluster_day_cadence(chronicle_dir=cluster_day_dir, today=cluster_day_today)
     strategy_targets = check_strategy_targets(strategy_path=strategy_targets_path)
     network_boundary = check_network_boundary(dirs=network_boundary_dirs)
+    strategy_true_positive = check_strategy_true_positive(
+        strategy_path=strategy_true_positive_path,
+        ledger_base=strategy_true_positive_ledger_base,
+    )
     broken = (
         (not town["ok"])
         or (not fencepost["ok"])
@@ -1219,6 +1274,7 @@ def run_ritual_check(
         or (not toolkits_in_use["clean"])
         or (not strategy_targets["clean"])
         or (not network_boundary["clean"])
+        or (not strategy_true_positive["clean"])
     )
     return {
         "now": now_iso,
@@ -1259,6 +1315,7 @@ def run_ritual_check(
         "cluster_day": cluster_day,
         "strategy_targets": strategy_targets,
         "network_boundary": network_boundary,
+        "strategy_true_positive": strategy_true_positive,
         "broken": broken,
     }
 
@@ -1469,6 +1526,18 @@ def format_ritual_check(result: dict) -> str:
         lines.append(
             f"  network boundary: BROKEN -- {len(nb['broken'])} of {nb['count']} file(s) claim "
             f"\"no network\" but don't: {sorted(nb['broken'])}, escalate now"
+        )
+    stp = result["strategy_true_positive"]
+    if stp["clean"]:
+        lines.append(
+            f"  strategy true-positive rate: clean ({stp['live_rate_pct']}% over {stp['live_total']} "
+            f"claim(s), meets STRATEGY.md's >={stp['strategy_target_pct']}% bar)"
+        )
+    else:
+        lines.append(
+            f"  strategy true-positive rate: BROKEN -- live rate {stp['live_rate_pct']}% over "
+            f"{stp['live_total']} claim(s) does not meet STRATEGY.md's >={stp['strategy_target_pct']}% "
+            "bar, escalate now"
         )
     return "\n".join(lines)
 

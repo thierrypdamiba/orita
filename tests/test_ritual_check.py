@@ -2325,6 +2325,109 @@ class StrategyTargetsFoldCase(unittest.TestCase):
         self.assertTrue(result["strategy_targets"]["clean"])
 
 
+class StrategyTruePositiveFoldCase(unittest.TestCase):
+    """Task 410: run_ritual_check() folds strategy_audit_target.py's own
+    STRATEGY.md-vs-live-Ledger true-positive rate cross-check (task 161)
+    into the same structured result. Real drift here IS a violation worth
+    flipping `broken` -- the same class strategy_targets/network_boundary
+    already hold: a genuine drop below STRATEGY.md's own stated `>=90%`
+    bar, or a future decree the real Ledger can't clear, is exactly the
+    "a doc claim silently drifts from what the live code proves" bug task
+    161 built this checker to catch."""
+
+    def setUp(self):
+        self.tmp = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.tmp, ignore_errors=True)
+
+    def _write_strategy(self, target_pct):
+        path = os.path.join(self.tmp, "STRATEGY.md")
+        with open(path, "w") as f:
+            f.write(
+                "# fixture\n\n"
+                "| metric | type | target | owner |\n"
+                "|--|--|--|--|\n"
+                f"| Gap true-positive rate (self-audited) | leading | >={target_pct}% | ogun |\n"
+            )
+        return path
+
+    def _scan(self, confidence=0.9, bar=0.70):
+        return {
+            "generated_at": "t",
+            "repo": "x/orita",
+            "window_hours": 24,
+            "confidence_bar": bar,
+            "separation_margin": 0.15,
+            "primary_gap": {
+                "slug": "milestone-unannounced",
+                "headline": "h",
+                "detail": "d",
+                "confidence": confidence,
+                "evidence": ["https://github.com/x/orita/commit/0000000"],
+                "label": "primary",
+            },
+            "tail": [{"slug": "coincidence-a", "confidence": 0.1, "label": "coincidence"}],
+            "excluded": [],
+        }
+
+    def test_agreeing_fixture_is_clean_and_never_flips_broken(self):
+        path = self._write_strategy(90)
+        seam_ledger.append_scan(
+            self._scan(confidence=0.9), now=datetime(2026, 7, 12, 12, tzinfo=timezone.utc), base=Path(self.tmp)
+        )
+        result = rc.run_ritual_check(
+            strategy_true_positive_path=path, strategy_true_positive_ledger_base=self.tmp
+        )
+        self.assertTrue(result["strategy_true_positive"]["clean"])
+        self.assertTrue(result["strategy_true_positive"]["meets_target"])
+        self.assertFalse(result["broken"])
+        formatted = rc.format_ritual_check(result)
+        self.assertIn("strategy true-positive rate: clean", formatted)
+
+    def test_drifted_fixture_flips_broken_and_is_named(self):
+        # A plausible future regression: a real false positive alongside
+        # confirmed gaps drops the live rate below STRATEGY.md's unmoved
+        # 90% bar -- must be loud, not silent.
+        path = self._write_strategy(90)
+        seam_ledger.append_scan(
+            self._scan(confidence=0.9), now=datetime(2026, 7, 12, 12, tzinfo=timezone.utc), base=Path(self.tmp)
+        )
+        seam_ledger.append_scan(
+            self._scan(confidence=0.9), now=datetime(2026, 7, 13, 12, tzinfo=timezone.utc), base=Path(self.tmp)
+        )
+        seam_ledger.append_scan(
+            self._scan(confidence=0.9), now=datetime(2026, 7, 14, 12, tzinfo=timezone.utc), base=Path(self.tmp)
+        )
+        seam_ledger.append_scan(
+            self._scan(confidence=0.60, bar=0.70),
+            now=datetime(2026, 7, 15, 12, tzinfo=timezone.utc),
+            base=Path(self.tmp),
+        )
+        result = rc.run_ritual_check(
+            strategy_true_positive_path=path, strategy_true_positive_ledger_base=self.tmp
+        )
+        self.assertFalse(result["strategy_true_positive"]["clean"])
+        self.assertEqual(result["strategy_true_positive"]["live_rate_pct"], 75.0)
+        self.assertTrue(result["broken"])
+        formatted = rc.format_ritual_check(result)
+        self.assertIn("strategy true-positive rate: BROKEN", formatted)
+
+    def test_default_path_reads_the_real_strategy_md_and_matches_direct_call(self):
+        """No override: reads the real STRATEGY.md and the real fencepost
+        Ledger, the same defaults check_strategy_true_positive falls back
+        to -- proves the fold never duplicates or diverges from the
+        module it wraps."""
+        sat = _load(
+            "_test_strategy_audit_target",
+            os.path.join(ROOT, "fencepost", "seam_engine", "src", "seam_engine", "strategy_audit_target.py"),
+        )
+        direct = sat.check_strategy_true_positive_target()
+        result = rc.run_ritual_check()
+        self.assertEqual(result["strategy_true_positive"]["strategy_target_pct"], direct["strategy_target_pct"])
+        self.assertEqual(result["strategy_true_positive"]["live_rate_pct"], direct["live_rate_pct"])
+        self.assertEqual(result["strategy_true_positive"]["meets_target"], direct["meets_target"])
+        self.assertTrue(result["strategy_true_positive"]["clean"])
+
+
 class NetworkBoundaryFoldCase(unittest.TestCase):
     """Task 408: run_ritual_check() folds network_boundary_check.py's own
     AST-based "no network" trust-boundary sweep (tasks 163/164) into the
