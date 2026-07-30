@@ -256,6 +256,21 @@ author can still edit at any time, so a fresh reference earns a grace
 period the others never get. Both scopes (`ListIssues`,
 `ListPullRequests`) already sit on `SCOPES.md`'s cleared oath table, no new
 scope wiring needed.
+[`RECIPES/commit-closes-keyword-pr-still-open/`](RECIPES/commit-closes-keyword-pr-still-open/)
+is the twenty-fifth (ROADMAP.md #403): the pull-request-side twin of
+`commit-closes-keyword-issue-still-open` (task 388), which explicitly only
+ever checked issue numbers — a commit already on the default branch names
+a real GitHub closing keyword for a PULL REQUEST that is still open well
+after the commit landed. GitHub's real auto-close trigger fires against a
+referenced PR the same way it fires against an issue, so the same silent
+misfire is possible on the half of the shared issue/PR number space the
+issue-side recipe was never built to see. Reuses
+`seam_engine.closing_keywords.CLOSING_KEYWORD_RE` verbatim rather than a
+sixth copy of the same grammar. Same age-gated confidence shape as the
+issue-side sibling (0.5 under 24h, 0.85 at/past it) — no genuine reason
+found to trust a PR-side resolution signal less than an issue-side one.
+Both scopes (`ListRepoCommits`, `ListPullRequests`) already sit on
+`SCOPES.md`'s cleared oath table, no new scope wiring needed.
 
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)

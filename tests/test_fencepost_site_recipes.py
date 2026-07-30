@@ -44,6 +44,7 @@ class TestFencepostSiteRecipes(unittest.TestCase):
             "duplicate-pr-still-open",
             "release-note-dangling-reference",
             "issue-body-dangling-reference",
+            "commit-closes-keyword-pr-still-open",
         ):
             self.assertIn(slug, self.text, f"site never names recipe {slug!r}")
 

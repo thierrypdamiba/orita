@@ -1,0 +1,42 @@
+[
+  {
+    "number": 901,
+    "title": "Cap worker queue depth at the configured max",
+    "state": "open",
+    "merged": false,
+    "merged_at": null,
+    "url": "https://github.com/example/example-repo/pull/901"
+  },
+  {
+    "number": 902,
+    "title": "Cap draft-back's own retry backoff",
+    "state": "open",
+    "merged": false,
+    "merged_at": null,
+    "url": "https://github.com/example/example-repo/pull/902"
+  },
+  {
+    "number": 903,
+    "title": "Verify the ledger hash chain on an empty file",
+    "state": "closed",
+    "merged": true,
+    "merged_at": "2026-07-26T09:05:00Z",
+    "url": "https://github.com/example/example-repo/pull/903"
+  },
+  {
+    "number": 904,
+    "title": "Investigate intermittent draft-back timeout",
+    "state": "open",
+    "merged": false,
+    "merged_at": null,
+    "url": "https://github.com/example/example-repo/pull/904"
+  },
+  {
+    "number": 905,
+    "title": "Prototype an alternate backoff strategy",
+    "state": "closed",
+    "merged": false,
+    "merged_at": null,
+    "url": "https://github.com/example/example-repo/pull/905"
+  }
+]

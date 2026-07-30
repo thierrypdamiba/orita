@@ -1,0 +1,51 @@
+[
+  {
+    "sha": "p1q2r3s",
+    "message": "Fixes #901 -- worker queue depth now respects the configured max",
+    "url": "https://github.com/example/example-repo/commit/p1q2r3s",
+    "ts": "2026-07-27T05:00:00Z",
+    "author": "ogun"
+  },
+  {
+    "sha": "q2r3s4t",
+    "message": "closes #902: draft-back retry now caps its own backoff",
+    "url": "https://github.com/example/example-repo/commit/q2r3s4t",
+    "ts": "2026-07-30T06:00:00Z",
+    "author": "nisaba"
+  },
+  {
+    "sha": "r3s4t5u",
+    "message": "Resolved #903 -- ledger hash chain verification, merged upstream",
+    "url": "https://github.com/example/example-repo/commit/r3s4t5u",
+    "ts": "2026-07-26T09:00:00Z",
+    "author": "off-by-one"
+  },
+  {
+    "sha": "s4t5u6v",
+    "message": "closed #905 -- this turned out unnecessary, closed without merging",
+    "url": "https://github.com/example/example-repo/commit/s4t5u6v",
+    "ts": "2026-07-25T09:00:00Z",
+    "author": "esu-elegba"
+  },
+  {
+    "sha": "t5u6v7w",
+    "message": "Touches #904 while investigating, no promise made here",
+    "url": "https://github.com/example/example-repo/commit/t5u6v7w",
+    "ts": "2026-07-26T10:00:00Z",
+    "author": "kwaku-ananse"
+  },
+  {
+    "sha": "u6v7w8x",
+    "message": "fixes #999 per the triage note",
+    "url": "https://github.com/example/example-repo/commit/u6v7w8x",
+    "ts": "2026-07-26T11:00:00Z",
+    "author": "nyx"
+  },
+  {
+    "sha": "v7w8x9y",
+    "message": "closing #901 the way the guard's own docstring describes it -- present participle, outside the grammar, never a real closing keyword",
+    "url": "https://github.com/example/example-repo/commit/v7w8x9y",
+    "ts": "2026-07-27T05:30:00Z",
+    "author": "nisaba"
+  }
+]
