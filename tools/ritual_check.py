@@ -906,7 +906,9 @@ def check_shared_reports(shared_path: str | None = None) -> dict:
     return mod.compute_shared_reports(**kwargs)
 
 
-def check_ritual_completeness(source_path: str | None = None) -> dict:
+def check_ritual_completeness(
+    source_path: str | None = None, tools_dir: str | None = None
+) -> dict:
     """Task 121: fold `ritual_completeness_check.py`'s own static, AST-only
     audit of THIS FILE into the one block it audits. Unconditional, like
     every other doctrine check -- but unlike `report_cadence`/
@@ -914,11 +916,16 @@ def check_ritual_completeness(source_path: str | None = None) -> dict:
     a `check_*` function silently dropped from `run_ritual_check`'s call
     list, its return dict, or `format_ritual_check`'s printed lines is a
     live regression in the one tool every hourly run depends on, not an
-    honest zero-state waiting on the calendar."""
+    honest zero-state waiting on the calendar. Task 409 widened the audit
+    itself to also catch a whole tools/*.py file never loaded here at all
+    (`tools_dir` lets tests point that half of the audit at a fixture
+    directory instead of the real, live tools/)."""
     mod = _ritual_completeness_check()
     kwargs = {}
     if source_path is not None:
         kwargs["source_path"] = source_path
+    if tools_dir is not None:
+        kwargs["tools_dir"] = tools_dir
     return mod.compute_ritual_completeness(**kwargs)
 
 
@@ -1107,6 +1114,7 @@ def run_ritual_check(
     metrics_cadence_path: str | None = None,
     shared_reports_path: str | None = None,
     ritual_completeness_path: str | None = None,
+    ritual_completeness_tools_dir: str | None = None,
     wip_reclaim_path: str | None = None,
     arcade_apps_state: dict | None = None,
     scopes_path: str | None = None,
@@ -1178,7 +1186,9 @@ def run_ritual_check(
     report_cadence = check_report_cadence(reports_dir=report_cadence_dir)
     metrics_cadence = check_metrics_cadence(metrics_path=metrics_cadence_path)
     shared_reports = check_shared_reports(shared_path=shared_reports_path)
-    ritual_completeness = check_ritual_completeness(source_path=ritual_completeness_path)
+    ritual_completeness = check_ritual_completeness(
+        source_path=ritual_completeness_path, tools_dir=ritual_completeness_tools_dir
+    )
     wip_reclaim = check_wip_reclaim(now, roadmap_path=wip_reclaim_path)
     scopes_completeness = check_scopes_completeness(scopes_path=scopes_path, app_log_path=app_log_path)
     toolkits_in_use = check_toolkits_in_use(
@@ -1417,6 +1427,8 @@ def format_ritual_check(result: dict) -> str:
             parts.append(f"dropped from return dict: {', '.join(rc['missing_from_dict'])}")
         if rc["missing_from_format"]:
             parts.append(f"never printed: {', '.join(rc['missing_from_format'])}")
+        if rc.get("unwired_tool_files"):
+            parts.append(f"tools/*.py unwired: {', '.join(rc['unwired_tool_files'])}")
         lines.append(f"  ritual completeness: BROKEN -- {'; '.join(parts)}, escalate now")
     wr = result["wip_reclaim"]
     if wr["open_count"] == 0:

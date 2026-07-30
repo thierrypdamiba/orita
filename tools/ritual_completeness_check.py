@@ -60,7 +60,15 @@ live but never called it from `run_ritual_check` either, the exact blind
 spot task 407's note above named and left open, found here by directly
 grepping every `tools/*.py` basename against `ritual_check.py`'s own
 source rather than waiting for this module's audit to widen its own
-reach (it still can't -- that remains future work).
+reach. Task 409 closed that exact gap: `find_unwired_tool_files()` below
+now performs that same basename grep as a live, running check (folded
+into `compute_ritual_completeness()`'s own result as `unwired_tool_files`)
+instead of a manual sweep someone has to remember to re-run by hand every
+time a new tool file lands -- a file under `tools/` that is neither
+referenced anywhere in `ritual_check.py`'s source nor named in
+`EXEMPT_TOOL_FILES` (with a reason) now fails this check the same hour it
+is added, rather than sitting unwired for months the way
+`network_boundary_check.py` and `strategy_targets_check.py` both did.
 
 Usage:
     python3 tools/ritual_completeness_check.py check
@@ -74,11 +82,28 @@ import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DEFAULT_RITUAL_CHECK_PATH = os.path.join(ROOT, "tools", "ritual_check.py")
+DEFAULT_TOOLS_DIR = os.path.join(ROOT, "tools")
 RUN_FUNC_NAME = "run_ritual_check"
 FORMAT_FUNC_NAME = "format_ritual_check"
 EXEMPT_DICT_KEYS = {"now", "broken"}
 
 CLAIMED_COUNT_PATTERN = re.compile(r"hand-wires (\d+) `check_\*` functions")
+
+# Every tools/*.py file NOT expected to be loaded from run_ritual_check,
+# and why -- reviewed and confirmed true, one by one, task 409 (the same
+# audit tasks 407/408 each did by hand: grep every real tools/*.py basename
+# against ritual_check.py's own source). A file added here without a real
+# reason is exactly the "flattering claim, never rechecked" shape this
+# whole module exists to catch -- so a new entry needs a reason as honest
+# as the ones below, not a rubber stamp.
+EXEMPT_TOOL_FILES = {
+    "ritual_check.py": "the ritual runner itself, not a tool it loads",
+    "card.py": "one-off X-card page generator (task 121's forge-and-post flow), not a periodic repo-state check",
+    "oath_badge.py": "one-off read-only badge JSON renderer, not a periodic repo-state check",
+    "roadmap_archive.py": "one-off length-triggered archival tool run by hand, not a periodic repo-state check",
+    "closing_keyword_guard.py": "takes a commit-message-and-open-issues-csv argument each call -- a per-commit guard, not the hourly repo-state sweep run_ritual_check folds",
+    "consent_grant_log.py": "append-only log library, called by toolkits_in_use_check.py (already wired) rather than loaded standalone",
+}
 
 
 def claimed_check_count(doc: str | None = None) -> int:
@@ -166,7 +191,37 @@ def _printed_keys(func: ast.FunctionDef) -> set:
     return keys
 
 
-def compute_ritual_completeness(source_path: str | None = None) -> dict:
+def find_unwired_tool_files(
+    tools_dir: str | None = None, ritual_check_path: str | None = None
+) -> list:
+    """Every tools/*.py file whose basename never appears as a quoted
+    string literal in ritual_check.py's own source (the same shape every
+    real `_load(..., os.path.join(ROOT, "tools", "<name>.py"))` call site
+    already takes -- see `_load`'s call sites in ritual_check.py), and
+    which isn't named in `EXEMPT_TOOL_FILES` with a reason. This is the
+    literal grep tasks 407 and 408 each ran by hand before wiring in the
+    checker they found sitting unused -- now a running check instead of a
+    manual sweep someone has to remember to redo."""
+    tools_dir = tools_dir or DEFAULT_TOOLS_DIR
+    ritual_check_path = ritual_check_path or DEFAULT_RITUAL_CHECK_PATH
+    with open(ritual_check_path, encoding="utf-8") as f:
+        source = f.read()
+
+    unwired = []
+    for name in sorted(os.listdir(tools_dir)):
+        if not name.endswith(".py"):
+            continue
+        if name in EXEMPT_TOOL_FILES:
+            continue
+        if f'"{name}"' in source or f"'{name}'" in source:
+            continue
+        unwired.append(name)
+    return unwired
+
+
+def compute_ritual_completeness(
+    source_path: str | None = None, tools_dir: str | None = None
+) -> dict:
     source_path = source_path or DEFAULT_RITUAL_CHECK_PATH
     with open(source_path, encoding="utf-8") as f:
         tree = ast.parse(f.read(), filename=source_path)
@@ -181,6 +236,7 @@ def compute_ritual_completeness(source_path: str | None = None) -> dict:
             "missing_from_run": sorted(check_functions),
             "missing_from_dict": [],
             "missing_from_format": [],
+            "unwired_tool_files": find_unwired_tool_files(tools_dir, source_path),
             "error": f"could not find {RUN_FUNC_NAME}/{FORMAT_FUNC_NAME} in {source_path}",
         }
 
@@ -197,18 +253,26 @@ def compute_ritual_completeness(source_path: str | None = None) -> dict:
     checked_keys = {k for k in return_dict if k not in EXEMPT_DICT_KEYS}
     missing_from_format = sorted(checked_keys - printed)
 
-    clean = not (missing_from_run or missing_from_dict or missing_from_format)
+    unwired_tool_files = find_unwired_tool_files(tools_dir, source_path)
+
+    clean = not (
+        missing_from_run
+        or missing_from_dict
+        or missing_from_format
+        or unwired_tool_files
+    )
     return {
         "clean": clean,
         "missing_from_run": missing_from_run,
         "missing_from_dict": missing_from_dict,
         "missing_from_format": missing_from_format,
+        "unwired_tool_files": unwired_tool_files,
     }
 
 
 def format_ritual_completeness(result: dict) -> str:
     if result["clean"]:
-        return "ritual completeness: clean (every check_* function is called, returned, and printed)"
+        return "ritual completeness: clean (every check_* function is called, returned, and printed; every tools/*.py file is wired or exempt)"
     parts = []
     if result["missing_from_run"]:
         parts.append(f"never called in {RUN_FUNC_NAME}: {', '.join(result['missing_from_run'])}")
@@ -216,6 +280,8 @@ def format_ritual_completeness(result: dict) -> str:
         parts.append(f"called but dropped from the return dict: {', '.join(result['missing_from_dict'])}")
     if result["missing_from_format"]:
         parts.append(f"returned but never printed in {FORMAT_FUNC_NAME}: {', '.join(result['missing_from_format'])}")
+    if result.get("unwired_tool_files"):
+        parts.append(f"tools/*.py never loaded from {RUN_FUNC_NAME} and not exempt: {', '.join(result['unwired_tool_files'])}")
     return "ritual completeness: BROKEN -- " + "; ".join(parts)
 
 

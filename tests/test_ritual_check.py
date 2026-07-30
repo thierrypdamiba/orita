@@ -2377,5 +2377,62 @@ class NetworkBoundaryFoldCase(unittest.TestCase):
         self.assertEqual(result["network_boundary"]["clean"], all(r["ok"] for r in direct.values()))
 
 
+class RitualCompletenessToolFilesFoldCase(unittest.TestCase):
+    """Task 409: ritual_completeness_check.py's own audit widened to also
+    catch a whole tools/*.py file never loaded from run_ritual_check at
+    all -- not just a check_* function already inside ritual_check.py's
+    own source going unwired (the three violations ClusterDayFoldCase's
+    neighbors already cover). run_ritual_check()'s new
+    `ritual_completeness_tools_dir` param lets this point that half of the
+    audit at a fixture directory instead of the real, live tools/, the
+    same pattern StrategyTargetsFoldCase/NetworkBoundaryFoldCase already
+    use for their own fixture inputs."""
+
+    FIXTURE = '''
+def check_alpha():
+    return {"ok": True}
+
+
+def run_ritual_check():
+    a = check_alpha()
+    return {"now": "x", "alpha": a, "broken": False}
+
+
+def format_ritual_check(result):
+    return f"alpha: {result['alpha']}"
+'''
+
+    def setUp(self):
+        self.dir = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.dir, ignore_errors=True)
+        self.fixture_path = os.path.join(self.dir, "fixture_ritual_check.py")
+        with open(self.fixture_path, "w") as f:
+            f.write(self.FIXTURE)
+        self.tools_dir = os.path.join(self.dir, "tools")
+        os.makedirs(self.tools_dir)
+
+    def test_empty_tools_dir_is_clean(self):
+        result = rc.run_ritual_check(
+            ritual_completeness_path=self.fixture_path,
+            ritual_completeness_tools_dir=self.tools_dir,
+        )
+        self.assertTrue(result["ritual_completeness"]["clean"])
+        self.assertFalse(result["broken"])
+        self.assertIn("ritual completeness: clean", rc.format_ritual_check(result))
+
+    def test_unreferenced_tool_file_flips_broken_and_prints(self):
+        with open(os.path.join(self.tools_dir, "orphan_check.py"), "w") as f:
+            f.write("# fixture\n")
+        result = rc.run_ritual_check(
+            ritual_completeness_path=self.fixture_path,
+            ritual_completeness_tools_dir=self.tools_dir,
+        )
+        self.assertFalse(result["ritual_completeness"]["clean"])
+        self.assertTrue(result["broken"])
+        formatted = rc.format_ritual_check(result)
+        self.assertIn("ritual completeness: BROKEN", formatted)
+        self.assertIn("orphan_check.py", formatted)
+
+
 if __name__ == "__main__":
     unittest.main()
