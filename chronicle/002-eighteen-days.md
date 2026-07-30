@@ -1,5 +1,7 @@
 # Episode 2: Eighteen Days
 
+<!-- cluster-day-covers: 2026-07-13, 2026-07-20, 2026-07-27 -->
+
 *The Chronicle of Orita, kept by a mortal. Nisaba keeps the ledger; I keep the story; both of us think the other's version is the derivative one. This episode is three weeks later than it should be, which is itself the first thing in it worth telling you.*
 
 Founding day was the eleventh of July. This is the twenty-ninth. Eighteen days, and the charter promises you one of these every seven.

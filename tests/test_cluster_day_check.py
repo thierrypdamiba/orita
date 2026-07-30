@@ -1,10 +1,15 @@
-"""Task 387. Proves tools/cluster_day_check.py's weekly scan actually
-counts real-calendar Mondays since founding, names a real lapsed Monday,
-ignores a non-conforming chronicle filename, and treats episode-001 (the
-founding-day release, week zero) as satisfying no Monday at all -- the
-exact distinction orita-vault/hand/skipped.md's 2026-07-27 hand-count
-needed and this module has to get right or it under-counts the gap it
-exists to name.
+"""Task 387 (extended task 406). Proves tools/cluster_day_check.py's weekly
+scan actually counts real-calendar Mondays since founding, names a real
+lapsed Monday, ignores a non-conforming chronicle filename, and treats
+episode-001 (the founding-day release, week zero) as satisfying no Monday
+at all -- the exact distinction orita-vault/hand/skipped.md's 2026-07-27
+hand-count needed and this module has to get right or it under-counts the
+gap it exists to name.
+
+Task 406 adds coverage for the `cluster-day-covers` marker: a catch-up
+episode that genuinely narrates more than one lapsed Monday (like the real
+`chronicle/002-eighteen-days.md`) can now say so explicitly instead of
+being permanently under-credited by the one-Monday-in-sequence fallback.
 """
 import importlib.util
 import os
@@ -110,6 +115,108 @@ class FixtureCadenceCase(unittest.TestCase):
         self.assertNotIn("lapsed", formatted)
 
 
+class CoversMarkerCase(unittest.TestCase):
+    """Task 406: a chronicle episode can explicitly declare which real
+    Mondays it covers, rather than being pinned to the one-Monday-in-
+    sequence fallback."""
+
+    def setUp(self):
+        self.chronicle = tempfile.mkdtemp()
+
+    def tearDown(self):
+        import shutil
+
+        shutil.rmtree(self.chronicle, ignore_errors=True)
+
+    def test_marked_episode_covers_every_date_it_declares(self):
+        _write(os.path.join(self.chronicle, "001-the-founding.md"), "x")
+        _write(
+            os.path.join(self.chronicle, "002-catch-up.md"),
+            "# Ep 2\n\n<!-- cluster-day-covers: 2026-07-13, 2026-07-20, 2026-07-27 -->\n\ntext",
+        )
+        result = cdc.compute_cadence(self.chronicle, today=date(2026, 7, 29))
+        self.assertEqual(result["cluster_day_episodes_shipped"], 1)
+        self.assertEqual(result["missed_mondays"], [])
+
+    def test_marked_episode_only_covers_what_it_declares_not_more(self):
+        _write(os.path.join(self.chronicle, "001-the-founding.md"), "x")
+        _write(
+            os.path.join(self.chronicle, "002-partial.md"),
+            "<!-- cluster-day-covers: 2026-07-13 -->\ntext",
+        )
+        result = cdc.compute_cadence(self.chronicle, today=date(2026, 7, 29))
+        self.assertEqual(result["missed_mondays"], ["2026-07-20", "2026-07-27"])
+
+    def test_markerless_episode_still_uses_old_sequential_fallback(self):
+        # Full backward compatibility: no marker anywhere behaves exactly
+        # like the pre-406 module.
+        _write(os.path.join(self.chronicle, "001-the-founding.md"), "x")
+        _write(os.path.join(self.chronicle, "002-something.md"), "x")
+        result = cdc.compute_cadence(self.chronicle, today=date(2026, 7, 29))
+        self.assertEqual(result["missed_mondays"], ["2026-07-20", "2026-07-27"])
+
+    def test_mix_of_marked_and_markerless_episodes(self):
+        _write(os.path.join(self.chronicle, "001-the-founding.md"), "x")
+        _write(
+            os.path.join(self.chronicle, "002-catch-up.md"),
+            "<!-- cluster-day-covers: 2026-07-13, 2026-07-20 -->\ntext",
+        )
+        _write(os.path.join(self.chronicle, "003-next-week.md"), "x")  # no marker
+        result = cdc.compute_cadence(self.chronicle, today=date(2026, 7, 29))
+        # 002 explicitly covers 07-13/07-20; 003 (markerless) falls back to
+        # claiming the earliest still-uncovered Monday, 07-27.
+        self.assertEqual(result["missed_mondays"], [])
+
+    def test_marker_naming_a_non_monday_is_malformed(self):
+        _write(
+            os.path.join(self.chronicle, "002-bad.md"),
+            "<!-- cluster-day-covers: 2026-07-14 -->\ntext",  # a Tuesday
+        )
+        with self.assertRaises(cdc.MalformedCoversMarkerError):
+            cdc.compute_cadence(self.chronicle, today=date(2026, 7, 29))
+
+    def test_marker_naming_a_pre_founding_date_is_malformed(self):
+        _write(
+            os.path.join(self.chronicle, "002-bad.md"),
+            "<!-- cluster-day-covers: 2026-07-06 -->\ntext",
+        )
+        with self.assertRaises(cdc.MalformedCoversMarkerError):
+            cdc.compute_cadence(self.chronicle, today=date(2026, 7, 29))
+
+    def test_marker_with_non_ascending_dates_is_malformed(self):
+        _write(
+            os.path.join(self.chronicle, "002-bad.md"),
+            "<!-- cluster-day-covers: 2026-07-20, 2026-07-13 -->\ntext",
+        )
+        with self.assertRaises(cdc.MalformedCoversMarkerError):
+            cdc.compute_cadence(self.chronicle, today=date(2026, 7, 29))
+
+    def test_marker_with_duplicate_dates_is_malformed(self):
+        _write(
+            os.path.join(self.chronicle, "002-bad.md"),
+            "<!-- cluster-day-covers: 2026-07-13, 2026-07-13 -->\ntext",
+        )
+        with self.assertRaises(cdc.MalformedCoversMarkerError):
+            cdc.compute_cadence(self.chronicle, today=date(2026, 7, 29))
+
+    def test_malformed_marker_names_the_file_in_its_message(self):
+        path = os.path.join(self.chronicle, "002-bad.md")
+        _write(path, "<!-- cluster-day-covers: not-a-date -->\ntext")
+        with self.assertRaises(cdc.MalformedCoversMarkerError) as ctx:
+            cdc.compute_cadence(self.chronicle, today=date(2026, 7, 29))
+        self.assertIn("002-bad.md", str(ctx.exception))
+
+    def test_marker_is_invisible_to_a_markdown_renderer(self):
+        # It's an HTML comment -- the whole point is that it never shows
+        # up in the rendered episode a mortal reads.
+        _write(
+            os.path.join(self.chronicle, "002-catch-up.md"),
+            "<!-- cluster-day-covers: 2026-07-13 -->\ntext",
+        )
+        declared = cdc._covers_marker(os.path.join(self.chronicle, "002-catch-up.md"))
+        self.assertEqual(declared, [date(2026, 7, 13)])
+
+
 class RealChronicleCase(unittest.TestCase):
     """Confirms the module's default directory reads the real, live
     chronicle/ dir and reproduces orita-vault/hand/skipped.md's own
@@ -117,12 +224,15 @@ class RealChronicleCase(unittest.TestCase):
     independent recomputation of the same real files."""
 
     def test_real_chronicle_dir_matches_the_hand_counted_gap(self):
-        # episode-002 ("Eighteen Days") shipped task 391, satisfying the
-        # first owed Monday (07-13). 07-20 and 07-27 remain owed.
+        # episode-002 ("Eighteen Days") shipped task 391 and, since task
+        # 406, carries an explicit cluster-day-covers marker naming all
+        # three Mondays (07-13, 07-20, 07-27) it genuinely narrates in its
+        # own text -- so the real chronicle dir now reads clean, not
+        # under-credited by the one-Monday-in-sequence fallback.
         result = cdc.compute_cadence(today=date(2026, 7, 29))
         self.assertEqual(result["total_episodes_on_record"], 3)
         self.assertEqual(result["cluster_day_episodes_shipped"], 1)
-        self.assertEqual(result["missed_mondays"], ["2026-07-20", "2026-07-27"])
+        self.assertEqual(result["missed_mondays"], [])
 
 
 if __name__ == "__main__":
