@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Task 121. Off-By-One counts the tool that counts everything else.
 
-`tools/ritual_check.py` hand-wires 38 `check_*` functions into one hourly
+`tools/ritual_check.py` hand-wires 39 `check_*` functions into one hourly
 block: each is called inside `run_ritual_check`, its result assigned to a
 dict key, and that key printed as a line in `format_ritual_check`. Three
 separate places a single typo or a forgotten wire-up can silently drop a
@@ -99,6 +99,17 @@ A module holding that constant and never referenced anywhere in
 check instead of something found by hand every time. `compute_
 ritual_completeness()` folds its result in as `unwired_strategy_audit_
 modules`, the same class `unwired_tool_files` already holds.
+
+**Updated to 39** the same hour task 412's `check_connected_users` was
+wired in -- `tools/connected_users_check.py` (task 412, built to the
+same shape task 145's `toolkits_in_use_check.py` already proved) cross-
+checks `records/metrics.jsonl`'s `connected_users_oauth` field against
+`consent_grant_log.real_distinct_human_count()`, the sibling ground-
+truth field `toolkits_in_use_check.py`'s own docstring named ("both
+real, both honestly 0/2 since founding" -- `shared_reports_check.py`
+line 7) but for which no running cross-check had ever actually been
+wired. `find_unwired_tool_files()` (task 409) already covers this file
+going forward, since it lives in `tools/`.
 
 Usage:
     python3 tools/ritual_completeness_check.py check

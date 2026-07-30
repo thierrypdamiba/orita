@@ -169,11 +169,52 @@ def real_distinct_toolkit_count(path: str = LOG) -> int:
     return len(distinct_toolkits(_entries(path)))
 
 
+def distinct_humans(entries: list) -> set:
+    """The set of distinct human identities across every real recorded
+    grant -- never a count of grants themselves (one human confirming
+    both Gmail and Calendar is still ONE connected user, not two).
+    Task 412: this is `records/metrics.jsonl`'s `connected_users_oauth`
+    field's actual ground truth, the same role `distinct_toolkits` already
+    plays for `distinct_toolkits_in_use` -- STRATEGY.md's own separate row,
+    "'Connect your own' OAuth completions across users | leading | 100
+    connected users in 60 days | kothar-wa-khasis," counts USERS, not
+    toolkits, and until now nothing in this log distinguished the two.
+
+    Refuses via ConsentLogTamperedError if any entry is malformed -- see
+    that class's docstring for why a partial read here is unsafe."""
+    malformed = [e for e in entries if e.get("_malformed")]
+    if malformed:
+        raise ConsentLogTamperedError(
+            f"distinct_humans(): refusing -- {len(malformed)} unreadable line(s) "
+            "could be hiding a real recorded grant, and guessing past that risks "
+            "silently undercounting STRATEGY.md's connected-users metric. Repair "
+            f"the log by hand, then re-run. First error: {malformed[0]['_error']}"
+        )
+    return {e["human"] for e in entries}
+
+
+def real_distinct_human_count(path: str = LOG) -> int:
+    """STRATEGY.md's "'Connect your own' OAuth completions across users"
+    row, computed from ground truth instead of hand-typed: how many
+    distinct REAL humans have actually, verifiably cleared the consent
+    gate for at least one toolkit. Zero until this log holds a real line
+    -- and it never fabricates one. Deliberately separate from
+    `real_distinct_toolkit_count`: one human clearing Gmail AND Calendar
+    is one connected user and two connected toolkits, and STRATEGY.md's
+    metrics table tracks both as distinct rows with distinct owners
+    (nisaba for toolkit breadth, kothar-wa-khasis for user completions) --
+    collapsing them into a single number would misreport whichever row
+    borrowed the other's count."""
+    return len(distinct_humans(_entries(path)))
+
+
 if __name__ == "__main__":
     argv = sys.argv[1:]
     if not argv or argv[0] != "count":
         print(__doc__)
         sys.exit(1)
     n = real_distinct_toolkit_count()
+    h = real_distinct_human_count()
     print(f"real distinct toolkits in use (outside users, gate-verified): {n}")
+    print(f"real distinct connected users (outside humans, gate-verified): {h}")
     sys.exit(0)

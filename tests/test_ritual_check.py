@@ -2088,6 +2088,65 @@ class ToolkitsInUseFoldCase(unittest.TestCase):
         self.assertFalse(result["broken"])
 
 
+class ConnectedUsersFoldCase(unittest.TestCase):
+    """Task 412: run_ritual_check() folds connected_users_check.py's own
+    cross-check of records/metrics.jsonl's last connected_users_oauth
+    reading against consent_grant_log.py's real ground truth into the
+    same structured result -- the sibling of ToolkitsInUseFoldCase above,
+    same shape, different field: clean against a fixture where the two
+    agree, BROKEN (and printed) where they don't, and honestly clean
+    against the real, live town state today (both real ground truth and
+    the last recorded reading are honestly 0)."""
+
+    def setUp(self):
+        self.tmp = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.tmp, ignore_errors=True)
+        self.metrics_path = os.path.join(self.tmp, "metrics.jsonl")
+        self.consent_path = os.path.join(self.tmp, "consent.jsonl")
+
+    def _write_metrics(self, rows):
+        with open(self.metrics_path, "w", encoding="utf-8") as f:
+            for row in rows:
+                f.write(json.dumps(row) + "\n")
+
+    def test_agreeing_reading_is_clean(self):
+        self._write_metrics([{"date": "2026-07-19", "connected_users_oauth": 0}])
+        result = rc.run_ritual_check(
+            connected_users_metrics_path=self.metrics_path,
+            connected_users_consent_log_path=self.consent_path,
+        )
+        self.assertTrue(result["connected_users"]["clean"])
+        self.assertFalse(result["broken"])
+        self.assertIn(
+            "connected users (OAuth): clean (0 real connected user(s), metrics.jsonl's 2026-07-19 reading agrees)",
+            rc.format_ritual_check(result),
+        )
+
+    def test_disagreeing_reading_flips_broken_and_prints_both_numbers(self):
+        self._write_metrics([{"date": "2026-07-18", "connected_users_oauth": 3}])
+        result = rc.run_ritual_check(
+            connected_users_metrics_path=self.metrics_path,
+            connected_users_consent_log_path=self.consent_path,
+        )
+        self.assertFalse(result["connected_users"]["clean"])
+        self.assertTrue(result["broken"])
+        formatted = rc.format_ritual_check(result)
+        self.assertIn("connected users (OAuth): BROKEN", formatted)
+        self.assertIn("claims 3", formatted)
+
+    def test_default_path_reads_the_real_state_and_is_honestly_clean(self):
+        """No override: reads the real records/metrics.jsonl and the real
+        (never-written) HAND/consent-grants-log.jsonl. connected_users_oauth
+        has read 0 every day since founding, and real ground truth (no
+        real human has ever cleared the consent gate) is also 0, so the
+        real, live state this hour genuinely agrees."""
+        result = rc.run_ritual_check()
+        self.assertEqual(result["connected_users"]["real"], 0)
+        self.assertEqual(result["connected_users"]["claimed"], 0)
+        self.assertTrue(result["connected_users"]["clean"])
+        self.assertFalse(result["broken"])
+
+
 class LoadJsonArgShapeGuardCase(unittest.TestCase):
     """ROADMAP.md task 364. `_load_json_arg` is the shared helper the CLI's
     six file-argument flags (`--square-state`, `--arcade-apps-state`,

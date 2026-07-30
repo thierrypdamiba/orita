@@ -197,6 +197,56 @@ class RealLiveStateCase(unittest.TestCase):
     def test_the_real_ground_truth_is_honestly_zero(self):
         self.assertEqual(cgl.real_distinct_toolkit_count(), 0)
 
+    def test_the_real_connected_user_ground_truth_is_also_honestly_zero(self):
+        self.assertEqual(cgl.real_distinct_human_count(), 0)
+
+
+class DistinctHumanCountCase(unittest.TestCase):
+    """Task 412: `distinct_humans`/`real_distinct_human_count` are
+    STRATEGY.md's "'Connect your own' OAuth completions across users"
+    row's actual ground truth -- distinct from `distinct_toolkits`
+    because one human confirming two toolkits is one connected USER, not
+    two toolkits' worth of users."""
+
+    def setUp(self):
+        self.tmp = tempfile.mkdtemp()
+        self.addCleanup(__import__("shutil").rmtree, self.tmp, ignore_errors=True)
+        self.log_path = os.path.join(self.tmp, "log.jsonl")
+
+    def test_never_checked_log_counts_zero_humans_not_error(self):
+        never_written = os.path.join(self.tmp, "does-not-exist.jsonl")
+        self.assertEqual(cgl.real_distinct_human_count(never_written), 0)
+
+    def test_one_human_two_toolkits_counts_as_one_connected_user(self):
+        cgl.record_grant(
+            "alice", "github", _REAL_ISSUE, REQUIRED_SCOPES["github"], "2026-07-19T01:00:00Z", path=self.log_path
+        )
+        cgl.record_grant(
+            "alice", "x", _REAL_ISSUE, REQUIRED_SCOPES["x"], "2026-07-19T02:00:00Z", path=self.log_path
+        )
+        self.assertEqual(cgl.real_distinct_human_count(self.log_path), 1)
+        # The sibling toolkit count, over the identical log, disagrees on purpose.
+        self.assertEqual(cgl.real_distinct_toolkit_count(self.log_path), 2)
+
+    def test_two_humans_same_toolkit_counts_as_two_connected_users(self):
+        cgl.record_grant(
+            "alice", "github", _REAL_ISSUE, REQUIRED_SCOPES["github"], "2026-07-19T01:00:00Z", path=self.log_path
+        )
+        cgl.record_grant(
+            "bob", "github", _REAL_ISSUE, REQUIRED_SCOPES["github"], "2026-07-19T02:00:00Z", path=self.log_path
+        )
+        self.assertEqual(cgl.real_distinct_human_count(self.log_path), 2)
+        self.assertEqual(cgl.real_distinct_toolkit_count(self.log_path), 1)
+
+    def test_a_malformed_line_makes_the_human_count_refuse(self):
+        cgl.record_grant(
+            "alice", "github", _REAL_ISSUE, REQUIRED_SCOPES["github"], "2026-07-19T01:00:00Z", path=self.log_path
+        )
+        with open(self.log_path, "a", encoding="utf-8") as f:
+            f.write("not valid json at all\n")
+        with self.assertRaises(cgl.ConsentLogTamperedError):
+            cgl.real_distinct_human_count(self.log_path)
+
 
 if __name__ == "__main__":
     unittest.main()

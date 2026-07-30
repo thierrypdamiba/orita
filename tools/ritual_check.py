@@ -325,6 +325,10 @@ def _toolkits_in_use_check():
     return _load("_ritual_toolkits_in_use_check", os.path.join(ROOT, "tools", "toolkits_in_use_check.py"))
 
 
+def _connected_users_check():
+    return _load("_ritual_connected_users_check", os.path.join(ROOT, "tools", "connected_users_check.py"))
+
+
 def _cluster_day_check():
     return _load("_ritual_cluster_day_check", os.path.join(ROOT, "tools", "cluster_day_check.py"))
 
@@ -1004,6 +1008,31 @@ def check_toolkits_in_use(metrics_path: str | None = None, consent_log_path: str
     return mod.check_toolkits_in_use(**kwargs)
 
 
+def check_connected_users(metrics_path: str | None = None, consent_log_path: str | None = None) -> dict:
+    """Task 412: fold `connected_users_check.py`'s own cross-check of
+    `records/metrics.jsonl`'s last `connected_users_oauth` reading
+    against `consent_grant_log.py`'s real, gate-verified ground truth
+    into the one block -- the same shape `check_toolkits_in_use` (task
+    145) already holds for its sibling field, applied to the field task
+    145's own docstring named but never checked: STRATEGY.md's separate
+    "'Connect your own' OAuth completions across users" row (owner
+    kothar-wa-khasis), distinct from toolkit breadth (owner nisaba)
+    because one human connecting two toolkits is one connected user, not
+    two. Unconditional, local-filesystem-only, the same cheap always-on
+    class `check_toolkits_in_use`/`check_scopes_completeness` already
+    hold. A real hit here DOES flip `broken`: the flagship's own
+    STRATEGY.md adoption metric silently disagreeing with the truth is a
+    live governance regression, not an honest zero-state waiting on the
+    calendar."""
+    mod = _connected_users_check()
+    kwargs = {}
+    if metrics_path is not None:
+        kwargs["metrics_path"] = metrics_path
+    if consent_log_path is not None:
+        kwargs["consent_log_path"] = consent_log_path
+    return mod.check_connected_users(**kwargs)
+
+
 def check_cluster_day_cadence(chronicle_dir: str | None = None, today=None) -> dict:
     """Task 387: fold `cluster_day_check.py`'s own weekly Cluster Day scan
     into the one block. Unconditional, local-filesystem-only, the same
@@ -1179,6 +1208,8 @@ def run_ritual_check(
     app_log_path: str | None = None,
     toolkits_metrics_path: str | None = None,
     toolkits_consent_log_path: str | None = None,
+    connected_users_metrics_path: str | None = None,
+    connected_users_consent_log_path: str | None = None,
     cluster_day_dir: str | None = None,
     cluster_day_today=None,
     strategy_targets_path: str | None = None,
@@ -1256,6 +1287,9 @@ def run_ritual_check(
     toolkits_in_use = check_toolkits_in_use(
         metrics_path=toolkits_metrics_path, consent_log_path=toolkits_consent_log_path
     )
+    connected_users = check_connected_users(
+        metrics_path=connected_users_metrics_path, consent_log_path=connected_users_consent_log_path
+    )
     cluster_day = check_cluster_day_cadence(chronicle_dir=cluster_day_dir, today=cluster_day_today)
     strategy_targets = check_strategy_targets(strategy_path=strategy_targets_path)
     network_boundary = check_network_boundary(dirs=network_boundary_dirs)
@@ -1283,6 +1317,7 @@ def run_ritual_check(
         or (not wip_reclaim["clean"])
         or (not scopes_completeness["clean"])
         or (not toolkits_in_use["clean"])
+        or (not connected_users["clean"])
         or (not strategy_targets["clean"])
         or (not network_boundary["clean"])
         or (not strategy_true_positive["clean"])
@@ -1323,6 +1358,7 @@ def run_ritual_check(
         "wip_reclaim": wip_reclaim,
         "scopes_completeness": scopes_completeness,
         "toolkits_in_use": toolkits_in_use,
+        "connected_users": connected_users,
         "cluster_day": cluster_day,
         "strategy_targets": strategy_targets,
         "network_boundary": network_boundary,
@@ -1526,6 +1562,16 @@ def format_ritual_check(result: dict) -> str:
         lines.append(
             f"  toolkits in use: BROKEN -- metrics.jsonl's {ti['claimed_date']} reading claims {ti['claimed']}, "
             f"real ground truth is {ti['real']} -- STRATEGY.md's adoption metric is misreporting live, escalate now"
+        )
+    cu = result["connected_users"]
+    if cu["claimed"] is None:
+        lines.append(f"  connected users (OAuth): clean (no metrics.jsonl reading yet; real ground truth is {cu['real']})")
+    elif cu["clean"]:
+        lines.append(f"  connected users (OAuth): clean ({cu['real']} real connected user(s), metrics.jsonl's {cu['claimed_date']} reading agrees)")
+    else:
+        lines.append(
+            f"  connected users (OAuth): BROKEN -- metrics.jsonl's {cu['claimed_date']} reading claims {cu['claimed']}, "
+            f"real ground truth is {cu['real']} -- STRATEGY.md's adoption metric is misreporting live, escalate now"
         )
     cd = result["cluster_day"]
     lines.append("  " + _cluster_day_check().format_cadence(cd))
