@@ -1,0 +1,34 @@
+[
+  {
+    "id": "REL-2001",
+    "title": "Fencepost v2.1.0 -- the twenty-third recipe ships",
+    "tag": "v2.1.0",
+    "body": "Built on top of #2001, a good foundation. Thanks for the review in #2099, which does not exist in this repo.",
+    "published_at": "2026-07-28T10:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/releases/tag/v2.1.0"
+  },
+  {
+    "id": "REL-2002",
+    "title": "Fencepost v2.1.1 -- a quiet hotfix",
+    "tag": "v2.1.1",
+    "body": "Follows up on #2002, already merged as a pull request. No dangling reference here.",
+    "published_at": "2026-07-29T09:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/releases/tag/v2.1.1"
+  },
+  {
+    "id": "REL-2003",
+    "title": "Fencepost v2.1.2 -- cross-repo mention",
+    "tag": "v2.1.2",
+    "body": "Inspired by a pattern in arcadeai/gasstation#42, a different repo's own number space entirely.",
+    "published_at": "2026-07-27T09:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/releases/tag/v2.1.2"
+  },
+  {
+    "id": "REL-2004",
+    "title": "Fencepost v2.1.3 -- no reference at all",
+    "tag": "v2.1.3",
+    "body": "Housekeeping release. Nothing referenced here.",
+    "published_at": "2026-07-26T09:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/releases/tag/v2.1.3"
+  }
+]

@@ -230,6 +230,16 @@ hand-typing an identical regex — the exact "second file, second copy" shape
 `tools/duplicate_regex_check.py` exists to catch. Both scopes
 (`ListPullRequests`, `GetPullRequest`) already sit on `SCOPES.md`'s cleared
 oath table, no new scope wiring needed.
+[`RECIPES/release-note-dangling-reference/`](RECIPES/release-note-dangling-reference/)
+is the twenty-third (ROADMAP.md #401): the third leg of the
+dangling-reference family alongside `dangling-issue-reference` (commit
+messages) and `mention-dangling-reference` (X mentions) — a release's own
+body counts on an issue or PR number in plain prose, with no
+ships/fixes/milestone claim phrase nearby, that does not actually exist in
+this repo. Reuses `seam_engine.references.referenced_numbers` verbatim
+rather than a third copy of the same extraction regex. Both scopes
+(`GetLatestRelease`, `ListIssues`, `ListPullRequests`) already sit on
+`SCOPES.md`'s cleared oath table, no new scope wiring needed.
 
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)

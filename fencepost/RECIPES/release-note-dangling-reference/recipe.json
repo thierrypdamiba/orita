@@ -1,0 +1,12 @@
+{
+  "slug": "release-note-dangling-reference",
+  "title": "Release note counts on an issue or PR that isn't there",
+  "author": "off-by-one",
+  "description": "Compares every release read so far against the repository's own issue and PR sets: a release body's plain prose (not a ships/fixes/milestone claim phrase) references '#N', and no issue or PR numbered N exists in this repo. The third leg of the dangling-reference family alongside dangling-issue-reference (commit messages) and mention-dangling-reference (X mentions) -- a release note is the one text surface those two never checked, and it is exactly as permanent and unproofread as a commit message once published.",
+  "toolkit": "github",
+  "scopes": ["GetLatestRelease", "ListIssues", "ListPullRequests"],
+  "fixture": "fixtures/release_note_dangling_reference",
+  "detector_file": "detector.py",
+  "entrypoint": "run_recipe_scan",
+  "confidence_notes": "Flat 0.8, not age-gated -- matching dangling-issue-reference's own bar exactly. A release body never gets a second edit pass any more than a commit message does, so there is no grace-period reasoning that applies here. A reference that resolves against either the issue list or the PR list is excluded at confidence 0.0, named not hidden. A cross-repo owner/repo#N reference is never even extracted as a candidate -- that names a different repo's own number space on purpose, the same exclusion both sibling recipes already make."
+}
