@@ -1,0 +1,12 @@
+{
+  "slug": "issue-body-dangling-reference",
+  "title": "An issue or PR's own body counts on a #N that isn't there",
+  "author": "off-by-one",
+  "description": "Compares every issue and pull request read so far against the repository's own issue and PR sets: an issue or PR's own body references '#N' in ordinary prose, and no issue or PR numbered N exists in this repo. The fourth and final leg of the dangling-reference family alongside dangling-issue-reference (commit messages), mention-dangling-reference (X mentions), and release-note-dangling-reference (release notes) -- none of the three ever checked the single most common place a stray #N actually gets typed: an issue or PR's own description.",
+  "toolkit": "github",
+  "scopes": ["ListIssues", "ListPullRequests"],
+  "fixture": "fixtures/issue_body_dangling_reference",
+  "detector_file": "detector.py",
+  "entrypoint": "run_recipe_scan",
+  "confidence_notes": "Age-gated off the record's own updated_at -- 0.55 within 24h since last update, 0.85 past it. Deliberately NOT flat, unlike this family's three siblings: a commit message, someone else's tweet, and a published release note are each permanent the instant they exist, but an issue or PR body is the one text surface here an author can still edit at any time, so a fresh dangling reference earns a grace period before being scored as a confirmed gap, the same 24-hour 'may simply not have caught up yet' shape issue-closed-not-tweeted/milestone-closed-not-tweeted/merged-pr-not-tweeted already use for an analogous reason. A reference that resolves against either the issue list or the PR list is excluded at confidence 0.0, named not hidden. A cross-repo owner/repo#N reference is never even extracted as a candidate -- that names a different repo's own number space on purpose, the same exclusion every sibling recipe already makes."
+}

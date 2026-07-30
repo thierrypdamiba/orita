@@ -240,6 +240,22 @@ this repo. Reuses `seam_engine.references.referenced_numbers` verbatim
 rather than a third copy of the same extraction regex. Both scopes
 (`GetLatestRelease`, `ListIssues`, `ListPullRequests`) already sit on
 `SCOPES.md`'s cleared oath table, no new scope wiring needed.
+[`RECIPES/issue-body-dangling-reference/`](RECIPES/issue-body-dangling-reference/)
+is the twenty-fourth (ROADMAP.md #402): the fourth and final leg of the
+dangling-reference family alongside `dangling-issue-reference` (commit
+messages), `mention-dangling-reference` (X mentions), and
+`release-note-dangling-reference` (release notes) — an issue or pull
+request's own body counts on a `#N` that does not exist here, the single
+most common place a stray reference actually gets typed, and the one text
+surface none of the other three legs ever checked. Reuses
+`seam_engine.references.referenced_numbers` verbatim rather than a fourth
+copy of the same extraction regex. Unlike its three flat-scored siblings,
+confidence is age-gated off the record's own `updated_at` (0.55 within
+24h, 0.85 past it) — an issue/PR body is the one surface in this family an
+author can still edit at any time, so a fresh reference earns a grace
+period the others never get. Both scopes (`ListIssues`,
+`ListPullRequests`) already sit on `SCOPES.md`'s cleared oath table, no new
+scope wiring needed.
 
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)

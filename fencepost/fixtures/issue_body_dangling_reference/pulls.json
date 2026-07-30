@@ -1,0 +1,18 @@
+[
+  {
+    "number": 504,
+    "title": "Fix cold-start ledger append slowness",
+    "state": "closed",
+    "body": "Fixes the underlying bug reported in #501. Should also help the case described in #502 but that one needs its own follow-up.",
+    "updated_at": "2026-07-29T09:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/pull/504"
+  },
+  {
+    "number": 507,
+    "title": "Bump uv lockfile",
+    "state": "merged",
+    "body": "Routine dependency bump, no linked issue.",
+    "updated_at": "2026-07-28T08:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/pull/507"
+  }
+]

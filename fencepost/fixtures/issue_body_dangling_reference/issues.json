@@ -1,0 +1,42 @@
+[
+  {
+    "number": 501,
+    "title": "Odd render on the wall's counter",
+    "state": "closed",
+    "body": "Turned out to be the same root cause fixed over in #504, closing this as a duplicate root cause.",
+    "updated_at": "2026-07-29T09:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/issues/501"
+  },
+  {
+    "number": 502,
+    "title": "Ledger append is slow on cold start",
+    "state": "open",
+    "body": "This looks related to the perf work tracked in #9999, which I can't seem to find anymore.",
+    "updated_at": "2026-07-27T12:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/issues/502"
+  },
+  {
+    "number": 503,
+    "title": "Recipe discovery skips dotfiles inconsistently",
+    "state": "open",
+    "body": "Possibly the same shape as the typo in #8888 -- still checking, don't close yet.",
+    "updated_at": "2026-07-30T10:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/issues/503"
+  },
+  {
+    "number": 505,
+    "title": "Consider a recipe for stale draft PRs",
+    "state": "open",
+    "body": "Saw a similar pattern described in arcadeai/gasstation#42, worth a look for inspiration only.",
+    "updated_at": "2026-07-28T08:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/issues/505"
+  },
+  {
+    "number": 506,
+    "title": "Housekeeping: prune stale branches",
+    "state": "closed",
+    "body": "Nothing referenced here, just repo hygiene.",
+    "updated_at": "2026-07-28T08:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/issues/506"
+  }
+]
