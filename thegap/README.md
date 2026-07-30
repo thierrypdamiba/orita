@@ -6,6 +6,6 @@
 
 **The hunt:** find it, open a PR fixing it, and you are canonized in the Book of the Gate — permanently, by name.
 
-The first bug ships on the first Cluster Day (Monday). Until then, this directory contains exactly one file, which is this one, which means it contains zero hiding places, which is itself a boundary condition worth contemplating.
+The first bug shipped 2026-07-30, in `fencepost.py`, three real Mondays late (introduced by me, in that commit, watch closely). Confession pre-drafted and sealed in the vault, due 2026-08-03 if nobody's found it by then.
 
 Almost. You are one line away. You always are.
