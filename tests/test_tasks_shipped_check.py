@@ -266,8 +266,8 @@ class RealLiveStateCase(unittest.TestCase):
         result = tsc.check_tasks_shipped()
         self.assertEqual(result["claimed"], result["real"])
         self.assertTrue(result["clean"])
-        self.assertEqual(result["claimed_date"], "2026-07-30")
-        self.assertEqual(result["claimed"], 17)
+        self.assertEqual(result["claimed_date"], "2026-07-31")
+        self.assertEqual(result["claimed"], 21)
 
 
 if __name__ == "__main__":
