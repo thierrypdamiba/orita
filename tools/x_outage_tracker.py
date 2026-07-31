@@ -58,6 +58,28 @@ the single worst crossed-and-unfired tier, so a long-stuck outage gets
 told once more at each real severity step instead of going silent
 forever after its first notice.
 
+Task 422. `next_escalation_tier`'s own docstring already named the shape
+this closes: "a long-stuck outage gets told once more at each real
+severity step instead of going silent forever after its first notice" --
+true only while the outage stays under `ESCALATION_TIERS`' own highest
+value. `hand/skipped.md`'s 2026-07-27 entry named the real gap directly:
+both defined tiers (48h, 168h) had long since fired on the town's own
+live `X_PostTweet`/`X_GetUserTweets` outage (started 2026-07-14) and
+"nothing higher will ever fire on its own no matter how long this runs"
+-- and forty-plus BUILDLOG.md hours since have each correctly logged "no
+new escalation tier" and moved on, which reads identically whether the
+outage is one week old or one year old. `ESCALATION_TIERS` is a finite
+tuple; `next_escalation_tier` only ever walked it. `RECURRING_ESCALATION_
+INTERVAL_HOURS` and `_extended_tiers` fix the actual top: once an outage
+runs past the highest named tier, one new tier is generated every
+`RECURRING_ESCALATION_INTERVAL_HOURS` (the same one-week cadence the
+168h tier already set) for as long as the outage keeps running, so a
+months-long outage still earns a fresh, real, never-before-fired
+escalation on a fixed weekly cadence instead of going silent forever
+after its second notice. `already_escalated_for_streak`'s existing
+(tool, streak_started_at, threshold_hours) key needs no change -- a
+generated tier is just one more real number in that same space.
+
 Usage:
     python3 tools/x_outage_tracker.py record <tool> <ok|forbidden> <checked_at>
     python3 tools/x_outage_tracker.py status
@@ -72,6 +94,7 @@ from datetime import datetime, timezone
 DEFAULT_COOLDOWN_HOURS = 2.0
 DEFAULT_ESCALATION_THRESHOLD_HOURS = 48.0
 ESCALATION_TIERS = (48.0, 168.0)
+RECURRING_ESCALATION_INTERVAL_HOURS = 168.0
 
 LOG = os.path.join(os.path.dirname(__file__), "..", "HAND", "x-outage-log.jsonl")
 ESCALATION_LOG = os.path.join(os.path.dirname(__file__), "..", "HAND", "escalations.jsonl")
@@ -343,20 +366,64 @@ def should_escalate(
     return True, f"outage since {started}, {elapsed:.1f}h old, crosses {threshold_hours}h threshold"
 
 
-def next_escalation_tier(entries: list, tool: str, now: str, escalation_entries=None, tiers=ESCALATION_TIERS):
+def _extended_tiers(
+    elapsed_hours: float,
+    tiers=ESCALATION_TIERS,
+    recurring_interval: float = RECURRING_ESCALATION_INTERVAL_HOURS,
+) -> tuple:
+    """`tiers` extended with recurring tiers beyond its own highest value.
+
+    `tiers` names finitely many severities; an outage does not stop
+    running just because it outlived the last one (task 422). Once
+    `elapsed_hours` runs past `max(tiers)`, `recurring_interval` is added
+    again and again -- each new tier only counted if it does not exceed
+    `elapsed_hours` -- so a real, currently-running outage always has a
+    real next tier available to fire, no matter how long it has run.
+    `tiers=()` (no explicit tiers at all) returns unchanged: there is
+    nothing to extend past.
+    """
+    if not tiers:
+        return tiers
+    extended = set(tiers)
+    threshold_hours = max(tiers) + recurring_interval
+    while threshold_hours <= elapsed_hours:
+        extended.add(threshold_hours)
+        threshold_hours += recurring_interval
+    return tuple(sorted(extended))
+
+
+def next_escalation_tier(
+    entries: list,
+    tool: str,
+    now: str,
+    escalation_entries=None,
+    tiers=ESCALATION_TIERS,
+    recurring_interval: float = RECURRING_ESCALATION_INTERVAL_HOURS,
+):
     """The single worst crossed-and-unfired escalation tier for `tool`, or None.
 
-    Walks `tiers` from most to least severe so a long-stuck outage reports
-    its highest real severity rather than re-surfacing a lower tier that
-    already fired (task 92) -- the gap task 81's single-threshold design
-    left: an outage that fires its 48h notice and then just keeps running
-    read "already escalated" forever after, with no way to tell the Hand
-    it got materially worse. Returns `(threshold_hours, reason)` for the
-    tier that's due, or `None` if no tier is currently due.
+    Walks `tiers` (extended past its own top by `_extended_tiers`, task
+    422, using this outage's own real elapsed hours) from most to least
+    severe so a long-stuck outage reports its highest real severity
+    rather than re-surfacing a lower tier that already fired (task 92) --
+    the gap task 81's single-threshold design left: an outage that fires
+    its 48h notice and then just keeps running read "already escalated"
+    forever after, with no way to tell the Hand it got materially worse.
+    Task 92 fixed that up to `max(tiers)`; task 422 fixes it past that
+    top too, so an outage that outlives every named tier still earns a
+    fresh one every `recurring_interval` hours instead of going silent
+    forever. Returns `(threshold_hours, reason)` for the tier that's due,
+    or `None` if no tier is currently due (including: no active outage).
     """
     if escalation_entries is None:
         escalation_entries = _escalation_entries()
-    for threshold_hours in sorted(tiers, reverse=True):
+    effective_tiers = tiers
+    streak = current_streak(entries, tool, "forbidden")
+    if streak:
+        started = streak_started_at(entries, tool, "forbidden")
+        elapsed = (_parse(now) - _parse(started)).total_seconds() / 3600.0
+        effective_tiers = _extended_tiers(elapsed, tiers, recurring_interval)
+    for threshold_hours in sorted(effective_tiers, reverse=True):
         due, reason = should_escalate(entries, tool, now, threshold_hours, escalation_entries)
         if due:
             return threshold_hours, reason

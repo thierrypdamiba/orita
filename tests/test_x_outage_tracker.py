@@ -408,6 +408,126 @@ class TestTieredEscalation(unittest.TestCase):
         self.assertIsNone(tier)
 
 
+class TestRecurringEscalationTiers(unittest.TestCase):
+    """Task 422: ESCALATION_TIERS is a finite tuple (48h, 168h) that
+    next_escalation_tier only ever walked -- so an outage that outlives
+    168h without recovering reads "already escalated" forever after, no
+    matter whether it is a week old or a year old (named directly to the
+    Hand in hand/skipped.md 2026-07-27, still open at task 421). Once an
+    outage runs past the highest named tier, one new tier every
+    RECURRING_ESCALATION_INTERVAL_HOURS (168h, matching the second named
+    tier's own cadence) must become due."""
+
+    def test_extended_tiers_adds_nothing_before_the_first_recurring_boundary(self):
+        # 336h is 168h (the highest named tier) + one more 168h interval.
+        # Anything short of that has nothing to add.
+        self.assertEqual(xot._extended_tiers(300.0, (48.0, 168.0)), (48.0, 168.0))
+
+    def test_extended_tiers_adds_one_recurring_tier_past_the_boundary(self):
+        self.assertEqual(xot._extended_tiers(400.0, (48.0, 168.0)), (48.0, 168.0, 336.0))
+
+    def test_extended_tiers_adds_every_boundary_crossed(self):
+        # 550h has crossed 336h (168+168) and 504h (168+168+168), not 672h.
+        self.assertEqual(xot._extended_tiers(550.0, (48.0, 168.0)), (48.0, 168.0, 336.0, 504.0))
+
+    def test_extended_tiers_empty_tiers_stays_empty(self):
+        self.assertEqual(xot._extended_tiers(1000.0, ()), ())
+
+    def test_next_escalation_tier_fires_a_recurring_tier_once_both_named_tiers_are_spent(self):
+        entries = [{"type": "check", "tool": "X_PostTweet", "status": "forbidden", "checked_at": "2026-07-14T01:09:00Z"}]
+        fired_both_named_tiers = [
+            {
+                "type": "escalation",
+                "tool": "X_PostTweet",
+                "streak_started_at": "2026-07-14T01:09:00Z",
+                "escalated_at": "2026-07-16T02:00:00Z",
+                "hours": 48.85,
+                "threshold_hours": 48.0,
+            },
+            {
+                "type": "escalation",
+                "tool": "X_PostTweet",
+                "streak_started_at": "2026-07-14T01:09:00Z",
+                "escalated_at": "2026-07-21T01:11:00Z",
+                "hours": 168.03,
+                "threshold_hours": 168.0,
+            },
+        ]
+        # 2026-07-14T01:09:00Z + 336h = 2026-07-28T01:09:00Z, the first
+        # recurring boundary -- matches this task's real live outage shape.
+        tier = xot.next_escalation_tier(
+            entries, "X_PostTweet", "2026-07-28T02:00:00Z", escalation_entries=fired_both_named_tiers
+        )
+        self.assertEqual(tier[0], 336.0)
+        self.assertIn("crosses 336.0h threshold", tier[1])
+
+    def test_next_escalation_tier_recurring_boundary_not_due_before_it_is_crossed(self):
+        entries = [{"type": "check", "tool": "X_PostTweet", "status": "forbidden", "checked_at": "2026-07-14T01:09:00Z"}]
+        fired_both_named_tiers = [
+            {
+                "type": "escalation",
+                "tool": "X_PostTweet",
+                "streak_started_at": "2026-07-14T01:09:00Z",
+                "escalated_at": "2026-07-16T02:00:00Z",
+                "hours": 48.85,
+                "threshold_hours": 48.0,
+            },
+            {
+                "type": "escalation",
+                "tool": "X_PostTweet",
+                "streak_started_at": "2026-07-14T01:09:00Z",
+                "escalated_at": "2026-07-21T01:11:00Z",
+                "hours": 168.03,
+                "threshold_hours": 168.0,
+            },
+        ]
+        # Only 262h in -- short of the 336h recurring boundary.
+        tier = xot.next_escalation_tier(
+            entries, "X_PostTweet", "2026-07-25T03:00:00Z", escalation_entries=fired_both_named_tiers
+        )
+        self.assertIsNone(tier)
+
+    def test_next_escalation_tier_recurring_tier_fires_once_then_suppresses(self):
+        entries = [{"type": "check", "tool": "X_PostTweet", "status": "forbidden", "checked_at": "2026-07-14T01:09:00Z"}]
+        fired_through_336 = [
+            {"type": "escalation", "tool": "X_PostTweet", "streak_started_at": "2026-07-14T01:09:00Z", "escalated_at": "2026-07-16T02:00:00Z", "hours": 48.85, "threshold_hours": 48.0},
+            {"type": "escalation", "tool": "X_PostTweet", "streak_started_at": "2026-07-14T01:09:00Z", "escalated_at": "2026-07-21T01:11:00Z", "hours": 168.03, "threshold_hours": 168.0},
+            {"type": "escalation", "tool": "X_PostTweet", "streak_started_at": "2026-07-14T01:09:00Z", "escalated_at": "2026-07-28T02:00:00Z", "hours": 336.85, "threshold_hours": 336.0},
+        ]
+        # Same 336h-crossed moment: already fired at that tier, and the
+        # next boundary (504h) is not crossed yet -- nothing due.
+        still_quiet = xot.next_escalation_tier(
+            entries, "X_PostTweet", "2026-07-28T02:00:00Z", escalation_entries=fired_through_336
+        )
+        self.assertIsNone(still_quiet)
+        # 504h later (2026-08-04T01:09:00Z is exactly 504h from start):
+        # the next real recurring boundary is due.
+        now_due = xot.next_escalation_tier(
+            entries, "X_PostTweet", "2026-08-04T02:00:00Z", escalation_entries=fired_through_336
+        )
+        self.assertEqual(now_due[0], 504.0)
+
+    def test_next_escalation_tier_recurring_boundary_respects_a_custom_interval(self):
+        entries = [{"type": "check", "tool": "X_PostTweet", "status": "forbidden", "checked_at": "2026-07-14T01:09:00Z"}]
+        # A 24h recurring interval crosses its first new boundary (192h)
+        # well before the default 168h interval would (336h).
+        tier = xot.next_escalation_tier(
+            entries,
+            "X_PostTweet",
+            "2026-07-22T01:09:00Z",  # 192h in
+            escalation_entries=[],
+            recurring_interval=24.0,
+        )
+        self.assertEqual(tier[0], 192.0)
+
+    def test_next_escalation_tier_regression_at_200h_still_reports_168_not_a_phantom_recurring_tier(self):
+        # Guards task 92's own existing fixture: 200h in is short of the
+        # 336h recurring boundary, so the worst unfired tier must stay 168.
+        entries = [{"type": "check", "tool": "X_PostTweet", "status": "forbidden", "checked_at": "2026-07-14T01:09:00Z"}]
+        tier = xot.next_escalation_tier(entries, "X_PostTweet", "2026-07-22T09:09:00Z", escalation_entries=[])
+        self.assertEqual(tier[0], 168.0)
+
+
 class TestTamperedCheckLog(_TempLogCase):
     """Task 246: a malformed line (bad hand-edit, stray merge-conflict
     marker, truncated write) in the check log must not crash
