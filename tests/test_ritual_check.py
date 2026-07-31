@@ -2323,6 +2323,167 @@ class ReportShippedFoldCase(unittest.TestCase):
         self.assertFalse(result["broken"])
 
 
+class GitHubStarsFoldCase(unittest.TestCase):
+    """Task 420: run_ritual_check() folds github_stars_check.py's own
+    cross-check of records/metrics.jsonl's last github_stars reading
+    against the last recorded live star count into the same structured
+    result -- the sibling of ToolkitsInUseFoldCase/ConnectedUsersFoldCase/
+    GapTruePositiveFoldCase/ReportShippedFoldCase above, applied to
+    off-by-one's own STRATEGY.md row. Unlike those four, this field's
+    ground truth has no local source -- it is only ever this hour's live
+    `github_stars_count` argument or a stale-but-real prior recording in
+    the log; passing neither still returns a verdict (unlike check_ci/
+    check_square, which return None with no live input), because a prior
+    real recording is still real ground truth to compare a hand-typed
+    claim against.
+
+    `record_github_stars` defaults `False` (task 374/375's own guard,
+    applied here): every test below that passes `github_stars_count`
+    also passes `record_github_stars=True` explicitly, and every log path
+    is a tmpdir path, never the real `HAND/github-stars-log.jsonl` --
+    proven directly by `GitHubStarsWriteDefaultCase` below, against the
+    real, unpatched module."""
+
+    def setUp(self):
+        self.tmp = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.tmp, ignore_errors=True)
+        self.metrics_path = os.path.join(self.tmp, "metrics.jsonl")
+        self.log_path = os.path.join(self.tmp, "github-stars-log.jsonl")
+
+    def _write_metrics(self, rows):
+        with open(self.metrics_path, "w", encoding="utf-8") as f:
+            for row in rows:
+                f.write(json.dumps(row) + "\n")
+
+    def test_live_count_given_without_record_flag_is_not_written(self):
+        self._write_metrics([{"date": "2026-07-30", "github_stars": 0}])
+        result = rc.run_ritual_check(
+            github_stars_count=0,
+            github_stars_metrics_path=self.metrics_path,
+            github_stars_log_path=self.log_path,
+        )
+        # Nothing recorded yet, so nothing to compare against -- clean,
+        # not broken, but real is None (task 374/375's own "not recording
+        # must not mean not comparing honestly" discipline).
+        self.assertTrue(result["github_stars"]["clean"])
+        self.assertIsNone(result["github_stars"]["real"])
+        self.assertFalse(os.path.exists(self.log_path))
+
+    def test_live_count_recorded_and_compared_when_asked(self):
+        self._write_metrics([{"date": "2026-07-30", "github_stars": 0}])
+        result = rc.run_ritual_check(
+            github_stars_count=0,
+            github_stars_metrics_path=self.metrics_path,
+            github_stars_log_path=self.log_path,
+            record_github_stars=True,
+        )
+        self.assertTrue(result["github_stars"]["clean"])
+        self.assertEqual(result["github_stars"]["real"], 0)
+        self.assertFalse(result["broken"])
+        self.assertIn(
+            "github stars: clean (0 real star(s), metrics.jsonl's 2026-07-30 reading agrees)",
+            rc.format_ritual_check(result),
+        )
+        # Task 88's own order: recorded durably, so the next hour's check
+        # (even with no live count given) can still compare against it.
+        with open(self.log_path) as f:
+            lines = [ln for ln in f if ln.strip()]
+        self.assertEqual(len(lines), 1)
+
+    def test_live_count_disagreeing_with_claim_flips_broken(self):
+        self._write_metrics([{"date": "2026-07-29", "github_stars": 1}])
+        result = rc.run_ritual_check(
+            github_stars_count=0,
+            github_stars_metrics_path=self.metrics_path,
+            github_stars_log_path=self.log_path,
+            record_github_stars=True,
+        )
+        self.assertFalse(result["github_stars"]["clean"])
+        self.assertTrue(result["broken"])
+        formatted = rc.format_ritual_check(result)
+        self.assertIn("github stars: BROKEN", formatted)
+        self.assertIn("claims 1", formatted)
+        self.assertIn("is 0", formatted)
+
+    def test_no_live_count_falls_back_to_last_recorded_log_entry(self):
+        gsc = rc._github_stars_check()
+        gsc.record_check(0, "2026-07-30T23:00:00Z", path=self.log_path)
+        self._write_metrics([{"date": "2026-07-30", "github_stars": 0}])
+        result = rc.run_ritual_check(
+            github_stars_metrics_path=self.metrics_path,
+            github_stars_log_path=self.log_path,
+        )
+        self.assertIsNotNone(result["github_stars"])
+        self.assertTrue(result["github_stars"]["clean"])
+        self.assertEqual(result["github_stars"]["real"], 0)
+        self.assertFalse(result["broken"])
+
+    def test_no_live_count_and_no_prior_log_is_clean(self):
+        self._write_metrics([{"date": "2026-07-30", "github_stars": 0}])
+        result = rc.run_ritual_check(
+            github_stars_metrics_path=self.metrics_path,
+            github_stars_log_path=self.log_path,
+        )
+        self.assertTrue(result["github_stars"]["clean"])
+        self.assertIsNone(result["github_stars"]["real"])
+        self.assertFalse(result["broken"])
+
+    def test_run_ritual_check_default_does_not_touch_the_real_log(self):
+        """Task 374/375's own bare-call guarantee, applied here: a bare
+        rc.run_ritual_check() (the shape every dev-verification and every
+        other test in this file already makes) must never write the real
+        production HAND/github-stars-log.jsonl, since it passes neither
+        github_stars_count nor record_github_stars."""
+        real_log = rc._github_stars_check().LOG
+        before = os.path.exists(real_log) and os.path.getsize(real_log)
+        rc.run_ritual_check()
+        after = os.path.exists(real_log) and os.path.getsize(real_log)
+        self.assertEqual(before, after)
+
+
+class GitHubStarsWriteDefaultCase(unittest.TestCase):
+    """Task 420, mirroring ScribeGrowthWriteDefaultCase exactly: proves
+    the write-by-default class of bug (tasks 374/375) is closed at its
+    actual source -- the real, unpatched github_stars_check.py module,
+    redirected only to a tmp LOG path, not to a patched loader."""
+
+    def setUp(self):
+        self.tmpdir = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.tmpdir, ignore_errors=True)
+        real_gsc = _load("_test_real_github_stars_check", os.path.join(ROOT, "tools", "github_stars_check.py"))
+        real_gsc.LOG = os.path.join(self.tmpdir, "github-stars-log.jsonl")
+        original_loader = rc._github_stars_check
+        rc._github_stars_check = lambda: real_gsc
+        self.addCleanup(setattr, rc, "_github_stars_check", original_loader)
+        self.log_path = real_gsc.LOG
+
+    def test_bare_call_with_a_live_count_but_no_record_flag_does_not_write(self):
+        rc.run_ritual_check(github_stars_count=3)
+        self.assertFalse(os.path.exists(self.log_path))
+
+    def test_cli_main_records_for_real(self):
+        """main() is the one real hourly entrypoint -- it must record,
+        exactly once per invocation with a live count in hand, unchanged
+        from before this fix."""
+        captured = {}
+        original = rc.run_ritual_check
+
+        def capturing(*args, **kwargs):
+            captured.update(kwargs)
+            return original(*args, **kwargs)
+
+        rc.run_ritual_check = capturing
+        try:
+            rc.main(["--github-stars", "3"])
+        finally:
+            rc.run_ritual_check = original
+        self.assertTrue(captured.get("record_github_stars") is True)
+        self.assertEqual(captured.get("github_stars_count"), 3)
+        with open(self.log_path) as f:
+            lines = [line for line in f.read().splitlines() if line.strip()]
+        self.assertEqual(len(lines), 1)
+
+
 class LoadJsonArgShapeGuardCase(unittest.TestCase):
     """ROADMAP.md task 364. `_load_json_arg` is the shared helper the CLI's
     six file-argument flags (`--square-state`, `--arcade-apps-state`,

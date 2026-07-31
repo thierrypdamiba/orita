@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Task 121. Off-By-One counts the tool that counts everything else.
 
-`tools/ritual_check.py` hand-wires 42 `check_*` functions into one hourly
+`tools/ritual_check.py` hand-wires 43 `check_*` functions into one hourly
 block: each is called inside `run_ritual_check`, its result assigned to a
 dict key, and that key printed as a line in `format_ritual_check`. Three
 separate places a single typo or a forgotten wire-up can silently drop a
@@ -120,6 +120,17 @@ gaps... erode the read-trust the whole product rests on") had a sibling
 check (task 410's `check_strategy_true_positive`) for the STRATEGY.md
 TARGET, but nothing ever read the hand-recorded rate itself back against
 the same live Ledger. `find_unwired_tool_files()` (task 409) already
+covers this file going forward, since it lives in `tools/`.
+
+**Updated to 43** the same hour task 420's `check_github_stars` was
+wired in -- `tools/github_stars_check.py` (task 420) cross-checks
+`records/metrics.jsonl`'s `github_stars` field against the last recorded
+live `Github_CountStargazers` read. STRATEGY.md's own explicit numeric
+metric row ("GitHub stars | lagging | 1,000 (Star Covenant, unbegged) |
+off-by-one") was the one sibling among `distinct_toolkits_in_use` (145)/
+`connected_users_oauth` (412)/`gap_true_positive_rate` (413)/
+`reports_shipped_today` (415)/`tasks_shipped_today` (416) that whole
+campaign never touched. `find_unwired_tool_files()` (task 409) already
 covers this file going forward, since it lives in `tools/`.
 
 **Updated to 42** the same hour task 416's `check_tasks_shipped` was

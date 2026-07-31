@@ -152,7 +152,7 @@ regardless, and `consent.py`'s gate still fails closed), so this never
 flips `broken`.
 
 Usage:
-    python3 tools/ritual_check.py [--now ISO_TS] [--fencepost-base DIR] [--square-state PATH] [--arcade-apps-state PATH] [--cron-checks PATH] [--child-files PATH]
+    python3 tools/ritual_check.py [--now ISO_TS] [--fencepost-base DIR] [--square-state PATH] [--arcade-apps-state PATH] [--cron-checks PATH] [--child-files PATH] [--github-stars COUNT]
 """
 from __future__ import annotations
 
@@ -219,6 +219,10 @@ def _square_check():
 
 def _ci_watch():
     return _load("_ritual_ci_watch", os.path.join(ROOT, "tools", "ci_watch.py"))
+
+
+def _github_stars_check():
+    return _load("_ritual_github_stars_check", os.path.join(ROOT, "tools", "github_stars_check.py"))
 
 
 def _word_watch():
@@ -1238,6 +1242,58 @@ def check_tasks_shipped(metrics_path: str | None = None, buildlog_path: str | No
     return mod.check_tasks_shipped(**kwargs)
 
 
+def check_github_stars(
+    github_stars_count: int | None,
+    now_iso: str,
+    metrics_path: str | None = None,
+    log_path: str | None = None,
+    record: bool = False,
+) -> dict:
+    """Task 420: fold `github_stars_check.py`'s own cross-check of
+    `records/metrics.jsonl`'s last `github_stars` reading against the
+    real, live GitHub stargazer count into the one block -- STRATEGY.md's
+    own explicit numeric target (">=1,000 (Star Covenant, unbegged) --
+    owner off-by-one") was the one sibling `metrics.jsonl` field among
+    `distinct_toolkits_in_use` (145)/`connected_users_oauth` (412)/
+    `gap_true_positive_rate` (413)/`reports_shipped_today` (415)/
+    `tasks_shipped_today` (416) that had never once been read back by any
+    checker.
+
+    Unlike those five siblings, star count has no ground truth derivable
+    from local files alone -- it lives on GitHub's own servers and moves
+    off-repo, on no schedule any local file records. This follows
+    `check_ci`/`check_square`'s shape instead (tasks 70/73): when the god
+    on duty already holds this hour's live `Github_CountStargazers` read,
+    it is recorded (append-only, `HAND/github-stars-log.jsonl`) BEFORE the
+    cross-check runs, the same order `check_square`/`check_ci` already
+    hold -- so this hour's real read becomes the new ground truth for the
+    next comparison, never a second network call of its own. Unlike
+    `check_ci`/`check_square`, though, this never returns `None` when
+    `github_stars_count` is omitted: a stale-but-real prior live count
+    (already durably recorded some earlier hour) is still real ground
+    truth to compare a hand-typed `metrics.jsonl` claim against, the same
+    always-gives-a-verdict discipline `check_toolkits_in_use`/
+    `check_connected_users` already hold for their own local-ground-truth
+    fields.
+
+    `record` defaults `False` for the identical reason tasks 374/375 gave
+    `record_scribe_growth`/`record_words` the same default: a bare or
+    library call to this function (a dev-verification run, a test, a
+    notebook exploration) passing `github_stars_count` for comparison
+    purposes must never silently write a real entry into the production
+    `HAND/github-stars-log.jsonl` -- exactly the class of bug those two
+    tasks closed for their own logs. Only `main()` below passes
+    `record=True`; every other caller compares without writing."""
+    mod = _github_stars_check()
+    resolved_log_path = log_path if log_path is not None else mod.LOG
+    if record and github_stars_count is not None:
+        mod.record_check(github_stars_count, now_iso, path=resolved_log_path)
+    kwargs = {"log_path": resolved_log_path}
+    if metrics_path is not None:
+        kwargs["metrics_path"] = metrics_path
+    return mod.check_github_stars(**kwargs)
+
+
 def check_network_boundary(dirs: tuple | None = None) -> dict:
     """Task 408: fold network_boundary_check.py's own AST-based "no
     network" trust-boundary sweep (tasks 163/164) into the one block.
@@ -1337,8 +1393,12 @@ def run_ritual_check(
     report_shipped_reports_dir: str | None = None,
     tasks_shipped_metrics_path: str | None = None,
     tasks_shipped_buildlog_path: str | None = None,
+    github_stars_count: int | None = None,
+    github_stars_metrics_path: str | None = None,
+    github_stars_log_path: str | None = None,
     record_scribe_growth: bool = False,
     record_words: bool = False,
+    record_github_stars: bool = False,
 ) -> dict:
     """Task 374: `record_scribe_growth` defaults `False` -- a bare or
     library call to this function (a dev-verification run, a test, a
@@ -1430,6 +1490,13 @@ def run_ritual_check(
         metrics_path=tasks_shipped_metrics_path,
         buildlog_path=tasks_shipped_buildlog_path,
     )
+    github_stars = check_github_stars(
+        github_stars_count,
+        now_iso,
+        metrics_path=github_stars_metrics_path,
+        log_path=github_stars_log_path,
+        record=record_github_stars,
+    )
     broken = (
         (not town["ok"])
         or (not fencepost["ok"])
@@ -1457,6 +1524,7 @@ def run_ritual_check(
         or (not gap_true_positive["clean"])
         or (not report_shipped["clean"])
         or (not tasks_shipped["clean"])
+        or (not github_stars["clean"])
     )
     return {
         "now": now_iso,
@@ -1502,6 +1570,7 @@ def run_ritual_check(
         "gap_true_positive": gap_true_positive,
         "report_shipped": report_shipped,
         "tasks_shipped": tasks_shipped,
+        "github_stars": github_stars,
         "broken": broken,
     }
 
@@ -1791,6 +1860,28 @@ def format_ritual_check(result: dict) -> str:
             f"{ts['claimed']}, real ground truth (BUILDLOG.md's own dated rows before that day's "
             f"aggregate task) is {ts['real']} -- misreporting live, escalate now"
         )
+    gs = result["github_stars"]
+    if gs["claimed"] is None:
+        if gs["real"] is None:
+            lines.append("  github stars: clean (no metrics.jsonl reading and no live check recorded yet)")
+        else:
+            lines.append(f"  github stars: clean (no metrics.jsonl reading yet; last live count is {gs['real']})")
+    elif gs["real"] is None:
+        lines.append(
+            f"  github stars: clean (metrics.jsonl's {gs['claimed_date']} reading claims "
+            f"{gs['claimed']}; no live check recorded yet, nothing to cross-check)"
+        )
+    elif gs["clean"]:
+        lines.append(
+            f"  github stars: clean ({gs['real']} real star(s), metrics.jsonl's "
+            f"{gs['claimed_date']} reading agrees)"
+        )
+    else:
+        lines.append(
+            f"  github stars: BROKEN -- metrics.jsonl's {gs['claimed_date']} reading claims "
+            f"{gs['claimed']}, real live count is {gs['real']} -- STRATEGY.md's off-by-one row "
+            "is misreporting live, escalate now"
+        )
     return "\n".join(lines)
 
 
@@ -1831,6 +1922,7 @@ def main(argv: list[str]) -> int:
     cron_checks = None
     child_files = None
     voice_window_commits = None
+    github_stars_count = None
     i = 0
     while i < len(argv):
         if argv[i] == "--now" and i + 1 < len(argv):
@@ -1861,6 +1953,9 @@ def main(argv: list[str]) -> int:
         elif argv[i] == "--voice-window-commits" and i + 1 < len(argv):
             voice_window_commits = _load_json_arg(argv[i + 1], "voice-window-commits", "list")
             i += 2
+        elif argv[i] == "--github-stars" and i + 1 < len(argv):
+            github_stars_count = int(argv[i + 1])
+            i += 2
         elif argv[i] == "--json":
             base = base
             i += 1
@@ -1875,11 +1970,14 @@ def main(argv: list[str]) -> int:
         cron_checks=cron_checks,
         child_files=child_files,
         voice_window_commits=voice_window_commits,
+        github_stars_count=github_stars_count,
         # Task 374: this is the one real hourly CLI entrypoint -- the only
         # caller that should durably record this hour's real scribe sizes.
         record_scribe_growth=True,
         # Task 375: same reasoning, same one real caller, for words.
         record_words=True,
+        # Task 420: same reasoning, same one real caller, for github_stars.
+        record_github_stars=True,
     )
     if "--json" in argv:
         print(json.dumps(result, ensure_ascii=False, indent=2))
