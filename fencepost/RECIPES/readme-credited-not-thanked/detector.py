@@ -123,12 +123,18 @@ def load_readme(path: Path | None = None) -> str:
 
 def credited_handles(readme_content: str) -> list[str]:
     """Every handle credited inside the README's own "## Thanks" section,
-    in the order they appear. A README with no such section at all credits
-    nobody -- empty list, not an error; there is simply nothing to check."""
+    in the order they first appear. A README with no such section at all
+    credits nobody -- empty list, not an error; there is simply nothing to
+    check. `dict.fromkeys` dedupes, order-preserving: a handle credited
+    twice (a duplicate bullet from a merge, or crediting someone for two
+    separate contributions) must not produce two identical `GapCandidate`s
+    that tie each other out of `rank()`'s `SEPARATION_MARGIN` -- the exact
+    false-negative shape task 442 already fixed for the four
+    `*-dangling-reference` recipes, unswept here until now."""
     match = _THANKS_SECTION_RE.search(readme_content)
     if not match:
         return []
-    return _CREDIT_LINE_RE.findall(match.group(1))
+    return list(dict.fromkeys(_CREDIT_LINE_RE.findall(match.group(1))))
 
 
 def _thanked_handles(tweets: list[Tweet]) -> set[str]:

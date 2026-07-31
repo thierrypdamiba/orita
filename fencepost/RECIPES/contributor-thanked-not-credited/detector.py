@@ -130,14 +130,35 @@ def compute_gaps(
     `merged-pr-issue-still-open`'s "name every non-match too" rule, because
     here the non-match is the tweet's own shape, not a comparison that was
     actually attempted). A thanked handle already in the README is named in
-    `excluded`, not hidden."""
+    `excluded`, not hidden.
+
+    Every thanks-shaped tweet is grouped by the handle it thanks (matched
+    case-insensitively, the same fold `_is_credited` already applies) before
+    a single `GapCandidate` is built per handle -- two separate tweets
+    thanking the SAME still-uncredited handle must not produce two
+    identically-slugged candidates that tie each other out of `rank()`'s
+    `SEPARATION_MARGIN`, the exact false-negative shape task 442 already
+    fixed for the four `*-dangling-reference` recipes, unswept here until
+    now. The EARLIEST thanks-tweet is the one whose evidence is used: it is
+    the one that actually determines how overdue the credit is, since a
+    later repeat thank-you for the same handle doesn't make the gap any
+    fresher."""
     surfaced: list[GapCandidate] = []
     excluded: list[GapCandidate] = []
 
+    by_handle: dict[str, list[Tweet]] = {}
+    display: dict[str, str] = {}
     for tweet in tweets:
         handle = _thanked_handle(tweet.text)
         if handle is None:
             continue
+        key = handle.lower()
+        by_handle.setdefault(key, []).append(tweet)
+        display.setdefault(key, handle)
+
+    for key, handle_tweets in by_handle.items():
+        handle = display[key]
+        tweet = min(handle_tweets, key=lambda t: t.created_at)
 
         if _is_credited(handle, readme_content):
             excluded.append(GapCandidate(

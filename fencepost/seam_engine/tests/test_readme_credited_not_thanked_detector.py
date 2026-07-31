@@ -65,6 +65,19 @@ class TestCreditedHandles:
         readme = "# Repo\n\n## Thanks\n\n- @lonewolf -- the only entry.\n"
         assert detector.credited_handles(readme) == ["lonewolf"]
 
+    def test_a_handle_credited_twice_is_deduped_to_one_entry(self):
+        # Task 443: a duplicate bullet (a merge slip, or crediting the same
+        # handle for two separate contributions) must not produce two
+        # candidates that tie each other out of rank()'s primary election --
+        # the exact false-negative shape task 442 fixed for the
+        # *-dangling-reference family, unswept here until now.
+        readme = (
+            "# Repo\n\n## Thanks\n\n"
+            "- @mortal-fixer -- the badge-cache fix.\n"
+            "- @mortal-fixer -- also caught a typo later.\n"
+        )
+        assert detector.credited_handles(readme) == ["mortal-fixer"]
+
 
 class TestThankedHandles:
     def test_a_thanks_shaped_tweet_marks_its_handle_thanked(self):
@@ -177,6 +190,35 @@ class TestRunRecipeScan:
             [result["primary_gap"]["slug"]] if result["primary_gap"] else []
         ) + [g["slug"] for g in result["tail"]] + [e["slug"] for e in result["excluded"]]
         assert not any("off-by-one" in s or "nisaba" in s for s in all_slugs)
+
+    def test_a_duplicate_credit_line_still_elects_a_primary_gap(self, tmp_path: Path):
+        # Task 443: pre-fix, this exact shape (one handle credited twice)
+        # produced two identically-slugged surfaced candidates that tied
+        # each other out of rank()'s SEPARATION_MARGIN -- primary_gap came
+        # back None even though there is exactly one real, single gap.
+        readme_path = tmp_path / "readme.json"
+        readme_path.write_text(json.dumps({
+            "path": "README.md",
+            "content": (
+                "# Repo\n\n## Thanks\n\n"
+                "- @mortal-fixer -- the badge-cache fix.\n"
+                "- @mortal-fixer -- also caught a typo later.\n"
+            ),
+        }))
+        tweets_path = tmp_path / "tweets.json"
+        tweets_path.write_text(json.dumps([
+            {
+                "id": "T-1",
+                "text": "Today's Fencepost Report: nothing cleared the bar.",
+                "created_at": "2026-07-15T08:00:00Z",
+                "url": "https://x.com/oritatown/status/1",
+            },
+        ]))
+
+        result = detector.run_recipe_scan(readme_path, tweets_path, now=_NOW)
+
+        assert result["primary_gap"] is not None
+        assert result["primary_gap"]["slug"] == "readme-credited-not-thanked-mortal-fixer"
 
 
 class TestLoaders:

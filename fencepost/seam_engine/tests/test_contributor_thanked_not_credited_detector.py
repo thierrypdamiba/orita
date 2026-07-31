@@ -119,6 +119,39 @@ class TestComputeGaps:
         assert len(surfaced) == 1 and surfaced[0].slug == "contributor-thanked-not-credited-newcomer99"
         assert len(excluded) == 1 and excluded[0].slug == "contributor-credited-mortal-fixer"
 
+    def test_two_tweets_thanking_the_same_uncredited_handle_produce_one_candidate(self):
+        # Task 443: pre-fix, two tweets thanking the same still-uncredited
+        # handle produced two identically-slugged surfaced candidates that
+        # tied each other out of rank()'s SEPARATION_MARGIN -- the exact
+        # false-negative shape task 442 already fixed for the
+        # *-dangling-reference family, unswept here until now.
+        tweets = [
+            _tweet("Thanks @newcomer99 for the PR", id="T-1",
+                   created_at=datetime(2026, 7, 15, 8, 0, 0, tzinfo=timezone.utc)),
+            _tweet("Thank you @newcomer99 for the follow-up too", id="T-2",
+                   created_at=datetime(2026, 7, 19, 8, 0, 0, tzinfo=timezone.utc)),
+        ]
+        surfaced, excluded = detector.compute_gaps(tweets, _README, now=_NOW)
+
+        assert excluded == []
+        assert len(surfaced) == 1
+        assert surfaced[0].slug == "contributor-thanked-not-credited-newcomer99"
+        # The earlier (2026-07-15) tweet is the one used -- it's the one
+        # that actually determines how overdue the credit is.
+        assert "T-1" in surfaced[0].evidence[0]
+
+    def test_a_repeat_thank_you_is_deduped_case_insensitively(self):
+        tweets = [
+            _tweet("Thanks @Newcomer99 for the PR", id="T-1",
+                   created_at=datetime(2026, 7, 15, 8, 0, 0, tzinfo=timezone.utc)),
+            _tweet("Thanks @newcomer99 again", id="T-2",
+                   created_at=datetime(2026, 7, 19, 8, 0, 0, tzinfo=timezone.utc)),
+        ]
+        surfaced, excluded = detector.compute_gaps(tweets, _README, now=_NOW)
+
+        assert excluded == []
+        assert len(surfaced) == 1
+
 
 class TestRunRecipeScan:
     def test_the_shipped_fixture_elects_exactly_one_primary_gap(self):
@@ -138,6 +171,33 @@ class TestRunRecipeScan:
         result = detector.run_recipe_scan(now=_NOW)
         excluded_slugs = {e["slug"] for e in result["excluded"]}
         assert "contributor-credited-mortal-fixer" in excluded_slugs
+
+    def test_two_tweets_thanking_the_same_handle_still_elects_a_primary(self, tmp_path: Path):
+        # Task 443: pre-fix, this exact shape (one still-uncredited handle
+        # thanked in two separate tweets) produced two identically-slugged
+        # surfaced candidates that tied each other out of rank()'s
+        # SEPARATION_MARGIN -- primary_gap came back None even though there
+        # is exactly one real, single gap.
+        tweets_path = tmp_path / "tweets.json"
+        tweets_path.write_text(json.dumps([
+            {
+                "id": "T-1", "text": "Thanks @newcomer99 for the PR",
+                "created_at": "2026-07-15T08:00:00Z",
+                "url": "https://x.com/oritatown/status/1",
+            },
+            {
+                "id": "T-2", "text": "Thank you @newcomer99 for the follow-up too",
+                "created_at": "2026-07-19T08:00:00Z",
+                "url": "https://x.com/oritatown/status/2",
+            },
+        ]))
+        readme_path = tmp_path / "readme.json"
+        readme_path.write_text(json.dumps({"path": "README.md", "content": "# Repo\n"}))
+
+        result = detector.run_recipe_scan(tweets_path, readme_path, now=_NOW)
+
+        assert result["primary_gap"] is not None
+        assert result["primary_gap"]["slug"] == "contributor-thanked-not-credited-newcomer99"
 
 
 class TestLoaders:
