@@ -33,5 +33,12 @@
     "state": "open",
     "milestone_number": null,
     "url": "https://github.com/thierrypdamiba/orita/issues/805"
+  },
+  {
+    "number": 806,
+    "title": "Draft the v0.3 changelog",
+    "state": "open",
+    "milestone_number": 99,
+    "url": "https://github.com/thierrypdamiba/orita/issues/806"
   }
 ]

@@ -139,7 +139,20 @@ def compute_gaps(
             continue
 
         milestone = _find_milestone(pr.milestone_number, milestones)
-        if milestone is None or milestone.state != "closed" or milestone.closed_at is None:
+        if milestone is None:
+            excluded.append(GapCandidate(
+                slug=f"nonexistent-target-{pr.number}-{pr.milestone_number}",
+                headline=f"Pull request #{pr.number} names milestone #{pr.milestone_number}, which does not exist",
+                detail=(
+                    f"'{pr.title}' is assigned to milestone #{pr.milestone_number}, but no such "
+                    "milestone exists. A broken link, not a resolved promise."
+                ),
+                confidence=0.0,
+                evidence=[pr.url],
+            ))
+            continue
+
+        if milestone.state != "closed" or milestone.closed_at is None:
             excluded.append(GapCandidate(
                 slug=f"milestone-still-open-{pr.number}-{pr.milestone_number}",
                 headline=f"Pull request #{pr.number}'s milestone #{pr.milestone_number} is still open",
@@ -148,7 +161,7 @@ def compute_gaps(
                     "that milestone has not closed yet. No seam here."
                 ),
                 confidence=0.0,
-                evidence=[pr.url] + ([milestone.url] if milestone else []),
+                evidence=[pr.url, milestone.url],
             ))
             continue
 

@@ -104,7 +104,36 @@ class TestComputeGaps:
         surfaced, excluded = detector.compute_gaps([], [issue], now=_NOW)
 
         assert surfaced == []
-        assert excluded[0].slug == "milestone-still-open-806-999"
+        assert excluded[0].slug == "nonexistent-target-806-999"
+
+
+class TestNonexistentMilestoneIsNotMislabeledStillOpen:
+    """ROADMAP.md #431: `milestone is None` (the milestone number was never
+    real) used to share a slug and detail with `milestone.state != "closed"`
+    (a milestone that genuinely exists and is still open) -- the same
+    conflation tasks 429/430 already split in the merged-pr/issue-closed
+    sibling recipes."""
+
+    def test_a_nonexistent_milestone_excludes_as_a_dangling_reference_not_still_open(self):
+        issue = _issue(807, milestone_number=999)
+
+        surfaced, excluded = detector.compute_gaps([], [issue], now=_NOW)
+
+        assert surfaced == []
+        assert excluded[0].slug == "nonexistent-target-807-999"
+        assert "still open" not in excluded[0].detail
+        assert "has not closed" not in excluded[0].detail
+        assert "no such milestone exists" in excluded[0].detail
+
+    def test_a_genuinely_still_open_milestone_keeps_its_own_distinct_slug(self):
+        milestone = _milestone(3, state="open", closed_at=None)
+        issue = _issue(808, milestone_number=3)
+
+        surfaced, excluded = detector.compute_gaps([milestone], [issue], now=_NOW)
+
+        assert surfaced == []
+        assert excluded[0].slug == "milestone-still-open-808-3"
+        assert "has not closed yet" in excluded[0].detail
 
 
 class TestRunRecipeScan:
@@ -124,6 +153,7 @@ class TestRunRecipeScan:
         excluded_slugs = {g["slug"] for g in result["excluded"]}
         assert "milestone-still-open-804-3" in excluded_slugs
         assert "no-milestone-805" in excluded_slugs
+        assert "nonexistent-target-806-99" in excluded_slugs
 
     def test_the_shipped_fixture_never_considers_the_already_closed_issue(self):
         result = detector.run_recipe_scan(now=_NOW)

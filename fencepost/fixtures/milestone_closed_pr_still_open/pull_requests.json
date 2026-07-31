@@ -38,5 +38,13 @@
     "merged": false,
     "milestone_number": null,
     "url": "https://github.com/thierrypdamiba/orita/pull/905"
+  },
+  {
+    "number": 906,
+    "title": "Draft the v0.3 changelog PR",
+    "state": "open",
+    "merged": false,
+    "milestone_number": 99,
+    "url": "https://github.com/thierrypdamiba/orita/pull/906"
   }
 ]
