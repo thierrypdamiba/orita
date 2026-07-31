@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Task 121. Off-By-One counts the tool that counts everything else.
 
-`tools/ritual_check.py` hand-wires 46 `check_*` functions into one hourly
+`tools/ritual_check.py` hand-wires 47 `check_*` functions into one hourly
 block: each is called inside `run_ritual_check`, its result assigned to a
 dict key, and that key printed as a line in `format_ritual_check`. Three
 separate places a single typo or a forgotten wire-up can silently drop a
@@ -145,6 +145,13 @@ date>.md`'s own real existence on disk. Off-By-One's own STRATEGY.md row
 four sibling metrics.jsonl fields with no live cross-check, closed here
 by the god whose row it actually is. `find_unwired_tool_files()` (task
 409) already covers this file going forward, since it lives in `tools/`.
+
+**Updated to 47** the same hour task 434's `check_escape_sequences` was
+wired in -- `tools/escape_sequence_check.py` (task 434) compiles every
+tracked `.py` file and flags any real "invalid escape sequence"
+`DeprecationWarning`, the class of bug found live this same hour pinned
+to `tools/roadmap_archive.py:2`. `find_unwired_tool_files()` (task 409)
+already covers this file going forward, since it lives in `tools/`.
 
 Usage:
     python3 tools/ritual_completeness_check.py check

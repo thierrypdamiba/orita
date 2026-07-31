@@ -21,7 +21,7 @@ record in the same sitting); this task ships the scalpel and proves, live
 and by test, that it cuts clean.
 
 Structure this leans on (confirmed by reading `ROADMAP.md`'s own real
-headers via `grep -n "^## \|^| # | status"`, never assumed): the file is
+headers via `grep -n "^## \\|^| # | status"`, never assumed): the file is
 a sequence of `## `-prefixed sections. Most task rows born after the
 first ~30 each get their own section (one `## Interlude -- ...` header,
 one `| # | status | owner | task | done when |` table with exactly one

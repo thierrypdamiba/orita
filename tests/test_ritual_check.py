@@ -3034,6 +3034,53 @@ class RecipeReadmeFoldCase(unittest.TestCase):
         self.assertEqual(result["recipe_readme"]["real_count"], direct["real_count"])
 
 
+class EscapeSequenceFoldCase(unittest.TestCase):
+    """Task 434: run_ritual_check() folds escape_sequence_check.py's own
+    repo-wide compile-time scan into the same structured result -- clean
+    by default against a fixture with no invalid escape sequence, and a
+    synthetic real one (the exact live shape found this hour in
+    tools/roadmap_archive.py:2) both flips `broken` and surfaces in the
+    printed block, the same class site_links/recipe_readme already
+    hold."""
+
+    def setUp(self):
+        self.dir = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.dir, ignore_errors=True)
+
+    def _write(self, rel, content):
+        path = os.path.join(self.dir, rel)
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, "w") as f:
+            f.write(content)
+
+    def test_clean_fixture_is_not_broken(self):
+        self._write("ok.py", "x = 1\n")
+        result = rc.run_ritual_check(escape_sequence_orita_dir=self.dir)
+        self.assertTrue(result["escape_sequences"]["clean"])
+        self.assertFalse(result["broken"])
+        self.assertIn("escape sequences: clean", rc.format_ritual_check(result))
+
+    def test_synthetic_invalid_escape_flips_broken_and_prints(self):
+        self._write("bad.py", '"""an example grep pattern: \\|"""\n')
+        result = rc.run_ritual_check(escape_sequence_orita_dir=self.dir)
+        self.assertFalse(result["escape_sequences"]["clean"])
+        self.assertTrue(result["broken"])
+        formatted = rc.format_ritual_check(result)
+        self.assertIn("escape sequences: BROKEN", formatted)
+        self.assertIn("bad.py", formatted)
+
+    def test_default_dir_reads_the_real_tree_and_matches_direct_call(self):
+        """No override: reads the real repo tree, the same default
+        check_escape_sequences falls back to -- proves the fold never
+        duplicates or diverges from the module it wraps."""
+        esc = _load("_test_escape_sequence_check", os.path.join(ROOT, "tools", "escape_sequence_check.py"))
+        esc.clear_cache()
+        direct = esc.find_violations()
+        result = rc.run_ritual_check()
+        self.assertEqual(result["escape_sequences"]["count"], len(direct))
+        self.assertEqual(result["escape_sequences"]["clean"], not direct)
+
+
 class RitualCompletenessToolFilesFoldCase(unittest.TestCase):
     """Task 409: ritual_completeness_check.py's own audit widened to also
     catch a whole tools/*.py file never loaded from run_ritual_check at

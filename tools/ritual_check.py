@@ -375,6 +375,10 @@ def _recipe_readme_check():
     return _load_once("_ritual_recipe_readme_check", os.path.join(ROOT, "tools", "recipe_readme_check.py"))
 
 
+def _escape_sequence_check():
+    return _load_once("_ritual_escape_sequence_check", os.path.join(ROOT, "tools", "escape_sequence_check.py"))
+
+
 def _strategy_audit_target():
     src = os.path.join(ROOT, "fencepost", "seam_engine", "src")
     if src not in sys.path:
@@ -1410,6 +1414,29 @@ def check_recipe_readme(readme_path: str | None = None, recipe_fencepost_root: s
     return mod.check_recipe_readme(**kwargs)
 
 
+def check_escape_sequences(orita_dir: str | None = None) -> dict:
+    """Task 434: fold escape_sequence_check.py's own repo-wide compile-
+    time scan into the one block. Found by accident this hour running
+    both full suites clean against a freshly-installed sandbox: pytest's
+    own collection output carried a real `DeprecationWarning: invalid
+    escape sequence` pinned to `tools/roadmap_archive.py:2`, unflagged by
+    either suite's pass/fail count because a DeprecationWarning is not an
+    assertion. Python turns this class of warning into a hard
+    SyntaxError in a future version, breaking import outright -- the
+    exact "true when written, never rechecked" shape Iron Rule 1's own
+    history (a `vault_leak_check.py` gap sitting unnoticed for 96 tasks)
+    already warns about. Unconditional, local-filesystem-only (compiles
+    -- never imports or executes -- every tracked `.py` file already on
+    disk, the same read-only boundary `check_duplicate_regex` already
+    holds via `ast.parse`). Never edits anything; a real hit here is a
+    god-on-duty escalation, not something this check silently repairs."""
+    mod = _escape_sequence_check()
+    kwargs = {}
+    if orita_dir is not None:
+        kwargs["orita_dir"] = orita_dir
+    return mod.check_escape_sequences(**kwargs)
+
+
 def check_change_gate(report_info: dict) -> dict | None:
     """Fold `change_gate.should_post_gap()` -- task 69's own change-gate
     rule -- using whichever report text `check_report_freshness` already
@@ -1476,6 +1503,7 @@ def run_ritual_check(
     badge_path: str | None = None,
     recipe_readme_path: str | None = None,
     recipe_readme_fencepost_root: str | None = None,
+    escape_sequence_orita_dir: str | None = None,
     strategy_true_positive_path: str | None = None,
     strategy_true_positive_ledger_base: str | None = None,
     gap_true_positive_metrics_path: str | None = None,
@@ -1570,6 +1598,7 @@ def run_ritual_check(
     recipe_readme = check_recipe_readme(
         readme_path=recipe_readme_path, recipe_fencepost_root=recipe_readme_fencepost_root
     )
+    escape_sequences = check_escape_sequences(orita_dir=escape_sequence_orita_dir)
     strategy_true_positive = check_strategy_true_positive(
         strategy_path=strategy_true_positive_path,
         ledger_base=strategy_true_positive_ledger_base,
@@ -1624,6 +1653,7 @@ def run_ritual_check(
         or (not report_shipped["clean"])
         or (not tasks_shipped["clean"])
         or (not github_stars["clean"])
+        or (not escape_sequences["clean"])
     )
     return {
         "now": now_iso,
@@ -1673,6 +1703,7 @@ def run_ritual_check(
         "report_shipped": report_shipped,
         "tasks_shipped": tasks_shipped,
         "github_stars": github_stars,
+        "escape_sequences": escape_sequences,
         "broken": broken,
     }
 
@@ -1993,6 +2024,7 @@ def format_ritual_check(result: dict) -> str:
             f"{gs['claimed']}, real live count is {gs['real']} -- STRATEGY.md's off-by-one row "
             "is misreporting live, escalate now"
         )
+    lines.append("  " + _escape_sequence_check().format_result(result["escape_sequences"]))
     return "\n".join(lines)
 
 
