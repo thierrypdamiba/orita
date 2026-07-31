@@ -50,6 +50,11 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 LOG = os.path.join(ROOT, "HAND", "github-stars-log.jsonl")
 DEFAULT_METRICS_PATH = os.path.join(ROOT, "records", "metrics.jsonl")
 
+# STRATEGY.md's own metrics-table row: "1,000 (Star Covenant, unbegged)".
+# Task 421: strategy_targets_check.py cross-checks this constant, live-
+# loaded, against STRATEGY.md's own text -- never a second hand-typed "1000".
+TARGET_STARS = 1000
+
 
 class GitHubStarsTamperedError(RuntimeError):
     """Raised by last_check() when the log's most recent line is not valid

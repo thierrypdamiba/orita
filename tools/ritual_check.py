@@ -1081,7 +1081,7 @@ def check_cluster_day_cadence(chronicle_dir: str | None = None, today=None) -> d
 def check_strategy_targets(strategy_path: str | None = None) -> dict:
     """Task 407: fold strategy_targets_check.py's own STRATEGY.md-vs-code
     target cross-check (task 159) into the one block. Unconditional,
-    local-filesystem-only (reads STRATEGY.md and the two real modules it
+    local-filesystem-only (reads STRATEGY.md and the real modules it
     cross-checks, already on disk, no network) -- the same cheap class
     `check_checkout`/`check_vault_leak`/`check_star_covenant`/
     `check_duplicate_regex` already hold.
@@ -1095,13 +1095,18 @@ def check_strategy_targets(strategy_path: str | None = None) -> dict:
     found and closed elsewhere. Never edits anything; a real drift
     between STRATEGY.md's stated targets and the code that claims to
     mirror them, if one is ever found, is a god-on-duty escalation, not
-    something this check silently repairs."""
+    something this check silently repairs.
+
+    Task 421: strategy_targets_check.py's own cross-check grew a third
+    row (github stars vs. github_stars_check.TARGET_STARS) -- this fold
+    wraps whatever the module returns, so `clean` now folds in all three
+    rows' agreement rather than a hand-counted two."""
     mod = _strategy_targets_check()
     kwargs = {}
     if strategy_path is not None:
         kwargs["strategy_path"] = strategy_path
     result = mod.check_strategy_targets(**kwargs)
-    clean = result["report_streak"]["agree"] and result["shared_reports"]["agree"]
+    clean = all(row["agree"] for row in result.values())
     return {"clean": clean, **result}
 
 

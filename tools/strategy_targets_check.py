@@ -27,6 +27,14 @@ This module extracts each row's target number from STRATEGY.md's own live
 table text via regex -- never a second hand-typed "30"/"50" -- and cross-
 checks it against the two real modules' real constants, live-loaded.
 
+Task 421: a third row joined the same doctrine. `github_stars_check.py`
+(task 420) cross-checks the last live stargazer count against
+`records/metrics.jsonl`'s claim, but nothing checked either of THOSE
+against STRATEGY.md's own stated target ("1,000 (Star Covenant,
+unbegged)"). `strategy_github_stars_target()` extracts it the same way,
+and `github_stars_check.TARGET_STARS = 1000` is the code-side constant it
+mirrors -- never a second hand-typed "1000" either.
+
 Usage:
     python3 tools/strategy_targets_check.py check
 """
@@ -42,9 +50,11 @@ STRATEGY_MD = os.path.join(ROOT, "STRATEGY.md")
 
 REPORT_STREAK_ROW_LABEL = "Daily Fencepost Report shipped (town dogfood)"
 SHARED_REPORTS_ROW_LABEL = "Shared Fencepost Reports in the wild"
+GITHUB_STARS_ROW_LABEL = "GitHub stars"
 
 _STREAK_PATTERN = re.compile(r"(\d+) of \d+ days")
 _SHARES_PATTERN = re.compile(r"(\d+) organic links/screenshots")
+_STARS_PATTERN = re.compile(r"([\d,]+)\s*\(Star Covenant")
 
 
 class StrategyTargetError(ValueError):
@@ -88,6 +98,20 @@ def strategy_shared_reports_target(strategy_text: str) -> int:
     return int(m.group(1))
 
 
+def strategy_github_stars_target(strategy_text: str) -> int:
+    """Extracts the live star-count target from STRATEGY.md's "GitHub
+    stars" row, e.g. "1,000 (Star Covenant, unbegged)" -> 1000. Commas are
+    stripped before parsing; the row is otherwise read exactly like its
+    two siblings above -- live text in, never a hand-typed number."""
+    line = _row_line(strategy_text, GITHUB_STARS_ROW_LABEL)
+    m = _STARS_PATTERN.search(line)
+    if not m:
+        raise StrategyTargetError(
+            f"STRATEGY.md row for {GITHUB_STARS_ROW_LABEL!r} has no 'N (Star Covenant' target: {line!r}"
+        )
+    return int(m.group(1).replace(",", ""))
+
+
 def _load(name: str, relpath: str):
     path = os.path.join(ROOT, relpath)
     spec = importlib.util.spec_from_file_location(name, path)
@@ -105,9 +129,11 @@ def check_strategy_targets(strategy_path: str = STRATEGY_MD) -> dict:
 
     rcc = _load("_stc_report_cadence_check", "tools/report_cadence_check.py")
     src = _load("_stc_shared_reports_check", "tools/shared_reports_check.py")
+    ghs = _load("_stc_github_stars_check", "tools/github_stars_check.py")
 
     strategy_streak = strategy_report_streak_target(text)
     strategy_shares = strategy_shared_reports_target(text)
+    strategy_stars = strategy_github_stars_target(text)
 
     return {
         "report_streak": {
@@ -120,12 +146,21 @@ def check_strategy_targets(strategy_path: str = STRATEGY_MD) -> dict:
             "code_target": src.TARGET_SHARES,
             "agree": strategy_shares == src.TARGET_SHARES,
         },
+        "github_stars": {
+            "strategy_target": strategy_stars,
+            "code_target": ghs.TARGET_STARS,
+            "agree": strategy_stars == ghs.TARGET_STARS,
+        },
     }
 
 
 def format_strategy_targets(result: dict) -> str:
     lines = []
-    for key, label in (("report_streak", "report cadence"), ("shared_reports", "shared reports")):
+    for key, label in (
+        ("report_streak", "report cadence"),
+        ("shared_reports", "shared reports"),
+        ("github_stars", "github stars"),
+    ):
         row = result[key]
         status = "agree" if row["agree"] else "DRIFT"
         lines.append(
@@ -142,4 +177,8 @@ if __name__ == "__main__":
         sys.exit(1)
     out = check_strategy_targets()
     print(format_strategy_targets(out))
-    sys.exit(0 if out["report_streak"]["agree"] and out["shared_reports"]["agree"] else 1)
+    sys.exit(
+        0
+        if out["report_streak"]["agree"] and out["shared_reports"]["agree"] and out["github_stars"]["agree"]
+        else 1
+    )
