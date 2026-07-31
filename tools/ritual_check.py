@@ -371,6 +371,10 @@ def _badge_freshness_check():
     return _load_once("_ritual_badge_freshness_check", os.path.join(ROOT, "tools", "badge_freshness_check.py"))
 
 
+def _recipe_readme_check():
+    return _load_once("_ritual_recipe_readme_check", os.path.join(ROOT, "tools", "recipe_readme_check.py"))
+
+
 def _strategy_audit_target():
     src = os.path.join(ROOT, "fencepost", "seam_engine", "src")
     if src not in sys.path:
@@ -1377,6 +1381,35 @@ def check_badge_freshness(badge_path: str | None = None) -> dict:
     return mod.check_badge_freshness(**kwargs)
 
 
+def check_recipe_readme(readme_path: str | None = None, recipe_fencepost_root: str | None = None) -> dict:
+    """Task 426: fold `recipe_readme_check.py`'s own two-way cross-check of
+    `fencepost/README.md`'s Community recipes section against the live
+    `seam_engine.recipes.discover_recipes()` tree into the one block.
+    `tests/test_fencepost_site_recipes.py` (task 417) already proves every
+    real recipe is named somewhere in that prose, but only forward, and
+    only by loose substring match -- nothing before this task ever asked
+    the reverse question live: does every `[`RECIPES/<slug>/`](RECIPES/
+    <slug>/)` link still point at a recipe directory that actually exists,
+    and does a link's own bracket text agree with its own href. A recipe
+    directory removed or renamed after merge (nothing in this repo's
+    history has done that yet, but nothing stops a future bad merge-
+    conflict resolution or an overbroad cleanup pass from doing it) would
+    leave a dead link sitting in published prose that no existing check,
+    running or test-suite, would ever notice. Unconditional,
+    local-filesystem-only, the same cheap always-on class
+    `check_wip_reclaim`/`check_scopes_completeness` already hold. A real
+    hit here DOES flip `broken`: a stale or mismatched recipe link is a
+    live documentation regression on the flagship's own public onboarding
+    surface, not an honest zero-state waiting on the calendar."""
+    mod = _recipe_readme_check()
+    kwargs = {}
+    if readme_path is not None:
+        kwargs["readme_path"] = readme_path
+    if recipe_fencepost_root is not None:
+        kwargs["fencepost_root"] = recipe_fencepost_root
+    return mod.check_recipe_readme(**kwargs)
+
+
 def check_change_gate(report_info: dict) -> dict | None:
     """Fold `change_gate.should_post_gap()` -- task 69's own change-gate
     rule -- using whichever report text `check_report_freshness` already
@@ -1441,6 +1474,8 @@ def run_ritual_check(
     network_boundary_dirs: tuple | None = None,
     site_link_docs_dir: str | None = None,
     badge_path: str | None = None,
+    recipe_readme_path: str | None = None,
+    recipe_readme_fencepost_root: str | None = None,
     strategy_true_positive_path: str | None = None,
     strategy_true_positive_ledger_base: str | None = None,
     gap_true_positive_metrics_path: str | None = None,
@@ -1532,6 +1567,9 @@ def run_ritual_check(
     network_boundary = check_network_boundary(dirs=network_boundary_dirs)
     site_links = check_site_links(docs_dir=site_link_docs_dir)
     badge_freshness = check_badge_freshness(badge_path=badge_path)
+    recipe_readme = check_recipe_readme(
+        readme_path=recipe_readme_path, recipe_fencepost_root=recipe_readme_fencepost_root
+    )
     strategy_true_positive = check_strategy_true_positive(
         strategy_path=strategy_true_positive_path,
         ledger_base=strategy_true_positive_ledger_base,
@@ -1580,6 +1618,7 @@ def run_ritual_check(
         or (not network_boundary["clean"])
         or (not site_links["clean"])
         or (not badge_freshness["clean"])
+        or (not recipe_readme["clean"])
         or (not strategy_true_positive["clean"])
         or (not gap_true_positive["clean"])
         or (not report_shipped["clean"])
@@ -1628,6 +1667,7 @@ def run_ritual_check(
         "network_boundary": network_boundary,
         "site_links": site_links,
         "badge_freshness": badge_freshness,
+        "recipe_readme": recipe_readme,
         "strategy_true_positive": strategy_true_positive,
         "gap_true_positive": gap_true_positive,
         "report_shipped": report_shipped,
@@ -1864,6 +1904,7 @@ def format_ritual_check(result: dict) -> str:
             f"  site links: {sl['count']} BROKEN LINK(S) -- Ogun's own charter duty is unmet, escalate now"
         )
     lines.append("  " + _badge_freshness_check().format_badge_freshness(result["badge_freshness"]))
+    lines.append("  " + _recipe_readme_check().format_result(result["recipe_readme"]))
     stp = result["strategy_true_positive"]
     if stp["clean"]:
         lines.append(

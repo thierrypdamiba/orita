@@ -69,6 +69,13 @@ DATE_NAME_MD = re.compile(r"^(\d{4})-(\d{2})-(\d{2})\.md$")
 # `**Petitioner:** <name>` line.
 PETITIONER_LINE = re.compile(r"\*\*Petitioner:\*\*\s*(.+)")
 
+# The next top-level markdown `## ` header, used to bound a doc section
+# read starting after some other header match -- byte-identical between
+# `scopes_completeness_check.py`'s `_NEXT_HEADER` (task 135) and
+# `recipe_readme_check.py`'s own bounded-section reader (task 426), which
+# both walk a `## <name>` ... next `## ` window the same way.
+NEXT_MARKDOWN_HEADER = re.compile(r"^## ", re.MULTILINE)
+
 # The six star/follow-begging shapes petition_limits_check.py copied
 # verbatim out of star_covenant_check.py's own curated list (task 99).
 PLEASE_STAR = re.compile(r"\bplease\s+star\b", re.IGNORECASE)

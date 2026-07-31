@@ -30,13 +30,14 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import arcade_app_watch  # noqa: E402
+import text_patterns  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DEFAULT_SCOPES_PATH = os.path.join(ROOT, "fencepost", "SCOPES.md")
 DEFAULT_APP_LOG_PATH = os.path.join(ROOT, "HAND", "arcade-app-check-log.jsonl")
 
 _SECTION_HEADER = re.compile(r"^## Every connected app, accounted for\s*$", re.MULTILINE)
-_NEXT_HEADER = re.compile(r"^## ", re.MULTILINE)
+_NEXT_HEADER = text_patterns.NEXT_MARKDOWN_HEADER
 _TABLE_ROW_APP_ID = re.compile(r"^\|\s*`([^`]+)`", re.MULTILINE)
 
 

@@ -2940,6 +2940,78 @@ class SiteLinkFoldCase(unittest.TestCase):
         self.assertEqual(result["site_links"]["clean"], not direct)
 
 
+class RecipeReadmeFoldCase(unittest.TestCase):
+    """Task 426: run_ritual_check() folds recipe_readme_check.py's own
+    two-way cross-check of fencepost/README.md's Community recipes
+    section against the live discover_recipes() tree into the same
+    structured result -- clean by default against a fixture where the
+    README and the RECIPES/ tree agree, and a synthetic stale link (a
+    recipe linked in the README but removed from disk) both flips
+    `broken` and surfaces in the printed block, the same class
+    site_links/badge_freshness already hold."""
+
+    def setUp(self):
+        self.dir = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.dir, ignore_errors=True)
+
+    def _write_recipe(self, slug):
+        import json as _json
+        recipe_dir = os.path.join(self.dir, "RECIPES", slug)
+        os.makedirs(recipe_dir, exist_ok=True)
+        manifest = {
+            "slug": slug,
+            "title": f"{slug} title",
+            "author": "nisaba",
+            "description": f"{slug} description",
+            "toolkit": "github",
+            "scopes": ["GetRepository"],
+            "fixture": "fixtures/dummy",
+            "detector_file": "detector.py",
+            "entrypoint": "run_recipe_scan",
+            "confidence_notes": "fixed 0.80",
+        }
+        with open(os.path.join(recipe_dir, "recipe.json"), "w") as f:
+            _json.dump(manifest, f)
+
+    def _write_readme(self, section):
+        path = os.path.join(self.dir, "README.md")
+        with open(path, "w") as f:
+            f.write(section)
+        return path
+
+    def test_clean_fixture_is_not_broken(self):
+        self._write_recipe("alpha-gap")
+        readme_path = self._write_readme(
+            "## Community recipes\n\n[`RECIPES/alpha-gap/`](RECIPES/alpha-gap/) is the first.\n\n## Run your own\n"
+        )
+        result = rc.run_ritual_check(recipe_readme_path=readme_path, recipe_readme_fencepost_root=self.dir)
+        self.assertTrue(result["recipe_readme"]["clean"])
+        self.assertFalse(result["broken"])
+        self.assertIn("recipe readme: clean", rc.format_ritual_check(result))
+
+    def test_stale_link_to_a_removed_recipe_flips_broken_and_prints(self):
+        # alpha-gap is linked but never written to disk -- a dead link.
+        readme_path = self._write_readme(
+            "## Community recipes\n\n[`RECIPES/alpha-gap/`](RECIPES/alpha-gap/) is the first.\n\n## Run your own\n"
+        )
+        result = rc.run_ritual_check(recipe_readme_path=readme_path, recipe_readme_fencepost_root=self.dir)
+        self.assertFalse(result["recipe_readme"]["clean"])
+        self.assertTrue(result["broken"])
+        formatted = rc.format_ritual_check(result)
+        self.assertIn("recipe readme: BROKEN", formatted)
+        self.assertIn("alpha-gap", formatted)
+
+    def test_default_paths_read_the_real_tree_and_match_direct_call(self):
+        """No override: reads the real fencepost/README.md and RECIPES/
+        tree, the same default check_recipe_readme falls back to -- proves
+        the fold never duplicates or diverges from the module it wraps."""
+        rrc = _load("_test_recipe_readme_check", os.path.join(ROOT, "tools", "recipe_readme_check.py"))
+        direct = rrc.check_recipe_readme()
+        result = rc.run_ritual_check()
+        self.assertEqual(result["recipe_readme"]["clean"], direct["clean"])
+        self.assertEqual(result["recipe_readme"]["real_count"], direct["real_count"])
+
+
 class RitualCompletenessToolFilesFoldCase(unittest.TestCase):
     """Task 409: ritual_completeness_check.py's own audit widened to also
     catch a whole tools/*.py file never loaded from run_ritual_check at
