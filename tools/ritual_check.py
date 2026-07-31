@@ -363,6 +363,10 @@ def _network_boundary_check():
     return _load_once("_ritual_network_boundary_check", os.path.join(ROOT, "tools", "network_boundary_check.py"))
 
 
+def _site_link_check():
+    return _load_once("_ritual_site_link_check", os.path.join(ROOT, "tools", "site_link_check.py"))
+
+
 def _strategy_audit_target():
     src = os.path.join(ROOT, "fencepost", "seam_engine", "src")
     if src not in sys.path:
@@ -1328,6 +1332,24 @@ def check_network_boundary(dirs: tuple | None = None) -> dict:
     return {"clean": not broken, "count": len(raw), "broken": broken}
 
 
+def check_site_links(docs_dir: str | None = None) -> dict:
+    """Task 423: fold site_link_check.py's own internal-link scan into the
+    one block -- CHARTER.md Appendix B names Ogun's charter duty plainly
+    ("links unbroken"), and it never had a running check the way its own
+    sentence's other clauses (CI timing, the badge, good-first-issues) do.
+    Unconditional, local-filesystem-only (reads `docs/**/*.html` and
+    `docs/**/*.md` already on disk, no network) -- the same cheap class
+    `check_duplicate_regex`/`check_network_boundary` already hold. Never
+    edits anything; a real broken link, if one is ever found, is a
+    god-on-duty escalation, not something this check silently repairs."""
+    mod = _site_link_check()
+    kwargs = {}
+    if docs_dir is not None:
+        kwargs["docs_dir"] = docs_dir
+    violations = mod.find_violations(**kwargs)
+    return {"clean": not violations, "count": len(violations), "violations": violations}
+
+
 def check_change_gate(report_info: dict) -> dict | None:
     """Fold `change_gate.should_post_gap()` -- task 69's own change-gate
     rule -- using whichever report text `check_report_freshness` already
@@ -1390,6 +1412,7 @@ def run_ritual_check(
     cluster_day_today=None,
     strategy_targets_path: str | None = None,
     network_boundary_dirs: tuple | None = None,
+    site_link_docs_dir: str | None = None,
     strategy_true_positive_path: str | None = None,
     strategy_true_positive_ledger_base: str | None = None,
     gap_true_positive_metrics_path: str | None = None,
@@ -1479,6 +1502,7 @@ def run_ritual_check(
     cluster_day = check_cluster_day_cadence(chronicle_dir=cluster_day_dir, today=cluster_day_today)
     strategy_targets = check_strategy_targets(strategy_path=strategy_targets_path)
     network_boundary = check_network_boundary(dirs=network_boundary_dirs)
+    site_links = check_site_links(docs_dir=site_link_docs_dir)
     strategy_true_positive = check_strategy_true_positive(
         strategy_path=strategy_true_positive_path,
         ledger_base=strategy_true_positive_ledger_base,
@@ -1525,6 +1549,7 @@ def run_ritual_check(
         or (not connected_users["clean"])
         or (not strategy_targets["clean"])
         or (not network_boundary["clean"])
+        or (not site_links["clean"])
         or (not strategy_true_positive["clean"])
         or (not gap_true_positive["clean"])
         or (not report_shipped["clean"])
@@ -1571,6 +1596,7 @@ def run_ritual_check(
         "cluster_day": cluster_day,
         "strategy_targets": strategy_targets,
         "network_boundary": network_boundary,
+        "site_links": site_links,
         "strategy_true_positive": strategy_true_positive,
         "gap_true_positive": gap_true_positive,
         "report_shipped": report_shipped,
@@ -1798,6 +1824,13 @@ def format_ritual_check(result: dict) -> str:
         lines.append(
             f"  network boundary: BROKEN -- {len(nb['broken'])} of {nb['count']} file(s) claim "
             f"\"no network\" but don't: {sorted(nb['broken'])}, escalate now"
+        )
+    sl = result["site_links"]
+    if sl["clean"]:
+        lines.append("  site links: clean (every internal docs/ link resolves)")
+    else:
+        lines.append(
+            f"  site links: {sl['count']} BROKEN LINK(S) -- Ogun's own charter duty is unmet, escalate now"
         )
     stp = result["strategy_true_positive"]
     if stp["clean"]:

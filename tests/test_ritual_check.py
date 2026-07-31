@@ -2893,6 +2893,53 @@ class NetworkBoundaryFoldCase(unittest.TestCase):
         self.assertEqual(result["network_boundary"]["clean"], all(r["ok"] for r in direct.values()))
 
 
+class SiteLinkFoldCase(unittest.TestCase):
+    """Task 423: run_ritual_check() folds site_link_check.py's own
+    internal-link scan (CHARTER.md Appendix B's "links unbroken", Ogun's
+    own charter duty, never previously checked in code) into the same
+    structured result -- clean by default against a fixture with no
+    broken link, and a real synthetic broken relative link both flips
+    `broken` and surfaces in the printed block, the same class
+    duplicate_regex/riders/network_boundary already hold."""
+
+    def setUp(self):
+        self.dir = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.dir, ignore_errors=True)
+
+    def _write(self, rel, content):
+        path = os.path.join(self.dir, rel)
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, "w") as f:
+            f.write(content)
+
+    def test_clean_fixture_is_not_broken(self):
+        self._write("gods/ogun.html", "<html></html>")
+        self._write("index.html", '<a href="gods/ogun.html">Ogun</a>')
+        result = rc.run_ritual_check(site_link_docs_dir=self.dir)
+        self.assertTrue(result["site_links"]["clean"])
+        self.assertFalse(result["broken"])
+        self.assertIn("site links: clean", rc.format_ritual_check(result))
+
+    def test_synthetic_broken_link_flips_broken_and_prints(self):
+        self._write("index.html", '<a href="gods/nobody.html">nobody</a>')
+        result = rc.run_ritual_check(site_link_docs_dir=self.dir)
+        self.assertFalse(result["site_links"]["clean"])
+        self.assertTrue(result["broken"])
+        formatted = rc.format_ritual_check(result)
+        self.assertIn("BROKEN LINK(S)", formatted)
+
+    def test_default_docs_dir_reads_the_real_tree_and_matches_direct_call(self):
+        """No override: reads the real docs/ tree, the same default
+        check_site_links falls back to -- proves the fold never
+        duplicates or diverges from the module it wraps."""
+        slc = _load("_test_site_link_check", os.path.join(ROOT, "tools", "site_link_check.py"))
+        slc.clear_cache()
+        direct = slc.find_violations()
+        result = rc.run_ritual_check()
+        self.assertEqual(result["site_links"]["count"], len(direct))
+        self.assertEqual(result["site_links"]["clean"], not direct)
+
+
 class RitualCompletenessToolFilesFoldCase(unittest.TestCase):
     """Task 409: ritual_completeness_check.py's own audit widened to also
     catch a whole tools/*.py file never loaded from run_ritual_check at

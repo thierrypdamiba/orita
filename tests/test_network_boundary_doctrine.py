@@ -189,6 +189,7 @@ class RealToolsDirCase(unittest.TestCase):
         "rider_check.py",
         "ritual_check.py",
         "scopes_completeness_check.py",
+        "site_link_check.py",
         "square_check.py",
         "star_covenant_check.py",
         "vault_leak_check.py",
