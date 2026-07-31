@@ -367,6 +367,10 @@ def _site_link_check():
     return _load_once("_ritual_site_link_check", os.path.join(ROOT, "tools", "site_link_check.py"))
 
 
+def _badge_freshness_check():
+    return _load_once("_ritual_badge_freshness_check", os.path.join(ROOT, "tools", "badge_freshness_check.py"))
+
+
 def _strategy_audit_target():
     src = os.path.join(ROOT, "fencepost", "seam_engine", "src")
     if src not in sys.path:
@@ -1350,6 +1354,29 @@ def check_site_links(docs_dir: str | None = None) -> dict:
     return {"clean": not violations, "count": len(violations), "violations": violations}
 
 
+def check_badge_freshness(badge_path: str | None = None) -> dict:
+    """Task 425: fold badge_freshness_check.py's own live-recompute-vs-
+    committed-file cross-check into the one block. `seam-scan.yml`'s daily
+    "repaint the read-only badge" step runs `seam_engine.badge --write`
+    non-blocking (`|| true`, its own comment: "a red badge IS the report")
+    -- a real failure inside that computation leaves whatever
+    `fencepost/BADGE.json` last said sitting in the repo, silently stale,
+    with nothing at any shorter cadence ever re-deriving it. This is the
+    one check in this block whose live half needs `arcade-mcp-server`, a
+    dependency `dawn-run.yml`'s root test job deliberately does not install
+    (task 404's own note) -- so the underlying module catches any import
+    or computation failure itself and reports `status: "unavailable"`,
+    clean, rather than raising into this function or crashing the rest of
+    the hourly ritual over a missing optional dependency. Never edits
+    anything; a real drift, if one is ever found, is a god-on-duty
+    escalation, not something this check silently repairs."""
+    mod = _badge_freshness_check()
+    kwargs = {}
+    if badge_path is not None:
+        kwargs["badge_path"] = badge_path
+    return mod.check_badge_freshness(**kwargs)
+
+
 def check_change_gate(report_info: dict) -> dict | None:
     """Fold `change_gate.should_post_gap()` -- task 69's own change-gate
     rule -- using whichever report text `check_report_freshness` already
@@ -1413,6 +1440,7 @@ def run_ritual_check(
     strategy_targets_path: str | None = None,
     network_boundary_dirs: tuple | None = None,
     site_link_docs_dir: str | None = None,
+    badge_path: str | None = None,
     strategy_true_positive_path: str | None = None,
     strategy_true_positive_ledger_base: str | None = None,
     gap_true_positive_metrics_path: str | None = None,
@@ -1503,6 +1531,7 @@ def run_ritual_check(
     strategy_targets = check_strategy_targets(strategy_path=strategy_targets_path)
     network_boundary = check_network_boundary(dirs=network_boundary_dirs)
     site_links = check_site_links(docs_dir=site_link_docs_dir)
+    badge_freshness = check_badge_freshness(badge_path=badge_path)
     strategy_true_positive = check_strategy_true_positive(
         strategy_path=strategy_true_positive_path,
         ledger_base=strategy_true_positive_ledger_base,
@@ -1550,6 +1579,7 @@ def run_ritual_check(
         or (not strategy_targets["clean"])
         or (not network_boundary["clean"])
         or (not site_links["clean"])
+        or (not badge_freshness["clean"])
         or (not strategy_true_positive["clean"])
         or (not gap_true_positive["clean"])
         or (not report_shipped["clean"])
@@ -1597,6 +1627,7 @@ def run_ritual_check(
         "strategy_targets": strategy_targets,
         "network_boundary": network_boundary,
         "site_links": site_links,
+        "badge_freshness": badge_freshness,
         "strategy_true_positive": strategy_true_positive,
         "gap_true_positive": gap_true_positive,
         "report_shipped": report_shipped,
@@ -1832,6 +1863,7 @@ def format_ritual_check(result: dict) -> str:
         lines.append(
             f"  site links: {sl['count']} BROKEN LINK(S) -- Ogun's own charter duty is unmet, escalate now"
         )
+    lines.append("  " + _badge_freshness_check().format_badge_freshness(result["badge_freshness"]))
     stp = result["strategy_true_positive"]
     if stp["clean"]:
         lines.append(
