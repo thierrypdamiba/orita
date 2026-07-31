@@ -35,10 +35,15 @@ compiles every tracked `.py` file under the repo (skipping `.git`,
 `__pycache__`, and `node_modules` -- the same directories every other
 full-repo scan in this tree already excludes) with warnings captured,
 and reports any file whose compilation raises an "invalid escape
-sequence" `DeprecationWarning`. Live run against the repo post-fix: 350
-files, 0 violations (confirmed 1 pre-fix via `git stash`, the same
-stash-and-rerun discipline tasks 421-433 already hold for proving a
-repro is real rather than assumed).
+sequence" warning -- `DeprecationWarning` on Python <=3.11,
+`SyntaxWarning` on 3.12+ (see `_invalid_escape_warnings`'s own docstring
+below: this module's FIRST version checked only the former and shipped
+green locally under 3.11 while failing live on `dawn-run.yml`'s pinned
+3.12 minutes later, an almost-immediate real instance of the exact
+version-drift class this whole check exists to guard against). Live run
+against the repo post-fix: 350 files, 0 violations (confirmed 1 pre-fix
+via `git stash`, the same stash-and-rerun discipline tasks 421-433
+already hold for proving a repro is real rather than assumed).
 
 One deliberate design choice worth naming: this checks COMPILATION,
 never IMPORT. Importing every `.py` file in the tree would require each
@@ -75,13 +80,26 @@ def _iter_python_files(orita_dir: str):
 
 def _invalid_escape_warnings(path: str) -> list[tuple[int, str]]:
     """`(lineno, message)` for every real "invalid escape sequence"
-    `DeprecationWarning` `compile()` raises against `path`'s own live
-    source text. A file that fails to even read (bad encoding, gone
-    between listing and opening) or fails to parse (a real syntax error,
-    a different bug entirely, not this check's job) yields nothing --
-    the same "not my failure to report" boundary
-    `duplicate_regex_check.py`'s own `_local_re_compile_patterns` already
-    holds for both cases."""
+    warning `compile()` raises against `path`'s own live source text.
+
+    The warning CATEGORY is not stable across Python versions, and this
+    module's own first version got bitten by that live, the same hour it
+    shipped: local verification ran under Python 3.11, where this is a
+    `DeprecationWarning` (true since 3.6). `dawn-run.yml`'s CI pins
+    Python 3.12, where CPython upgraded the identical warning to a
+    `SyntaxWarning` -- same message text, same "future SyntaxError" fate,
+    different category -- and a category check pinned to only
+    `DeprecationWarning` silently sees nothing on 3.12+, reporting
+    "clean" for source that will not compile at all a few Python
+    versions from now. Matched here on the message text (the one thing
+    that hasn't moved across 3.6-3.13) against BOTH categories rather
+    than either alone.
+
+    A file that fails to even read (bad encoding, gone between listing
+    and opening) or fails to parse (a real syntax error, a different bug
+    entirely, not this check's job) yields nothing -- the same "not my
+    failure to report" boundary `duplicate_regex_check.py`'s own
+    `_local_re_compile_patterns` already holds for both cases."""
     try:
         with open(path, encoding="utf-8") as f:
             source = f.read()
@@ -95,9 +113,10 @@ def _invalid_escape_warnings(path: str) -> list[tuple[int, str]]:
         except SyntaxError:
             return []
         for warning in caught:
-            if warning.category is DeprecationWarning and _INVALID_ESCAPE_MARKER in str(
-                warning.message
-            ):
+            if warning.category in (
+                DeprecationWarning,
+                SyntaxWarning,
+            ) and _INVALID_ESCAPE_MARKER in str(warning.message):
                 hits.append((warning.lineno, str(warning.message)))
     return hits
 
