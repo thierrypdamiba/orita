@@ -118,7 +118,18 @@ def load_issues(path: Path | None = None) -> list[Issue]:
 
 
 def _closed_issue_numbers(body: str) -> list[int]:
-    return [int(n) for n in _CLOSES_RE.findall(body)]
+    """Every issue number `body` names via a closing keyword, de-duplicated,
+    first-seen order -- same discipline `commit-closes-keyword-issue-still-
+    open/detector.py`'s `_closing_refs` already holds. A body naming the
+    same number twice via two different keyword forms (e.g. "Closes #5 and
+    also fixes #5") must not produce two identically-scored `GapCandidate`s
+    for `rank()` to tie against itself (ROADMAP.md #444)."""
+    seen: list[int] = []
+    for n in _CLOSES_RE.findall(body):
+        num = int(n)
+        if num not in seen:
+            seen.append(num)
+    return seen
 
 
 def _find_issue(number: int, issues: list[Issue]) -> Issue | None:

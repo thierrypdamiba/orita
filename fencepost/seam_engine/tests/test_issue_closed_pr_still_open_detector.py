@@ -64,6 +64,14 @@ class TestNamedIssueNumbers:
         # closing-keyword forms and a common way to write it.
         assert detector._named_issue_numbers("Fix #56.") == [56]
 
+    def test_the_same_number_named_twice_is_deduplicated(self):
+        # ROADMAP.md #444: a body naming the same issue via two different
+        # closing-keyword forms ("Closes #5 and also fixes #5") used to
+        # return [5, 5] -- reproduced live against the pre-fix code before
+        # writing this test. `merged-pr-issue-still-open`'s sibling
+        # extractor carried the identical gap, fixed in the same task.
+        assert detector._named_issue_numbers("Closes #5 and also fixes #5") == [5]
+
 
 class TestComputeGaps:
     def test_a_stale_closed_issue_is_surfaced_at_high_confidence(self):
@@ -129,6 +137,24 @@ class TestComputeGaps:
         excluded_slugs = {g.slug for g in excluded}
         assert "issue-closed-pr-still-open-100-1" in surfaced_slugs
         assert "issue-still-open-100-2" in excluded_slugs
+
+    def test_a_number_named_twice_no_longer_ties_rank_out_of_a_primary(self):
+        # ROADMAP.md #444: before the dedup fix, "Closes #5 and also fixes
+        # #5" produced two identically-slugged, identically-scored
+        # GapCandidates; rank()'s SEPARATION_MARGIN saw a 0.0 lead and
+        # refused to elect a primary on a real, single gap. Reproduced live
+        # (primary came back None) before writing this test.
+        from seam_engine.ranking import rank
+
+        pr = _pull("Closes #5 and also fixes #5")
+        issues = [_issue(5, "closed", closed_at=datetime(2026, 7, 19, 0, 0, 0, tzinfo=timezone.utc))]
+
+        surfaced, excluded = detector.compute_gaps([pr], issues, now=_NOW)
+        assert len(surfaced) == 1
+
+        ranking = rank(surfaced)
+        assert ranking.primary is not None
+        assert ranking.primary.slug == "issue-closed-pr-still-open-100-5"
 
     def test_an_unrecognized_issue_number_is_excluded_not_surfaced(self):
         pr = _pull("Closes #999")
