@@ -56,11 +56,23 @@ from datetime import datetime, timezone
 # test. If SCOPES.md ever grows a new toolkit, this dict grows with it or a
 # consent for that toolkit can never pass — the gate fails closed by
 # construction, not by memory.
+#
+# Task 424: "GetPullRequest" was missing here even though the 22nd real
+# recipe (`RECIPES/duplicate-pr-still-open/recipe.json`) has declared it
+# since it merged, and that recipe's own detector.py docstring swore "Both
+# scopes already sit on SCOPES.md's cleared oath table" -- a claim that was
+# false the whole time this dict, SCOPES.md's table, gateway.py's keyword
+# map, and the issue template all silently agreed with each other while
+# never once naming the tool a shipped recipe actually asks for. Nothing
+# checked a RECIPE's declared scopes against this dict at all -- only
+# scan.py's own claimed tools were ever cross-checked (test_consent_doctrine.
+# py, task 136). recipes.validate_recipe now closes that gap structurally.
 REQUIRED_SCOPES: dict[str, frozenset[str]] = {
     "github": frozenset({
         "GetRepository", "ListRepoCommits", "ListIssues", "GetIssue",
-        "ListPullRequests", "ListRepositoryActivities", "CountStargazers",
-        "GetLatestRelease", "GetFileContents", "ListMilestones",
+        "ListPullRequests", "GetPullRequest", "ListRepositoryActivities",
+        "CountStargazers", "GetLatestRelease", "GetFileContents",
+        "ListMilestones",
     }),
     "x": frozenset({"GetUserTweets", "GetMyMentions", "WhoAmI"}),
     "gmail": frozenset({"ListEmails", "GetEmail", "SearchThreads"}),

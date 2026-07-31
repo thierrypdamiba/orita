@@ -370,10 +370,17 @@ def test_scope_with_trailing_newline_is_rejected():
 
 
 def test_read_only_scopes_are_accepted():
+    # Task 424: every scope here must actually sit on consent.REQUIRED_SCOPES
+    # for the manifest's own toolkit ("github", `_manifest`'s default) --
+    # "WhoAmI" used to appear here but is only ever granted for the "x"
+    # toolkit (SCOPES.md's own table), so it would have failed the new
+    # check 3/3 for the wrong reason (an unrelated toolkit's tool, not a
+    # write-shaped one) and was never actually proving what this test's
+    # name claims.
     manifest = validate_recipe(
-        _manifest(scopes=("GetRepository", "ListRepoCommits", "WhoAmI", "CountStargazers"))
+        _manifest(scopes=("GetRepository", "ListRepoCommits", "GetIssue", "CountStargazers"))
     )
-    assert manifest.scopes == ("GetRepository", "ListRepoCommits", "WhoAmI", "CountStargazers")
+    assert manifest.scopes == ("GetRepository", "ListRepoCommits", "GetIssue", "CountStargazers")
 
 
 def test_real_scopes_from_scopes_md_still_accepted_after_glued_verb_check():
@@ -396,6 +403,102 @@ def test_real_scopes_from_scopes_md_still_accepted_after_glued_verb_check():
 def test_no_scopes_at_all_is_rejected():
     with pytest.raises(RecipeValidationError, match="scopes"):
         validate_recipe(_manifest(scopes=()))
+
+
+# --- Task 424: check 3/3 -- a read-only-SHAPED scope must also be a real,
+# oath-covered one (consent.REQUIRED_SCOPES for the recipe's toolkit) --------
+
+
+def test_a_read_only_shaped_scope_the_oath_never_swears_to_is_rejected():
+    # "GetWidgets" clears checks 1 and 2 (Get*-shaped, no write verb) but
+    # names a tool no toolkit's REQUIRED_SCOPES has ever heard of.
+    with pytest.raises(RecipeValidationError, match="REQUIRED_SCOPES"):
+        validate_recipe(_manifest(toolkit="github", scopes=("GetWidgets",)))
+
+
+def test_the_real_historical_gap_is_caught_by_the_new_check():
+    # Mutation-based hand-verification, in test form: reconstruct
+    # consent.REQUIRED_SCOPES exactly as it stood before task 424 (no
+    # "GetPullRequest") and prove the real, shipped
+    # `duplicate-pr-still-open` recipe.json -- unchanged by this task --
+    # would have failed this check the whole time it sat on the merged
+    # RECIPES/ tree, the same discipline test_consent_doctrine.py's own
+    # "would this catcher have caught the real historical string" test
+    # already holds gateway.py's coverage check to.
+    from seam_engine import recipes as recipes_mod
+
+    pre_424_scopes = frozenset(
+        s for s in recipes_mod.REQUIRED_SCOPES["github"] if s != "GetPullRequest"
+    )
+    assert "GetPullRequest" not in pre_424_scopes
+
+    real_manifest = recipes_mod.load_recipe_manifest(
+        FENCEPOST_ROOT / RECIPES_DIR_NAME / "duplicate-pr-still-open" / "recipe.json"
+    )
+    assert "GetPullRequest" in real_manifest.scopes
+
+    allowed = pre_424_scopes  # simulates the pre-fix REQUIRED_SCOPES["github"]
+    uncovered = [s for s in real_manifest.scopes if s not in allowed]
+    assert uncovered == ["GetPullRequest"], (
+        "the reconstructed pre-424 REQUIRED_SCOPES would not have flagged "
+        "duplicate-pr-still-open's real, shipped GetPullRequest scope -- "
+        "this test no longer proves what its name claims"
+    )
+
+
+def test_a_scope_covered_only_under_a_different_toolkit_is_still_rejected():
+    # "WhoAmI" is real and oath-covered -- but only for "x", never "github".
+    # A github-toolkit recipe declaring it must be refused the same as any
+    # other uncovered scope; toolkits are not interchangeable just because
+    # both grant SOME read-only tool by that shape.
+    with pytest.raises(RecipeValidationError, match="REQUIRED_SCOPES"):
+        validate_recipe(_manifest(toolkit="github", scopes=("WhoAmI",)))
+
+
+def test_composite_toolkit_unions_both_sides_scopes():
+    # Six of the twenty-six real recipes declare a "toolkit+toolkit" pair
+    # (a GitHub-vs-X seam). A scope legitimately on either named toolkit's
+    # REQUIRED_SCOPES must be accepted.
+    manifest = validate_recipe(
+        _manifest(toolkit="github+x", scopes=("ListIssues", "GetUserTweets"))
+    )
+    assert manifest.scopes == ("ListIssues", "GetUserTweets")
+
+    manifest = validate_recipe(
+        _manifest(toolkit="x+github", scopes=("GetMyMentions", "GetFileContents"))
+    )
+    assert manifest.scopes == ("GetMyMentions", "GetFileContents")
+
+
+def test_composite_toolkit_still_rejects_a_scope_covered_by_neither_side():
+    with pytest.raises(RecipeValidationError, match="REQUIRED_SCOPES"):
+        validate_recipe(_manifest(toolkit="github+x", scopes=("ListEvents",)))
+
+
+def test_unknown_toolkit_rejects_every_scope_named():
+    # An unrecognized toolkit string (typo, a toolkit REQUIRED_SCOPES has
+    # never been given a row for) must not silently pass every scope --
+    # `_oath_scopes_for_toolkit` returns an empty set for a part it doesn't
+    # know, so every declared scope is correctly reported as uncovered.
+    with pytest.raises(RecipeValidationError, match="REQUIRED_SCOPES"):
+        validate_recipe(_manifest(toolkit="notarealtoolkit", scopes=("GetRepository",)))
+
+
+def test_all_real_shipped_recipes_pass_the_oath_coverage_check():
+    # The generalization this task exists to prove: every real recipe under
+    # RECIPES/ today (not just the one reference recipe
+    # test_reference_recipes_scopes_are_already_on_scopes_md_table already
+    # checked) actually clears check 3/3 -- discover_recipes() itself would
+    # already raise if not, but a direct assertion here names what's being
+    # proven rather than relying on an absence of exception elsewhere.
+    manifests = discover_recipes(FENCEPOST_ROOT)
+    assert len(manifests) >= 26
+    for m in manifests:
+        from seam_engine.recipes import _oath_scopes_for_toolkit
+
+        allowed = _oath_scopes_for_toolkit(m.toolkit)
+        uncovered = [s for s in m.scopes if s not in allowed]
+        assert not uncovered, f"{m.slug}: scope(s) {uncovered} not covered by the Oath for toolkit {m.toolkit!r}"
 
 
 # --- MOCK ONLY: fixture must live under fixtures/ ---------------------------

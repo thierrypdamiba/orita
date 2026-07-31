@@ -68,6 +68,7 @@ _SCOPE_KEYWORDS: dict[str, dict[str, str]] = {
         "ListIssues": "issues",
         "GetIssue": "issues",
         "ListPullRequests": "pull requests",
+        "GetPullRequest": "pull requests",
         "ListRepositoryActivities": "repository activity",
         "CountStargazers": "stargazer",
         "GetLatestRelease": "release",

@@ -55,6 +55,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Callable
 
+from seam_engine.consent import REQUIRED_SCOPES
+
 # fencepost/  (…/fencepost/seam_engine/src/seam_engine/recipes.py → parents[3])
 _FENCEPOST_ROOT = Path(__file__).resolve().parents[3]
 RECIPES_DIR_NAME = "RECIPES"
@@ -208,6 +210,25 @@ def _check_scope_is_read_only(scope: str, *, where: str) -> None:
             )
 
 
+def _oath_scopes_for_toolkit(toolkit: str) -> frozenset[str]:
+    """The union of `consent.REQUIRED_SCOPES` for one recipe's `toolkit`
+    field. A recipe's toolkit is usually a single Arcade toolkit ("github"),
+    but six of the twenty-six real recipes today name a plus-joined pair
+    spanning two ("github+x", "x+github" -- both directions appear, cosmetic
+    either way) because their seam compares a GitHub timeline against an X
+    one. Splitting on "+" and unioning is the one place that shape is
+    handled; a part `REQUIRED_SCOPES` has never heard of contributes an
+    empty set rather than raising here -- the caller reports every one of
+    the recipe's scopes as uncovered in that case, which is the correct,
+    named failure (an unknown toolkit is not a silent pass).
+    """
+    parts = [p.strip() for p in toolkit.split("+") if p.strip()]
+    allowed: set[str] = set()
+    for part in parts:
+        allowed |= set(REQUIRED_SCOPES.get(part, frozenset()))
+    return frozenset(allowed)
+
+
 def validate_recipe(manifest: RecipeManifest) -> RecipeManifest:
     """Pure function, no I/O: the oath and the schema, checked against an
     already-parsed manifest. Returns the same manifest unchanged if every
@@ -241,6 +262,37 @@ def validate_recipe(manifest: RecipeManifest) -> RecipeManifest:
         )
     for scope in manifest.scopes:
         _check_scope_is_read_only(scope, where=where)
+
+    # Task 424: check 3/3 -- a scope can be shaped perfectly read-only (checks
+    # 1 and 2 above) and still name a tool nobody has ever sworn to on
+    # SCOPES.md's own Oath table. `duplicate-pr-still-open` (the 22nd real
+    # recipe) declared `GetPullRequest` since the day it merged; its own
+    # detector.py docstring swore "Both scopes already sit on SCOPES.md's
+    # cleared oath table" -- true of `ListPullRequests`, false of
+    # `GetPullRequest`, and nothing here ever checked the difference. A
+    # scope this loose could ask Arcade's Gateway Assistant for a tool
+    # consent.REQUIRED_SCOPES never demands, which a real human's scope
+    # confirm (SCOPES.md's own table, the issue template) would then never
+    # grant -- the recipe would be merged today and unrunnable against a
+    # live account tomorrow, the same "true when written, never rechecked"
+    # shape task 372 already closed one file over (gateway.py's own
+    # capabilities-string floor). `_oath_scopes_for_toolkit` below is the
+    # one place "which REQUIRED_SCOPES apply to this recipe's toolkit
+    # string" is computed, so a composite toolkit ("github+x", "x+github" --
+    # both directions appear across the real recipe set today) is handled
+    # once, not reimplemented per caller.
+    allowed = _oath_scopes_for_toolkit(manifest.toolkit)
+    uncovered = [s for s in manifest.scopes if s not in allowed]
+    if uncovered:
+        raise RecipeValidationError(
+            f"{where}: scope(s) {uncovered} are not in consent.REQUIRED_SCOPES "
+            f"for toolkit {manifest.toolkit!r} -- SCOPES.md's own Read-Only "
+            "Oath table does not cover this. Either the scope belongs on "
+            "SCOPES.md's table (and gateway.py's _SCOPE_KEYWORDS, "
+            "consent.REQUIRED_SCOPES, and the point-fencepost.md issue "
+            "template all extended in the same commit), or the recipe "
+            "should not be asking for a tool the Oath never swore to."
+        )
 
     if not manifest.fixture.startswith("fixtures/"):
         raise RecipeValidationError(

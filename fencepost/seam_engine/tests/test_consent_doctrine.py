@@ -206,11 +206,11 @@ def test_parser_actually_detects_drift_not_just_tautologically_passes():
     real_text = _scopes_md_text()
     real_row = (
         "GetRepository, ListRepoCommits, ListIssues, GetIssue, ListPullRequests, "
-        "ListRepositoryActivities, CountStargazers, GetLatestRelease"
+        "GetPullRequest, ListRepositoryActivities, CountStargazers, GetLatestRelease"
     )
     mutated_row = (
         "GetRepository, ListRepoCommits, ListIssues, GetIssue, ListPullRequests, "
-        "ListRepositoryActivities, CountStargazers"
+        "GetPullRequest, ListRepositoryActivities, CountStargazers"
     )
     assert real_row in real_text, "SCOPES.md's GitHub row text has already changed shape — update this fixture row"
     mutated_text = real_text.replace(real_row, mutated_row)
