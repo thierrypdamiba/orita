@@ -163,6 +163,18 @@ class TestComputeGaps:
         assert len(excluded) == 1 and excluded[0].slug == "issue-body-ref-matched-issue-1-2"
         assert len(surfaced) == 1 and surfaced[0].slug == "issue-body-dangling-reference-issue-1-999"
 
+    def test_the_same_dangling_number_mentioned_twice_produces_only_one_candidate(self):
+        # Task 442: _referenced_numbers() returns every occurrence, repeats
+        # included -- without a dedup, an issue body naming #2 twice
+        # produced two identical GapCandidates that tied each other out of
+        # rank()'s SEPARATION_MARGIN, silently dropping a real gap.
+        issues = [_issue(1, "related to #2, also see #2 in the old repo")]
+        surfaced, excluded = detector.compute_gaps(issues, [], now=_NOW)
+
+        assert excluded == []
+        assert len(surfaced) == 1
+        assert surfaced[0].slug == "issue-body-dangling-reference-issue-1-2"
+
     def test_grace_window_constant_is_twenty_four_hours(self):
         assert detector._EDIT_GRACE_WINDOW_HOURS == 24.0
 

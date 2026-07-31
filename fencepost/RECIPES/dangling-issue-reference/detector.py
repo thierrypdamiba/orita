@@ -152,7 +152,10 @@ def compute_gaps(
     excluded: list[GapCandidate] = []
 
     for c in commits:
-        for n in _referenced_numbers(c.message):
+        # dict.fromkeys dedupes, order-preserving: a commit mentioning the
+        # same #N twice must not produce two identical GapCandidates that
+        # tie each other out of rank()'s SEPARATION_MARGIN (task 442).
+        for n in dict.fromkeys(_referenced_numbers(c.message)):
             if n in known_numbers:
                 excluded.append(GapCandidate(
                     slug=f"dangling-ref-matched-{c.sha}-{n}",

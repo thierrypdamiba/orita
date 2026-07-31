@@ -136,6 +136,18 @@ class TestComputeGaps:
         assert len(excluded) == 1 and excluded[0].slug == "mention-ref-matched-X-1007-1"
         assert len(surfaced) == 1 and surfaced[0].slug == "mention-dangling-reference-X-1007-999"
 
+    def test_the_same_dangling_number_mentioned_twice_produces_only_one_candidate(self):
+        # Task 442: _referenced_numbers() returns every occurrence, repeats
+        # included -- without a dedup, one mention naming #2 twice produced
+        # two identical GapCandidates that tied each other out of rank()'s
+        # SEPARATION_MARGIN, silently dropping a real gap as "ambiguous."
+        mentions = [_mention("saw #2 earlier, still no #2 anywhere", "X-1099")]
+        surfaced, excluded = detector.compute_gaps(mentions, [], [], now=_NOW)
+
+        assert excluded == []
+        assert len(surfaced) == 1
+        assert surfaced[0].slug == "mention-dangling-reference-X-1099-2"
+
     def test_surfaced_confidence_is_lower_than_the_commit_sourced_twins(self):
         # An honest, reasoned gap versus dangling-issue-reference's own
         # flat 0.8 -- not a copy-pasted number. See recipe.json's

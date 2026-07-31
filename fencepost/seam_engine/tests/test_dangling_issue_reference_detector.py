@@ -136,6 +136,29 @@ class TestComputeGaps:
         assert len(excluded) == 1 and excluded[0].slug == "dangling-ref-matched-abc1234-1"
         assert len(surfaced) == 1 and surfaced[0].slug == "dangling-issue-reference-abc1234-999"
 
+    def test_the_same_dangling_number_mentioned_twice_produces_only_one_candidate(self):
+        # Task 442: _referenced_numbers() returns every occurrence, repeats
+        # included -- without a dedup, "related to #2, also see #2 in the
+        # old repo" produced two identical GapCandidates that tied each
+        # other out of rank()'s SEPARATION_MARGIN, silently dropping a real
+        # gap as "ambiguous."
+        commits = [_commit("related to #2, also see #2 in the old repo")]
+        surfaced, excluded = detector.compute_gaps(commits, [], [], now=_NOW)
+
+        assert excluded == []
+        assert len(surfaced) == 1
+        assert surfaced[0].slug == "dangling-issue-reference-abc1234-2"
+
+    def test_a_repeated_dangling_reference_still_elects_a_primary_gap(self):
+        from seam_engine.ranking import rank
+
+        commits = [_commit("related to #2, also see #2 in the old repo")]
+        surfaced, _excluded = detector.compute_gaps(commits, [], [], now=_NOW)
+        ranking = rank(surfaced)
+
+        assert ranking.primary is not None
+        assert ranking.primary.slug == "dangling-issue-reference-abc1234-2"
+
 
 class TestRunRecipeScan:
     def test_the_shipped_fixture_elects_exactly_one_primary_gap(self):

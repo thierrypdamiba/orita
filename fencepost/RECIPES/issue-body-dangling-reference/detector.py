@@ -160,7 +160,10 @@ def compute_gaps(
 
     def _scan(source_kind: str, number: int, body: str, updated_at: datetime, url: str) -> None:
         label = _SOURCE_LABEL[source_kind]
-        for n in _referenced_numbers(body):
+        # dict.fromkeys dedupes, order-preserving: a body naming the same
+        # #N twice must not produce two identical GapCandidates that tie
+        # each other out of rank()'s SEPARATION_MARGIN (task 442).
+        for n in dict.fromkeys(_referenced_numbers(body)):
             if n in known_numbers:
                 excluded.append(GapCandidate(
                     slug=f"issue-body-ref-matched-{source_kind}-{number}-{n}",

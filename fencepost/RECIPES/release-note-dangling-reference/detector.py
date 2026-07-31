@@ -133,7 +133,10 @@ def compute_gaps(
     excluded: list[GapCandidate] = []
 
     for release in releases:
-        for n in _referenced_numbers(release.body):
+        # dict.fromkeys dedupes, order-preserving: a release body naming
+        # the same #N twice must not produce two identical GapCandidates
+        # that tie each other out of rank()'s SEPARATION_MARGIN (task 442).
+        for n in dict.fromkeys(_referenced_numbers(release.body)):
             if n in known_numbers:
                 excluded.append(GapCandidate(
                     slug=f"release-note-ref-matched-{release.tag}-{n}",

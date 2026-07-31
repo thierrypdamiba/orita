@@ -136,6 +136,18 @@ class TestComputeGaps:
         assert len(excluded) == 1 and excluded[0].slug == "release-note-ref-matched-v1.0.6-1"
         assert len(surfaced) == 1 and surfaced[0].slug == "release-note-dangling-reference-v1.0.6-999"
 
+    def test_the_same_dangling_number_mentioned_twice_produces_only_one_candidate(self):
+        # Task 442: _referenced_numbers() returns every occurrence, repeats
+        # included -- without a dedup, one release body naming #2 twice
+        # produced two identical GapCandidates that tied each other out of
+        # rank()'s SEPARATION_MARGIN, silently dropping a real gap.
+        releases = [_release("fixes #2, see also #2 in the changelog", "v1.0.7", "REL-1099")]
+        surfaced, excluded = detector.compute_gaps(releases, [], [], now=_NOW)
+
+        assert excluded == []
+        assert len(surfaced) == 1
+        assert surfaced[0].slug == "release-note-dangling-reference-v1.0.7-2"
+
     def test_surfaced_confidence_matches_the_commit_sourced_twin(self):
         # Flat, matching dangling-issue-reference's own bar exactly -- a
         # release note is exactly as permanent and unproofread as a commit
