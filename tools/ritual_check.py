@@ -152,7 +152,7 @@ regardless, and `consent.py`'s gate still fails closed), so this never
 flips `broken`.
 
 Usage:
-    python3 tools/ritual_check.py [--now ISO_TS] [--fencepost-base DIR] [--square-state PATH] [--arcade-apps-state PATH] [--cron-checks PATH] [--child-files PATH] [--github-stars COUNT]
+    python3 tools/ritual_check.py [--now ISO_TS] [--fencepost-base DIR] [--square-state PATH] [--arcade-apps-state PATH] [--ci-checks PATH] [--cron-checks PATH] [--child-files PATH] [--voice-window-commits PATH] [--github-stars COUNT] [--json]
 """
 from __future__ import annotations
 

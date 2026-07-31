@@ -4,8 +4,10 @@ a stale/missing/pending report, and an X recheck due/not-due -- the same
 kind of fixture proof tasks 57-59 gave the tools they consolidate.
 """
 import importlib.util
+import inspect
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -2640,6 +2642,38 @@ class CliMainArgShapeGuardCase(unittest.TestCase):
         after the refactor from a bare `__main__` block into `main(argv)`."""
         exit_code = rc.main([])
         self.assertIn(exit_code, (0, 1))
+
+
+class UsageStringMatchesRealFlagsCase(unittest.TestCase):
+    """The module's own Usage docstring must name every `--flag` `main()`
+    actually parses, and nothing else -- structurally, never a hand-typed
+    guess, the same doctrine `tests/test_oath_badge.py`'s
+    `TestUsageStringMatchesRealFlags` already holds for
+    `tools/oath_badge.py`'s own usage string (task 437, a phantom `--write`
+    flag advertised there that main() never parsed). Here the drift ran the
+    other way: `--ci-checks`, `--voice-window-commits`, and `--json` are all
+    real, live-parsed flags (`CliMainArgShapeGuardCase` above already drives
+    two of them through `main()`) that the Usage line never grew to mention
+    as the CLI grew past task 71's original four flags -- a god reading only
+    the module's own `Usage:` block would never learn any of the three
+    exist."""
+
+    def test_usage_line_names_exactly_the_flags_main_parses(self):
+        usage_line = next(
+            line for line in rc.__doc__.splitlines()
+            if line.strip().startswith("python3 tools/ritual_check.py")
+        )
+        documented = set(re.findall(r"--[\w-]+", usage_line))
+
+        main_source = inspect.getsource(rc.main)
+        parsed = set(re.findall(r'argv\[i\] == "(--[\w-]+)"', main_source))
+
+        self.assertEqual(
+            parsed, documented,
+            f"main() parses {sorted(parsed)} but the module's own Usage "
+            f"docstring names {sorted(documented)} -- every real flag must "
+            "be documented, and every documented flag must be real.",
+        )
 
 
 class ClusterDayFoldCase(unittest.TestCase):
