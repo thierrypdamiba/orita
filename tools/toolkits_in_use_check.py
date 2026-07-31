@@ -52,6 +52,13 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DEFAULT_METRICS_PATH = os.path.join(ROOT, "records", "metrics.jsonl")
 DEFAULT_CONSENT_LOG_PATH = consent_grant_log.LOG
 
+# STRATEGY.md: "Distinct read-only toolkits connected across users (Arcade
+# breadth) | leading | >=5 toolkits in real use | nisaba" -- task 428,
+# cross-checked against the live doc text (never a second hand-typed copy)
+# by tools/strategy_targets_check.py, the same doctrine tasks 159/421
+# already hold for report cadence/shared reports/github stars.
+TARGET_TOOLKITS = 5
+
 
 def _last_metrics_entry(metrics_path: str) -> dict | None:
     """The most recently recorded dated reading in `records/

@@ -77,6 +77,34 @@ class SyntheticExtractionCase(unittest.TestCase):
         with self.assertRaises(stc.StrategyTargetError):
             stc.strategy_github_stars_target(text)
 
+    def test_extracts_connected_users_target_from_synthetic_row(self):
+        text = "| \"Connect your own\" OAuth completions across users | leading | 250 connected users in 60 days | kothar-wa-khasis |\n"
+        self.assertEqual(stc.strategy_connected_users_target(text), 250)
+
+    def test_missing_connected_users_row_raises(self):
+        text = "| Some other row | leading | 100 connected users in 60 days | kothar-wa-khasis |\n"
+        with self.assertRaises(stc.StrategyTargetError):
+            stc.strategy_connected_users_target(text)
+
+    def test_connected_users_row_present_but_malformed_target_raises(self):
+        text = "| \"Connect your own\" OAuth completions across users | leading | a hundred users | kothar-wa-khasis |\n"
+        with self.assertRaises(stc.StrategyTargetError):
+            stc.strategy_connected_users_target(text)
+
+    def test_extracts_toolkits_target_from_synthetic_row(self):
+        text = "| Distinct read-only toolkits connected across users (Arcade breadth) | leading | >=9 toolkits in real use | nisaba |\n"
+        self.assertEqual(stc.strategy_toolkits_target(text), 9)
+
+    def test_missing_toolkits_row_raises(self):
+        text = "| Some other row | leading | >=5 toolkits in real use | nisaba |\n"
+        with self.assertRaises(stc.StrategyTargetError):
+            stc.strategy_toolkits_target(text)
+
+    def test_toolkits_row_present_but_malformed_target_raises(self):
+        text = "| Distinct read-only toolkits connected across users (Arcade breadth) | leading | several toolkits | nisaba |\n"
+        with self.assertRaises(stc.StrategyTargetError):
+            stc.strategy_toolkits_target(text)
+
 
 class RealStrategyMdCase(unittest.TestCase):
     """The real point: STRATEGY.md's own live text, read from disk, not a
@@ -99,6 +127,12 @@ class RealStrategyMdCase(unittest.TestCase):
     def test_real_github_stars_target_is_a_thousand(self):
         self.assertEqual(stc.strategy_github_stars_target(self.text), 1000)
 
+    def test_real_connected_users_target_is_a_hundred(self):
+        self.assertEqual(stc.strategy_connected_users_target(self.text), 100)
+
+    def test_real_toolkits_target_is_five(self):
+        self.assertEqual(stc.strategy_toolkits_target(self.text), 5)
+
 
 class RealCrossCheckCase(unittest.TestCase):
     """`check_strategy_targets()` against the real repo: today, both real
@@ -115,6 +149,12 @@ class RealCrossCheckCase(unittest.TestCase):
         self.assertTrue(result["github_stars"]["agree"])
         self.assertEqual(result["github_stars"]["strategy_target"], 1000)
         self.assertEqual(result["github_stars"]["code_target"], 1000)
+        self.assertTrue(result["connected_users"]["agree"])
+        self.assertEqual(result["connected_users"]["strategy_target"], 100)
+        self.assertEqual(result["connected_users"]["code_target"], 100)
+        self.assertTrue(result["toolkits"]["agree"])
+        self.assertEqual(result["toolkits"]["strategy_target"], 5)
+        self.assertEqual(result["toolkits"]["code_target"], 5)
 
     def test_real_code_targets_are_live_loaded_not_hand_typed(self):
         # Cross-check against a SECOND, independent live import of the
@@ -123,23 +163,33 @@ class RealCrossCheckCase(unittest.TestCase):
         rcc = _load("_t159_rcc_indep", os.path.join(ROOT, "tools", "report_cadence_check.py"))
         src = _load("_t159_src_indep", os.path.join(ROOT, "tools", "shared_reports_check.py"))
         ghs = _load("_t159_ghs_indep", os.path.join(ROOT, "tools", "github_stars_check.py"))
+        cuc = _load("_t428_cuc_indep", os.path.join(ROOT, "tools", "connected_users_check.py"))
+        tiu = _load("_t428_tiu_indep", os.path.join(ROOT, "tools", "toolkits_in_use_check.py"))
         result = stc.check_strategy_targets()
         self.assertEqual(result["report_streak"]["code_target"], rcc.TARGET_STREAK_DAYS)
         self.assertEqual(result["shared_reports"]["code_target"], src.TARGET_SHARES)
         self.assertEqual(result["github_stars"]["code_target"], ghs.TARGET_STARS)
+        self.assertEqual(result["connected_users"]["code_target"], cuc.TARGET_CONNECTED_USERS)
+        self.assertEqual(result["toolkits"]["code_target"], tiu.TARGET_TOOLKITS)
 
-    def test_format_names_all_three_rows_and_agreement(self):
+    def test_format_names_all_five_rows_and_agreement(self):
         result = stc.check_strategy_targets()
         formatted = stc.format_strategy_targets(result)
         self.assertIn("report cadence", formatted)
         self.assertIn("shared reports", formatted)
         self.assertIn("github stars", formatted)
+        self.assertIn("connected users", formatted)
+        self.assertIn("toolkits", formatted)
         self.assertIn("STRATEGY.md=30", formatted)
         self.assertIn("code=30", formatted)
         self.assertIn("STRATEGY.md=50", formatted)
         self.assertIn("code=50", formatted)
         self.assertIn("STRATEGY.md=1000", formatted)
         self.assertIn("code=1000", formatted)
+        self.assertIn("STRATEGY.md=100", formatted)
+        self.assertIn("code=100", formatted)
+        self.assertIn("STRATEGY.md=5", formatted)
+        self.assertIn("code=5", formatted)
         self.assertNotIn("DRIFT", formatted)
 
 
@@ -198,6 +248,44 @@ class MutationCase(unittest.TestCase):
             real_text = f.read()
         real_strategy_target = stc.strategy_github_stars_target(real_text)
         self.assertNotEqual(real_strategy_target, ghs.TARGET_STARS)
+
+    def test_mutation_a_drifted_connected_users_row_disagrees_with_the_real_code_constant(self):
+        with open(stc.STRATEGY_MD, encoding="utf-8") as f:
+            real_text = f.read()
+        drifted_text = real_text.replace(
+            "100 connected users in 60 days", "300 connected users in 60 days"
+        )
+        self.assertNotEqual(drifted_text, real_text, "fixture setup: the real row text must actually match first")
+
+        cuc = _load("_t428_cuc_mut1", os.path.join(ROOT, "tools", "connected_users_check.py"))
+        drifted_target = stc.strategy_connected_users_target(drifted_text)
+        self.assertNotEqual(drifted_target, cuc.TARGET_CONNECTED_USERS)
+
+    def test_mutation_a_drifted_code_constant_disagrees_with_the_real_connected_users_row(self):
+        cuc = _load("_t428_cuc_mut2", os.path.join(ROOT, "tools", "connected_users_check.py"))
+        cuc.TARGET_CONNECTED_USERS = cuc.TARGET_CONNECTED_USERS + 50  # mutate a loaded copy only
+        with open(stc.STRATEGY_MD, encoding="utf-8") as f:
+            real_text = f.read()
+        real_strategy_target = stc.strategy_connected_users_target(real_text)
+        self.assertNotEqual(real_strategy_target, cuc.TARGET_CONNECTED_USERS)
+
+    def test_mutation_a_drifted_toolkits_row_disagrees_with_the_real_code_constant(self):
+        with open(stc.STRATEGY_MD, encoding="utf-8") as f:
+            real_text = f.read()
+        drifted_text = real_text.replace(">=5 toolkits in real use", ">=8 toolkits in real use")
+        self.assertNotEqual(drifted_text, real_text, "fixture setup: the real row text must actually match first")
+
+        tiu = _load("_t428_tiu_mut1", os.path.join(ROOT, "tools", "toolkits_in_use_check.py"))
+        drifted_target = stc.strategy_toolkits_target(drifted_text)
+        self.assertNotEqual(drifted_target, tiu.TARGET_TOOLKITS)
+
+    def test_mutation_a_drifted_code_constant_disagrees_with_the_real_toolkits_row(self):
+        tiu = _load("_t428_tiu_mut2", os.path.join(ROOT, "tools", "toolkits_in_use_check.py"))
+        tiu.TARGET_TOOLKITS = tiu.TARGET_TOOLKITS + 3  # mutate a loaded copy only, never the file on disk
+        with open(stc.STRATEGY_MD, encoding="utf-8") as f:
+            real_text = f.read()
+        real_strategy_target = stc.strategy_toolkits_target(real_text)
+        self.assertNotEqual(real_strategy_target, tiu.TARGET_TOOLKITS)
 
 
 if __name__ == "__main__":

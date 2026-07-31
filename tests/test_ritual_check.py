@@ -2674,7 +2674,7 @@ class StrategyTargetsFoldCase(unittest.TestCase):
         self.tmp = tempfile.mkdtemp()
         self.addCleanup(shutil.rmtree, self.tmp, ignore_errors=True)
 
-    def _write_strategy(self, streak, shares, stars=1000):
+    def _write_strategy(self, streak, shares, stars=1000, connected_users=100, toolkits=5):
         path = os.path.join(self.tmp, "STRATEGY.md")
         with open(path, "w") as f:
             f.write(
@@ -2684,14 +2684,17 @@ class StrategyTargetsFoldCase(unittest.TestCase):
                 f"| Daily Fencepost Report shipped (town dogfood) | leading | {streak} of {streak} days, 1/day | off-by-one |\n"
                 f"| Shared Fencepost Reports in the wild | lagging | {shares} organic links/screenshots | kwaku-ananse |\n"
                 f"| GitHub stars | lagging | {stars} (Star Covenant, unbegged) | off-by-one |\n"
+                f"| \"Connect your own\" OAuth completions across users | leading | {connected_users} connected users in 60 days | kothar-wa-khasis |\n"
+                f"| Distinct read-only toolkits connected across users (Arcade breadth) | leading | >={toolkits} toolkits in real use | nisaba |\n"
             )
         return path
 
     def test_agreeing_fixture_is_clean_and_never_flips_broken(self):
-        # Real code constants are 30/50/1000 (report_cadence_check.py,
-        # shared_reports_check.py, github_stars_check.py) -- a fixture
+        # Real code constants are 30/50/1000/100/5 (report_cadence_check.py,
+        # shared_reports_check.py, github_stars_check.py,
+        # connected_users_check.py, toolkits_in_use_check.py) -- a fixture
         # naming the same numbers must read clean.
-        path = self._write_strategy(30, 50, 1000)
+        path = self._write_strategy(30, 50, 1000, 100, 5)
         result = rc.run_ritual_check(strategy_targets_path=path)
         self.assertTrue(result["strategy_targets"]["clean"])
         self.assertFalse(result["broken"])
@@ -2699,11 +2702,13 @@ class StrategyTargetsFoldCase(unittest.TestCase):
         self.assertIn("strategy target (report cadence): STRATEGY.md=30 code=30 -- agree", formatted)
         self.assertIn("strategy target (shared reports): STRATEGY.md=50 code=50 -- agree", formatted)
         self.assertIn("strategy target (github stars): STRATEGY.md=1000 code=1000 -- agree", formatted)
+        self.assertIn("strategy target (connected users): STRATEGY.md=100 code=100 -- agree", formatted)
+        self.assertIn("strategy target (toolkits): STRATEGY.md=5 code=5 -- agree", formatted)
 
     def test_drifted_fixture_is_named_and_flips_broken(self):
         # A plausible future decree (STRATEGY.md moves its target, code
         # never catches up) must be loud, not silent.
-        path = self._write_strategy(60, 100, 2000)
+        path = self._write_strategy(60, 100, 2000, 300, 8)
         result = rc.run_ritual_check(strategy_targets_path=path)
         self.assertFalse(result["strategy_targets"]["clean"])
         self.assertTrue(result["broken"])
@@ -2711,12 +2716,14 @@ class StrategyTargetsFoldCase(unittest.TestCase):
         self.assertIn("strategy target (report cadence): STRATEGY.md=60 code=30 -- DRIFT", formatted)
         self.assertIn("strategy target (shared reports): STRATEGY.md=100 code=50 -- DRIFT", formatted)
         self.assertIn("strategy target (github stars): STRATEGY.md=2000 code=1000 -- DRIFT", formatted)
+        self.assertIn("strategy target (connected users): STRATEGY.md=300 code=100 -- DRIFT", formatted)
+        self.assertIn("strategy target (toolkits): STRATEGY.md=8 code=5 -- DRIFT", formatted)
 
     def test_only_github_stars_drifted_still_flips_broken(self):
-        # The two pre-existing rows agree; only the new third row drifts --
-        # proves `all(row["agree"] ...)` catches a lone-row drift, not just
-        # a whole-fixture one.
-        path = self._write_strategy(30, 50, 2000)
+        # The other four rows agree; only github stars drifts -- proves
+        # `all(row["agree"] ...)` catches a lone-row drift, not just a
+        # whole-fixture one.
+        path = self._write_strategy(30, 50, 2000, 100, 5)
         result = rc.run_ritual_check(strategy_targets_path=path)
         self.assertFalse(result["strategy_targets"]["clean"])
         self.assertTrue(result["broken"])
@@ -2724,6 +2731,19 @@ class StrategyTargetsFoldCase(unittest.TestCase):
         self.assertIn("strategy target (report cadence): STRATEGY.md=30 code=30 -- agree", formatted)
         self.assertIn("strategy target (shared reports): STRATEGY.md=50 code=50 -- agree", formatted)
         self.assertIn("strategy target (github stars): STRATEGY.md=2000 code=1000 -- DRIFT", formatted)
+        self.assertIn("strategy target (connected users): STRATEGY.md=100 code=100 -- agree", formatted)
+        self.assertIn("strategy target (toolkits): STRATEGY.md=5 code=5 -- agree", formatted)
+
+    def test_only_toolkits_drifted_still_flips_broken(self):
+        # The other four rows agree; only the newest (fifth) row drifts --
+        # proves the fold's genericness catches a drift on the row added
+        # last, not just the ones that existed when the fold was written.
+        path = self._write_strategy(30, 50, 1000, 100, 9)
+        result = rc.run_ritual_check(strategy_targets_path=path)
+        self.assertFalse(result["strategy_targets"]["clean"])
+        self.assertTrue(result["broken"])
+        formatted = rc.format_ritual_check(result)
+        self.assertIn("strategy target (toolkits): STRATEGY.md=9 code=5 -- DRIFT", formatted)
 
     def test_default_path_reads_the_real_strategy_md_and_matches_direct_call(self):
         """No override: reads the real STRATEGY.md, the same default
@@ -2735,6 +2755,8 @@ class StrategyTargetsFoldCase(unittest.TestCase):
         self.assertEqual(result["strategy_targets"]["report_streak"], direct["report_streak"])
         self.assertEqual(result["strategy_targets"]["shared_reports"], direct["shared_reports"])
         self.assertEqual(result["strategy_targets"]["github_stars"], direct["github_stars"])
+        self.assertEqual(result["strategy_targets"]["connected_users"], direct["connected_users"])
+        self.assertEqual(result["strategy_targets"]["toolkits"], direct["toolkits"])
         self.assertTrue(result["strategy_targets"]["clean"])
 
 
