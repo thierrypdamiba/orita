@@ -261,7 +261,7 @@ def main(argv: list[str] | None = None) -> int:
 
     if "--catalog" not in argv:
         print("usage: oath_badge.py --catalog module:attr [--policy path.json] "
-              "[--label text] [--write path] [--out path]", file=sys.stderr)
+              "[--label text] [--out path]", file=sys.stderr)
         return 2
 
     def _take(flag: str) -> str | None:

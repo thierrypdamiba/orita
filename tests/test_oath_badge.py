@@ -231,5 +231,65 @@ class TestMainCliPolicyArgGuard(unittest.TestCase):
             os.remove(policy_path)
 
 
+class TestUsageStringMatchesRealFlags(unittest.TestCase):
+    """Task 437. The no-`--catalog` usage string advertised a `--write path`
+    flag lifted from seam_engine/badge.py's own CLI -- oath_badge.py never
+    parses `--write` at all, only `--out` actually persists the rendered
+    badge to disk. An unrecognized flag is silently left in `argv` and
+    never inspected again, so `--write somepath` used to exit 0, print the
+    badge, and write nothing -- no error, matching the tool's own
+    (wrong) usage text exactly."""
+
+    def setUp(self):
+        import sys
+
+        class _FakeApp:
+            _catalog = [_MaterializedTool("ListIssues", True, False, ["read"])]
+
+        class _FakeModule:
+            app = _FakeApp()
+
+        sys.modules["_oath_badge_write_fixture_module"] = _FakeModule
+
+    def tearDown(self):
+        import sys
+        del sys.modules["_oath_badge_write_fixture_module"]
+
+    def test_usage_string_does_not_advertise_the_phantom_write_flag(self):
+        import io
+        import contextlib
+
+        stderr = io.StringIO()
+        with contextlib.redirect_stderr(stderr):
+            rc = oath_badge.main([])
+        self.assertEqual(rc, 2)
+        self.assertNotIn("--write", stderr.getvalue())
+        self.assertIn("--out path", stderr.getvalue())
+
+    def test_write_flag_is_a_silent_no_op_out_is_the_real_flag(self):
+        import tempfile
+
+        fd, path = tempfile.mkstemp(suffix=".json")
+        os.close(fd)
+        os.remove(path)
+        try:
+            rc = oath_badge.main([
+                "--catalog", "_oath_badge_write_fixture_module:app",
+                "--write", path,
+            ])
+            self.assertEqual(rc, 0)
+            self.assertFalse(os.path.exists(path), "--write is not a real flag; it must not create a file")
+
+            rc = oath_badge.main([
+                "--catalog", "_oath_badge_write_fixture_module:app",
+                "--out", path,
+            ])
+            self.assertEqual(rc, 0)
+            self.assertTrue(os.path.exists(path), "--out is the real, tested persistence flag")
+        finally:
+            if os.path.exists(path):
+                os.remove(path)
+
+
 if __name__ == "__main__":
     unittest.main()
