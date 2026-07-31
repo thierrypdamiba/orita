@@ -137,7 +137,37 @@ class TestComputeGaps:
         surfaced, excluded = detector.compute_gaps([pr], issues, now=_NOW)
 
         assert surfaced == []
-        assert excluded[0].slug == "issue-still-open-100-999"
+        assert excluded[0].slug == "nonexistent-target-100-999"
+
+
+class TestNonexistentIssueIsNotMislabeledStillOpen:
+    """ROADMAP.md #430: a PR naming an issue number that doesn't exist at
+    all used to fall into the same `issue-still-open-...` slug and "has not
+    closed yet" detail as a PR naming a genuinely still-open issue -- a
+    false claim, since no such issue was ever found to be open or closed."""
+
+    def test_a_nonexistent_issue_excludes_with_its_own_slug_and_an_honest_detail(self):
+        pr = _pull("Closes #100")
+        issues = [_issue(1, "closed", closed_at=datetime(2026, 7, 19, 0, 0, 0, tzinfo=timezone.utc))]
+
+        surfaced, excluded = detector.compute_gaps([pr], issues, now=_NOW)
+
+        assert surfaced == []
+        assert len(excluded) == 1
+        assert excluded[0].slug == "nonexistent-target-100-100"
+        assert "still open" not in excluded[0].detail
+        assert "has not closed" not in excluded[0].detail
+        assert "no such issue exists" in excluded[0].detail
+
+    def test_a_genuinely_still_open_issue_keeps_its_own_distinct_slug(self):
+        pr = _pull("Resolves #1")
+        issues = [_issue(1, "open")]
+
+        surfaced, excluded = detector.compute_gaps([pr], issues, now=_NOW)
+
+        assert surfaced == []
+        assert excluded[0].slug == "issue-still-open-100-1"
+        assert "has not closed yet" in excluded[0].detail
 
 
 class TestRunRecipeScan:
@@ -157,6 +187,11 @@ class TestRunRecipeScan:
         excluded_slugs = {g["slug"] for g in result["excluded"]}
         assert "issue-still-open-603-503" in excluded_slugs
         assert "no-closing-keyword-604" in excluded_slugs
+
+    def test_the_shipped_fixture_excludes_the_nonexistent_named_issue(self):
+        result = detector.run_recipe_scan(now=_NOW)
+        excluded_slugs = {g["slug"] for g in result["excluded"]}
+        assert "nonexistent-target-605-599" in excluded_slugs
 
 
 class TestLoaders:

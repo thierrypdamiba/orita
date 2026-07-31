@@ -34,5 +34,14 @@
     "state": "open",
     "opened_at": "2026-07-24T09:00:00Z",
     "url": "https://github.com/example/example-repo/pull/604"
+  },
+  {
+    "id": "PR-605",
+    "title": "Wire the new onboarding banner into the README",
+    "number": 605,
+    "body": "Closes #599 -- adds the banner copy reviewed in standup.",
+    "state": "open",
+    "opened_at": "2026-07-26T11:00:00Z",
+    "url": "https://github.com/example/example-repo/pull/605"
   }
 ]

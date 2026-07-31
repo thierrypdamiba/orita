@@ -20,6 +20,16 @@ PR alone nor the issue alone shows this -- only holding both at once does.
 Confidence is age-gated on how long the issue has been closed while the PR
 still sits open, not flat -- see `recipe.json`'s `confidence_notes` for the
 full reasoning behind the 48-hour bar.
+
+ROADMAP.md #430: named as still open by task 429's own closing note, this
+module's exclusion branch used to fold "the named issue does not exist at
+all" into the same `issue is None or issue.state != "closed"` check as "the
+named issue exists and is still open" -- one shared `issue-still-open-...`
+slug, and a detail line that claimed "the issue has not closed yet" even
+when no such issue was ever found. Split here, the same way task 429 split
+the identical conflation in `merged-pr-issue-still-open/detector.py`: a
+dangling reference (the number was never real) and a genuinely-still-open
+issue are different facts about the world.
 """
 from __future__ import annotations
 
@@ -144,13 +154,26 @@ def compute_gaps(
 
         for number in numbers:
             issue = _find_issue(number, issues)
-            if issue is None or issue.state != "closed" or issue.closed_at is None:
+            if issue is None:
+                excluded.append(GapCandidate(
+                    slug=f"nonexistent-target-{pr.number}-{number}",
+                    headline=f"PR #{pr.number} names #{number}, which does not exist in this repo",
+                    detail=(
+                        f"'{pr.title}' names #{number}, but no such issue exists. "
+                        "A broken link, not a resolved promise (see dangling-issue-reference)."
+                    ),
+                    confidence=0.0,
+                    evidence=[pr.url],
+                ))
+                continue
+
+            if issue.state != "closed" or issue.closed_at is None:
                 excluded.append(GapCandidate(
                     slug=f"issue-still-open-{pr.number}-{number}",
                     headline=f"PR #{pr.number}'s named issue #{number} is still open",
                     detail=f"'{pr.title}' names #{number}; the issue has not closed yet. No seam here.",
                     confidence=0.0,
-                    evidence=[pr.url] + ([issue.url] if issue else []),
+                    evidence=[pr.url, issue.url],
                 ))
                 continue
 
