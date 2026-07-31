@@ -136,7 +136,7 @@ def find_violations(orita_dir: str = DEFAULT_ORITA_DIR) -> list:
     key = os.path.realpath(orita_dir)
     if key not in _VIOLATIONS_CACHE:
         _VIOLATIONS_CACHE[key] = _find_violations_uncached(orita_dir)
-    return _VIOLATIONS_CACHE[key]
+    return list(_VIOLATIONS_CACHE[key])
 
 
 def _find_violations_uncached(orita_dir: str = DEFAULT_ORITA_DIR) -> list:

@@ -117,6 +117,21 @@ class FixtureViolationCase(unittest.TestCase):
         self.assertEqual(result["count"], 0)
         self.assertIn("clean", esc.format_result(result))
 
+    def test_find_violations_returns_a_copy_not_the_live_cache(self):
+        # duplicate_regex_check.py and site_link_check.py's own
+        # find_violations() both return list(_VIOLATIONS_CACHE[key]), a
+        # defensive copy -- this module dropped the list(...) and
+        # returned the bare cached list object itself, so any caller
+        # mutating what it got back (append/sort/clear -- ordinary
+        # things to do with "a list of violations" before formatting)
+        # silently corrupts the process-wide cache for every later call.
+        _write(os.path.join(self.repo, "ok.py"), "x = 1\n")
+        first = esc.find_violations(orita_dir=self.repo)
+        self.assertEqual(first, [])
+        first.append({"file": "FAKE.py", "line": 1, "message": "injected"})
+        second = esc.find_violations(orita_dir=self.repo)
+        self.assertEqual(second, [], "mutating a prior result corrupted the cache")
+
     def test_clear_cache_forces_a_fresh_scan(self):
         _write(os.path.join(self.repo, "drift.py"), '"""bad \\| escape"""\n')
         first = esc.find_violations(orita_dir=self.repo)
