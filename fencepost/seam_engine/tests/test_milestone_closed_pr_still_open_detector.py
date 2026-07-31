@@ -147,6 +147,27 @@ class TestNonexistentMilestoneIsNotMislabeledStillOpen:
         assert "has not closed yet" in excluded[0].detail
 
 
+class TestClosedMilestoneWithNoTimestampIsNotMislabeledStillOpen:
+    """ROADMAP.md #433: `milestone.state != "closed" or milestone.closed_at
+    is None` folded a genuinely still-open milestone and a milestone that
+    reads closed but carries no closed_at (a malformed record) into the
+    same `milestone-still-open-...` slug and its false "has not closed yet"
+    detail. Split so the malformed case gets its own honest slug."""
+
+    def test_a_closed_milestone_with_no_timestamp_is_excluded_as_malformed_not_still_open(self):
+        milestone = _milestone(790, state="closed", closed_at=None)
+        pr = _pr(791, milestone_number=790, state="open")
+
+        surfaced, excluded = detector.compute_gaps([milestone], [pr], now=_NOW)
+
+        assert surfaced == []
+        by_slug = {g.slug: g for g in excluded}
+        candidate = by_slug["milestone-closed-no-timestamp-791-790"]
+        assert "has not closed yet" not in candidate.detail
+        assert "malformed" in candidate.detail
+        assert candidate.evidence == [pr.url, milestone.url]
+
+
 class TestRunRecipeScan:
     def test_the_shipped_fixture_elects_exactly_one_primary_gap(self):
         result = detector.run_recipe_scan(now=_NOW)

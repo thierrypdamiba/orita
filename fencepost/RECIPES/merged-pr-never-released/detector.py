@@ -144,11 +144,24 @@ def compute_gaps(
     claims = _claims_by_number(releases)
 
     for pr in pull_requests:
-        if not pr.merged or pr.merged_at is None:
+        if not pr.merged:
             excluded.append(GapCandidate(
                 slug=f"pr-not-merged-{pr.number}",
                 headline=f"Pull request #{pr.number} never merged",
                 detail=f"'{pr.title}' reads state={pr.state}, merged={pr.merged}. No seam here.",
+                confidence=0.0,
+                evidence=[pr.url],
+            ))
+            continue
+
+        if pr.merged_at is None:
+            excluded.append(GapCandidate(
+                slug=f"pr-merged-no-timestamp-{pr.number}",
+                headline=f"Pull request #{pr.number} merged with no merge timestamp",
+                detail=(
+                    f"'{pr.title}' reads merged=True but carries no merged_at timestamp -- "
+                    "a malformed record, not an unmerged PR."
+                ),
                 confidence=0.0,
                 evidence=[pr.url],
             ))

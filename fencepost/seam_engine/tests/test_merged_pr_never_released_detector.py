@@ -138,6 +138,28 @@ class TestComputeGaps:
         assert surfaced[0].slug == "merged-pr-never-released-2009"
 
 
+class TestMergedPrWithNoTimestampIsNotMislabeledUnmerged:
+    """ROADMAP.md #433: `not pr.merged or pr.merged_at is None` folded a
+    genuinely-unmerged PR and a PR that reads merged=True but carries no
+    merged_at (a malformed record) into the same `pr-not-merged-...` slug
+    and its detail line, which itself would print "merged=True" underneath
+    a headline claiming "never merged" -- a direct self-contradiction.
+    Split so the malformed case gets its own honest slug."""
+
+    def test_a_merged_pr_with_no_timestamp_is_excluded_as_malformed_not_unmerged(self):
+        pr = _pr(750, merged=True, merged_at=None)
+
+        surfaced, excluded = detector.compute_gaps([pr], [], now=_NOW)
+
+        assert surfaced == []
+        assert len(excluded) == 1
+        candidate = excluded[0]
+        assert candidate.slug == "pr-merged-no-timestamp-750"
+        assert "never merged" not in candidate.headline
+        assert "malformed" in candidate.detail
+        assert candidate.evidence == [pr.url]
+
+
 class TestRunRecipeScan:
     def test_the_shipped_fixture_elects_exactly_one_primary_gap(self):
         result = detector.run_recipe_scan(now=_NOW)

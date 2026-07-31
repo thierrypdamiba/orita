@@ -129,11 +129,24 @@ def compute_gaps(
     claims = _claims_by_number(releases)
 
     for milestone in milestones:
-        if milestone.state != "closed" or milestone.closed_at is None:
+        if milestone.state != "closed":
             excluded.append(GapCandidate(
                 slug=f"milestone-not-closed-{milestone.number}",
                 headline=f"Milestone #{milestone.number} is still open",
                 detail=f"'{milestone.title}' reads state={milestone.state}. No seam here.",
+                confidence=0.0,
+                evidence=[milestone.url],
+            ))
+            continue
+
+        if milestone.closed_at is None:
+            excluded.append(GapCandidate(
+                slug=f"milestone-closed-no-timestamp-{milestone.number}",
+                headline=f"Milestone #{milestone.number} closed with no close timestamp",
+                detail=(
+                    f"'{milestone.title}' reads state=closed but carries no closed_at timestamp -- "
+                    "a malformed record, not an open milestone."
+                ),
                 confidence=0.0,
                 evidence=[milestone.url],
             ))

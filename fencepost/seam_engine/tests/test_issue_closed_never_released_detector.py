@@ -153,6 +153,29 @@ class TestComputeGaps:
         assert surfaced[0].slug == "issue-closed-never-released-4010"
 
 
+class TestClosedIssueWithNoTimestampIsNotMislabeledStillOpen:
+    """ROADMAP.md #433: `issue.state != "closed" or issue.closed_at is
+    None` folded two different facts into one `issue-not-closed-...` slug:
+    a genuinely still-open issue, and an issue that reads state=closed but
+    carries no closed_at (a malformed record) -- whose own detail line
+    ("reads state={state}") would print "reads state=closed" underneath a
+    headline claiming "is still open," a direct self-contradiction. Split
+    so the malformed case gets its own honest slug."""
+
+    def test_a_closed_issue_with_no_timestamp_is_excluded_as_malformed_not_still_open(self):
+        issue = _issue(730, state="closed", closed_at=None)
+
+        surfaced, excluded = detector.compute_gaps([issue], [], now=_NOW)
+
+        assert surfaced == []
+        assert len(excluded) == 1
+        candidate = excluded[0]
+        assert candidate.slug == "issue-closed-no-timestamp-730"
+        assert "is still open" not in candidate.headline
+        assert "malformed" in candidate.detail
+        assert candidate.evidence == [issue.url]
+
+
 class TestRunRecipeScan:
     def test_the_shipped_fixture_elects_exactly_one_primary_gap(self):
         result = detector.run_recipe_scan(now=_NOW)

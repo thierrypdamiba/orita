@@ -159,11 +159,24 @@ def compute_gaps(
             ))
             continue
 
-        if original.state not in _RESOLVED_STATES or original.closed_at is None:
+        if original.state not in _RESOLVED_STATES:
             excluded.append(GapCandidate(
                 slug=f"original-still-open-{pull.number}-{number}",
                 headline=f"PR #{pull.number}'s named original #{number} is still open",
                 detail=f"'{pull.title}' names #{number} as its original; that PR has not resolved yet. No seam here.",
+                confidence=0.0,
+                evidence=[pull.url, original.url],
+            ))
+            continue
+
+        if original.closed_at is None:
+            excluded.append(GapCandidate(
+                slug=f"original-resolved-no-timestamp-{pull.number}-{number}",
+                headline=f"PR #{pull.number}'s named original #{number} resolved with no timestamp",
+                detail=(
+                    f"'{pull.title}' names #{number} as its original; that PR reads resolved but "
+                    "carries no close timestamp -- a malformed record, not an unresolved seam."
+                ),
                 confidence=0.0,
                 evidence=[pull.url, original.url],
             ))

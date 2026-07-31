@@ -167,11 +167,24 @@ def compute_gaps(
                 ))
                 continue
 
-            if issue.state != "closed" or issue.closed_at is None:
+            if issue.state != "closed":
                 excluded.append(GapCandidate(
                     slug=f"issue-still-open-{pr.number}-{number}",
                     headline=f"PR #{pr.number}'s named issue #{number} is still open",
                     detail=f"'{pr.title}' names #{number}; the issue has not closed yet. No seam here.",
+                    confidence=0.0,
+                    evidence=[pr.url, issue.url],
+                ))
+                continue
+
+            if issue.closed_at is None:
+                excluded.append(GapCandidate(
+                    slug=f"issue-closed-no-timestamp-{pr.number}-{number}",
+                    headline=f"PR #{pr.number}'s named issue #{number} closed with no timestamp",
+                    detail=(
+                        f"'{pr.title}' names #{number}; that issue reads closed but carries no close "
+                        "timestamp -- a malformed record, not an unresolved seam."
+                    ),
                     confidence=0.0,
                     evidence=[pr.url, issue.url],
                 ))

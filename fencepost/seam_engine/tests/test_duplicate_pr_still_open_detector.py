@@ -167,6 +167,28 @@ class TestNonexistentOriginalIsNotMislabeledStillOpen:
         assert candidate.evidence == [dup.url, original.url]
 
 
+class TestResolvedOriginalWithNoTimestampIsNotMislabeledStillOpen:
+    """ROADMAP.md #433: `original.state not in _RESOLVED_STATES or
+    original.closed_at is None` folded a different pair of facts than task
+    432 split: a genuinely still-open original, and an original that reads
+    a resolved state but carries no `closed_at` (a malformed record). Split
+    so a resolved-but-untimestamped original gets its own honest slug
+    instead of the false "has not resolved yet" claim."""
+
+    def test_a_resolved_original_with_no_timestamp_is_excluded_as_malformed_not_still_open(self):
+        dup = _pull(720, "duplicate of #721")
+        original = _pull(721, "Some bug", state="closed", closed_at=None)
+
+        surfaced, excluded = detector.compute_gaps([original, dup], now=_NOW)
+
+        assert surfaced == []
+        by_slug = {g.slug: g for g in excluded}
+        candidate = by_slug["original-resolved-no-timestamp-720-721"]
+        assert "has not resolved yet" not in candidate.detail
+        assert "malformed" in candidate.detail
+        assert candidate.evidence == [dup.url, original.url]
+
+
 class TestRunRecipeScan:
     def test_the_shipped_fixture_elects_exactly_one_primary_gap(self):
         result = detector.run_recipe_scan(now=_NOW)

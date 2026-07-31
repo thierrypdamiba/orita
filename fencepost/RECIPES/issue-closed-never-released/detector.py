@@ -141,11 +141,24 @@ def compute_gaps(
     claims = _claims_by_number(releases)
 
     for issue in issues:
-        if issue.state != "closed" or issue.closed_at is None:
+        if issue.state != "closed":
             excluded.append(GapCandidate(
                 slug=f"issue-not-closed-{issue.number}",
                 headline=f"Issue #{issue.number} is still open",
                 detail=f"'{issue.title}' reads state={issue.state}. No seam here.",
+                confidence=0.0,
+                evidence=[issue.url],
+            ))
+            continue
+
+        if issue.closed_at is None:
+            excluded.append(GapCandidate(
+                slug=f"issue-closed-no-timestamp-{issue.number}",
+                headline=f"Issue #{issue.number} closed with no close timestamp",
+                detail=(
+                    f"'{issue.title}' reads state=closed but carries no closed_at timestamp -- "
+                    "a malformed record, not an open issue."
+                ),
                 confidence=0.0,
                 evidence=[issue.url],
             ))

@@ -145,13 +145,26 @@ def compute_gaps(
             ))
             continue
 
-        if milestone.state != "closed" or milestone.closed_at is None:
+        if milestone.state != "closed":
             excluded.append(GapCandidate(
                 slug=f"milestone-still-open-{issue.number}-{issue.milestone_number}",
                 headline=f"Issue #{issue.number}'s milestone #{issue.milestone_number} is still open",
                 detail=(
                     f"'{issue.title}' is assigned to milestone #{issue.milestone_number}; "
                     "that milestone has not closed yet. No seam here."
+                ),
+                confidence=0.0,
+                evidence=[issue.url, milestone.url],
+            ))
+            continue
+
+        if milestone.closed_at is None:
+            excluded.append(GapCandidate(
+                slug=f"milestone-closed-no-timestamp-{issue.number}-{issue.milestone_number}",
+                headline=f"Issue #{issue.number}'s milestone #{issue.milestone_number} closed with no timestamp",
+                detail=(
+                    f"'{issue.title}' is assigned to milestone #{issue.milestone_number}; that milestone "
+                    "reads closed but carries no close timestamp -- a malformed record, not an unresolved seam."
                 ),
                 confidence=0.0,
                 evidence=[issue.url, milestone.url],
