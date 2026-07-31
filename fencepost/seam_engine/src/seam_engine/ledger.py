@@ -273,7 +273,7 @@ def _entry_prose(seq: int, sealed: dict[str, Any]) -> str:
         out.append("")
 
     if tail:
-        named = ", ".join(f"`{t['slug']}` ({t['confidence']})" for t in tail[:6])
+        named = ", ".join(f"`{t['slug']}` ({t['confidence']})" for t in tail)
         out.append(
             f"**Weighed and dropped.** {len(tail)} coincidence(s) sat below the "
             f"bar: {named}. They are named, not hidden — a ledger that flatters "

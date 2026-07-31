@@ -292,6 +292,21 @@ def test_no_primary_records_the_seam_held(tmp_path: Path):
     assert recs[0]["sealed"]["fenceposts_recorded_total"] == 0
 
 
+def test_weighed_and_dropped_names_every_tail_entry_not_just_six(tmp_path: Path):
+    # Task 440. The sentence claims "They are named, not hidden" and states
+    # the true count via len(tail) -- but the printed list used to be
+    # silently capped at tail[:6], so a tail of 8 said "8 coincidence(s)"
+    # while only naming 6. Already fired for real in GAPS/2026-07-18.md and
+    # GAPS/2026-07-19.md (7 stated, 6 named) before this fix.
+    tablet = ledger.append_scan(
+        _scan(primary=True, generated_at="g", tail_n=8), now=_at(2026, 7, 12), base=tmp_path
+    )
+    text = tablet.read_text()
+    assert "8 coincidence(s)" in text
+    for i in range(8):
+        assert f"`coincidence-{i}`" in text
+
+
 # --- last_seal --------------------------------------------------------------
 
 
