@@ -28,6 +28,24 @@ having existed to fire.
 Confidence is age-gated on how long the original has been closed while the
 duplicate still sits open -- see `recipe.json`'s `confidence_notes` for the
 full reasoning behind the 24-hour bar.
+
+This module's exclusion branch used to fold "the named original does not
+exist at all" and "the named original exists but has not closed yet" into
+one `original is None or original.state != "closed"` check, one shared slug
+(`original-still-open-...`), and one detail line that flatly claimed "that
+issue has not closed yet" even when no such issue was ever found. Every
+sibling that solves this same referencing-record/target-record shape has
+since learned to split that (`merged-pr-issue-still-open/detector.py`'s
+`nonexistent-target-...` vs `issue-already-closed-...`, `merged-pr-pr-
+still-open/detector.py`'s `nonexistent-target-...` vs `already-resolved-...`).
+A dangling reference (the number was never real) and an unresolved seam
+(the number was real and is still open) are different facts about the
+world -- conflating them makes a false claim in the surviving branch's own
+words. Split here too: `nonexistent-original-...` for a duplicate marker
+naming a number this fixture doesn't carry at all, `original-still-open-...`
+reserved for a real original that just hasn't closed yet.
+`duplicate-pr-still-open/detector.py` carries the identical conflation on
+its own PR-original pair.
 """
 from __future__ import annotations
 
@@ -130,13 +148,26 @@ def compute_gaps(
             continue
 
         original = _find_issue(number, issues)
-        if original is None or original.state != "closed" or original.closed_at is None:
+        if original is None:
+            excluded.append(GapCandidate(
+                slug=f"nonexistent-original-{issue.number}-{number}",
+                headline=f"Issue #{issue.number} names #{number}, which does not exist in this repo",
+                detail=(
+                    f"'{issue.title}' names #{number} as its original, but no such issue "
+                    "exists. A broken link, not a broken promise."
+                ),
+                confidence=0.0,
+                evidence=[issue.url],
+            ))
+            continue
+
+        if original.state != "closed" or original.closed_at is None:
             excluded.append(GapCandidate(
                 slug=f"original-still-open-{issue.number}-{number}",
                 headline=f"Issue #{issue.number}'s named original #{number} is still open",
                 detail=f"'{issue.title}' names #{number} as its original; that issue has not closed yet. No seam here.",
                 confidence=0.0,
-                evidence=[issue.url] + ([original.url] if original else []),
+                evidence=[issue.url, original.url],
             ))
             continue
 

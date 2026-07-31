@@ -114,7 +114,7 @@ class TestComputeGaps:
         surfaced, excluded = detector.compute_gaps([dup], now=_NOW)
 
         assert surfaced == []
-        assert excluded[0].slug == "original-still-open-809-999"
+        assert excluded[0].slug == "nonexistent-original-809-999"
 
     def test_an_original_that_is_still_open_is_not_treated_as_resolved_even_if_it_has_a_closed_at(self):
         # A malformed/hypothetical row: state="open" but closed_at set.
@@ -127,6 +127,44 @@ class TestComputeGaps:
         assert surfaced == []
         excluded_slugs = {g.slug for g in excluded}
         assert "original-still-open-810-811" in excluded_slugs
+
+
+class TestNonexistentOriginalIsNotMislabeledStillOpen:
+    """ROADMAP.md #432: before this fix, `original is None or original.state
+    not in _RESOLVED_STATES` folded a dangling reference (the named original
+    was never real) into the same `original-still-open-...` slug and the
+    same false detail line ("that PR has not resolved yet") as a
+    genuinely-unresolved original -- the PR-side twin of the same conflation
+    fixed in `duplicate-issue-still-open/detector.py`. A dangling reference
+    gets its own `nonexistent-original-...` slug now."""
+
+    def test_a_named_original_that_does_not_exist_is_excluded_as_nonexistent_not_still_open(self):
+        dup = _pull(812, "duplicate of #999")  # #999 is never in the pull list at all
+
+        surfaced, excluded = detector.compute_gaps([dup], now=_NOW)
+
+        assert surfaced == []
+        assert len(excluded) == 1
+        candidate = excluded[0]
+        assert candidate.slug == "nonexistent-original-812-999"
+        assert "resolved" not in candidate.detail
+        assert "open" not in candidate.detail
+        assert candidate.evidence == [dup.url]  # no original.url to append -- it doesn't exist
+
+    def test_a_named_original_that_exists_and_is_still_open_is_still_excluded_as_still_open(self):
+        # The genuinely-unresolved path must survive the split unchanged.
+        # `original` itself is also `open` here, but with no duplicate
+        # marker of its own, so it produces its own separate excluded
+        # candidate -- this test asserts on the #813 candidate specifically.
+        dup = _pull(813, "Duplicate of #814")
+        original = _pull(814, "Some fix", state="open")
+
+        surfaced, excluded = detector.compute_gaps([original, dup], now=_NOW)
+
+        assert surfaced == []
+        by_slug = {g.slug: g for g in excluded}
+        candidate = by_slug["original-still-open-813-814"]
+        assert candidate.evidence == [dup.url, original.url]
 
 
 class TestRunRecipeScan:
@@ -146,7 +184,7 @@ class TestRunRecipeScan:
         excluded_slugs = {g["slug"] for g in result["excluded"]}
         assert "original-still-open-804-805" in excluded_slugs
         assert "no-duplicate-marker-806" in excluded_slugs
-        assert "original-still-open-809-999" in excluded_slugs
+        assert "nonexistent-original-809-999" in excluded_slugs
 
     def test_the_shipped_fixture_never_considers_the_already_closed_duplicate(self):
         result = detector.run_recipe_scan(now=_NOW)

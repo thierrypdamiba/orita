@@ -28,6 +28,17 @@ sixth hand-typed instance of an identical pattern.
 Confidence is age-gated on how long the original PR has been resolved while
 the duplicate still sits open -- see `recipe.json`'s `confidence_notes` for
 the full reasoning.
+
+This module's exclusion branch used to fold "the named original does not
+exist at all" and "the named original exists but has not resolved yet" into
+one `original is None or original.state not in _RESOLVED_STATES` check, one
+shared slug (`original-still-open-...`), and one detail line that flatly
+claimed "that PR has not resolved yet" even when no such PR was ever found
+-- the same conflation `duplicate-issue-still-open/detector.py` carried on
+its issue-original pair. Split here too, mirroring that fix:
+`nonexistent-original-...` for a duplicate marker naming a number this
+fixture doesn't carry at all, `original-still-open-...` reserved for a real
+original that just hasn't merged or closed yet.
 """
 from __future__ import annotations
 
@@ -135,13 +146,26 @@ def compute_gaps(
             continue
 
         original = _find_pull(number, pulls)
-        if original is None or original.state not in _RESOLVED_STATES or original.closed_at is None:
+        if original is None:
+            excluded.append(GapCandidate(
+                slug=f"nonexistent-original-{pull.number}-{number}",
+                headline=f"PR #{pull.number} names #{number}, which does not exist in this repo",
+                detail=(
+                    f"'{pull.title}' names #{number} as its original, but no such pull request "
+                    "exists. A broken link, not a broken promise."
+                ),
+                confidence=0.0,
+                evidence=[pull.url],
+            ))
+            continue
+
+        if original.state not in _RESOLVED_STATES or original.closed_at is None:
             excluded.append(GapCandidate(
                 slug=f"original-still-open-{pull.number}-{number}",
                 headline=f"PR #{pull.number}'s named original #{number} is still open",
                 detail=f"'{pull.title}' names #{number} as its original; that PR has not resolved yet. No seam here.",
                 confidence=0.0,
-                evidence=[pull.url] + ([original.url] if original else []),
+                evidence=[pull.url, original.url],
             ))
             continue
 
