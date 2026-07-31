@@ -102,7 +102,7 @@ class FixtureViolationCase(unittest.TestCase):
         self.assertEqual(violations, [])
 
     def test_seeded_exception_pair_is_not_flagged(self):
-        pattern = r"\b(?:closes?|fixes?|resolves?)\s+#(\d+)\b"
+        pattern = r"\b(?:closes?|fix(?:es)?|resolves?)\s+#(\d+)\b"
         allowed = drc._ALLOWED_DUPLICATES[pattern]
         for rel in allowed:
             _write(os.path.join(self.orita, rel), f'import re\n_CLOSES_RE = re.compile(r"{pattern}", re.IGNORECASE)\n')
@@ -113,7 +113,7 @@ class FixtureViolationCase(unittest.TestCase):
         # Task 397: the exception is seeded to an EXACT file set. A third
         # file independently defining the same "allowed" pattern is a new
         # fact the town never actually decided to allow -- must still bite.
-        pattern = r"\b(?:closes?|fixes?|resolves?)\s+#(\d+)\b"
+        pattern = r"\b(?:closes?|fix(?:es)?|resolves?)\s+#(\d+)\b"
         allowed = drc._ALLOWED_DUPLICATES[pattern]
         for rel in allowed:
             _write(os.path.join(self.orita, rel), f'import re\n_CLOSES_RE = re.compile(r"{pattern}", re.IGNORECASE)\n')

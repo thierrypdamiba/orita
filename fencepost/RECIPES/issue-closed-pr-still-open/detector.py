@@ -40,7 +40,7 @@ DEFAULT_ISSUES_FIXTURE = _HERE.parents[1] / "fixtures" / "issue_closed_pr_still_
 # includes "close"/"closed"/"fix"/"fixed"/"resolve"/"resolved" -- these three
 # base forms cover every fixture case here, mirroring
 # `merged-pr-issue-still-open`'s own declared subset exactly).
-_CLOSES_RE = re.compile(r"\b(?:closes?|fixes?|resolves?)\s+#(\d+)\b", re.IGNORECASE)
+_CLOSES_RE = re.compile(r"\b(?:closes?|fix(?:es)?|resolves?)\s+#(\d+)\b", re.IGNORECASE)
 
 # An issue closed under this age may not have been noticed yet by whoever
 # has the open PR -- not yet a gap.

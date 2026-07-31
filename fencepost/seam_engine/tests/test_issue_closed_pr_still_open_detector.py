@@ -56,6 +56,14 @@ class TestNamedIssueNumbers:
     def test_no_closing_keyword_returns_an_empty_list(self):
         assert detector._named_issue_numbers("No linked issue, docs only.") == []
 
+    def test_the_bare_word_fix_is_matched_not_just_fixes(self):
+        # Regression: `fixes?` (the pre-427 pattern) only ever matched
+        # `fixe`/`fixes`, never the bare word `fix` -- an asymmetry with
+        # `closes?`/`resolves?`, which both correctly span their bare and
+        # `s`-suffixed forms. "Fix #N" is one of GitHub's own documented
+        # closing-keyword forms and a common way to write it.
+        assert detector._named_issue_numbers("Fix #56.") == [56]
+
 
 class TestComputeGaps:
     def test_a_stale_closed_issue_is_surfaced_at_high_confidence(self):

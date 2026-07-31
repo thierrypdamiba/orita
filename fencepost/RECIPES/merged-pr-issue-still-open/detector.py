@@ -48,7 +48,7 @@ DEFAULT_ISSUES_FIXTURE = _HERE.parents[1] / "fixtures" / "merged_pr_issue_still_
 # includes "close"/"closed"/"fix"/"fixed"/"resolve"/"resolved" -- these three
 # base forms cover every fixture case here, and a recipe declares exactly
 # what it actually matches, not the full spec it doesn't yet implement).
-_CLOSES_RE = re.compile(r"\b(?:closes?|fixes?|resolves?)\s+#(\d+)\b", re.IGNORECASE)
+_CLOSES_RE = re.compile(r"\b(?:closes?|fix(?:es)?|resolves?)\s+#(\d+)\b", re.IGNORECASE)
 
 # A promised close under this age may just be lagging automation, not a gap.
 _STALE_HOURS = 24.0

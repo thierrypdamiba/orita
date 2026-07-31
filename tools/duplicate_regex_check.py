@@ -79,7 +79,7 @@ _SKIP_BASENAMES = {"__init__.py"}
 # nothing if their patterns differ, and two files disagreeing on a name
 # means nothing if their patterns (the live behavior) are identical.
 _ALLOWED_DUPLICATES: dict[str, frozenset[str]] = {
-    r"\b(?:closes?|fixes?|resolves?)\s+#(\d+)\b": frozenset({
+    r"\b(?:closes?|fix(?:es)?|resolves?)\s+#(\d+)\b": frozenset({
         os.path.join("fencepost", "RECIPES", "issue-closed-pr-still-open", "detector.py"),
         os.path.join("fencepost", "RECIPES", "merged-pr-issue-still-open", "detector.py"),
     }),
