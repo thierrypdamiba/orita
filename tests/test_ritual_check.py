@@ -278,6 +278,45 @@ class XEscalationCase(unittest.TestCase):
         self.assertEqual(result["X_PostTweet"]["threshold_hours"], 168.0)
         self.assertIn("crosses 168.0h threshold", result["X_PostTweet"]["reason"])
 
+    def test_not_due_reason_names_the_highest_fired_tier_not_the_lowest(self):
+        """Task 436: the live town outage's own real shape. Once a streak has
+        escalated at 48h, then 168h, then a recurring 336h tier (exactly
+        task 422's own scenario, HAND/escalations.jsonl's real last three
+        X_PostTweet rows), and nothing new is due yet, `check_x_escalation`'s
+        "not due" fallback used to always call `should_escalate` at the
+        fixed `min(ESCALATION_TIERS)` (48.0h) -- so the printed reason read
+        "already escalated ... at the 48.0h tier" forever after, no matter
+        how much worse the real streak had gotten. True in isolation (it
+        really did escalate at 48h once) but misleading about the streak's
+        actual, current severity: this same outage had already earned a
+        336h-tier notice by the time this test's timestamp is set, and nothing
+        in the printed line said so. The reason should name the highest tier
+        actually already fired for this streak, not the first one."""
+        started = "2026-07-14T00:00:00Z"
+        self.xot.record_check("X_PostTweet", "forbidden", started, path=self.xot.LOG)
+        self.xot.record_escalation(
+            "X_PostTweet", started, "2026-07-16T01:00:00Z", 49.0,
+            threshold_hours=48.0, path=self.xot.ESCALATION_LOG,
+        )
+        self.xot.record_escalation(
+            "X_PostTweet", started, "2026-07-21T01:00:00Z", 169.0,
+            threshold_hours=168.0, path=self.xot.ESCALATION_LOG,
+        )
+        self.xot.record_escalation(
+            "X_PostTweet", started, "2026-07-31T02:00:00Z", 409.0,
+            threshold_hours=336.0, path=self.xot.ESCALATION_LOG,
+        )
+        # A moment after the 336h escalation, still short of the next
+        # recurring tier (504h) -- next_escalation_tier() correctly returns
+        # None here (nothing NEW is due), which is what routes through the
+        # buggy fallback in the first place.
+        result = rc.check_x_escalation("2026-07-31T03:00:00Z")
+        self.assertFalse(result["X_PostTweet"]["due"])
+        self.assertEqual(result["X_PostTweet"]["threshold_hours"], 336.0)
+        self.assertIn("already escalated", result["X_PostTweet"]["reason"])
+        self.assertIn("336.0h tier", result["X_PostTweet"]["reason"])
+        self.assertNotIn("48.0h tier", result["X_PostTweet"]["reason"])
+
 
 class SquareFoldCase(unittest.TestCase):
     """Task 71: run_ritual_check(square_state=...) folds square_check.py's

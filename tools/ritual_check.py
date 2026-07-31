@@ -463,7 +463,23 @@ def check_x_escalation(now_iso: str) -> dict:
     single fixed threshold, so a sustained outage that already fired its
     48h notice can still surface as due once it crosses the 168h tier,
     rather than reading "already escalated" forever after its first
-    notice regardless of how much worse it gets."""
+    notice regardless of how much worse it gets.
+
+    Task 436. When nothing NEW is due, the printed "not due" reason used to
+    always be `should_escalate` at the fixed `min(ESCALATION_TIERS)` (48.0h)
+    -- correct the day a streak had only ever fired its 48h notice, but
+    silently wrong forever after once a sustained streak escalates past it.
+    This town's own live `X_PostTweet`/`X_GetUserTweets` outage (started
+    2026-07-14) escalated at 48h, then 168h, then task 422's own recurring
+    336h tier -- and every hourly `ritual_check.py` run since has printed
+    "already escalated for the streak ... at the 48.0h tier" regardless,
+    understating a 336h-severity outage as a 48h one. The "not due" reason
+    now names the HIGHEST tier this streak has actually already fired at
+    (walking the same extended-tiers space `next_escalation_tier` itself
+    uses), falling back to the lowest named tier only when no tier has
+    fired at all yet (no active outage, or a fresh outage still below its
+    first threshold) -- both of which `should_escalate` already reports
+    correctly on their own."""
     mod = _outage_tracker()
     entries = mod._entries(mod.LOG)
     escalation_entries = mod._escalation_entries(mod.ESCALATION_LOG)
@@ -474,9 +490,20 @@ def check_x_escalation(now_iso: str) -> dict:
             threshold_hours, reason = tier
             result[tool] = {"due": True, "reason": reason, "threshold_hours": threshold_hours}
         else:
-            lowest = min(mod.ESCALATION_TIERS)
-            _due, reason = mod.should_escalate(entries, tool, now_iso, lowest, escalation_entries)
-            result[tool] = {"due": False, "reason": reason, "threshold_hours": lowest}
+            reported_tier = min(mod.ESCALATION_TIERS)
+            streak = mod.current_streak(entries, tool, "forbidden")
+            if streak:
+                started = mod.streak_started_at(entries, tool, "forbidden")
+                elapsed = (mod._parse(now_iso) - mod._parse(started)).total_seconds() / 3600.0
+                effective_tiers = mod._extended_tiers(
+                    elapsed, mod.ESCALATION_TIERS, mod.RECURRING_ESCALATION_INTERVAL_HOURS
+                )
+                for candidate in sorted(effective_tiers, reverse=True):
+                    if mod.already_escalated_for_streak(escalation_entries, tool, started, candidate):
+                        reported_tier = candidate
+                        break
+            _due, reason = mod.should_escalate(entries, tool, now_iso, reported_tier, escalation_entries)
+            result[tool] = {"due": False, "reason": reason, "threshold_hours": reported_tier}
     return result
 
 
