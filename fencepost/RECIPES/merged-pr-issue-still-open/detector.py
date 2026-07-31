@@ -28,6 +28,24 @@ not yet a gap (auto-close can lag, a human may simply not have looked yet);
 still open a full day and more later is. `_STALE_HOURS = 24.0` is the one
 number this recipe leans on, named here so a reviewer can see exactly what
 it claims and why.
+
+ROADMAP.md #429: as the oldest recipe in this family (task ~108), this
+module's exclusion branch used to fold "the named issue does not exist at
+all" and "the named issue exists and already closed" into one `issue is
+None or issue.state == "closed"` check, one shared slug
+(`issue-already-closed-...`), and one detail line that flatly claimed "it
+already reads closed" even when no such issue was ever found. Every newer
+sibling that solves this same referencing-record/target-record shape
+already learned to split that: `merged-pr-pr-still-open/detector.py`'s
+`nonexistent-target-...` vs `already-resolved-...`, `release-claims-
+unfixed-issue/detector.py`, `release-claims-unmerged-pr/detector.py`. A
+dangling reference (the number was never real) and a resolved promise (the
+number was real and is now closed) are different facts about the world --
+conflating them makes a false claim in the surviving branch's own words.
+Split here too, now consistent with the rest of the family;
+`issue-closed-pr-still-open/detector.py` carries the identical conflation
+(`issue is None` folded into its own "still open" label) and is named,
+not yet fixed, for a future task.
 """
 from __future__ import annotations
 
@@ -136,13 +154,26 @@ def compute_gaps(
 
         for number in numbers:
             issue = _find_issue(number, issues)
-            if issue is None or issue.state == "closed":
+            if issue is None:
+                excluded.append(GapCandidate(
+                    slug=f"nonexistent-target-{pr.number}-{number}",
+                    headline=f"PR #{pr.number} names #{number}, which does not exist in this repo",
+                    detail=(
+                        f"'{pr.title}' promises to close #{number}, but no such issue "
+                        "exists. A broken link, not a broken promise (see dangling-issue-reference)."
+                    ),
+                    confidence=0.0,
+                    evidence=[pr.url],
+                ))
+                continue
+
+            if issue.state == "closed":
                 excluded.append(GapCandidate(
                     slug=f"issue-already-closed-{pr.number}-{number}",
                     headline=f"PR #{pr.number}'s promised issue #{number} is already closed",
                     detail=f"'{pr.title}' promised to close #{number}; it already reads closed. No seam here.",
                     confidence=0.0,
-                    evidence=[pr.url] + ([issue.url] if issue else []),
+                    evidence=[pr.url, issue.url],
                 ))
                 continue
 

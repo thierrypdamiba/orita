@@ -30,5 +30,13 @@
     "body": "resolves #57 by regenerating BADGE.json on every daily run.",
     "merged_at": "2026-07-17T08:00:00Z",
     "url": "https://github.com/example/example-repo/pull/104"
+  },
+  {
+    "id": "PR-105",
+    "title": "Tighten the ledger's hash-chain verifier",
+    "number": 105,
+    "body": "Closes #99 -- the verifier now rejects a truncated tail entry.",
+    "merged_at": "2026-07-17T10:00:00Z",
+    "url": "https://github.com/example/example-repo/pull/105"
   }
 ]

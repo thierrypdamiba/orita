@@ -101,6 +101,44 @@ class TestComputeGapsMultiIssuePr:
         assert surfaced[0].slug == "merged-pr-issue-still-open-100-55"
 
 
+class TestNonexistentIssueIsNotMislabeledClosed:
+    """ROADMAP.md #429: before this fix, `issue is None or issue.state ==
+    "closed"` folded a dangling reference (the named issue was never real)
+    into the same `issue-already-closed-...` slug and the same false detail
+    line ("it already reads closed") as a genuinely resolved promise --
+    reproduced live against the pre-fix code before writing this test. A
+    dangling reference gets its own `nonexistent-target-...` slug now,
+    matching the split every newer sibling in this recipe family already
+    made (`merged-pr-pr-still-open/detector.py`'s own `nonexistent-target-`
+    vs `already-resolved-`)."""
+
+    def test_a_promised_issue_that_does_not_exist_is_excluded_as_nonexistent_not_closed(self):
+        pr = _pull("Closes #999", merged_at=datetime(2026, 7, 15, 0, 0, 0, tzinfo=timezone.utc))
+        issues = [_issue(1, "open")]  # #999 is never in the issue list at all
+
+        surfaced, excluded = detector.compute_gaps([pr], issues, now=_NOW)
+
+        assert surfaced == []
+        assert len(excluded) == 1
+        candidate = excluded[0]
+        assert candidate.slug == "nonexistent-target-100-999"
+        assert "already" not in candidate.detail
+        assert "closed" not in candidate.detail
+        assert candidate.evidence == [pr.url]  # no issue.url to append -- it doesn't exist
+
+    def test_a_promised_issue_that_exists_and_is_closed_is_still_excluded_as_already_closed(self):
+        # The genuinely-resolved path must survive the split unchanged.
+        pr = _pull("Closes #1", merged_at=datetime(2026, 7, 15, 0, 0, 0, tzinfo=timezone.utc))
+        issues = [_issue(1, "closed")]
+
+        surfaced, excluded = detector.compute_gaps([pr], issues, now=_NOW)
+
+        assert surfaced == []
+        assert len(excluded) == 1
+        assert excluded[0].slug == "issue-already-closed-100-1"
+        assert excluded[0].evidence == [pr.url, issues[0].url]
+
+
 class TestLoadPullsAndIssues:
     """load_pulls/load_issues (task 358) -- no test in this file called either
     loader directly before this class; test_recipes.py only proves

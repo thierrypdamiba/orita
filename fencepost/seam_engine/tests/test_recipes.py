@@ -133,12 +133,14 @@ def test_second_recipe_detector_actually_runs_and_finds_its_gap():
     # but does not out-rank the stale #101 gap or break its election.
     tail_slugs = [g["slug"] for g in result["tail"]]
     assert any("104" in s for s in tail_slugs)
-    # PR #102 (issue already closed) and PR #103 (no closing keyword) are
-    # both named, not hidden, in excluded.
+    # PR #102 (issue already closed), PR #103 (no closing keyword), and
+    # PR #105 (names #99, which does not exist at all -- ROADMAP.md #429)
+    # are all named, not hidden, in excluded.
     excluded_slugs = [g["slug"] for g in result["excluded"]]
-    assert len(excluded_slugs) == 2
+    assert len(excluded_slugs) == 3
     assert any("102" in s for s in excluded_slugs)
     assert any("103" in s for s in excluded_slugs)
+    assert any(s.startswith("nonexistent-target-105-") for s in excluded_slugs)
 
 
 def test_discover_recipes_finds_both_real_recipes():
