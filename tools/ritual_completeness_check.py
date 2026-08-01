@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Task 121. Off-By-One counts the tool that counts everything else.
 
-`tools/ritual_check.py` hand-wires 47 `check_*` functions into one hourly
+`tools/ritual_check.py` hand-wires 48 `check_*` functions into one hourly
 block: each is called inside `run_ritual_check`, its result assigned to a
 dict key, and that key printed as a line in `format_ritual_check`. Three
 separate places a single typo or a forgotten wire-up can silently drop a
@@ -151,6 +151,15 @@ wired in -- `tools/escape_sequence_check.py` (task 434) compiles every
 tracked `.py` file and flags any real "invalid escape sequence"
 `DeprecationWarning`, the class of bug found live this same hour pinned
 to `tools/roadmap_archive.py:2`. `find_unwired_tool_files()` (task 409)
+already covers this file going forward, since it lives in `tools/`.
+
+**Updated to 48** the same hour task 449's `check_what_moved_cadence` was
+wired in -- `tools/what_moved_check.py` (task 449) closes Zashiki's own
+half of the weekly Cluster Day ritual that `check_cluster_day_cadence`
+(task 387/406) left un-sensed: whether `docs/what-moved.html` actually
+gets updated "one day in arrears" each Monday. It never has, past the
+page's own founding-day placeholder -- a genuine lapse, surfaced honestly
+rather than silently absorbed. `find_unwired_tool_files()` (task 409)
 already covers this file going forward, since it lives in `tools/`.
 
 Usage:

@@ -355,6 +355,10 @@ def _cluster_day_check():
     return _load("_ritual_cluster_day_check", os.path.join(ROOT, "tools", "cluster_day_check.py"))
 
 
+def _what_moved_check():
+    return _load("_ritual_what_moved_check", os.path.join(ROOT, "tools", "what_moved_check.py"))
+
+
 def _strategy_targets_check():
     return _load_once("_ritual_strategy_targets_check", os.path.join(ROOT, "tools", "strategy_targets_check.py"))
 
@@ -1121,6 +1125,30 @@ def check_cluster_day_cadence(chronicle_dir: str | None = None, today=None) -> d
     return mod.compute_cadence(**kwargs)
 
 
+def check_what_moved_cadence(what_moved_path: str | None = None, what_moved_today=None) -> dict:
+    """Task 449: fold `what_moved_check.py`'s own weekly `docs/what-moved.html`
+    scan into the one block, alongside `check_cluster_day_cadence`'s own
+    fold-in of Ananse's chronicle half. Unconditional, local-filesystem-
+    only, the same cheap informational class `check_report_cadence`/
+    `check_cluster_day_cadence` already hold -- Zashiki's own half of
+    TOWN-OPERATIONS.md's weekly Cluster Day ritual (updating
+    `docs/what-moved.html` "one day in arrears") had never once been
+    checked for whether it actually ran. Read live: it never has, past
+    the page's own founding-day placeholder. Printed every hour, not
+    gated on today being a Monday. Never flips `broken`: a missed Cluster
+    Day is a fact worth surfacing to the next hour's run, not a
+    currently-live law violation -- the same distinction
+    `cluster_day`/`report_cadence`/`metrics_cadence` already hold for
+    their own gaps."""
+    mod = _what_moved_check()
+    kwargs = {}
+    if what_moved_path is not None:
+        kwargs["path"] = what_moved_path
+    if what_moved_today is not None:
+        kwargs["today"] = what_moved_today
+    return mod.compute_cadence(**kwargs)
+
+
 def check_strategy_targets(strategy_path: str | None = None) -> dict:
     """Task 407: fold strategy_targets_check.py's own STRATEGY.md-vs-code
     target cross-check (task 159) into the one block. Unconditional,
@@ -1524,6 +1552,8 @@ def run_ritual_check(
     connected_users_consent_log_path: str | None = None,
     cluster_day_dir: str | None = None,
     cluster_day_today=None,
+    what_moved_path: str | None = None,
+    what_moved_today=None,
     strategy_targets_path: str | None = None,
     network_boundary_dirs: tuple | None = None,
     site_link_docs_dir: str | None = None,
@@ -1618,6 +1648,7 @@ def run_ritual_check(
         metrics_path=connected_users_metrics_path, consent_log_path=connected_users_consent_log_path
     )
     cluster_day = check_cluster_day_cadence(chronicle_dir=cluster_day_dir, today=cluster_day_today)
+    what_moved = check_what_moved_cadence(what_moved_path=what_moved_path, what_moved_today=what_moved_today)
     strategy_targets = check_strategy_targets(strategy_path=strategy_targets_path)
     network_boundary = check_network_boundary(dirs=network_boundary_dirs)
     site_links = check_site_links(docs_dir=site_link_docs_dir)
@@ -1720,6 +1751,7 @@ def run_ritual_check(
         "toolkits_in_use": toolkits_in_use,
         "connected_users": connected_users,
         "cluster_day": cluster_day,
+        "what_moved": what_moved,
         "strategy_targets": strategy_targets,
         "network_boundary": network_boundary,
         "site_links": site_links,
@@ -1943,6 +1975,8 @@ def format_ritual_check(result: dict) -> str:
         )
     cd = result["cluster_day"]
     lines.append("  " + _cluster_day_check().format_cadence(cd))
+    wm = result["what_moved"]
+    lines.append("  " + _what_moved_check().format_cadence(wm))
     st = result["strategy_targets"]
     for line in _strategy_targets_check().format_strategy_targets(st).split("\n"):
         lines.append("  " + line)
