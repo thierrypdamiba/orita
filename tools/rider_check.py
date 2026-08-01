@@ -81,13 +81,24 @@ _RIDERS = [
 ]
 
 _SENTENCE_BOUNDARY = text_patterns.SENTENCE_BOUNDARY_TIGHT
-# "will"/"would" included alongside the plain negations, matching
-# star_covenant_check.py's own _NEGATION_CUES exactly (this module's
-# docstring, line 24, already claims to reuse "the identical negation ...
-# guards task 99 built") -- real, live pre-founding prose narrates a
-# predicted RISK ("trolls WILL feed the ... Satan slander into the issues")
-# rather than asserting the town's own violation, the same predictive-not-
-# present-tense shape star_covenant_check's guard exists to catch.
+# "will"/"would" included alongside the plain negations for the same reason
+# star_covenant_check.py's guard includes them: real, live pre-founding
+# prose narrates a predicted RISK ("trolls WILL feed the ... Satan slander
+# into the issues") rather than asserting the town's own violation, the
+# same predictive-not-present-tense shape star_covenant_check's guard
+# exists to catch. Only that SEARCH TECHNIQUE (sentence-scoped, prefix-only
+# negation lookback -- see `_is_negated` below) is shared with
+# star_covenant_check.py. The word list itself is NOT a byte-for-byte
+# mirror of star_covenant_check's own `_NEGATION_CUES` (it adds "no" and
+# "without" and "zero", and lacks "wouldn't") -- `tools/text_patterns.py`'s
+# own task-418 docstring already classifies this file as one of four that
+# tune their own negation list on purpose, not a consumer of the shared
+# `NEGATION_CUES_STANDARD` constant `petition_limits_check.py`/
+# `star_covenant_check.py` import. Task 462 corrected this comment (and
+# the matching false "mirrors ... exactly" claim in `tests/
+# test_rider_check.py`) after task 418's own classification and this
+# file's still-uncorrected claim of byte-identical word lists were found
+# committed side by side, silently contradicting each other.
 _NEGATION_CUES = re.compile(
     r"\b(never|not|no|won't|wasn't|isn't|doesn't|didn't|n't|without|zero|will|would)\b",
     re.IGNORECASE,

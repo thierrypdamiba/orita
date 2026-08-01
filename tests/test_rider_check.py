@@ -179,9 +179,13 @@ class FixtureViolationCase(unittest.TestCase):
         # feed the ... Satan slander into the issues" -- not the town's own
         # present-tense violation. Scoping negation to prefix-only (this
         # fix) would otherwise surface this as a new false positive unless
-        # "will"/"would" join the cue list, mirroring star_covenant_check's
-        # own _NEGATION_CUES exactly, as this module's docstring (line 24)
-        # already claims to do.
+        # "will"/"would" join the cue list for the same predictive-risk
+        # reason star_covenant_check's own guard includes them -- the word
+        # list itself is this module's own tuned list (task 418's text_
+        # patterns.py docstring classifies it as one of four files that
+        # keep their own on purpose), not a byte-for-byte mirror of star_
+        # covenant_check's `_NEGATION_CUES` (task 462 corrected this
+        # comment's prior false "mirrors ... exactly" claim).
         _write(
             os.path.join(self.orita, "records", "pre-founding", "ballots.md"),
             "Trolls WILL feed the missionary-era Satan slander into the "
@@ -286,6 +290,31 @@ class LiveRepoCase(unittest.TestCase):
             f"cheaper than the first ({first_elapsed:.3f}s).",
         )
         rc.clear_cache()
+
+
+class NegationCuesDeliberateDivergenceCase(unittest.TestCase):
+    """Task 462. `tools/rider_check.py`'s own comments (and this file's,
+    before this task) asserted its `_NEGATION_CUES` word list "mirrors
+    star_covenant_check.py's own _NEGATION_CUES exactly" -- a claim that
+    was never actually true (this file's list adds "no"/"without"/"zero"
+    and lacks "wouldn't") and directly contradicted `tools/text_patterns.
+    py`'s own task-418 docstring, which classifies rider_check.py as one
+    of four files that tune their own negation list on purpose. Both
+    claims were committed, live, side by side. This pins the TRUE
+    relationship as a running fact so a future task can't "fix" the
+    now-corrected comment by silently unifying the two lists instead --
+    that would be the real, unasked-for behavior change task 418 itself
+    already warned against."""
+
+    def test_rider_check_negation_cues_are_not_a_byte_for_byte_mirror(self):
+        tp = _load("text_patterns", os.path.join(ROOT, "tools", "text_patterns.py"))
+        self.assertNotEqual(rc._NEGATION_CUES.pattern, tp.NEGATION_CUES_STANDARD.pattern)
+
+    def test_rider_check_negation_cues_do_not_import_the_shared_constant(self):
+        with open(os.path.join(ROOT, "tools", "rider_check.py"), encoding="utf-8") as f:
+            source = f.read()
+        self.assertIn("_NEGATION_CUES = re.compile(", source)
+        self.assertNotIn("text_patterns.NEGATION_CUES_STANDARD", source)
 
 
 if __name__ == "__main__":
