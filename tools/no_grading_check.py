@@ -21,9 +21,9 @@ and a human reviewer's attention, never by a running check.
 
 This module does exactly what CONTRIBUTING.md says the code can't: a
 read-only, local-filesystem-only scan (mirrors
-`star_covenant_check.find_violations`'s shape exactly -- same sentence-
-scoped negation guard, same quoted-citation guard) of every public
-`.md`/`.html` file in the town checkout, PLUS every `fencepost/RECIPES/*/
+`star_covenant_check.find_violations`'s shape -- same SEARCH TECHNIQUE,
+sentence-scoped negation lookback, same quoted-citation guard) of every
+public `.md`/`.html` file in the town checkout, PLUS every `fencepost/RECIPES/*/
 detector.py` and `recipe.json` (the actual shipped product surface a
 community recipe's prose lives in, not just the town's own voice), for the
 SHAPE of grading -- blaming a specific human, account, tool, or automation
@@ -91,6 +91,18 @@ _PATTERNS = [
 
 
 _SENTENCE_BOUNDARY = text_patterns.SENTENCE_BOUNDARY_LOOSE
+# Only the SEARCH TECHNIQUE (sentence-scoped, prefix-only negation lookback
+# -- see `_is_negated_or_predictive` below) is shared with
+# `star_covenant_check.py`. The word list itself is NOT a byte-for-byte
+# mirror of `star_covenant_check.py`'s own `_NEGATION_CUES` (imported from
+# the shared `NEGATION_CUES_STANDARD` constant in `text_patterns.py`) --
+# this file's copy adds "no", which the shared standard lacks.
+# `tools/text_patterns.py`'s own task-418
+# docstring already classifies this file as one of four that tune their
+# own negation list on purpose, not a consumer of the shared constant.
+# Task 467 corrected this module's own docstring (and this comment) after
+# task 462 found and fixed the identical false "mirrors ... exactly"
+# claim in `rider_check.py` but never checked whether it survived here too.
 _NEGATION_CUES = re.compile(
     r"\b(never|not|won't|wasn't|isn't|doesn't|didn't|n't|will|would|wouldn't|no)\b",
     re.IGNORECASE,

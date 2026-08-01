@@ -266,5 +266,33 @@ class LiveRepoCase(unittest.TestCase):
         hlc.clear_cache()
 
 
+class NegationCuesDeliberateDivergenceCase(unittest.TestCase):
+    """Task 467. `tools/hand_lore_check.py`'s own module docstring claimed
+    CONFIRM shapes get "the same same-sentence negation guard tasks 99/100
+    built" (`star_covenant_check.py`/`rider_check.py`) -- the identical
+    claim shape task 462 already found and fixed as false in
+    `rider_check.py` itself (against `star_covenant_check.py`), but that
+    task never checked whether the claim survived here too. It did: this
+    module's `_NEGATION_CUES` word list differs from both siblings'. This
+    pins the TRUE relationship as a running fact so a future task can't
+    "fix" the now-corrected comment by silently unifying the lists instead
+    -- that would be the real, unasked-for behavior change task 418 itself
+    already warned against."""
+
+    def test_hand_lore_negation_cues_are_not_a_byte_for_byte_mirror_of_star_covenant(self):
+        tp = _load("text_patterns", os.path.join(ROOT, "tools", "text_patterns.py"))
+        self.assertNotEqual(hlc._NEGATION_CUES.pattern, tp.NEGATION_CUES_STANDARD.pattern)
+
+    def test_hand_lore_negation_cues_are_not_a_byte_for_byte_mirror_of_rider_check(self):
+        rc = _load("rider_check", os.path.join(ROOT, "tools", "rider_check.py"))
+        self.assertNotEqual(hlc._NEGATION_CUES.pattern, rc._NEGATION_CUES.pattern)
+
+    def test_hand_lore_negation_cues_do_not_import_the_shared_constant(self):
+        with open(os.path.join(ROOT, "tools", "hand_lore_check.py"), encoding="utf-8") as f:
+            source = f.read()
+        self.assertIn("_NEGATION_CUES = re.compile(", source)
+        self.assertNotIn("_NEGATION_CUES = text_patterns.NEGATION_CUES_STANDARD", source)
+
+
 if __name__ == "__main__":
     unittest.main()

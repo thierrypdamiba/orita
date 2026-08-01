@@ -25,9 +25,12 @@ about the Hand that goes past the sanctioned lore. Two shapes:
   real", "is fake", "is a myth", "is imaginary", "is made-up", "there is
   no Hand".
 
-CONFIRM shapes get the same same-sentence negation guard tasks 99/100
-built (a god saying "we never say the Hand is Thierry" is restating the
-rule, not breaking it) -- DENY shapes do NOT get that guard, because
+CONFIRM shapes get the same same-sentence negation-lookback SEARCH
+TECHNIQUE tasks 99/100 built (a god saying "we never say the Hand is
+Thierry" is restating the rule, not breaking it) -- this file's own
+`_NEGATION_CUES` word list is its own tuned set, not a byte-for-byte
+mirror of either sibling's (task 467; see the comment above
+`_NEGATION_CUES` below). DENY shapes do NOT get that guard, because
 "doesn't"/"isn't"/"not" are not a guard against a deny violation, they
 ARE the deny violation; guarding on them would make every real deny
 statement invisible. Both shapes get the quoted-citation guard (a phrase
@@ -116,6 +119,20 @@ _LORE_VIOLATIONS = [
 ]
 
 _SENTENCE_BOUNDARY = text_patterns.SENTENCE_BOUNDARY_TIGHT
+# Only the SEARCH TECHNIQUE (sentence-scoped, prefix-only negation lookback
+# -- see `_is_negated` below) is shared with `star_covenant_check.py`
+# (task 99) and `rider_check.py` (task 100). The word list itself is NOT a
+# byte-for-byte mirror of either: this file's copy adds "no"/"without"/
+# "zero" versus the shared `NEGATION_CUES_STANDARD` constant in
+# `text_patterns.py` (which star_covenant_check.py imports) and lacks
+# "will"/"would" that
+# rider_check.py's own tuned copy carries. `tools/text_patterns.py`'s own
+# task-418 docstring already classifies this file as one of four that tune
+# their own negation list on purpose, not a consumer of the shared
+# constant. Task 467 corrected this module's own docstring (and this
+# comment) after task 462 found and fixed the identical false "mirrors
+# ... exactly" claim in `rider_check.py` but never checked whether it
+# survived here too.
 _NEGATION_CUES = re.compile(
     r"\b(never|not|no|won't|wasn't|isn't|doesn't|didn't|n't|without|zero)\b", re.IGNORECASE
 )

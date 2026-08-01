@@ -227,5 +227,31 @@ class LiveRepoCase(unittest.TestCase):
         ahc.clear_cache()
 
 
+class NegationCuesDeliberateDivergenceCase(unittest.TestCase):
+    """Task 467. `tools/arcade_hero_check.py`'s own module/function
+    docstrings claimed it "mirrors `no_grading_check.find_violations`'s
+    shape exactly -- same sentence-scoped negation guard" -- the identical
+    claim shape task 462 already found and fixed as false in
+    `rider_check.py` (against `star_covenant_check.py`), but that task
+    never checked whether the claim survived here too. It did: this
+    module's `_NEGATION_CUES` word list adds "nobody"/"without" that
+    `no_grading_check.py`'s own copy lacks, and lacks
+    "will"/"would"/"wouldn't" that `no_grading_check.py`'s copy carries.
+    This pins the TRUE relationship as a running fact so a future task
+    can't "fix" the now-corrected comment by silently unifying the two
+    lists instead -- that would be the real, unasked-for behavior change
+    task 418 itself already warned against."""
+
+    def test_arcade_hero_negation_cues_are_not_a_byte_for_byte_mirror(self):
+        ngc = _load("no_grading_check", os.path.join(ROOT, "tools", "no_grading_check.py"))
+        self.assertNotEqual(ahc._NEGATION_CUES.pattern, ngc._NEGATION_CUES.pattern)
+
+    def test_arcade_hero_negation_cues_do_not_import_the_shared_constant(self):
+        with open(os.path.join(ROOT, "tools", "arcade_hero_check.py"), encoding="utf-8") as f:
+            source = f.read()
+        self.assertIn("_NEGATION_CUES = re.compile(", source)
+        self.assertNotIn("_NEGATION_CUES = text_patterns.NEGATION_CUES_STANDARD", source)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -19,10 +19,11 @@ concrete way this constraint could ever be broken in public -- and, unlike
 constraint #2's blame/grading prose, nothing in the codebase checked for it.
 
 This module does what no prior check did: a read-only, local-filesystem-
-only scan (mirrors `no_grading_check.find_violations`'s shape exactly --
-same sentence-scoped negation guard, same quoted-citation guard) of every
-public `.md`/`.html` file for the shape of a direct-credential-handoff ask
--- "paste your API key", "share your token", "send us your password" --
+only scan (mirrors `no_grading_check.find_violations`'s shape -- same
+SEARCH TECHNIQUE, sentence-scoped negation lookback, same quoted-citation
+guard) of every public `.md`/`.html` file for the shape of a
+direct-credential-handoff ask -- "paste your API key", "share your token",
+"send us your password" --
 the one move that routes a human's credential around Arcade's OAuth screen
 entirely instead of through it. Bare mentions of "token"/"key"/"password"
 are NOT the pattern (`CONNECT.md` uses "token" honestly six times
@@ -90,6 +91,17 @@ _PATTERNS = [
 ]
 
 _SENTENCE_BOUNDARY = text_patterns.SENTENCE_BOUNDARY_LOOSE
+# Only the SEARCH TECHNIQUE (sentence-scoped, prefix-only negation lookback
+# -- see `_is_negated_or_predictive` below) is shared with
+# `no_grading_check.py`. The word list itself is NOT a byte-for-byte
+# mirror (this file's copy adds "nobody"/"without" and lacks
+# "will"/"would"/"wouldn't") -- `tools/text_patterns.py`'s own task-418
+# docstring already classifies this file as one of four that tune their
+# own negation list on purpose, not a consumer of the shared
+# `NEGATION_CUES_STANDARD` constant. Task 467 corrected this module's own
+# docstring (and this comment) after task 462 found and fixed the
+# identical false "mirrors ... exactly" claim in `rider_check.py` but
+# never checked whether it survived here too.
 _NEGATION_CUES = re.compile(
     r"\b(never|not|won't|wasn't|isn't|doesn't|didn't|n't|no|nobody|without)\b",
     re.IGNORECASE,
@@ -118,13 +130,18 @@ def _is_negated_or_predictive(text: str, match_start: int) -> bool:
 
     `_SENTENCE_BOUNDARY` includes `;` alongside `[.!?]`/`\\n{2,}` -- a
     semicolon joins two independent clauses exactly the way a period does,
-    and this module's own docstring already claims it "mirrors
-    `no_grading_check.find_violations`'s shape exactly," but it was copied
-    before task 202 added `;` to that module's boundary (task 200 first, in
-    `star_covenant_check.py`), so this copy carried the identical gap
-    forward: an earlier, unrelated negation/prediction cue joined by `;`
+    and this module's own docstring already claims it mirrors
+    `no_grading_check.find_violations`'s SEARCH TECHNIQUE, but it was
+    copied before task 202 added `;` to that module's boundary (task 200
+    first, in `star_covenant_check.py`), so this copy carried the identical
+    gap forward: an earlier, unrelated negation/prediction cue joined by `;`
     instead of `.` to a real, present-tense ask on the other side still fell
-    inside the same "sentence" window and silently suppressed it."""
+    inside the same "sentence" window and silently suppressed it. (Task 467:
+    the SENTENCE-SCOPING technique is shared with `no_grading_check.py` --
+    the `_NEGATION_CUES` word list itself is NOT: this file's copy adds
+    "nobody"/"without" and lacks "will"/"would"/"wouldn't", one of four
+    files `tools/text_patterns.py`'s own task-418 docstring names as tuning
+    its own negation list on purpose.)"""
     window_start = 0
     for boundary in _SENTENCE_BOUNDARY.finditer(text, 0, match_start):
         window_start = boundary.end()

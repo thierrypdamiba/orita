@@ -242,5 +242,30 @@ class LiveRepoCase(unittest.TestCase):
         ngc.clear_cache()
 
 
+class NegationCuesDeliberateDivergenceCase(unittest.TestCase):
+    """Task 467. `tools/no_grading_check.py`'s own module docstring claimed
+    it "mirrors `star_covenant_check.find_violations`'s shape exactly --
+    same sentence-scoped negation guard" -- the identical claim shape task
+    462 already found and fixed as false in `rider_check.py` (against the
+    same target file, `star_covenant_check.py`), but that task never
+    checked whether the claim survived here too. It did: this module's
+    `_NEGATION_CUES` word list adds "no" that `star_covenant_check.py`'s
+    imported `text_patterns.NEGATION_CUES_STANDARD` lacks. This pins the
+    TRUE relationship as a running fact so a future task can't "fix" the
+    now-corrected comment by silently unifying the two lists instead --
+    that would be the real, unasked-for behavior change task 418 itself
+    already warned against."""
+
+    def test_no_grading_negation_cues_are_not_a_byte_for_byte_mirror(self):
+        tp = _load("text_patterns", os.path.join(ROOT, "tools", "text_patterns.py"))
+        self.assertNotEqual(ngc._NEGATION_CUES.pattern, tp.NEGATION_CUES_STANDARD.pattern)
+
+    def test_no_grading_negation_cues_do_not_import_the_shared_constant(self):
+        with open(os.path.join(ROOT, "tools", "no_grading_check.py"), encoding="utf-8") as f:
+            source = f.read()
+        self.assertIn("_NEGATION_CUES = re.compile(", source)
+        self.assertNotIn("_NEGATION_CUES = text_patterns.NEGATION_CUES_STANDARD", source)
+
+
 if __name__ == "__main__":
     unittest.main()
