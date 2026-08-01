@@ -28,6 +28,7 @@ import unittest
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TOOLS_DIR = os.path.join(ROOT, "tools")
 SEAM_ENGINE_SRC_DIR = os.path.join(ROOT, "fencepost", "seam_engine", "src", "seam_engine")
+ORACLE_ENGINE_SRC_DIR = os.path.join(ROOT, "oracle", "oracle_engine", "src", "oracle_engine")
 
 
 def _load(name, path):
@@ -351,6 +352,49 @@ class RealSeamEngineDirCase(unittest.TestCase):
         )
 
 
+class RealOracleEngineDirCase(unittest.TestCase):
+    """Task 446: `oracle/oracle_engine/src/oracle_engine/` -- the Oracle
+    Desk's own 58-file cadence/autograde engine -- is now a scanned
+    `SEARCH_DIRS` member, the same extension `RealSeamEngineDirCase` already
+    pins for Fencepost's own source. A single-line `grep -rl "no network"`
+    over this directory (the check this task's own commit message first ran
+    by hand) reported zero hits and would have shipped this class with an
+    empty `EXPECTED_TODAY` -- but the checker's own `CLAIM_PATTERN` is
+    `re.compile(r"no\\s+network")`, and `\\s` matches a newline: `copylint.
+    py`'s real docstring wraps exactly there ("makes no\\nnetwork call,
+    writes nothing..."), so it silently escaped a same-line grep while
+    still being a real, structural "no network" trust-boundary claim this
+    checker was built to catch. Running `nbc.find_claiming_files()` itself
+    (not a hand-typed grep) is what actually caught it. Pinned here
+    (deliberately updatable, same discipline as `RealToolsDirCase.
+    EXPECTED_TODAY` -- a future second claiming file landing here should
+    grow this set the same hour, not silently pass a stale assertion)."""
+
+    EXPECTED_TODAY = {"copylint.py"}
+
+    def test_live_discovery_matches_todays_real_set(self):
+        found = set(nbc.find_claiming_files(ORACLE_ENGINE_SRC_DIR))
+        self.assertEqual(found, self.EXPECTED_TODAY)
+
+    def test_directory_is_a_real_nonempty_source_tree(self):
+        # Guards against a typo'd path silently scanning an empty/missing
+        # directory and reporting a trivially-true "zero claims" -- the
+        # same sanity-floor discipline RealToolsDirCase's sibling test
+        # holds against a glob typo.
+        py_files = [
+            n for n in os.listdir(ORACLE_ENGINE_SRC_DIR) if n.endswith(".py")
+        ]
+        self.assertGreater(len(py_files), 10, "oracle_engine dir looks empty or mistyped")
+
+    def test_oracle_engine_dir_is_in_search_dirs(self):
+        self.assertIn(ORACLE_ENGINE_SRC_DIR, nbc.SEARCH_DIRS)
+
+    def test_every_real_claiming_file_holds_the_boundary_today(self):
+        result = nbc.check_network_boundary(ORACLE_ENGINE_SRC_DIR)
+        broken = {name: r["reason"] for name, r in result.items() if not r["ok"]}
+        self.assertEqual(broken, {})
+
+
 class RealMultiDirCase(unittest.TestCase):
     """Proves the multi-directory fold (`find_claiming_files_all`/`check_
     network_boundary_all`, task 164) really combines tools/ and seam_engine's
@@ -368,10 +412,15 @@ class RealMultiDirCase(unittest.TestCase):
             os.path.relpath(os.path.join(SEAM_ENGINE_SRC_DIR, n), ROOT)
             for n in nbc.find_claiming_files(SEAM_ENGINE_SRC_DIR)
         }
-        self.assertEqual(combined, tools_only | seam_only)
+        oracle_only = {
+            os.path.relpath(os.path.join(ORACLE_ENGINE_SRC_DIR, n), ROOT)
+            for n in nbc.find_claiming_files(ORACLE_ENGINE_SRC_DIR)
+        }
+        self.assertEqual(combined, tools_only | seam_only | oracle_only)
         self.assertIn("fencepost/seam_engine/src/seam_engine/consent.py", combined)
         self.assertIn("fencepost/seam_engine/src/seam_engine/draftback.py", combined)
         self.assertIn("tools/vault_leak_check.py", combined)
+        self.assertIn("oracle/oracle_engine/src/oracle_engine/copylint.py", combined)
 
     def test_combined_check_is_clean_and_keys_match_combined_discovery(self):
         result = nbc.check_network_boundary_all()
@@ -379,11 +428,12 @@ class RealMultiDirCase(unittest.TestCase):
         broken = {k: r["reason"] for k, r in result.items() if not r["ok"]}
         self.assertEqual(broken, {})
 
-    def test_combined_result_count_is_the_sum_of_both_directories(self):
+    def test_combined_result_count_is_the_sum_of_all_three_directories(self):
         result = nbc.check_network_boundary_all()
         tools_count = len(nbc.check_network_boundary(TOOLS_DIR))
         seam_count = len(nbc.check_network_boundary(SEAM_ENGINE_SRC_DIR))
-        self.assertEqual(len(result), tools_count + seam_count)
+        oracle_count = len(nbc.check_network_boundary(ORACLE_ENGINE_SRC_DIR))
+        self.assertEqual(len(result), tools_count + seam_count + oracle_count)
 
     def test_format_reports_clean_for_the_combined_tree(self):
         text = nbc.format_network_boundary(nbc.check_network_boundary_all())
@@ -435,6 +485,37 @@ class MutationRealSeamEngineFileCase(unittest.TestCase):
         key = os.path.relpath(os.path.join(tmp, "consent.py"), nbc.ROOT)
         self.assertFalse(result[key]["ok"])
         self.assertIn("socket", result[key]["reason"])
+
+
+class MutationSyntheticOracleEngineFileCase(unittest.TestCase):
+    """No real oracle_engine file claims "no network" today (`RealOracle
+    EngineDirCase` above), so unlike `MutationRealSeamEngineFileCase` there
+    is no real claiming file to mutate. This proves the same guarantee the
+    other direction: a HYPOTHETICAL future oracle_engine module that claims
+    the boundary and then drifts to import a network module is still caught
+    by the widened `SEARCH_DIRS`, end to end through `check_network_
+    boundary_all`, keyed exactly as `ORACLE_ENGINE_SRC_DIR` would key it --
+    not just via an arbitrary tempdir like `MutationRealFileCase` already
+    proves generically."""
+
+    def test_a_future_oracle_engine_file_that_lies_about_no_network_is_caught(self):
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as tmp:
+            fake_oracle_dir = os.path.join(tmp, "oracle_engine")
+            os.makedirs(fake_oracle_dir)
+            with open(os.path.join(fake_oracle_dir, "future_module.py"), "w", encoding="utf-8") as f:
+                f.write(
+                    '"""A hypothetical future oracle_engine module. Pure\n'
+                    'local-filesystem reads, no network, mirroring consent.\n'
+                    'py\'s own boundary claim."""\n'
+                    "import os\n"
+                    "import socket  # drift: a hypothetical live lookup\n"
+                )
+            result = nbc.check_network_boundary_all((fake_oracle_dir,))
+            key = os.path.relpath(os.path.join(fake_oracle_dir, "future_module.py"), nbc.ROOT)
+            self.assertFalse(result[key]["ok"])
+            self.assertIn("socket", result[key]["reason"])
 
 
 class CLIEntrypointCase(unittest.TestCase):

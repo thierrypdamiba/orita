@@ -68,6 +68,24 @@ The CLI now runs the combined check; every existing single-directory
 function keeps its original default and behavior, so nothing that already
 called `check_network_boundary()` (unqualified, tools/-only) changes.
 
+Task 446: the two-directory sweep still never reached `oracle/oracle_
+engine/src/oracle_engine/` -- the Oracle Desk's own 58-file cadence/
+autograde engine, built in the same "mirror this sibling verbatim" style
+`duplicate_regex_check.py` was widened for at task 445, and the exact
+directory `duplicate_regex_check.py` now scans but this checker did not.
+A same-line `grep -rl "no network"` over the directory (tried first, by
+hand) reported zero hits -- but `CLAIM_PATTERN` below is `r"no\\s+network"`,
+and `\\s` matches a newline: `copylint.py`'s real docstring wraps exactly
+there ("makes no...network call, writes nothing..."), so a plain grep
+missed a real, structural "no network" trust-boundary claim this checker
+exists to catch. `find_claiming_files()` itself -- not a hand-typed grep
+-- is what actually surfaced it once `ORACLE_ENGINE_SRC_DIR` was added to
+`SEARCH_DIRS`. The claim holds true (`copylint.py` imports only `re` and
+`dataclasses`), so this closes a real, previously-unchecked blind spot
+rather than catching an active violation -- but unlike task 445's own
+"widened the scan, found nothing" outcome, this one found a real claiming
+file that had been running unchecked since the Oracle Desk shipped.
+
 Usage:
     python3 tools/network_boundary_check.py check
 """
@@ -82,13 +100,18 @@ import sys
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TOOLS_DIR = os.path.join(ROOT, "tools")
 SEAM_ENGINE_SRC_DIR = os.path.join(ROOT, "fencepost", "seam_engine", "src", "seam_engine")
+ORACLE_ENGINE_SRC_DIR = os.path.join(ROOT, "oracle", "oracle_engine", "src", "oracle_engine")
 
 # Every real source directory this repo's own "no network" trust-boundary
-# claims live in today -- tools/'s eighteen (task 163) plus Fencepost's own
-# consent.py/draftback.py (task 164). A future third directory only needs
-# adding here; find_claiming_files_all/check_network_boundary_all already
-# fold over however many are listed.
-SEARCH_DIRS = (TOOLS_DIR, SEAM_ENGINE_SRC_DIR)
+# claims live in today -- tools/'s eighteen (task 163), Fencepost's own
+# consent.py/draftback.py (task 164), and the Oracle Desk's own engine
+# (task 446 -- the identical "checker never scanned the sibling directory
+# built in the same mirror-this-sibling style" shape task 164 first closed
+# for seam_engine and task 445 closed for duplicate_regex_check.py, found
+# here for network_boundary_check.py itself). A future fourth directory
+# only needs adding here; find_claiming_files_all/check_network_boundary_all
+# already fold over however many are listed.
+SEARCH_DIRS = (TOOLS_DIR, SEAM_ENGINE_SRC_DIR, ORACLE_ENGINE_SRC_DIR)
 
 # Matches "no network" even when line-wrapped inside a docstring (e.g.
 # petition_limits_check.py's own "...scan (no\nnetwork, mirrors...") --
