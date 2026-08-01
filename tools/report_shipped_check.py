@@ -37,6 +37,24 @@ a file that gets archived out from under itself every couple hundred
 tasks, a messier claim than "does this file exist," and does not fit one
 hour done honestly.
 
+Task 455: task 453 found and fixed the identical bug shape one field over
+(`gap_true_positive_check.py`'s `gap_true_positive_rate`), then task 454
+found the same shape again in `toolkits_in_use_check.py` and named, but
+did not chase, the two remaining unfixed siblings. This module was one of
+them, and it is my own metric's row (STRATEGY.md: "off-by-one"), the same
+"left my own name off the list" blind spot task 415 already confessed to
+once. `last is None or "reports_shipped_today" not in last or "date" not
+in last` collapsed three distinct shapes into one unconditional clean: no
+reading has ever existed at all (genuinely nothing to contradict); a
+reading with no `date` at all (nothing to compute ground truth against,
+still genuinely nothing to contradict); and a reading that DOES carry a
+`date` but omits `reports_shipped_today` itself, which is the same
+"claims nothing so it can't be wrong" failure this whole sibling class of
+checks exists to catch, just from the omission side -- clean only when
+the live filesystem ground truth for THAT date is honestly `0` (no report
+shipped, nothing yet to have omitted), `BROKEN` the moment a report file
+for that date genuinely exists and the reading failed to record it.
+
 Usage:
     python3 tools/report_shipped_check.py check
 """
@@ -91,14 +109,30 @@ def check_report_shipped(
     `date` field, not "today" by wall clock -- this check can run against
     any historical metrics.jsonl line, the same date-scoped comparison
     `report_cadence_check.py`'s own missing-dates scan already makes, and
-    never assumes the last line in the file is dated today."""
+    never assumes the last line in the file is dated today.
+
+    Task 455: a reading that exists and carries a `date` but omits
+    `reports_shipped_today` itself is no longer folded into the same
+    unconditional-clean branch as "no reading at all" / "no date at
+    all" -- it is clean only when the real ground truth for that date is
+    honestly `0` (nothing yet to have omitted), `BROKEN` the moment a
+    report file for that date genuinely exists and the reading failed to
+    carry it, the identical shape task 453/454 already proved one field
+    over."""
     last = _last_metrics_entry(metrics_path)
-    if last is None or "reports_shipped_today" not in last or "date" not in last:
+    if last is None or "date" not in last:
         return {"clean": True, "real": None, "claimed": None, "claimed_date": None}
     claimed_date = last["date"]
-    claimed = last["reports_shipped_today"]
     report_path = os.path.join(reports_dir, f"{claimed_date}.md")
     real = 1 if os.path.isfile(report_path) else 0
+    if "reports_shipped_today" not in last:
+        return {
+            "clean": real == 0,
+            "real": real,
+            "claimed": None,
+            "claimed_date": claimed_date,
+        }
+    claimed = last["reports_shipped_today"]
     return {
         "clean": claimed == real,
         "real": real,
@@ -109,7 +143,19 @@ def check_report_shipped(
 
 def format_result(result: dict) -> str:
     if result["claimed"] is None:
-        return "reports shipped today: clean (no metrics.jsonl reading yet; nothing to cross-check)"
+        if result["claimed_date"] is None:
+            return "reports shipped today: clean (no metrics.jsonl reading yet; nothing to cross-check)"
+        if result["clean"]:
+            return (
+                f"reports shipped today: clean (metrics.jsonl's {result['claimed_date']} reading names no "
+                "reports_shipped_today field; real ground truth is honestly 0, nothing omitted)"
+            )
+        return (
+            f"reports shipped today: BROKEN -- metrics.jsonl's {result['claimed_date']} reading names no "
+            f"reports_shipped_today field, but real ground truth (fencepost/REPORTS/{result['claimed_date']}.md's "
+            f"own existence) is already {result['real']} -- a real report shipped and was not recorded, "
+            "escalate now"
+        )
     if result["clean"]:
         return (
             f"reports shipped today: clean (metrics.jsonl's {result['claimed_date']} reading claims "

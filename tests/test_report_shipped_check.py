@@ -181,6 +181,63 @@ class MalformedLastLineCase(unittest.TestCase):
         self.assertEqual(result["claimed_date"], "2026-07-20")
 
 
+class OmittedFieldOnExistingReadingCase(unittest.TestCase):
+    """Task 455: the same bug shape task 453/454 found and fixed in
+    gap_true_positive_check.py/toolkits_in_use_check.py -- a reading that
+    EXISTS and carries a `date` but omits `reports_shipped_today` itself
+    used to collapse into the identical unconditional-clean branch as "no
+    reading at all", even when a real report file for that date already
+    sits on disk. Proves both the honest-omission (no file, real is 0,
+    nothing yet to have missed) and the broken-omission (a real file
+    exists, a real shipped report went unrecorded) shapes."""
+
+    def setUp(self):
+        self.tmp = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.tmp, ignore_errors=True)
+        self.metrics_path = os.path.join(self.tmp, "metrics.jsonl")
+        self.reports_dir = os.path.join(self.tmp, "REPORTS")
+        os.mkdir(self.reports_dir)
+
+    def test_omitted_field_with_no_real_file_is_honestly_clean(self):
+        _write_metrics(self.metrics_path, [{"date": "2026-07-20", "tasks_shipped_today": 5}])
+        result = rsc.check_report_shipped(self.metrics_path, self.reports_dir)
+        self.assertTrue(result["clean"])
+        self.assertEqual(result["real"], 0)
+        self.assertIsNone(result["claimed"])
+        self.assertEqual(result["claimed_date"], "2026-07-20")
+        formatted = rsc.format_result(result)
+        self.assertIn("clean", formatted)
+        self.assertIn("nothing omitted", formatted)
+
+    def test_omitted_field_with_a_real_file_present_is_broken(self):
+        with open(os.path.join(self.reports_dir, "2026-07-20.md"), "w", encoding="utf-8") as f:
+            f.write("# report\n")
+        _write_metrics(self.metrics_path, [{"date": "2026-07-20", "tasks_shipped_today": 5}])
+        result = rsc.check_report_shipped(self.metrics_path, self.reports_dir)
+        self.assertFalse(result["clean"])
+        self.assertEqual(result["real"], 1)
+        self.assertIsNone(result["claimed"])
+        self.assertEqual(result["claimed_date"], "2026-07-20")
+        formatted = rsc.format_result(result)
+        self.assertIn("BROKEN", formatted)
+        self.assertIn("already 1", formatted)
+
+    def test_reading_with_no_date_at_all_stays_clean_unconditionally(self):
+        """The genuinely-nothing-to-contradict shape (no `date` at all,
+        so no ground truth is even computable) must NOT be affected by
+        this fix -- only an EXISTING reading that carries a date but
+        omits the field changes behavior."""
+        _write_metrics(self.metrics_path, [{"tasks_shipped_today": 5}])
+        result = rsc.check_report_shipped(self.metrics_path, self.reports_dir)
+        self.assertTrue(result["clean"])
+        self.assertIsNone(result["claimed_date"])
+
+    def test_no_reading_at_all_still_stays_clean_unconditionally(self):
+        result = rsc.check_report_shipped(self.metrics_path, self.reports_dir)
+        self.assertTrue(result["clean"])
+        self.assertIsNone(result["claimed_date"])
+
+
 class RealLiveStateCase(unittest.TestCase):
     """The real point of this task: records/metrics.jsonl's own
     reports_shipped_today field claims 1 for 2026-07-30, and ground truth
