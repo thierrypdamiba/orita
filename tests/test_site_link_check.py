@@ -111,6 +111,18 @@ class FixtureViolationCase(unittest.TestCase):
         violations = slc.find_violations(docs_dir=self.docs)
         self.assertEqual(violations, [])
 
+    def test_protocol_relative_link_is_not_a_false_positive(self):
+        """A `//host/path` link inherits the current page's scheme and is
+        never a same-repo relative path -- its leading "/" was previously
+        read as a site-root path and checked against `docs_dir`, flagging
+        a perfectly valid external link as a broken internal one."""
+        _write(
+            os.path.join(self.docs, "index.html"),
+            '<a href="//cdn.example.com/lib.js">cdn link</a>',
+        )
+        violations = slc.find_violations(docs_dir=self.docs)
+        self.assertEqual(violations, [])
+
     def test_data_uri_favicon_is_not_a_false_positive(self):
         """The exact bug this module's own docstring names finding live on
         its first run: every page's inline favicon is a `data:` URI, not a

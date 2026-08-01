@@ -57,8 +57,12 @@ _SCRIPT_RE = re.compile(r'<script\b[^>]*>.*?</script>', re.DOTALL | re.IGNORECAS
 # a local-filesystem existence check. Anchors-only ("#foo") point within
 # the same already-loaded page. `data:` is an inline payload, not a
 # fetch -- the exact false-positive class this module's own docstring
-# names finding on its first live run.
-_SKIP_PREFIXES = ("http://", "https://", "mailto:", "tel:", "javascript:", "data:")
+# names finding on its first live run. "//" is a protocol-relative URL
+# (e.g. `href="//cdn.example.com/lib.js"`, inherits the current page's
+# scheme) -- without this, `_resolve` reads its leading "/" as a site-
+# root-relative path and checks it against `docs_dir`, a second false
+# positive of the same class the `data:` one already names.
+_SKIP_PREFIXES = ("http://", "https://", "mailto:", "tel:", "javascript:", "data:", "//")
 
 
 def _iter_site_files(docs_dir: str) -> list[str]:
