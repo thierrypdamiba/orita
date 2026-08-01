@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Task 121. Off-By-One counts the tool that counts everything else.
 
-`tools/ritual_check.py` hand-wires 51 `check_*` functions into one hourly
+`tools/ritual_check.py` hand-wires 52 `check_*` functions into one hourly
 block: each is called inside `run_ritual_check`, its result assigned to a
 dict key, and that key printed as a line in `format_ritual_check`. Three
 separate places a single typo or a forgotten wire-up can silently drop a
@@ -169,6 +169,20 @@ Gap-bug hide/confess cadence, which `check_what_moved_cadence`'s own
 docstring had already named as missing and left open for whichever hour
 picked it up next. `find_unwired_tool_files()` (task 409) already
 covers this file going forward, since it lives in `tools/`.
+
+**Updated to 51** the same hour task 464's `check_gateway_toolset` was
+wired in (a re-check record for `fencepost/SCOPES.md`'s live Gmail/
+Calendar tool-exposure claim) -- this docstring's own leading count went
+un-narrated the hour it happened, corrected here rather than left silent.
+
+**Updated to 52** the same hour task 465's `check_nyx_traffic_cadence`
+was wired in -- `tools/nyx_traffic_check.py` (task 465) closes the
+fourth leg of the weekly Cluster Day ritual, Nyx's own weekly traffic
+report, which `cluster_day_check.py`'s own docstring had named from the
+start (alongside Ananse's chronicle, Zashiki's what-moved page, and
+Off-By-One's thegap doctrine) but nothing had ever built a sensor for.
+`find_unwired_tool_files()` (task 409) already covers this file going
+forward, since it lives in `tools/`.
 
 Usage:
     python3 tools/ritual_completeness_check.py check

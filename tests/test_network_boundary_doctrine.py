@@ -186,6 +186,7 @@ class RealToolsDirCase(unittest.TestCase):
         "journal_numbering_check.py",
         "metrics_field_completeness_check.py",
         "network_boundary_check.py",
+        "nyx_traffic_check.py",
         "petition_cadence_check.py",
         "petition_limits_check.py",
         "recipe_readme_check.py",

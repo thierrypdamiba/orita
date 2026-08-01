@@ -2918,6 +2918,63 @@ class ThegapFoldCase(unittest.TestCase):
         self.assertEqual(result["thegap"], direct)
 
 
+class NyxTrafficFoldCase(unittest.TestCase):
+    """Task 465: run_ritual_check() folds nyx_traffic_check.py's own
+    weekly traffic-report scan into the same structured result -- the
+    fourth leg of TOWN-OPERATIONS.md's Cluster Day ritual, alongside
+    ClusterDayFoldCase (Ananse), what_moved (Zashiki, tested only via its
+    own module suite), and ThegapFoldCase (Off-By-One). A no-gap fixture
+    prints a clean line; a lapsed fixture names it plainly; neither ever
+    flips `broken`, the same class every sibling cadence check already
+    holds."""
+
+    def setUp(self):
+        self.tmp = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.tmp, ignore_errors=True)
+        self.vault = os.path.join(self.tmp, "orita-vault")
+
+    def _report(self, date_iso):
+        path = os.path.join(self.vault, "vault", "nyx", "traffic", f"{date_iso}.md")
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, "w") as f:
+            f.write("x")
+
+    def test_no_gap_fixture_prints_clean_and_never_flips_broken(self):
+        from datetime import date
+
+        self._report("2026-07-14")
+        result = rc.run_ritual_check(nyx_traffic_vault_dir=self.vault, nyx_traffic_today=date(2026, 7, 15))
+        self.assertEqual(result["nyx_traffic"]["missed_mondays"], [])
+        self.assertFalse(result["broken"])
+        formatted = rc.format_ritual_check(result)
+        self.assertIn("nyx traffic cadence: current", formatted)
+
+    def test_lapsed_fixture_is_named_but_still_never_flips_broken(self):
+        from datetime import date
+
+        result = rc.run_ritual_check(nyx_traffic_vault_dir=self.vault, nyx_traffic_today=date(2026, 7, 29))
+        self.assertEqual(
+            result["nyx_traffic"]["missed_mondays"], ["2026-07-13", "2026-07-20", "2026-07-27"]
+        )
+        self.assertFalse(result["broken"])
+        formatted = rc.format_ritual_check(result)
+        self.assertIn("3 Cluster Days lapsed", formatted)
+        self.assertIn("never carried a dated report", formatted)
+
+    def test_default_paths_read_the_real_data_and_match_direct_call(self):
+        """No override: reads the real orita-vault checkout, the same
+        default compute_cadence falls back to -- proves the fold never
+        duplicates or diverges from the module it wraps
+        (test_nyx_traffic_check.py's own RealVaultCase already owns
+        proving that module's own correctness against the real data)."""
+        from datetime import date
+
+        ntc = _load("_test_nyx_traffic_check", os.path.join(ROOT, "tools", "nyx_traffic_check.py"))
+        direct = ntc.compute_cadence(today=date(2026, 8, 1))
+        result = rc.run_ritual_check(nyx_traffic_today=date(2026, 8, 1))
+        self.assertEqual(result["nyx_traffic"], direct)
+
+
 class StrategyTargetsFoldCase(unittest.TestCase):
     """Task 407: run_ritual_check() folds strategy_targets_check.py's own
     STRATEGY.md-vs-code target cross-check (task 159) into the same

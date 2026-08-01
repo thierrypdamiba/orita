@@ -367,6 +367,10 @@ def _thegap_check():
     return _load("_ritual_thegap_check", os.path.join(ROOT, "tools", "thegap_check.py"))
 
 
+def _nyx_traffic_check():
+    return _load("_ritual_nyx_traffic_check", os.path.join(ROOT, "tools", "nyx_traffic_check.py"))
+
+
 def _strategy_targets_check():
     return _load_once("_ritual_strategy_targets_check", os.path.join(ROOT, "tools", "strategy_targets_check.py"))
 
@@ -1222,6 +1226,34 @@ def check_thegap_cadence(
     return mod.compute_cadence(**kwargs)
 
 
+def check_nyx_traffic_cadence(
+    nyx_traffic_vault_dir: str | None = None,
+    nyx_traffic_today=None,
+) -> dict:
+    """Task 465: fold `nyx_traffic_check.py`'s own weekly traffic-report
+    scan into the one block, closing the fourth leg of TOWN-OPERATIONS.md's
+    "Weekly, Cluster Day (Monday)" ritual -- `check_cluster_day_cadence`
+    (task 387) covers Ananse's chronicle, `check_what_moved_cadence`
+    (task 449) covers Zashiki's mystery page, `check_thegap_cadence`
+    (task 463) covers Off-By-One's `/thegap/` doctrine, and this covers
+    Nyx's own weekly traffic report, which `cluster_day_check.py`'s own
+    docstring named from the start but nothing ever built a sensor for
+    until this task. Unconditional, local-filesystem-only (reads dated
+    filenames in `orita-vault/vault/nyx/traffic/`, never their content --
+    the same Proclamation 0001 boundary its siblings already hold), the
+    same cheap informational class every check in this family holds.
+    Never flips `broken`: a lapsed week is a fact worth surfacing to the
+    next hour's run, not a currently-live violation -- the same
+    distinction `cluster_day`/`what_moved`/`thegap` already draw."""
+    mod = _nyx_traffic_check()
+    kwargs = {}
+    if nyx_traffic_vault_dir is not None:
+        kwargs["vault_dir"] = nyx_traffic_vault_dir
+    if nyx_traffic_today is not None:
+        kwargs["today"] = nyx_traffic_today
+    return mod.compute_cadence(**kwargs)
+
+
 def check_strategy_targets(strategy_path: str | None = None) -> dict:
     """Task 407: fold strategy_targets_check.py's own STRATEGY.md-vs-code
     target cross-check (task 159) into the one block. Unconditional,
@@ -1653,6 +1685,8 @@ def run_ritual_check(
     thegap_readme_path: str | None = None,
     thegap_vault_dir: str | None = None,
     thegap_today=None,
+    nyx_traffic_vault_dir: str | None = None,
+    nyx_traffic_today=None,
     strategy_targets_path: str | None = None,
     network_boundary_dirs: tuple | None = None,
     site_link_docs_dir: str | None = None,
@@ -1753,6 +1787,9 @@ def run_ritual_check(
     what_moved = check_what_moved_cadence(what_moved_path=what_moved_path, what_moved_today=what_moved_today)
     thegap = check_thegap_cadence(
         thegap_readme_path=thegap_readme_path, thegap_vault_dir=thegap_vault_dir, thegap_today=thegap_today
+    )
+    nyx_traffic = check_nyx_traffic_cadence(
+        nyx_traffic_vault_dir=nyx_traffic_vault_dir, nyx_traffic_today=nyx_traffic_today
     )
     strategy_targets = check_strategy_targets(strategy_path=strategy_targets_path)
     network_boundary = check_network_boundary(dirs=network_boundary_dirs)
@@ -1864,6 +1901,7 @@ def run_ritual_check(
         "cluster_day": cluster_day,
         "what_moved": what_moved,
         "thegap": thegap,
+        "nyx_traffic": nyx_traffic,
         "strategy_targets": strategy_targets,
         "network_boundary": network_boundary,
         "site_links": site_links,
@@ -2095,6 +2133,8 @@ def format_ritual_check(result: dict) -> str:
     lines.append("  " + _what_moved_check().format_cadence(wm))
     tg = result["thegap"]
     lines.append("  " + _thegap_check().format_cadence(tg))
+    nt = result["nyx_traffic"]
+    lines.append("  " + _nyx_traffic_check().format_cadence(nt))
     st = result["strategy_targets"]
     for line in _strategy_targets_check().format_strategy_targets(st).split("\n"):
         lines.append("  " + line)
