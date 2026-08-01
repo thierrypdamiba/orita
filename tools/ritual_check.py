@@ -152,7 +152,7 @@ regardless, and `consent.py`'s gate still fails closed), so this never
 flips `broken`.
 
 Usage:
-    python3 tools/ritual_check.py [--now ISO_TS] [--fencepost-base DIR] [--square-state PATH] [--arcade-apps-state PATH] [--ci-checks PATH] [--cron-checks PATH] [--child-files PATH] [--voice-window-commits PATH] [--github-stars COUNT] [--json]
+    python3 tools/ritual_check.py [--now ISO_TS] [--fencepost-base DIR] [--square-state PATH] [--arcade-apps-state PATH] [--gateway-toolset PATH] [--ci-checks PATH] [--cron-checks PATH] [--child-files PATH] [--voice-window-commits PATH] [--github-stars COUNT] [--json]
 """
 from __future__ import annotations
 
@@ -243,6 +243,10 @@ def _change_gate():
 
 def _arcade_app_watch():
     return _load("_ritual_arcade_app_watch", os.path.join(ROOT, "tools", "arcade_app_watch.py"))
+
+
+def _gateway_toolset_check():
+    return _load("_ritual_gateway_toolset_check", os.path.join(ROOT, "tools", "gateway_toolset_check.py"))
 
 
 def _scribe_growth_check():
@@ -561,6 +565,27 @@ def check_arcade_apps(arcade_apps_state: dict | None, now_iso: str) -> dict | No
     mod = _arcade_app_watch()
     changed, reason = mod.app_delta(arcade_apps_state, path=mod.LOG)
     mod.record_app_check(arcade_apps_state, now_iso, path=mod.LOG)
+    return {"changed": changed, "reason": reason}
+
+
+def check_gateway_toolset(gateway_toolset_state: dict | None, now_iso: str) -> dict | None:
+    """Fold a caller-supplied, already-computed live the-hand tool-name list
+    (task 464's `gateway_toolset_check.compute_toolset_state` output)
+    through `toolset_delta`, mirroring `check_arcade_apps` exactly. Makes
+    no network call -- `gateway_toolset_state` is None unless the caller
+    already holds this hour's live tool-list read. Records this hour's
+    state via `record_toolset_check` AFTER computing the delta (same order
+    task 88 fixed for `check_square`), so a real change (Gmail/Calendar
+    tools appearing on the gateway -- SCOPES.md's v0.2 gate) is compared
+    against the PRIOR baseline, never against itself. Informational only:
+    zero gmail/calendar tools is the expected, honest steady state, not a
+    rule violation -- this never flips `broken`, the same class
+    `square`/`arcade_apps` already hold."""
+    if gateway_toolset_state is None:
+        return None
+    mod = _gateway_toolset_check()
+    changed, reason = mod.toolset_delta(gateway_toolset_state, path=mod.LOG)
+    mod.record_toolset_check(gateway_toolset_state, now_iso, path=mod.LOG)
     return {"changed": changed, "reason": reason}
 
 
@@ -1614,6 +1639,7 @@ def run_ritual_check(
     ritual_completeness_seam_engine_dir: str | None = None,
     wip_reclaim_path: str | None = None,
     arcade_apps_state: dict | None = None,
+    gateway_toolset_state: dict | None = None,
     scopes_path: str | None = None,
     app_log_path: str | None = None,
     toolkits_metrics_path: str | None = None,
@@ -1679,6 +1705,7 @@ def run_ritual_check(
     escalation = check_x_escalation(now_iso)
     square = check_square(square_state, now_iso)
     arcade_apps = check_arcade_apps(arcade_apps_state, now_iso)
+    gateway_toolset = check_gateway_toolset(gateway_toolset_state, now_iso)
     scribe_growth = check_scribe_growth(now_iso, scribe_root=scribe_root, record=record_scribe_growth)
     ci = check_ci(ci_checks)
     words = check_words(now_iso, record=record_words)
@@ -1806,6 +1833,7 @@ def run_ritual_check(
         "x_escalation": escalation,
         "square": square,
         "arcade_apps": arcade_apps,
+        "gateway_toolset": gateway_toolset,
         "scribe_growth": scribe_growth,
         "ci": ci,
         "words": words,
@@ -1885,6 +1913,9 @@ def format_ritual_check(result: dict) -> str:
     if result["arcade_apps"] is not None:
         aa = result["arcade_apps"]
         lines.append(f"  arcade apps: {'changed' if aa['changed'] else 'unchanged'} -- {aa['reason']}")
+    if result["gateway_toolset"] is not None:
+        gt = result["gateway_toolset"]
+        lines.append(f"  gateway toolset (gmail/calendar): {'changed' if gt['changed'] else 'unchanged'} -- {gt['reason']}")
     sg = result["scribe_growth"]
     lines.append(
         "  scribe growth: "
@@ -2212,6 +2243,7 @@ def main(argv: list[str]) -> int:
     base = DEFAULT_FENCEPOST_BASE
     square_state = None
     arcade_apps_state = None
+    gateway_toolset_state = None
     ci_checks = None
     cron_checks = None
     child_files = None
@@ -2234,6 +2266,11 @@ def main(argv: list[str]) -> int:
             raw = _load_json_arg(argv[i + 1], "arcade-apps-state", "dict")
             aw = _arcade_app_watch()
             arcade_apps_state = aw.compute_app_state(raw.get("apps", []))
+            i += 2
+        elif argv[i] == "--gateway-toolset" and i + 1 < len(argv):
+            raw = _load_json_arg(argv[i + 1], "gateway-toolset", "dict")
+            gt = _gateway_toolset_check()
+            gateway_toolset_state = gt.compute_toolset_state(raw.get("tool_names", []))
             i += 2
         elif argv[i] == "--ci-checks" and i + 1 < len(argv):
             ci_checks = _load_json_arg(argv[i + 1], "ci-checks", "list")
@@ -2260,6 +2297,7 @@ def main(argv: list[str]) -> int:
         fencepost_base=base,
         square_state=square_state,
         arcade_apps_state=arcade_apps_state,
+        gateway_toolset_state=gateway_toolset_state,
         ci_checks=ci_checks,
         cron_checks=cron_checks,
         child_files=child_files,

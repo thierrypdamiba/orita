@@ -559,6 +559,108 @@ class ArcadeAppsFoldCase(unittest.TestCase):
         self.assertFalse(result["broken"])
 
 
+class GatewayToolsetFoldCase(unittest.TestCase):
+    """Task 464: run_ritual_check(gateway_toolset_state=...) folds
+    gateway_toolset_check.py into the same structured result --
+    ArcadeAppsFoldCase's exact shape, since check_gateway_toolset mirrors
+    check_arcade_apps line for line (caller-supplied state, no network call
+    of its own, delta computed before the state is recorded so a real
+    change is never compared against itself)."""
+
+    def setUp(self):
+        self.tmpdir = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.tmpdir, ignore_errors=True)
+        self.gt = _load(
+            f"_test_ritual_gateway_toolset_check_{id(self)}",
+            os.path.join(ROOT, "tools", "gateway_toolset_check.py"),
+        )
+        self.gt.LOG = os.path.join(self.tmpdir, "gateway-toolset-check-log.jsonl")
+        original_loader = rc._gateway_toolset_check
+        rc._gateway_toolset_check = lambda: self.gt
+        self.addCleanup(setattr, rc, "_gateway_toolset_check", original_loader)
+
+    def _state(self, tool_names):
+        return self.gt.compute_toolset_state(tool_names)
+
+    def test_no_gateway_toolset_state_is_none(self):
+        self.assertIsNone(rc.check_gateway_toolset(None, "2026-08-01T19:00:00Z"))
+
+    def test_first_check_is_changed(self):
+        state = self._state(["Github_ListIssues"])
+        result = rc.check_gateway_toolset(state, "2026-08-01T19:00:00Z")
+        self.assertTrue(result["changed"])
+        self.assertIn("no prior toolset check recorded", result["reason"])
+
+    def test_unchanged_after_recording(self):
+        state = self._state(["Github_ListIssues"])
+        self.gt.record_toolset_check(state, "2026-08-01T19:00:00Z", path=self.gt.LOG)
+        result = rc.check_gateway_toolset(state, "2026-08-01T20:00:00Z")
+        self.assertFalse(result["changed"])
+        self.assertIn("unchanged", result["reason"])
+
+    def test_gmail_calendar_tools_appearing_is_changed(self):
+        old = self._state(["Github_ListIssues"])
+        self.gt.record_toolset_check(old, "2026-08-01T19:00:00Z", path=self.gt.LOG)
+        new = self._state(["Github_ListIssues", "Gmail_ListEmails"])
+        result = rc.check_gateway_toolset(new, "2026-08-01T20:00:00Z")
+        self.assertTrue(result["changed"])
+        self.assertIn("False -> True", result["reason"])
+
+    def test_check_gateway_toolset_records_so_next_call_reads_it_back(self):
+        state = self._state(["Github_ListIssues"])
+        rc.check_gateway_toolset(state, "2026-08-01T19:00:00Z")
+        with open(self.gt.LOG) as f:
+            lines = [line for line in f.read().splitlines() if line.strip()]
+        self.assertEqual(len(lines), 1)
+        self.assertIn('"checked_at": "2026-08-01T19:00:00Z"', lines[0])
+
+    def test_a_real_change_settles_into_new_baseline_next_call(self):
+        old = self._state(["Github_ListIssues"])
+        self.gt.record_toolset_check(old, "2026-08-01T19:00:00Z", path=self.gt.LOG)
+        new = self._state(["Github_ListIssues", "Gmail_ListEmails"])
+        first = rc.check_gateway_toolset(new, "2026-08-01T20:00:00Z")
+        self.assertTrue(first["changed"])
+        second = rc.check_gateway_toolset(new, "2026-08-01T21:00:00Z")
+        self.assertFalse(second["changed"])
+        self.assertIn("unchanged, still exposed", second["reason"])
+
+    def test_run_ritual_check_folds_gateway_toolset_key(self):
+        state = self._state(["Github_ListIssues"])
+        result = rc.run_ritual_check(gateway_toolset_state=state)
+        self.assertIsNotNone(result["gateway_toolset"])
+        self.assertIn("changed", result["gateway_toolset"])
+
+    def test_run_ritual_check_gateway_toolset_none_when_omitted(self):
+        result = rc.run_ritual_check()
+        self.assertIsNone(result["gateway_toolset"])
+        self.assertFalse(result["broken"])
+
+    def test_format_includes_gateway_toolset_line_only_when_present(self):
+        with_state = rc.format_ritual_check(
+            {
+                **rc.run_ritual_check(),
+                "gateway_toolset": {
+                    "changed": False,
+                    "reason": "unchanged, still zero gmail/calendar-capable tools on the-hand gateway",
+                },
+            }
+        )
+        self.assertIn(
+            "gateway toolset (gmail/calendar): unchanged -- unchanged, still zero gmail/calendar-capable tools on the-hand gateway",
+            with_state,
+        )
+        without_state = rc.format_ritual_check(rc.run_ritual_check())
+        self.assertNotIn("gateway toolset", without_state)
+
+    def test_gateway_toolset_change_never_flips_broken(self):
+        old = self._state(["Github_ListIssues"])
+        self.gt.record_toolset_check(old, "2026-08-01T19:00:00Z", path=self.gt.LOG)
+        new = self._state(["Github_ListIssues", "Gmail_ListEmails"])
+        result = rc.run_ritual_check(gateway_toolset_state=new)
+        self.assertTrue(result["gateway_toolset"]["changed"])
+        self.assertFalse(result["broken"])
+
+
 class ScribeGrowthFoldCase(unittest.TestCase):
     """Task 168: run_ritual_check() folds tools/scribe_growth_check.py's
     real ROADMAP.md/BUILDLOG.md byte sizes in -- unlike square/arcade_apps,

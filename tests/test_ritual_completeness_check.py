@@ -529,8 +529,9 @@ class DocstringClaimDoctrineCase(unittest.TestCase):
         # Task 459's check_metrics_field_completeness moved this from 48
         # to 49, docstring updated in the same commit. Task 463's
         # check_thegap_cadence moved this from 49 to 50, docstring
-        # updated in the same commit.
-        self.assertEqual(self._real_check_count(), 50)
+        # updated in the same commit. Task 464's check_gateway_toolset
+        # moved this from 50 to 51, docstring updated in the same commit.
+        self.assertEqual(self._real_check_count(), 51)
 
     def test_stale_27_claim_would_have_been_flagged_against_todays_real_count(self):
         # Mutation-based hand-verification: reconstruct the module's own

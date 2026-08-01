@@ -43,6 +43,16 @@ happens to call `Arcade_ListApps`. It goes live only after the Hand runs
 intent-gated consent flow (task 20) is completed for that account; the
 detection logic does not change when it does.
 
+**Re-verified live 2026-08-01T19:0x UTC (task 464):** the tool-exposure half
+of this note sat unre-checked for two weeks — nothing durably recorded WHEN
+it was last actually confirmed, the same recalled-not-recorded shape task
+122's own docstring already named as recurring. `tools/gateway_toolset_check.py`
+closes it: given this hour's live the-hand tool-name list, still **zero
+Gmail/Calendar-capable tools exposed** — same finding as 2026-07-18, now with
+a durable `HAND/gateway-toolset-check-log.jsonl` record and a `ritual_check.py`
+fold (`--gateway-toolset PATH`) that flags the day this flips true, instead of
+the claim quietly aging past whatever it says.
+
 ## Every connected app, accounted for
 
 *Task 135. The table above names the four toolkits Fencepost's own code uses. It says nothing about what else the-hand's shared gateway can already reach — an Oath that stays silent on that is not the complete account of risk surface. `tools/arcade_app_watch.py`'s durable log is the source of truth; this section is re-derived from its last recorded state, never typed from memory.*

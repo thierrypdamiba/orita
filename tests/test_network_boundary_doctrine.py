@@ -181,6 +181,7 @@ class RealToolsDirCase(unittest.TestCase):
         "child_work_check.py",
         "ci_watch.py",
         "duplicate_regex_check.py",
+        "gateway_toolset_check.py",
         "hand_lore_check.py",
         "journal_numbering_check.py",
         "metrics_field_completeness_check.py",
