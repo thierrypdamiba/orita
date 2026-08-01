@@ -13,14 +13,15 @@ and `vault_leak_check.py` (task 98) already made, from an intention
 narrated each hour to a script that proves it.
 
 It reads every `fencepost/RECIPES/*/detector.py`, every `fencepost/
-seam_engine/src/seam_engine/*.py`, and every `tools/*.py` (skipping tests
-and `__init__.py`) with `ast` -- no import, no execution, so a real bug in
-a detector's own body can't crash the check that's supposed to catch its
-regex hygiene. For every `re.compile(...)` call whose first argument is a
-literal string, it records the pattern text and the file it was found in.
-Any pattern text that is DEFINED LOCALLY (not merely referenced by name
-after an import) in two or more distinct files is exactly the bug this
-campaign kept finding: a claimed mirror with nothing backing it.
+seam_engine/src/seam_engine/*.py`, every `tools/*.py`, and every `oracle/
+oracle_engine/src/oracle_engine/*.py` (skipping tests and `__init__.py`)
+with `ast` -- no import, no execution, so a real bug in a detector's own
+body can't crash the check that's supposed to catch its regex hygiene.
+For every `re.compile(...)` call whose first argument is a literal
+string, it records the pattern text and the file it was found in. Any
+pattern text that is DEFINED LOCALLY (not merely referenced by name after
+an import) in two or more distinct files is exactly the bug this campaign
+kept finding: a claimed mirror with nothing backing it.
 
 Task 418: the `tools/*.py` glob was missing entirely until this task --
 this checker never scanned the very directory it lives in. A live sweep
@@ -36,6 +37,22 @@ definition per pattern, with every one of those files now importing it
 instead of retyping it (mirrors this same campaign's own fix shape for
 `fencepost/seam_engine/closing_keywords.py`, `thanks.py`, `references.py`,
 etc.).
+
+Task 445: the same blind spot task 418 found and closed for `tools/*.py`
+still stood for `oracle/oracle_engine/src/oracle_engine/*.py` -- the
+Oracle Desk's own 25-file cadence/autograde engine, built by the same
+hand, in the same "mirror this sibling's regex verbatim" style this whole
+campaign exists to police (BUILDLOG.md task 134: "mirroring `contributor_
+cadence.py`/`contributor_autograde.py` exactly"), yet never once scanned.
+Reproduced live before fixing: two synthetic `oracle_engine/*.py` files
+sharing a hand-typed, unimported `re.compile(...)` pattern (the identical
+fixture shape `test_tools_glob_is_actually_scanned` already uses for the
+`tools/*.py` glob) returned zero violations against the pre-fix checker.
+A live scan of the real, current `oracle/` tree against the widened glob
+found no NEW real duplicate today -- this closes a real blind spot before
+it bites, the same preventive shape task 418's own docstring opened with
+("this checker never scanned the very directory it lives in"), not
+because it caught a sixth live instance this hour.
 
 One pair is a deliberate, already-documented exception, not a bug:
 `_CLOSES_RE` in `issue-closed-pr-still-open` and `merged-pr-issue-still-
@@ -69,6 +86,7 @@ DEFAULT_ORITA_DIR = ROOT
 _RECIPES_GLOB = "fencepost/RECIPES/*/detector.py"
 _SEAM_ENGINE_GLOB = "fencepost/seam_engine/src/seam_engine/*.py"
 _TOOLS_GLOB = "tools/*.py"
+_ORACLE_ENGINE_GLOB = "oracle/oracle_engine/src/oracle_engine/*.py"
 _SKIP_BASENAMES = {"__init__.py"}
 
 # Pattern text -> the exact set of files it is allowed to be locally
@@ -98,7 +116,7 @@ _ALLOWED_DUPLICATES: dict[str, frozenset[str]] = {
 
 
 def _iter_scanned_files(orita_dir: str):
-    for rel_glob in (_RECIPES_GLOB, _SEAM_ENGINE_GLOB, _TOOLS_GLOB):
+    for rel_glob in (_RECIPES_GLOB, _SEAM_ENGINE_GLOB, _TOOLS_GLOB, _ORACLE_ENGINE_GLOB):
         for path in sorted(glob.glob(os.path.join(orita_dir, rel_glob))):
             if os.path.basename(path) in _SKIP_BASENAMES:
                 continue

@@ -1,12 +1,15 @@
-"""Task 397 (widened by task 418). Proves tools/duplicate_regex_check.py
-actually bites on a synthetic hand-typed duplicate, stays clean when a
-file imports a shared name instead of redefining it, does not flag either
-seeded/documented exception (`_CLOSES_RE`, and task 418's `tools/closing_
-keyword_guard.py`/`seam_engine/closing_keywords.py` mirror), and -- the
-real point -- confirms the live, current orita checkout holds zero real
-violations today. Task 418 also proves the checker's own `tools/*.py`
-glob (added this task, having never scanned its own directory before) is
-actually wired in, not just documented.
+"""Task 397 (widened by tasks 418 and 445). Proves tools/duplicate_regex_
+check.py actually bites on a synthetic hand-typed duplicate, stays clean
+when a file imports a shared name instead of redefining it, does not flag
+either seeded/documented exception (`_CLOSES_RE`, and task 418's `tools/
+closing_keyword_guard.py`/`seam_engine/closing_keywords.py` mirror), and
+-- the real point -- confirms the live, current orita checkout holds zero
+real violations today. Task 418 also proves the checker's own `tools/
+*.py` glob (added this task, having never scanned its own directory
+before) is actually wired in, not just documented. Task 445 proves the
+same for `oracle/oracle_engine/src/oracle_engine/*.py` -- the Oracle
+Desk's own cadence/autograde engine, scanned for the first time this
+task.
 """
 import importlib.util
 import os
@@ -203,6 +206,57 @@ class FixtureViolationCase(unittest.TestCase):
             'sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))\n'
             'import fixture_shared\n'
             '_RE = fixture_shared.SHARED_RE\n',
+        )
+        violations = drc.find_violations(orita_dir=self.orita)
+        self.assertEqual(violations, [])
+
+    def test_oracle_engine_glob_is_actually_scanned(self):
+        # Task 445: _iter_scanned_files() never included oracle/oracle_
+        # engine/src/oracle_engine/*.py -- the Oracle Desk's own 25-file
+        # cadence/autograde engine, built in the identical "mirror this
+        # sibling's regex verbatim" style this whole campaign polices
+        # (BUILDLOG.md task 134) -- so a hand-typed duplicate there went
+        # undetected. Reproduced live pre-fix: this exact fixture pair
+        # returned zero violations before the glob existed. Proves the
+        # fix is real (the glob is wired in), not just claimed in the
+        # docstring.
+        _write(
+            os.path.join(self.orita, "oracle", "oracle_engine", "src", "oracle_engine", "fixture_a.py"),
+            'import re\n_MENTION_RE = re.compile(r"@(\\w[\\w-]*)", re.IGNORECASE)\n',
+        )
+        _write(
+            os.path.join(self.orita, "oracle", "oracle_engine", "src", "oracle_engine", "fixture_b.py"),
+            '# mirrors fixture_a\'s own _MENTION_RE verbatim\n'
+            'import re\n_MENTION_RE = re.compile(r"@(\\w[\\w-]*)", re.IGNORECASE)\n',
+        )
+        violations = drc.find_violations(orita_dir=self.orita)
+        self.assertEqual(len(violations), 1)
+        self.assertEqual(violations[0]["pattern"], r"@(\w[\w-]*)")
+        files = {rel for rel, _lineno in violations[0]["locations"]}
+        self.assertEqual(
+            files,
+            {
+                os.path.join("oracle", "oracle_engine", "src", "oracle_engine", "fixture_a.py"),
+                os.path.join("oracle", "oracle_engine", "src", "oracle_engine", "fixture_b.py"),
+            },
+        )
+
+    def test_oracle_engine_file_importing_a_shared_name_is_not_flagged(self):
+        # Mirrors test_tools_file_importing_a_shared_name_is_not_flagged,
+        # for the oracle_engine glob specifically -- proves the widened
+        # scan reads the real, live oracle_engine tree clean (no false
+        # positive), not just that it finds a synthetic bug.
+        _write(
+            os.path.join(self.orita, "oracle", "oracle_engine", "src", "oracle_engine", "fixture_shared.py"),
+            'import re\nSHARED_RE = re.compile(r"@(\\w[\\w-]*)", re.IGNORECASE)\n',
+        )
+        _write(
+            os.path.join(self.orita, "oracle", "oracle_engine", "src", "oracle_engine", "fixture_consumer_a.py"),
+            'from oracle_engine.fixture_shared import SHARED_RE\n',
+        )
+        _write(
+            os.path.join(self.orita, "oracle", "oracle_engine", "src", "oracle_engine", "fixture_consumer_b.py"),
+            'from oracle_engine.fixture_shared import SHARED_RE\n',
         )
         violations = drc.find_violations(orita_dir=self.orita)
         self.assertEqual(violations, [])
