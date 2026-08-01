@@ -74,7 +74,7 @@ class TestPrClaimRe:
 
 
 class TestBothDetectorsShareTheLaw:
-    """The regression test: both "ships/includes/merges/via #N"-claim
+    """The regression test: all three "ships/includes/merges/via #N"-claim
     recipes must bind their own `_claimed_pr_numbers` name to THIS module's
     function object, not to a second, independently-defined one --
     identity, not textual coincidence."""
@@ -90,5 +90,12 @@ class TestBothDetectorsShareTheLaw:
         detector = _load_detector(
             "merged-pr-never-released",
             "seam_engine._recipe_merged_pr_never_released_pr_claims_test",
+        )
+        assert detector._claimed_pr_numbers is claimed_pr_numbers
+
+    def test_tweet_claims_unmerged_pr_binds_the_shared_function(self) -> None:
+        detector = _load_detector(
+            "tweet-claims-unmerged-pr",
+            "seam_engine._recipe_tweet_claims_unmerged_pr_pr_claims_test",
         )
         assert detector._claimed_pr_numbers is claimed_pr_numbers

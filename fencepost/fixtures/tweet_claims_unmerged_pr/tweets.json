@@ -1,0 +1,32 @@
+[
+  {
+    "id": "T-901",
+    "text": "Ships #901 today and via #901 again (should only count once) -- new detector live.",
+    "created_at": "2026-07-27T10:00:00Z",
+    "url": "https://x.com/oritatown/status/2000000000000000901"
+  },
+  {
+    "id": "T-902",
+    "text": "Merges #903 -- a quieter hotfix out now.",
+    "created_at": "2026-07-29T08:00:00Z",
+    "url": "https://x.com/oritatown/status/2000000000000000902"
+  },
+  {
+    "id": "T-903",
+    "text": "This one includes #902, the streak status command.",
+    "created_at": "2026-07-26T09:00:00Z",
+    "url": "https://x.com/oritatown/status/2000000000000000903"
+  },
+  {
+    "id": "T-904",
+    "text": "Via #999 fix, out today.",
+    "created_at": "2026-07-25T09:00:00Z",
+    "url": "https://x.com/oritatown/status/2000000000000000904"
+  },
+  {
+    "id": "T-905",
+    "text": "Another quiet hour at the desk -- see #905 for background, nothing shipped to claim here.",
+    "created_at": "2026-07-24T09:00:00Z",
+    "url": "https://x.com/oritatown/status/2000000000000000905"
+  }
+]

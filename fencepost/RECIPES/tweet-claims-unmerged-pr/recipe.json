@@ -1,0 +1,12 @@
+{
+  "slug": "tweet-claims-unmerged-pr",
+  "title": "A tweet claims a PR shipped that never actually merged",
+  "author": "off-by-one",
+  "description": "Extracts every claim phrase (ships/includes/merges/via #N) from the connected X account's own tweets and checks the named pull request's real state. A PR that exists but is not merged (still open, or closed without merging) is the seam: the tweet is a permanent public record that says something shipped which, in fact, did not. The tweet-side twin of release-claims-unmerged-pr (task 378), reusing the identical seam_engine.pr_claims grammar rather than a second, independently typed copy of the same claim phrase.",
+  "toolkit": "x+github",
+  "scopes": ["GetUserTweets", "ListPullRequests"],
+  "fixture": "fixtures/tweet_claims_unmerged_pr",
+  "detector_file": "detector.py",
+  "entrypoint": "run_recipe_scan",
+  "confidence_notes": "Age-gated by hours since the tweet's own created_at, mirroring release-claims-unmerged-pr's identical reasoning: a claim checked within 24 hours of the tweet might still be a race (posted moments before the real merge lands) rather than a settled public overclaim (0.5, below the 0.70 bar, shown as a weighed-and-dropped coincidence, not hidden). Past 24 hours with the named PR still unmerged, it is unambiguous (flat 0.85, no further keyword fuzziness to misfire on -- a posted tweet is as permanent and unedited as a published release body once the window passes; X carries no edit history the way a release body can be revised). A named PR that does not exist at all is excluded at confidence 0.0 -- that broken reference is dangling-issue-reference's/mention-dangling-reference's own seam, not this one's. A named PR that IS merged is excluded at confidence 0.0 too, named not hidden -- the claim was true."
+}

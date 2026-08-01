@@ -286,6 +286,19 @@ GitHub's own UI never treats that as a real closing trigger. Same age-
 gated confidence shape as `merged-pr-issue-still-open` (0.55 under 24h,
 0.85 at/past it). The one scope (`ListPullRequests`) already sits on
 `SCOPES.md`'s cleared oath table, no new scope wiring needed.
+[`RECIPES/tweet-claims-unmerged-pr/`](RECIPES/tweet-claims-unmerged-pr/)
+is the twenty-seventh (ROADMAP.md #450): the tweet-side twin of
+`release-claims-unmerged-pr` (the ninth real recipe) — a tweet from the
+connected X account claims a pull request shipped ("ships #N" /
+"includes #N" / "merges #N" / "via #N"), but the named PR never actually
+merged. A tweet is as permanent and public a record as a release body once
+posted, and nothing on either platform ever checks it against the PR
+tracker's own truth. Same age-gated confidence shape as
+`release-claims-unmerged-pr` (0.5 under 24h, 0.85 at/past it), and reuses
+the identical `seam_engine.pr_claims.claimed_pr_numbers` grammar rather
+than a third, independently typed copy of the same regex. Both scopes
+(`GetUserTweets`, `ListPullRequests`) already sit on `SCOPES.md`'s cleared
+oath table, no new scope wiring needed.
 
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)

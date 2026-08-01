@@ -1,0 +1,30 @@
+[
+  {
+    "number": 901,
+    "title": "Fix badge cache invalidation",
+    "state": "open",
+    "merged": false,
+    "url": "https://github.com/thierrypdamiba/orita/pull/901"
+  },
+  {
+    "number": 902,
+    "title": "Add streak status command",
+    "state": "closed",
+    "merged": true,
+    "url": "https://github.com/thierrypdamiba/orita/pull/902"
+  },
+  {
+    "number": 903,
+    "title": "Widen journal numbering check",
+    "state": "closed",
+    "merged": false,
+    "url": "https://github.com/thierrypdamiba/orita/pull/903"
+  },
+  {
+    "number": 905,
+    "title": "Unrelated background discussion PR",
+    "state": "open",
+    "merged": false,
+    "url": "https://github.com/thierrypdamiba/orita/pull/905"
+  }
+]
