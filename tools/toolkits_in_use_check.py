@@ -99,18 +99,43 @@ def check_toolkits_in_use(
     consent_log_path: str = DEFAULT_CONSENT_LOG_PATH,
 ) -> dict:
     """Cross-check the last recorded `distinct_toolkits_in_use` reading
-    against ground truth. Returns `clean: True` only when the two agree
-    (or nothing has been recorded yet -- a fresh log has nothing to
+    against ground truth. Returns `clean: True` when the two agree, or
+    when nothing has been recorded yet (a fresh log has nothing to
     contradict); otherwise `clean: False` naming the exact claimed vs.
-    real numbers, never a bare pass/fail."""
+    real numbers, never a bare pass/fail.
+
+    Task 453 found and fixed this exact bug shape one field over
+    (`gap_true_positive_check.py`'s `gap_true_positive_rate`): a
+    `last is None or FIELD not in last` single branch collapses two
+    different "nothing recorded" shapes into one unconditional clean --
+    no reading has ever existed at all (genuinely nothing to contradict,
+    stays clean unconditionally), versus a reading that DOES exist (has
+    a `date`, other fields present) but happens to omit THIS field, which
+    is the same "claims a number ground truth cannot back" failure this
+    whole sibling class of checks exists to catch, just from the
+    omission side. Unlike `gap_true_positive_rate` (a `float | None`,
+    genuinely absent until the first gap is ever audited),
+    `distinct_toolkits_in_use`'s ground truth
+    (`consent_grant_log.real_distinct_toolkit_count`) is always a
+    definite `int`, never `None` -- so the omission-with-an-existing-
+    reading case is clean only when that real count is honestly `0`
+    (nothing yet to have omitted), and `BROKEN` the moment a real
+    connected toolkit exists and a dated reading failed to record it."""
     real = consent_grant_log.real_distinct_toolkit_count(consent_log_path)
     last = _last_metrics_entry(metrics_path)
-    if last is None or "distinct_toolkits_in_use" not in last:
+    if last is None:
         return {
             "clean": True,
             "real": real,
             "claimed": None,
             "claimed_date": None,
+        }
+    if "distinct_toolkits_in_use" not in last:
+        return {
+            "clean": real == 0,
+            "real": real,
+            "claimed": None,
+            "claimed_date": last.get("date"),
         }
     claimed = last["distinct_toolkits_in_use"]
     return {
@@ -123,7 +148,19 @@ def check_toolkits_in_use(
 
 def format_result(result: dict) -> str:
     if result["claimed"] is None:
-        return f"toolkits in use: clean (no metrics.jsonl reading yet; real ground truth is {result['real']})"
+        if result["claimed_date"] is None:
+            return f"toolkits in use: clean (no metrics.jsonl reading yet; real ground truth is {result['real']})"
+        if result["clean"]:
+            return (
+                f"toolkits in use: clean (metrics.jsonl's {result['claimed_date']} reading names no "
+                f"distinct_toolkits_in_use field; real ground truth is honestly 0, nothing omitted)"
+            )
+        return (
+            f"toolkits in use: BROKEN -- metrics.jsonl's {result['claimed_date']} reading names no "
+            f"distinct_toolkits_in_use field, but real ground truth (HAND/consent-grants-log.jsonl, "
+            f"gate-verified) is already {result['real']} -- a real count exists and was not recorded, "
+            "escalate now"
+        )
     if result["clean"]:
         return f"toolkits in use: clean ({result['real']} real toolkit(s), metrics.jsonl's {result['claimed_date']} reading agrees)"
     return (

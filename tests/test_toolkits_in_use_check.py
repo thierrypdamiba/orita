@@ -211,6 +211,64 @@ class ValidJsonNonDictLastLineCase(unittest.TestCase):
         self.assertIsNone(tiu._last_metrics_entry(self.metrics_path))
 
 
+class OmittedFieldOnExistingReadingCase(unittest.TestCase):
+    """Task 454: the same bug shape task 453 found and fixed one field
+    over in `gap_true_positive_check.py` -- a reading that EXISTS (has a
+    `date`, other fields present) but omits `distinct_toolkits_in_use`
+    used to collapse into the identical unconditional-clean branch as
+    "no reading has ever existed at all", even when the real, live
+    ground truth already names a nonzero count that reading failed to
+    carry. Proves both the honest-omission (real is 0, nothing yet to
+    have missed) and the broken-omission (real is nonzero, a real count
+    went unrecorded) shapes."""
+
+    def setUp(self):
+        self.tmp = tempfile.mkdtemp()
+        self.addCleanup(__import__("shutil").rmtree, self.tmp, ignore_errors=True)
+        self.metrics_path = os.path.join(self.tmp, "metrics.jsonl")
+        self.consent_path = os.path.join(self.tmp, "consent.jsonl")
+
+    def test_omitted_field_against_zero_real_is_honestly_clean(self):
+        _write_metrics(self.metrics_path, [{"date": "2026-07-20", "reports_shipped_today": 1}])
+        result = tiu.check_toolkits_in_use(self.metrics_path, self.consent_path)
+        self.assertTrue(result["clean"])
+        self.assertEqual(result["real"], 0)
+        self.assertIsNone(result["claimed"])
+        self.assertEqual(result["claimed_date"], "2026-07-20")
+        formatted = tiu.format_result(result)
+        self.assertIn("clean", formatted)
+        self.assertIn("nothing omitted", formatted)
+
+    def test_omitted_field_against_a_real_nonzero_count_is_broken(self):
+        from seam_engine.consent import REQUIRED_SCOPES
+
+        cgl.record_grant(
+            "thierrypdamiba",
+            "github",
+            "https://github.com/thierrypdamiba/orita/issues/9",
+            REQUIRED_SCOPES["github"],
+            "2026-07-20T01:00:00Z",
+            path=self.consent_path,
+        )
+        _write_metrics(self.metrics_path, [{"date": "2026-07-20", "reports_shipped_today": 1}])
+        result = tiu.check_toolkits_in_use(self.metrics_path, self.consent_path)
+        self.assertFalse(result["clean"])
+        self.assertEqual(result["real"], 1)
+        self.assertIsNone(result["claimed"])
+        self.assertEqual(result["claimed_date"], "2026-07-20")
+        formatted = tiu.format_result(result)
+        self.assertIn("BROKEN", formatted)
+        self.assertIn("already 1", formatted)
+
+    def test_no_reading_at_all_still_stays_clean_unconditionally(self):
+        """The genuinely-nothing-to-contradict shape (no `date` at all)
+        must NOT be affected by this fix -- only an EXISTING reading
+        that omits the field changes behavior."""
+        result = tiu.check_toolkits_in_use(self.metrics_path, self.consent_path)
+        self.assertTrue(result["clean"])
+        self.assertIsNone(result["claimed_date"])
+
+
 class RealLiveStateCase(unittest.TestCase):
     """The real point of this task: records/metrics.jsonl had recorded
     `distinct_toolkits_in_use: 2` every single day since 2026-07-12 --
