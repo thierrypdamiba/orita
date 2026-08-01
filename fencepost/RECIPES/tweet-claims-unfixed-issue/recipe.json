@@ -1,0 +1,12 @@
+{
+  "slug": "tweet-claims-unfixed-issue",
+  "title": "A tweet claims an issue fixed that never actually closed",
+  "author": "off-by-one",
+  "description": "Extracts every closing-keyword claim (fixes/closes/resolves #N, both tenses) from the connected X account's own tweets and checks the named issue's real state. An issue that exists but is still open is the seam: the tweet is a permanent public record that says something was fixed which, in fact, was not. The tweet-side twin of release-claims-unfixed-issue (task 382), reusing the identical seam_engine.closing_keywords grammar rather than a fourth, independently typed copy of the same closing-keyword pattern.",
+  "toolkit": "x+github",
+  "scopes": ["GetUserTweets", "ListIssues"],
+  "fixture": "fixtures/tweet_claims_unfixed_issue",
+  "detector_file": "detector.py",
+  "entrypoint": "run_recipe_scan",
+  "confidence_notes": "Age-gated by hours since the tweet's own created_at, mirroring release-claims-unfixed-issue's and tweet-claims-unmerged-pr's identical reasoning: a claim checked within 24 hours of the tweet might still be a race (posted moments before the real fix lands) rather than a settled public overclaim (0.5, below the 0.70 bar, shown as a weighed-and-dropped coincidence, not hidden). Past 24 hours with the named issue still open, it is unambiguous (flat 0.85, no further keyword fuzziness to misfire on -- a posted tweet is as permanent and unedited as a published release body once the window passes; X carries no edit history the way a release body can be revised). A named issue that does not exist at all is excluded at confidence 0.0 -- that broken reference is dangling-issue-reference's/mention-dangling-reference's own seam, not this one's. A named issue that IS closed is excluded at confidence 0.0 too, named not hidden -- the claim was true."
+}

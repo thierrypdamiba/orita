@@ -299,6 +299,19 @@ the identical `seam_engine.pr_claims.claimed_pr_numbers` grammar rather
 than a third, independently typed copy of the same regex. Both scopes
 (`GetUserTweets`, `ListPullRequests`) already sit on `SCOPES.md`'s cleared
 oath table, no new scope wiring needed.
+[`RECIPES/tweet-claims-unfixed-issue/`](RECIPES/tweet-claims-unfixed-issue/)
+is the twenty-eighth (ROADMAP.md #451): the tweet-side twin of
+`release-claims-unfixed-issue` (the thirteenth real recipe), closing the
+matching issue-claim half of the release-vs-tweet split
+`tweet-claims-unmerged-pr` already opened for PR claims — a tweet from the
+connected X account invokes a real GitHub closing keyword ("fixes #N" /
+"closes #N" / "resolves #N", both tenses), but the named issue never
+actually closed. Same age-gated confidence shape as
+`release-claims-unfixed-issue` (0.5 under 24h, 0.85 at/past it), and
+reuses the shared `seam_engine.closing_keywords.CLOSING_KEYWORD_RE`
+grammar (task 394) rather than a fourth, independently typed copy of the
+same pattern. Both scopes (`GetUserTweets`, `ListIssues`) already sit on
+`SCOPES.md`'s cleared oath table, no new scope wiring needed.
 
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)

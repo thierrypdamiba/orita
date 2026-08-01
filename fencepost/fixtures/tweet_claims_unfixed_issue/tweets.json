@@ -1,0 +1,32 @@
+[
+  {
+    "id": "T-1101",
+    "text": "Fixes #1101 today and closes #1101 again (should only count once) -- new detector live.",
+    "created_at": "2026-07-27T10:00:00Z",
+    "url": "https://x.com/oritatown/status/2000000000000001101"
+  },
+  {
+    "id": "T-1102",
+    "text": "Resolves #1103 -- a quieter hotfix out now.",
+    "created_at": "2026-07-29T08:00:00Z",
+    "url": "https://x.com/oritatown/status/2000000000000001102"
+  },
+  {
+    "id": "T-1103",
+    "text": "This one closes #1102, the streak status command.",
+    "created_at": "2026-07-26T09:00:00Z",
+    "url": "https://x.com/oritatown/status/2000000000000001103"
+  },
+  {
+    "id": "T-1104",
+    "text": "Fix #1999 today.",
+    "created_at": "2026-07-25T09:00:00Z",
+    "url": "https://x.com/oritatown/status/2000000000000001104"
+  },
+  {
+    "id": "T-1105",
+    "text": "Another quiet hour at the desk -- see #1105 for background, nothing fixed to claim here.",
+    "created_at": "2026-07-24T09:00:00Z",
+    "url": "https://x.com/oritatown/status/2000000000000001105"
+  }
+]

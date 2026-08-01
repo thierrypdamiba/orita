@@ -41,7 +41,7 @@ _CARDINAL_WORDS = {
     "twelve": 12, "thirteen": 13, "fourteen": 14, "fifteen": 15, "sixteen": 16,
     "seventeen": 17, "eighteen": 18, "nineteen": 19, "twenty": 20,
     "twenty-one": 21, "twenty-two": 22, "twenty-three": 23, "twenty-four": 24,
-    "twenty-five": 25, "twenty-six": 26, "twenty-seven": 27,
+    "twenty-five": 25, "twenty-six": 26, "twenty-seven": 27, "twenty-eight": 28,
 }
 
 _CLAIM_RE = re.compile(r"([A-Za-z-]+) real recipes stand today")
@@ -88,13 +88,13 @@ def test_unrecognized_cardinal_word_raises():
         claimed_recipe_count("Several real recipes stand today:")
 
 
-def test_real_recipe_count_is_currently_twenty_seven():
-    """Regression pin: today's real, live count under RECIPES/. Was 26 until
-    RECIPES/tweet-claims-unmerged-pr/ merged (the twenty-seventh real
-    recipe, task 450) -- the exact drift this whole doctrine file exists to
+def test_real_recipe_count_is_currently_twenty_eight():
+    """Regression pin: today's real, live count under RECIPES/. Was 27 until
+    RECIPES/tweet-claims-unfixed-issue/ merged (the twenty-eighth real
+    recipe, task 451) -- the exact drift this whole doctrine file exists to
     catch, now caught once for real instead of only rehearsed by the
     mutation test below."""
-    assert real_recipe_count(FENCEPOST_ROOT) == 27
+    assert real_recipe_count(FENCEPOST_ROOT) == 28
 
 
 def test_site_claim_matches_the_real_live_count():
