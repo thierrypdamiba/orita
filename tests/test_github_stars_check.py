@@ -156,6 +156,60 @@ class CrossCheckCase(_TempLogCase):
         self.assertEqual(result["real"], 0)
 
 
+class OmittedFieldOnExistingReadingCase(_TempLogCase):
+    """Task 456: the same bug shape task 453/454/455 found and fixed in
+    gap_true_positive_check.py/toolkits_in_use_check.py/report_shipped_
+    check.py -- a reading that EXISTS and carries a `date` but omits
+    `github_stars` itself used to collapse into the identical
+    unconditional-clean branch as "no reading at all", even when the
+    last live count already carries a real, nonzero star count. Proves
+    both the honest-omission (no live check, or a live check reading
+    honestly 0) and the broken-omission (a real nonzero live count
+    exists and went unrecorded) shapes."""
+
+    def test_omitted_field_with_no_live_check_is_honestly_clean(self):
+        _write_metrics(self.metrics_path, [{"date": "2026-07-20", "connected_users_oauth": 5}])
+        result = gsc.check_github_stars(self.metrics_path, self.log_path)
+        self.assertTrue(result["clean"])
+        self.assertIsNone(result["real"])
+        self.assertIsNone(result["claimed"])
+        self.assertEqual(result["claimed_date"], "2026-07-20")
+        formatted = gsc.format_result(result)
+        self.assertIn("clean", formatted)
+        self.assertIn("no live check recorded yet", formatted)
+
+    def test_omitted_field_with_a_real_zero_live_check_is_honestly_clean(self):
+        gsc.record_check(0, "2026-07-20T00:03:00Z", path=self.log_path)
+        _write_metrics(self.metrics_path, [{"date": "2026-07-20", "connected_users_oauth": 5}])
+        result = gsc.check_github_stars(self.metrics_path, self.log_path)
+        self.assertTrue(result["clean"])
+        self.assertEqual(result["real"], 0)
+        self.assertIsNone(result["claimed"])
+        formatted = gsc.format_result(result)
+        self.assertIn("clean", formatted)
+        self.assertIn("nothing omitted", formatted)
+
+    def test_omitted_field_with_a_real_nonzero_live_check_is_broken(self):
+        gsc.record_check(7, "2026-07-20T00:03:00Z", path=self.log_path)
+        _write_metrics(self.metrics_path, [{"date": "2026-07-20", "connected_users_oauth": 5}])
+        result = gsc.check_github_stars(self.metrics_path, self.log_path)
+        self.assertFalse(result["clean"])
+        self.assertEqual(result["real"], 7)
+        self.assertIsNone(result["claimed"])
+        self.assertEqual(result["claimed_date"], "2026-07-20")
+        formatted = gsc.format_result(result)
+        self.assertIn("BROKEN", formatted)
+        self.assertIn("already 7", formatted)
+
+    def test_reading_with_no_date_at_all_stays_clean_unconditionally(self):
+        """The genuinely-nothing-to-contradict shape (no reading at all)
+        must not be affected by this fix -- only a dated reading that
+        omits the field changes behavior."""
+        result = gsc.check_github_stars(self.metrics_path, self.log_path)
+        self.assertTrue(result["clean"])
+        self.assertIsNone(result["claimed_date"])
+
+
 class MalformedLastLineCase(_TempLogCase):
     """Mirrors tasks_shipped_check.py's/report_shipped_check.py's own
     guard: a truncated/malformed trailing line in metrics.jsonl must be

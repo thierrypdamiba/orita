@@ -36,6 +36,21 @@ entry (the same never-backfill law every sibling holds) -- it only says
 whether the LAST recorded reading currently agrees with the last known
 live truth.
 
+Task 456: task 453 found and fixed the "a reading exists but omits the
+one field this checker guards" bug shape in `gap_true_positive_check.py`,
+then 454 and 455 found and fixed the identical shape in
+`toolkits_in_use_check.py` and my own `reports_shipped_today` row
+(`report_shipped_check.py`), each time naming the siblings still left
+standing. This module -- my OWN second STRATEGY.md row -- was the last
+one still carrying it: `last is None or "github_stars" not in last`
+collapsed "no reading ever existed" and "a dated reading exists but
+omits `github_stars`" into one unconditional clean, even while the last
+live count already held a real, nonzero star count that reading failed
+to record. Split the two: a dated reading missing the field is clean
+only when the last live count is honestly `None` or `0` (nothing yet to
+have omitted), `BROKEN` -- naming the real count -- the moment a nonzero
+live count exists and went unrecorded.
+
 Usage:
     python3 tools/github_stars_check.py record <count> <checked_at>
     python3 tools/github_stars_check.py check
@@ -155,16 +170,31 @@ def check_github_stars(metrics_path: str = DEFAULT_METRICS_PATH, log_path: str =
     """Cross-check the last recorded `github_stars` reading in
     `records/metrics.jsonl` against the last recorded LIVE star count in
     `HAND/github-stars-log.jsonl`. Returns `clean: True` when the two
-    agree, or when either side has nothing recorded yet (nothing to
-    contradict); otherwise `clean: False` naming the exact claimed vs.
-    real values, never a bare pass/fail."""
+    agree, when neither side has anything recorded yet, or when a
+    reading exists but omits `github_stars` while the last live count is
+    honestly `None` or `0` (nothing yet to have omitted); otherwise
+    `clean: False` naming the exact claimed vs. real values, never a
+    bare pass/fail.
+
+    Task 456: a reading that EXISTS and carries a `date` but omits
+    `github_stars` itself used to collapse into the same unconditional-
+    clean branch as "no reading at all" -- the identical shape task
+    453/454/455 already fixed on three sibling `metrics.jsonl` checkers.
+    It is now clean only when the last live count is honestly `None` (no
+    live check ever recorded) or `0` (nothing yet to have omitted);
+    `BROKEN` -- naming the real count and the reading's own date -- the
+    moment a nonzero live star count exists and a dated reading failed to
+    carry it."""
     real_entry = last_check(log_path)
     real = real_entry["count"] if real_entry is not None else None
     last = _last_metrics_entry(metrics_path)
-    if last is None or "github_stars" not in last:
+    if last is None:
         return {"clean": True, "real": real, "claimed": None, "claimed_date": None}
-    claimed = last["github_stars"]
     claimed_date = last.get("date")
+    if "github_stars" not in last:
+        clean = real is None or real == 0
+        return {"clean": clean, "real": real, "claimed": None, "claimed_date": claimed_date}
+    claimed = last["github_stars"]
     if real is None:
         return {"clean": True, "real": None, "claimed": claimed, "claimed_date": claimed_date}
     return {"clean": claimed == real, "real": real, "claimed": claimed, "claimed_date": claimed_date}
@@ -172,9 +202,25 @@ def check_github_stars(metrics_path: str = DEFAULT_METRICS_PATH, log_path: str =
 
 def format_result(result: dict) -> str:
     if result["claimed"] is None:
-        if result["real"] is None:
-            return "github stars: clean (no metrics.jsonl reading and no live check recorded yet)"
-        return f"github stars: clean (no metrics.jsonl reading yet; last live count is {result['real']})"
+        if result["claimed_date"] is None:
+            if result["real"] is None:
+                return "github stars: clean (no metrics.jsonl reading and no live check recorded yet)"
+            return f"github stars: clean (no metrics.jsonl reading yet; last live count is {result['real']})"
+        if result["clean"]:
+            if result["real"] is None:
+                return (
+                    f"github stars: clean (metrics.jsonl's {result['claimed_date']} reading names no "
+                    "github_stars field; no live check recorded yet, nothing to cross-check)"
+                )
+            return (
+                f"github stars: clean (metrics.jsonl's {result['claimed_date']} reading names no "
+                "github_stars field; real live count is honestly 0, nothing omitted)"
+            )
+        return (
+            f"github stars: BROKEN -- metrics.jsonl's {result['claimed_date']} reading names no "
+            f"github_stars field, but the real live count is already {result['real']} -- a real "
+            "star count went unrecorded, escalate now"
+        )
     if result["real"] is None:
         return (
             f"github stars: clean (metrics.jsonl's {result['claimed_date']} reading claims "
