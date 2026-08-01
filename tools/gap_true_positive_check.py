@@ -94,10 +94,17 @@ def check_gap_true_positive_rate(
 
     Two distinct "nothing recorded" shapes, both clean, mirroring
     `connected_users_check.py`'s own no-reading-yet branch:
-    - no metrics.jsonl reading has ever named this field, or
+    - no metrics.jsonl reading has ever existed at all, or
     - the ledger itself has audited zero gaps (real rate is `None`) AND
       the last reading also names no rate (`null`/absent) -- an honest
       pair of unknowns, not a mismatch.
+
+    A reading that DOES exist but names no rate (`null`/absent) while the
+    live Ledger already has a real rate to report is not covered by
+    either clean shape above -- it is the same "claims a number ground
+    truth cannot back" failure in the other direction: a real rate exists
+    and this reading fails to carry it. Flagged `clean: False` exactly
+    like a recorded number that disagrees with reality.
 
     A recorded number against a `None` live rate (claiming a rate that
     cannot exist because nothing has been audited yet) is a real
@@ -106,10 +113,19 @@ def check_gap_true_positive_rate(
     catch."""
     real = audit.audit_ledger(Path(ledger_base)).rate
     last = _last_metrics_entry(metrics_path)
-    claimed = None if last is None else last.get("gap_true_positive_rate")
+
+    if last is None:
+        return {"clean": True, "real": real, "claimed": None, "claimed_date": None}
+
+    claimed = last.get("gap_true_positive_rate")
 
     if claimed is None:
-        return {"clean": True, "real": real, "claimed": None, "claimed_date": None}
+        return {
+            "clean": real is None,
+            "real": real,
+            "claimed": None,
+            "claimed_date": last.get("date"),
+        }
     if real is None:
         return {
             "clean": False,
@@ -128,8 +144,14 @@ def check_gap_true_positive_rate(
 
 def format_result(result: dict) -> str:
     if result["claimed"] is None:
-        real = "none audited yet" if result["real"] is None else f"{round(result['real'] * 100, 4)}%"
-        return f"gap true-positive rate: clean (no metrics.jsonl reading yet; real ground truth is {real})"
+        if result["clean"]:
+            real = "none audited yet" if result["real"] is None else f"{round(result['real'] * 100, 4)}%"
+            return f"gap true-positive rate: clean (no metrics.jsonl reading yet; real ground truth is {real})"
+        return (
+            f"gap true-positive rate: BROKEN -- metrics.jsonl's {result['claimed_date']} reading names "
+            f"no rate (null/absent), but the real Ledger already has one to report "
+            f"({round(result['real'] * 100, 4)}%) -- a real rate exists and was not recorded, escalate now"
+        )
     if result["real"] is None:
         return (
             f"gap true-positive rate: BROKEN -- metrics.jsonl's {result['claimed_date']} reading claims "

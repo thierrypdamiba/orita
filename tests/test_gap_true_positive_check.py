@@ -80,6 +80,20 @@ class NoMetricsReadingCase(unittest.TestCase):
         self.assertTrue(result["clean"])
         self.assertIsNone(result["real"])
 
+    def test_a_reading_that_exists_but_names_no_rate_is_clean_when_the_ledger_also_has_none(self):
+        # A real reading exists (unlike the missing-file case above), but
+        # it explicitly names no rate -- the honest 2026-07-12 shape,
+        # written before the self-audit tally existed. Still clean, since
+        # the live ledger agrees there is nothing to report either.
+        _write_metrics(
+            self.metrics_path,
+            [{"date": "2026-07-12", "gap_true_positive_rate": None}],
+        )
+        result = gtpc.check_gap_true_positive_rate(self.metrics_path, self.ledger_base)
+        self.assertTrue(result["clean"])
+        self.assertIsNone(result["real"])
+        self.assertIsNone(result["claimed"])
+
 
 class AgreementCase(unittest.TestCase):
     def setUp(self):
@@ -159,6 +173,26 @@ class MismatchCase(unittest.TestCase):
         formatted = gtpc.format_result(result)
         self.assertIn("BROKEN", formatted)
         self.assertIn("no rate exists to claim", formatted)
+
+    def test_null_rate_reading_against_a_real_confirmed_rate_is_broken(self):
+        # The ledger already has a real rate to report (1.0), but the
+        # most recent metrics.jsonl reading names no rate at all (the
+        # 2026-07-12 shape, `null`, replayed on a day the ledger is no
+        # longer empty) -- a real rate exists and was silently dropped,
+        # not an honest pair of unknowns.
+        seam_ledger.append_scan(_scan(confidence=0.9), now=_at(2026, 7, 12), base=self.ledger_base)
+        _write_metrics(
+            self.metrics_path,
+            [{"date": "2026-07-13", "gap_true_positive_rate": None}],
+        )
+        result = gtpc.check_gap_true_positive_rate(self.metrics_path, self.ledger_base)
+        self.assertFalse(result["clean"])
+        self.assertEqual(result["real"], 1.0)
+        self.assertIsNone(result["claimed"])
+        self.assertEqual(result["claimed_date"], "2026-07-13")
+        formatted = gtpc.format_result(result)
+        self.assertIn("BROKEN", formatted)
+        self.assertIn("names no rate", formatted)
 
     def test_only_the_most_recent_reading_is_checked_not_every_historical_one(self):
         seam_ledger.append_scan(_scan(confidence=0.9), now=_at(2026, 7, 12), base=self.ledger_base)
