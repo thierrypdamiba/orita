@@ -88,18 +88,39 @@ def check_connected_users(
     consent_log_path: str = DEFAULT_CONSENT_LOG_PATH,
 ) -> dict:
     """Cross-check the last recorded `connected_users_oauth` reading
-    against ground truth. Returns `clean: True` only when the two agree
-    (or nothing has been recorded yet -- a fresh log has nothing to
+    against ground truth. Returns `clean: True` when the two agree, or
+    when nothing has been recorded yet (a fresh log has nothing to
     contradict); otherwise `clean: False` naming the exact claimed vs.
-    real numbers, never a bare pass/fail."""
+    real numbers, never a bare pass/fail.
+
+    Task 457: the identical `last is None or FIELD not in last` omitted-
+    field bug tasks 453-456 already fixed on four sibling `metrics.jsonl`
+    checkers (`gap_true_positive_check.py`, `toolkits_in_use_check.py`,
+    `report_shipped_check.py`, `github_stars_check.py`) -- a reading that
+    EXISTS (has a `date`, other fields present) but omits
+    `connected_users_oauth` used to collapse into the same unconditional-
+    clean branch as "no reading has ever existed at all", even while the
+    real ground truth already names a nonzero connected-user count that
+    reading failed to carry. `consent_grant_log.real_distinct_human_count`
+    is always a definite `int`, never `None`, so the omission-with-an-
+    existing-reading case is clean only when that real count is honestly
+    `0` (nothing yet to have omitted), and `BROKEN` the moment a real
+    connected human exists and a dated reading failed to record it."""
     real = consent_grant_log.real_distinct_human_count(consent_log_path)
     last = _last_metrics_entry(metrics_path)
-    if last is None or "connected_users_oauth" not in last:
+    if last is None:
         return {
             "clean": True,
             "real": real,
             "claimed": None,
             "claimed_date": None,
+        }
+    if "connected_users_oauth" not in last:
+        return {
+            "clean": real == 0,
+            "real": real,
+            "claimed": None,
+            "claimed_date": last.get("date"),
         }
     claimed = last["connected_users_oauth"]
     return {
@@ -112,7 +133,19 @@ def check_connected_users(
 
 def format_result(result: dict) -> str:
     if result["claimed"] is None:
-        return f"connected users (OAuth): clean (no metrics.jsonl reading yet; real ground truth is {result['real']})"
+        if result["claimed_date"] is None:
+            return f"connected users (OAuth): clean (no metrics.jsonl reading yet; real ground truth is {result['real']})"
+        if result["clean"]:
+            return (
+                f"connected users (OAuth): clean (metrics.jsonl's {result['claimed_date']} reading names no "
+                f"connected_users_oauth field; real ground truth is honestly 0, nothing omitted)"
+            )
+        return (
+            f"connected users (OAuth): BROKEN -- metrics.jsonl's {result['claimed_date']} reading names no "
+            f"connected_users_oauth field, but real ground truth (HAND/consent-grants-log.jsonl, "
+            f"gate-verified) is already {result['real']} -- a real count exists and was not recorded, "
+            "escalate now"
+        )
     if result["clean"]:
         return f"connected users (OAuth): clean ({result['real']} real connected user(s), metrics.jsonl's {result['claimed_date']} reading agrees)"
     return (
