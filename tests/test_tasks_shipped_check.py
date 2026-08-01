@@ -254,6 +254,65 @@ class MalformedLastLineCase(unittest.TestCase):
         self.assertEqual(result["claimed_date"], "2026-07-20")
 
 
+class OmittedFieldOnExistingReadingCase(unittest.TestCase):
+    """Task 458: the identical bug shape tasks 453-457 already fixed on
+    five sibling metrics.jsonl checkers -- a reading that EXISTS (has a
+    `date`) but omits `tasks_shipped_today` used to collapse into the same
+    unconditional-clean branch as "no reading has ever existed at all",
+    even when real, live ground truth (BUILDLOG.md's own dated rows before
+    that date's aggregate row) already names a nonzero count the reading
+    failed to carry. Proves the honest-omission shape (real is 0, nothing
+    yet to have missed), the broken-omission shape (real is nonzero, a
+    real count went unrecorded), and that the omission stays clean when
+    no aggregate row exists for that date at all (nothing to honestly
+    cross-check, same as every other shape in this file)."""
+
+    def setUp(self):
+        self.tmp = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.tmp, ignore_errors=True)
+        self.metrics_path = os.path.join(self.tmp, "metrics.jsonl")
+        self.buildlog_path = os.path.join(self.tmp, "BUILDLOG.md")
+
+    def test_omitted_field_against_zero_real_is_honestly_clean(self):
+        _write_buildlog(self.buildlog_path, [
+            "2026-07-20 18:00 UTC | nisaba | 1 | 18:00 UTC daily aggregate: metrics.jsonl reading recorded",
+        ])
+        _write_metrics(self.metrics_path, [{"date": "2026-07-20", "reports_shipped_today": 1}])
+        result = tsc.check_tasks_shipped(self.metrics_path, self.buildlog_path)
+        self.assertTrue(result["clean"])
+        self.assertEqual(result["real"], 0)
+        self.assertIsNone(result["claimed"])
+        self.assertEqual(result["claimed_date"], "2026-07-20")
+        formatted = tsc.format_result(result)
+        self.assertIn("clean", formatted)
+        self.assertIn("nothing omitted", formatted)
+
+    def test_omitted_field_against_a_real_nonzero_count_is_broken(self):
+        _write_buildlog(self.buildlog_path, [
+            "2026-07-20 09:00 UTC | ogun | 1 | shipped something ordinary",
+            "2026-07-20 10:00 UTC | ogun | 2 | shipped another thing",
+            "2026-07-20 18:00 UTC | nisaba | 3 | 18:00 UTC daily aggregate: metrics.jsonl reading recorded",
+        ])
+        _write_metrics(self.metrics_path, [{"date": "2026-07-20", "reports_shipped_today": 1}])
+        result = tsc.check_tasks_shipped(self.metrics_path, self.buildlog_path)
+        self.assertFalse(result["clean"])
+        self.assertEqual(result["real"], 2)
+        self.assertIsNone(result["claimed"])
+        formatted = tsc.format_result(result)
+        self.assertIn("BROKEN", formatted)
+        self.assertIn("not recorded", formatted)
+
+    def test_omitted_field_with_no_aggregate_row_stays_clean(self):
+        _write_buildlog(self.buildlog_path, [
+            "2026-07-20 09:00 UTC | ogun | 1 | shipped something ordinary",
+        ])
+        _write_metrics(self.metrics_path, [{"date": "2026-07-20", "reports_shipped_today": 1}])
+        result = tsc.check_tasks_shipped(self.metrics_path, self.buildlog_path)
+        self.assertTrue(result["clean"])
+        self.assertIsNone(result["real"])
+        self.assertIsNone(result["claimed"])
+
+
 class RealLiveStateCase(unittest.TestCase):
     """The real point of this task: records/metrics.jsonl's own
     tasks_shipped_today field claims 17 for 2026-07-30 (task 414's own

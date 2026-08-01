@@ -135,17 +135,46 @@ def check_tasks_shipped(
 ) -> dict:
     """Cross-check the last recorded `tasks_shipped_today` reading against
     real, live BUILDLOG.md ground truth. Returns `clean: True` when the two
-    agree, or when there is no reading yet, or no aggregate row for that
-    reading's date, to contradict (absence of ground truth is not a
-    mismatch -- the same no-reading branch every sibling check already
-    holds); otherwise `clean: False` naming the exact claimed vs. real
-    values and the date in question, never a bare pass/fail."""
+    agree, when there is no reading yet, or when no aggregate row exists
+    for that reading's date (absence of ground truth is not a mismatch --
+    the same no-reading branch every sibling check already holds);
+    otherwise `clean: False` naming the exact claimed vs. real values and
+    the date in question, never a bare pass/fail.
+
+    Task 458: the identical `last is None or FIELD not in last` omitted-
+    field bug tasks 453-457 already fixed on five sibling `metrics.jsonl`
+    checkers (`gap_true_positive_check.py`, `toolkits_in_use_check.py`,
+    `report_shipped_check.py`, `github_stars_check.py`,
+    `connected_users_check.py`) -- built at task 416, one campaign before
+    that fix existed, and never revisited by it. A reading that EXISTS (has
+    a `date`) but omits `tasks_shipped_today` used to collapse into the
+    same unconditional-clean branch as "no reading has ever existed at
+    all", even when real ground truth for that date already names a
+    nonzero count the reading failed to carry. Unlike the other five
+    siblings, this file's ground truth can ALSO be honestly unknowable
+    (`_tasks_shipped_ground_truth` returns `None` when no daily-aggregate
+    BUILDLOG.md row exists for that date yet) -- that "real is None" case
+    stays clean regardless of what was claimed, same as it always has,
+    since there is nothing to contradict a claim with. Only when real
+    ground truth is a definite number does an omitted field get judged:
+    clean if that real count is honestly `0` (nothing yet to have
+    omitted), BROKEN the moment real tasks shipped that day and the
+    reading silently dropped the field meant to record it."""
     last = _last_metrics_entry(metrics_path)
-    if last is None or "tasks_shipped_today" not in last or "date" not in last:
+    if last is None or "date" not in last:
         return {"clean": True, "real": None, "claimed": None, "claimed_date": None}
     claimed_date = last["date"]
-    claimed = last["tasks_shipped_today"]
     real = _tasks_shipped_ground_truth(buildlog_path, claimed_date)
+    if "tasks_shipped_today" not in last:
+        if real is None:
+            return {"clean": True, "real": None, "claimed": None, "claimed_date": claimed_date}
+        return {
+            "clean": real == 0,
+            "real": real,
+            "claimed": None,
+            "claimed_date": claimed_date,
+        }
+    claimed = last["tasks_shipped_today"]
     if real is None:
         return {"clean": True, "real": None, "claimed": claimed, "claimed_date": claimed_date}
     return {
@@ -157,8 +186,26 @@ def check_tasks_shipped(
 
 
 def format_result(result: dict) -> str:
-    if result["claimed"] is None:
+    if result["claimed_date"] is None:
         return "tasks shipped today: clean (no metrics.jsonl reading yet; nothing to cross-check)"
+    if result["claimed"] is None:
+        if result["real"] is None:
+            return (
+                f"tasks shipped today: clean (metrics.jsonl's {result['claimed_date']} reading names no "
+                "tasks_shipped_today field; no daily-aggregate BUILDLOG.md row found for that date, "
+                "nothing to cross-check)"
+            )
+        if result["clean"]:
+            return (
+                f"tasks shipped today: clean (metrics.jsonl's {result['claimed_date']} reading names no "
+                "tasks_shipped_today field; real ground truth is honestly 0, nothing omitted)"
+            )
+        return (
+            f"tasks shipped today: BROKEN -- metrics.jsonl's {result['claimed_date']} reading names no "
+            f"tasks_shipped_today field, but real ground truth (BUILDLOG.md's own dated rows before "
+            f"that day's aggregate task) is already {result['real']} -- a real count exists and was "
+            "not recorded, escalate now"
+        )
     if result["real"] is None:
         return (
             f"tasks shipped today: clean (metrics.jsonl's {result['claimed_date']} reading claims "
