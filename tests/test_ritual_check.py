@@ -3154,6 +3154,67 @@ class EscapeSequenceFoldCase(unittest.TestCase):
         self.assertEqual(result["escape_sequences"]["clean"], not direct)
 
 
+class MetricsFieldCompletenessFoldCase(unittest.TestCase):
+    """Task 459: run_ritual_check() folds metrics_field_completeness_
+    check.py's own structural sweep into the same structured result --
+    clean against a fixture where every field is guarded, and a
+    synthetic unguarded field both flips `broken` and surfaces in the
+    printed block, the same class escape_sequences/scopes_completeness
+    already hold."""
+
+    def setUp(self):
+        self.dir = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.dir, ignore_errors=True)
+        self.tools_dir = os.path.join(self.dir, "tools")
+        os.makedirs(self.tools_dir)
+
+    def _write_metrics(self, rows):
+        path = os.path.join(self.dir, "metrics.jsonl")
+        with open(path, "w") as f:
+            for row in rows:
+                f.write(json.dumps(row) + "\n")
+        return path
+
+    def test_clean_when_every_field_is_guarded(self):
+        metrics_path = self._write_metrics([{"date": "2026-08-01", "widgets_shipped": 3}])
+        with open(os.path.join(self.tools_dir, "widgets_check.py"), "w") as f:
+            f.write('FIELD = "widgets_shipped"\n')
+        result = rc.run_ritual_check(
+            metrics_field_completeness_metrics_path=metrics_path,
+            metrics_field_completeness_tools_dir=self.tools_dir,
+        )
+        self.assertTrue(result["metrics_field_completeness"]["clean"])
+        self.assertFalse(result["broken"])
+        self.assertIn("metrics field completeness: clean", rc.format_ritual_check(result))
+
+    def test_unguarded_field_flips_broken_and_prints_the_field_name(self):
+        metrics_path = self._write_metrics([{"date": "2026-08-01", "widgets_shipped": 3}])
+        result = rc.run_ritual_check(
+            metrics_field_completeness_metrics_path=metrics_path,
+            metrics_field_completeness_tools_dir=self.tools_dir,
+        )
+        self.assertFalse(result["metrics_field_completeness"]["clean"])
+        self.assertTrue(result["broken"])
+        formatted = rc.format_ritual_check(result)
+        self.assertIn("metrics field completeness", formatted)
+        self.assertIn("UNGUARDED FIELD", formatted)
+        self.assertIn("widgets_shipped", formatted)
+
+    def test_default_paths_read_the_real_tree_and_match_direct_call(self):
+        """No override: reads the real records/metrics.jsonl and tools/
+        dir, the same default check_metrics_field_completeness falls back
+        to -- proves the fold never duplicates or diverges from the
+        module it wraps."""
+        mfc = _load(
+            "_test_metrics_field_completeness_check",
+            os.path.join(ROOT, "tools", "metrics_field_completeness_check.py"),
+        )
+        direct = mfc.check_metrics_field_completeness()
+        result = rc.run_ritual_check()
+        self.assertEqual(result["metrics_field_completeness"]["clean"], direct["clean"])
+        self.assertEqual(result["metrics_field_completeness"]["unguarded"], direct["unguarded"])
+
+
 class RitualCompletenessToolFilesFoldCase(unittest.TestCase):
     """Task 409: ritual_completeness_check.py's own audit widened to also
     catch a whole tools/*.py file never loaded from run_ritual_check at

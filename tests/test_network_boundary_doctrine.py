@@ -183,6 +183,7 @@ class RealToolsDirCase(unittest.TestCase):
         "duplicate_regex_check.py",
         "hand_lore_check.py",
         "journal_numbering_check.py",
+        "metrics_field_completeness_check.py",
         "network_boundary_check.py",
         "petition_cadence_check.py",
         "petition_limits_check.py",

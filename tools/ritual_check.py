@@ -383,6 +383,13 @@ def _escape_sequence_check():
     return _load_once("_ritual_escape_sequence_check", os.path.join(ROOT, "tools", "escape_sequence_check.py"))
 
 
+def _metrics_field_completeness_check():
+    return _load_once(
+        "_ritual_metrics_field_completeness_check",
+        os.path.join(ROOT, "tools", "metrics_field_completeness_check.py"),
+    )
+
+
 def _strategy_audit_target():
     src = os.path.join(ROOT, "fencepost", "seam_engine", "src")
     if src not in sys.path:
@@ -1492,6 +1499,28 @@ def check_escape_sequences(orita_dir: str | None = None) -> dict:
     return mod.check_escape_sequences(**kwargs)
 
 
+def check_metrics_field_completeness(
+    metrics_path: str | None = None, tools_dir: str | None = None
+) -> dict:
+    """Task 459: fold `metrics_field_completeness_check.py`'s own
+    structural sweep into the one block -- the third of its family
+    alongside `check_ritual_completeness` (every `check_*` function
+    wired) and `check_scopes_completeness` (every connected app named).
+    Unconditional, local-filesystem-only, the same cheap always-on class
+    those two already hold. A real hit here DOES flip `broken`: a field
+    recorded in `records/metrics.jsonl` with no matching cross-checker is
+    the exact silent-omission risk tasks 453-458's whole campaign existed
+    to close, now standing again on a field this check can name, not an
+    honest zero-state waiting on the calendar."""
+    mod = _metrics_field_completeness_check()
+    kwargs = {}
+    if metrics_path is not None:
+        kwargs["metrics_path"] = metrics_path
+    if tools_dir is not None:
+        kwargs["tools_dir"] = tools_dir
+    return mod.check_metrics_field_completeness(**kwargs)
+
+
 def check_change_gate(report_info: dict) -> dict | None:
     """Fold `change_gate.should_post_gap()` -- task 69's own change-gate
     rule -- using whichever report text `check_report_freshness` already
@@ -1561,6 +1590,8 @@ def run_ritual_check(
     recipe_readme_path: str | None = None,
     recipe_readme_fencepost_root: str | None = None,
     escape_sequence_orita_dir: str | None = None,
+    metrics_field_completeness_metrics_path: str | None = None,
+    metrics_field_completeness_tools_dir: str | None = None,
     strategy_true_positive_path: str | None = None,
     strategy_true_positive_ledger_base: str | None = None,
     gap_true_positive_metrics_path: str | None = None,
@@ -1657,6 +1688,10 @@ def run_ritual_check(
         readme_path=recipe_readme_path, recipe_fencepost_root=recipe_readme_fencepost_root
     )
     escape_sequences = check_escape_sequences(orita_dir=escape_sequence_orita_dir)
+    metrics_field_completeness = check_metrics_field_completeness(
+        metrics_path=metrics_field_completeness_metrics_path,
+        tools_dir=metrics_field_completeness_tools_dir,
+    )
     strategy_true_positive = check_strategy_true_positive(
         strategy_path=strategy_true_positive_path,
         ledger_base=strategy_true_positive_ledger_base,
@@ -1712,6 +1747,7 @@ def run_ritual_check(
         or (not tasks_shipped["clean"])
         or (not github_stars["clean"])
         or (not escape_sequences["clean"])
+        or (not metrics_field_completeness["clean"])
     )
     return {
         "now": now_iso,
@@ -1763,6 +1799,7 @@ def run_ritual_check(
         "tasks_shipped": tasks_shipped,
         "github_stars": github_stars,
         "escape_sequences": escape_sequences,
+        "metrics_field_completeness": metrics_field_completeness,
         "broken": broken,
     }
 
@@ -2086,6 +2123,9 @@ def format_ritual_check(result: dict) -> str:
             "is misreporting live, escalate now"
         )
     lines.append("  " + _escape_sequence_check().format_result(result["escape_sequences"]))
+    lines.append(
+        "  " + _metrics_field_completeness_check().format_result(result["metrics_field_completeness"])
+    )
     return "\n".join(lines)
 
 
