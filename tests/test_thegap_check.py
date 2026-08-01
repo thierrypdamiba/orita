@@ -16,6 +16,14 @@ import unittest
 from datetime import date
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+VAULT_ROOT = os.path.join(os.path.dirname(ROOT), "orita-vault")
+# Task 370's own first CI run caught this the hard way (test_journal_
+# numbering_check.py's own VAULT_ROOT comment): dawn-run's workflow
+# checks out only this public repo, never the private orita-vault
+# sibling. A test that asserts something about the REAL vault's content
+# must skip cleanly there instead of failing on a premise that was never
+# true in that environment.
+_VAULT_CHECKED_OUT = os.path.isdir(os.path.join(VAULT_ROOT, "hand", "gap-confessions"))
 
 
 def _load(name, path):
@@ -203,18 +211,40 @@ class FixtureCadenceCase(unittest.TestCase):
         self.assertIn("confession due now: 2026-07-30->2026-08-03", line)
 
     def test_real_live_readme_today_reproduces_the_named_gap(self):
-        # Proves the live README + real vault, not just a fixture: one
-        # real gap-hidden marker (2026-07-30), a real pre-drafted
-        # confession on record (due 2026-08-03), not yet due as of
-        # 2026-08-01, and the two Mondays before it (07-13, 07-20)
-        # genuinely missed -- task 463's own research pass found this
-        # live, unwatched until this module.
+        # Proves the live README, not just a fixture: one real gap-hidden
+        # marker (2026-07-30) and the two Mondays before it (07-13,
+        # 07-20) genuinely missed -- task 463's own research pass found
+        # this live, unwatched until this module. Uses a vault dir that
+        # deliberately does NOT exist, so this assertion holds in any
+        # checkout (public CI included) regardless of whether the private
+        # orita-vault sibling is present -- the predraft/confession half
+        # of the real state is proven separately, and only where the
+        # real vault actually is (see RealVaultCase below).
         real_readme = os.path.join(ROOT, "thegap", "README.md")
-        real_vault = os.path.join(os.path.dirname(ROOT), "orita-vault")
-        result = tgc.compute_cadence(real_readme, real_vault, today=date(2026, 8, 1))
+        no_vault = os.path.join(ROOT, "does-not-exist-orita-vault")
+        result = tgc.compute_cadence(real_readme, no_vault, today=date(2026, 8, 1))
         self.assertEqual(result["total_hidden_on_record"], 1)
         self.assertEqual(result["latest_hidden"], "2026-07-30")
         self.assertEqual(result["missed_mondays"], ["2026-07-13", "2026-07-20"])
+
+
+class RealVaultCase(unittest.TestCase):
+    """Task 463: the confession-predraft half of the live gap, provable
+    only where the real orita-vault sibling checkout is actually present
+    (a developer's machine, this session) -- never in public CI, which
+    checks out only this repo (the same boundary
+    test_journal_numbering_check.py's RealCheckoutCase already draws)."""
+
+    @unittest.skipUnless(
+        _VAULT_CHECKED_OUT,
+        "orita-vault sibling checkout not present (expected in public CI, which checks out only orita)",
+    )
+    def test_real_live_readme_and_vault_today_reproduces_the_named_gap(self):
+        # One real gap-hidden marker (2026-07-30), a real pre-drafted
+        # confession on record (due 2026-08-03), not yet due as of
+        # 2026-08-01.
+        real_readme = os.path.join(ROOT, "thegap", "README.md")
+        result = tgc.compute_cadence(real_readme, VAULT_ROOT, today=date(2026, 8, 1))
         self.assertEqual(result["missing_predraft"], [])
         self.assertEqual(result["confession_due_now"], [])
 
