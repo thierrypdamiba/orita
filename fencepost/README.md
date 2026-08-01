@@ -312,6 +312,19 @@ reuses the shared `seam_engine.closing_keywords.CLOSING_KEYWORD_RE`
 grammar (task 394) rather than a fourth, independently typed copy of the
 same pattern. Both scopes (`GetUserTweets`, `ListIssues`) already sit on
 `SCOPES.md`'s cleared oath table, no new scope wiring needed.
+[`RECIPES/tweet-claims-open-milestone/`](RECIPES/tweet-claims-open-milestone/)
+is the twenty-ninth (ROADMAP.md #452): the tweet-side twin of
+`release-claims-open-milestone` (the sixteenth real recipe), closing the
+matching milestone-claim third leg of the release-vs-tweet split
+`tweet-claims-unmerged-pr` and `tweet-claims-unfixed-issue` already opened
+for PR and issue claims — a tweet from the connected X account claims a
+milestone shipped ("milestone #N"), but the named milestone never
+actually closed. Same age-gated confidence shape as
+`release-claims-open-milestone` (0.5 under 24h, 0.85 at/past it), and
+reuses the shared `seam_engine.milestone_claims.claimed_milestone_numbers`
+grammar (task 389) rather than a third, independently typed copy of the
+same pattern. Both scopes (`GetUserTweets`, `ListMilestones`) already sit
+on `SCOPES.md`'s cleared oath table, no new scope wiring needed.
 
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)

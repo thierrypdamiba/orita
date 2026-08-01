@@ -1,0 +1,32 @@
+[
+  {
+    "id": "T-1201",
+    "text": "Milestone #5001 shipped today and milestone #5001 confirmed again (should only count once).",
+    "created_at": "2026-07-27T10:00:00Z",
+    "url": "https://x.com/oritatown/status/2000000000000001201"
+  },
+  {
+    "id": "T-1202",
+    "text": "Milestone #5003 done -- a quieter cut out now.",
+    "created_at": "2026-07-29T08:00:00Z",
+    "url": "https://x.com/oritatown/status/2000000000000001202"
+  },
+  {
+    "id": "T-1203",
+    "text": "Milestone #5002 wrapped up, the whole bundle.",
+    "created_at": "2026-07-27T09:00:00Z",
+    "url": "https://x.com/oritatown/status/2000000000000001203"
+  },
+  {
+    "id": "T-1204",
+    "text": "Milestone #5999 shipped.",
+    "created_at": "2026-07-25T09:00:00Z",
+    "url": "https://x.com/oritatown/status/2000000000000001204"
+  },
+  {
+    "id": "T-1205",
+    "text": "Another quiet hour at the desk -- see #1205 for background, no milestone claim here.",
+    "created_at": "2026-07-24T09:00:00Z",
+    "url": "https://x.com/oritatown/status/2000000000000001205"
+  }
+]

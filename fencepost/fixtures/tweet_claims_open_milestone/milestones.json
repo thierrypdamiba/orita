@@ -1,0 +1,20 @@
+[
+  {
+    "number": 5001,
+    "title": "v1.9 seam family completion",
+    "state": "open",
+    "url": "https://github.com/thierrypdamiba/orita/milestone/5001"
+  },
+  {
+    "number": 5002,
+    "title": "v1.7 closed bundle",
+    "state": "closed",
+    "url": "https://github.com/thierrypdamiba/orita/milestone/5002"
+  },
+  {
+    "number": 5003,
+    "title": "v2.0 fresh cut",
+    "state": "open",
+    "url": "https://github.com/thierrypdamiba/orita/milestone/5003"
+  }
+]
