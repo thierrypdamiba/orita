@@ -359,6 +359,10 @@ def _what_moved_check():
     return _load("_ritual_what_moved_check", os.path.join(ROOT, "tools", "what_moved_check.py"))
 
 
+def _thegap_check():
+    return _load("_ritual_thegap_check", os.path.join(ROOT, "tools", "thegap_check.py"))
+
+
 def _strategy_targets_check():
     return _load_once("_ritual_strategy_targets_check", os.path.join(ROOT, "tools", "strategy_targets_check.py"))
 
@@ -1156,6 +1160,43 @@ def check_what_moved_cadence(what_moved_path: str | None = None, what_moved_toda
     return mod.compute_cadence(**kwargs)
 
 
+def check_thegap_cadence(
+    thegap_readme_path: str | None = None,
+    thegap_vault_dir: str | None = None,
+    thegap_today=None,
+) -> dict:
+    """Task 463: fold `thegap_check.py`'s own weekly Gap-bug hide/confess
+    scan into the one block, closing the third and last leg of
+    TOWN-OPERATIONS.md's "Weekly, Cluster Day (Monday)" ritual --
+    `check_cluster_day_cadence` (task 387) covers Ananse's chronicle,
+    `check_what_moved_cadence` (task 449) covers Zashiki's mystery page,
+    and this covers Off-By-One's own `/thegap/` doctrine, which
+    `what_moved_check.py`'s own docstring named as still missing a
+    sensor and left open for whichever hour picked it up next (this one).
+    Unconditional, local-filesystem-only (reads `thegap/README.md` and,
+    for the confession-predraft half, `orita-vault/hand/gap-confessions/`
+    -- never the confession text itself, only whether a file exists),
+    the same cheap informational class its two siblings already hold.
+    Never flips `broken` on cadence or on a confession merely being due:
+    a lapsed week or an unconfessed-but-not-yet-due bug is a fact worth
+    surfacing to the next hour's run, not a currently-live violation --
+    the same distinction `cluster_day`/`what_moved` already hold. A
+    missing pre-drafted confession IS named plainly inside the printed
+    line (Iron Rule: the draft must exist before the bug ships), but even
+    that stays non-`broken` here, consistent with every other doctrine
+    check in this weekly-cadence family being informational rather than
+    a hard gate."""
+    mod = _thegap_check()
+    kwargs = {}
+    if thegap_readme_path is not None:
+        kwargs["readme_path"] = thegap_readme_path
+    if thegap_vault_dir is not None:
+        kwargs["vault_dir"] = thegap_vault_dir
+    if thegap_today is not None:
+        kwargs["today"] = thegap_today
+    return mod.compute_cadence(**kwargs)
+
+
 def check_strategy_targets(strategy_path: str | None = None) -> dict:
     """Task 407: fold strategy_targets_check.py's own STRATEGY.md-vs-code
     target cross-check (task 159) into the one block. Unconditional,
@@ -1583,6 +1624,9 @@ def run_ritual_check(
     cluster_day_today=None,
     what_moved_path: str | None = None,
     what_moved_today=None,
+    thegap_readme_path: str | None = None,
+    thegap_vault_dir: str | None = None,
+    thegap_today=None,
     strategy_targets_path: str | None = None,
     network_boundary_dirs: tuple | None = None,
     site_link_docs_dir: str | None = None,
@@ -1680,6 +1724,9 @@ def run_ritual_check(
     )
     cluster_day = check_cluster_day_cadence(chronicle_dir=cluster_day_dir, today=cluster_day_today)
     what_moved = check_what_moved_cadence(what_moved_path=what_moved_path, what_moved_today=what_moved_today)
+    thegap = check_thegap_cadence(
+        thegap_readme_path=thegap_readme_path, thegap_vault_dir=thegap_vault_dir, thegap_today=thegap_today
+    )
     strategy_targets = check_strategy_targets(strategy_path=strategy_targets_path)
     network_boundary = check_network_boundary(dirs=network_boundary_dirs)
     site_links = check_site_links(docs_dir=site_link_docs_dir)
@@ -1788,6 +1835,7 @@ def run_ritual_check(
         "connected_users": connected_users,
         "cluster_day": cluster_day,
         "what_moved": what_moved,
+        "thegap": thegap,
         "strategy_targets": strategy_targets,
         "network_boundary": network_boundary,
         "site_links": site_links,
@@ -2014,6 +2062,8 @@ def format_ritual_check(result: dict) -> str:
     lines.append("  " + _cluster_day_check().format_cadence(cd))
     wm = result["what_moved"]
     lines.append("  " + _what_moved_check().format_cadence(wm))
+    tg = result["thegap"]
+    lines.append("  " + _thegap_check().format_cadence(tg))
     st = result["strategy_targets"]
     for line in _strategy_targets_check().format_strategy_targets(st).split("\n"):
         lines.append("  " + line)

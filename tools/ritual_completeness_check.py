@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Task 121. Off-By-One counts the tool that counts everything else.
 
-`tools/ritual_check.py` hand-wires 49 `check_*` functions into one hourly
+`tools/ritual_check.py` hand-wires 50 `check_*` functions into one hourly
 block: each is called inside `run_ritual_check`, its result assigned to a
 dict key, and that key printed as a line in `format_ritual_check`. Three
 separate places a single typo or a forgotten wire-up can silently drop a
@@ -161,6 +161,14 @@ gets updated "one day in arrears" each Monday. It never has, past the
 page's own founding-day placeholder -- a genuine lapse, surfaced honestly
 rather than silently absorbed. `find_unwired_tool_files()` (task 409)
 already covers this file going forward, since it lives in `tools/`.
+
+**Updated to 50** the same hour task 463's `check_thegap_cadence` was
+wired in -- `tools/thegap_check.py` (task 463) closes the third and
+last leg of the weekly Cluster Day ritual, Off-By-One's own `/thegap/`
+Gap-bug hide/confess cadence, which `check_what_moved_cadence`'s own
+docstring had already named as missing and left open for whichever hour
+picked it up next. `find_unwired_tool_files()` (task 409) already
+covers this file going forward, since it lives in `tools/`.
 
 Usage:
     python3 tools/ritual_completeness_check.py check

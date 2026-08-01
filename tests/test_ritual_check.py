@@ -2732,6 +2732,90 @@ class ClusterDayFoldCase(unittest.TestCase):
         self.assertEqual(result["cluster_day"], direct)
 
 
+class ThegapFoldCase(unittest.TestCase):
+    """Task 463: run_ritual_check() folds thegap_check.py's own weekly
+    Gap-bug hide/confess scan into the same structured result -- the
+    third and last leg of TOWN-OPERATIONS.md's Cluster Day ritual,
+    alongside ClusterDayFoldCase (Ananse) and what_moved (Zashiki, never
+    given its own fold-case here, only tested via its own module suite).
+    A no-gap, fully-predrafted fixture prints a clean line; a lapsed or
+    predraft-missing fixture names it plainly; neither ever flips
+    `broken`, the same class every sibling cadence check already holds."""
+
+    def setUp(self):
+        self.tmp = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.tmp, ignore_errors=True)
+        self.readme = os.path.join(self.tmp, "thegap", "README.md")
+        self.vault = os.path.join(self.tmp, "orita-vault")
+
+    def _write_readme(self, content):
+        path = self.readme
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, "w") as f:
+            f.write(content)
+
+    def _draft(self, due_iso, name="fixture-bug.md"):
+        path = os.path.join(self.vault, "hand", "gap-confessions", f"{due_iso}-{name}")
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, "w") as f:
+            f.write("x")
+
+    def test_no_gap_fixture_prints_clean_and_never_flips_broken(self):
+        from datetime import date
+
+        self._write_readme("<!-- gap-hidden: 2026-07-14 -->\n")
+        self._draft("2026-07-20")
+        result = rc.run_ritual_check(
+            thegap_readme_path=self.readme, thegap_vault_dir=self.vault, thegap_today=date(2026, 7, 15)
+        )
+        self.assertEqual(result["thegap"]["missed_mondays"], [])
+        self.assertEqual(result["thegap"]["missing_predraft"], [])
+        self.assertFalse(result["broken"])
+        formatted = rc.format_ritual_check(result)
+        self.assertIn("thegap cadence: current", formatted)
+
+    def test_gap_fixture_is_named_but_still_never_flips_broken(self):
+        from datetime import date
+
+        self._write_readme("# The Gap\n\nnothing hidden yet.\n")
+        result = rc.run_ritual_check(
+            thegap_readme_path=self.readme, thegap_vault_dir=self.vault, thegap_today=date(2026, 7, 29)
+        )
+        self.assertEqual(
+            result["thegap"]["missed_mondays"], ["2026-07-13", "2026-07-20", "2026-07-27"]
+        )
+        self.assertFalse(result["broken"])
+        formatted = rc.format_ritual_check(result)
+        self.assertIn("3 Cluster Days lapsed", formatted)
+        self.assertIn("2026-07-27", formatted)
+
+    def test_missing_predraft_named_but_still_never_flips_broken(self):
+        from datetime import date
+
+        self._write_readme("<!-- gap-hidden: 2026-07-30 -->\n")
+        result = rc.run_ritual_check(
+            thegap_readme_path=self.readme, thegap_vault_dir=self.vault, thegap_today=date(2026, 7, 31)
+        )
+        self.assertEqual(result["thegap"]["missing_predraft"], ["2026-07-30"])
+        self.assertFalse(result["broken"])
+        formatted = rc.format_ritual_check(result)
+        self.assertIn("missing pre-drafted confession for 2026-07-30", formatted)
+
+    def test_default_paths_read_the_real_data_and_match_direct_call(self):
+        """No override: reads the real thegap/README.md + the real
+        orita-vault checkout, the same default compute_cadence falls
+        back to -- proves the fold never duplicates or diverges from the
+        module it wraps (test_thegap_check.py's own
+        test_real_live_readme_today_reproduces_the_named_gap already owns
+        proving that module's own correctness against the real data)."""
+        from datetime import date
+
+        tgc = _load("_test_thegap_check", os.path.join(ROOT, "tools", "thegap_check.py"))
+        direct = tgc.compute_cadence(today=date(2026, 8, 1))
+        result = rc.run_ritual_check(thegap_today=date(2026, 8, 1))
+        self.assertEqual(result["thegap"], direct)
+
+
 class StrategyTargetsFoldCase(unittest.TestCase):
     """Task 407: run_ritual_check() folds strategy_targets_check.py's own
     STRATEGY.md-vs-code target cross-check (task 159) into the same
