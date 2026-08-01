@@ -67,6 +67,7 @@ STAR_PATTERN_CONSUMERS = {
     "text_patterns.DROP_A_STAR",
     "text_patterns.LEAVE_A_STAR",
     "text_patterns.STAR_US_IF",
+    "text_patterns.STAR_THIS_OUR_THE_REPO",
 }
 
 
@@ -152,11 +153,22 @@ class StarBeggingPatternsCase(unittest.TestCase):
     def test_star_us_if(self):
         self.assertTrue(tp.STAR_US_IF.search("star us if you liked this"))
 
+    def test_star_this_our_the_repo(self):
+        self.assertTrue(tp.STAR_THIS_OUR_THE_REPO.search("star this repo"))
+
+    def test_star_this_our_the_repo_matches_town(self):
+        # Task 461: "town" is this project's own dominant self-referential
+        # noun (CHARTER.md:93 uses it in a live sentence) -- the exact
+        # noun star_covenant_check.py's pre-fix local copy of this pattern
+        # never covered, unlike petition_limits_check.py's copy.
+        self.assertTrue(tp.STAR_THIS_OUR_THE_REPO.search("please star the town"))
+
     def test_none_match_ordinary_prose(self):
         prose = "the counter reads the true count minus one"
         for pattern in (
             tp.PLEASE_STAR, tp.PLEASE_FOLLOW, tp.GIVE_US_A_STAR,
             tp.DROP_A_STAR, tp.LEAVE_A_STAR, tp.STAR_US_IF,
+            tp.STAR_THIS_OUR_THE_REPO,
         ):
             self.assertIsNone(pattern.search(prose))
 
@@ -220,7 +232,7 @@ class ConsumerRegressionCase(unittest.TestCase):
                     f"{relpath} still locally defines a pattern it should only import",
                 )
 
-    def test_star_covenant_and_petition_limits_share_six_patterns(self):
+    def test_star_covenant_and_petition_limits_share_seven_patterns(self):
         star_source = _source("star_covenant_check.py")
         petition_source = _source("petition_limits_check.py")
         for attr in STAR_PATTERN_CONSUMERS:

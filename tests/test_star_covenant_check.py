@@ -52,6 +52,20 @@ class FixtureViolationCase(unittest.TestCase):
         self.assertIn("VIOLATION(S) FOUND", formatted)
         self.assertIn("Star Covenant broken", formatted)
 
+    def test_star_the_town_is_detected(self):
+        # Task 461: "town" is this project's own dominant self-referential
+        # noun (CHARTER.md:93: "star the town and it records your name in
+        # stone") -- the exact noun this check's "star this/our/the repo"
+        # pattern never covered pre-fix, unlike the sibling copy in
+        # petition_limits_check.py, which already included it.
+        _write(
+            os.path.join(self.orita, "docs", "report.md"),
+            "This project is worth a look. Star the town if you enjoy it!\n",
+        )
+        violations = scc.find_violations(orita_dir=self.orita)
+        patterns = {v["pattern"] for v in violations}
+        self.assertIn("star this/our/the repo", patterns)
+
     def test_follow_begging_is_detected(self):
         _write(
             os.path.join(self.orita, "houses", "kwaku-ananse", "journal", "0099-test.md"),
@@ -156,6 +170,44 @@ class FixtureViolationCase(unittest.TestCase):
     def test_missing_dir_returns_empty_not_crash(self):
         violations = scc.find_violations(orita_dir=os.path.join(self.orita, "does-not-exist"))
         self.assertEqual(violations, [])
+
+    def test_automatic_consequence_and_form_is_not_flagged(self):
+        # Task 461: closing the real "town" noun gap made this checker see,
+        # for the first time, CHARTER.md's own load-bearing description of
+        # the Founders' Wall -- a real live match this test proves stays
+        # clean. Third-person "it records" describes an automatic
+        # consequence of an existing public API, not an appeal to the
+        # reader.
+        _write(
+            os.path.join(self.orita, "CHARTER.md"),
+            "renders a Founders' Wall from the stargazers API: "
+            "star the town and it records your name in stone.\n",
+        )
+        violations = scc.find_violations(orita_dir=self.orita)
+        self.assertEqual(violations, [])
+
+    def test_automatic_consequence_comma_form_is_not_flagged(self):
+        # The same sentence, comma-joined instead of "and"-joined -- the
+        # exact shape docs/founding.html's meta tags use.
+        _write(
+            os.path.join(self.orita, "docs", "founding.html"),
+            "<meta name=\"description\" content=\"the Founders' Wall — "
+            "star the town, it records your name in stone.\">\n",
+        )
+        violations = scc.find_violations(orita_dir=self.orita)
+        self.assertEqual(violations, [])
+
+    def test_automatic_consequence_guard_does_not_mask_real_begging(self):
+        # The guard is scoped to third-person "it <verb>s" specifically --
+        # it must never swallow an actual ask phrased with a similar
+        # "star X and <benefit>" shape that doesn't use "it".
+        _write(
+            os.path.join(self.orita, "docs", "report.md"),
+            "Star this repo and get notified of every release!\n",
+        )
+        violations = scc.find_violations(orita_dir=self.orita)
+        patterns = {v["pattern"] for v in violations}
+        self.assertIn("star this/our/the repo", patterns)
 
 
 class LiveRepoCase(unittest.TestCase):

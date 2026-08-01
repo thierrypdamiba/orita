@@ -34,7 +34,13 @@ files:
     "same curated imperative shapes star_covenant_check uses"). The
     shapes that were never copied (e.g. "smash that star", "like and
     subscribe" -- aimed at public-post scanning, not petition text) stay
-    local to `star_covenant_check.py`, untouched.
+    local to `star_covenant_check.py`, untouched. (Task 461 found and
+    fixed a seventh near-duplicate task 418 missed: "star this/our/the
+    repo" existed independently in both files, and had already drifted
+    -- petition_limits_check.py's noun list included "town", star_
+    covenant_check.py's did not. Now shared as `STAR_THIS_OUR_THE_REPO`
+    below, petition_limits_check.py's fuller noun set, so the two can't
+    drift apart again.)
 
 This module is the fix's other half: one real definition per pattern that
 actually is duplicated, here, that every one of those files now imports
@@ -84,3 +90,16 @@ GIVE_US_A_STAR = re.compile(r"\bgive\s+(us|me)\s+a\s+star\b", re.IGNORECASE)
 DROP_A_STAR = re.compile(r"\bdrop\s+a\s+star\b", re.IGNORECASE)
 LEAVE_A_STAR = re.compile(r"\bleave\s+a\s+star\b", re.IGNORECASE)
 STAR_US_IF = re.compile(r"\bstar\s+(us|it)\s+if\b", re.IGNORECASE)
+
+# Task 461. The seventh shape petition_limits_check.py's own copy had
+# drifted from star_covenant_check.py's: petition_limits_check.py's noun
+# alternation already included "town" (this project's own dominant
+# self-referential noun -- CHARTER.md:93 uses it in a live sentence), but
+# star_covenant_check.py's copy -- the repo-wide public-prose scanner,
+# not just the petition-scoped one -- never did, so "star the town" could
+# ship to any public file undetected. Both files now import this one
+# definition (petition_limits_check.py's fuller noun set) instead of each
+# keeping their own, closing the drift for good.
+STAR_THIS_OUR_THE_REPO = re.compile(
+    r"\bstar\s+(this|our|the)\s+(repo|repository|project|town)\b", re.IGNORECASE
+)

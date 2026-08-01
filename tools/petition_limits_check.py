@@ -84,14 +84,18 @@ _NEGATION_CUES = text_patterns.NEGATION_CUES_STANDARD
 _QUOTE_CHARS = set('"\'“‘')
 
 # (a) Star/follow ask -- same curated imperative shapes star_covenant_check
-# uses, aimed at petitions specifically now. Six of these are the exact
+# uses, aimed at petitions specifically now. Seven of these are the exact
 # same shapes star_covenant_check.py already defines (task 418: shared via
-# tools/text_patterns.py instead of retyped); "star this/our/the repo" and
-# "grant us/me a star" are this file's own, not shared.
+# tools/text_patterns.py instead of retyped; task 461 found "star this/
+# our/the repo" had drifted into a locally-retyped copy here that DID
+# include "town" while star_covenant_check.py's own copy did not --
+# promoted to the shared constant, this file's fuller noun set, so both
+# scan the identical text going forward); "grant us/me a star" is this
+# file's own, not shared.
 _STAR_PATTERNS = [
     ("please star", text_patterns.PLEASE_STAR),
     ("please follow", text_patterns.PLEASE_FOLLOW),
-    ("star this/our/the repo", re.compile(r"\bstar\s+(this|our|the)\s+(repo|repository|project|town)\b", re.IGNORECASE)),
+    ("star this/our/the repo", text_patterns.STAR_THIS_OUR_THE_REPO),
     ("give us/me a star", text_patterns.GIVE_US_A_STAR),
     ("grant us/me a star", re.compile(r"\bgrant\s+(us|me)\s+a\s+star\b", re.IGNORECASE)),
     ("drop a star", text_patterns.DROP_A_STAR),

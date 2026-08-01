@@ -50,15 +50,18 @@ _SCAN_EXTENSIONS = (".md", ".html")
 # keyword -- "star" and "follow" appear constantly in this town's own
 # legitimate voice (cadence claims, the n-1 counter, epithets), so only
 # an imperative ask against a reader counts as a Star-Covenant violation.
-# Six of these are the exact shapes petition_limits_check.py's own
+# Seven of these are the exact shapes petition_limits_check.py's own
 # "(a) Star/follow ask" petition guard copied verbatim (task 418: shared
-# via tools/text_patterns.py instead of retyped in either file). The
-# rest -- aimed at public-post scanning, never copied into the petition
-# guard -- stay local.
+# via tools/text_patterns.py instead of retyped in either file; task 461
+# found "star this/our/the repo" had silently drifted between the two
+# copies -- petition_limits_check.py's noun list already included "town",
+# this file's did not -- and promoted it to the shared constant too, this
+# file's noun set). The rest -- aimed at public-post scanning, never
+# copied into the petition guard -- stay local.
 _PATTERNS = [
     ("please star", text_patterns.PLEASE_STAR),
     ("please follow", text_patterns.PLEASE_FOLLOW),
-    ("star this/our/the repo", re.compile(r"\bstar\s+(this|our|the)\s+(repo|repository|project)\b", re.IGNORECASE)),
+    ("star this/our/the repo", text_patterns.STAR_THIS_OUR_THE_REPO),
     ("give us/me a star", text_patterns.GIVE_US_A_STAR),
     ("drop a star", text_patterns.DROP_A_STAR),
     ("leave a star", text_patterns.LEAVE_A_STAR),
@@ -121,6 +124,30 @@ def _is_quoted_citation(text: str, match_start: int) -> bool:
     return match_start > 0 and text[match_start - 1] in _QUOTE_CHARS
 
 
+_AUTOMATIC_CONSEQUENCE_RE = re.compile(r"(,|\s+and)\s+it\s+\w+s\b", re.IGNORECASE)
+
+
+def _is_automatic_consequence(text: str, match_end: int) -> bool:
+    """Task 461's own fix (widening `_PATTERNS`' "star this/our/the repo"
+    noun list to include "town") turned up a real live match this guard
+    exists to clear: `CHARTER.md`'s own load-bearing description of the
+    Founders' Wall -- "star the town and it records your name in stone"
+    (mirrored, comma-joined instead of "and"-joined, in `docs/founding.
+    html`'s meta tags -- "star the town, it records your name in stone"
+    -- and quoted in `ROADMAP-ARCHIVE-002-170-365.md`'s task 322).
+    Grammatically identical to an imperative, but the trailing clause is
+    third-person ("it records"), describing what an existing, already-
+    public API does
+    automatically for anyone who already starred, for their own reasons
+    -- not a first/second-person appeal like "...and get updates" or
+    "...and support us". Exactly the same "town's own legitimate voice"
+    category this module's own docstring already names ("a mystery file
+    that tells drawer-openers what to do only AFTER they already starred
+    for their own reasons"), just never phrased with the word "town"
+    before this fix made the phrase visible to this checker at all."""
+    return bool(_AUTOMATIC_CONSEQUENCE_RE.match(text, match_end))
+
+
 _VIOLATIONS_CACHE: dict[str, list] = {}
 
 
@@ -160,7 +187,11 @@ def _find_violations_uncached(orita_dir: str = DEFAULT_ORITA_DIR) -> list:
             continue
         for label, pattern in _PATTERNS:
             for m in pattern.finditer(text):
-                if _is_negated_or_predictive(text, m.start()) or _is_quoted_citation(text, m.start()):
+                if (
+                    _is_negated_or_predictive(text, m.start())
+                    or _is_quoted_citation(text, m.start())
+                    or _is_automatic_consequence(text, m.end())
+                ):
                     continue
                 line_no = text.count("\n", 0, m.start()) + 1
                 snippet = text[max(0, m.start() - 20):m.end() + 20].replace("\n", " ").strip()
