@@ -125,13 +125,17 @@ class FixtureCadenceCase(unittest.TestCase):
         self.assertIn("2026-07-13, 2026-07-20, 2026-07-27", line)
 
     def test_real_live_page_today_reproduces_the_named_gap(self):
-        # The actual real docs/what-moved.html this task found: zero
-        # markers, three real Mondays lapsed as of 2026-07-29 (the day
-        # before this test module's own fixed reference point elsewhere
-        # in this suite). Proves the live page, not just a fixture.
+        # Task 460 closed the 07-27 gap for real: one honest
+        # `what-moved-entry: 2026-08-01` marker landed on the live page,
+        # covering that week (`_monday_of(2026-08-01)` == 2026-07-27).
+        # The two earlier Mondays are NOT backfilled -- they never shipped
+        # their own ritual and this suite keeps naming that honestly,
+        # same discipline task 391's chronicle catch-up held for the
+        # identical shape of debt. Proves the live page, not just a
+        # fixture.
         real_page = os.path.join(ROOT, "docs", "what-moved.html")
         result = wmc.compute_cadence(real_page, today=date(2026, 7, 29))
-        self.assertEqual(result["missed_mondays"], ["2026-07-13", "2026-07-20", "2026-07-27"])
+        self.assertEqual(result["missed_mondays"], ["2026-07-13", "2026-07-20"])
 
 
 if __name__ == "__main__":
