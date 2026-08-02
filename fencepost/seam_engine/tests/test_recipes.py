@@ -530,7 +530,7 @@ _CARDINAL_WORDS = {
     "twenty-one": 21, "twenty-two": 22, "twenty-three": 23, "twenty-four": 24,
     "twenty-five": 25, "twenty-six": 26, "twenty-seven": 27, "twenty-eight": 28,
     "twenty-nine": 29, "thirty": 30, "thirty-one": 31, "thirty-two": 32,
-    "thirty-three": 33, "thirty-four": 34,
+    "thirty-three": 33, "thirty-four": 34, "thirty-five": 35,
 }
 
 _PLUS_JOINED_CLAIM_RE = re.compile(
@@ -582,11 +582,12 @@ def test_plus_joined_claim_missing_sentence_raises():
         claimed_plus_joined_counts("Nothing here about plus-joined toolkits.")
 
 
-def test_real_plus_joined_counts_are_currently_eleven_of_thirty_four():
-    # Regression pin: today's real, live counts under RECIPES/. Was (11, 33)
-    # until stale-branch-no-pr merged (the thirty-fourth real recipe, task
-    # 490, single-toolkit -- the plus-joined half stays 11).
-    assert real_plus_joined_counts(FENCEPOST_ROOT) == (11, 34)
+def test_real_plus_joined_counts_are_currently_eleven_of_thirty_five():
+    # Regression pin: today's real, live counts under RECIPES/. Was (11, 34)
+    # until readme-claims-open-milestone merged (the thirty-fifth real
+    # recipe, task 491, single-toolkit "github" -- the plus-joined half
+    # stays 11).
+    assert real_plus_joined_counts(FENCEPOST_ROOT) == (11, 35)
 
 
 def test_oath_scopes_for_toolkit_docstring_matches_the_real_live_counts():

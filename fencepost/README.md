@@ -397,6 +397,19 @@ resolution clock. Both scopes (`ListRepositoryActivities`,
 `ListPullRequests`) already sit on `SCOPES.md`'s cleared oath table, no
 new scope wiring needed.
 
+[`RECIPES/readme-claims-open-milestone/`](RECIPES/readme-claims-open-milestone/)
+is the thirty-fifth (ROADMAP.md #491), the third leg of the
+`claims-open-milestone` family alongside `release-claims-open-milestone`
+and `tweet-claims-open-milestone`: README.md's own text claims a milestone
+shipped ("milestone #N"), but the named milestone is not actually closed.
+Unlike both siblings, deliberately not age-gated — a `GetFileContents`
+read returns the README's current text, not a change history, so there is
+no per-claim timestamp to weigh a staleness window against, and no race to
+guard against either: a README is read live, so a claim it currently makes
+and the milestone's currently-open state are both true at the same instant
+the scan runs. Both scopes (`GetFileContents`, `ListMilestones`) already
+sit on `SCOPES.md`'s cleared oath table, no new scope wiring needed.
+
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)
 (ROADMAP.md #111) is that second promise, kept: it runs `scan.py`'s own

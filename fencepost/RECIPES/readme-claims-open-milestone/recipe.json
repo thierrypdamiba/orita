@@ -1,0 +1,12 @@
+{
+  "slug": "readme-claims-open-milestone",
+  "title": "README.md claims a milestone shipped, but it's still open",
+  "author": "off-by-one",
+  "description": "Reads README.md's own text for a 'milestone #N shipped' claim phrase and cross-checks it against the live milestone list. The third leg of the claims-open-milestone family alongside release-claims-open-milestone and tweet-claims-open-milestone -- this time the permanent public claim lives in the repo's own front door, not a release body or a tweet.",
+  "toolkit": "github",
+  "scopes": ["GetFileContents", "ListMilestones"],
+  "fixture": "fixtures/readme_claims_open_milestone",
+  "detector_file": "detector.py",
+  "entrypoint": "run_recipe_scan",
+  "confidence_notes": "Deliberately NOT age-gated, unlike both siblings in this family. A GetFileContents read of README.md returns current text, not a change history, so there is no per-claim timestamp to weigh a staleness window against -- and no race to guard against either: a README is read live, right now, so a claim it currently makes and the milestone's currently-open state are both true at the same instant the scan runs. Flat 0.85 on every surfaced claim; a claim naming a nonexistent milestone, or one that is genuinely closed, is excluded at 0.0, named not hidden."
+}
