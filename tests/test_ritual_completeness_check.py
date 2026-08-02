@@ -562,5 +562,61 @@ class DocstringClaimDoctrineCase(unittest.TestCase):
             src.claimed_check_count("no claim sentence here at all")
 
 
+class TextPatternsImporterCountDoctrineCase(unittest.TestCase):
+    """Task 484. EXEMPT_TOOL_FILES["text_patterns.py"]'s own entry
+    self-reports how many tools/*.py files import text_patterns.py directly
+    -- proves that claim is live-extracted (never a second hand-typed copy)
+    and actually equals the real, live count, the exact "true when written,
+    never rechecked" shape this whole module exists to catch, this time
+    inside itself: task 418 wrote "nine" when it was true; task 461 (and
+    others) wired more importers (star_covenant_check.py,
+    petition_limits_check.py, among them) without ever revisiting this
+    sentence, leaving it stuck at nine against a real live count of 11.
+    """
+
+    def test_claim_is_live_extracted_not_hardcoded(self):
+        self.assertEqual(
+            src.claimed_text_patterns_importer_count(),
+            src.claimed_text_patterns_importer_count(
+                src.EXEMPT_TOOL_FILES["text_patterns.py"]
+            ),
+        )
+
+    def test_claim_equals_the_real_live_importer_count(self):
+        self.assertEqual(
+            src.claimed_text_patterns_importer_count(),
+            src.real_text_patterns_importer_count(),
+        )
+
+    def test_real_importer_count_is_currently_11(self):
+        # Regression pin: task 418 shipped this claiming nine. Task 461
+        # (and others) wired more tools/*.py callers of text_patterns.py
+        # afterward without revisiting the docstring's number. Naming the
+        # real count here so a future addition that forgets to update the
+        # sentence trips a second, independent assertion, not just the
+        # live cross-check above.
+        self.assertEqual(src.real_text_patterns_importer_count(), 11)
+
+    def test_stale_nine_claim_would_have_been_flagged_against_todays_real_count(self):
+        # Mutation-based hand-verification: reconstruct the module's own
+        # real pre-fix entry text (the literal "nine" claim task 418
+        # actually shipped, rewritten here as the digit the regex expects)
+        # and prove it disagrees with today's real, live count -- the exact
+        # historical bug this task fixes, proven catchable rather than
+        # assumed fixed.
+        stale_entry = (
+            "shared regex-pattern library (task 418), imported directly by "
+            "the 9 tools/*.py files that use it rather than loaded "
+            "standalone by ritual_check.py"
+        )
+        stale_claim = src.claimed_text_patterns_importer_count(stale_entry)
+        self.assertEqual(stale_claim, 9)
+        self.assertNotEqual(stale_claim, src.real_text_patterns_importer_count())
+
+    def test_missing_claim_raises_instead_of_silently_passing(self):
+        with self.assertRaises(ValueError):
+            src.claimed_text_patterns_importer_count("no claim sentence here at all")
+
+
 if __name__ == "__main__":
     unittest.main()

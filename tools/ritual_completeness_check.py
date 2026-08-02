@@ -247,7 +247,7 @@ EXEMPT_TOOL_FILES = {
     "roadmap_archive.py": "one-off length-triggered archival tool run by hand, not a periodic repo-state check",
     "closing_keyword_guard.py": "takes a commit-message-and-open-issues-csv argument each call -- a per-commit guard, not the hourly repo-state sweep run_ritual_check folds",
     "consent_grant_log.py": "append-only log library, called by toolkits_in_use_check.py (already wired) rather than loaded standalone",
-    "text_patterns.py": "shared regex-pattern library (task 418), imported directly by the nine tools/*.py files that use it rather than loaded standalone by ritual_check.py",
+    "text_patterns.py": "shared regex-pattern library (task 418), imported directly by the 11 tools/*.py files that use it rather than loaded standalone by ritual_check.py (task 484: grown from the original nine as later tasks, task 461 among them, wired more callers without revisiting this count)",
 }
 
 # Every fencepost/seam_engine/src/seam_engine/*.py file that defines a live
@@ -273,6 +273,49 @@ def claimed_check_count(doc: str | None = None) -> int:
             "could not find a 'hand-wires N `check_*` functions' claim in the docstring"
         )
     return int(match.group(1))
+
+
+TEXT_PATTERNS_IMPORTER_COUNT_PATTERN = re.compile(
+    r"imported directly by the (\d+) tools/\*\.py files that use it"
+)
+
+
+def claimed_text_patterns_importer_count(entry: str | None = None) -> int:
+    """Extract the self-reported text_patterns.py importer count from
+    EXEMPT_TOOL_FILES's own entry (or a supplied string, for mutation-based
+    hand-verification) -- never a second hand-typed copy of the number, so a
+    stale claim can be caught by comparing this against the real, live count
+    of tools/*.py files that import text_patterns.py, instead of trusting
+    the prose. Task 484: this entry drifted from 9 to a real 11 without
+    anyone revisiting it."""
+    entry = EXEMPT_TOOL_FILES["text_patterns.py"] if entry is None else entry
+    match = TEXT_PATTERNS_IMPORTER_COUNT_PATTERN.search(entry)
+    if match is None:
+        raise ValueError(
+            "could not find an 'imported directly by the N tools/*.py files' "
+            "claim in the supplied entry"
+        )
+    return int(match.group(1))
+
+
+def real_text_patterns_importer_count(tools_dir: str = DEFAULT_TOOLS_DIR) -> int:
+    """Live-count the tools/*.py files that import text_patterns.py directly,
+    the same real value claimed_text_patterns_importer_count's docstring
+    claim is checked against."""
+    count = 0
+    for name in os.listdir(tools_dir):
+        if not name.endswith(".py") or name == "text_patterns.py":
+            continue
+        path = os.path.join(tools_dir, name)
+        with open(path, encoding="utf-8") as f:
+            tree = ast.parse(f.read(), filename=path)
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Import) and any(
+                alias.name == "text_patterns" for alias in node.names
+            ):
+                count += 1
+                break
+    return count
 
 
 def _find_function(tree: ast.Module, name: str) -> ast.FunctionDef | None:
