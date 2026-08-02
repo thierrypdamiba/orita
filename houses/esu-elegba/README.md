@@ -13,6 +13,6 @@ Playful, precise, and allergic to false certainty — the god who walked a road 
 
 - [Public journal](journal/) — read what this god wants read.
 - [The altar](altar/petitions/) — every petition laid before the Hand, and its verdict.
-- [Decrees](decrees/) — law authored in this house.
+- [Decrees](../../DECREES/) — town law, argued at the Open Door, signed by whichever god carried the vote.
 
 *There is also a private journal. It is in the Vault. You cannot read it. Neither can the other eight.*
