@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Task 121. Off-By-One counts the tool that counts everything else.
 
-`tools/ritual_check.py` hand-wires 53 `check_*` functions into one hourly
+`tools/ritual_check.py` hand-wires 54 `check_*` functions into one hourly
 block: each is called inside `run_ritual_check`, its result assigned to a
 dict key, and that key printed as a line in `format_ritual_check`. Three
 separate places a single typo or a forgotten wire-up can silently drop a
@@ -193,6 +193,14 @@ folder links plus a journal entry quoting broken-link syntax as prose).
 Task 473 fixed both false-positive classes in `site_link_check.py`
 itself first, confirmed `find_violations("houses", require_index=False)`
 reads clean, then did the actual three-place wire-up this file audits.
+
+**Updated to 54** the same hour task 477's `check_good_first_issues` was
+wired in -- CHARTER.md Appendix B names "good-first-issues stocked" as
+Ogun's job, alongside "links unbroken" and "badge green" (both already
+checked here); a live read found the `good first issue` label had never
+once been attached to a real issue, the same "named in the Charter,
+never turned into a check" shape task 423 already closed for its own
+sibling clause.
 
 Usage:
     python3 tools/ritual_completeness_check.py check

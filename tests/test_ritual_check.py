@@ -3650,5 +3650,41 @@ def format_ritual_check(result):
         self.assertTrue(result["ritual_completeness"]["clean"])
 
 
+class GoodFirstIssuesFoldCase(unittest.TestCase):
+    """Task 477: run_ritual_check(good_first_issues_state=...) folds
+    good_first_issue_check.py into the same structured result --
+    CHARTER.md Appendix B names "good-first-issues stocked" as Ogun's job,
+    never checked before this. No live read this hour reads as `None`
+    (never `broken`, the same optional-input class square/arcade_apps/
+    gateway_toolset already hold); an empty shelf is real but does not
+    flip `broken` either -- the same informational-only class
+    report_cadence/cluster_day/thegap already hold for their own
+    real-but-not-fatal cadence gaps."""
+
+    def test_no_state_reads_as_not_read_this_hour(self):
+        result = rc.run_ritual_check()
+        self.assertIsNone(result["good_first_issues"])
+        formatted = rc.format_ritual_check(result)
+        self.assertIn("good first issues: not read this hour", formatted)
+        self.assertFalse(result["broken"])
+
+    def test_empty_shelf_never_flips_broken(self):
+        result = rc.run_ritual_check(good_first_issues_state=[{"number": 1, "labels": ["bug"]}])
+        self.assertFalse(result["good_first_issues"]["clean"])
+        self.assertFalse(result["broken"])
+        formatted = rc.format_ritual_check(result)
+        self.assertIn("good first issues: EMPTY", formatted)
+
+    def test_stocked_shelf_reads_clean_and_prints_the_issue_numbers(self):
+        result = rc.run_ritual_check(
+            good_first_issues_state=[{"number": 42, "labels": ["good first issue"]}]
+        )
+        self.assertTrue(result["good_first_issues"]["clean"])
+        self.assertEqual(result["good_first_issues"]["issue_numbers"], [42])
+        formatted = rc.format_ritual_check(result)
+        self.assertIn("good first issues: stocked", formatted)
+        self.assertIn("[42]", formatted)
+
+
 if __name__ == "__main__":
     unittest.main()

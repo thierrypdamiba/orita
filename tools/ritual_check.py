@@ -151,8 +151,22 @@ own scoping note: no live Gmail/Calendar tool is reachable through it
 regardless, and `consent.py`'s gate still fails closed), so this never
 flips `broken`.
 
+Task 477 folds `good_first_issue_check.py`: CHARTER.md Appendix B names
+"good-first-issues stocked" as Ogun's job, alongside "links unbroken"
+(task 423) and "badge green" (task 425), both of which already had a
+running check here -- "stocked" never did, until a live read showed the
+`good first issue` label has never once been attached to a real issue in
+this repo's history. `good_first_issues_state` is `None` unless the god
+on duty holds this hour's live `list_issues` read (each entry carrying
+`number`/`labels`); no durable log, since there is no "change since last
+hour" worth tracking here, only "is the shelf stocked right now" -- the
+same simpler, log-free shape `badge_freshness_check.py` already holds.
+Informational only, the same class `report_cadence`/`cluster_day`/
+`thegap` already hold for their own real-but-not-fatal cadence gaps --
+never flips `broken`.
+
 Usage:
-    python3 tools/ritual_check.py [--now ISO_TS] [--fencepost-base DIR] [--square-state PATH] [--arcade-apps-state PATH] [--gateway-toolset PATH] [--ci-checks PATH] [--cron-checks PATH] [--child-files PATH] [--voice-window-commits PATH] [--github-stars COUNT] [--json]
+    python3 tools/ritual_check.py [--now ISO_TS] [--fencepost-base DIR] [--square-state PATH] [--arcade-apps-state PATH] [--gateway-toolset PATH] [--good-first-issues PATH] [--ci-checks PATH] [--cron-checks PATH] [--child-files PATH] [--voice-window-commits PATH] [--github-stars COUNT] [--json]
 """
 from __future__ import annotations
 
@@ -247,6 +261,10 @@ def _arcade_app_watch():
 
 def _gateway_toolset_check():
     return _load("_ritual_gateway_toolset_check", os.path.join(ROOT, "tools", "gateway_toolset_check.py"))
+
+
+def _good_first_issue_check():
+    return _load("_ritual_good_first_issue_check", os.path.join(ROOT, "tools", "good_first_issue_check.py"))
 
 
 def _scribe_growth_check():
@@ -591,6 +609,19 @@ def check_gateway_toolset(gateway_toolset_state: dict | None, now_iso: str) -> d
     changed, reason = mod.toolset_delta(gateway_toolset_state, path=mod.LOG)
     mod.record_toolset_check(gateway_toolset_state, now_iso, path=mod.LOG)
     return {"changed": changed, "reason": reason}
+
+
+def check_good_first_issues(open_issues: list | None) -> dict | None:
+    """Task 477: fold `good_first_issue_check.py`'s own live-vs-Charter
+    compare into the one block. Makes no network call -- `open_issues` is
+    None unless the caller already holds this hour's live `list_issues`
+    read (each entry carrying at least `number` and `labels`). CHARTER.md
+    Appendix B names "good-first-issues stocked" as Ogun's job; an empty
+    shelf is real but not fatal, the same informational-only class
+    `report_cadence`/`cluster_day`/`thegap` already hold for their own
+    named-but-not-doctrine-breaking gaps -- never flips `broken`."""
+    mod = _good_first_issue_check()
+    return mod.check_good_first_issues(open_issues)
 
 
 def check_scribe_growth(now_iso: str, scribe_root: str | None = None, record: bool = True) -> dict:
@@ -1700,6 +1731,7 @@ def run_ritual_check(
     wip_reclaim_path: str | None = None,
     arcade_apps_state: dict | None = None,
     gateway_toolset_state: dict | None = None,
+    good_first_issues_state: list | None = None,
     scopes_path: str | None = None,
     app_log_path: str | None = None,
     toolkits_metrics_path: str | None = None,
@@ -1769,6 +1801,7 @@ def run_ritual_check(
     square = check_square(square_state, now_iso)
     arcade_apps = check_arcade_apps(arcade_apps_state, now_iso)
     gateway_toolset = check_gateway_toolset(gateway_toolset_state, now_iso)
+    good_first_issues = check_good_first_issues(good_first_issues_state)
     scribe_growth = check_scribe_growth(now_iso, scribe_root=scribe_root, record=record_scribe_growth)
     ci = check_ci(ci_checks)
     words = check_words(now_iso, record=record_words)
@@ -1902,6 +1935,7 @@ def run_ritual_check(
         "square": square,
         "arcade_apps": arcade_apps,
         "gateway_toolset": gateway_toolset,
+        "good_first_issues": good_first_issues,
         "scribe_growth": scribe_growth,
         "ci": ci,
         "words": words,
@@ -1986,6 +2020,7 @@ def format_ritual_check(result: dict) -> str:
     if result["gateway_toolset"] is not None:
         gt = result["gateway_toolset"]
         lines.append(f"  gateway toolset (gmail/calendar): {'changed' if gt['changed'] else 'unchanged'} -- {gt['reason']}")
+    lines.append("  " + _good_first_issue_check().format_good_first_issues(result["good_first_issues"]))
     sg = result["scribe_growth"]
     lines.append(
         "  scribe growth: "
@@ -2323,6 +2358,7 @@ def main(argv: list[str]) -> int:
     square_state = None
     arcade_apps_state = None
     gateway_toolset_state = None
+    good_first_issues_state = None
     ci_checks = None
     cron_checks = None
     child_files = None
@@ -2351,6 +2387,9 @@ def main(argv: list[str]) -> int:
             gt = _gateway_toolset_check()
             gateway_toolset_state = gt.compute_toolset_state(raw.get("tool_names", []))
             i += 2
+        elif argv[i] == "--good-first-issues" and i + 1 < len(argv):
+            good_first_issues_state = _load_json_arg(argv[i + 1], "good-first-issues", "list")
+            i += 2
         elif argv[i] == "--ci-checks" and i + 1 < len(argv):
             ci_checks = _load_json_arg(argv[i + 1], "ci-checks", "list")
             i += 2
@@ -2377,6 +2416,7 @@ def main(argv: list[str]) -> int:
         square_state=square_state,
         arcade_apps_state=arcade_apps_state,
         gateway_toolset_state=gateway_toolset_state,
+        good_first_issues_state=good_first_issues_state,
         ci_checks=ci_checks,
         cron_checks=cron_checks,
         child_files=child_files,
