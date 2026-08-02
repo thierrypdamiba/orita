@@ -10,6 +10,7 @@ aspirational — one already lives in this repo and clears every check.
 from __future__ import annotations
 
 import json
+import re
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -501,6 +502,118 @@ def test_all_real_shipped_recipes_pass_the_oath_coverage_check():
         allowed = _oath_scopes_for_toolkit(m.toolkit)
         uncovered = [s for s in m.scopes if s not in allowed]
         assert not uncovered, f"{m.slug}: scope(s) {uncovered} not covered by the Oath for toolkit {m.toolkit!r}"
+
+
+# --- _oath_scopes_for_toolkit's own docstring claim, cross-checked ---------
+
+# `_oath_scopes_for_toolkit`'s docstring names how many of today's real
+# recipes declare a plus-joined ("github+x"/"x+github") toolkit -- a hand-
+# typed cardinal-word count of both the plus-joined subset and the total
+# recipe count, never rechecked against `discover_recipes()` since it was
+# written at 26 real recipes (task 424). Three more recipes have merged
+# since (tweet-claims-unfixed-issue, tweet-claims-unmerged-pr,
+# tweet-claims-open-milestone -- all three "x+github", the exact shape this
+# claim describes), so both halves of the sentence went stale: the real
+# live count is 10 of 29 today, not the 6 of 26 the docstring still swore
+# to. The same "claims a number about itself, nothing ever checked it
+# against the live thing it describes" shape `test_recipe_count_doctrine.py`
+# already closed for `docs/fencepost/index.html`'s own cardinal claim,
+# found here for `_oath_scopes_for_toolkit`'s own docstring.
+_CARDINAL_WORDS = {
+    "zero": 0, "one": 1, "two": 2, "three": 3, "four": 4, "five": 5,
+    "six": 6, "seven": 7, "eight": 8, "nine": 9, "ten": 10, "eleven": 11,
+    "twelve": 12, "thirteen": 13, "fourteen": 14, "fifteen": 15, "sixteen": 16,
+    "seventeen": 17, "eighteen": 18, "nineteen": 19, "twenty": 20,
+    "twenty-one": 21, "twenty-two": 22, "twenty-three": 23, "twenty-four": 24,
+    "twenty-five": 25, "twenty-six": 26, "twenty-seven": 27, "twenty-eight": 28,
+    "twenty-nine": 29, "thirty": 30,
+}
+
+_PLUS_JOINED_CLAIM_RE = re.compile(
+    r"but ([a-z-]+) of the ([a-z-]+) real recipes today name a plus-joined pair"
+)
+
+
+def claimed_plus_joined_counts(doc_text: str) -> tuple[int, int]:
+    """Live-extracts `_oath_scopes_for_toolkit`'s own "N of the M real
+    recipes today name a plus-joined pair" claim -- never a second
+    hand-typed (6, 26). Raises if the sentence is missing or uses a
+    cardinal word this check doesn't recognize, rather than silently
+    passing an unchecked claim through."""
+    match = _PLUS_JOINED_CLAIM_RE.search(doc_text)
+    if not match:
+        raise AssertionError(
+            "_oath_scopes_for_toolkit's docstring no longer contains a "
+            "'N of the M real recipes today name a plus-joined pair' "
+            "sentence -- this doctrine test has nothing left to cross-check"
+        )
+    plus_word, total_word = match.group(1).lower(), match.group(2).lower()
+    for word in (plus_word, total_word):
+        if word not in _CARDINAL_WORDS:
+            raise AssertionError(
+                f"_oath_scopes_for_toolkit's docstring uses an unrecognized "
+                f"cardinal word {word!r} -- add it to _CARDINAL_WORDS before "
+                "trusting this check"
+            )
+    return _CARDINAL_WORDS[plus_word], _CARDINAL_WORDS[total_word]
+
+
+def real_plus_joined_counts(fencepost_root: Path) -> tuple[int, int]:
+    """The REAL, live (plus-joined count, total count) across every recipe
+    `discover_recipes()` finds today -- structural, never a second
+    hand-typed sum."""
+    manifests = discover_recipes(fencepost_root)
+    plus_joined = sum(1 for m in manifests if "+" in m.toolkit)
+    return plus_joined, len(manifests)
+
+
+def test_plus_joined_claim_extraction_is_structural_not_hardcoded():
+    assert claimed_plus_joined_counts(
+        "but two of the five real recipes today name a plus-joined pair"
+    ) == (2, 5)
+
+
+def test_plus_joined_claim_missing_sentence_raises():
+    with pytest.raises(AssertionError):
+        claimed_plus_joined_counts("Nothing here about plus-joined toolkits.")
+
+
+def test_real_plus_joined_counts_are_currently_ten_of_twenty_nine():
+    # Regression pin: today's real, live counts under RECIPES/.
+    assert real_plus_joined_counts(FENCEPOST_ROOT) == (10, 29)
+
+
+def test_oath_scopes_for_toolkit_docstring_matches_the_real_live_counts():
+    from seam_engine import recipes as recipes_mod
+
+    claimed = claimed_plus_joined_counts(recipes_mod._oath_scopes_for_toolkit.__doc__)
+    assert claimed == real_plus_joined_counts(FENCEPOST_ROOT), (
+        f"_oath_scopes_for_toolkit's docstring claims {claimed[0]} of "
+        f"{claimed[1]} real recipes name a plus-joined toolkit, but the "
+        f"real live counts are {real_plus_joined_counts(FENCEPOST_ROOT)}"
+    )
+
+
+def test_one_more_plus_joined_recipe_would_flip_this_check_red():
+    """Mutation-based hand-verification, same discipline
+    `test_recipe_count_doctrine.py` already holds itself to: prove the
+    checker actually flags a real drift, not just that it happens to pass
+    today. A synthetic doc claim one recipe short of the real live count
+    must disagree with `real_plus_joined_counts`."""
+    real_plus, real_total = real_plus_joined_counts(FENCEPOST_ROOT)
+    stale_doc = (
+        f"but {_word_for(real_plus - 1)} of the {_word_for(real_total)} "
+        "real recipes today name a plus-joined pair"
+    )
+    claimed = claimed_plus_joined_counts(stale_doc)
+    assert claimed != (real_plus, real_total)
+
+
+def _word_for(n: int) -> str:
+    for word, value in _CARDINAL_WORDS.items():
+        if value == n:
+            return word
+    raise AssertionError(f"no cardinal word mapped for {n} -- extend _CARDINAL_WORDS")
 
 
 # --- MOCK ONLY: fixture must live under fixtures/ ---------------------------
