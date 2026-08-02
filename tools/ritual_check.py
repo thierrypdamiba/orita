@@ -1581,6 +1581,35 @@ def check_house_links(houses_dir: str | None = None) -> dict:
     return {"clean": not violations, "count": len(violations), "violations": violations}
 
 
+def check_fencepost_links(fencepost_dir: str | None = None) -> dict:
+    """Task 483: the third sibling of `check_site_links`/`check_house_links`
+    -- `fencepost/README.md` and its neighbors (`ONBOARDING.md`,
+    `SCOPES.md`, `CONNECT.md`, ...) are GitHub-browsed, not Pages-served,
+    the same rule `houses/` already established, but nothing had ever
+    pointed `site_link_check.py` at `fencepost/` itself. A live run found
+    exactly one real break the moment this was checked for the first time:
+    `fencepost/README.md`'s own badge-explainer sentence linked
+    `seam_engine/badge.py`, missing the `src/` layout segment the real
+    file (`seam_engine/src/seam_engine/badge.py`) actually lives under --
+    a dead link in the flagship's own front door, sitting unnoticed since
+    whichever task moved the package to a `src/` layout. `require_index
+    =False` (the same GitHub-browsed rule `check_house_links` uses, not
+    `check_site_links`'s stricter Pages rule -- `fencepost/RECIPES/`,
+    `fencepost/GAPS/` etc. are real, clickable, index-less GitHub folder
+    links same as `houses/*/journal/`). Unconditional, local-filesystem-
+    only, same cheap class as its two siblings. Never edits anything; a
+    real broken link is a god-on-duty escalation, not something this
+    check silently repairs."""
+    mod = _site_link_check()
+    kwargs = {"require_index": False}
+    if fencepost_dir is not None:
+        kwargs["docs_dir"] = fencepost_dir
+    else:
+        kwargs["docs_dir"] = os.path.join(ROOT, "fencepost")
+    violations = mod.find_violations(**kwargs)
+    return {"clean": not violations, "count": len(violations), "violations": violations}
+
+
 def check_badge_freshness(badge_path: str | None = None) -> dict:
     """Task 425: fold badge_freshness_check.py's own live-recompute-vs-
     committed-file cross-check into the one block. `seam-scan.yml`'s daily
@@ -1751,6 +1780,7 @@ def run_ritual_check(
     network_boundary_dirs: tuple | None = None,
     site_link_docs_dir: str | None = None,
     house_links_houses_dir: str | None = None,
+    fencepost_links_dir: str | None = None,
     badge_path: str | None = None,
     recipe_readme_path: str | None = None,
     recipe_readme_fencepost_root: str | None = None,
@@ -1857,6 +1887,7 @@ def run_ritual_check(
     network_boundary = check_network_boundary(dirs=network_boundary_dirs)
     site_links = check_site_links(docs_dir=site_link_docs_dir)
     house_links = check_house_links(houses_dir=house_links_houses_dir)
+    fencepost_links = check_fencepost_links(fencepost_dir=fencepost_links_dir)
     badge_freshness = check_badge_freshness(badge_path=badge_path)
     recipe_readme = check_recipe_readme(
         readme_path=recipe_readme_path, recipe_fencepost_root=recipe_readme_fencepost_root
@@ -1914,6 +1945,7 @@ def run_ritual_check(
         or (not network_boundary["clean"])
         or (not site_links["clean"])
         or (not house_links["clean"])
+        or (not fencepost_links["clean"])
         or (not badge_freshness["clean"])
         or (not recipe_readme["clean"])
         or (not strategy_true_positive["clean"])
@@ -1971,6 +2003,7 @@ def run_ritual_check(
         "network_boundary": network_boundary,
         "site_links": site_links,
         "house_links": house_links,
+        "fencepost_links": fencepost_links,
         "badge_freshness": badge_freshness,
         "recipe_readme": recipe_readme,
         "strategy_true_positive": strategy_true_positive,
@@ -2226,6 +2259,13 @@ def format_ritual_check(result: dict) -> str:
     else:
         lines.append(
             f"  house links: {hl['count']} BROKEN LINK(S) -- a house's own front door is unmet, escalate now"
+        )
+    fl = result["fencepost_links"]
+    if fl["clean"]:
+        lines.append("  fencepost links: clean (every fencepost/ link resolves, GitHub-browsed rule)")
+    else:
+        lines.append(
+            f"  fencepost links: {fl['count']} BROKEN LINK(S) -- the flagship's own front door is unmet, escalate now"
         )
     lines.append("  " + _badge_freshness_check().format_badge_freshness(result["badge_freshness"]))
     lines.append("  " + _recipe_readme_check().format_result(result["recipe_readme"]))

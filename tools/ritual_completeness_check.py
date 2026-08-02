@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Task 121. Off-By-One counts the tool that counts everything else.
 
-`tools/ritual_check.py` hand-wires 54 `check_*` functions into one hourly
+`tools/ritual_check.py` hand-wires 55 `check_*` functions into one hourly
 block: each is called inside `run_ritual_check`, its result assigned to a
 dict key, and that key printed as a line in `format_ritual_check`. Three
 separate places a single typo or a forgotten wire-up can silently drop a
@@ -201,6 +201,14 @@ checked here); a live read found the `good first issue` label had never
 once been attached to a real issue, the same "named in the Charter,
 never turned into a check" shape task 423 already closed for its own
 sibling clause.
+
+**Updated to 55** the same hour task 483's `check_fencepost_links` was
+wired in -- the third sibling of `check_site_links`/`check_house_links`,
+pointed at `fencepost/` itself (GitHub-browsed, same `require_index=
+False` rule as `houses/`), never checked before. Its first live run
+found a real break: `fencepost/README.md`'s own badge-explainer link to
+`seam_engine/badge.py` was missing the `src/` layout segment the file
+actually lives under.
 
 Usage:
     python3 tools/ritual_completeness_check.py check
