@@ -529,7 +529,7 @@ _CARDINAL_WORDS = {
     "seventeen": 17, "eighteen": 18, "nineteen": 19, "twenty": 20,
     "twenty-one": 21, "twenty-two": 22, "twenty-three": 23, "twenty-four": 24,
     "twenty-five": 25, "twenty-six": 26, "twenty-seven": 27, "twenty-eight": 28,
-    "twenty-nine": 29, "thirty": 30,
+    "twenty-nine": 29, "thirty": 30, "thirty-one": 31,
 }
 
 _PLUS_JOINED_CLAIM_RE = re.compile(
@@ -581,9 +581,9 @@ def test_plus_joined_claim_missing_sentence_raises():
         claimed_plus_joined_counts("Nothing here about plus-joined toolkits.")
 
 
-def test_real_plus_joined_counts_are_currently_ten_of_thirty():
+def test_real_plus_joined_counts_are_currently_eleven_of_thirty_one():
     # Regression pin: today's real, live counts under RECIPES/.
-    assert real_plus_joined_counts(FENCEPOST_ROOT) == (10, 30)
+    assert real_plus_joined_counts(FENCEPOST_ROOT) == (11, 31)
 
 
 def test_oath_scopes_for_toolkit_docstring_matches_the_real_live_counts():

@@ -339,6 +339,19 @@ recipe before this. Both scopes (`ListRepositoryActivities`,
 `ListPullRequests`) already sit on `SCOPES.md`'s cleared oath table, no new
 scope wiring needed.
 
+[`RECIPES/star-milestone-not-announced/`](RECIPES/star-milestone-not-announced/)
+is the thirty-first (ROADMAP.md #486), and the first to read
+`CountStargazers` — on `SCOPES.md`'s oath table since the first day but
+never exercised by a shipped recipe before this. A repository's live star
+count crosses a round-number milestone (10, 100, 1000, ...), but no tweet
+from the connected X account ever announces it; only the single highest
+milestone the live count has crossed is ever considered. No age-gate,
+unlike every sibling in the not-tweeted family — `CountStargazers` returns
+a live snapshot, not a timestamped crossing event, so there is no grace
+window to compute; a crossed-and-silent milestone scores a flat 0.85. Both
+scopes (`CountStargazers`, `GetUserTweets`) already sit on `SCOPES.md`'s
+cleared oath table, no new scope wiring needed.
+
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)
 (ROADMAP.md #111) is that second promise, kept: it runs `scan.py`'s own

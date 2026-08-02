@@ -1,0 +1,12 @@
+{
+  "slug": "star-milestone-not-announced",
+  "title": "Repo crossed a star milestone, never announced it",
+  "author": "off-by-one",
+  "description": "Compares the repository's own live stargazer count against its X account's tweet history: the count crosses a round-number milestone (10, 100, 1000, ...), but no tweet ever names it. Only the single highest milestone the live count has crossed is considered -- the biggest round number is the one worth a screenshot.",
+  "toolkit": "github+x",
+  "scopes": ["CountStargazers", "GetUserTweets"],
+  "fixture": "fixtures/star_milestone_not_announced",
+  "detector_file": "detector.py",
+  "entrypoint": "run_recipe_scan",
+  "confidence_notes": "No age-gate, unlike every sibling in the not-tweeted family: CountStargazers returns a live snapshot, not a timestamped crossing event, so there is no 'may simply not have tweeted yet within N hours' grace window to compute. A crossed-and-silent milestone scores a flat 0.85 -- an unambiguous, non-fuzzy signal: an exact round-number match, digit-boundary-guarded on both comma and plain spelling, gated on the word 'star' appearing in the same tweet so an unrelated number is never mistaken for an announcement. A live count that hasn't crossed the first tracked milestone yet, or a crossed milestone a tweet already names, is excluded at confidence 0.0, named not hidden."
+}
