@@ -78,11 +78,36 @@ class TestRecordWordCheck(_TempTownCase):
         ww.record_word_check(state, "2026-07-15T00:00:00Z", path=self.log)
         with open(self.log) as f:
             before = f.readlines()
-        ww.record_word_check(state, "2026-07-15T01:00:00Z", path=self.log)
+        # A real second word (a new decree) so this call carries new
+        # information -- task 487 made an identical repeat a no-op, so
+        # proving "the prior line survives a later real append" needs a
+        # genuinely different second state, not the same one twice.
+        with open(os.path.join(self.tmp, "DECREES", "002-second.md"), "w") as f:
+            f.write("a second decree\n")
+        state2 = ww.compute_word_state(root=self.tmp)
+        ww.record_word_check(state2, "2026-07-15T01:00:00Z", path=self.log)
         with open(self.log) as f:
             after = f.readlines()
         self.assertEqual(after[0], before[0])
         self.assertEqual(len(after), len(before) + 1)
+
+    def test_repeat_record_of_identical_state_is_a_no_op(self):
+        """Task 487: mirrors scribe_growth_check's identical fix. Tasks
+        478/482/484 each found and hand-reverted duplicate, byte-identical
+        lines in the real HAND/word-check-log.jsonl -- never fixed at the
+        source until now."""
+        state = ww.compute_word_state(root=self.tmp)
+        first = ww.record_word_check(state, "2026-07-15T00:00:00Z", path=self.log)
+        second = ww.record_word_check(state, "2026-07-15T01:00:00Z", path=self.log)
+        self.assertTrue(first)
+        self.assertFalse(second)
+        with open(self.log) as f:
+            lines = [ln for ln in f if ln.strip()]
+        self.assertEqual(len(lines), 1)
+
+    def test_first_ever_record_always_writes(self):
+        state = ww.compute_word_state(root=self.tmp)
+        self.assertTrue(ww.record_word_check(state, "2026-07-15T00:00:00Z", path=self.log))
 
 
 class TestLastWordState(_TempTownCase):
@@ -160,6 +185,20 @@ class TestLastWordState(_TempTownCase):
             f.write("a new petition\n")
         state2 = ww.compute_word_state(root=self.tmp)
         ww.record_word_check(state2, "2026-07-15T01:00:00Z", path=self.log)
+        last = ww.last_word_state(path=self.log)
+        self.assertEqual(last["checked_at"], "2026-07-15T01:00:00Z")
+
+    def test_record_over_a_malformed_tip_still_repairs_by_appending(self):
+        """Task 487: the new duplicate-state check must never block the
+        existing repair-by-append guarantee -- recording over a corrupted
+        tip treats "cannot confirm a duplicate" as "write it," even when
+        the state itself is unchanged."""
+        state = ww.compute_word_state(root=self.tmp)
+        ww.record_word_check(state, "2026-07-15T00:00:00Z", path=self.log)
+        with open(self.log, "a") as f:
+            f.write("not valid json garbage\n")
+        wrote = ww.record_word_check(state, "2026-07-15T01:00:00Z", path=self.log)
+        self.assertTrue(wrote)
         last = ww.last_word_state(path=self.log)
         self.assertEqual(last["checked_at"], "2026-07-15T01:00:00Z")
 

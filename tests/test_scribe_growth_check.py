@@ -138,6 +138,81 @@ class TestRecordScribeCheck(_TempFixtureCase):
     def test_last_scribe_state_is_none_for_a_missing_log(self):
         self.assertIsNone(sgc.last_scribe_state(path=self.log_path))
 
+    def test_record_returns_true_when_it_writes(self):
+        self.assertTrue(sgc.record_scribe_check({"ROADMAP.md": 100}, "2026-07-20T00:00:00Z", path=self.log_path))
+
+    def test_first_ever_record_always_writes_even_though_there_is_no_prior(self):
+        # Task 487: last_scribe_state() is None on a missing log -- the
+        # identical-to-last check below must not mistake "nothing recorded
+        # yet" for "identical," or the very first observation would be
+        # silently dropped.
+        sgc.record_scribe_check({"ROADMAP.md": 100}, "2026-07-20T00:00:00Z", path=self.log_path)
+        with open(self.log_path) as f:
+            self.assertEqual(len(f.readlines()), 1)
+
+    def test_repeat_record_of_identical_sizes_is_a_no_op(self):
+        """Task 487: the real bug this closes. Tasks 478/482/484 each found
+        and hand-reverted duplicate, byte-identical lines in the real
+        HAND/scribe-growth-log.jsonl, every time caused by the same real
+        module being asked to record the same unchanged sizes more than
+        once in the same hour (a god running `python3 tools/
+        ritual_check.py` more than once mid-task to sanity-check live
+        state) -- never fixed at the source until now."""
+        sizes = {"ROADMAP.md": 100, "BUILDLOG.md": 50}
+        first = sgc.record_scribe_check(sizes, "2026-07-20T00:00:00Z", path=self.log_path)
+        second = sgc.record_scribe_check(sizes, "2026-07-20T01:00:00Z", path=self.log_path)
+        third = sgc.record_scribe_check(sizes, "2026-07-20T02:00:00Z", path=self.log_path)
+        self.assertTrue(first)
+        self.assertFalse(second)
+        self.assertFalse(third)
+        with open(self.log_path) as f:
+            lines = [line for line in f.read().splitlines() if line.strip()]
+        self.assertEqual(len(lines), 1)
+        self.assertIn('"checked_at": "2026-07-20T00:00:00Z"', lines[0])
+
+    def test_a_real_change_after_a_run_of_identical_calls_still_records(self):
+        sizes = {"ROADMAP.md": 100, "BUILDLOG.md": 50}
+        sgc.record_scribe_check(sizes, "2026-07-20T00:00:00Z", path=self.log_path)
+        sgc.record_scribe_check(sizes, "2026-07-20T01:00:00Z", path=self.log_path)
+        grew = sgc.record_scribe_check({"ROADMAP.md": 130, "BUILDLOG.md": 50}, "2026-07-20T02:00:00Z", path=self.log_path)
+        self.assertTrue(grew)
+        with open(self.log_path) as f:
+            lines = [line for line in f.read().splitlines() if line.strip()]
+        self.assertEqual(len(lines), 2)
+        self.assertIn('"checked_at": "2026-07-20T02:00:00Z"', lines[1])
+
+    def test_record_over_a_malformed_tip_still_repairs_by_appending(self):
+        """Task 487: the dedup check must never block the existing
+        repair-by-append guarantee -- recording over a corrupted tip
+        treats "cannot confirm a duplicate" as "write it," the same
+        `test_a_valid_tip_after_a_malformed_earlier_line_is_unaffected`
+        contract on the read side, applied to the new duplicate check."""
+        sgc.record_scribe_check({"ROADMAP.md": 100}, "2026-07-20T00:00:00Z", path=self.log_path)
+        with open(self.log_path, "a") as f:
+            f.write("not valid json garbage\n")
+        wrote = sgc.record_scribe_check({"ROADMAP.md": 100}, "2026-07-20T01:00:00Z", path=self.log_path)
+        self.assertTrue(wrote)
+        last = sgc.last_scribe_state(path=self.log_path)
+        self.assertEqual(last["sizes"], {"ROADMAP.md": 100})
+        self.assertEqual(last["checked_at"], "2026-07-20T01:00:00Z")
+
+    def test_mutation_reconstructing_the_pre_487_behavior_would_have_grown_the_log(self):
+        """Proves this test class would have caught the real, pre-fix
+        state: an unconditional `_append` (task 487's own before-picture)
+        writes a duplicate line on a repeat identical call, which
+        `test_repeat_record_of_identical_sizes_is_a_no_op` above would
+        catch."""
+
+        def _pre_487_record(sizes, checked_at, path=self.log_path):
+            sgc._append({"sizes": sizes, "checked_at": checked_at}, path)
+
+        sizes = {"ROADMAP.md": 100, "BUILDLOG.md": 50}
+        _pre_487_record(sizes, "2026-07-20T00:00:00Z")
+        _pre_487_record(sizes, "2026-07-20T01:00:00Z")
+        with open(self.log_path) as f:
+            lines = [line for line in f.read().splitlines() if line.strip()]
+        self.assertEqual(len(lines), 2, "the unfixed shape really does duplicate -- this mutation proves it")
+
     def test_entries_marks_a_malformed_line_instead_of_raising(self):
         # A hand-edit, stray merge-conflict marker, or truncated write can
         # leave a line that isn't valid JSON at all -- _entries() must name

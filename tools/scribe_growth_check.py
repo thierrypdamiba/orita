@@ -141,9 +141,40 @@ def last_scribe_state(path=LOG):
     return entries[-1]
 
 
-def record_scribe_check(sizes: dict, checked_at: str, path=LOG) -> None:
-    """Append one real observed scribe-size snapshot. Never edits or removes a prior line."""
+def record_scribe_check(sizes: dict, checked_at: str, path=LOG) -> bool:
+    """Append one real observed scribe-size snapshot. Never edits or removes
+    a prior line.
+
+    Task 487: skips the append -- returns False, writes nothing -- when
+    `sizes` is identical to the most recently recorded snapshot. Tasks
+    478/482/484 each found and hand-reverted duplicate lines in this exact
+    log, every time attributing them to "repeat `ritual_check.py` runs"
+    without ever closing the actual gap: `run_ritual_check()`'s bare CLI
+    (`python3 tools/ritual_check.py`, the one caller `main()` marks as
+    always recording) writes unconditionally on every invocation, so a god
+    running it more than once in the same hour to sanity-check live state
+    -- a normal, encouraged thing to do mid-task -- silently grew this log
+    with a byte-identical entry every time, the exact live-caught shape
+    this task's own dev-verification reproduced. Recording is a real
+    observation only when the observation changed; a repeat read of the
+    same unchanged sizes carries no new information and must not cost a
+    line. Returns True when a new line was actually written (the
+    first-ever check, or a real size change since the last one).
+
+    A malformed tip (ScribeGrowthLogTamperedError) is treated as "cannot
+    confirm a duplicate" rather than propagated -- recording must still be
+    able to repair a corrupted log by appending a fresh valid line, the
+    same guarantee `test_a_valid_tip_after_a_malformed_earlier_line_is_
+    unaffected` already pins for the read side; only reading refuses to
+    guess past a bad tip, never writing."""
+    try:
+        last = last_scribe_state(path)
+    except ScribeGrowthLogTamperedError:
+        last = None
+    if last is not None and last["sizes"] == sizes:
+        return False
     _append({"sizes": sizes, "checked_at": checked_at}, path)
+    return True
 
 
 def check_scribe_growth(sizes: dict, threshold_bytes: int = WARN_BYTES, path=LOG) -> dict:
@@ -183,8 +214,8 @@ def main(argv):
         if len(argv) < 3:
             print("usage: record <checked_at>")
             return 1
-        record_scribe_check(sizes, argv[2])
-        print(f"recorded: {sizes}")
+        wrote = record_scribe_check(sizes, argv[2])
+        print(f"recorded: {sizes}" if wrote else f"no-op (unchanged since last recorded check): {sizes}")
         return 0
     print(__doc__)
     return 1

@@ -135,11 +135,33 @@ def last_word_state(path: str = LOG):
     return entries[-1]
 
 
-def record_word_check(state: dict, checked_at: str, path: str = LOG) -> None:
-    """Append one real observed word state. Never edits or removes a prior line."""
+def record_word_check(state: dict, checked_at: str, path: str = LOG) -> bool:
+    """Append one real observed word state. Never edits or removes a prior
+    line.
+
+    Task 487: mirrors `scribe_growth_check.record_scribe_check`'s identical
+    fix -- skips the append (returns False, writes nothing) when
+    `state["files"]` is byte-identical to the most recently recorded
+    snapshot, closing the same self-inflicted-duplication class in this
+    log's sibling that tasks 478/482/484 kept finding and hand-reverting
+    without ever fixing at the source. Returns True when a new line was
+    actually written (the first-ever check, or a real word-file change
+    since the last one).
+
+    A malformed tip (WordWatchTamperedError) is treated as "cannot confirm
+    a duplicate" rather than propagated -- recording must still be able to
+    repair a corrupted log by appending a fresh valid line; only reading
+    refuses to guess past a bad tip, never writing."""
+    try:
+        last = last_word_state(path)
+    except WordWatchTamperedError:
+        last = None
+    if last is not None and last["files"] == state["files"]:
+        return False
     entry = dict(state)
     entry["checked_at"] = checked_at
     _append(entry, path)
+    return True
 
 
 def word_delta(state: dict, path: str = LOG):
@@ -182,8 +204,11 @@ def main(argv):
         if len(argv) < 3:
             print("usage: record <checked_at>")
             return 1
-        record_word_check(state, argv[2])
-        print(f"recorded: {len(state['files'])} tracked file(s)")
+        wrote = record_word_check(state, argv[2])
+        if wrote:
+            print(f"recorded: {len(state['files'])} tracked file(s)")
+        else:
+            print(f"no-op (unchanged since last recorded check): {len(state['files'])} tracked file(s)")
         return 0
     print(f"unknown command: {cmd!r}")
     return 1
