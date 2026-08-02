@@ -1,0 +1,12 @@
+{
+  "slug": "deleted-branch-pr-still-open",
+  "title": "PR's branch deleted, the PR itself never closed",
+  "author": "off-by-one",
+  "description": "Compares the repository's own Activity feed against its own pull request set: a pull request's head branch was deleted upstream, but the PR itself was never closed. GitHub does not auto-close a PR just because its source branch disappeared -- it sits open, unmergeable, silently orphaned, unless a human notices by hand and closes it.",
+  "toolkit": "github",
+  "scopes": ["ListRepositoryActivities", "ListPullRequests"],
+  "fixture": "fixtures/deleted_branch_pr_still_open",
+  "detector_file": "detector.py",
+  "entrypoint": "run_recipe_scan",
+  "confidence_notes": "Age-gated on how long ago the branch-deletion event fired while the PR still reads open, mirroring duplicate-issue-still-open's own 24h grace window: under 24 hours scores 0.5 (below the 0.70 bar, weighed in the tail not hidden -- a branch deleted minutes ago may just be an in-progress rebase, not yet a real gap), at or past 24 hours scores a flat 0.85 -- an unambiguous, non-fuzzy signal: an exact ref match between a real deletion event and a PR's own head branch. A deleted branch with no matching open PR, or a PR whose branch was deleted after it already merged or closed some other way, is excluded at confidence 0.0, named not hidden."
+}

@@ -1,0 +1,30 @@
+[
+  {
+    "type": "branch_deletion",
+    "ref": "feature/login-timeout-fix",
+    "actor": "some-contributor",
+    "created_at": "2026-07-20T10:00:00Z",
+    "url": "https://github.com/example/example-repo/activity#branch_deletion-feature-login-timeout-fix"
+  },
+  {
+    "type": "branch_deletion",
+    "ref": "chore/bump-deps",
+    "actor": "dependabot",
+    "created_at": "2026-07-25T09:00:00Z",
+    "url": "https://github.com/example/example-repo/activity#branch_deletion-chore-bump-deps"
+  },
+  {
+    "type": "branch_deletion",
+    "ref": "spike/cache-experiment",
+    "actor": "some-contributor",
+    "created_at": "2026-07-26T14:00:00Z",
+    "url": "https://github.com/example/example-repo/activity#branch_deletion-spike-cache-experiment"
+  },
+  {
+    "type": "push",
+    "ref": "main",
+    "actor": "some-contributor",
+    "created_at": "2026-07-27T08:00:00Z",
+    "url": "https://github.com/example/example-repo/activity#push-main"
+  }
+]

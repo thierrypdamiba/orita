@@ -326,6 +326,19 @@ grammar (task 389) rather than a third, independently typed copy of the
 same pattern. Both scopes (`GetUserTweets`, `ListMilestones`) already sit
 on `SCOPES.md`'s cleared oath table, no new scope wiring needed.
 
+[`RECIPES/deleted-branch-pr-still-open/`](RECIPES/deleted-branch-pr-still-open/)
+is the thirtieth (ROADMAP.md #485), and the first to read the repository's
+own **Activity** feed instead of a document-shaped record: a pull request's
+head branch is deleted upstream, but GitHub never treats a missing source
+branch as a reason to close the PR built on it, so it sits open and
+permanently unmergeable until a human notices by hand. Age-gated the same
+shape as `duplicate-issue-still-open` (0.5 under 24h since the deletion
+event, 0.85 at/past it), and the first recipe to use `ListRepositoryActivities`
+— on `SCOPES.md`'s oath table since day one but never exercised by a shipped
+recipe before this. Both scopes (`ListRepositoryActivities`,
+`ListPullRequests`) already sit on `SCOPES.md`'s cleared oath table, no new
+scope wiring needed.
+
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)
 (ROADMAP.md #111) is that second promise, kept: it runs `scan.py`'s own

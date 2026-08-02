@@ -514,11 +514,14 @@ def test_all_real_shipped_recipes_pass_the_oath_coverage_check():
 # since (tweet-claims-unfixed-issue, tweet-claims-unmerged-pr,
 # tweet-claims-open-milestone -- all three "x+github", the exact shape this
 # claim describes), so both halves of the sentence went stale: the real
-# live count is 10 of 29 today, not the 6 of 26 the docstring still swore
-# to. The same "claims a number about itself, nothing ever checked it
-# against the live thing it describes" shape `test_recipe_count_doctrine.py`
-# already closed for `docs/fencepost/index.html`'s own cardinal claim,
-# found here for `_oath_scopes_for_toolkit`'s own docstring.
+# live count is 10 of 29 then, not the 6 of 26 the docstring still swore
+# to (later still: `deleted-branch-pr-still-open` merged as the thirtieth
+# real recipe, task 485, a single-toolkit "github" entry that leaves the
+# plus-joined half at 10 while moving the total to 30). The same "claims a
+# number about itself, nothing ever checked it against the live thing it
+# describes" shape `test_recipe_count_doctrine.py` already closed for
+# `docs/fencepost/index.html`'s own cardinal claim, found here for
+# `_oath_scopes_for_toolkit`'s own docstring.
 _CARDINAL_WORDS = {
     "zero": 0, "one": 1, "two": 2, "three": 3, "four": 4, "five": 5,
     "six": 6, "seven": 7, "eight": 8, "nine": 9, "ten": 10, "eleven": 11,
@@ -578,9 +581,9 @@ def test_plus_joined_claim_missing_sentence_raises():
         claimed_plus_joined_counts("Nothing here about plus-joined toolkits.")
 
 
-def test_real_plus_joined_counts_are_currently_ten_of_twenty_nine():
+def test_real_plus_joined_counts_are_currently_ten_of_thirty():
     # Regression pin: today's real, live counts under RECIPES/.
-    assert real_plus_joined_counts(FENCEPOST_ROOT) == (10, 29)
+    assert real_plus_joined_counts(FENCEPOST_ROOT) == (10, 30)
 
 
 def test_oath_scopes_for_toolkit_docstring_matches_the_real_live_counts():

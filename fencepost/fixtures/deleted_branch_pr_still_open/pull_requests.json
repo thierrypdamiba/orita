@@ -1,0 +1,16 @@
+[
+  {
+    "number": 88,
+    "title": "Fix login timeout under load",
+    "state": "open",
+    "head_ref": "feature/login-timeout-fix",
+    "url": "https://github.com/example/example-repo/pull/88"
+  },
+  {
+    "number": 81,
+    "title": "Bump dependency versions",
+    "state": "merged",
+    "head_ref": "chore/bump-deps",
+    "url": "https://github.com/example/example-repo/pull/81"
+  }
+]
