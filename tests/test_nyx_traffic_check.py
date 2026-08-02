@@ -138,6 +138,28 @@ class FixtureCadenceCase(unittest.TestCase):
         self.assertIn("2026-07-13, 2026-07-20, 2026-07-27", line)
         self.assertIn("never carried a dated report", line)
 
+    def test_format_cadence_lapsed_with_reports_on_record(self):
+        # Sibling regression to what_moved_check.py's task-470 fix: this
+        # module (task 465) explicitly documents mirroring
+        # what_moved_check.py's "exact real-Monday-window shape," but was
+        # written before task 470's format_cadence correction existed and
+        # never got the matching fix. Once at least one dated traffic
+        # report exists on record, the message must stop claiming the
+        # directory "has never carried a dated report" -- it must instead
+        # name the real latest report date, even while Mondays are still
+        # missed.
+        result = {
+            "total_reports_on_record": 1,
+            "latest_report": "2026-08-01",
+            "mondays_due": ["2026-07-13", "2026-07-20", "2026-07-27"],
+            "missed_mondays": ["2026-07-13", "2026-07-20"],
+            "today": "2026-08-02",
+        }
+        line = ntc.format_cadence(result)
+        self.assertNotIn("never carried a dated report", line)
+        self.assertIn("last carried a report dated 2026-08-01", line)
+        self.assertIn("2 Cluster Days lapsed", line)
+
     def test_default_vault_dir_falls_back_to_the_real_sibling_path(self):
         # No override: DEFAULT_VAULT_DIR resolves to the real orita-vault
         # sibling checkout path (proven structurally, not by requiring it

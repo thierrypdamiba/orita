@@ -140,10 +140,17 @@ def format_cadence(result: dict) -> str:
         )
     joined = ", ".join(result["missed_mondays"])
     plural = "" if len(result["missed_mondays"]) == 1 else "s"
+    if result["total_reports_on_record"] == 0:
+        context = "orita-vault/vault/nyx/traffic/ has never carried a dated report"
+    else:
+        context = (
+            f"orita-vault/vault/nyx/traffic/ last carried a report dated "
+            f"{result['latest_report']}, still short the Monday(s) named above"
+        )
     return (
         f"nyx traffic cadence: {len(result['missed_mondays'])} Cluster Day{plural} lapsed -- "
         f"{result['total_reports_on_record']} report(s) on record, owed for {joined} "
-        f"(TOWN-OPERATIONS.md's weekly ritual; orita-vault/vault/nyx/traffic/ has never carried a dated report)"
+        f"(TOWN-OPERATIONS.md's weekly ritual; {context})"
     )
 
 
