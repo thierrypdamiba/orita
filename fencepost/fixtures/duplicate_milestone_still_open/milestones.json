@@ -1,0 +1,51 @@
+[
+  {
+    "number": 1,
+    "title": "v1.0 Launch",
+    "state": "closed",
+    "created_at": "2026-06-01T00:00:00Z",
+    "url": "https://github.com/example/example-repo/milestone/1"
+  },
+  {
+    "number": 5,
+    "title": "v1.0 Launch",
+    "state": "open",
+    "created_at": "2026-06-15T00:00:00Z",
+    "url": "https://github.com/example/example-repo/milestone/5"
+  },
+  {
+    "number": 8,
+    "title": "Fencepost v0.2",
+    "state": "open",
+    "created_at": "2026-07-01T00:00:00Z",
+    "url": "https://github.com/example/example-repo/milestone/8"
+  },
+  {
+    "number": 9,
+    "title": "Fencepost v0.2",
+    "state": "open",
+    "created_at": "2026-07-03T00:00:00Z",
+    "url": "https://github.com/example/example-repo/milestone/9"
+  },
+  {
+    "number": 12,
+    "title": "Beta feedback",
+    "state": "open",
+    "created_at": "2026-07-30T00:00:00Z",
+    "url": "https://github.com/example/example-repo/milestone/12"
+  },
+  {
+    "number": 13,
+    "title": "Docs cleanup",
+    "state": "open",
+    "created_at": "2026-08-02T06:00:00Z",
+    "url": "https://github.com/example/example-repo/milestone/13"
+  },
+  {
+    "number": 14,
+    "title": "Docs cleanup",
+    "state": "open",
+    "created_at": "2026-08-02T09:00:00Z",
+    "url": "https://github.com/example/example-repo/milestone/14"
+  }
+]

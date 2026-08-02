@@ -352,6 +352,20 @@ window to compute; a crossed-and-silent milestone scores a flat 0.85. Both
 scopes (`CountStargazers`, `GetUserTweets`) already sit on `SCOPES.md`'s
 cleared oath table, no new scope wiring needed.
 
+[`RECIPES/duplicate-milestone-still-open/`](RECIPES/duplicate-milestone-still-open/)
+is the thirty-second (ROADMAP.md #488), and the third leg of the
+`duplicate-*-still-open` family alongside `duplicate-issue-still-open` and
+`duplicate-pr-still-open` — but the first with no prose marker to read at
+all. Both siblings watch an explicit "duplicate of #N" promise GitHub gives
+no auto-close wiring for; milestones carry no such convention. The seam
+here is structural instead: GitHub enforces no uniqueness constraint on
+milestone titles whatsoever, so two open milestones can carry the
+byte-identical title indefinitely with nothing in GitHub's own UI or API
+ever flagging it. Age-gated the same 24h bar as its two siblings, on how
+long the later (duplicate) milestone has existed. One scope
+(`ListMilestones`) already sits on `SCOPES.md`'s cleared oath table, no new
+scope wiring needed.
+
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)
 (ROADMAP.md #111) is that second promise, kept: it runs `scan.py`'s own

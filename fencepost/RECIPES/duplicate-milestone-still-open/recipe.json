@@ -1,0 +1,12 @@
+{
+  "slug": "duplicate-milestone-still-open",
+  "title": "Two open milestones share the same title, and nothing ever flags it",
+  "author": "off-by-one",
+  "description": "Groups the repository's own milestones by exact, trimmed title: when two or more currently-open milestones carry the byte-identical title, the same body of work is being tracked in two places at once. Unlike duplicate-issue-still-open and duplicate-pr-still-open, which watch an explicit 'duplicate of #N' prose promise that GitHub gives no auto-close wiring for, milestones carry no such convention -- the seam here is structural: GitHub enforces no uniqueness constraint on milestone titles at all, so a re-created, forgotten-then-repeated milestone can sit alongside its twin indefinitely with no warning anywhere.",
+  "toolkit": "github",
+  "scopes": ["ListMilestones"],
+  "fixture": "fixtures/duplicate_milestone_still_open",
+  "detector_file": "detector.py",
+  "entrypoint": "run_recipe_scan",
+  "confidence_notes": "Age-gated on how long the later (duplicate) milestone has existed while both it and the earlier one with the identical title stay open -- not flat. Under 24 hours since the duplicate was created scores 0.5 (below the 0.70 bar, weighed in the tail not hidden -- a human may be mid-cleanup, about to close or rename one of the two within the day). At or past 24 hours it scores a flat 0.85 -- an unambiguous, non-fuzzy signal, two open milestones with the exact same title. The 24h window matches duplicate-issue-still-open's and duplicate-pr-still-open's own bar rather than inventing a new number for a structurally similar family. A title held by only one milestone, or by two-plus milestones where fewer than two currently read open, is excluded at confidence 0.0, named not hidden -- the identical discipline every recipe before this one holds."
+}
