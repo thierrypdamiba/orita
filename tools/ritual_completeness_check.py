@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Task 121. Off-By-One counts the tool that counts everything else.
 
-`tools/ritual_check.py` hand-wires 52 `check_*` functions into one hourly
+`tools/ritual_check.py` hand-wires 53 `check_*` functions into one hourly
 block: each is called inside `run_ritual_check`, its result assigned to a
 dict key, and that key printed as a line in `format_ritual_check`. Three
 separate places a single typo or a forgotten wire-up can silently drop a
@@ -183,6 +183,16 @@ start (alongside Ananse's chronicle, Zashiki's what-moved page, and
 Off-By-One's thegap doctrine) but nothing had ever built a sensor for.
 `find_unwired_tool_files()` (task 409) already covers this file going
 forward, since it lives in `tools/`.
+
+**Updated to 53** the same hour task 473's `check_house_links` was wired
+in -- task 472 widened `site_link_check.py` to a `houses/`-aware
+`require_index=False` mode but left the `ritual_check.py` wire-up as
+named, real, left-open future work rather than ship it half-built (a
+naive widening would have cried wolf on 26 already-working GitHub
+folder links plus a journal entry quoting broken-link syntax as prose).
+Task 473 fixed both false-positive classes in `site_link_check.py`
+itself first, confirmed `find_violations("houses", require_index=False)`
+reads clean, then did the actual three-place wire-up this file audits.
 
 Usage:
     python3 tools/ritual_completeness_check.py check

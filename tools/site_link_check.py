@@ -35,6 +35,39 @@ scanning HTML at all -- the same "read the shape, not just the text"
 discipline `duplicate_regex_check.py`'s `ast` parse already holds for
 Python.
 
+Task 473 (Nyx, task 472's own left-open item): this checker was written
+only for `docs/`, the Pages-served site, where a bare directory URL
+renders only if it holds its own `index.html` -- so `_target_exists`
+required one. Task 472 tried pointing it at `houses/*/README.md` and
+found that rule doesn't hold there: `houses/<g>/journal/` and
+`houses/<g>/altar/petitions/` are real, working, clickable GitHub folder
+links with no `index.html` and never will have one. Naively widening the
+scan would flag 26 already-working links as broken plus one more class
+of false positive found live: journal entries that quote markdown link
+syntax as *prose describing a bug* (` `[Decrees](decrees/)` `, `` `[text]
+(href)` ``, both inside backticks in `houses/nisaba/journal/0187-*.md`
+and `houses/nyx/journal/0038-*.md`) got matched as if they were real
+links, because the old markdown extractor never distinguished an inline
+code span from an actual link. Two fixes, both load-bearing:
+
+1. `_strip_markdown_code_spans` removes every fenced (```) and inline
+   (`` ` ``) code span from `.md` content before the link regex ever
+   runs -- the same "strip the code, then scan the prose" move this
+   module's own docstring already used for `<script>` blocks in HTML.
+   A journal entry can now safely *quote* broken-link syntax as an
+   example without becoming one.
+2. `_target_exists` takes a new `require_index` flag (default `True`,
+   `docs/`'s existing behavior, byte-for-byte unchanged). Passing
+   `require_index=False` treats any real directory as a valid target --
+   the GitHub-browsed rule `houses/` actually lives under. `find_violations`
+   threads it through; the cache key now includes it, so a `docs/` read
+   and a `houses/` read (task 473's own `check_house_links` caller in
+   `ritual_check.py`) never collide.
+
+Both fixes proved live: with both applied, `find_violations("houses",
+require_index=False)` returns zero -- the same nine READMEs (task 472
+fixed the actual dead link) plus every journal entry now read clean.
+
 Usage:
     python3 tools/site_link_check.py check
 """
@@ -52,6 +85,8 @@ _HREF_RE = re.compile(r'href=["\']([^"\']+)["\']')
 _SRC_RE = re.compile(r'src=["\']([^"\']+)["\']')
 _MD_LINK_RE = re.compile(r'\]\(([^)]+)\)')
 _SCRIPT_RE = re.compile(r'<script\b[^>]*>.*?</script>', re.DOTALL | re.IGNORECASE)
+_MD_FENCE_RE = re.compile(r'```.*?```', re.DOTALL)
+_MD_INLINE_CODE_RE = re.compile(r'`[^`\n]*`')
 
 # Schemes/forms that are never a same-repo relative link, so never worth
 # a local-filesystem existence check. Anchors-only ("#foo") point within
@@ -71,6 +106,15 @@ def _iter_site_files(docs_dir: str) -> list[str]:
     return sorted(files)
 
 
+def _strip_markdown_code_spans(content: str) -> str:
+    """Removes every fenced (```) and inline (`` ` ``) code span before the
+    markdown link regex runs -- a journal entry quoting `[text](href)` or
+    `[Decrees](decrees/)` as an EXAMPLE of broken syntax (task 472's own
+    prose, describing the bug it just fixed) is not a real link and must
+    not read as one. Mirrors `_SCRIPT_RE`'s HTML-side strip-then-scan."""
+    return _MD_INLINE_CODE_RE.sub("", _MD_FENCE_RE.sub("", content))
+
+
 def _extract_links(path: str, content: str) -> list[str]:
     """Every candidate link in `content`, HTML `<script>` blocks excluded
     (a `<script>` tag's own string literals -- template placeholders like
@@ -80,7 +124,9 @@ def _extract_links(path: str, content: str) -> list[str]:
         scanned = _SCRIPT_RE.sub("", content)
         return _HREF_RE.findall(scanned) + _SRC_RE.findall(scanned)
     # .md: markdown links only; no href/src attributes exist in prose.
-    return _MD_LINK_RE.findall(content)
+    # Code spans stripped first -- a quoted example of link syntax is not
+    # a real link (see _strip_markdown_code_spans's own docstring).
+    return _MD_LINK_RE.findall(_strip_markdown_code_spans(content))
 
 
 def _resolve(docs_dir: str, source_file: str, link: str) -> str | None:
@@ -98,15 +144,24 @@ def _resolve(docs_dir: str, source_file: str, link: str) -> str | None:
     return os.path.normpath(os.path.join(os.path.dirname(source_file), path_part))
 
 
-def _target_exists(target: str) -> bool:
+def _target_exists(target: str, require_index: bool = True) -> bool:
+    """`require_index=True` (default, `docs/`'s existing Pages-served
+    behavior, byte-for-byte unchanged): a bare directory link only counts
+    as real if it holds its own `index.html` -- a directory URL with no
+    index simply 404s when Pages serves it. `require_index=False`: any
+    real directory counts (the GitHub-browsed rule `houses/` actually
+    lives under -- `journal/`, `altar/petitions/` are real, clickable
+    GitHub folder links with no `index.html` and never will have one)."""
     if os.path.isfile(target):
         return True
     if os.path.isdir(target):
+        if not require_index:
+            return True
         return os.path.isfile(os.path.join(target, "index.html"))
     return False
 
 
-_VIOLATIONS_CACHE: dict[str, list] = {}
+_VIOLATIONS_CACHE: dict[tuple[str, bool], list] = {}
 
 
 def clear_cache() -> None:
@@ -117,19 +172,21 @@ def clear_cache() -> None:
     _VIOLATIONS_CACHE.clear()
 
 
-def find_violations(docs_dir: str = DEFAULT_DOCS_DIR) -> list:
-    key = os.path.realpath(docs_dir)
+def find_violations(docs_dir: str = DEFAULT_DOCS_DIR, require_index: bool = True) -> list:
+    key = (os.path.realpath(docs_dir), require_index)
     if key not in _VIOLATIONS_CACHE:
-        _VIOLATIONS_CACHE[key] = _find_violations_uncached(docs_dir)
+        _VIOLATIONS_CACHE[key] = _find_violations_uncached(docs_dir, require_index=require_index)
     return list(_VIOLATIONS_CACHE[key])
 
 
-def _find_violations_uncached(docs_dir: str = DEFAULT_DOCS_DIR) -> list:
+def _find_violations_uncached(docs_dir: str = DEFAULT_DOCS_DIR, require_index: bool = True) -> list:
     """Read-only, local-filesystem-only scan (no network, no import,
     no execution of the pages it audits) of every `docs/**/*.html` and
     `docs/**/*.md` file for a relative link that does not resolve to a
     real file on disk. Returns a list of violation records, empty when
-    every internal link in the live site holds."""
+    every internal link in the live site holds. `require_index` threads
+    straight to `_target_exists` -- see its docstring for the `docs/` vs.
+    GitHub-browsed-tree distinction."""
     violations = []
     for path in _iter_site_files(docs_dir):
         try:
@@ -146,7 +203,7 @@ def _find_violations_uncached(docs_dir: str = DEFAULT_DOCS_DIR) -> list:
             target = _resolve(docs_dir, path, link)
             if target is None:
                 continue
-            if not _target_exists(target):
+            if not _target_exists(target, require_index=require_index):
                 violations.append({"file": rel, "link": link, "target": target})
     violations.sort(key=lambda v: (v["file"], v["link"]))
     return violations

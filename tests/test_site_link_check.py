@@ -168,10 +168,87 @@ class FixtureViolationCase(unittest.TestCase):
         self.assertEqual(fresh, [])
 
 
+    def test_require_index_false_treats_bare_directory_as_valid(self):
+        """Task 473: the GitHub-browsed rule `houses/` actually lives
+        under -- a real directory with no `index.html` is a perfectly
+        working folder link there, unlike the Pages-served `docs/` tree."""
+        _write(
+            os.path.join(self.docs, "index.html"),
+            '<a href="journal/">journal</a>',
+        )
+        os.makedirs(os.path.join(self.docs, "journal"), exist_ok=True)
+        violations = slc.find_violations(docs_dir=self.docs, require_index=False)
+        self.assertEqual(violations, [])
+
+    def test_require_index_true_is_still_the_unchanged_default(self):
+        """The exact same fixture, default flag: docs/'s existing stricter
+        rule (bare directory needs its own index.html) must not have
+        loosened just because require_index=False now exists elsewhere."""
+        _write(
+            os.path.join(self.docs, "index.html"),
+            '<a href="journal/">journal</a>',
+        )
+        os.makedirs(os.path.join(self.docs, "journal"), exist_ok=True)
+        violations = slc.find_violations(docs_dir=self.docs)
+        self.assertEqual(len(violations), 1)
+
+    def test_require_index_false_still_flags_a_truly_missing_directory(self):
+        _write(
+            os.path.join(self.docs, "index.html"),
+            '<a href="nowhere/">gone</a>',
+        )
+        violations = slc.find_violations(docs_dir=self.docs, require_index=False)
+        self.assertEqual(len(violations), 1)
+
+    def test_markdown_link_quoted_in_backticks_is_not_a_real_link(self):
+        """Task 473: a journal entry quoting `[text](href)` as PROSE
+        describing a bug (task 472's own live shape, in `houses/nisaba/
+        journal/0187-*.md` and `houses/nyx/journal/0038-*.md`) must not
+        be scanned as if it were a real link."""
+        _write(
+            os.path.join(self.docs, "journal.md"),
+            "every README carried `[Decrees](decrees/)`, a dead link, "
+            "fixed by pointing at `[text](href)` correctly instead.",
+        )
+        violations = slc.find_violations(docs_dir=self.docs)
+        self.assertEqual(violations, [])
+
+    def test_markdown_link_in_fenced_code_block_is_not_a_real_link(self):
+        _write(
+            os.path.join(self.docs, "journal.md"),
+            "before:\n```\n[gone](nowhere.md)\n```\nafter\n",
+        )
+        violations = slc.find_violations(docs_dir=self.docs)
+        self.assertEqual(violations, [])
+
+    def test_markdown_link_outside_backticks_is_still_checked(self):
+        """The code-span strip must not swallow a REAL link just because
+        the same file also happens to quote syntax elsewhere."""
+        _write(
+            os.path.join(self.docs, "journal.md"),
+            "quoting `[text](href)` as an example, but this real link "
+            "is [actually broken](nowhere.md) and should still be caught.",
+        )
+        violations = slc.find_violations(docs_dir=self.docs)
+        self.assertEqual(len(violations), 1)
+        self.assertEqual(violations[0]["link"], "nowhere.md")
+
+
 class LiveTreeCase(unittest.TestCase):
     def test_the_real_live_docs_tree_holds_zero_broken_links(self):
         slc.clear_cache()
         violations = slc.find_violations()
+        self.assertEqual(violations, [], slc.format_violations(violations))
+
+    def test_the_real_live_houses_tree_holds_zero_broken_links_github_browsed(self):
+        """Task 473: the same widened checker, pointed at `houses/` with
+        the GitHub-browsed `require_index=False` rule -- proves task 472's
+        fix (the Decrees link) plus this hour's two false-positive fixes
+        (bare directories, quoted link syntax in journal prose) together
+        leave the real live tree clean, not just a fixture."""
+        slc.clear_cache()
+        houses_dir = os.path.join(ROOT, "houses")
+        violations = slc.find_violations(docs_dir=houses_dir, require_index=False)
         self.assertEqual(violations, [], slc.format_violations(violations))
 
 

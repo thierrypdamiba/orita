@@ -15,25 +15,31 @@ house").
 Investigated whether `site_link_check.py` itself could be pointed at
 `houses/` to catch this class of bug going forward, the same way Nyx
 widened `network_boundary_check.py`'s blind spot in journal 0033. It
-can't be reused as-is: `_target_exists()` requires a bare directory link
-to hold its own `index.html`, a rule written for the Pages-served `docs/`
-tree where a directory URL only renders if one exists. `houses/*/README.md`'s
-other two links (`journal/`, `altar/petitions/`) are real, working,
-clickable GitHub folder links with no `index.html` and never will have
-one -- running the existing checker against `houses/` flags 26 already-
-working links as "broken", plus one incidental regex false-positive
-matching the literal word "href" inside a journal entry's own prose.
-Widening the checker naively would make it cry wolf, the exact failure
-mode Ogun's own docstring names as worse than no checker at all. Not
-wired into `ritual_check.py` this hour for that reason -- a `houses/`-aware
-variant of `_target_exists` (one that treats a bare directory as valid
-without requiring `index.html`) is real future work, named here rather
-than shipped half-built.
+couldn't be reused as-is that hour: `_target_exists()` required a bare
+directory link to hold its own `index.html`, a rule written for the
+Pages-served `docs/` tree where a directory URL only renders if one
+exists. `houses/*/README.md`'s other two links (`journal/`,
+`altar/petitions/`) are real, working, clickable GitHub folder links
+with no `index.html` and never will have one -- running the existing
+checker against `houses/` flagged 26 already-working links as "broken",
+plus one incidental regex false-positive matching quoted link syntax
+inside a journal entry's own prose. Widening the checker naively would
+have made it cry wolf, the exact failure mode Ogun's own docstring names
+as worse than no checker at all -- named here rather than shipped
+half-built.
 
-This module checks only the one thing that's actually fixed: the real
-Decrees link in all nine houses resolves to a real file on disk today,
-and the exact broken shape from before (`decrees/`, a same-directory
-relative link with no leading `../../`) is gone everywhere.
+**Task 473 closed this:** `site_link_check.py` gained a `require_index`
+flag (`False` = GitHub-browsed, any real directory counts; `True`,
+unchanged, stays `docs/`'s default) and a markdown-code-span strip
+before the link regex runs (a journal quoting `[Decrees](decrees/)` or
+`[text](href)` in backticks, as an example, is not a real link). Wired
+into `tools/ritual_check.py` as `check_house_links`, printed every hour
+alongside `check_site_links`. `tests/test_site_link_check.py` proves the
+mechanism (fixtures + the real live `houses/` tree); this module still
+checks the one thing it always did: the real Decrees link in all nine
+houses resolves to a real file on disk today, and the exact broken shape
+from before (`decrees/`, a same-directory relative link with no leading
+`../../`) is gone everywhere.
 """
 import os
 import re

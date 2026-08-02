@@ -1522,6 +1522,34 @@ def check_site_links(docs_dir: str | None = None) -> dict:
     return {"clean": not violations, "count": len(violations), "violations": violations}
 
 
+def check_house_links(houses_dir: str | None = None) -> dict:
+    """Task 473: the `houses/`-aware sibling `check_site_links` task 472
+    named as real, left-open future work rather than shipping half-built.
+    `site_link_check.py` (task 423) only ever scanned `docs/`, the Pages-
+    served site where a bare directory URL only renders with its own
+    `index.html`. `houses/*/README.md` lives under a different rule --
+    GitHub-browsed, where a real directory with no `index.html` (`journal/`,
+    `altar/petitions/`) is a perfectly working link -- so `site_link_check.py`
+    gained a `require_index` flag this same hour: `False` here, unchanged
+    `True` (the default) for `check_site_links`'s own `docs/` call above, so
+    this call can never loosen that one's stricter Pages rule. Also picks up
+    this hour's markdown-code-span strip, closing the one incidental false
+    positive task 472 found and declined to paper over (a journal entry
+    quoting `[Decrees](decrees/)`/`[text](href)` in backticks, as prose
+    ABOUT the bug it fixed, is not itself a link). Unconditional, local-
+    filesystem-only, same cheap class as `check_site_links`. Never edits
+    anything; a real broken link is a god-on-duty escalation, not something
+    this check silently repairs."""
+    mod = _site_link_check()
+    kwargs = {"require_index": False}
+    if houses_dir is not None:
+        kwargs["docs_dir"] = houses_dir
+    else:
+        kwargs["docs_dir"] = os.path.join(ROOT, "houses")
+    violations = mod.find_violations(**kwargs)
+    return {"clean": not violations, "count": len(violations), "violations": violations}
+
+
 def check_badge_freshness(badge_path: str | None = None) -> dict:
     """Task 425: fold badge_freshness_check.py's own live-recompute-vs-
     committed-file cross-check into the one block. `seam-scan.yml`'s daily
@@ -1690,6 +1718,7 @@ def run_ritual_check(
     strategy_targets_path: str | None = None,
     network_boundary_dirs: tuple | None = None,
     site_link_docs_dir: str | None = None,
+    house_links_houses_dir: str | None = None,
     badge_path: str | None = None,
     recipe_readme_path: str | None = None,
     recipe_readme_fencepost_root: str | None = None,
@@ -1794,6 +1823,7 @@ def run_ritual_check(
     strategy_targets = check_strategy_targets(strategy_path=strategy_targets_path)
     network_boundary = check_network_boundary(dirs=network_boundary_dirs)
     site_links = check_site_links(docs_dir=site_link_docs_dir)
+    house_links = check_house_links(houses_dir=house_links_houses_dir)
     badge_freshness = check_badge_freshness(badge_path=badge_path)
     recipe_readme = check_recipe_readme(
         readme_path=recipe_readme_path, recipe_fencepost_root=recipe_readme_fencepost_root
@@ -1850,6 +1880,7 @@ def run_ritual_check(
         or (not strategy_targets["clean"])
         or (not network_boundary["clean"])
         or (not site_links["clean"])
+        or (not house_links["clean"])
         or (not badge_freshness["clean"])
         or (not recipe_readme["clean"])
         or (not strategy_true_positive["clean"])
@@ -1905,6 +1936,7 @@ def run_ritual_check(
         "strategy_targets": strategy_targets,
         "network_boundary": network_boundary,
         "site_links": site_links,
+        "house_links": house_links,
         "badge_freshness": badge_freshness,
         "recipe_readme": recipe_readme,
         "strategy_true_positive": strategy_true_positive,
@@ -2152,6 +2184,13 @@ def format_ritual_check(result: dict) -> str:
     else:
         lines.append(
             f"  site links: {sl['count']} BROKEN LINK(S) -- Ogun's own charter duty is unmet, escalate now"
+        )
+    hl = result["house_links"]
+    if hl["clean"]:
+        lines.append("  house links: clean (every houses/ link resolves, GitHub-browsed rule)")
+    else:
+        lines.append(
+            f"  house links: {hl['count']} BROKEN LINK(S) -- a house's own front door is unmet, escalate now"
         )
     lines.append("  " + _badge_freshness_check().format_badge_freshness(result["badge_freshness"]))
     lines.append("  " + _recipe_readme_check().format_result(result["recipe_readme"]))

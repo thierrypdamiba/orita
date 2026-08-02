@@ -3278,6 +3278,64 @@ class SiteLinkFoldCase(unittest.TestCase):
         self.assertEqual(result["site_links"]["clean"], not direct)
 
 
+class HouseLinksFoldCase(unittest.TestCase):
+    """Task 473: run_ritual_check() folds site_link_check.py's houses/-
+    aware require_index=False mode into check_house_links -- the sibling
+    fold task 472 named as real, left-open future work rather than a
+    half-built widening. Clean by default against a fixture that mirrors
+    houses/*/README.md's real shape (a bare directory link with no
+    index.html, which must NOT be flagged here even though check_site_links'
+    own docs/ default still requires one), and a genuinely missing target
+    both flips `broken` and surfaces in the printed block."""
+
+    def setUp(self):
+        self.dir = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.dir, ignore_errors=True)
+
+    def _write(self, rel, content):
+        path = os.path.join(self.dir, rel)
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, "w") as f:
+            f.write(content)
+
+    def test_bare_directory_link_is_not_flagged_github_browsed_rule(self):
+        self._write("ogun/README.md", "[journal](journal/)")
+        os.makedirs(os.path.join(self.dir, "ogun", "journal"), exist_ok=True)
+        result = rc.run_ritual_check(house_links_houses_dir=self.dir)
+        self.assertTrue(result["house_links"]["clean"])
+        self.assertFalse(result["broken"])
+        self.assertIn("house links: clean", rc.format_ritual_check(result))
+
+    def test_synthetic_broken_link_flips_broken_and_prints(self):
+        self._write("ogun/README.md", "[nowhere](nowhere/)")
+        result = rc.run_ritual_check(house_links_houses_dir=self.dir)
+        self.assertFalse(result["house_links"]["clean"])
+        self.assertTrue(result["broken"])
+        formatted = rc.format_ritual_check(result)
+        self.assertIn("house links: 1 BROKEN LINK(S)", formatted)
+
+    def test_default_houses_dir_reads_the_real_tree_and_matches_direct_call(self):
+        """No override: reads the real houses/ tree, the same default
+        check_house_links falls back to -- proves the fold never
+        duplicates or diverges from the module it wraps."""
+        slc = _load("_test_site_link_check", os.path.join(ROOT, "tools", "site_link_check.py"))
+        slc.clear_cache()
+        direct = slc.find_violations(docs_dir=os.path.join(ROOT, "houses"), require_index=False)
+        result = rc.run_ritual_check()
+        self.assertEqual(result["house_links"]["count"], len(direct))
+        self.assertEqual(result["house_links"]["clean"], not direct)
+
+    def test_house_links_never_loosens_site_links_own_docs_rule(self):
+        """The two checks must stay independent: a bare directory link
+        with no index.html is valid for house_links but still broken for
+        site_links, in the exact same fixture tree."""
+        self._write("README.md", "[journal](journal/)")
+        os.makedirs(os.path.join(self.dir, "journal"), exist_ok=True)
+        result = rc.run_ritual_check(site_link_docs_dir=self.dir, house_links_houses_dir=self.dir)
+        self.assertFalse(result["site_links"]["clean"])
+        self.assertTrue(result["house_links"]["clean"])
+
+
 class RecipeReadmeFoldCase(unittest.TestCase):
     """Task 426: run_ritual_check() folds recipe_readme_check.py's own
     two-way cross-check of fencepost/README.md's Community recipes
