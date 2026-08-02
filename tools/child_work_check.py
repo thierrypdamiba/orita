@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Task 101. Nyx's fourth door this window.
 
-`TOWN-OPERATIONS.md`'s Iron Rules name seven laws that "never bend." Tasks
+`TOWN-OPERATIONS.md`'s Iron Rules name eight laws that "never bend." Tasks
 98-100 gave rules #1 (no cross-peek), #4 (Star Covenant), and #5 (the five
 character riders) their first running checks, each replacing "held by
 construction/intent" with "held, proven, every hour." Rule #6 -- "The

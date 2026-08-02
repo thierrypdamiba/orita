@@ -1,5 +1,6 @@
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -8,6 +9,10 @@ import unittest
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "tools"))
 import child_work_check as cwc  # noqa: E402
+
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+VAULT_ROOT = os.path.join(os.path.dirname(ROOT), "orita-vault")
+_VAULT_CHECKED_OUT = os.path.isfile(os.path.join(VAULT_ROOT, "TOWN-OPERATIONS.md"))
 
 
 def _git_quiet(repo, *args):
@@ -279,6 +284,110 @@ class TestLoadFilesJsonArgGuard(unittest.TestCase):
         self._write([{"path": "a.md", "sha": "s1", "author_date": "2026-07-11T00:00:00Z"}])
         loaded = cwc._load_files_json(self.path)
         self.assertEqual(loaded, [{"path": "a.md", "sha": "s1", "author_date": "2026-07-11T00:00:00Z"}])
+
+
+# --- Task 481: child_work_check.py's own docstring claimed "seven laws" ----
+# for the live Iron Rules count, unchecked since task 101 -- the same
+# hardcoded-cardinal-word-never-cross-checked shape task 480 fixed one file
+# over in network_boundary_check.py. TOWN-OPERATIONS.md has since grown an
+# eighth Iron Rule (task 183/184's commit-message-is-a-live-instruction
+# lesson); nothing re-verified the prose claim against the live rulebook.
+
+_CARDINAL_WORDS = {
+    "zero": 0, "one": 1, "two": 2, "three": 3, "four": 4, "five": 5,
+    "six": 6, "seven": 7, "eight": 8, "nine": 9, "ten": 10, "eleven": 11,
+    "twelve": 12,
+}
+
+_LAW_COUNT_CLAIM_RE = re.compile(r"name ([a-z-]+) laws that")
+_IRON_RULE_ITEM_RE = re.compile(r"^\d+\.\s", re.MULTILINE)
+
+
+def claimed_law_count(doc_text: str) -> int:
+    """Live-extracts child_work_check.py's own "name N laws that" claim --
+    never a second hand-typed eight. Raises if the sentence is missing or
+    uses a cardinal word this check doesn't recognize, rather than silently
+    passing an unchecked claim through."""
+    match = _LAW_COUNT_CLAIM_RE.search(doc_text.replace("\n", " "))
+    if not match:
+        raise AssertionError(
+            "child_work_check.py's own docstring no longer contains a "
+            "'name N laws that' sentence -- this doctrine test has nothing "
+            "left to cross-check"
+        )
+    word = match.group(1).lower()
+    if word not in _CARDINAL_WORDS:
+        raise AssertionError(
+            f"child_work_check.py's docstring uses an unrecognized cardinal "
+            f"word {word!r} -- add it to _CARDINAL_WORDS before trusting "
+            "this check"
+        )
+    return _CARDINAL_WORDS[word]
+
+
+def _live_iron_rule_count(vault_root: str = VAULT_ROOT) -> int:
+    """Structurally counts TOWN-OPERATIONS.md's own numbered
+    '## Iron rules (never bend)' list items -- never a hand-typed number."""
+    with open(os.path.join(vault_root, "TOWN-OPERATIONS.md"), encoding="utf-8") as f:
+        text = f.read()
+    section = text.split("## Iron rules (never bend)", 1)[1].split("\n## ", 1)[0]
+    return len(_IRON_RULE_ITEM_RE.findall(section))
+
+
+def _word_for(n: int) -> str:
+    for word, value in _CARDINAL_WORDS.items():
+        if value == n:
+            return word
+    raise AssertionError(f"no cardinal word registered for {n}")
+
+
+class IronRulesCountDoctrineCase(unittest.TestCase):
+    def test_claim_extraction_is_structural_not_hardcoded(self):
+        self.assertEqual(
+            claimed_law_count("Iron Rules name eight laws that never bend"),
+            8,
+        )
+
+    def test_claim_missing_sentence_raises(self):
+        with self.assertRaises(AssertionError):
+            claimed_law_count("Nothing here about a law count.")
+
+    @unittest.skipUnless(
+        _VAULT_CHECKED_OUT,
+        "orita-vault sibling checkout not present (expected in public CI, which checks out only orita)",
+    )
+    def test_real_live_iron_rule_count_is_currently_eight(self):
+        # Regression pin: today's real, live TOWN-OPERATIONS.md rule count.
+        self.assertEqual(_live_iron_rule_count(), 8)
+
+    @unittest.skipUnless(
+        _VAULT_CHECKED_OUT,
+        "orita-vault sibling checkout not present (expected in public CI, which checks out only orita)",
+    )
+    def test_docstring_matches_the_real_live_count(self):
+        real_count = _live_iron_rule_count()
+        claimed = claimed_law_count(cwc.__doc__)
+        self.assertEqual(
+            claimed, real_count,
+            msg=f"child_work_check.py's own docstring claims {claimed} Iron "
+                f"Rules 'never bend', but TOWN-OPERATIONS.md's live count is "
+                f"{real_count}",
+        )
+
+    @unittest.skipUnless(
+        _VAULT_CHECKED_OUT,
+        "orita-vault sibling checkout not present (expected in public CI, which checks out only orita)",
+    )
+    def test_one_fewer_law_in_the_claim_would_flip_this_check_red(self):
+        """Mutation-based hand-verification: proves this doctrine test
+        actually flags a real drift, not just that it happens to pass
+        today (same discipline test_network_boundary_doctrine.py's
+        analogous case holds itself to)."""
+        real_count = _live_iron_rule_count()
+        wrong_word = _word_for(real_count - 1)
+        wrong_doc = cwc.__doc__.replace("eight laws", f"{wrong_word} laws")
+        claimed = claimed_law_count(wrong_doc)
+        self.assertNotEqual(claimed, real_count)
 
 
 if __name__ == "__main__":
