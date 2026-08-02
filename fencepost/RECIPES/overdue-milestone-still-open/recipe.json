@@ -1,0 +1,12 @@
+{
+  "slug": "overdue-milestone-still-open",
+  "title": "A milestone's own due date passed, and it's still open",
+  "author": "off-by-one",
+  "description": "Reads the repository's own milestone list and compares each open milestone's due_on date against the clock. GitHub renders an overdue due date in red on its own milestone page but does nothing else with it -- no auto-close, no notification, no flag surfaced anywhere in the API. A milestone due last month with open issues still sitting inside it looks, to every other tool reading this repo, identical to one due next month. Structural, single-toolkit, the same family as duplicate-milestone-still-open: the promise and the breach both already live inside GitHub's own milestone object, and nothing ever compares them.",
+  "toolkit": "github",
+  "scopes": ["ListMilestones"],
+  "fixture": "fixtures/overdue_milestone_still_open",
+  "detector_file": "detector.py",
+  "entrypoint": "run_recipe_scan",
+  "confidence_notes": "Age-gated on how long past its own due_on date an open milestone has run -- not flat. Under 24 hours past due scores 0.5 (below the 0.70 bar, weighed in the tail not hidden -- a human may be closing the last issue out right now). At or past 24 hours past due it scores a flat 0.85 -- an unambiguous, non-fuzzy signal read directly off two fields GitHub's own API already returns (due_on, state). The 24h window matches duplicate-issue-still-open's, duplicate-pr-still-open's, and duplicate-milestone-still-open's own bar rather than inventing a new number for a structurally similar family. A milestone with no due_on set, one already closed, or one whose due date has not yet arrived is excluded at confidence 0.0, named not hidden -- there is no broken promise to surface."
+}

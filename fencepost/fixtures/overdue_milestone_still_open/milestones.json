@@ -1,0 +1,47 @@
+[
+  {
+    "number": 20,
+    "title": "v1.3 Release",
+    "state": "open",
+    "due_on": "2026-07-10T00:00:00Z",
+    "open_issues": 3,
+    "closed_issues": 9,
+    "url": "https://github.com/example/example-repo/milestone/20"
+  },
+  {
+    "number": 21,
+    "title": "Security patch backlog",
+    "state": "open",
+    "due_on": "2026-08-02T09:00:00Z",
+    "open_issues": 1,
+    "closed_issues": 4,
+    "url": "https://github.com/example/example-repo/milestone/21"
+  },
+  {
+    "number": 22,
+    "title": "Future roadmap",
+    "state": "open",
+    "due_on": "2026-09-01T00:00:00Z",
+    "open_issues": 5,
+    "closed_issues": 0,
+    "url": "https://github.com/example/example-repo/milestone/22"
+  },
+  {
+    "number": 23,
+    "title": "No due date tracked",
+    "state": "open",
+    "due_on": null,
+    "open_issues": 2,
+    "closed_issues": 2,
+    "url": "https://github.com/example/example-repo/milestone/23"
+  },
+  {
+    "number": 24,
+    "title": "Closed but was overdue",
+    "state": "closed",
+    "due_on": "2026-06-01T00:00:00Z",
+    "open_issues": 0,
+    "closed_issues": 6,
+    "url": "https://github.com/example/example-repo/milestone/24"
+  }
+]

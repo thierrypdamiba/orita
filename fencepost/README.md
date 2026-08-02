@@ -366,6 +366,18 @@ long the later (duplicate) milestone has existed. One scope
 (`ListMilestones`) already sits on `SCOPES.md`'s cleared oath table, no new
 scope wiring needed.
 
+[`RECIPES/overdue-milestone-still-open/`](RECIPES/overdue-milestone-still-open/)
+is the thirty-third (ROADMAP.md #489): a milestone's own `due_on` date
+passed while it's still open. GitHub renders an overdue due date in red on
+the milestone's own page but does nothing else with it — no auto-close, no
+notification, nothing surfaced anywhere else in the API — so a milestone
+due last month looks identical to one due next month to every other tool
+reading the repo. Structural, single-toolkit, the same family as
+`duplicate-milestone-still-open`. Age-gated the same 24h bar as every
+`*-still-open` sibling, on how long past its own due date the milestone has
+run. One scope (`ListMilestones`) already sits on `SCOPES.md`'s cleared
+oath table, no new scope wiring needed.
+
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)
 (ROADMAP.md #111) is that second promise, kept: it runs `scan.py`'s own
