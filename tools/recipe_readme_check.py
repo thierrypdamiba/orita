@@ -80,10 +80,10 @@ def _community_recipes_section(readme_text: str) -> str:
     `scopes_completeness_check.py`'s `_accounted_for_app_ids` already
     holds for `SCOPES.md`, so a `RECIPES/<slug>/` link mentioned in some
     OTHER section (there are none today, but nothing should assume that
-    forever) is never mistaken for one of the twenty-six community
-    recipes this section actually enumerates. Empty string if the header
-    itself is missing -- a real gap, not silently treated as vacuously
-    documented."""
+    forever) is never mistaken for one of the twenty-nine community
+    recipes this section actually enumerates today. Empty string if the
+    header itself is missing -- a real gap, not silently treated as
+    vacuously documented."""
     header_match = _SECTION_HEADER.search(readme_text)
     if header_match is None:
         return ""

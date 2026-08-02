@@ -9,6 +9,7 @@ never covered.
 import importlib.util
 import json
 import os
+import re
 import sys
 import tempfile
 import unittest
@@ -220,6 +221,116 @@ class RealRepoCase(unittest.TestCase):
                 readme_path=restored_path, fencepost_root=rrc.DEFAULT_FENCEPOST_ROOT
             )
             self.assertTrue(restored_result["clean"])
+
+
+# --- _community_recipes_section's own docstring claim, cross-checked ------
+#
+# ROADMAP.md #479: the same "claims a number about itself, nothing ever
+# checked it against the live thing it describes" shape
+# test_recipes.py's own `test_oath_scopes_for_toolkit_docstring_matches_
+# the_real_live_counts` (task 475) already closed for
+# `_oath_scopes_for_toolkit`'s docstring, found here one file over:
+# `_community_recipes_section`'s docstring said "twenty-six community
+# recipes" from the hour task 426 wrote it (26 real recipes then); three
+# more have merged since (tweet-claims-unfixed-issue,
+# tweet-claims-unmerged-pr, tweet-claims-open-milestone), so the real live
+# count is 29 today, not 26. Nothing in this file's own test suite ever
+# read that docstring back against `_linked_recipes`/`discover_recipes`'s
+# live count -- fixed at the root (the docstring itself), pinned here so
+# it cannot silently drift again.
+_CARDINAL_WORDS = {
+    "zero": 0, "one": 1, "two": 2, "three": 3, "four": 4, "five": 5,
+    "six": 6, "seven": 7, "eight": 8, "nine": 9, "ten": 10, "eleven": 11,
+    "twelve": 12, "thirteen": 13, "fourteen": 14, "fifteen": 15, "sixteen": 16,
+    "seventeen": 17, "eighteen": 18, "nineteen": 19, "twenty": 20,
+    "twenty-one": 21, "twenty-two": 22, "twenty-three": 23, "twenty-four": 24,
+    "twenty-five": 25, "twenty-six": 26, "twenty-seven": 27, "twenty-eight": 28,
+    "twenty-nine": 29, "thirty": 30,
+}
+
+_SECTION_COUNT_CLAIM_RE = re.compile(
+    r"never mistaken for one of the ([a-z-]+) community\n?\s*recipes this section actually enumerates"
+)
+
+
+def _word_for(n: int) -> str:
+    for word, value in _CARDINAL_WORDS.items():
+        if value == n:
+            return word
+    raise AssertionError(f"no cardinal word known for {n}")
+
+
+def claimed_section_count(doc_text: str) -> int:
+    """Live-extracts `_community_recipes_section`'s own "one of the N
+    community recipes this section actually enumerates" claim -- never a
+    second hand-typed 26. Raises if the sentence is missing or uses a
+    cardinal word this check doesn't recognize, rather than silently
+    passing an unchecked claim through."""
+    match = _SECTION_COUNT_CLAIM_RE.search(doc_text.replace("\n", " "))
+    if not match:
+        raise AssertionError(
+            "_community_recipes_section's docstring no longer contains a "
+            "'one of the N community recipes this section actually "
+            "enumerates' sentence -- this doctrine test has nothing left "
+            "to cross-check"
+        )
+    word = match.group(1).lower()
+    if word not in _CARDINAL_WORDS:
+        raise AssertionError(
+            f"_community_recipes_section's docstring uses an unrecognized "
+            f"cardinal word {word!r} -- add it to _CARDINAL_WORDS before "
+            "trusting this check"
+        )
+    return _CARDINAL_WORDS[word]
+
+
+class DocstringCountDoctrineCase(unittest.TestCase):
+    def test_claim_extraction_is_structural_not_hardcoded(self):
+        self.assertEqual(
+            claimed_section_count(
+                "never mistaken for one of the five community recipes "
+                "this section actually enumerates"
+            ),
+            5,
+        )
+
+    def test_claim_missing_sentence_raises(self):
+        with self.assertRaises(AssertionError):
+            claimed_section_count("Nothing here about a recipe count.")
+
+    def test_real_live_section_count_is_currently_twenty_nine(self):
+        # Regression pin: today's real, live linked-recipe count.
+        with open(rrc.DEFAULT_README_PATH, encoding="utf-8") as f:
+            text = f.read()
+        section = rrc._community_recipes_section(text)
+        self.assertEqual(len(rrc._linked_recipes(section)), 29)
+
+    def test_docstring_matches_the_real_live_count(self):
+        with open(rrc.DEFAULT_README_PATH, encoding="utf-8") as f:
+            text = f.read()
+        section = rrc._community_recipes_section(text)
+        real_count = len(rrc._linked_recipes(section))
+        claimed = claimed_section_count(rrc._community_recipes_section.__doc__)
+        self.assertEqual(
+            claimed, real_count,
+            msg=f"_community_recipes_section's docstring claims {claimed} "
+                f"community recipes, but the real live count is {real_count}",
+        )
+
+    def test_one_fewer_recipe_in_the_claim_would_flip_this_check_red(self):
+        """Mutation-based hand-verification, same discipline
+        test_recipes.py's own analogous doctrine test already holds itself
+        to: prove the checker actually flags a real drift, not just that
+        it happens to pass today."""
+        with open(rrc.DEFAULT_README_PATH, encoding="utf-8") as f:
+            text = f.read()
+        section = rrc._community_recipes_section(text)
+        real_count = len(rrc._linked_recipes(section))
+        stale_doc = (
+            f"never mistaken for one of the {_word_for(real_count - 1)} "
+            "community recipes this section actually enumerates"
+        )
+        self.assertNotEqual(claimed_section_count(stale_doc), real_count)
 
 
 if __name__ == "__main__":
