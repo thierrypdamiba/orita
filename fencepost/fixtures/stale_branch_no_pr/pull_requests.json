@@ -1,0 +1,9 @@
+[
+  {
+    "number": 95,
+    "title": "Bump the lockfile",
+    "state": "merged",
+    "head_ref": "chore/lockfile-bump",
+    "url": "https://github.com/example/example-repo/pull/95"
+  }
+]

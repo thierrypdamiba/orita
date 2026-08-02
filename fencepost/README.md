@@ -378,6 +378,25 @@ reading the repo. Structural, single-toolkit, the same family as
 run. One scope (`ListMilestones`) already sits on `SCOPES.md`'s cleared
 oath table, no new scope wiring needed.
 
+[`RECIPES/stale-branch-no-pr/`](RECIPES/stale-branch-no-pr/)
+is the thirty-fourth (ROADMAP.md #490), the other end of
+`deleted-branch-pr-still-open`'s own branch lifecycle: a branch is created
+straight on the repository, and no pull request is ever opened from it.
+GitHub's own branch list shows how far a branch has drifted from the
+default branch, but nothing anywhere flags one that never became a pull
+request — real, reviewable work sitting invisible next to every branch
+that did get opened. Unlike its sibling, ANY pull request in ANY state
+(open, closed, or merged) clears the seam here — the promise being
+watched is only "was this ever turned into reviewable work," not whether
+that PR is still open. The repository's own default branch (`main`/
+`master`) is excluded outright. Age-gated 96 hours, matching
+`merged-pr-never-released`'s and `issue-closed-never-released`'s own bar
+rather than `deleted-branch-pr-still-open`'s shorter 24h one — a branch's
+natural time-to-first-PR runs longer than a deletion event's own
+resolution clock. Both scopes (`ListRepositoryActivities`,
+`ListPullRequests`) already sit on `SCOPES.md`'s cleared oath table, no
+new scope wiring needed.
+
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)
 (ROADMAP.md #111) is that second promise, kept: it runs `scan.py`'s own

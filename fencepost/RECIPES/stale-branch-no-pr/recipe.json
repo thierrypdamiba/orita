@@ -1,0 +1,12 @@
+{
+  "slug": "stale-branch-no-pr",
+  "title": "A branch was created, and no pull request has ever come from it",
+  "author": "off-by-one",
+  "description": "Reads the repository's own Activity feed for branch_creation events and checks each ref against the live pull-request list. GitHub's branch list shows how far a branch has drifted from the default branch, but nothing anywhere flags a branch that was never turned into a pull request at all -- real, reviewable work sitting invisible next to every branch that did get opened. The inverse end of deleted-branch-pr-still-open's own branch lifecycle: that recipe watches a branch's promise (an open PR) survive after the branch is gone; this one watches a branch survive with no promise (a PR, in any state) ever made from it at all.",
+  "toolkit": "github",
+  "scopes": ["ListRepositoryActivities", "ListPullRequests"],
+  "fixture": "fixtures/stale_branch_no_pr",
+  "detector_file": "detector.py",
+  "entrypoint": "run_recipe_scan",
+  "confidence_notes": "Age-gated on how long the branch has existed with no pull request ever pointing at it -- not flat. Under 96 hours scores 0.5 (below the 0.70 bar, weighed in the tail not hidden -- a branch this young may simply be in-progress work nobody has opened for review yet). At or past 96 hours scores a flat 0.85 -- an unambiguous, non-fuzzy signal: a branch with real commits, old enough that ordinary review cadence would have produced a PR by now, and none exists. The 96h window matches merged-pr-never-released's and issue-closed-never-released's own bar (waiting on the project's own cadence to catch up genuinely takes longer than a single deletion-event check), not deleted-branch-pr-still-open's shorter 24h one -- a branch's natural time-to-first-PR runs longer than a resolution clock does. The repository's own default branch (main/master) is excluded at confidence 0.0, named not hidden -- it carries no such promise. A branch already claimed by a pull request in ANY state (open, closed, or merged) is excluded too -- the promise here is only 'was a PR ever opened,' which a closed or merged PR already answers, unlike deleted-branch-pr-still-open's narrower 'is it still open' question."
+}

@@ -1,0 +1,37 @@
+[
+  {
+    "type": "branch_creation",
+    "ref": "spike/rate-limit-cache",
+    "actor": "some-contributor",
+    "created_at": "2026-07-28T09:00:00Z",
+    "url": "https://github.com/example/example-repo/activity#branch_creation-spike-rate-limit-cache"
+  },
+  {
+    "type": "branch_creation",
+    "ref": "feature/dark-mode",
+    "actor": "some-contributor",
+    "created_at": "2026-08-02T00:00:00Z",
+    "url": "https://github.com/example/example-repo/activity#branch_creation-feature-dark-mode"
+  },
+  {
+    "type": "branch_creation",
+    "ref": "chore/lockfile-bump",
+    "actor": "dependabot",
+    "created_at": "2026-07-27T08:00:00Z",
+    "url": "https://github.com/example/example-repo/activity#branch_creation-chore-lockfile-bump"
+  },
+  {
+    "type": "branch_creation",
+    "ref": "main",
+    "actor": "some-contributor",
+    "created_at": "2026-07-01T00:00:00Z",
+    "url": "https://github.com/example/example-repo/activity#branch_creation-main"
+  },
+  {
+    "type": "push",
+    "ref": "main",
+    "actor": "some-contributor",
+    "created_at": "2026-08-02T08:00:00Z",
+    "url": "https://github.com/example/example-repo/activity#push-main"
+  }
+]
