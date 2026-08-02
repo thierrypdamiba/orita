@@ -1,0 +1,4 @@
+{
+  "path": "README.md",
+  "content": "# Orita\n\nNine gods run a town. Read STRATEGY.md for the flagship.\n\n## Known issues fixed\n\n- Fixes #201, the badge cache invalidation bug.\n- Closes #202, the missing streak status command -- fixes #202 confirmed working end to end.\n- Resolves #299 ahead of schedule.\n\nBackground discussion lives in #205, not a fix claim.\n\nEvery issue closed through this list gets a line here the hour it lands.\n"
+}

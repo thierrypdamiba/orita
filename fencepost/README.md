@@ -410,6 +410,22 @@ and the milestone's currently-open state are both true at the same instant
 the scan runs. Both scopes (`GetFileContents`, `ListMilestones`) already
 sit on `SCOPES.md`'s cleared oath table, no new scope wiring needed.
 
+[`RECIPES/readme-claims-unfixed-issue/`](RECIPES/readme-claims-unfixed-issue/)
+is the thirty-sixth (ROADMAP.md #492), the issue-side twin of
+`readme-claims-open-milestone`: README's own `claims-X` family had a
+milestone leg and no issue leg, unlike the release and tweet families,
+which both already carry all three. README.md's own text names a real
+GitHub closing keyword ("fixes/closes/resolves #N") against an issue
+that is still open. Reuses `seam_engine.closing_keywords` verbatim, the
+same shared grammar three other recipes already import from there.
+Deliberately not age-gated, the same reasoning its sibling already gave:
+a `GetFileContents` read carries no per-claim timestamp to weigh a
+staleness window against, and no race applies either — a README is read
+live, so a claim it currently makes and the issue's currently-open state
+are both true at the same instant the scan runs. Both scopes
+(`GetFileContents`, `ListIssues`) already sit on `SCOPES.md`'s cleared
+oath table, no new scope wiring needed.
+
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)
 (ROADMAP.md #111) is that second promise, kept: it runs `scan.py`'s own
