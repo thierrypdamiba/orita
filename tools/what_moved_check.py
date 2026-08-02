@@ -21,15 +21,17 @@ opt-in convention mirroring chronicle's `cluster-day-covers` (task 406),
 meant to be appended by whichever hour actually writes new content into
 the page. It does NOT fabricate retroactive entries here -- the same
 "mechanism first, content stays real" discipline task 387 held for
-Ananse's cadence. Read live against the real page today: zero markers
-exist anywhere in `docs/what-moved.html`. The page has never been
-edited past its founding-day placeholder ("nothing moved yesterday...
-the town is one day old") despite three real Mondays having passed --
-a genuine, previously invisible lapse, surfaced honestly here rather
-than silently absorbed or backfilled with invented history. Writing the
-actual catch-up content is dedicated narrative work for a future
-Cluster Day hour (the same way `chronicle/002-eighteen-days.md` was),
-not something a checker can or should manufacture.
+Ananse's cadence. Read live against the real page as of task 449: zero
+markers existed anywhere in `docs/what-moved.html` -- the page had never
+been edited past its founding-day placeholder ("nothing moved
+yesterday... the town is one day old") despite three real Mondays
+having passed. Task 460 closed one of those honestly: a real
+`what-moved-entry: 2026-08-01` marker now covers the week of 07-27.
+2026-07-13 and 2026-07-20 remain genuinely missed, still not
+backfilled. Writing the actual catch-up content is dedicated narrative
+work for a future Cluster Day hour (the same way
+`chronicle/002-eighteen-days.md` was), not something a checker can or
+should manufacture.
 
 Does NOT attempt Off-By-One's Gap-bug cadence (a different god's
 domain, a different shape of evidence -- `/thegap/`'s own file
@@ -130,10 +132,14 @@ def format_cadence(result: dict) -> str:
         )
     joined = ", ".join(result["missed_mondays"])
     plural = "" if len(result["missed_mondays"]) == 1 else "s"
+    if result["total_entries_on_record"] == 0:
+        context = "docs/what-moved.html never updated past its founding placeholder"
+    else:
+        context = f"docs/what-moved.html last updated {result['latest_entry']}, still short the Monday(s) named above"
     return (
         f"what-moved cadence: {len(result['missed_mondays'])} Cluster Day{plural} lapsed -- "
         f"{result['total_entries_on_record']} entry/entries on record, owed for {joined} "
-        f"(TOWN-OPERATIONS.md's weekly ritual; docs/what-moved.html never updated past its founding placeholder)"
+        f"(TOWN-OPERATIONS.md's weekly ritual; {context})"
     )
 
 

@@ -2,8 +2,11 @@
 real-calendar Mondays since founding against docs/what-moved.html's own
 `what-moved-entry` markers -- mirroring tests/test_cluster_day_check.py's
 own shape for the sibling cadence it's built alongside, and proving the
-live, real gap this module surfaces: as of task 449, the real page carries
-zero markers and misses every real Monday since founding.
+live, real gap this module surfaces: as of task 449, the real page carried
+zero markers and missed every real Monday since founding. Task 460 closed
+one of those for real (a `what-moved-entry: 2026-08-01` marker now covers
+the week of 07-27); 2026-07-13 and 2026-07-20 remain genuinely missed, per
+`test_real_live_page_today_reproduces_the_named_gap` below.
 """
 import importlib.util
 import os
@@ -123,6 +126,25 @@ class FixtureCadenceCase(unittest.TestCase):
         line = wmc.format_cadence(result)
         self.assertIn("3 Cluster Days lapsed", line)
         self.assertIn("2026-07-13, 2026-07-20, 2026-07-27", line)
+
+    def test_format_cadence_lapsed_with_entries_on_record(self):
+        # Task 470 regression: once at least one what-moved-entry marker
+        # exists, the message must stop claiming the page was "never
+        # updated past its founding placeholder" -- that was true at task
+        # 449 (0 entries) but went false the moment task 460 landed the
+        # page's first real entry. It must instead name the real latest
+        # entry date.
+        result = {
+            "total_entries_on_record": 1,
+            "latest_entry": "2026-08-01",
+            "mondays_due": ["2026-07-13", "2026-07-20", "2026-07-27"],
+            "missed_mondays": ["2026-07-13", "2026-07-20"],
+            "today": "2026-08-02",
+        }
+        line = wmc.format_cadence(result)
+        self.assertNotIn("never updated past its founding placeholder", line)
+        self.assertIn("last updated 2026-08-01", line)
+        self.assertIn("2 Cluster Days lapsed", line)
 
     def test_real_live_page_today_reproduces_the_named_gap(self):
         # Task 460 closed the 07-27 gap for real: one honest
