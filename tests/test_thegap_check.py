@@ -163,6 +163,66 @@ class FixtureCadenceCase(unittest.TestCase):
             result["confession_due_now"], [{"hidden": "2026-07-30", "due": "2026-08-03"}]
         )
 
+    def test_confessed_marker_suppresses_it_even_when_overdue(self):
+        # ROADMAP.md #505: the exact real-world shape task 495 hit -- a
+        # bug's confession comes due and IS posted the same hour, but
+        # nothing before this task ever recorded that it had been. Without
+        # a gap-confessed marker, this is identical to the fixture above
+        # and stays named forever; with one, it is gone even long after
+        # its due date, because the marker means the obligation was
+        # already discharged, not merely that time has passed.
+        _write(
+            self.readme,
+            "<!-- gap-hidden: 2026-07-30 -->\n<!-- gap-confessed: 2026-07-30 -->\n",
+        )
+        self._draft("2026-08-03", "fencepost-posts-needed.md")
+        result = tgc.compute_cadence(self.readme, self.vault, today=date(2026, 8, 10))
+        self.assertEqual(result["confession_due_now"], [])
+        self.assertEqual(result["confessed_on_record"], ["2026-07-30"])
+
+    def test_confessed_marker_only_suppresses_its_own_hidden_date(self):
+        # Two hidden bugs, both overdue and predrafted -- confessing the
+        # first must never silently suppress the second's own real,
+        # still-outstanding obligation.
+        _write(
+            self.readme,
+            "<!-- gap-hidden: 2026-07-16 -->\n"
+            "<!-- gap-confessed: 2026-07-16 -->\n"
+            "<!-- gap-hidden: 2026-07-30 -->\n",
+        )
+        self._draft("2026-07-20", "first-bug.md")
+        self._draft("2026-08-03", "fencepost-posts-needed.md")
+        result = tgc.compute_cadence(self.readme, self.vault, today=date(2026, 8, 10))
+        self.assertEqual(
+            result["confession_due_now"], [{"hidden": "2026-07-30", "due": "2026-08-03"}]
+        )
+
+    def test_confessed_marker_with_no_matching_hidden_date_is_inert(self):
+        # A gap-confessed marker naming a date nothing was ever hidden on
+        # (a typo, a stray leftover) must never be mistaken for a real
+        # confession of some OTHER bug -- it simply names nothing in
+        # `hidden`, so the loop over `hidden` never reaches it.
+        _write(
+            self.readme,
+            "<!-- gap-hidden: 2026-07-30 -->\n<!-- gap-confessed: 2026-08-01 -->\n",
+        )
+        self._draft("2026-08-03", "fencepost-posts-needed.md")
+        result = tgc.compute_cadence(self.readme, self.vault, today=date(2026, 8, 3))
+        self.assertEqual(
+            result["confession_due_now"], [{"hidden": "2026-07-30", "due": "2026-08-03"}]
+        )
+        self.assertEqual(result["confessed_on_record"], ["2026-08-01"])
+
+    def test_malformed_confessed_marker_raises_loudly(self):
+        _write(self.readme, "<!-- gap-confessed: not-a-date -->\n")
+        with self.assertRaises(tgc.MalformedGapConfessedMarkerError):
+            tgc.compute_cadence(self.readme, self.vault, today=date(2026, 7, 29))
+
+    def test_no_confessed_markers_at_all_is_empty_not_an_error(self):
+        _write(self.readme, "<!-- gap-hidden: 2026-07-30 -->\n")
+        result = tgc.compute_cadence(self.readme, self.vault, today=date(2026, 7, 31))
+        self.assertEqual(result["confessed_on_record"], [])
+
     def test_format_cadence_clean(self):
         result = {
             "total_hidden_on_record": 2,
@@ -253,15 +313,17 @@ class RealVaultCase(unittest.TestCase):
     def test_real_live_readme_and_vault_today_reproduces_the_named_gap(self):
         # Two real gap-hidden markers (2026-07-30, 2026-08-03 -- task
         # 495), both with real pre-drafted confessions on record. As of
-        # 2026-08-03, the first bug's confession (due 2026-08-03) has
-        # come due; the second's (due 2026-08-10) has not.
+        # 2026-08-03, the first bug's confession (due 2026-08-03) came
+        # due AND was actually posted publicly the same hour (task 495) --
+        # the real README now carries its own `gap-confessed: 2026-07-30`
+        # marker (task 505), so it no longer shows up here at all, overdue
+        # or not. The second bug's confession (due 2026-08-10) has not
+        # come due and carries no such marker.
         real_readme = os.path.join(ROOT, "thegap", "README.md")
         result = tgc.compute_cadence(real_readme, VAULT_ROOT, today=date(2026, 8, 3))
         self.assertEqual(result["missing_predraft"], [])
-        self.assertEqual(
-            result["confession_due_now"],
-            [{"hidden": "2026-07-30", "due": "2026-08-03"}],
-        )
+        self.assertEqual(result["confession_due_now"], [])
+        self.assertEqual(result["confessed_on_record"], ["2026-07-30"])
 
 
 if __name__ == "__main__":

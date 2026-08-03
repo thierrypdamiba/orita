@@ -45,6 +45,23 @@ is real content work for the owning god, not something a checker can do
 on their behalf, the same line `what_moved_check.py` draws for its own
 catch-up content).
 
+ROADMAP.md #505: that "first hour obligated" framing had no way to ever
+become "already handled" -- `confession_due_now` had nothing to read that
+meant "this one already happened," so once a bug's due date arrived it
+stayed named on every single hourly run forever, including hours long
+after the confession was actually posted (task 495 confessed Bug #1,
+unforced, the same hour it fell due; this check kept naming
+2026-07-30->2026-08-03 as "due now" on every run afterward, live-proven
+against the real README/vault right up until this fix). Closed the same
+way `_hidden_dates` closes the hide side: a second, opt-in
+`<!-- gap-confessed: YYYY-MM-DD -->` marker (keyed to the HIDDEN date it
+resolves, not the due date), appended once, the hour the confession is
+actually posted publicly. A hidden bug already carrying this marker is
+never named in `confession_due_now` again, no matter how long ago or how
+far in the future its due date sits -- read-only, no inference, exactly
+the "a filename/marker proves the event, nothing guessed" discipline
+every sibling cadence check already holds.
+
 Usage:
     python3 tools/thegap_check.py check
 """
@@ -63,6 +80,7 @@ DEFAULT_README_PATH = os.path.join(ROOT, "thegap", "README.md")
 DEFAULT_VAULT_DIR = os.path.join(os.path.dirname(ROOT), "orita-vault")
 
 _HIDDEN_MARKER = re.compile(r"<!--\s*gap-hidden:\s*(?P<date>[^>]*?)\s*-->")
+_CONFESSED_MARKER = re.compile(r"<!--\s*gap-confessed:\s*(?P<date>[^>]*?)\s*-->")
 _CONFESSION_FILE = re.compile(r"^(?P<date>\d{4}-\d{2}-\d{2})-.+\.md$")
 
 
@@ -70,6 +88,12 @@ class MalformedGapHiddenMarkerError(ValueError):
     """A `gap-hidden` marker names a string that isn't a real `YYYY-MM-DD`
     date -- named loudly here rather than silently skipped, same
     discipline every sibling marker parser in this campaign holds."""
+
+
+class MalformedGapConfessedMarkerError(ValueError):
+    """A `gap-confessed` marker names a string that isn't a real
+    `YYYY-MM-DD` date -- same discipline as `MalformedGapHiddenMarkerError`,
+    never silently skipped."""
 
 
 def _hidden_dates(path: str) -> list:
@@ -91,6 +115,30 @@ def _hidden_dates(path: str) -> list:
                 f"{path}: gap-hidden names {raw!r}, not a valid YYYY-MM-DD date"
             ) from e
     return sorted(dates)
+
+
+def _confessed_dates(path: str) -> set:
+    """Every HIDDEN date whose confession has already been posted
+    publicly, per a `<!-- gap-confessed: YYYY-MM-DD -->` marker in `path`
+    -- the marker names the bug it resolves by its hidden date, not the
+    (possibly later) date the confession itself was posted, so it lines
+    up directly with `_hidden_dates`'s own keys. An absent file returns
+    an empty set, not an error; a malformed date inside a marker that IS
+    present raises loudly instead, mirroring `_hidden_dates` exactly."""
+    if not os.path.isfile(path):
+        return set()
+    with open(path, encoding="utf-8") as f:
+        text = f.read()
+    dates = set()
+    for m in _CONFESSED_MARKER.finditer(text):
+        raw = m.group("date")
+        try:
+            dates.add(date.fromisoformat(raw))
+        except ValueError as e:
+            raise MalformedGapConfessedMarkerError(
+                f"{path}: gap-confessed names {raw!r}, not a valid YYYY-MM-DD date"
+            ) from e
+    return dates
 
 
 def _monday_of(d: date) -> date:
@@ -142,13 +190,18 @@ def compute_cadence(
     - confession_due_now: hidden bugs whose confession due date (the
       first Monday on or after one day past the hide date -- matches the
       one bug on record: hidden 2026-07-30, due 2026-08-03) has arrived
-      or passed, and a pre-drafted confession exists on record.
+      or passed, a pre-drafted confession exists on record, and the
+      confession has NOT already been posted publicly (ROADMAP.md #505:
+      a bug carrying its own `gap-confessed` marker is done, and stays
+      done -- it is never renamed here again no matter how many more
+      hours pass after the fact).
     """
     readme_path = readme_path or DEFAULT_README_PATH
     vault_dir = vault_dir or DEFAULT_VAULT_DIR
     today = today or datetime.now(timezone.utc).date()
 
     hidden = _hidden_dates(readme_path)
+    confessed = _confessed_dates(readme_path)
     mondays_due = cluster_day_check._mondays_through(today)
     mondays_due_set = set(mondays_due)
     covered = {_monday_of(d) for d in hidden} & mondays_due_set
@@ -162,6 +215,8 @@ def compute_cadence(
         due = _next_monday_on_or_after(d + timedelta(days=1))
         if due not in predrafted:
             missing_predraft.append(d.isoformat())
+        elif d in confessed:
+            continue
         elif today >= due:
             confession_due_now.append({"hidden": d.isoformat(), "due": due.isoformat()})
 
@@ -172,6 +227,7 @@ def compute_cadence(
         "missed_mondays": [d.isoformat() for d in missed],
         "missing_predraft": missing_predraft,
         "confession_due_now": confession_due_now,
+        "confessed_on_record": sorted(d.isoformat() for d in confessed),
         "today": today.isoformat(),
     }
 
