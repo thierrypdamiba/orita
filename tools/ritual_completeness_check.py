@@ -261,6 +261,7 @@ EXEMPT_TOOL_FILES = {
     "closing_keyword_guard.py": "takes a commit-message-and-open-issues-csv argument each call -- a per-commit guard, not the hourly repo-state sweep run_ritual_check folds",
     "consent_grant_log.py": "append-only log library, called by toolkits_in_use_check.py (already wired) rather than loaded standalone",
     "text_patterns.py": "shared regex-pattern library (task 418), imported directly by the 11 tools/*.py files that use it rather than loaded standalone by ritual_check.py (task 484: grown from the original nine as later tasks, task 461 among them, wired more callers without revisiting this count)",
+    "metrics_reader.py": "shared records/metrics.jsonl reader library (task 508), imported directly by the six tools/*.py checks that use it (connected_users_check.py, gap_true_positive_check.py, github_stars_check.py, report_shipped_check.py, tasks_shipped_check.py, toolkits_in_use_check.py -- all already wired) rather than loaded standalone by ritual_check.py, the same shape consent_grant_log.py/text_patterns.py already hold",
 }
 
 # Every fencepost/seam_engine/src/seam_engine/*.py file that defines a live

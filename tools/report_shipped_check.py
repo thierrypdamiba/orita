@@ -60,36 +60,21 @@ Usage:
 """
 from __future__ import annotations
 
-import json
 import os
 import sys
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import metrics_reader  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DEFAULT_METRICS_PATH = os.path.join(ROOT, "records", "metrics.jsonl")
 DEFAULT_REPORTS_DIR = os.path.join(ROOT, "fencepost", "REPORTS")
 
-
-def _last_metrics_entry(metrics_path: str) -> dict | None:
-    """The most recently recorded dated reading in `records/metrics.jsonl`
-    -- one append-only file, not one file per day. Walks non-blank lines
-    from the end and returns the first one that parses as valid JSON AND
-    is itself a JSON object; a truncated/malformed trailing line is
-    skipped, not fatal -- the same discipline `gap_true_positive_check.py`'s
-    own reader holds (task 413, itself following tasks 306/328/412).
-    `None` if no reading has ever shipped, or every line is malformed or
-    non-dict."""
-    if not os.path.exists(metrics_path):
-        return None
-    with open(metrics_path, encoding="utf-8") as f:
-        lines = [line for line in f if line.strip()]
-    for line in reversed(lines):
-        try:
-            value = json.loads(line)
-        except json.JSONDecodeError:
-            continue
-        if isinstance(value, dict):
-            return value
-    return None
+# Task 508: consolidated into tools/metrics_reader.py -- six sibling
+# checks each carried a byte-identical copy of this reader, invisible to
+# duplicate_regex_check.py (which only scans `re.compile()` call sites).
+# tests/test_metrics_reader.py asserts this name IS that shared function.
+_last_metrics_entry = metrics_reader.last_metrics_entry
 
 
 def check_report_shipped(

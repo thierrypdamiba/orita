@@ -61,6 +61,9 @@ import json
 import os
 import sys
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import metrics_reader  # noqa: E402
+
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 LOG = os.path.join(ROOT, "HAND", "github-stars-log.jsonl")
 DEFAULT_METRICS_PATH = os.path.join(ROOT, "records", "metrics.jsonl")
@@ -173,25 +176,11 @@ def last_check(path=LOG):
     return entries[-1]
 
 
-def _last_metrics_entry(metrics_path=DEFAULT_METRICS_PATH):
-    """The most recently recorded dated reading in `records/metrics.jsonl`
-    -- one append-only file, not one file per day. Walks non-blank lines
-    from the end and returns the first one that parses as valid JSON AND
-    is itself a JSON object, the same discipline every sibling check's own
-    `_last_metrics_entry()` already holds. `None` if no reading has ever
-    shipped, or every line is malformed/non-dict."""
-    if not os.path.exists(metrics_path):
-        return None
-    with open(metrics_path, encoding="utf-8") as f:
-        lines = [line for line in f if line.strip()]
-    for line in reversed(lines):
-        try:
-            value = json.loads(line)
-        except json.JSONDecodeError:
-            continue
-        if isinstance(value, dict):
-            return value
-    return None
+# Task 508: consolidated into tools/metrics_reader.py -- six sibling
+# checks each carried a byte-identical copy of this reader, invisible to
+# duplicate_regex_check.py (which only scans `re.compile()` call sites).
+# tests/test_metrics_reader.py asserts this name IS that shared function.
+_last_metrics_entry = metrics_reader.last_metrics_entry
 
 
 def check_github_stars(metrics_path: str = DEFAULT_METRICS_PATH, log_path: str = LOG) -> dict:
