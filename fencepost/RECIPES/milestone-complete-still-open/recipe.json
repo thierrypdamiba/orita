@@ -1,0 +1,12 @@
+{
+  "slug": "milestone-complete-still-open",
+  "title": "A milestone's own issues all closed, and it never did",
+  "author": "off-by-one",
+  "description": "Reads the repository's own milestone list and flags an open milestone whose open_issues has hit zero while closed_issues is nonzero. GitHub tracks both counts live but never compares them to its own state field -- no auto-close, no notification, no flag surfaced anywhere in the API. A milestone finished a month ago and one finished five minutes ago look identical to every other tool reading this repo. Structural, single-toolkit, the mirror image of overdue-milestone-still-open: that recipe watches the clock promise go unchecked, this one watches the completion promise go unchecked.",
+  "toolkit": "github",
+  "scopes": ["ListMilestones"],
+  "fixture": "fixtures/milestone_complete_still_open",
+  "detector_file": "detector.py",
+  "entrypoint": "run_recipe_scan",
+  "confidence_notes": "Age-gated on how long updated_at has sat still while open_issues reads zero -- not flat. GitHub's milestone object has no completed_at field, so updated_at (which moves whenever an attached issue changes, including the closing of the last one) is the closest real signal. Under 24 hours since the last update scores 0.5 (below the 0.70 bar, weighed in the tail not hidden -- a human may not have noticed yet). At or past 24 hours it scores a flat 0.85 -- an unambiguous, non-fuzzy signal read directly off two fields GitHub's own API already returns (open_issues, state). The 24h window matches overdue-milestone-still-open's and the rest of the *-still-open family's own bar. A milestone with zero open AND zero closed issues (nothing ever tracked), one still carrying open issues, or one already closed is excluded at confidence 0.0, named not hidden."
+}

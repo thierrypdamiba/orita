@@ -458,6 +458,20 @@ measures whether anyone has started, not whether an existing promise
 already broke. Both scopes (`ListIssues`, `ListPullRequests`) already sit
 on `SCOPES.md`'s cleared oath table, no new scope wiring needed.
 
+[`RECIPES/milestone-complete-still-open/`](RECIPES/milestone-complete-still-open/)
+is the thirty-ninth (ROADMAP.md #512): the mirror image of
+`overdue-milestone-still-open` — every issue inside an open milestone has
+closed, but the milestone itself never did. GitHub tracks `open_issues`
+live but never compares it to the milestone's own `state`, so closing it
+stays a separate, manual action nothing ever triggers; a milestone
+finished a month ago and one finished five minutes ago look identical to
+every other tool reading this repo. Age-gated on how long `updated_at`
+has sat still since `open_issues` hit zero — there is no `completed_at`
+field on a real milestone object, so `updated_at` is the closest real
+signal, mirroring the `*-still-open` family's 24h bar. The one scope,
+`ListMilestones`, already sits on `SCOPES.md`'s cleared oath table, no
+new scope wiring needed.
+
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)
 (ROADMAP.md #111) is that second promise, kept: it runs `scan.py`'s own
