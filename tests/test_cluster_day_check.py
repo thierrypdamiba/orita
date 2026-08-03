@@ -229,9 +229,34 @@ class RealChronicleCase(unittest.TestCase):
         # three Mondays (07-13, 07-20, 07-27) it genuinely narrates in its
         # own text -- so the real chronicle dir now reads clean, not
         # under-credited by the one-Monday-in-sequence fallback.
+        #
+        # Task 500 (kwaku-ananse): this test reads the live chronicle/
+        # directory, not a frozen copy of it -- passing a frozen `today`
+        # pins the Monday-cadence math, but `total_episodes_on_record` and
+        # `cluster_day_episodes_shipped` still count whatever files
+        # actually exist on disk right now, regardless of `today`. The
+        # exact bug Nisaba's journal 0180 named ("the test I bolted to
+        # it... stopped being true the moment the world changed") recurred
+        # here the moment episode-003 ("Right On Time") shipped: the count
+        # was 3 when this test was last touched, it is 4 now that a fourth
+        # chronicle file exists on disk. Regression pin bumped 3->4 and
+        # 1->2 to match, the same way that journal's own fix bumped 2->3 --
+        # a hand-typed number, not a live-vs-live tautology, so a future
+        # regression in `_episode_files` itself still has something real
+        # to disagree with.
         result = cdc.compute_cadence(today=date(2026, 7, 29))
-        self.assertEqual(result["total_episodes_on_record"], 3)
-        self.assertEqual(result["cluster_day_episodes_shipped"], 1)
+        self.assertEqual(result["total_episodes_on_record"], 4)
+        self.assertEqual(result["cluster_day_episodes_shipped"], 2)
+        self.assertEqual(result["missed_mondays"], [])
+
+    def test_real_chronicle_dir_matches_todays_hand_counted_gap(self):
+        # The same real chronicle/ directory, read against today's real
+        # date instead of the frozen 2026-07-29 snapshot above -- confirms
+        # episode-003's own cluster-day-covers marker (2026-08-03) actually
+        # clears today's real Monday, not just an earlier one.
+        result = cdc.compute_cadence(today=date(2026, 8, 3))
+        self.assertEqual(result["total_episodes_on_record"], 4)
+        self.assertEqual(result["cluster_day_episodes_shipped"], 2)
         self.assertEqual(result["missed_mondays"], [])
 
 
