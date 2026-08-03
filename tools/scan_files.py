@@ -30,6 +30,22 @@ sibling holds the identical function object (not just identical source),
 so a future edit to one is an edit to all by construction -- the same
 guarantee `metrics_reader.py`/`iso_time.py`/`jsonl_append.py` give theirs.
 
+Task 515: `duplicate_regex_check.py` and `escape_sequence_check.py` each
+carried the identical `find_violations()`/`clear_cache()`/`_VIOLATIONS_
+CACHE` shape too -- missed by task 513's own AST-hash sweep because that
+sweep only compared same-named functions, and both of these still hashed
+identically to each other's copy (not to the other five, whose docstrings
+and surrounding code differed enough to change the hash of the wrapper
+functions themselves in a naive whole-body hash) so they simply weren't
+in the batch that got checked against the newly-created `scan_files.py`
+that same hour. A second sweep this hour re-ran the exact same AST-hash
+method with no time pressure to stop early and caught both. Now seven
+siblings share `path_memoize`, not five. `site_link_check.py` carries the
+same visible shape but keys its cache on a `(docs_dir, require_index)`
+tuple, not a bare `orita_dir` -- `path_memoize`'s single-argument contract
+doesn't fit it, so it stays a genuine one-off, the same call task 513 made
+for `no_grading_check.py`'s own `_iter_scan_files`.
+
 Usage: not run directly; imported by tools/*.py.
 """
 from __future__ import annotations

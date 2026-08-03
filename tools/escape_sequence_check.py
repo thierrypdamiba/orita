@@ -63,6 +63,9 @@ import os
 import sys
 import warnings
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import scan_files  # noqa: E402
+
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DEFAULT_ORITA_DIR = ROOT
 
@@ -121,24 +124,6 @@ def _invalid_escape_warnings(path: str) -> list[tuple[int, str]]:
     return hits
 
 
-_VIOLATIONS_CACHE: dict[str, list] = {}
-
-
-def clear_cache() -> None:
-    """Same fix, same rationale as `duplicate_regex_check.py`/
-    `site_link_check.py`'s own `clear_cache()`: only real callers are
-    tests that want a forced fresh scan; production's one-call-per-
-    process shape never needs this."""
-    _VIOLATIONS_CACHE.clear()
-
-
-def find_violations(orita_dir: str = DEFAULT_ORITA_DIR) -> list:
-    key = os.path.realpath(orita_dir)
-    if key not in _VIOLATIONS_CACHE:
-        _VIOLATIONS_CACHE[key] = _find_violations_uncached(orita_dir)
-    return list(_VIOLATIONS_CACHE[key])
-
-
 def _find_violations_uncached(orita_dir: str = DEFAULT_ORITA_DIR) -> list:
     violations = []
     for path in _iter_python_files(orita_dir):
@@ -146,6 +131,15 @@ def _find_violations_uncached(orita_dir: str = DEFAULT_ORITA_DIR) -> list:
         for lineno, message in _invalid_escape_warnings(path):
             violations.append({"file": rel, "line": lineno, "message": message})
     return violations
+
+
+# Task 515: consolidated into tools/scan_files.py -- the same shared
+# factory task 513 built for five other checkers carrying this exact
+# memoize-by-orita_dir shape; this module's copy (and duplicate_regex_
+# check.py's) went unswept that hour because task 513's AST-hash sweep
+# matched only same-named find_violations/clear_cache pairs, and both
+# still passed the same hash test this task's re-run of that sweep found.
+find_violations, clear_cache = scan_files.path_memoize(_find_violations_uncached, DEFAULT_ORITA_DIR)
 
 
 def check_escape_sequences(orita_dir: str = DEFAULT_ORITA_DIR) -> dict:

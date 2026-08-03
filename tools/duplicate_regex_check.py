@@ -80,6 +80,9 @@ import glob
 import os
 import sys
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import scan_files  # noqa: E402
+
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DEFAULT_ORITA_DIR = ROOT
 
@@ -167,24 +170,6 @@ def _local_re_compile_patterns(path: str) -> list[tuple[str, int]]:
     return found
 
 
-_VIOLATIONS_CACHE: dict[str, list] = {}
-
-
-def clear_cache() -> None:
-    """Same fix, same rationale as `star_covenant_check.py`/`vault_leak_
-    check.py`'s own `clear_cache()`: only real callers are tests that
-    want a forced fresh scan; production's one-call-per-process shape
-    never needs this."""
-    _VIOLATIONS_CACHE.clear()
-
-
-def find_violations(orita_dir: str = DEFAULT_ORITA_DIR) -> list:
-    key = os.path.realpath(orita_dir)
-    if key not in _VIOLATIONS_CACHE:
-        _VIOLATIONS_CACHE[key] = _find_violations_uncached(orita_dir)
-    return list(_VIOLATIONS_CACHE[key])
-
-
 def _find_violations_uncached(orita_dir: str = DEFAULT_ORITA_DIR) -> list:
     """Read-only, local-filesystem-only `ast` scan (no import, no
     execution, no network) of every recipe detector and every
@@ -212,6 +197,17 @@ def _find_violations_uncached(orita_dir: str = DEFAULT_ORITA_DIR) -> list:
         })
     violations.sort(key=lambda v: v["pattern"])
     return violations
+
+
+# Task 515: consolidated into tools/scan_files.py -- the same memoize-by-
+# orita_dir shape task 513's own five siblings shared (an AST-hash sweep
+# that hour matched only same-named find_violations/clear_cache pairs
+# wrapping the exact `_VIOLATIONS_CACHE` variable name, so this module's
+# byte-identical copy -- and escape_sequence_check.py's -- went unswept
+# until this task's own re-run of that sweep). find_violations/clear_cache
+# now name the shared factory's output, not a local copy; tests/test_
+# scan_files.py asserts this call came from the one shared function.
+find_violations, clear_cache = scan_files.path_memoize(_find_violations_uncached, DEFAULT_ORITA_DIR)
 
 
 def format_violations(violations: list) -> str:

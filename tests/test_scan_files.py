@@ -53,6 +53,8 @@ CACHE_SIBLINGS = [
     "star_covenant_check",
     "arcade_hero_check",
     "rider_check",
+    "duplicate_regex_check",
+    "escape_sequence_check",
 ]
 
 
