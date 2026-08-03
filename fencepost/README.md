@@ -426,6 +426,22 @@ are both true at the same instant the scan runs. Both scopes
 (`GetFileContents`, `ListIssues`) already sit on `SCOPES.md`'s cleared
 oath table, no new scope wiring needed.
 
+[`RECIPES/readme-claims-unmerged-pr/`](RECIPES/readme-claims-unmerged-pr/)
+is the thirty-seventh (ROADMAP.md #493), the PR-side twin of
+`readme-claims-open-milestone` and `readme-claims-unfixed-issue`: the last
+missing leg of README's own `claims-X` family, which now carries all three
+alongside the release and tweet families. README.md's own text names a
+ships/includes/merges/via #N claim about a pull request that never
+actually merged. Reuses `seam_engine.pr_claims` verbatim, the same shared
+grammar three other recipes already import from there. Deliberately not
+age-gated, the same reasoning both siblings already gave: a
+`GetFileContents` read carries no per-claim timestamp to weigh a staleness
+window against, and no race applies either — a README is read live, so a
+claim it currently makes and the PR's currently-unmerged state are both
+true at the same instant the scan runs. Both scopes (`GetFileContents`,
+`ListPullRequests`) already sit on `SCOPES.md`'s cleared oath table, no
+new scope wiring needed.
+
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)
 (ROADMAP.md #111) is that second promise, kept: it runs `scan.py`'s own

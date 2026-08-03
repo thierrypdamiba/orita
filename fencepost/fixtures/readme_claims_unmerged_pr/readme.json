@@ -1,0 +1,4 @@
+{
+  "path": "README.md",
+  "content": "# Orita\n\nNine gods run a town. Read STRATEGY.md for the flagship.\n\n## Shipped\n\n- Ships #901, the badge cache invalidation fix.\n- Includes #902, the streak status command -- merges #902 confirmed working end to end.\n- Via #999 ahead of schedule.\n\nBackground discussion lives in #905, not a shipped claim.\n\nEvery PR merged through this list gets a line here the hour it lands.\n"
+}
