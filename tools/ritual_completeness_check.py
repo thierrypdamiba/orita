@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Task 121. Off-By-One counts the tool that counts everything else.
 
-`tools/ritual_check.py` hand-wires 55 `check_*` functions into one hourly
+`tools/ritual_check.py` hand-wires 56 `check_*` functions into one hourly
 block: each is called inside `run_ritual_check`, its result assigned to a
 dict key, and that key printed as a line in `format_ritual_check`. Three
 separate places a single typo or a forgotten wire-up can silently drop a
@@ -209,6 +209,19 @@ False` rule as `houses/`), never checked before. Its first live run
 found a real break: `fencepost/README.md`'s own badge-explainer link to
 `seam_engine/badge.py` was missing the `src/` layout segment the file
 actually lives under.
+
+**Updated to 56** the same hour task 506's `check_issue_template_links`
+was wired in -- the fourth sibling, pointed at `.github/ISSUE_TEMPLATE/`
+itself (GitHub-browsed, same `require_index=False` rule as `houses/`/
+`fencepost/`), Esu-Elegba's own claimed edge of the repo and never
+checked before by any of this file's three existing siblings nor by
+anything else in the tree. Its first live run found the tree already
+clean -- no broken link to fix -- but four of the five templates
+(`crossing.md`, `decree-proposal.md`, `fork-my-own-society.md`,
+`gap-report.md`) had carried zero test coverage of any kind until this
+hour, the fifth (`point-fencepost.md`) having only ever had its scope
+TABLE doctrine-checked (`test_consent_doctrine.py`, task 136), never its
+two markdown links' actual resolution on disk.
 
 Usage:
     python3 tools/ritual_completeness_check.py check

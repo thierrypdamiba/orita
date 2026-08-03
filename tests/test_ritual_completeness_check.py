@@ -494,7 +494,7 @@ class DocstringClaimDoctrineCase(unittest.TestCase):
     def test_docstring_claim_equals_the_real_live_check_count(self):
         self.assertEqual(src.claimed_check_count(), self._real_check_count())
 
-    def test_real_check_count_is_currently_55(self):
+    def test_real_check_count_is_currently_56(self):
         # Regression pin: task 121 shipped this module claiming 27. Five
         # more check_* functions (this module's own check_ritual_completeness
         # fold-in among them, plus task 145's check_toolkits_in_use) were
@@ -539,8 +539,9 @@ class DocstringClaimDoctrineCase(unittest.TestCase):
         # in the same commit. Task 477's check_good_first_issues moved
         # this from 53 to 54, docstring updated in the same commit. Task
         # 483's check_fencepost_links moved this from 54 to 55, docstring
-        # updated in the same commit.
-        self.assertEqual(self._real_check_count(), 55)
+        # updated in the same commit. Task 506's check_issue_template_links
+        # moved this from 55 to 56, docstring updated in the same commit.
+        self.assertEqual(self._real_check_count(), 56)
 
     def test_stale_27_claim_would_have_been_flagged_against_todays_real_count(self):
         # Mutation-based hand-verification: reconstruct the module's own

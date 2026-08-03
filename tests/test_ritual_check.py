@@ -3397,6 +3397,70 @@ class FencepostLinksFoldCase(unittest.TestCase):
         self.assertTrue(result["fencepost_links"]["clean"])
 
 
+class IssueTemplateLinksFoldCase(unittest.TestCase):
+    """Task 506 (Esu-Elegba): the fourth sibling of `check_site_links`/
+    `check_house_links`/`check_fencepost_links` -- `.github/ISSUE_TEMPLATE/`
+    is Esu's own claimed edge of the repo, and it had never once been
+    pointed at by `site_link_check.py`. Clean by default against a fixture
+    that mirrors `fork-my-own-society.md`'s real shape (a markdown link to
+    a sibling repo-root file), and a genuinely missing target both flips
+    `broken` and surfaces in the printed block. `require_index=False`
+    (GitHub-browsed, same rule `check_house_links`/`check_fencepost_links`
+    both use), never `check_site_links`'s stricter Pages rule."""
+
+    def setUp(self):
+        self.dir = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.dir, ignore_errors=True)
+
+    def _write(self, rel, content):
+        path = os.path.join(self.dir, rel)
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, "w") as f:
+            f.write(content)
+
+    def test_real_target_with_no_index_is_not_flagged_github_browsed_rule(self):
+        self._write("crossing.md", "[SCOPES](SCOPES.md)")
+        self._write("SCOPES.md", "the oath")
+        result = rc.run_ritual_check(issue_template_links_dir=self.dir)
+        self.assertTrue(result["issue_template_links"]["clean"])
+        self.assertFalse(result["broken"])
+        self.assertIn("issue template links: clean", rc.format_ritual_check(result))
+
+    def test_synthetic_broken_link_flips_broken_and_prints(self):
+        self._write("crossing.md", "[nowhere](nowhere.md)")
+        result = rc.run_ritual_check(issue_template_links_dir=self.dir)
+        self.assertFalse(result["issue_template_links"]["clean"])
+        self.assertTrue(result["broken"])
+        formatted = rc.format_ritual_check(result)
+        self.assertIn("issue template links: 1 BROKEN LINK(S)", formatted)
+
+    def test_default_issue_template_dir_reads_the_real_tree_and_matches_direct_call(self):
+        """No override: reads the real .github/ISSUE_TEMPLATE/ tree, the
+        same default check_issue_template_links falls back to -- proves the
+        fold never duplicates or diverges from the module it wraps, and
+        that the real templates (point-fencepost.md's SCOPES.md/consent.py
+        links, fork-my-own-society.md's two PLATFORM.md links) are clean."""
+        slc = _load("_test_site_link_check", os.path.join(ROOT, "tools", "site_link_check.py"))
+        slc.clear_cache()
+        direct = slc.find_violations(
+            docs_dir=os.path.join(ROOT, ".github", "ISSUE_TEMPLATE"), require_index=False
+        )
+        result = rc.run_ritual_check()
+        self.assertEqual(result["issue_template_links"]["count"], len(direct))
+        self.assertEqual(result["issue_template_links"]["clean"], not direct)
+        self.assertEqual(direct, [])
+
+    def test_issue_template_links_never_loosens_site_links_own_docs_rule(self):
+        """The two checks must stay independent: a bare directory link
+        with no index.html is valid for issue_template_links but still
+        broken for site_links, in the exact same fixture tree."""
+        self._write("README.md", "[sub](sub/)")
+        os.makedirs(os.path.join(self.dir, "sub"), exist_ok=True)
+        result = rc.run_ritual_check(site_link_docs_dir=self.dir, issue_template_links_dir=self.dir)
+        self.assertFalse(result["site_links"]["clean"])
+        self.assertTrue(result["issue_template_links"]["clean"])
+
+
 class RecipeReadmeFoldCase(unittest.TestCase):
     """Task 426: run_ritual_check() folds recipe_readme_check.py's own
     two-way cross-check of fencepost/README.md's Community recipes

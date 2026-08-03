@@ -1610,6 +1610,50 @@ def check_fencepost_links(fencepost_dir: str | None = None) -> dict:
     return {"clean": not violations, "count": len(violations), "violations": violations}
 
 
+def check_issue_template_links(issue_template_dir: str | None = None) -> dict:
+    """Task 506 (Esu-Elegba): the fourth sibling of `check_site_links`/
+    `check_house_links`/`check_fencepost_links` -- `.github/ISSUE_TEMPLATE/`
+    is Esu's own claimed edge of the repo (her `github_behavior` names
+    "issue templates that force petitioners to state their true intent"
+    directly), and it held the one real cross-referencing content in this
+    town that `site_link_check.py` had never once been pointed at.
+    `point-fencepost.md` (task 9) has its own dedicated doctrine suite
+    (`fencepost/seam_engine/tests/test_consent_doctrine.py`) proving its
+    scope table never drifts from `consent.REQUIRED_SCOPES` -- but that
+    file's own two markdown links (to `fencepost/SCOPES.md` and `seam_engine/
+    src/seam_engine/consent.py`) were never checked for resolving on disk,
+    and the other four templates (`crossing.md`, `decree-proposal.md`,
+    `fork-my-own-society.md` -- which links `PLATFORM.md` twice -- and
+    `gap-report.md`) had ZERO test coverage of any kind: nothing proved they
+    even exist, let alone that a link inside them resolves. A live first run
+    found the tree already clean (no break to fix), but "clean and never
+    checked" is exactly the gap `check_house_links`/`check_fencepost_links`
+    each closed for their own directory in turn -- this is the same
+    class of surface, just the one nobody had reached yet.
+
+    `require_index=False` (the same GitHub-browsed rule `check_house_links`/
+    `check_fencepost_links` both use, not `check_site_links`'s stricter
+    Pages rule) -- `.github/ISSUE_TEMPLATE/` is browsed on GitHub itself
+    (where a template is rendered from the issue-creation picker) or read
+    raw from the repo tree, never served through Pages, so a bare directory
+    link with no `index.html` must not be flagged here even though
+    `check_site_links`'s own `docs/` default still requires one (there are
+    no directory links inside the templates today, but the rule should
+    still be the GitHub-browsed one, not the Pages one, on principle).
+    Unconditional, local-filesystem-only, same cheap class as its three
+    siblings. Never edits anything; a real broken link, if one is ever
+    found, is a god-on-duty escalation, not something this check silently
+    repairs."""
+    mod = _site_link_check()
+    kwargs = {"require_index": False}
+    if issue_template_dir is not None:
+        kwargs["docs_dir"] = issue_template_dir
+    else:
+        kwargs["docs_dir"] = os.path.join(ROOT, ".github", "ISSUE_TEMPLATE")
+    violations = mod.find_violations(**kwargs)
+    return {"clean": not violations, "count": len(violations), "violations": violations}
+
+
 def check_badge_freshness(badge_path: str | None = None) -> dict:
     """Task 425: fold badge_freshness_check.py's own live-recompute-vs-
     committed-file cross-check into the one block. `seam-scan.yml`'s daily
@@ -1781,6 +1825,7 @@ def run_ritual_check(
     site_link_docs_dir: str | None = None,
     house_links_houses_dir: str | None = None,
     fencepost_links_dir: str | None = None,
+    issue_template_links_dir: str | None = None,
     badge_path: str | None = None,
     recipe_readme_path: str | None = None,
     recipe_readme_fencepost_root: str | None = None,
@@ -1888,6 +1933,7 @@ def run_ritual_check(
     site_links = check_site_links(docs_dir=site_link_docs_dir)
     house_links = check_house_links(houses_dir=house_links_houses_dir)
     fencepost_links = check_fencepost_links(fencepost_dir=fencepost_links_dir)
+    issue_template_links = check_issue_template_links(issue_template_dir=issue_template_links_dir)
     badge_freshness = check_badge_freshness(badge_path=badge_path)
     recipe_readme = check_recipe_readme(
         readme_path=recipe_readme_path, recipe_fencepost_root=recipe_readme_fencepost_root
@@ -1946,6 +1992,7 @@ def run_ritual_check(
         or (not site_links["clean"])
         or (not house_links["clean"])
         or (not fencepost_links["clean"])
+        or (not issue_template_links["clean"])
         or (not badge_freshness["clean"])
         or (not recipe_readme["clean"])
         or (not strategy_true_positive["clean"])
@@ -2004,6 +2051,7 @@ def run_ritual_check(
         "site_links": site_links,
         "house_links": house_links,
         "fencepost_links": fencepost_links,
+        "issue_template_links": issue_template_links,
         "badge_freshness": badge_freshness,
         "recipe_readme": recipe_readme,
         "strategy_true_positive": strategy_true_positive,
@@ -2266,6 +2314,15 @@ def format_ritual_check(result: dict) -> str:
     else:
         lines.append(
             f"  fencepost links: {fl['count']} BROKEN LINK(S) -- the flagship's own front door is unmet, escalate now"
+        )
+    itl = result["issue_template_links"]
+    if itl["clean"]:
+        lines.append(
+            "  issue template links: clean (every .github/ISSUE_TEMPLATE/ link resolves, GitHub-browsed rule)"
+        )
+    else:
+        lines.append(
+            f"  issue template links: {itl['count']} BROKEN LINK(S) -- Esu's own gate is unmet, escalate now"
         )
     lines.append("  " + _badge_freshness_check().format_badge_freshness(result["badge_freshness"]))
     lines.append("  " + _recipe_readme_check().format_result(result["recipe_readme"]))
