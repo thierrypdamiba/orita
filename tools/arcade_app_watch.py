@@ -144,11 +144,34 @@ def last_app_state(path=LOG):
     return entries[-1]
 
 
-def record_app_check(state: dict, checked_at: str, path=LOG) -> None:
-    """Append one real observed gateway app-connection state. Never edits or removes a prior line."""
+def record_app_check(state: dict, checked_at: str, path=LOG) -> bool:
+    """Append one real observed gateway app-connection state. Never edits or removes a prior line.
+
+    Task 498: skips the append -- returns False, writes nothing -- when
+    `connected_app_ids`/`scopes_by_app` are identical to the most recently
+    recorded entry, mirroring `square_check.record_square_check`'s
+    identical fix (task 497) for this file's own sibling log. Returns True
+    when a new line was actually written (the first-ever check, or a real
+    connect/disconnect/scope change since the last one). A malformed tip
+    is treated as "cannot confirm a duplicate" rather than propagated --
+    recording must still be able to repair a corrupted log by appending a
+    fresh valid line.
+    """
+    try:
+        last = last_app_state(path)
+    except ArcadeAppWatchTamperedError:
+        last = None
+
+    if last is not None and (
+        last["connected_app_ids"] == state["connected_app_ids"]
+        and last["scopes_by_app"] == state["scopes_by_app"]
+    ):
+        return False
+
     entry = dict(state)
     entry["checked_at"] = checked_at
     _append(entry, path)
+    return True
 
 
 def app_delta(state: dict, path=LOG):

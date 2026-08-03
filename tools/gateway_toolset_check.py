@@ -111,11 +111,34 @@ def last_toolset_state(path=LOG):
     return entries[-1]
 
 
-def record_toolset_check(state: dict, checked_at: str, path=LOG) -> None:
-    """Append one real observed gateway toolset state. Never edits or removes a prior line."""
+def record_toolset_check(state: dict, checked_at: str, path=LOG) -> bool:
+    """Append one real observed gateway toolset state. Never edits or removes a prior line.
+
+    Task 498: skips the append -- returns False, writes nothing -- when
+    `has_gmail_calendar_tools`/`matched_tools` are identical to the most
+    recently recorded entry, mirroring `arcade_app_watch.record_app_check`'s
+    identical fix (same task) for this file's own sibling log. Returns True
+    when a new line was actually written (the first-ever check, or a real
+    exposure change since the last one). A malformed tip is treated as
+    "cannot confirm a duplicate" rather than propagated -- recording must
+    still be able to repair a corrupted log by appending a fresh valid
+    line.
+    """
+    try:
+        last = last_toolset_state(path)
+    except GatewayToolsetCheckTamperedError:
+        last = None
+
+    if last is not None and (
+        bool(last.get("has_gmail_calendar_tools")) == state["has_gmail_calendar_tools"]
+        and last.get("matched_tools") == state["matched_tools"]
+    ):
+        return False
+
     entry = dict(state)
     entry["checked_at"] = checked_at
     _append(entry, path)
+    return True
 
 
 def toolset_delta(state: dict, path=LOG):

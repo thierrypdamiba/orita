@@ -83,15 +83,66 @@ class TestRecordToolsetCheck(_TempLogCase):
         self.assertEqual(len(lines), 1)
 
     def test_never_edits_a_prior_line(self):
-        state = gt.compute_toolset_state(TOOLS_GITHUB_X_ONLY)
-        gt.record_toolset_check(state, "2026-08-01T18:00:00Z", path=self.path)
+        state1 = gt.compute_toolset_state(TOOLS_GITHUB_X_ONLY)
+        gt.record_toolset_check(state1, "2026-08-01T18:00:00Z", path=self.path)
         with open(self.path) as f:
             before = f.readlines()
-        gt.record_toolset_check(state, "2026-08-01T19:00:00Z", path=self.path)
+        state2 = gt.compute_toolset_state(TOOLS_PLUS_GMAIL)
+        gt.record_toolset_check(state2, "2026-08-01T19:00:00Z", path=self.path)
         with open(self.path) as f:
             after = f.readlines()
         self.assertEqual(after[0], before[0])
         self.assertEqual(len(after), len(before) + 1)
+
+
+class TestRecordToolsetCheckDedup(_TempLogCase):
+    def test_identical_state_skips_the_write(self):
+        # Task 498: the log had 4 of 5 real lines byte-identical aside
+        # from checked_at before this fix -- the same self-inflicted
+        # duplication shape task 497 closed for square_check.py and this
+        # same task closed for arcade_app_watch.py's sibling log.
+        state = gt.compute_toolset_state(TOOLS_GITHUB_X_ONLY)
+        wrote_first = gt.record_toolset_check(state, "2026-08-01T18:00:00Z", path=self.path)
+        wrote_second = gt.record_toolset_check(state, "2026-08-01T19:00:00Z", path=self.path)
+        self.assertTrue(wrote_first)
+        self.assertFalse(wrote_second)
+        with open(self.path) as f:
+            lines = [ln for ln in f if ln.strip()]
+        self.assertEqual(len(lines), 1)
+
+    def test_skip_despite_different_checked_at(self):
+        state = gt.compute_toolset_state(TOOLS_GITHUB_X_ONLY)
+        gt.record_toolset_check(state, "2026-08-01T18:00:00Z", path=self.path)
+        gt.record_toolset_check(state, "2026-08-02T09:00:00Z", path=self.path)
+        with open(self.path) as f:
+            lines = [ln for ln in f if ln.strip()]
+        self.assertEqual(len(lines), 1)
+
+    def test_real_change_after_a_duplicate_still_writes(self):
+        state1 = gt.compute_toolset_state(TOOLS_GITHUB_X_ONLY)
+        gt.record_toolset_check(state1, "2026-08-01T18:00:00Z", path=self.path)
+        gt.record_toolset_check(state1, "2026-08-01T19:00:00Z", path=self.path)
+        state2 = gt.compute_toolset_state(TOOLS_PLUS_GMAIL)
+        wrote = gt.record_toolset_check(state2, "2026-08-01T20:00:00Z", path=self.path)
+        self.assertTrue(wrote)
+        with open(self.path) as f:
+            lines = [ln for ln in f if ln.strip()]
+        self.assertEqual(len(lines), 2)
+
+    def test_no_prior_check_always_writes(self):
+        state = gt.compute_toolset_state(TOOLS_GITHUB_X_ONLY)
+        wrote = gt.record_toolset_check(state, "2026-08-01T18:00:00Z", path=self.path)
+        self.assertTrue(wrote)
+
+    def test_malformed_tip_does_not_block_a_write(self):
+        with open(self.path, "w") as f:
+            f.write("{not valid json\n")
+        state = gt.compute_toolset_state(TOOLS_GITHUB_X_ONLY)
+        wrote = gt.record_toolset_check(state, "2026-08-01T18:00:00Z", path=self.path)
+        self.assertTrue(wrote)
+        with open(self.path) as f:
+            lines = [ln for ln in f if ln.strip()]
+        self.assertEqual(len(lines), 2)
 
 
 class TestLastToolsetState(_TempLogCase):
