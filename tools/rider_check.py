@@ -39,6 +39,7 @@ import re
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import scan_files  # noqa: E402
 import text_patterns  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -106,14 +107,13 @@ _NEGATION_CUES = re.compile(
 _QUOTE_CHARS = set('"\'“‘')
 
 
-def _iter_public_files(base_dir: str):
-    if not os.path.isdir(base_dir):
-        return
-    for dirpath, dirnames, filenames in os.walk(base_dir):
-        dirnames[:] = [d for d in dirnames if d not in _SKIP_DIR_NAMES]
-        for name in filenames:
-            if name.endswith(_SCAN_EXTENSIONS):
-                yield os.path.join(dirpath, name)
+# Task 513: consolidated into tools/scan_files.py -- five sibling checks
+# (this one, no_grading_check.py, hand_lore_check.py, star_covenant_check.py,
+# arcade_hero_check.py) each carried a byte-identical walk over
+# _SKIP_DIR_NAMES/_SCAN_EXTENSIONS. `_iter_public_files` now names the
+# shared function object, not a local copy; tests/test_scan_files.py
+# asserts this.
+_iter_public_files = scan_files.iter_public_files
 
 
 def _sentences(text: str):
@@ -165,31 +165,6 @@ def _is_parenthesized_example(sentence: str, match_start: int) -> bool:
     return depth > 0
 
 
-_VIOLATIONS_CACHE: dict[str, list] = {}
-
-
-def clear_cache() -> None:
-    """Task 367: drop every memoized `find_violations()` result -- same
-    fix, same rationale as `vault_leak_check.py`'s `clear_cache()`. Only
-    real callers are tests that want a forced fresh scan; production's
-    one-call-per-process shape never needs this."""
-    _VIOLATIONS_CACHE.clear()
-
-
-def find_violations(orita_dir: str = DEFAULT_ORITA_DIR) -> list:
-    """Task 367: memoized per `orita_dir` for the lifetime of the process
-    -- same fix, same rationale as `vault_leak_check.py`'s `find_leaks()`.
-    `ritual_check.py`'s own loader now reuses one module instance per
-    check across repeated `run_ritual_check()` calls in one process (its
-    own fix, same task); this memoization is what lets that reuse
-    actually pay off instead of re-scanning the whole public tree on
-    every call regardless of module identity."""
-    key = os.path.realpath(orita_dir)
-    if key not in _VIOLATIONS_CACHE:
-        _VIOLATIONS_CACHE[key] = _find_violations_uncached(orita_dir)
-    return list(_VIOLATIONS_CACHE[key])
-
-
 def _find_violations_uncached(orita_dir: str = DEFAULT_ORITA_DIR) -> list:
     """Task 100: read-only scan of every public .md/.html file in the town
     checkout for a sentence naming a rider-bound god alongside the specific
@@ -224,6 +199,15 @@ def _find_violations_uncached(orita_dir: str = DEFAULT_ORITA_DIR) -> list:
                         "snippet": snippet,
                     })
     return violations
+
+
+# Task 513: consolidated into tools/scan_files.py -- five sibling checks
+# shared this exact memoize-by-orita_dir shape (task 367's own fix,
+# reimplemented five times over). find_violations/clear_cache now name the
+# shared factory's output, not a local copy; tests/test_scan_files.py
+# asserts every sibling's path_memoize call came from the one shared
+# function.
+find_violations, clear_cache = scan_files.path_memoize(_find_violations_uncached, DEFAULT_ORITA_DIR)
 
 
 def format_violations(violations: list) -> str:

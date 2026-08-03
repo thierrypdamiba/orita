@@ -44,6 +44,7 @@ import re
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import scan_files  # noqa: E402
 import text_patterns  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -157,31 +158,6 @@ def _is_quoted_citation(text: str, match_start: int) -> bool:
     return match_start > 0 and text[match_start - 1] in _QUOTE_CHARS
 
 
-_VIOLATIONS_CACHE: dict[str, list] = {}
-
-
-def clear_cache() -> None:
-    """Task 367: drop every memoized `find_violations()` result -- same
-    fix, same rationale as `vault_leak_check.py`'s `clear_cache()`. Only
-    real callers are tests that want a forced fresh scan; production's
-    one-call-per-process shape never needs this."""
-    _VIOLATIONS_CACHE.clear()
-
-
-def find_violations(orita_dir: str = DEFAULT_ORITA_DIR) -> list:
-    """Task 367: memoized per `orita_dir` for the lifetime of the process
-    -- same fix, same rationale as `vault_leak_check.py`'s `find_leaks()`.
-    `ritual_check.py`'s own loader now reuses one module instance per
-    check across repeated `run_ritual_check()` calls in one process (its
-    own fix, same task); this memoization is what lets that reuse
-    actually pay off instead of re-scanning the whole public tree on
-    every call regardless of module identity."""
-    key = os.path.realpath(orita_dir)
-    if key not in _VIOLATIONS_CACHE:
-        _VIOLATIONS_CACHE[key] = _find_violations_uncached(orita_dir)
-    return list(_VIOLATIONS_CACHE[key])
-
-
 def _find_violations_uncached(orita_dir: str = DEFAULT_ORITA_DIR) -> list:
     """Task 105: read-only scan of every public .md/.html file plus every
     RECIPES/*/detector.py and recipe.json in the town checkout for the
@@ -209,6 +185,17 @@ def _find_violations_uncached(orita_dir: str = DEFAULT_ORITA_DIR) -> list:
                     "snippet": snippet,
                 })
     return violations
+
+
+# Task 513: consolidated into tools/scan_files.py -- five sibling checks
+# shared this exact memoize-by-orita_dir shape (task 367's own fix,
+# reimplemented five times over). find_violations/clear_cache now name the
+# shared factory's output, not a local copy; tests/test_scan_files.py
+# asserts every sibling's path_memoize call came from the one shared
+# function. (This module's own `_iter_scan_files` stays a local, genuine
+# one-off -- it adds a real extra condition, `_RECIPE_FILENAMES`, the other
+# four siblings' walk doesn't need.)
+find_violations, clear_cache = scan_files.path_memoize(_find_violations_uncached, DEFAULT_ORITA_DIR)
 
 
 def format_violations(violations: list) -> str:
