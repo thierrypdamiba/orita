@@ -92,20 +92,57 @@ def _append(entry, path=LOG):
         f.write(json.dumps(entry, ensure_ascii=False) + "\n")
 
 
-def record_check(workflow: str, conclusion: str, run_id, checked_at: str, path=LOG) -> None:
-    """Append one real observed CI conclusion. Never edits or removes a prior line."""
+def record_check(workflow: str, conclusion: str, run_id, checked_at: str, path=LOG) -> bool:
+    """Append one real observed CI conclusion. Never edits or removes a prior line.
+
+    Task 501: the one genuine gap task 495 found live and named but deferred
+    ("left the underlying ci_watch.py dedup fix itself for a future task
+    rather than scope-creep this hour's real, due Cluster Day work") -- the
+    real `HAND/ci-watch-log.jsonl` carries 84 byte-for-byte-identical lines
+    (same workflow/conclusion/run_id/checked_at, all four fields) out of 431
+    total, produced whenever two `ritual_check.py` invocations fed this
+    function the exact same already-recorded observation a second time (a
+    retry, an addendum call re-reading the same live state, task 495's own
+    self-caught example). This is a narrower criterion than `square_check.py`/
+    `scribe_growth_check.py`/`word_watch.py`'s "skip if the durable STATE is
+    unchanged" dedup (tasks 487/497/498): those are single-baseline logs
+    where two calls with an unchanged state carry zero new information no
+    matter when they land. `current_streak`'s whole design instead REQUIRES
+    that two genuinely separate real checks landing on the same conclusion
+    at two different real moments both count (a five-hour green streak is
+    five recorded lines, not one) -- so this only refuses the exact
+    resubmission of an already-recorded moment (`checked_at` matching too,
+    not just workflow/conclusion/run_id), never a real new observation that
+    merely repeats the same conclusion. Returns True if a line was written,
+    False if this exact entry was already the last one recorded for this
+    workflow (mirroring `record_square_check`/`record_app_check`/
+    `record_toolset_check`'s bool-return shape) -- the one real caller
+    (`ritual_check.py`'s `check_ci`) does not yet use the return value,
+    so this is not a breaking change to anything that calls it live.
+    """
     if conclusion not in CONCLUSIONS:
         raise ValueError(f"unknown conclusion {conclusion!r} -- must be one of {CONCLUSIONS}")
-    _append(
-        {
-            "type": "check",
-            "workflow": workflow,
-            "conclusion": conclusion,
-            "run_id": run_id,
-            "checked_at": checked_at,
-        },
-        path,
-    )
+    entry = {
+        "type": "check",
+        "workflow": workflow,
+        "conclusion": conclusion,
+        "run_id": run_id,
+        "checked_at": checked_at,
+    }
+    # A malformed line ANYWHERE in the log is "cannot confirm a duplicate",
+    # not a reason to refuse writing -- recording must still be able to
+    # repair a corrupted log by appending a fresh valid line, the identical
+    # discipline record_square_check's own write path holds (task 497):
+    # only *reading* (current_streak/last_check/format_status_line) refuses
+    # to guess past a bad line, never writing.
+    try:
+        last = last_check(_entries(path), workflow)
+    except CIWatchTamperedError:
+        last = None
+    if last is not None and last == entry:
+        return False
+    _append(entry, path)
+    return True
 
 
 def _workflow_entries(entries: list, workflow: str) -> list:

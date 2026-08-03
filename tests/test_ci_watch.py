@@ -63,9 +63,19 @@ class TestCurrentStreak(_TempLogCase):
         self.assertEqual(ciw.current_streak([], "dawn-run"), 0)
 
     def test_trailing_run_is_exact_not_off_by_one(self):
+        # Task 501: each call now needs its own real checked_at -- three
+        # byte-identical repeats of the same moment would dedup to one line
+        # under the new guard, same as a real caller re-submitting the same
+        # already-recorded observation. Three genuinely different real
+        # moments landing on the same conclusion must still all count.
         entries = []
-        for conclusion in ("success", "failure", "failure", "failure"):
-            ciw.record_check("dawn-run", conclusion, 1, "2026-07-14T00:00:00Z", path=self.path)
+        for conclusion, checked_at in [
+            ("success", "2026-07-14T00:00:00Z"),
+            ("failure", "2026-07-14T01:00:00Z"),
+            ("failure", "2026-07-14T02:00:00Z"),
+            ("failure", "2026-07-14T03:00:00Z"),
+        ]:
+            ciw.record_check("dawn-run", conclusion, 1, checked_at, path=self.path)
         with open(self.path) as f:
             import json
 
@@ -75,8 +85,12 @@ class TestCurrentStreak(_TempLogCase):
     def test_streak_broken_by_a_success_resets_to_zero(self):
         import json
 
-        for conclusion in ("failure", "failure", "success"):
-            ciw.record_check("dawn-run", conclusion, 1, "2026-07-14T00:00:00Z", path=self.path)
+        for conclusion, checked_at in [
+            ("failure", "2026-07-14T00:00:00Z"),
+            ("failure", "2026-07-14T01:00:00Z"),
+            ("success", "2026-07-14T02:00:00Z"),
+        ]:
+            ciw.record_check("dawn-run", conclusion, 1, checked_at, path=self.path)
         with open(self.path) as f:
             entries = [json.loads(ln) for ln in f if ln.strip()]
         self.assertEqual(ciw.current_streak(entries, "dawn-run", "failure"), 0)
@@ -91,6 +105,76 @@ class TestCurrentStreak(_TempLogCase):
             entries = [json.loads(ln) for ln in f if ln.strip()]
         self.assertEqual(ciw.current_streak(entries, "dawn-run", "failure"), 2)
         self.assertEqual(ciw.current_streak(entries, "pages", "failure"), 0)
+
+
+class TestRecordCheckDedup(_TempLogCase):
+    """Task 501: the real `HAND/ci-watch-log.jsonl` carries 84 byte-for-byte
+    duplicate lines out of 431 -- task 495 found and named this live, then
+    deliberately deferred fixing it. `record_check` now refuses to write an
+    exact resubmission of the already-last-recorded entry for a workflow,
+    while still writing every genuinely new observation, even one that
+    repeats the same conclusion at a real new `checked_at` (the whole point
+    of `current_streak`)."""
+
+    def test_no_prior_check_always_writes(self):
+        wrote = ciw.record_check("dawn-run", "success", 1, "2026-07-14T00:00:00Z", path=self.path)
+        self.assertTrue(wrote)
+        with open(self.path) as f:
+            self.assertEqual(len(f.readlines()), 1)
+
+    def test_exact_duplicate_is_skipped(self):
+        ciw.record_check("dawn-run", "success", 111, "2026-07-14T21:00:00Z", path=self.path)
+        wrote = ciw.record_check("dawn-run", "success", 111, "2026-07-14T21:00:00Z", path=self.path)
+        self.assertFalse(wrote)
+        with open(self.path) as f:
+            self.assertEqual(len(f.readlines()), 1)
+
+    def test_same_conclusion_and_run_id_but_a_new_checked_at_still_writes(self):
+        # The exact case current_streak depends on: a real check an hour
+        # later that happens to name the same already-completed run_id and
+        # the same conclusion is still a genuinely new observation.
+        ciw.record_check("dawn-run", "success", 111, "2026-07-14T21:00:00Z", path=self.path)
+        wrote = ciw.record_check("dawn-run", "success", 111, "2026-07-14T22:00:00Z", path=self.path)
+        self.assertTrue(wrote)
+        with open(self.path) as f:
+            self.assertEqual(len(f.readlines()), 2)
+
+    def test_a_real_change_after_a_duplicate_still_writes(self):
+        ciw.record_check("dawn-run", "failure", 1, "2026-07-14T00:00:00Z", path=self.path)
+        skipped = ciw.record_check("dawn-run", "failure", 1, "2026-07-14T00:00:00Z", path=self.path)
+        wrote = ciw.record_check("dawn-run", "success", 2, "2026-07-14T01:00:00Z", path=self.path)
+        self.assertFalse(skipped)
+        self.assertTrue(wrote)
+        with open(self.path) as f:
+            self.assertEqual(len(f.readlines()), 2)
+
+    def test_dedup_is_scoped_per_workflow(self):
+        # An exact duplicate for "pages" must not be suppressed just because
+        # "dawn-run" happens to hold an identical-looking last entry.
+        ciw.record_check("dawn-run", "success", 1, "2026-07-14T00:00:00Z", path=self.path)
+        wrote = ciw.record_check("pages", "success", 1, "2026-07-14T00:00:00Z", path=self.path)
+        self.assertTrue(wrote)
+        with open(self.path) as f:
+            self.assertEqual(len(f.readlines()), 2)
+
+    def test_a_malformed_line_elsewhere_does_not_block_a_real_write(self):
+        # Reading (current_streak/last_check) refuses to guess past a
+        # corrupted log -- writing must not inherit that refusal, or a
+        # single bad hand-edit anywhere in the log would permanently wedge
+        # every future real check for every workflow.
+        ciw.record_check("dawn-run", "success", 1, "2026-07-14T00:00:00Z", path=self.path)
+        with open(self.path, "a") as f:
+            f.write('{"type": "check", broken <<<< not json\n')
+        wrote = ciw.record_check("dawn-run", "failure", 2, "2026-07-14T01:00:00Z", path=self.path)
+        self.assertTrue(wrote)
+        with open(self.path) as f:
+            self.assertEqual(len(f.readlines()), 3)
+
+    def test_return_value_is_a_bool_not_none(self):
+        wrote = ciw.record_check("dawn-run", "success", 1, "2026-07-14T00:00:00Z", path=self.path)
+        self.assertIs(wrote, True)
+        wrote_again = ciw.record_check("dawn-run", "success", 1, "2026-07-14T00:00:00Z", path=self.path)
+        self.assertIs(wrote_again, False)
 
 
 class TestFormatStatusLine(_TempLogCase):
