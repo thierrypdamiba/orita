@@ -77,15 +77,91 @@ class TestRecordSquareCheck(_TempLogCase):
         self.assertEqual(len(lines), 1)
 
     def test_never_edits_a_prior_line(self):
-        state = sc.compute_square_state(ISSUES_BASE, PRS_NONE)
-        sc.record_square_check(state, "2026-07-14T20:00:00Z", path=self.path)
+        state1 = sc.compute_square_state(ISSUES_BASE, PRS_NONE)
+        sc.record_square_check(state1, "2026-07-14T20:00:00Z", path=self.path)
         with open(self.path) as f:
             before = f.readlines()
-        sc.record_square_check(state, "2026-07-14T21:00:00Z", path=self.path)
+        state2 = sc.compute_square_state(
+            ISSUES_BASE + [{"number": 6, "updated_at": "2026-07-14T21:00:00Z"}],
+            PRS_NONE,
+        )
+        sc.record_square_check(state2, "2026-07-14T21:00:00Z", path=self.path)
         with open(self.path) as f:
             after = f.readlines()
         self.assertEqual(after[0], before[0])
         self.assertEqual(len(after), len(before) + 1)
+
+    def test_returns_true_when_a_line_is_written(self):
+        state = sc.compute_square_state(ISSUES_BASE, PRS_NONE)
+        wrote = sc.record_square_check(state, "2026-07-14T20:00:00Z", path=self.path)
+        self.assertTrue(wrote)
+
+
+class TestRecordSquareCheckDedup(_TempLogCase):
+    """Task 497: `record_square_check` used to write unconditionally on every
+    call, the exact self-inflicted-duplicate-line class task 487 already
+    closed in this file's siblings (`scribe_growth_check`/`word_watch`) --
+    the real `HAND/square-check-log.jsonl` already carries byte-identical
+    consecutive lines from repeat same-hour `ritual_check.py` runs. A repeat
+    observation of the same unchanged square carries no new information and
+    must not cost a line."""
+
+    def test_identical_state_is_not_recorded_twice(self):
+        state = sc.compute_square_state(ISSUES_BASE, PRS_NONE)
+        sc.record_square_check(state, "2026-07-16T18:03:00Z", path=self.path)
+        wrote = sc.record_square_check(state, "2026-07-16T18:03:00Z", path=self.path)
+        self.assertFalse(wrote)
+        with open(self.path) as f:
+            lines = [ln for ln in f if ln.strip()]
+        self.assertEqual(len(lines), 1)
+
+    def test_identical_state_skipped_even_with_a_different_checked_at(self):
+        state = sc.compute_square_state(ISSUES_BASE, PRS_NONE)
+        sc.record_square_check(state, "2026-07-16T18:03:00Z", path=self.path)
+        wrote = sc.record_square_check(state, "2026-07-16T20:04:07Z", path=self.path)
+        self.assertFalse(wrote)
+        with open(self.path) as f:
+            lines = [ln for ln in f if ln.strip()]
+        self.assertEqual(len(lines), 1)
+
+    def test_a_real_change_after_a_duplicate_still_writes(self):
+        state = sc.compute_square_state(ISSUES_BASE, PRS_NONE)
+        sc.record_square_check(state, "2026-07-16T18:03:00Z", path=self.path)
+        sc.record_square_check(state, "2026-07-16T18:03:00Z", path=self.path)  # skipped
+        changed = sc.compute_square_state(
+            ISSUES_BASE + [{"number": 6, "updated_at": "2026-07-16T20:00:00Z"}],
+            PRS_NONE,
+        )
+        wrote = sc.record_square_check(changed, "2026-07-16T20:04:07Z", path=self.path)
+        self.assertTrue(wrote)
+        with open(self.path) as f:
+            lines = [ln for ln in f if ln.strip()]
+        self.assertEqual(len(lines), 2)
+
+    def test_max_updated_at_moving_counts_as_a_real_change(self):
+        state = sc.compute_square_state(ISSUES_BASE, PRS_NONE)
+        sc.record_square_check(state, "2026-07-16T18:03:00Z", path=self.path)
+        commented = [dict(i) for i in ISSUES_BASE]
+        commented[0]["updated_at"] = "2026-07-16T19:00:00Z"
+        moved = sc.compute_square_state(commented, PRS_NONE)
+        wrote = sc.record_square_check(moved, "2026-07-16T20:04:07Z", path=self.path)
+        self.assertTrue(wrote)
+
+    def test_no_prior_check_always_writes(self):
+        state = sc.compute_square_state(ISSUES_BASE, PRS_NONE)
+        wrote = sc.record_square_check(state, "2026-07-14T20:00:00Z", path=self.path)
+        self.assertTrue(wrote)
+
+    def test_malformed_tip_does_not_block_a_non_empty_write(self):
+        state = sc.compute_square_state(ISSUES_BASE, PRS_NONE)
+        sc.record_square_check(state, "2026-07-14T20:00:00Z", path=self.path)
+        with open(self.path, "a") as f:
+            f.write("not valid json garbage\n")
+        wrote = sc.record_square_check(state, "2026-07-14T21:00:00Z", path=self.path)
+        self.assertTrue(wrote)
+        with open(self.path) as f:
+            lines = [ln for ln in f if ln.strip()]
+        self.assertEqual(len(lines), 3)
 
 
 class TestRecordSquareCheckDegenerateGuard(_TempLogCase):
@@ -118,12 +194,17 @@ class TestRecordSquareCheckDegenerateGuard(_TempLogCase):
         self.assertEqual(last["issue_numbers"], [])
 
     def test_empty_over_empty_prior_baseline_is_allowed(self):
+        # Task 497: two identical empty observations now dedup to one line
+        # (no DegenerateSquareStateError either way) -- "allowed" no longer
+        # means "always writes a new line", the same semantic shift task 487
+        # already made for this file's siblings.
         empty = sc.compute_square_state([], [])
         sc.record_square_check(empty, "2026-07-18T02:00:00Z", path=self.path)
-        sc.record_square_check(empty, "2026-07-18T03:00:00Z", path=self.path)
+        wrote = sc.record_square_check(empty, "2026-07-18T03:00:00Z", path=self.path)
+        self.assertFalse(wrote)
         with open(self.path) as f:
             lines = [ln for ln in f if ln.strip()]
-        self.assertEqual(len(lines), 2)
+        self.assertEqual(len(lines), 1)
 
     def test_ordinary_non_empty_record_is_unaffected(self):
         state1 = sc.compute_square_state(ISSUES_BASE, PRS_NONE)

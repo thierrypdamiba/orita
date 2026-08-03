@@ -25,6 +25,21 @@ Task 124 closed the one gap this left: `record` trusted whatever
 genuine all-clear square. `record_square_check` now refuses an all-empty
 state over a non-empty prior baseline unless `force=True` (CLI: `--force`).
 
+Task 497 (nyx): `record_square_check` still wrote unconditionally on every
+call, the exact self-inflicted-duplicate-line class task 487 already closed
+in this file's two siblings, `scribe_growth_check.record_scribe_check` and
+`word_watch.record_word_check` -- both skip the append when the new
+observation is byte-identical to the last one recorded. This file was never
+given the same guard, and the real `HAND/square-check-log.jsonl` already
+carries the proof: multiple runs of `python3 tools/ritual_check.py` in the
+same hour (a normal, encouraged sanity-check habit, not a bug) wrote
+byte-for-byte identical consecutive lines throughout 2026-07-16/17 (e.g. two
+lines both timestamped 2026-07-16T18:03:00+00:00). `record_square_check` now
+returns `True`/`False` (wrote / skipped-as-duplicate) like its two siblings,
+comparing `issue_numbers`/`pr_numbers`/`max_updated_at` against the last
+recorded entry -- a real square change (including one that flips back to
+`force`d-empty) still always writes.
+
 Usage:
     python3 tools/square_check.py check <state.json>
     python3 tools/square_check.py record <state.json> <checked_at> [--force]
@@ -139,11 +154,24 @@ class DegenerateSquareStateError(ValueError):
     real close events in between is the rare case, not the common one."""
 
 
-def record_square_check(state: dict, checked_at: str, path=LOG, *, force: bool = False) -> None:
+def record_square_check(state: dict, checked_at: str, path=LOG, *, force: bool = False) -> bool:
     """Append one real observed square state. Never edits or removes a prior line.
 
     Refuses to record an all-empty state when the last recorded real check
     was non-empty, unless `force=True` -- see `DegenerateSquareStateError`.
+    A malformed tip is NOT swallowed on this path: guessing past a corrupted
+    tip is exactly the unsafe guess this guard exists to prevent.
+
+    Task 497: skips the append -- returns False, writes nothing -- when
+    `issue_numbers`/`pr_numbers`/`max_updated_at` are identical to the most
+    recently recorded entry, mirroring `word_watch.record_word_check`'s
+    identical fix (task 487) for this file's own sibling log. Returns True
+    when a new line was actually written (the first-ever check, or a real
+    square change since the last one). A malformed tip on THIS path is
+    treated as "cannot confirm a duplicate" rather than propagated --
+    recording must still be able to repair a corrupted log by appending a
+    fresh valid line; only reading refuses to guess past a bad tip, never
+    writing.
     """
     is_empty = not state["issue_numbers"] and not state["pr_numbers"]
     if is_empty and not force:
@@ -154,9 +182,23 @@ def record_square_check(state: dict, checked_at: str, path=LOG, *, force: bool =
                 f"prior baseline (issues {last['issue_numbers']}, prs {last['pr_numbers']}) "
                 "-- pass force=True if every issue/PR was genuinely closed this hour"
             )
+    else:
+        try:
+            last = last_square_state(path)
+        except SquareCheckTamperedError:
+            last = None
+
+    if last is not None and (
+        last["issue_numbers"] == state["issue_numbers"]
+        and last["pr_numbers"] == state["pr_numbers"]
+        and last["max_updated_at"] == state["max_updated_at"]
+    ):
+        return False
+
     entry = dict(state)
     entry["checked_at"] = checked_at
     _append(entry, path)
+    return True
 
 
 def square_delta(state: dict, path=LOG):
@@ -224,11 +266,14 @@ def main(argv):
             return 1
         force = "--force" in argv[4:]
         try:
-            record_square_check(state, argv[3], path=LOG, force=force)
+            wrote = record_square_check(state, argv[3], path=LOG, force=force)
         except DegenerateSquareStateError as e:
             print(f"refused: {e}")
             return 1
-        print(f"recorded: {state}")
+        if wrote:
+            print(f"recorded: {state}")
+        else:
+            print(f"no-op (unchanged since last recorded check): {state}")
         return 0
     print(f"unknown command: {cmd!r}")
     return 1
