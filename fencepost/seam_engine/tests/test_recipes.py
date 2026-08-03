@@ -531,7 +531,7 @@ _CARDINAL_WORDS = {
     "twenty-five": 25, "twenty-six": 26, "twenty-seven": 27, "twenty-eight": 28,
     "twenty-nine": 29, "thirty": 30, "thirty-one": 31, "thirty-two": 32,
     "thirty-three": 33, "thirty-four": 34, "thirty-five": 35, "thirty-six": 36,
-    "thirty-seven": 37,
+    "thirty-seven": 37, "thirty-eight": 38,
 }
 
 _PLUS_JOINED_CLAIM_RE = re.compile(
@@ -583,12 +583,12 @@ def test_plus_joined_claim_missing_sentence_raises():
         claimed_plus_joined_counts("Nothing here about plus-joined toolkits.")
 
 
-def test_real_plus_joined_counts_are_currently_eleven_of_thirty_seven():
-    # Regression pin: today's real, live counts under RECIPES/. Was (11, 36)
-    # until readme-claims-unmerged-pr merged (the thirty-seventh real
-    # recipe, task 493, single-toolkit "github" -- the plus-joined half
-    # stays 11).
-    assert real_plus_joined_counts(FENCEPOST_ROOT) == (11, 37)
+def test_real_plus_joined_counts_are_currently_eleven_of_thirty_eight():
+    # Regression pin: today's real, live counts under RECIPES/. Was (11, 37)
+    # until good-first-issue-never-referenced merged (the thirty-eighth
+    # real recipe, task 499, single-toolkit "github" -- the plus-joined
+    # half stays 11).
+    assert real_plus_joined_counts(FENCEPOST_ROOT) == (11, 38)
 
 
 def test_oath_scopes_for_toolkit_docstring_matches_the_real_live_counts():

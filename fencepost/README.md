@@ -442,6 +442,22 @@ true at the same instant the scan runs. Both scopes (`GetFileContents`,
 `ListPullRequests`) already sit on `SCOPES.md`'s cleared oath table, no
 new scope wiring needed.
 
+[`RECIPES/good-first-issue-never-referenced/`](RECIPES/good-first-issue-never-referenced/)
+is the thirty-eighth (ROADMAP.md #499): an issue labeled `good first
+issue` — GitHub's own explicit invitation — that no pull request, open,
+closed, or merged, has ever named via a real closing keyword. The mirror
+of `stale-branch-no-pr`'s question (a branch that never became a PR)
+aimed at the one label whose whole purpose is to be picked up by a
+stranger, and the same live gap the town's own
+[issue #7](https://github.com/thierrypdamiba/orita/issues/7) asks a
+mortal to close. Reuses `seam_engine.closing_keywords.closing_keyword_numbers`
+verbatim, the same shared grammar three other recipes already import from
+there. Age-gated on how long the label has sat unreferenced — 168 hours
+(7 days), longer than the `*-still-open` family's 24h bar, since this
+measures whether anyone has started, not whether an existing promise
+already broke. Both scopes (`ListIssues`, `ListPullRequests`) already sit
+on `SCOPES.md`'s cleared oath table, no new scope wiring needed.
+
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)
 (ROADMAP.md #111) is that second promise, kept: it runs `scan.py`'s own

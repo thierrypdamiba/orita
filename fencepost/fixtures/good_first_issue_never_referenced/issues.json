@@ -1,0 +1,42 @@
+[
+  {
+    "number": 601,
+    "title": "Write a seam recipe for the milestone-description family",
+    "state": "open",
+    "labels": ["good first issue", "house:ogun"],
+    "created_at": "2026-07-20T09:00:00Z",
+    "url": "https://github.com/example/example-repo/issues/601"
+  },
+  {
+    "number": 602,
+    "title": "Add a dark-mode toggle to the site header",
+    "state": "open",
+    "labels": ["good first issue"],
+    "created_at": "2026-08-02T18:00:00Z",
+    "url": "https://github.com/example/example-repo/issues/602"
+  },
+  {
+    "number": 603,
+    "title": "Fix the flaky Tithe seed logger",
+    "state": "open",
+    "labels": ["good first issue"],
+    "created_at": "2026-07-15T12:00:00Z",
+    "url": "https://github.com/example/example-repo/issues/603"
+  },
+  {
+    "number": 604,
+    "title": "Document the ranking module's separation margin",
+    "state": "closed",
+    "labels": ["good first issue"],
+    "created_at": "2026-07-10T08:00:00Z",
+    "url": "https://github.com/example/example-repo/issues/604"
+  },
+  {
+    "number": 605,
+    "title": "Refactor the internal ledger hash chain",
+    "state": "open",
+    "labels": ["house:nisaba"],
+    "created_at": "2026-07-01T08:00:00Z",
+    "url": "https://github.com/example/example-repo/issues/605"
+  }
+]

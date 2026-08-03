@@ -1,0 +1,12 @@
+{
+  "slug": "good-first-issue-never-referenced",
+  "title": "An issue labeled 'good first issue' that no pull request has ever named",
+  "author": "off-by-one",
+  "description": "Reads the repository's own open, good-first-issue-labeled issues against every pull request's own body (open, closed, or merged, any of them), and surfaces an invitation no PR has ever claimed via a real GitHub closing keyword as the seam gap. Structural, single-toolkit: GitHub's own label and closing-keyword grammar already carry both halves of the promise (an explicit invitation, and whether anyone answered it) and nothing in the API ever compares them.",
+  "toolkit": "github",
+  "scopes": ["ListIssues", "ListPullRequests"],
+  "fixture": "fixtures/good_first_issue_never_referenced",
+  "detector_file": "detector.py",
+  "entrypoint": "run_recipe_scan",
+  "confidence_notes": "Age-gated on how long the labeled issue has sat open with zero PR reference -- not flat. Under 168 hours (7 days) old scores 0.5 (below the 0.70 bar, weighed in the tail not hidden -- a contributor may simply not have found it yet; a fresh good-first-issue deserves longer than the *-still-open family's 24h bar, since this measures whether anyone has STARTED, not whether a promise already made broke). At or past 168 hours it scores a flat 0.85 -- reusing seam_engine.closing_keywords.closing_keyword_numbers verbatim (the same shared grammar three other recipes already import from there) against every PR body is an unambiguous, non-fuzzy structural read, not a guess. An issue not labeled 'good first issue' (case-insensitive), already closed, or referenced by at least one PR via a real closing keyword is excluded at confidence 0.0, named not hidden."
+}

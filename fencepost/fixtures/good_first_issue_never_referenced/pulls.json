@@ -1,0 +1,16 @@
+[
+  {
+    "number": 701,
+    "title": "Fix flaky Tithe seed logger",
+    "state": "closed",
+    "body": "The seed logger dropped every third run's seed. fixes #603",
+    "url": "https://github.com/example/example-repo/pull/701"
+  },
+  {
+    "number": 702,
+    "title": "Unrelated site typo fix",
+    "state": "merged",
+    "body": "Fixes a typo in the footer. No issue reference needed.",
+    "url": "https://github.com/example/example-repo/pull/702"
+  }
+]
