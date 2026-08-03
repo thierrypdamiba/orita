@@ -89,7 +89,10 @@ Usage:
 """
 import json
 import os
-from datetime import datetime, timezone
+import sys
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import iso_time  # noqa: E402
 
 DEFAULT_COOLDOWN_HOURS = 2.0
 DEFAULT_ESCALATION_THRESHOLD_HOURS = 48.0
@@ -257,8 +260,12 @@ def last_checked_at(entries: list, tool: str):
     return t_entries[-1]["checked_at"] if t_entries else None
 
 
-def _parse(ts: str) -> datetime:
-    return datetime.fromisoformat(ts.replace("Z", "+00:00")).astimezone(timezone.utc)
+# Task 509: consolidated into tools/iso_time.py -- three sibling checks
+# (cron_health.py, voice_window_check.py, x_outage_tracker.py) each
+# carried a byte-identical copy of this parser. This name now points at
+# the shared function object, not a local copy; tests/test_iso_time.py
+# asserts this name IS that shared function.
+_parse = iso_time.parse_iso_utc
 
 
 def hours_since_last_check(entries: list, tool: str, now: str):
@@ -483,8 +490,6 @@ def format_status_line(entries: list, tool: str, status: str = "forbidden") -> s
 
 
 if __name__ == "__main__":
-    import sys
-
     cmd = sys.argv[1] if len(sys.argv) > 1 else "status"
     if cmd == "record":
         _tool, _status, _checked_at = sys.argv[2], sys.argv[3], sys.argv[4]

@@ -61,7 +61,9 @@ from __future__ import annotations
 import json
 import os
 import sys
-from datetime import datetime, timezone
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import iso_time  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 LOG = os.path.join(ROOT, "HAND", "voice-window-log.jsonl")
@@ -74,9 +76,12 @@ WINDOW_END_HOUR = 6
 # here is new and actionable.
 FIX_LANDED_AT = "2026-07-17T07:30:00Z"
 
-
-def _parse(ts: str) -> datetime:
-    return datetime.fromisoformat(ts.replace("Z", "+00:00")).astimezone(timezone.utc)
+# Task 509: consolidated into tools/iso_time.py -- three sibling checks
+# (cron_health.py, voice_window_check.py, x_outage_tracker.py) each
+# carried a byte-identical copy of this parser. This name now points at
+# the shared function object, not a local copy; tests/test_iso_time.py
+# asserts this name IS that shared function.
+_parse = iso_time.parse_iso_utc
 
 
 def in_window(author_date_iso: str) -> bool:
