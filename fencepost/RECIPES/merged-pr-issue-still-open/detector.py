@@ -43,9 +43,22 @@ dangling reference (the number was never real) and a resolved promise (the
 number was real and is now closed) are different facts about the world --
 conflating them makes a false claim in the surviving branch's own words.
 Split here too, now consistent with the rest of the family;
-`issue-closed-pr-still-open/detector.py` carries the identical conflation
-(`issue is None` folded into its own "still open" label) and is named,
-not yet fixed, for a future task.
+`issue-closed-pr-still-open/detector.py` carried the identical conflation
+(`issue is None` folded into its own "still open" label) at the time this
+paragraph was written, named here as a future task, not yet fixed.
+
+ROADMAP.md #494: that forward pointer went stale without anyone circling
+back to it -- `issue-closed-pr-still-open/detector.py` split its own
+`issue is None` branch into a separate `nonexistent-target-...` slug at
+task 430, the same hour this file's own note above still claimed the split
+was undone. Both `test_issue_closed_pr_still_open_detector.py` (its own
+"dangling reference" case, asserting `excluded[0].slug ==
+"nonexistent-target-100-999"`) and this module's own sibling test
+(`test_merged_pr_issue_still_open_detector.py`, the identical assertion)
+have held that split for real ever since -- this paragraph is the only
+place left still describing task 430's fix as future work. Corrected in
+place, past tense, rather than left to mislead the next reader who trusts
+a docstring over the code and tests sitting right below it.
 """
 from __future__ import annotations
 
