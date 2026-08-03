@@ -28,7 +28,7 @@ import json
 import os
 from types import ModuleType
 
-from oracle_engine import copylint, prediction
+from oracle_engine import copylint, github_auth, prediction, time_utils
 
 _ORACLE_ENGINE_ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..")
 _ORACLE_ROOT = os.path.join(_ORACLE_ENGINE_ROOT, "..")
@@ -75,14 +75,7 @@ class WorkflowCadenceTamperedError(RuntimeError):
     the log before the next real call."""
 
 
-def _default_http_get(url: str) -> dict:
-    import httpx
-
-    from oracle_engine.github_auth import github_headers
-
-    resp = httpx.get(url, headers=github_headers(), timeout=10.0)
-    resp.raise_for_status()
-    return resp.json()
+_default_http_get = github_auth.default_http_get
 
 
 def fetch_workflow_count(repo: str = DEFAULT_REPO, http_get=None) -> int:
@@ -145,11 +138,7 @@ def record_snapshot(count: int, ts: str, path: str = DEFAULT_SNAPSHOT_PATH) -> d
     return entry
 
 
-def _parse_ts(ts: str) -> datetime.datetime:
-    dt = datetime.datetime.fromisoformat(ts)
-    if dt.tzinfo is None:
-        dt = dt.replace(tzinfo=datetime.timezone.utc)
-    return dt
+_parse_ts = time_utils.parse_ts
 
 
 def _reject_malformed(snapshots: list[dict], caller: str) -> None:

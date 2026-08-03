@@ -24,10 +24,30 @@ Outside CI (this sandbox, a contributor's laptop) `GITHUB_TOKEN` is usually
 unset, so `github_headers()` degrades to the original unauthenticated header
 — every existing test and every prior real cadence seal already exercised
 that path and keeps working unchanged.
+
+This module's own docstring has claimed since task 63 to be shared "for
+every cadence module's `_default_http_get`" — but only `github_headers()`
+ever actually was; each of twenty cadence modules still carried its own
+byte-identical `_default_http_get(url)` wrapper around it (confirmed by an
+AST-hash sweep: same import order, same `httpx.get(...)` call, same
+`raise_for_status()`/`.json()` tail, differing only in a cosmetic `-> dict`
+vs `-> list` return annotation that Python never enforces at runtime).
+Twenty-six modules (the twenty above, plus `autograde.py`, `follower_
+cadence.py`, `following_cadence.py`, `listed_cadence.py`, `media_cadence.py`,
+and `tweet_cadence.py`) carried a second, unrelated byte-identical copy of
+`_parse_ts` for good measure — consolidated into `time_utils.parse_ts`
+instead, the same task, the same AST-hash method `tools/iso_time.py` (task
+509) and `tools/metrics_reader.py` (task 508) already used one directory
+over. `default_http_get` below finally makes this module's own docstring
+true: every sibling now points `_default_http_get` at this one function
+object (`tests/test_github_auth.py` asserts identity, not source equality),
+so a future fix here is a fix everywhere at once, the guarantee the
+docstring already promised and never quite kept.
 """
 from __future__ import annotations
 
 import os
+from typing import Any
 
 
 def github_headers(accept: str = "application/vnd.github+json") -> dict:
@@ -40,3 +60,18 @@ def github_headers(accept: str = "application/vnd.github+json") -> dict:
     if token:
         headers["Authorization"] = f"Bearer {token}"
     return headers
+
+
+def default_http_get(url: str) -> Any:
+    """The real network call every cadence module's `fetch_*` falls back to
+    when no `http_get` override is given (every existing test always
+    injects one, so this body itself has never been under direct test —
+    same boundary the twenty prior private copies shared). `httpx` is
+    imported lazily, matching every sibling's own prior copy, so importing
+    this module for `github_headers()` alone — already done everywhere —
+    never requires `httpx` to be installed."""
+    import httpx
+
+    resp = httpx.get(url, headers=github_headers(), timeout=10.0)
+    resp.raise_for_status()
+    return resp.json()

@@ -31,7 +31,7 @@ import json
 import os
 from types import ModuleType
 
-from oracle_engine import copylint, prediction
+from oracle_engine import copylint, prediction, time_utils
 
 _ORACLE_ENGINE_ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..")
 _ORACLE_ROOT = os.path.join(_ORACLE_ENGINE_ROOT, "..")
@@ -155,11 +155,7 @@ def record_snapshot(count: int, ts: str, path: str = DEFAULT_SNAPSHOT_PATH) -> d
     return entry
 
 
-def _parse_ts(ts: str) -> datetime.datetime:
-    dt = datetime.datetime.fromisoformat(ts)
-    if dt.tzinfo is None:
-        dt = dt.replace(tzinfo=datetime.timezone.utc)
-    return dt
+_parse_ts = time_utils.parse_ts
 
 
 def _reject_malformed(snapshots: list[dict], caller: str) -> None:

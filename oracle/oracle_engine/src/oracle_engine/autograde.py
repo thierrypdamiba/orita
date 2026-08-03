@@ -34,7 +34,7 @@ import json
 import re
 from types import ModuleType
 
-from oracle_engine import grading
+from oracle_engine import grading, time_utils
 from oracle_engine.cadence import (
     DEFAULT_BUILDLOG_PATH,
     load_buildlog_entries,
@@ -70,11 +70,7 @@ def parse_cadence_claim(claim: str) -> tuple[datetime.datetime, int]:
     return target, int(m.group("threshold"))
 
 
-def _parse_ts(ts: str) -> datetime.datetime:
-    dt = datetime.datetime.fromisoformat(ts)
-    if dt.tzinfo is None:
-        dt = dt.replace(tzinfo=datetime.timezone.utc)
-    return dt
+_parse_ts = time_utils.parse_ts
 
 
 def find_due_calls(entries: list[dict], now: datetime.datetime) -> list[dict]:
