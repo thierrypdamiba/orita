@@ -1,0 +1,12 @@
+{
+  "slug": "merged-pr-branch-not-deleted",
+  "title": "A pull request resolved, and its own branch was never deleted",
+  "author": "off-by-one",
+  "description": "Compares the repository's own pull-request list against its own Activity feed: a pull request reached a terminal state (merged or closed), but no branch_deletion event was ever recorded for its head branch. GitHub's merge UI offers a 'Delete branch' button but does not force it -- the branch just sits in the branch list, unresolved-looking clutter, until a human happens to notice and clicks it by hand. The third leg of the branch-lifecycle trio this engine now covers end to end, alongside stale-branch-no-pr (branch survives, no PR ever) and deleted-branch-pr-still-open (branch gone, PR still open).",
+  "toolkit": "github",
+  "scopes": ["ListPullRequests", "ListRepositoryActivities"],
+  "fixture": "fixtures/merged_pr_branch_not_deleted",
+  "detector_file": "detector.py",
+  "entrypoint": "run_recipe_scan",
+  "confidence_notes": "Age-gated on how long ago the pull request resolved while its branch remains undeleted, mirroring deleted-branch-pr-still-open's own 24h grace window on the same lifecycle: under 24 hours scores 0.5 (below the 0.70 bar, weighed in the tail not hidden -- a PR resolved minutes ago may just be mid-cleanup, a merge-queue tool or a human about to click delete). At or past 24 hours scores a flat 0.85 -- an unambiguous, non-fuzzy signal: an exact ref match failure between a resolved PR's own head branch and every branch_deletion event on record. A pull request still open is excluded at confidence 0.0, named not hidden -- it has not resolved yet, so no cleanup promise has been missed. A resolved PR whose branch already carries a matching branch_deletion event is excluded too -- the ordinary, unremarkable case this recipe is deliberately not about."
+}

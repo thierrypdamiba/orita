@@ -472,6 +472,19 @@ signal, mirroring the `*-still-open` family's 24h bar. The one scope,
 `ListMilestones`, already sits on `SCOPES.md`'s cleared oath table, no
 new scope wiring needed.
 
+[`RECIPES/merged-pr-branch-not-deleted/`](RECIPES/merged-pr-branch-not-deleted/)
+is the fortieth: the third leg of a branch-lifecycle trio this engine now
+covers end to end, alongside `stale-branch-no-pr` (branch survives, no PR
+ever) and `deleted-branch-pr-still-open` (branch gone, PR still open) —
+this one watches a pull request reach a terminal state (merged or closed)
+while its own head branch is never deleted. GitHub's merge UI offers a
+"Delete branch" button, but nothing forces it, so the branch just sits in
+the branch list, unremarked clutter, until a human happens to notice.
+Age-gated on how long ago the PR resolved — 24 hours, mirroring
+`deleted-branch-pr-still-open`'s own grace window on the same lifecycle.
+Both scopes (`ListPullRequests`, `ListRepositoryActivities`) already sit
+on `SCOPES.md`'s cleared oath table, no new scope wiring needed.
+
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)
 (ROADMAP.md #111) is that second promise, kept: it runs `scan.py`'s own

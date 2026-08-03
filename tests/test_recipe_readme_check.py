@@ -307,7 +307,7 @@ _CARDINAL_WORDS = {
     "twenty-five": 25, "twenty-six": 26, "twenty-seven": 27, "twenty-eight": 28,
     "twenty-nine": 29, "thirty": 30, "thirty-one": 31, "thirty-two": 32,
     "thirty-three": 33, "thirty-four": 34, "thirty-five": 35, "thirty-six": 36,
-    "thirty-seven": 37, "thirty-eight": 38, "thirty-nine": 39,
+    "thirty-seven": 37, "thirty-eight": 38, "thirty-nine": 39, "forty": 40,
 }
 
 _SECTION_COUNT_CLAIM_RE = re.compile(
@@ -360,13 +360,13 @@ class DocstringCountDoctrineCase(unittest.TestCase):
         with self.assertRaises(AssertionError):
             claimed_section_count("Nothing here about a recipe count.")
 
-    def test_real_live_section_count_is_currently_thirty_nine(self):
-        # Regression pin: today's real, live linked-recipe count. Was 38
-        # until milestone-complete-still-open merged (task 512).
+    def test_real_live_section_count_is_currently_forty(self):
+        # Regression pin: today's real, live linked-recipe count. Was 39
+        # until merged-pr-branch-not-deleted merged (task 514).
         with open(rrc.DEFAULT_README_PATH, encoding="utf-8") as f:
             text = f.read()
         section = rrc._community_recipes_section(text)
-        self.assertEqual(len(rrc._linked_recipes(section)), 39)
+        self.assertEqual(len(rrc._linked_recipes(section)), 40)
 
     def test_docstring_matches_the_real_live_count(self):
         with open(rrc.DEFAULT_README_PATH, encoding="utf-8") as f:

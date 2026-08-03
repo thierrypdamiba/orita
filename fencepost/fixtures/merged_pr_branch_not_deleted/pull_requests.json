@@ -1,0 +1,34 @@
+[
+  {
+    "number": 145,
+    "title": "Add dark-mode toggle to settings",
+    "state": "merged",
+    "head_ref": "feature/dark-mode-toggle",
+    "url": "https://github.com/example/example-repo/pull/145",
+    "resolved_at": "2026-07-24T10:00:00Z"
+  },
+  {
+    "number": 150,
+    "title": "Drop unused lockfile entry",
+    "state": "closed",
+    "head_ref": "chore/drop-lockfile",
+    "url": "https://github.com/example/example-repo/pull/150",
+    "resolved_at": "2026-07-26T20:00:00Z"
+  },
+  {
+    "number": 152,
+    "title": "Bump dependency versions",
+    "state": "merged",
+    "head_ref": "chore/bump-deps-2",
+    "url": "https://github.com/example/example-repo/pull/152",
+    "resolved_at": "2026-07-20T09:00:00Z"
+  },
+  {
+    "number": 160,
+    "title": "WIP: experiment with cache layer",
+    "state": "open",
+    "head_ref": "wip/cache-layer",
+    "url": "https://github.com/example/example-repo/pull/160",
+    "resolved_at": null
+  }
+]

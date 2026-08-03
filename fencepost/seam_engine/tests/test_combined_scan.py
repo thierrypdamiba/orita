@@ -274,6 +274,7 @@ def test_runs_all_real_recipes_in_the_actual_repo_without_error(monkeypatch):
         "readme-claims-unmerged-pr",
         "good-first-issue-never-referenced",
         "milestone-complete-still-open",
+        "merged-pr-branch-not-deleted",
     }
 
 
