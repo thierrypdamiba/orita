@@ -3429,6 +3429,8 @@ class RecipeReadmeFoldCase(unittest.TestCase):
         }
         with open(os.path.join(recipe_dir, "recipe.json"), "w") as f:
             _json.dump(manifest, f)
+        with open(os.path.join(recipe_dir, "README.md"), "w") as f:
+            f.write(f"# {slug}\n")
 
     def _write_readme(self, section):
         path = os.path.join(self.dir, "README.md")

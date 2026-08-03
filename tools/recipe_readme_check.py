@@ -44,6 +44,20 @@ already holds), then checks three things a bare substring match cannot:
    page and to `discover_recipes()` both, and neither existing check
    would ever notice the two halves of one link disagree).
 
+An Explore agent hunting the codebase for the next real gap (the hour
+task 504 shipped) found a fourth, orthogonal one this check never asked:
+whether a real recipe directory carries its own local `README.md` at all.
+`CONTRIBUTING.md` calls a recipe's own `README.md` optional, but 37 of
+the 38 real recipes wrote one anyway, and `merged-pr-pr-still-open`
+(task #419) was the one silent exception -- fully shipped, fully tested,
+with a full hand-written paragraph in `fencepost/README.md`'s own
+Community recipes section, but nothing in its own directory. This check's
+existing three cross-checks were all aimed at the parent README's link
+text; none of them ever looked inside a recipe's own directory for a file
+named `README.md`, so a recipe missing one read exactly as clean as a
+recipe that had one. `missing_readme` closes that -- named, not silently
+treated as "optional means untracked."
+
 Local-filesystem-only, no network call, the same cheap always-on class
 `check_wip_reclaim`/`check_scopes_completeness` already hold.
 
@@ -123,8 +137,13 @@ def check_recipe_readme(
 
     missing_from_readme = sorted(real_slugs - linked_slugs)
     stale_in_readme = sorted(linked_slugs - real_slugs)
+    missing_readme = sorted(
+        slug
+        for slug in real_slugs
+        if not os.path.isfile(os.path.join(fencepost_root, "RECIPES", slug, "README.md"))
+    )
 
-    clean = not (missing_from_readme or stale_in_readme or mismatched_links)
+    clean = not (missing_from_readme or stale_in_readme or mismatched_links or missing_readme)
     return {
         "clean": clean,
         "real_count": len(real_slugs),
@@ -132,6 +151,7 @@ def check_recipe_readme(
         "missing_from_readme": missing_from_readme,
         "stale_in_readme": stale_in_readme,
         "mismatched_links": mismatched_links,
+        "missing_readme": missing_readme,
     }
 
 
@@ -150,6 +170,8 @@ def format_result(result: dict) -> str:
     if result["mismatched_links"]:
         pairs = ", ".join(f"[{t}]->({h})" for t, h in result["mismatched_links"])
         problems.append(f"link text/href disagree: {pairs}")
+    if result["missing_readme"]:
+        problems.append(f"recipe dir(s) with no own README.md: {', '.join(result['missing_readme'])}")
     return "recipe readme: BROKEN -- " + "; ".join(problems)
 
 

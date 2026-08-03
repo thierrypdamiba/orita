@@ -45,11 +45,13 @@ Not this section's problem.
 """
 
 
-def _write_recipe(fencepost_root, slug):
+def _write_recipe(fencepost_root, slug, with_readme=True):
     """A minimal, schema-valid recipe.json under <fencepost_root>/RECIPES/<slug>/ --
     enough for discover_recipes() to accept it without ever needing a real
     detector.py (discover_recipes only reads the manifest, never imports
-    the detector)."""
+    the detector). Writes a stub README.md alongside it by default -- the
+    convention 37 of 38 real recipes hold, see MissingRecipeReadmeCase for
+    the one exception this check exists to catch."""
     recipe_dir = os.path.join(fencepost_root, "RECIPES", slug)
     os.makedirs(recipe_dir, exist_ok=True)
     manifest = {
@@ -66,6 +68,9 @@ def _write_recipe(fencepost_root, slug):
     }
     with open(os.path.join(recipe_dir, "recipe.json"), "w", encoding="utf-8") as f:
         json.dump(manifest, f)
+    if with_readme:
+        with open(os.path.join(recipe_dir, "README.md"), "w", encoding="utf-8") as f:
+            f.write(f"# {slug}\n")
 
 
 class SectionParsingCase(unittest.TestCase):
@@ -110,6 +115,7 @@ class CrossCheckCase(unittest.TestCase):
         self.assertEqual(result["missing_from_readme"], [])
         self.assertEqual(result["stale_in_readme"], [])
         self.assertEqual(result["mismatched_links"], [])
+        self.assertEqual(result["missing_readme"], [])
         self.assertEqual(result["real_count"], 2)
         self.assertEqual(result["linked_count"], 2)
 
@@ -155,10 +161,62 @@ class CrossCheckCase(unittest.TestCase):
         self.assertEqual(result["real_count"], 0)
 
 
+class MissingRecipeReadmeCase(unittest.TestCase):
+    """The fourth cross-check (task 504): a real recipe directory with no
+    own README.md -- exactly the silent gap an Explore agent found sitting
+    in `merged-pr-pr-still-open/` (task #419, fully shipped, fully tested,
+    just never given its own README.md the way 37 of its 38 siblings
+    were). Every existing cross-check in this file is aimed at the PARENT
+    README's own links; this is the first one that ever looks inside a
+    recipe's own directory."""
+
+    def _fixture(self, slugs_with_readme, slugs_without_readme):
+        tmpdir = tempfile.mkdtemp()
+        self.addCleanup(__import__("shutil").rmtree, tmpdir, ignore_errors=True)
+        lines = ["## Community recipes", ""]
+        for slug in slugs_with_readme:
+            _write_recipe(tmpdir, slug, with_readme=True)
+            lines.append(f"[`RECIPES/{slug}/`](RECIPES/{slug}/) has one.")
+        for slug in slugs_without_readme:
+            _write_recipe(tmpdir, slug, with_readme=False)
+            lines.append(f"[`RECIPES/{slug}/`](RECIPES/{slug}/) does not.")
+        lines += ["", "## Run your own"]
+        readme_path = os.path.join(tmpdir, "README.md")
+        with open(readme_path, "w", encoding="utf-8") as f:
+            f.write("\n".join(lines))
+        return readme_path, tmpdir
+
+    def test_recipe_with_no_own_readme_is_caught(self):
+        readme_path, fencepost_root = self._fixture(["alpha-gap"], ["beta-gap"])
+        result = rrc.check_recipe_readme(readme_path=readme_path, fencepost_root=fencepost_root)
+        self.assertFalse(result["clean"])
+        self.assertEqual(result["missing_readme"], ["beta-gap"])
+        # the other three checks stay clean -- this is genuinely orthogonal
+        self.assertEqual(result["missing_from_readme"], [])
+        self.assertEqual(result["stale_in_readme"], [])
+        self.assertEqual(result["mismatched_links"], [])
+
+    def test_every_recipe_with_its_own_readme_is_clean(self):
+        readme_path, fencepost_root = self._fixture(["alpha-gap", "beta-gap"], [])
+        result = rrc.check_recipe_readme(readme_path=readme_path, fencepost_root=fencepost_root)
+        self.assertTrue(result["clean"])
+        self.assertEqual(result["missing_readme"], [])
+
+    def test_writing_the_missing_readme_flips_it_back_to_clean(self):
+        readme_path, fencepost_root = self._fixture(["alpha-gap"], ["beta-gap"])
+        broken = rrc.check_recipe_readme(readme_path=readme_path, fencepost_root=fencepost_root)
+        self.assertFalse(broken["clean"])
+        with open(os.path.join(fencepost_root, "RECIPES", "beta-gap", "README.md"), "w", encoding="utf-8") as f:
+            f.write("# beta-gap\n")
+        fixed = rrc.check_recipe_readme(readme_path=readme_path, fencepost_root=fencepost_root)
+        self.assertTrue(fixed["clean"])
+
+
 class FormatResultCase(unittest.TestCase):
     def test_clean_result_names_the_real_count(self):
         text = rrc.format_result({"clean": True, "real_count": 26, "linked_count": 26,
-                                   "missing_from_readme": [], "stale_in_readme": [], "mismatched_links": []})
+                                   "missing_from_readme": [], "stale_in_readme": [], "mismatched_links": [],
+                                   "missing_readme": []})
         self.assertIn("26 real recipe(s)", text)
         self.assertIn("clean", text)
 
@@ -170,11 +228,13 @@ class FormatResultCase(unittest.TestCase):
             "missing_from_readme": ["gamma-gap"],
             "stale_in_readme": ["beta-gap"],
             "mismatched_links": [("alpha-gap", "beta-gap")],
+            "missing_readme": ["delta-gap"],
         })
         self.assertIn("BROKEN", text)
         self.assertIn("gamma-gap", text)
         self.assertIn("beta-gap", text)
         self.assertIn("alpha-gap", text)
+        self.assertIn("delta-gap", text)
 
 
 class RealRepoCase(unittest.TestCase):
@@ -190,7 +250,7 @@ class RealRepoCase(unittest.TestCase):
         self.assertTrue(
             result["clean"],
             msg=f"missing={result['missing_from_readme']} stale={result['stale_in_readme']} "
-                f"mismatched={result['mismatched_links']}",
+                f"mismatched={result['mismatched_links']} missing_readme={result['missing_readme']}",
         )
         self.assertGreater(result["real_count"], 0)
 
