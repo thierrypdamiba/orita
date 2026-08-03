@@ -6,6 +6,14 @@ tests/test_what_moved_check.py's own shape for the sibling it's built
 alongside, and proving the live, real gap this module surfaces: as of
 task 463, the real README carries exactly one marker (2026-07-30) and
 misses the two Mondays before it (07-13, 07-20).
+
+Task 495 (Cluster Day, 2026-08-03): the first bug's confession came due
+and was confessed unfound, and a second, smaller bug shipped the same
+hour, on time. The real README now carries two markers (2026-07-30,
+2026-08-03); the live-state regression pins below are updated to match,
+same discipline task 460's what-moved catch-up already held for its own
+sibling -- historical misses (07-13, 07-20) stay honestly unfixed, never
+backfilled.
 """
 import importlib.util
 import os
@@ -211,20 +219,23 @@ class FixtureCadenceCase(unittest.TestCase):
         self.assertIn("confession due now: 2026-07-30->2026-08-03", line)
 
     def test_real_live_readme_today_reproduces_the_named_gap(self):
-        # Proves the live README, not just a fixture: one real gap-hidden
-        # marker (2026-07-30) and the two Mondays before it (07-13,
-        # 07-20) genuinely missed -- task 463's own research pass found
-        # this live, unwatched until this module. Uses a vault dir that
-        # deliberately does NOT exist, so this assertion holds in any
-        # checkout (public CI included) regardless of whether the private
-        # orita-vault sibling is present -- the predraft/confession half
-        # of the real state is proven separately, and only where the
-        # real vault actually is (see RealVaultCase below).
+        # Proves the live README, not just a fixture: two real gap-hidden
+        # markers (2026-07-30, 2026-08-03 -- task 495) and the two
+        # Mondays before them (07-13, 07-20) still genuinely, honestly
+        # missed -- task 463's own research pass found the shape of this
+        # gap live, unwatched until this module; task 495 confessed the
+        # first bug and shipped the second on time without backfilling
+        # the two historical misses. Uses a vault dir that deliberately
+        # does NOT exist, so this assertion holds in any checkout (public
+        # CI included) regardless of whether the private orita-vault
+        # sibling is present -- the predraft/confession half of the real
+        # state is proven separately, and only where the real vault
+        # actually is (see RealVaultCase below).
         real_readme = os.path.join(ROOT, "thegap", "README.md")
         no_vault = os.path.join(ROOT, "does-not-exist-orita-vault")
-        result = tgc.compute_cadence(real_readme, no_vault, today=date(2026, 8, 1))
-        self.assertEqual(result["total_hidden_on_record"], 1)
-        self.assertEqual(result["latest_hidden"], "2026-07-30")
+        result = tgc.compute_cadence(real_readme, no_vault, today=date(2026, 8, 3))
+        self.assertEqual(result["total_hidden_on_record"], 2)
+        self.assertEqual(result["latest_hidden"], "2026-08-03")
         self.assertEqual(result["missed_mondays"], ["2026-07-13", "2026-07-20"])
 
 
@@ -240,13 +251,17 @@ class RealVaultCase(unittest.TestCase):
         "orita-vault sibling checkout not present (expected in public CI, which checks out only orita)",
     )
     def test_real_live_readme_and_vault_today_reproduces_the_named_gap(self):
-        # One real gap-hidden marker (2026-07-30), a real pre-drafted
-        # confession on record (due 2026-08-03), not yet due as of
-        # 2026-08-01.
+        # Two real gap-hidden markers (2026-07-30, 2026-08-03 -- task
+        # 495), both with real pre-drafted confessions on record. As of
+        # 2026-08-03, the first bug's confession (due 2026-08-03) has
+        # come due; the second's (due 2026-08-10) has not.
         real_readme = os.path.join(ROOT, "thegap", "README.md")
-        result = tgc.compute_cadence(real_readme, VAULT_ROOT, today=date(2026, 8, 1))
+        result = tgc.compute_cadence(real_readme, VAULT_ROOT, today=date(2026, 8, 3))
         self.assertEqual(result["missing_predraft"], [])
-        self.assertEqual(result["confession_due_now"], [])
+        self.assertEqual(
+            result["confession_due_now"],
+            [{"hidden": "2026-07-30", "due": "2026-08-03"}],
+        )
 
 
 if __name__ == "__main__":

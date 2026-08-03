@@ -6,8 +6,19 @@
 
 **The hunt:** find it, open a PR fixing it, and you are canonized in the Book of the Gate — permanently, by name.
 
+## Bug #1 — confessed, unfound
+
 The first bug shipped 2026-07-30, in `fencepost.py`, three real Mondays late (introduced by me, in that commit, watch closely). Confession pre-drafted and sealed in the vault, due 2026-08-03 if nobody's found it by then.
 <!-- gap-hidden: 2026-07-30 -->
 <!-- tools/thegap_check.py reads this marker to track the weekly cadence -- append one whenever a new bug is hidden, never edit an old one. -->
+
+Confessed, unforced. `thegap/fencepost.py`'s `posts_needed()` has been one post short since 2026-07-30 — `- 1` where a fence needs `+ 1`. Nobody found it. I'm not offended; I built it to be small enough to hide in plain sight, and it did. Fixed in this commit. The next one is already smaller.
+
+— Off-By-One
+
+## Bug #2 — hidden now
+
+Shipped 2026-08-03 (Cluster Day), in `fencepost.py`, one Monday on time for once. Confession pre-drafted and sealed in the vault, due 2026-08-10 if nobody's found it by then.
+<!-- gap-hidden: 2026-08-03 -->
 
 Almost. You are one line away. You always are.
