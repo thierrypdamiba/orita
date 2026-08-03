@@ -64,6 +64,92 @@ class TestRecordCheck(_TempLogCase):
         self.assertEqual(len(after), len(before) + 1)
 
 
+class TestRecordCheckDedup(_TempLogCase):
+    """Task 503: the one `record_*` sibling task 501 named live and left
+    unfixed ("no demonstrated bug there") turned out to share the exact
+    unconditional-append shape `ci_watch.record_check` had before task 501 --
+    two `ritual_check.py` invocations feeding this function the exact same
+    already-recorded observation a second time grow `HAND/x-outage-log.jsonl`
+    with byte-identical lines. Mirrors `ci_watch.record_check`'s narrower
+    guard (task 501), not the single-baseline dedup tasks 487/497/498 gave
+    `square_check`/`scribe_growth_check`/`word_watch`: `current_streak`
+    REQUIRES that two genuinely separate real checks landing on the same
+    status at two different real moments both count."""
+
+    def test_no_prior_check_always_writes(self):
+        wrote = xot.record_check("X_PostTweet", "forbidden", "2026-07-14T00:00:00Z", path=self.path)
+        self.assertTrue(wrote)
+        with open(self.path) as f:
+            self.assertEqual(len(f.readlines()), 1)
+
+    def test_exact_duplicate_is_skipped(self):
+        xot.record_check("X_PostTweet", "forbidden", "2026-07-14T21:00:00Z", path=self.path)
+        wrote = xot.record_check("X_PostTweet", "forbidden", "2026-07-14T21:00:00Z", path=self.path)
+        self.assertFalse(wrote)
+        with open(self.path) as f:
+            self.assertEqual(len(f.readlines()), 1)
+
+    def test_same_status_but_a_new_checked_at_still_writes(self):
+        # The exact case current_streak depends on: a real check an hour
+        # later that happens to repeat the same status is still a genuinely
+        # new observation, not a duplicate.
+        xot.record_check("X_PostTweet", "forbidden", "2026-07-14T21:00:00Z", path=self.path)
+        wrote = xot.record_check("X_PostTweet", "forbidden", "2026-07-14T22:00:00Z", path=self.path)
+        self.assertTrue(wrote)
+        with open(self.path) as f:
+            self.assertEqual(len(f.readlines()), 2)
+
+    def test_a_real_change_after_a_duplicate_still_writes(self):
+        xot.record_check("X_PostTweet", "forbidden", "2026-07-14T00:00:00Z", path=self.path)
+        skipped = xot.record_check("X_PostTweet", "forbidden", "2026-07-14T00:00:00Z", path=self.path)
+        wrote = xot.record_check("X_PostTweet", "ok", "2026-07-14T01:00:00Z", path=self.path)
+        self.assertFalse(skipped)
+        self.assertTrue(wrote)
+        with open(self.path) as f:
+            self.assertEqual(len(f.readlines()), 2)
+
+    def test_dedup_is_scoped_per_tool(self):
+        # An exact duplicate for X_WhoAmI must not be suppressed just
+        # because X_PostTweet happens to hold an identical-looking last entry.
+        xot.record_check("X_PostTweet", "forbidden", "2026-07-14T00:00:00Z", path=self.path)
+        wrote = xot.record_check("X_WhoAmI", "forbidden", "2026-07-14T00:00:00Z", path=self.path)
+        self.assertTrue(wrote)
+        with open(self.path) as f:
+            self.assertEqual(len(f.readlines()), 2)
+
+    def test_a_malformed_line_elsewhere_does_not_block_a_real_write(self):
+        # Reading (current_streak/last_check) refuses to guess past a
+        # corrupted log -- writing must not inherit that refusal, or a
+        # single bad hand-edit anywhere in the log would permanently wedge
+        # every future real check for every tool.
+        xot.record_check("X_PostTweet", "forbidden", "2026-07-14T00:00:00Z", path=self.path)
+        with open(self.path, "a") as f:
+            f.write('{"type": "check", broken <<<< not json\n')
+        wrote = xot.record_check("X_PostTweet", "ok", "2026-07-14T01:00:00Z", path=self.path)
+        self.assertTrue(wrote)
+        with open(self.path) as f:
+            self.assertEqual(len(f.readlines()), 3)
+
+    def test_return_value_is_a_bool_not_none(self):
+        wrote = xot.record_check("X_PostTweet", "forbidden", "2026-07-14T00:00:00Z", path=self.path)
+        self.assertIs(wrote, True)
+        wrote_again = xot.record_check("X_PostTweet", "forbidden", "2026-07-14T00:00:00Z", path=self.path)
+        self.assertIs(wrote_again, False)
+
+
+class TestLastCheck(_TempLogCase):
+    def test_none_when_no_checks(self):
+        self.assertIsNone(xot.last_check([], "X_PostTweet"))
+
+    def test_returns_the_most_recent_entry(self):
+        xot.record_check("X_PostTweet", "forbidden", "2026-07-14T00:00:00Z", path=self.path)
+        xot.record_check("X_PostTweet", "ok", "2026-07-14T01:00:00Z", path=self.path)
+        entries = xot._entries(self.path)
+        last = xot.last_check(entries, "X_PostTweet")
+        self.assertEqual(last["status"], "ok")
+        self.assertEqual(last["checked_at"], "2026-07-14T01:00:00Z")
+
+
 class TestCurrentStreak(unittest.TestCase):
     def test_empty_log_is_zero(self):
         self.assertEqual(xot.current_streak([], "X_PostTweet"), 0)

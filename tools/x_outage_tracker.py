@@ -168,11 +168,51 @@ def _append(entry, path=LOG):
         f.write(json.dumps(entry, ensure_ascii=False) + "\n")
 
 
-def record_check(tool: str, status: str, checked_at: str, path=LOG) -> None:
-    """Append one real API check. Never edits or removes a prior line."""
+def last_check(entries: list, tool: str):
+    """The most recently recorded real check for `tool`, or None."""
+    t_entries = _tool_entries(entries, tool)
+    return t_entries[-1] if t_entries else None
+
+
+def record_check(tool: str, status: str, checked_at: str, path=LOG) -> bool:
+    """Append one real API check. Never edits or removes a prior line.
+
+    Task 503: the one `record_*` sibling task 501 named live and explicitly
+    left unfixed ("no demonstrated bug there") -- but `HAND/x-outage-log.jsonl`
+    grew the same way `HAND/ci-watch-log.jsonl` did before task 501: two
+    `ritual_check.py` invocations feeding this function the exact same
+    already-recorded observation a second time (a retry, an addendum call
+    re-reading the same live state) produce byte-identical lines. This is
+    `ci_watch.record_check`'s narrower guard (task 501), not
+    `record_square_check`/`record_scribe_check`/`record_word_check`'s
+    "skip if the durable STATE is unchanged" dedup (tasks 487/497/498):
+    `current_streak` REQUIRES that two genuinely separate real checks
+    landing on the same status at two different real moments both count
+    (a five-hour outage streak is five recorded lines, not one) -- so this
+    only refuses the exact resubmission of an already-recorded moment
+    (`checked_at` matching too, not just tool/status), never a real new
+    observation that merely repeats the same status. Returns True if a
+    line was written, False if this exact entry was already the last one
+    recorded for this tool -- the one real caller (a god on duty running a
+    due recheck) does not depend on the return value today, so this is not
+    a breaking change to anything that calls it live.
+    """
     if status not in STATUSES:
         raise ValueError(f"unknown status {status!r} -- must be one of {STATUSES}")
-    _append({"type": "check", "tool": tool, "status": status, "checked_at": checked_at}, path)
+    entry = {"type": "check", "tool": tool, "status": status, "checked_at": checked_at}
+    # A malformed line ANYWHERE in the log is "cannot confirm a duplicate,"
+    # not a reason to refuse writing -- recording must still be able to
+    # repair a corrupted log by appending a fresh valid line, the identical
+    # discipline record_square_check/ci_watch.record_check's own write
+    # paths hold: only *reading* refuses to guess past a bad line.
+    try:
+        last = last_check(_entries(path), tool)
+    except XOutageTrackerTamperedError:
+        last = None
+    if last is not None and last == entry:
+        return False
+    _append(entry, path)
+    return True
 
 
 def _tool_entries(entries: list, tool: str) -> list:
