@@ -62,6 +62,7 @@ import os
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import jsonl_append  # noqa: E402
 import metrics_reader  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -115,10 +116,11 @@ def _entries(path=LOG):
     return entries
 
 
-def _append(entry, path=LOG):
-    os.makedirs(os.path.dirname(path), exist_ok=True)
-    with open(path, "a") as f:
-        f.write(json.dumps(entry, ensure_ascii=False) + "\n")
+# Task 510: consolidated into tools/jsonl_append.py -- ten sibling checks
+# each carried a byte-identical copy of this helper. This name now points
+# at the shared function object, not a local copy; tests/test_jsonl_
+# append.py asserts this name IS that shared function.
+_append = jsonl_append.append_jsonl
 
 
 def record_check(count: int, checked_at: str, path=LOG) -> bool:

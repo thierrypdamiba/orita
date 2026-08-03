@@ -63,6 +63,10 @@ Usage:
 """
 import json
 import os
+import sys
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import jsonl_append  # noqa: E402
 
 QUEUE = os.path.join(os.path.dirname(__file__), "..", "HAND", "x-post-queue.jsonl")
 MAX_TWEET_CHARS = 280
@@ -107,10 +111,11 @@ class QueueTamperedError(RuntimeError):
     beats guessing which tasks are actually already posted."""
 
 
-def _append(entry, path=QUEUE):
-    os.makedirs(os.path.dirname(path), exist_ok=True)
-    with open(path, "a") as f:
-        f.write(json.dumps(entry, ensure_ascii=False) + "\n")
+# Task 510: consolidated into tools/jsonl_append.py -- ten sibling checks
+# each carried a byte-identical copy of this helper. This name now points
+# at the shared function object, not a local copy; tests/test_jsonl_
+# append.py asserts this name IS that shared function.
+_append = jsonl_append.append_jsonl
 
 
 def queue_owed_post(task: str, topic: str, queued_at: str, path=QUEUE) -> bool:
