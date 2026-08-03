@@ -118,12 +118,40 @@ def _append(entry, path=LOG):
         f.write(json.dumps(entry, ensure_ascii=False) + "\n")
 
 
-def record_check(count: int, checked_at: str, path=LOG) -> None:
+def record_check(count: int, checked_at: str, path=LOG) -> bool:
     """Append one real observed live star count. Never edits or removes a
-    prior line."""
+    prior line.
+
+    Task 502: this was the one `record_*` sibling the tasks 487/497/498/501
+    dedup campaign never reached at all -- not fixed, not even named as
+    checked (unlike `x_outage_tracker.record_check`, which task 501
+    explicitly reviewed and left alone for showing zero live duplicates).
+    `check_github_stars` in `tools/ritual_check.py` only ever reads
+    `last_check()` (the single most recent line), never a fold over
+    repeated same-count observations the way `ci_watch.current_streak`
+    reads repeated same-conclusion ones -- so this is the "one baseline,
+    two calls with an unchanged value carry zero new information" shape
+    `square_check.py`/`scribe_growth_check.py`/`word_watch.py`/
+    `arcade_app_watch.py`/`gateway_toolset_check.py` already fixed (tasks
+    487/497/498), not `ci_watch.py`'s narrower "only the exact same
+    moment resubmitted" shape (task 501). Skips the write -- returns
+    `False` -- when `count` matches the last recorded count, regardless of
+    `checked_at`; returns `True` when a line was actually written (first
+    ever check, or a real count change since the last one). A malformed
+    tip on this path is "cannot confirm a duplicate," not a reason to
+    refuse writing -- recording must still be able to repair a corrupted
+    log by appending a fresh valid line; only *reading* (`last_check`)
+    refuses to guess past a bad tip."""
     if not isinstance(count, int) or isinstance(count, bool) or count < 0:
         raise ValueError(f"count must be a non-negative int, got {count!r}")
+    try:
+        last = last_check(path)
+    except GitHubStarsTamperedError:
+        last = None
+    if last is not None and last.get("count") == count:
+        return False
     _append({"type": "check", "count": count, "checked_at": checked_at}, path)
+    return True
 
 
 def last_check(path=LOG):
@@ -241,8 +269,8 @@ def format_result(result: dict) -> str:
 if __name__ == "__main__":
     argv = sys.argv[1:]
     if argv and argv[0] == "record" and len(argv) >= 3:
-        record_check(int(argv[1]), argv[2])
-        print("recorded")
+        wrote = record_check(int(argv[1]), argv[2])
+        print("recorded" if wrote else "skipped (unchanged from last recorded count)")
         sys.exit(0)
     elif argv and argv[0] == "check":
         result = check_github_stars()

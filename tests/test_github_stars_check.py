@@ -75,6 +75,68 @@ class RecordCheckCase(_TempLogCase):
         self.assertEqual(after[0], before[0])
         self.assertEqual(len(after), len(before) + 1)
 
+    def test_return_value_is_a_bool_not_none(self):
+        wrote = gsc.record_check(1, "2026-07-30T10:00:00Z", path=self.log_path)
+        self.assertIs(wrote, True)
+
+
+class RecordCheckDedupCase(_TempLogCase):
+    """Task 502: this was the one `record_*` sibling (tools/ci_watch.py,
+    tools/scribe_growth_check.py, tools/word_watch.py,
+    tools/square_check.py, tools/arcade_app_watch.py,
+    tools/gateway_toolset_check.py) the tasks 487/497/498/501 dedup
+    campaign never reached -- `record_check` recorded unconditionally on
+    every call, so a repeat same-hour `ritual_check.py` run (task 487's
+    own named ordinary case) with an unchanged live star count would have
+    grown `HAND/github-stars-log.jsonl` with a byte-identical line, same
+    shape as the six siblings already fixed. Live production log carried
+    zero duplicates at the time this was found (2026-07-31/08-01) --
+    fixed anyway, as the identical latent bug, rather than waiting for a
+    real duplicate to appear."""
+
+    def test_no_prior_check_always_writes(self):
+        wrote = gsc.record_check(3, "2026-07-31T00:00:00Z", path=self.log_path)
+        self.assertTrue(wrote)
+        with open(self.log_path) as f:
+            self.assertEqual(len(f.readlines()), 1)
+
+    def test_unchanged_count_is_skipped(self):
+        gsc.record_check(3, "2026-07-31T00:00:00Z", path=self.log_path)
+        wrote = gsc.record_check(3, "2026-07-31T00:05:00Z", path=self.log_path)
+        self.assertFalse(wrote)
+        with open(self.log_path) as f:
+            self.assertEqual(len(f.readlines()), 1)
+
+    def test_changed_count_still_writes(self):
+        gsc.record_check(3, "2026-07-31T00:00:00Z", path=self.log_path)
+        wrote = gsc.record_check(4, "2026-07-31T00:05:00Z", path=self.log_path)
+        self.assertTrue(wrote)
+        with open(self.log_path) as f:
+            self.assertEqual(len(f.readlines()), 2)
+
+    def test_a_real_change_after_a_would_be_duplicate_still_writes(self):
+        gsc.record_check(3, "2026-07-31T00:00:00Z", path=self.log_path)
+        skipped = gsc.record_check(3, "2026-07-31T00:05:00Z", path=self.log_path)
+        wrote = gsc.record_check(5, "2026-07-31T00:10:00Z", path=self.log_path)
+        self.assertFalse(skipped)
+        self.assertTrue(wrote)
+        with open(self.log_path) as f:
+            self.assertEqual(len(f.readlines()), 2)
+
+    def test_a_malformed_line_elsewhere_does_not_block_a_real_write(self):
+        gsc.record_check(3, "2026-07-31T00:00:00Z", path=self.log_path)
+        with open(self.log_path, "a") as f:
+            f.write("not even json {{{\n")
+        # last_check() would raise on this corrupted tip -- recording must
+        # still be able to repair the log by appending a fresh valid line,
+        # never propagate the tamper error onto the write path.
+        wrote = gsc.record_check(3, "2026-07-31T00:05:00Z", path=self.log_path)
+        self.assertTrue(wrote)
+        with open(self.log_path) as f:
+            lines = f.readlines()
+        self.assertEqual(len(lines), 3)
+        self.assertEqual(json.loads(lines[-1])["count"], 3)
+
 
 class LastCheckCase(_TempLogCase):
     def test_no_log_returns_none(self):
