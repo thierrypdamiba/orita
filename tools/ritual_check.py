@@ -1610,6 +1610,17 @@ def check_fencepost_links(fencepost_dir: str | None = None) -> dict:
     return {"clean": not violations, "count": len(violations), "violations": violations}
 
 
+EXPECTED_ISSUE_TEMPLATES = frozenset(
+    {
+        "crossing.md",
+        "decree-proposal.md",
+        "fork-my-own-society.md",
+        "gap-report.md",
+        "point-fencepost.md",
+    }
+)
+
+
 def check_issue_template_links(issue_template_dir: str | None = None) -> dict:
     """Task 506 (Esu-Elegba): the fourth sibling of `check_site_links`/
     `check_house_links`/`check_fencepost_links` -- `.github/ISSUE_TEMPLATE/`
@@ -1643,15 +1654,36 @@ def check_issue_template_links(issue_template_dir: str | None = None) -> dict:
     Unconditional, local-filesystem-only, same cheap class as its three
     siblings. Never edits anything; a real broken link, if one is ever
     found, is a god-on-duty escalation, not something this check silently
-    repairs."""
+    repairs.
+
+    Task 507 (Nisaba): `find_violations` only ever scans files that are
+    *present* -- it proves every link inside an existing template
+    resolves, but never that the five templates themselves still exist.
+    A template silently deleted (or renamed) would read clean here even
+    though a whole `.github/ISSUE_TEMPLATE/` entry point vanished --
+    exactly the "checker only looks inside a file, never whether the
+    expected file is there at all" shape `recipe_readme_check.py`'s
+    `missing_readme` (task 504) closed one directory over. `EXPECTED_
+    ISSUE_TEMPLATES` is a hardcoded set, deliberately not live-discovered
+    from the directory itself -- a live discovery could never notice its
+    own subject going missing."""
     mod = _site_link_check()
     kwargs = {"require_index": False}
     if issue_template_dir is not None:
-        kwargs["docs_dir"] = issue_template_dir
+        template_dir = issue_template_dir
     else:
-        kwargs["docs_dir"] = os.path.join(ROOT, ".github", "ISSUE_TEMPLATE")
+        template_dir = os.path.join(ROOT, ".github", "ISSUE_TEMPLATE")
+    kwargs["docs_dir"] = template_dir
     violations = mod.find_violations(**kwargs)
-    return {"clean": not violations, "count": len(violations), "violations": violations}
+    present = set(os.listdir(template_dir)) if os.path.isdir(template_dir) else set()
+    missing_templates = sorted(EXPECTED_ISSUE_TEMPLATES - present)
+    clean = not violations and not missing_templates
+    return {
+        "clean": clean,
+        "count": len(violations),
+        "violations": violations,
+        "missing_templates": missing_templates,
+    }
 
 
 def check_badge_freshness(badge_path: str | None = None) -> dict:
@@ -2318,7 +2350,13 @@ def format_ritual_check(result: dict) -> str:
     itl = result["issue_template_links"]
     if itl["clean"]:
         lines.append(
-            "  issue template links: clean (every .github/ISSUE_TEMPLATE/ link resolves, GitHub-browsed rule)"
+            "  issue template links: clean (every .github/ISSUE_TEMPLATE/ link resolves, GitHub-browsed rule, "
+            "all five expected templates present)"
+        )
+    elif itl["missing_templates"]:
+        lines.append(
+            f"  issue template links: MISSING TEMPLATE(S) {', '.join(itl['missing_templates'])} -- "
+            f"Esu's own gate is unmet, escalate now"
         )
     else:
         lines.append(

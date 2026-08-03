@@ -3418,15 +3418,28 @@ class IssueTemplateLinksFoldCase(unittest.TestCase):
         with open(path, "w") as f:
             f.write(content)
 
+    def _write_all_expected_templates(self, skip=()):
+        """Every fixture below this point is exercising something other
+        than template *existence* (link resolution, docs-rule isolation)
+        -- write harmless stand-ins for all five of Nisaba's task-507
+        `EXPECTED_ISSUE_TEMPLATES` (minus any the test wants to omit) so
+        the existence guard itself stays clean and doesn't mask what each
+        test actually means to prove."""
+        for name in sorted(rc.EXPECTED_ISSUE_TEMPLATES - set(skip)):
+            self._write(name, "stand-in template body, no links")
+
     def test_real_target_with_no_index_is_not_flagged_github_browsed_rule(self):
+        self._write_all_expected_templates()
         self._write("crossing.md", "[SCOPES](SCOPES.md)")
         self._write("SCOPES.md", "the oath")
         result = rc.run_ritual_check(issue_template_links_dir=self.dir)
         self.assertTrue(result["issue_template_links"]["clean"])
+        self.assertEqual(result["issue_template_links"]["missing_templates"], [])
         self.assertFalse(result["broken"])
         self.assertIn("issue template links: clean", rc.format_ritual_check(result))
 
     def test_synthetic_broken_link_flips_broken_and_prints(self):
+        self._write_all_expected_templates()
         self._write("crossing.md", "[nowhere](nowhere.md)")
         result = rc.run_ritual_check(issue_template_links_dir=self.dir)
         self.assertFalse(result["issue_template_links"]["clean"])
@@ -3434,12 +3447,40 @@ class IssueTemplateLinksFoldCase(unittest.TestCase):
         formatted = rc.format_ritual_check(result)
         self.assertIn("issue template links: 1 BROKEN LINK(S)", formatted)
 
+    def test_missing_template_flips_broken_and_names_it(self):
+        """Task 507: a template silently deleted (here, `gap-report.md`
+        never written) must flip `broken` even though every link inside
+        every *present* file still resolves -- the exact gap
+        `find_violations` alone can never see, since it only ever looks
+        inside files that exist."""
+        self._write_all_expected_templates(skip=("gap-report.md",))
+        result = rc.run_ritual_check(issue_template_links_dir=self.dir)
+        self.assertFalse(result["issue_template_links"]["clean"])
+        self.assertEqual(result["issue_template_links"]["missing_templates"], ["gap-report.md"])
+        self.assertTrue(result["broken"])
+        formatted = rc.format_ritual_check(result)
+        self.assertIn("issue template links: MISSING TEMPLATE(S) gap-report.md", formatted)
+
+    def test_all_five_missing_names_all_five(self):
+        """An empty directory (no templates at all) names every one of
+        the five, not just the first found -- a petitioner-facing gate
+        going fully dark should read as total, not partial."""
+        os.makedirs(self.dir, exist_ok=True)
+        result = rc.run_ritual_check(issue_template_links_dir=self.dir)
+        self.assertFalse(result["issue_template_links"]["clean"])
+        self.assertEqual(
+            result["issue_template_links"]["missing_templates"],
+            sorted(rc.EXPECTED_ISSUE_TEMPLATES),
+        )
+
     def test_default_issue_template_dir_reads_the_real_tree_and_matches_direct_call(self):
         """No override: reads the real .github/ISSUE_TEMPLATE/ tree, the
         same default check_issue_template_links falls back to -- proves the
         fold never duplicates or diverges from the module it wraps, and
         that the real templates (point-fencepost.md's SCOPES.md/consent.py
-        links, fork-my-own-society.md's two PLATFORM.md links) are clean."""
+        links, fork-my-own-society.md's two PLATFORM.md links) are clean
+        and, per task 507, that all five expected templates are present
+        on disk right now (not just link-clean)."""
         slc = _load("_test_site_link_check", os.path.join(ROOT, "tools", "site_link_check.py"))
         slc.clear_cache()
         direct = slc.find_violations(
@@ -3447,6 +3488,7 @@ class IssueTemplateLinksFoldCase(unittest.TestCase):
         )
         result = rc.run_ritual_check()
         self.assertEqual(result["issue_template_links"]["count"], len(direct))
+        self.assertEqual(result["issue_template_links"]["missing_templates"], [])
         self.assertEqual(result["issue_template_links"]["clean"], not direct)
         self.assertEqual(direct, [])
 
@@ -3454,6 +3496,7 @@ class IssueTemplateLinksFoldCase(unittest.TestCase):
         """The two checks must stay independent: a bare directory link
         with no index.html is valid for issue_template_links but still
         broken for site_links, in the exact same fixture tree."""
+        self._write_all_expected_templates()
         self._write("README.md", "[sub](sub/)")
         os.makedirs(os.path.join(self.dir, "sub"), exist_ok=True)
         result = rc.run_ritual_check(site_link_docs_dir=self.dir, issue_template_links_dir=self.dir)
