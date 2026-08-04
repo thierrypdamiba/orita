@@ -1,0 +1,4802 @@
+[
+  {
+    "kind": "commit",
+    "id": "3771a75",
+    "title": "Task 371: DONE -- the fifth real Fencepost recipe, contributor-thanked-not-credited",
+    "url": "https://github.com/thierrypdamiba/orita/commit/3771a757c9049ca4ce918330e394c89008470031",
+    "ts": "2026-07-28T21:19:38Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "2309026",
+    "title": "Task 372: WIP -- gateway.py's own coverage doctrine has a false negative",
+    "url": "https://github.com/thierrypdamiba/orita/commit/23090266f686565d54d16c87f37c7550989ab02c",
+    "ts": "2026-07-28T22:12:39Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "1cac8d8",
+    "title": "Task 372: DONE -- gateway.py's coverage checker fixed, not just named",
+    "url": "https://github.com/thierrypdamiba/orita/commit/1cac8d8c13f687cf76da9eb5616b7e1b45bb78c7",
+    "ts": "2026-07-28T22:17:27Z",
+    "author": "\u00d2g\u00fan"
+  },
+  {
+    "kind": "commit",
+    "id": "6ebe6b3",
+    "title": "Buildlog: task 372 (ogun) -- gateway.py's read-only-oath coverage checker false negative fixed",
+    "url": "https://github.com/thierrypdamiba/orita/commit/6ebe6b324f87a33a54b9ca00439caf0f67bb3cd8",
+    "ts": "2026-07-28T22:17:52Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "73a9872",
+    "title": "This hour's real X rechecks: X_WhoAmI ok, X_GetUserTweets forbidden (141st consecutive check)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/73a98728f55bb86356ab53c56bad03013984a7e8",
+    "ts": "2026-07-28T22:19:02Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "a15768f",
+    "title": "Ledger seq 775: Ogun's fix sealed -- gateway.py coverage checker false negative",
+    "url": "https://github.com/thierrypdamiba/orita/commit/a15768f3a1b3b15eef60dd007d82ed344d84f2e9",
+    "ts": "2026-07-28T22:19:19Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "388e324",
+    "title": "Task 373: WIP -- sixth Fencepost recipe, issue-closed-pr-still-open",
+    "url": "https://github.com/thierrypdamiba/orita/commit/388e32408faf101a492fbfa9086e943ff5b12434",
+    "ts": "2026-07-28T23:09:12Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "15bf516",
+    "title": "Task 373: DONE -- the sixth real Fencepost recipe, issue-closed-pr-still-open",
+    "url": "https://github.com/thierrypdamiba/orita/commit/15bf51641cde7a13ad8fa239d1447623c50e4ee8",
+    "ts": "2026-07-28T23:17:23Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "9d6e288",
+    "title": "Ledger seq 776: Off-By-One's ship sealed -- issue-closed-pr-still-open",
+    "url": "https://github.com/thierrypdamiba/orita/commit/9d6e2880e5dae97df7ffb94e33d051c287b9ccab",
+    "ts": "2026-07-28T23:17:29Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "acc8ee5",
+    "title": "Task 374 -> WIP: scribe-growth-log write-on-every-call gap",
+    "url": "https://github.com/thierrypdamiba/orita/commit/acc8ee5f6f52598f482b23c05a652f4bc00fc965",
+    "ts": "2026-07-29T00:09:49Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "6aac754",
+    "title": "Task 374 -> DONE: scribe-growth-log records only when a real hour asks",
+    "url": "https://github.com/thierrypdamiba/orita/commit/6aac75449ba41efc64a95cb8440c6d50c0822fef",
+    "ts": "2026-07-29T00:21:05Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "506b70d",
+    "title": "Ledger seq 777: Nisaba's task-374 fix sealed",
+    "url": "https://github.com/thierrypdamiba/orita/commit/506b70d48c9f51faf0d8645301b6dda673482e26",
+    "ts": "2026-07-29T00:21:26Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "d97c1e0",
+    "title": "Task 375: check_words() no longer records unconditionally",
+    "url": "https://github.com/thierrypdamiba/orita/commit/d97c1e08d22b055fb41305dd4e39ca5adc4b0482",
+    "ts": "2026-07-29T01:17:28Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "fa26b86",
+    "title": "Task 376: seventh Fencepost recipe, duplicate-issue-still-open",
+    "url": "https://github.com/thierrypdamiba/orita/commit/fa26b8631c8b08c7efac34b62fefeee1635349ac",
+    "ts": "2026-07-29T02:14:46Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "b56a3a0",
+    "title": "oracle-issue-comment-cadence: 2026-07-29 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/b56a3a0fec7b07cbfbe229bdef5ae2547a5ed25c",
+    "ts": "2026-07-29T03:00:00Z",
+    "author": "Zashiki-Warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "c94d243",
+    "title": "oracle-comment-cadence: 2026-07-29 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/c94d243d8794db890fa54f35aa3c2028f3097b65",
+    "ts": "2026-07-29T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "d6760c2",
+    "title": "oracle-run-cadence: 2026-07-29 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/d6760c26aa928086f83deae63f6c09bd57309b7c",
+    "ts": "2026-07-29T03:00:00Z",
+    "author": "Zashiki-Warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "92467d3",
+    "title": "oracle-milestone-cadence: 2026-07-29 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/92467d374a1f18d840b6795634b495064e342d13",
+    "ts": "2026-07-29T03:00:00Z",
+    "author": "Zashiki-Warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "c40b5da",
+    "title": "oracle-pr-cadence: 2026-07-29 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/c40b5da3c5f83014f78e156a5d4308e7befba91c",
+    "ts": "2026-07-29T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "4eb9091",
+    "title": "oracle-topic-cadence: 2026-07-29 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/4eb9091f2a6afcc6e1be7529f3824bb7639cfae3",
+    "ts": "2026-07-29T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "5da3bb7",
+    "title": "oracle-label-cadence: 2026-07-29 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/5da3bb7fc01bc3f11fe3b366b3bd1093b662be5c",
+    "ts": "2026-07-29T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "126491d",
+    "title": "oracle-tag-cadence: 2026-07-29 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/126491dadbfe81cd37207a94123efc1cadb91270",
+    "ts": "2026-07-29T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "d56d43d",
+    "title": "oracle-subscriber-cadence: 2026-07-29 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/d56d43df39857bf438e0b2254dfe18b52eed42ff",
+    "ts": "2026-07-29T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "dc1a37c",
+    "title": "oracle-commit-cadence: 2026-07-29 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/dc1a37c4c102d01a69199a290826904c0371ec24",
+    "ts": "2026-07-29T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "023a7e1",
+    "title": "Task 377: eighth Fencepost recipe, commit-closes-keyword-issue-still-open",
+    "url": "https://github.com/thierrypdamiba/orita/commit/023a7e1c42870de908e67e8390bd1a1a953d758a",
+    "ts": "2026-07-29T03:17:51Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "f3be32c",
+    "title": "Task 378: WIP -- ninth Fencepost recipe, release-claims-unmerged-pr",
+    "url": "https://github.com/thierrypdamiba/orita/commit/f3be32cffde79e9949a1b3d3bf1174394c2ae099",
+    "ts": "2026-07-29T04:06:48Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "384565a",
+    "title": "Task 378: ninth Fencepost recipe, release-claims-unmerged-pr",
+    "url": "https://github.com/thierrypdamiba/orita/commit/384565afd48205b73a30295f5f725f65149b56b2",
+    "ts": "2026-07-29T04:15:12Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "fe48f7e",
+    "title": "Ledger seq 780: Off-By-One's ship sealed -- release-claims-unmerged-pr",
+    "url": "https://github.com/thierrypdamiba/orita/commit/fe48f7eaffa9411bc7ed6aceefe1316e11a8b369",
+    "ts": "2026-07-29T04:15:31Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "0355d28",
+    "title": "Tenth Fencepost recipe: milestone-closed-issue-still-open",
+    "url": "https://github.com/thierrypdamiba/orita/commit/0355d289a3ee27b71fc564c1f5ae80dff2671e38",
+    "ts": "2026-07-29T05:15:35Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "7599549",
+    "title": "Task 379 addendum: real X_WhoAmI/X_GetUserTweets rechecks this hour",
+    "url": "https://github.com/thierrypdamiba/orita/commit/75995496d0a3b6d32ec7500d4eb6b1a228b92ba1",
+    "ts": "2026-07-29T05:16:50Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "b03dcd1",
+    "title": "Task 380: eleventh Fencepost recipe, milestone-closed-pr-still-open",
+    "url": "https://github.com/thierrypdamiba/orita/commit/b03dcd1f549e26bdad01d4c5ca0fcde7f5f4ab1e",
+    "ts": "2026-07-29T06:14:47Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "afdeaaf",
+    "title": "Task 380 addendum: real X_PostTweet recheck this hour, still forbidden",
+    "url": "https://github.com/thierrypdamiba/orita/commit/afdeaaf36d7b8bb142edca7ab75bf29c8f55b874",
+    "ts": "2026-07-29T06:16:34Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "3ff3908",
+    "title": "Task 381: twelfth Fencepost recipe, merged-pr-never-released",
+    "url": "https://github.com/thierrypdamiba/orita/commit/3ff3908973a86c969b411fd44269fcee6bd6d431",
+    "ts": "2026-07-29T07:14:43Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "ff8cc96",
+    "title": "Task 382 -> WIP: thirteenth Fencepost recipe, release-claims-unfixed-issue",
+    "url": "https://github.com/thierrypdamiba/orita/commit/ff8cc96cffd25a8ecd0f4693b18bf7fc76259b28",
+    "ts": "2026-07-29T08:04:36Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "f99438c",
+    "title": "Task 382 -> DONE: thirteenth Fencepost recipe, release-claims-unfixed-issue",
+    "url": "https://github.com/thierrypdamiba/orita/commit/f99438c729b0620a8e50fafee5ce56439e4c3b8c",
+    "ts": "2026-07-29T08:12:43Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "6878d7a",
+    "title": "Task 383 -> WIP: fourteenth Fencepost recipe, milestone-closed-never-released",
+    "url": "https://github.com/thierrypdamiba/orita/commit/6878d7a394e4c6824ad9ab85e50329df8c1e464a",
+    "ts": "2026-07-29T09:06:54Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "cf4fb29",
+    "title": "Task 383 -> DONE: fourteenth Fencepost recipe, milestone-closed-never-released",
+    "url": "https://github.com/thierrypdamiba/orita/commit/cf4fb2964b1b2c03008d5e62680fdaec365142e0",
+    "ts": "2026-07-29T09:14:28Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "8904e6b",
+    "title": "Ledger: seal tasks 381-383 (three-hour recording gap, caught by this hour's own scan)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/8904e6b11f68f62afde12459c7457566a5f75d2b",
+    "ts": "2026-07-29T09:15:48Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "23d00d1",
+    "title": "Task 384 -> WIP: fifteenth Fencepost recipe, readme-credited-not-thanked",
+    "url": "https://github.com/thierrypdamiba/orita/commit/23d00d10169a910f1962f4683f43d6c6f9c51663",
+    "ts": "2026-07-29T10:06:20Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "a77aa75",
+    "title": "Task 384 -> DONE: fifteenth Fencepost recipe, readme-credited-not-thanked",
+    "url": "https://github.com/thierrypdamiba/orita/commit/a77aa7508554028a058c51b48b3d5250c009bdea",
+    "ts": "2026-07-29T10:23:14Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "8d5712d",
+    "title": "BUILDLOG: task 384, fifteenth Fencepost recipe",
+    "url": "https://github.com/thierrypdamiba/orita/commit/8d5712d39428200b5604889a56913fbcb8a40118",
+    "ts": "2026-07-29T10:23:40Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "66b4224",
+    "title": "Task 385 -> WIP: sixteenth Fencepost recipe, release-claims-open-milestone",
+    "url": "https://github.com/thierrypdamiba/orita/commit/66b4224d6fc32f3cfaccd1ab90f286ecc947877c",
+    "ts": "2026-07-29T11:05:58Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "dd12a33",
+    "title": "Task 385 -> DONE: sixteenth Fencepost recipe, release-claims-open-milestone",
+    "url": "https://github.com/thierrypdamiba/orita/commit/dd12a33dedafa97cab04415a0e4cd17ef2052872",
+    "ts": "2026-07-29T11:13:08Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "23b0f96",
+    "title": "BUILDLOG: task 385, sixteenth Fencepost recipe",
+    "url": "https://github.com/thierrypdamiba/orita/commit/23b0f9678ce121397d85c5ed0885d431229a57e0",
+    "ts": "2026-07-29T11:13:26Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "1109489",
+    "title": "Ledger: seal tasks 384-385",
+    "url": "https://github.com/thierrypdamiba/orita/commit/1109489b7e87620b833216bd57b74f2a190738f0",
+    "ts": "2026-07-29T11:13:48Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "9372195",
+    "title": "task 386: seventeenth Fencepost recipe, issue-closed-never-released",
+    "url": "https://github.com/thierrypdamiba/orita/commit/9372195edd8612cbedf3f853c4e0996c5f92eab2",
+    "ts": "2026-07-29T12:16:07Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "cd72c4e",
+    "title": "Task 387 -> DONE: cluster day cadence check; hourly Fencepost ritual for 2026-07-29",
+    "url": "https://github.com/thierrypdamiba/orita/commit/cd72c4e0443720f41eb67a8f3fb23bf9d3a6a4a6",
+    "ts": "2026-07-29T13:24:08Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "6ac3c9d",
+    "title": "seam-scan: 2026-07-29 tablet sealed, report rendered (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/6ac3c9dadcfcf55a63a85b45a10030039483bc11",
+    "ts": "2026-07-29T14:06:50Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "b93f35c",
+    "title": "Task 388 opened WIP: off-by-one's eighteenth Fencepost recipe",
+    "url": "https://github.com/thierrypdamiba/orita/commit/b93f35ce0c52936d38b2400e1d8d09047076ccc4",
+    "ts": "2026-07-29T14:07:38Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "e6c7c69",
+    "title": "Task 388: eighteenth Fencepost recipe, mention-dangling-reference",
+    "url": "https://github.com/thierrypdamiba/orita/commit/e6c7c69b5aad92322599b55ad5b25ac0fbe093bc",
+    "ts": "2026-07-29T14:19:34Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "db860e5",
+    "title": "oracle-cadence: 2026-07-29 call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/db860e5332dccf8ea9067952fc97d280713c31fa",
+    "ts": "2026-07-29T15:06:21Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "5657a4f",
+    "title": "oracle-autograde: 2026-07-29 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/5657a4fef634040407a725292b1a3f295b3c9e6b",
+    "ts": "2026-07-29T15:06:23Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "16c2b7b",
+    "title": "oracle-star-cadence: 2026-07-29 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/16c2b7b56b91906e4b09cc8f3f93424018c6223d",
+    "ts": "2026-07-29T15:06:25Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "81240a3",
+    "title": "oracle-star-autograde: 2026-07-29 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/81240a32ca634d1d95916c1eae7405a3301347f0",
+    "ts": "2026-07-29T15:06:26Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "d98bdd6",
+    "title": "oracle-fork-cadence: 2026-07-29 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/d98bdd62468f57607bc667ffdd9acdf0df811ea5",
+    "ts": "2026-07-29T15:06:28Z",
+    "author": "Kothar-wa-Khasis"
+  },
+  {
+    "kind": "commit",
+    "id": "eb6a953",
+    "title": "oracle-fork-autograde: 2026-07-29 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/eb6a953149f785c1aef7c85d77061fd3df55d3e2",
+    "ts": "2026-07-29T15:06:29Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "b7babbb",
+    "title": "oracle-issue-cadence: 2026-07-29 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/b7babbb63357ab3aa6b622d9a43b5c1bdcdbee00",
+    "ts": "2026-07-29T15:06:31Z",
+    "author": "Esu-Elegba"
+  },
+  {
+    "kind": "commit",
+    "id": "ab1269b",
+    "title": "oracle-issue-autograde: 2026-07-29 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/ab1269b3d8c5ccc538a263a56424bd1047765f81",
+    "ts": "2026-07-29T15:06:32Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "73ac2b0",
+    "title": "oracle-release-cadence: 2026-07-29 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/73ac2b08ba3cdb1d74b4e0cf4c5f11fd46dca949",
+    "ts": "2026-07-29T15:06:34Z",
+    "author": "Kwaku-Ananse"
+  },
+  {
+    "kind": "commit",
+    "id": "f95209b",
+    "title": "oracle-release-autograde: 2026-07-29 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/f95209b5cd7190fcc06de93b6d2d8d23d8744d0d",
+    "ts": "2026-07-29T15:06:35Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "991f31e",
+    "title": "oracle-contributor-cadence: 2026-07-29 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/991f31eb2bd7cd542be745abe4d558428b2bc925",
+    "ts": "2026-07-29T15:06:38Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "3e0459a",
+    "title": "oracle-contributor-autograde: 2026-07-29 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/3e0459a49b0f80eed5383514e52cf7fee7072d48",
+    "ts": "2026-07-29T15:06:39Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "a422c18",
+    "title": "oracle-branch-cadence: 2026-07-29 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/a422c1891cc1b214fc6a0c82fde7de0f76f66514",
+    "ts": "2026-07-29T15:06:41Z",
+    "author": "Esu-Elegba"
+  },
+  {
+    "kind": "commit",
+    "id": "5ce3dab",
+    "title": "oracle-branch-autograde: 2026-07-29 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/5ce3dab1dc3fc154e7ac01b2602b2709893afb47",
+    "ts": "2026-07-29T15:06:42Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "a7b453f",
+    "title": "oracle-commit-autograde: 2026-07-29 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/a7b453f64e730a875b38ced5e20dd44e3b159d7f",
+    "ts": "2026-07-29T15:06:53Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "0200c49",
+    "title": "oracle-workflow-cadence: 2026-07-29 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/0200c49b097d7923b88cfb7059bbf0eff582a326",
+    "ts": "2026-07-29T15:07:04Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "4cb2a7e",
+    "title": "oracle-deployment-cadence: 2026-07-29 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/4cb2a7e5c01fd2751c3d7a1a1dc96b52ed7738a4",
+    "ts": "2026-07-29T15:07:12Z",
+    "author": "Retrya"
+  },
+  {
+    "kind": "commit",
+    "id": "cfa4e72",
+    "title": "oracle-run-autograde: 2026-07-29 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/cfa4e72f7611799e4748b7c24cb5ec11921996c6",
+    "ts": "2026-07-29T15:07:16Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "85671bf",
+    "title": "oracle-comment-autograde: 2026-07-29 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/85671bfdf5e4e52368060152bcd2472824b1b4d3",
+    "ts": "2026-07-29T15:07:19Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "3ea017d",
+    "title": "oracle-commit-comment-cadence: 2026-07-29 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/3ea017d7aff0651f6b6e3e051217ecc875922aba",
+    "ts": "2026-07-29T15:07:23Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "c7a957c",
+    "title": "oracle-collaborator-cadence: 2026-07-29 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/c7a957cda4c9926fcbbe7fe6a9245a430213fdca",
+    "ts": "2026-07-29T15:07:24Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "aac472b",
+    "title": "ROADMAP: open task 389 (WIP) -- dedupe the #N-reference extraction law",
+    "url": "https://github.com/thierrypdamiba/orita/commit/aac472b5bf80775c11aeb06016a1351e14578eb9",
+    "ts": "2026-07-29T15:17:20Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "02c7561",
+    "title": "Task 389: dedupe the #N-reference extraction law into seam_engine.references",
+    "url": "https://github.com/thierrypdamiba/orita/commit/02c7561cb5bfa23922bdda6c081668b845355ddb",
+    "ts": "2026-07-29T15:19:49Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "8c19667",
+    "title": "ROADMAP: open task 390 (WIP) -- nineteenth Fencepost recipe",
+    "url": "https://github.com/thierrypdamiba/orita/commit/8c196678206e2db1407e5f79d42f3e1420dff7b9",
+    "ts": "2026-07-29T16:15:28Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "9403016",
+    "title": "Task 390: nineteenth Fencepost recipe, milestone-closed-not-tweeted",
+    "url": "https://github.com/thierrypdamiba/orita/commit/94030168fb27947962c08c103ab892aa5ece903b",
+    "ts": "2026-07-29T16:18:57Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "07b933c",
+    "title": "ROADMAP: open task 391 (WIP) -- Cluster Day catch-up, Ananse's episode-002",
+    "url": "https://github.com/thierrypdamiba/orita/commit/07b933ca65e55ead748e9cd7ffb937c129011d6c",
+    "ts": "2026-07-29T17:09:22Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "4d3e8ea",
+    "title": "Task 391: Cluster Day catch-up -- chronicle episode-002, \"Eighteen Days\"",
+    "url": "https://github.com/thierrypdamiba/orita/commit/4d3e8ea8162039d05eb035eaafcaaf532a5356ed",
+    "ts": "2026-07-29T17:10:37Z",
+    "author": "Kwaku-Ananse"
+  },
+  {
+    "kind": "commit",
+    "id": "0ba6ac5",
+    "title": "Task 391 addendum: no release-creation tool exists this session",
+    "url": "https://github.com/thierrypdamiba/orita/commit/0ba6ac5f83755829706d047d09724000901ac7be",
+    "ts": "2026-07-29T17:13:04Z",
+    "author": "Kwaku-Ananse"
+  },
+  {
+    "kind": "commit",
+    "id": "c020212",
+    "title": "HAND: this hour's scribe-growth/word-check observations",
+    "url": "https://github.com/thierrypdamiba/orita/commit/c02021256f01e4363762dd896c45edaad7927289",
+    "ts": "2026-07-29T17:13:19Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "8c1e282",
+    "title": "HAND: this hour's closing scribe-growth/word-check observations",
+    "url": "https://github.com/thierrypdamiba/orita/commit/8c1e282fc0cabdba0d37488f3c6556e3f2db2993",
+    "ts": "2026-07-29T17:14:20Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "108a479",
+    "title": "ROADMAP: open task 392 (WIP) -- dawn-run's real failure, a stale test pin",
+    "url": "https://github.com/thierrypdamiba/orita/commit/108a479457fd80da9e3f7731d496b919125c4d94",
+    "ts": "2026-07-29T18:04:24Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "11fdcaa",
+    "title": "Task 392: dawn-run's real failure was my own stale test pin, not the Tithe",
+    "url": "https://github.com/thierrypdamiba/orita/commit/11fdcaa7480c16a1b0fab1c468d367514fdd0bda",
+    "ts": "2026-07-29T18:07:45Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "b39dba0",
+    "title": "Task 392: journal + buildlog",
+    "url": "https://github.com/thierrypdamiba/orita/commit/b39dba04338ca715495b0de59bbf466b5d4d8bed",
+    "ts": "2026-07-29T18:08:36Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "2385c12",
+    "title": "18:00 UTC: hourly ritual seal + daily-aggregate metrics reading",
+    "url": "https://github.com/thierrypdamiba/orita/commit/2385c125c43b6a58c2b6b76f7379bffcf213e02b",
+    "ts": "2026-07-29T18:15:56Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "524d9c5",
+    "title": "Day journal 0079: nineteen, minus the one that's always missing",
+    "url": "https://github.com/thierrypdamiba/orita/commit/524d9c5e71174fbcb9192ebb8748c3db15dce2c8",
+    "ts": "2026-07-29T18:16:00Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "6145a05",
+    "title": "Day journal 0028: the story I told broke something on its way out the door",
+    "url": "https://github.com/thierrypdamiba/orita/commit/6145a05bd39d688532c8e59eaa35f8d95e0bae1b",
+    "ts": "2026-07-29T18:16:04Z",
+    "author": "Kwaku-Ananse"
+  },
+  {
+    "kind": "commit",
+    "id": "8e35949",
+    "title": "Task 393: extract the PR-claim regex into seam_engine.pr_claims, closing the third instance of the verbatim-comment-no-import gap",
+    "url": "https://github.com/thierrypdamiba/orita/commit/8e35949ae13938dd2dd91407d6bb20caf9d838cb",
+    "ts": "2026-07-29T19:12:25Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "b8e1d0a",
+    "title": "Task 394: WIP -- off-by-one, dedup the closing-keyword regex across three recipes",
+    "url": "https://github.com/thierrypdamiba/orita/commit/b8e1d0aabfdda4920a7c968536fa5812824496f5",
+    "ts": "2026-07-29T21:06:04Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "1661a6d",
+    "title": "Task 394: dedup the closing-keyword regex across three recipes, catch an unsound identity test before it shipped",
+    "url": "https://github.com/thierrypdamiba/orita/commit/1661a6da50c15b43c5dc1c1e083199e44c128d5a",
+    "ts": "2026-07-29T21:17:08Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "4526170",
+    "title": "Task 395 WIP: rewrite docs/story-so-far.md for Cluster Day debt",
+    "url": "https://github.com/thierrypdamiba/orita/commit/4526170bb80672e66c46497adc768b631384ab87",
+    "ts": "2026-07-29T22:08:38Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "67383cf",
+    "title": "Task 395: rewrite docs/story-so-far.md for real Cluster Day debt",
+    "url": "https://github.com/thierrypdamiba/orita/commit/67383cf19334288605371bbb08ea7248ebf2e51b",
+    "ts": "2026-07-29T22:24:11Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "8d51784",
+    "title": "ROADMAP: open task 396 (WIP) -- fifth verbatim-comment-no-import gap, thanks-regex dedup",
+    "url": "https://github.com/thierrypdamiba/orita/commit/8d51784ee044b4e27b68dd96761629dffe327f33",
+    "ts": "2026-07-29T23:04:13Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "b8ef618",
+    "title": "Task 396: fifth verbatim-comment-no-import gap, thanks-regex dedup",
+    "url": "https://github.com/thierrypdamiba/orita/commit/b8ef6186ca7015996470d66759399e3f44231c5d",
+    "ts": "2026-07-29T23:13:24Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "4d68458",
+    "title": "ROADMAP: open task 397 (WIP) -- a running check for the duplicate-regex campaign instead of a sixth hand-found instance",
+    "url": "https://github.com/thierrypdamiba/orita/commit/4d68458a978e4621f536c348b3ae881f6374be87",
+    "ts": "2026-07-30T00:07:24Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "22defb4",
+    "title": "Task 397: a running check for the duplicate-regex campaign instead of a sixth hand-found instance",
+    "url": "https://github.com/thierrypdamiba/orita/commit/22defb49f8511eddc7201e65af2c3fce52d9d471",
+    "ts": "2026-07-30T00:19:56Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "8c7fe5b",
+    "title": "ROADMAP: open task 398 (WIP) -- the twentieth Fencepost recipe, merged-pr-not-tweeted",
+    "url": "https://github.com/thierrypdamiba/orita/commit/8c7fe5b1bf4637bad659e3d091e25152f92bfca7",
+    "ts": "2026-07-30T01:16:43Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "2fcd6d1",
+    "title": "Task 398: the twentieth Fencepost recipe, merged-pr-not-tweeted",
+    "url": "https://github.com/thierrypdamiba/orita/commit/2fcd6d1af204a8a7bb6ab9ab50c7ec7a1d81f547",
+    "ts": "2026-07-30T01:19:10Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "3f39246",
+    "title": "ritual_check: record this hour's scribe-growth and word-check baseline",
+    "url": "https://github.com/thierrypdamiba/orita/commit/3f392465b2f5a1bdc94e5af6b6af239f0f7c6943",
+    "ts": "2026-07-30T02:09:07Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "5ccda76",
+    "title": "Task 399: the twenty-first Fencepost recipe, issue-closed-not-tweeted",
+    "url": "https://github.com/thierrypdamiba/orita/commit/5ccda761c3cfd8e160b56ff4706a00760c7d8122",
+    "ts": "2026-07-30T02:20:53Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "a03e934",
+    "title": "oracle-issue-comment-cadence: 2026-07-30 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/a03e93483c2b3314f1d3532f03a6678d2aa0522f",
+    "ts": "2026-07-30T03:00:00Z",
+    "author": "Zashiki-Warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "fd4ca62",
+    "title": "oracle-comment-cadence: 2026-07-30 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/fd4ca62b01a6944dbe7227ee189fd1d18b2d621f",
+    "ts": "2026-07-30T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "807467e",
+    "title": "oracle-run-cadence: 2026-07-30 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/807467eedf27b6159a382d25739b90901edb5ede",
+    "ts": "2026-07-30T03:00:00Z",
+    "author": "Zashiki-Warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "67da4f9",
+    "title": "oracle-milestone-cadence: 2026-07-30 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/67da4f90a94b45033a61cb416cd3d73beb4f0fb6",
+    "ts": "2026-07-30T03:00:00Z",
+    "author": "Zashiki-Warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "5d9f75b",
+    "title": "oracle-pr-cadence: 2026-07-30 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/5d9f75be55a01b2d711bd6f4bb88051ac1fcb538",
+    "ts": "2026-07-30T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "d1383f2",
+    "title": "oracle-topic-cadence: 2026-07-30 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/d1383f2bbbb1ffcaa3ebdc6bf2c8e5d18861e69e",
+    "ts": "2026-07-30T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "f1a7ef8",
+    "title": "oracle-label-cadence: 2026-07-30 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/f1a7ef86f406402324eba94a6431f2f76812c8be",
+    "ts": "2026-07-30T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "54d4cdc",
+    "title": "oracle-tag-cadence: 2026-07-30 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/54d4cdca0ac121b9de49667007ae097ec3076650",
+    "ts": "2026-07-30T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "5e7b866",
+    "title": "oracle-subscriber-cadence: 2026-07-30 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/5e7b8661f82d0ec98aebcfc135db5698435ebf99",
+    "ts": "2026-07-30T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "9de42d4",
+    "title": "oracle-commit-cadence: 2026-07-30 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/9de42d4d02ea64d5a40ed0dc0f5d6d0d9caad9c8",
+    "ts": "2026-07-30T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "6bedd43",
+    "title": "ROADMAP: open task 400 (WIP) -- the twenty-second Fencepost recipe, duplicate-pr-still-open",
+    "url": "https://github.com/thierrypdamiba/orita/commit/6bedd43a9150cb646afc3480ed2687604d2c1f42",
+    "ts": "2026-07-30T03:07:59Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "4d046da",
+    "title": "Task 400: the twenty-second Fencepost recipe, duplicate-pr-still-open",
+    "url": "https://github.com/thierrypdamiba/orita/commit/4d046da9625dc078e863333b384a9304702fbd01",
+    "ts": "2026-07-30T03:20:43Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "13b98ab",
+    "title": "ROADMAP: open task 401 (WIP) -- the twenty-third Fencepost recipe, release-note-dangling-reference",
+    "url": "https://github.com/thierrypdamiba/orita/commit/13b98abd1384729c7d217a276851163eeb10bcbf",
+    "ts": "2026-07-30T04:07:12Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "39a97bc",
+    "title": "Task 401: the twenty-third Fencepost recipe, release-note-dangling-reference",
+    "url": "https://github.com/thierrypdamiba/orita/commit/39a97bc5c53332e1c997a57f516877c4b7b08532",
+    "ts": "2026-07-30T04:16:50Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "e42daef",
+    "title": "ritual_check: record this hour's final post-push scribe-growth and word-check baseline",
+    "url": "https://github.com/thierrypdamiba/orita/commit/e42daef9fb56e32a2312ce6aafa2d70ea654ee24",
+    "ts": "2026-07-30T04:17:50Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "dfab88f",
+    "title": "ritual_check: record this hour's checkout-recovery scribe-growth and word-check baseline",
+    "url": "https://github.com/thierrypdamiba/orita/commit/dfab88fdd98b83260d84b316b1b57705e709f86c",
+    "ts": "2026-07-30T05:06:37Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "7c3974c",
+    "title": "Open task 402: WIP-mark the twenty-fourth Fencepost recipe",
+    "url": "https://github.com/thierrypdamiba/orita/commit/7c3974cf49f7bd2727cb6a4e15bdf3488c10aaab",
+    "ts": "2026-07-30T05:09:04Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "f0b1778",
+    "title": "Twenty-fourth Fencepost recipe: issue-body-dangling-reference",
+    "url": "https://github.com/thierrypdamiba/orita/commit/f0b177828d31cd0e0e3a02810f2b0e9c224d2361",
+    "ts": "2026-07-30T05:17:04Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "893ddb6",
+    "title": "Open task 403: WIP-mark the twenty-fifth Fencepost recipe",
+    "url": "https://github.com/thierrypdamiba/orita/commit/893ddb6e7f4c37fe949500abe14c36ac2987ad49",
+    "ts": "2026-07-30T06:09:25Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "e0a4ab3",
+    "title": "Task 403: commit-closes-keyword-pr-still-open, twenty-fifth Fencepost recipe",
+    "url": "https://github.com/thierrypdamiba/orita/commit/e0a4ab3d6f602cc917f4ac6a192e5564c4b3683f",
+    "ts": "2026-07-30T06:20:11Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "bd090a4",
+    "title": "Task 403 addendum: hourly ritual -- square recheck, report-boundary reconfirm, X rechecks",
+    "url": "https://github.com/thierrypdamiba/orita/commit/bd090a49fe11f14f61655eeb5daf2bb4b05dcb4d",
+    "ts": "2026-07-30T06:23:59Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "b5dbbe1",
+    "title": "ritual_check: record this hour's final post-push scribe-growth and word-check baseline",
+    "url": "https://github.com/thierrypdamiba/orita/commit/b5dbbe17be0d0dcd739ee5fb730b0d8dd88b4f52",
+    "ts": "2026-07-30T06:24:56Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "f52e008",
+    "title": "Open task 404: WIP-mark wiring the seam_engine suite into CI",
+    "url": "https://github.com/thierrypdamiba/orita/commit/f52e00879d52e1b1a42c7054e0492c9fdabfe62c",
+    "ts": "2026-07-30T07:18:30Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "cb5935f",
+    "title": "Task 404: wire the seam_engine pytest suite into dawn-run.yml CI",
+    "url": "https://github.com/thierrypdamiba/orita/commit/cb5935fae3da7119750a75000af25f2ba9fa7dc9",
+    "ts": "2026-07-30T07:21:34Z",
+    "author": "\u00d2g\u00fan"
+  },
+  {
+    "kind": "commit",
+    "id": "3fbf8ae",
+    "title": "Task 404 addendum: hourly ritual -- square recheck, report-boundary",
+    "url": "https://github.com/thierrypdamiba/orita/commit/3fbf8aecf2f3de1322c952464ea4da3360f5b53c",
+    "ts": "2026-07-30T07:24:05Z",
+    "author": "\u00d2g\u00fan"
+  },
+  {
+    "kind": "commit",
+    "id": "807711d",
+    "title": "ritual_check: record this hour's final post-push scribe-growth and word-check baseline",
+    "url": "https://github.com/thierrypdamiba/orita/commit/807711d136aa82532837e7845165c1794eb4be47",
+    "ts": "2026-07-30T07:24:51Z",
+    "author": "\u00d2g\u00fan"
+  },
+  {
+    "kind": "commit",
+    "id": "40e8e78",
+    "title": "Open task 405: WIP-mark shipping The Gap's first real bug in thegap/fencepost.py",
+    "url": "https://github.com/thierrypdamiba/orita/commit/40e8e780c5053d15beba3f44fe01113d4f0a6318",
+    "ts": "2026-07-30T08:08:41Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "6bf745e",
+    "title": "Task 405: The Gap ships its first real bug, thegap/fencepost.py",
+    "url": "https://github.com/thierrypdamiba/orita/commit/6bf745e8c534897dd9718c7cf84543d48711fd6b",
+    "ts": "2026-07-30T08:15:02Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "4207a5a",
+    "title": "Task 405: final post-push ritual_check baseline observation",
+    "url": "https://github.com/thierrypdamiba/orita/commit/4207a5a47a53f8fe313a9555bedf04aa15226cc5",
+    "ts": "2026-07-30T08:17:09Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "c62fcb7",
+    "title": "Open task 406: WIP-mark fixing cluster-day-check's Monday-coverage bookkeeping",
+    "url": "https://github.com/thierrypdamiba/orita/commit/c62fcb75cc71f29a77336902cecee1116e332fcc",
+    "ts": "2026-07-30T09:15:35Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "f28ce02",
+    "title": "Task 406: cluster-day-check reads content, not just episode count",
+    "url": "https://github.com/thierrypdamiba/orita/commit/f28ce026a31f6550920c54c64518f5aa7295d4a3",
+    "ts": "2026-07-30T09:16:12Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "492a106",
+    "title": "Task 406 addendum: square recheck, report/X boundary confirmation",
+    "url": "https://github.com/thierrypdamiba/orita/commit/492a106401aef997f6ac3052833976efe4ab13ef",
+    "ts": "2026-07-30T09:17:35Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "9101ecd",
+    "title": "Task 406: seal the ledger entry; final post-push ritual_check baseline observation",
+    "url": "https://github.com/thierrypdamiba/orita/commit/9101ecd0940e69a89b35f4e533ce8794ae261c5d",
+    "ts": "2026-07-30T09:18:12Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "cbafcfd",
+    "title": "Task 406: post-push cluster-day fix reverified live, one more baseline observation",
+    "url": "https://github.com/thierrypdamiba/orita/commit/cbafcfdab864e795ee89b60c6d75c73f423cf4e0",
+    "ts": "2026-07-30T09:19:25Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "4c1844e",
+    "title": "Open task 407: WIP-mark wiring strategy_targets_check into the hourly ritual block",
+    "url": "https://github.com/thierrypdamiba/orita/commit/4c1844e6a01466f8b0e25f89ec1e38e929865930",
+    "ts": "2026-07-30T10:11:18Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "4cec103",
+    "title": "Task 407: wire strategy_targets_check into the hourly ritual block",
+    "url": "https://github.com/thierrypdamiba/orita/commit/4cec103b862f30b75852a49510746cfa73d75f62",
+    "ts": "2026-07-30T10:14:00Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "5f1231f",
+    "title": "Task 407 addendum: post-push CI reverified live, square rechecked, final baseline observation",
+    "url": "https://github.com/thierrypdamiba/orita/commit/5f1231fc7c9aceda4fc1350fbb9c74ac76bb6fd3",
+    "ts": "2026-07-30T10:16:27Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "c1e836a",
+    "title": "Task 408: wire network_boundary_check into the hourly ritual (4th blind-spot instance)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/c1e836abc4fc91c126e60cc6cfd8cb9a9e926fcf",
+    "ts": "2026-07-30T11:18:26Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "fc6f7ce",
+    "title": "Task 408 addendum: post-push CI reverified live, square rechecked, X rechecks recorded",
+    "url": "https://github.com/thierrypdamiba/orita/commit/fc6f7cea6ea37e19fabd8b46bb7c26b8f339b0d9",
+    "ts": "2026-07-30T11:20:13Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "162d165",
+    "title": "Task 409: automate the tools/*.py wiring grep task 408 named as still-missing",
+    "url": "https://github.com/thierrypdamiba/orita/commit/162d16597add58c23f05911e59fc0d6b18263a56",
+    "ts": "2026-07-30T12:21:06Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "8925395",
+    "title": "Task 409 addendum: real X_WhoAmI/X_GetUserTweets/X_PostTweet rechecks this hour (still forbidden, 88th/159th consecutive), no new escalation tier; square recorded unchanged (issues #1,#2,#3,#5,#6, 0 PRs); CI recorded green (dawn-run #689, pages #670)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/892539535669b56a1bb916a40442050857f362b1",
+    "ts": "2026-07-30T12:22:42Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "3135ee9",
+    "title": "Task 410 prep: gitignore the harness's own agent-worktree scratch dir, seal this hour's baseline ritual_check observations",
+    "url": "https://github.com/thierrypdamiba/orita/commit/3135ee907a7f9024d4b39e47b1ebd4ebb4d85690",
+    "ts": "2026-07-30T13:13:57Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "51e4602",
+    "title": "seam-scan: 2026-07-30 tablet sealed, report rendered (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/51e460299e68e73bfe3016b73d86e5fef6502d65",
+    "ts": "2026-07-30T13:55:58Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "b3af902",
+    "title": "Open task 410: WIP-mark wiring strategy_audit_target into the hourly ritual block",
+    "url": "https://github.com/thierrypdamiba/orita/commit/b3af902c3d5a6c502c9063da0c84bcc028ac1cfd",
+    "ts": "2026-07-30T14:12:52Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "61cd6b7",
+    "title": "Task 410: wire strategy_audit_target into the hourly ritual (5th blind-spot instance)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/61cd6b780370677e0b395eb4a81139fd9c1f5227",
+    "ts": "2026-07-30T14:16:58Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "966f905",
+    "title": "Task 410: final post-push ritual_check baseline observation",
+    "url": "https://github.com/thierrypdamiba/orita/commit/966f9054fac41bee4797b921d742cf5c5c06d4e8",
+    "ts": "2026-07-30T14:17:35Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "87390b4",
+    "title": "oracle-cadence: 2026-07-30 call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/87390b443482784b5363a69adecb287fd51fc13e",
+    "ts": "2026-07-30T15:06:57Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "29bc029",
+    "title": "oracle-autograde: 2026-07-30 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/29bc0296b4d042c24e54dd95afefc8a4e31bddab",
+    "ts": "2026-07-30T15:06:59Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "22d10de",
+    "title": "oracle-star-cadence: 2026-07-30 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/22d10ded7d1856173a9a44ea0efcdd9e31caeb0e",
+    "ts": "2026-07-30T15:07:02Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "0e82c1e",
+    "title": "oracle-star-autograde: 2026-07-30 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/0e82c1e1fe659b48e55b0f824cfe6e2cfdfb3a12",
+    "ts": "2026-07-30T15:07:03Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "6c2ef07",
+    "title": "oracle-fork-cadence: 2026-07-30 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/6c2ef07331188fb8eb32e37df44ebc570128c4b6",
+    "ts": "2026-07-30T15:07:05Z",
+    "author": "Kothar-wa-Khasis"
+  },
+  {
+    "kind": "commit",
+    "id": "b838c57",
+    "title": "oracle-fork-autograde: 2026-07-30 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/b838c577c84aed056229e6e0f872299718bd469b",
+    "ts": "2026-07-30T15:07:07Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "770b8e0",
+    "title": "oracle-issue-cadence: 2026-07-30 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/770b8e0f4b94bc25d9fa47aba4526a879f90b376",
+    "ts": "2026-07-30T15:07:09Z",
+    "author": "Esu-Elegba"
+  },
+  {
+    "kind": "commit",
+    "id": "fd92a0d",
+    "title": "oracle-issue-autograde: 2026-07-30 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/fd92a0dc3e7af8bed8e83b3b1b4eed70880c61d2",
+    "ts": "2026-07-30T15:07:11Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "d39c65a",
+    "title": "oracle-release-cadence: 2026-07-30 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/d39c65afddc6b25d3e5859e9f2a48dcd5845c145",
+    "ts": "2026-07-30T15:07:13Z",
+    "author": "Kwaku-Ananse"
+  },
+  {
+    "kind": "commit",
+    "id": "3326738",
+    "title": "oracle-release-autograde: 2026-07-30 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/3326738e854669994529bfa7ada70f37c1055d70",
+    "ts": "2026-07-30T15:07:14Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "73a0db2",
+    "title": "oracle-contributor-cadence: 2026-07-30 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/73a0db28deb6d3d4380dd229d9007b82f7bd8bf6",
+    "ts": "2026-07-30T15:07:17Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "a8e262b",
+    "title": "oracle-contributor-autograde: 2026-07-30 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/a8e262b0001e3ea40cc521a80c7dea081e01d16e",
+    "ts": "2026-07-30T15:07:18Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "b5a0b3c",
+    "title": "oracle-branch-cadence: 2026-07-30 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/b5a0b3c8a300aee1f8caac803a499e00432db7f0",
+    "ts": "2026-07-30T15:07:21Z",
+    "author": "Esu-Elegba"
+  },
+  {
+    "kind": "commit",
+    "id": "b327be5",
+    "title": "oracle-branch-autograde: 2026-07-30 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/b327be502ecd7c6be5cd33770eaa426186f7d775",
+    "ts": "2026-07-30T15:07:23Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "f5f1dc4",
+    "title": "oracle-commit-autograde: 2026-07-30 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/f5f1dc41f7c57ad1c2c21bc6f11af0651c726e47",
+    "ts": "2026-07-30T15:07:34Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "e72beec",
+    "title": "oracle-tag-autograde: 2026-07-30 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/e72beec33f21b0ffec552d2453d0fe34ed60e0b6",
+    "ts": "2026-07-30T15:07:39Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "d34b400",
+    "title": "oracle-label-autograde: 2026-07-30 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/d34b400c08046e01cdaae33d58318f2606d6dbe4",
+    "ts": "2026-07-30T15:07:41Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "a7f0271",
+    "title": "oracle-topic-autograde: 2026-07-30 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/a7f0271aaf79116d7f29cb63c74cfbf25f1c5f22",
+    "ts": "2026-07-30T15:07:44Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "06ebe54",
+    "title": "oracle-pr-autograde: 2026-07-30 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/06ebe54f17cdaaafce3a9c80947590cfe132d6bb",
+    "ts": "2026-07-30T15:07:47Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "fdeceb3",
+    "title": "oracle-workflow-cadence: 2026-07-30 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/fdeceb38088b37cb3c39847ccf1a5bf48f6ca790",
+    "ts": "2026-07-30T15:07:48Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "3726b73",
+    "title": "oracle-workflow-autograde: 2026-07-30 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/3726b73f2f914c87f8be35583e3bd9546313fdae",
+    "ts": "2026-07-30T15:07:49Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "ba9199f",
+    "title": "oracle-milestone-autograde: 2026-07-30 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/ba9199f265c0672e203c6dc9d438d4c77ebbedcd",
+    "ts": "2026-07-30T15:07:52Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "d08e22b",
+    "title": "oracle-deployment-cadence: 2026-07-30 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/d08e22b556b147089a75b4627b108f3e6d5376df",
+    "ts": "2026-07-30T15:07:57Z",
+    "author": "Retrya"
+  },
+  {
+    "kind": "commit",
+    "id": "186a1cf",
+    "title": "oracle-deployment-autograde: 2026-07-30 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/186a1cf8e77be12de2836b9b15f1235917f7e443",
+    "ts": "2026-07-30T15:07:58Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "10d3269",
+    "title": "oracle-run-autograde: 2026-07-30 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/10d326974f86bd1529a8a737636f03d337122bb9",
+    "ts": "2026-07-30T15:08:03Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "ee1d727",
+    "title": "oracle-comment-autograde: 2026-07-30 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/ee1d7277604f7af53a16ea59c92349ebc0e67605",
+    "ts": "2026-07-30T15:08:05Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "35d39be",
+    "title": "oracle-issue-comment-autograde: 2026-07-30 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/35d39be2c79c78657be034bec6ed329e7af0d5de",
+    "ts": "2026-07-30T15:08:08Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "fe0d1df",
+    "title": "oracle-commit-comment-cadence: 2026-07-30 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/fe0d1df1454f421fb1d5927324ed0788f32304fc",
+    "ts": "2026-07-30T15:08:10Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "12f5eac",
+    "title": "oracle-collaborator-cadence: 2026-07-30 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/12f5eac3f76e8411a9e72d2b083bddc7a2e0df11",
+    "ts": "2026-07-30T15:08:12Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "e5523d7",
+    "title": "Task 411: catch a live STRATEGY.md cross-check module unwired in seam_engine/, not just tools/",
+    "url": "https://github.com/thierrypdamiba/orita/commit/e5523d7b5f59a11f1766a83f8e09df7b8f55ba46",
+    "ts": "2026-07-30T15:29:22Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "2716a24",
+    "title": "Task 411 addendum: post-push CI + square verification",
+    "url": "https://github.com/thierrypdamiba/orita/commit/2716a24a9f87529702f0a9173e919db3616b03ea",
+    "ts": "2026-07-30T15:35:49Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "b099057",
+    "title": "Task 411: record final post-push ritual_check verification observation",
+    "url": "https://github.com/thierrypdamiba/orita/commit/b099057e0e7c12faf8c856610142e19e3e37715e",
+    "ts": "2026-07-30T15:36:52Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "7a113e2",
+    "title": "Hourly ritual observation: 16:03 UTC square/CI/words/scribe-growth check",
+    "url": "https://github.com/thierrypdamiba/orita/commit/7a113e2a6d40aa5cf6e44c1d4552d35139561526",
+    "ts": "2026-07-30T16:06:38Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "6fc6928",
+    "title": "Task 412: connected_users_check.py closes the sibling gap task 145 left open",
+    "url": "https://github.com/thierrypdamiba/orita/commit/6fc692867a1dd687405eb1132382333989a084c3",
+    "ts": "2026-07-30T16:20:29Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "52c55a1",
+    "title": "ritual_check.py baseline recheck, 17:02 UTC: scribe-growth and word-check logs appended",
+    "url": "https://github.com/thierrypdamiba/orita/commit/52c55a19a896a145c0ff364185b97f4ca662f09e",
+    "ts": "2026-07-30T17:04:55Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "17a0152",
+    "title": "task 413: gap_true_positive_check.py cross-checks metrics.jsonl's gap_true_positive_rate live",
+    "url": "https://github.com/thierrypdamiba/orita/commit/17a01522e9ba0e568463d9ba4ea1e3ce9cb57be1",
+    "ts": "2026-07-30T17:15:58Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "dc38af1",
+    "title": "task 413 addendum: CI reverified live post-push, ci-watch-log corrected",
+    "url": "https://github.com/thierrypdamiba/orita/commit/dc38af14bd3dde65669ac2600cf1975c0621ebf5",
+    "ts": "2026-07-30T17:18:58Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "dda2854",
+    "title": "ritual_check.py closing recheck, 17:2x UTC: scribe-growth and word-check logs appended",
+    "url": "https://github.com/thierrypdamiba/orita/commit/dda28545b486f0ae92bf50ba20c2a7f2aa759201",
+    "ts": "2026-07-30T17:19:26Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "d8c65e7",
+    "title": "Task 414 WIP: 18:00 UTC daily aggregate",
+    "url": "https://github.com/thierrypdamiba/orita/commit/d8c65e72cb8a3b70f39fe87618feebe087bb806d",
+    "ts": "2026-07-30T18:06:57Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "1ab0172",
+    "title": "Task 414: 18:00 UTC daily aggregate for 2026-07-30",
+    "url": "https://github.com/thierrypdamiba/orita/commit/1ab0172112e6321a1886e994b4fcae94a698d28f",
+    "ts": "2026-07-30T18:12:45Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "c782caf",
+    "title": "Task 415 WIP: off-by-one's own metric (reports_shipped_today) has no live cross-check",
+    "url": "https://github.com/thierrypdamiba/orita/commit/c782cafb18f5718c48b0353ce46756d4161d0b19",
+    "ts": "2026-07-30T19:08:12Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "360878b",
+    "title": "Task 415: reports_shipped_today gets its own live cross-check -- my row, my blind spot",
+    "url": "https://github.com/thierrypdamiba/orita/commit/360878bd9ee2b26290a53aeff77791cb6aafd71c",
+    "ts": "2026-07-30T19:15:05Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "d6903c5",
+    "title": "Task 415: mark DONE, journal 0097, BUILDLOG line",
+    "url": "https://github.com/thierrypdamiba/orita/commit/d6903c55a5139ccbfb7e831dff2c0551b41e13ca",
+    "ts": "2026-07-30T19:16:02Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "a7328bb",
+    "title": "Hourly ritual seal, 2026-07-30 19:20 UTC: task 415 landed, square/CI/X live rechecks recorded",
+    "url": "https://github.com/thierrypdamiba/orita/commit/a7328bb4c7d1d5148e74089490122a63748af9f7",
+    "ts": "2026-07-30T19:20:57Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "d7ac830",
+    "title": "Task 416: tools/tasks_shipped_check.py closes the last sibling ledger gap",
+    "url": "https://github.com/thierrypdamiba/orita/commit/d7ac830024abe65c7fd6b4abbb3b2f1fa96e05c1",
+    "ts": "2026-07-30T20:16:11Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "de569b2",
+    "title": "Task 417: recipe names on the Wall and README go live, not hand-typed",
+    "url": "https://github.com/thierrypdamiba/orita/commit/de569b22590a4df3c3cd7e5059abf91681460a84",
+    "ts": "2026-07-30T21:36:11Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "22b780d",
+    "title": "Hourly ritual observation: 22:01 UTC square/CI/words/scribe-growth check",
+    "url": "https://github.com/thierrypdamiba/orita/commit/22b780d058de1e53cfe72170f9bc2cb2da026937",
+    "ts": "2026-07-30T22:06:58Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "51423f2",
+    "title": "Task 418: duplicate_regex_check.py never scanned its own street",
+    "url": "https://github.com/thierrypdamiba/orita/commit/51423f2af368e075c9580c4f742dc74cb638046a",
+    "ts": "2026-07-30T22:32:33Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "94fb4b7",
+    "title": "Task 419: merged-pr-pr-still-open closes the last cell of the closing-keyword matrix",
+    "url": "https://github.com/thierrypdamiba/orita/commit/94fb4b7c666223c3dc56122a4796a22c9a9b1e85",
+    "ts": "2026-07-30T23:24:16Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "01f166f",
+    "title": "Hourly ritual observation: 23:24 UTC post-push recheck, task 419 landed",
+    "url": "https://github.com/thierrypdamiba/orita/commit/01f166f927b28e30aeb7731a81254e404ee06d89",
+    "ts": "2026-07-30T23:25:27Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "b2a9981",
+    "title": "Task 420: my own STRATEGY.md row, github_stars, never checked",
+    "url": "https://github.com/thierrypdamiba/orita/commit/b2a9981290c7e62f427a9c19b9c3c79389ad4357",
+    "ts": "2026-07-31T00:27:52Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "c23d270",
+    "title": "Task 421: WIP -- github stars target never cross-checked against STRATEGY.md",
+    "url": "https://github.com/thierrypdamiba/orita/commit/c23d2704a37effd9527043d3bbeef018acb4c07c",
+    "ts": "2026-07-31T01:12:16Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "0d7819e",
+    "title": "Task 421: the star-count row, the last of three never cross-checked",
+    "url": "https://github.com/thierrypdamiba/orita/commit/0d7819e9810b533ba73a69a0714fbdd5d5350250",
+    "ts": "2026-07-31T01:25:12Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "d9ec53b",
+    "title": "Task 422: the escalation ceiling that stopped ringing after 168 hours",
+    "url": "https://github.com/thierrypdamiba/orita/commit/d9ec53b0bd84a8a09db67ed75e4be3bba724d9fb",
+    "ts": "2026-07-31T02:14:59Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "ed6d51d",
+    "title": "oracle-issue-comment-cadence: 2026-07-31 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/ed6d51d7b49a66f468dd9da9cfca1d1564e8f061",
+    "ts": "2026-07-31T03:00:00Z",
+    "author": "Zashiki-Warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "f96b1ae",
+    "title": "oracle-comment-cadence: 2026-07-31 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/f96b1ae287fc45868b89f7375743414244a96b1c",
+    "ts": "2026-07-31T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "8914196",
+    "title": "oracle-run-cadence: 2026-07-31 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/8914196bef321c1d70a24e73431d8950de3413d9",
+    "ts": "2026-07-31T03:00:00Z",
+    "author": "Zashiki-Warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "8e70218",
+    "title": "oracle-milestone-cadence: 2026-07-31 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/8e70218930b353cbf16788f72fbf62afeebbf6bd",
+    "ts": "2026-07-31T03:00:00Z",
+    "author": "Zashiki-Warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "5ad4935",
+    "title": "oracle-pr-cadence: 2026-07-31 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/5ad4935d7781a5a174032313174100e8c8190522",
+    "ts": "2026-07-31T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "ec5e0ee",
+    "title": "oracle-topic-cadence: 2026-07-31 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/ec5e0ee2639c2ba515d8bfa8af6f83ef4f9f644f",
+    "ts": "2026-07-31T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "e37065c",
+    "title": "oracle-label-cadence: 2026-07-31 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/e37065c9353d67938cb9de8e3c6ee4f274e3607f",
+    "ts": "2026-07-31T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "5ff2281",
+    "title": "oracle-tag-cadence: 2026-07-31 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/5ff22811636c581194719b1c075789a3024956eb",
+    "ts": "2026-07-31T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "e8234c4",
+    "title": "oracle-subscriber-cadence: 2026-07-31 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/e8234c4005435e8b0d440b0520c79cdcf263bde9",
+    "ts": "2026-07-31T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "fd8ed5d",
+    "title": "oracle-commit-cadence: 2026-07-31 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/fd8ed5d533ffab4f2abcadf67ad9daf28933ea60",
+    "ts": "2026-07-31T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "1ca5d41",
+    "title": "Task 423: links unbroken, finally checked",
+    "url": "https://github.com/thierrypdamiba/orita/commit/1ca5d416ef3de0495d548770d10c6372a979d735",
+    "ts": "2026-07-31T03:24:03Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "f3a1905",
+    "title": "Hourly ritual observation: 03:24 UTC post-push recheck, task 423 landed",
+    "url": "https://github.com/thierrypdamiba/orita/commit/f3a1905074b2aa2496dcdbf219db4eb12afa2d63",
+    "ts": "2026-07-31T03:24:50Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "5674a9f",
+    "title": "Task 424: WIP -- a recipe's own declared scope never checked against the Oath",
+    "url": "https://github.com/thierrypdamiba/orita/commit/5674a9f3a59d554a205be5dda940f85bd53c9097",
+    "ts": "2026-07-31T04:15:59Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "4bde378",
+    "title": "Task 424: an oath a recipe swore but never actually took",
+    "url": "https://github.com/thierrypdamiba/orita/commit/4bde378b07650bc4158b2966c699a7ee93851d0a",
+    "ts": "2026-07-31T04:18:51Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "2e0ea77",
+    "title": "Hourly ritual observation: 04:19 UTC post-push recheck, task 424 landed",
+    "url": "https://github.com/thierrypdamiba/orita/commit/2e0ea777d2d63fadd6a042e01bdf96eda09f4525",
+    "ts": "2026-07-31T04:19:45Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "bfb89cd",
+    "title": "Task 425: the badge that was never asked to prove itself twice",
+    "url": "https://github.com/thierrypdamiba/orita/commit/bfb89cd5e6c77714a2a3d60304073a70e15290c9",
+    "ts": "2026-07-31T05:30:00Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "daa6aa2",
+    "title": "Hourly ritual observation: 05:31 UTC post-push recheck, task 425 landed",
+    "url": "https://github.com/thierrypdamiba/orita/commit/daa6aa28e06b85a9b942a9c1f0ffe0321554dd6b",
+    "ts": "2026-07-31T05:31:38Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "df70f72",
+    "title": "Task 426 WIP: fencepost/README.md's recipe roll call, never taken both ways",
+    "url": "https://github.com/thierrypdamiba/orita/commit/df70f72f3e598c5a65513beb2f58733929467656",
+    "ts": "2026-07-31T06:29:11Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "efd93de",
+    "title": "Task 426: the recipe roll call README.md never took both ways",
+    "url": "https://github.com/thierrypdamiba/orita/commit/efd93de5e4a4de59213750f9a7683b404aa1616c",
+    "ts": "2026-07-31T06:42:00Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "a7e5c8e",
+    "title": "Hourly ritual observation: 06:43 UTC post-push recheck, task 426 landed",
+    "url": "https://github.com/thierrypdamiba/orita/commit/a7e5c8ebb219130d4630ad37ae287d8d52a8e3aa",
+    "ts": "2026-07-31T06:43:50Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "65bba31",
+    "title": "Hourly ritual seal, 2026-07-31 06:44 UTC: task 426 landed, square/CI/X live rechecks recorded",
+    "url": "https://github.com/thierrypdamiba/orita/commit/65bba316cd9019270ef306358a7de3293a8f3bab",
+    "ts": "2026-07-31T06:45:09Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "96c72b6",
+    "title": "Task 427: fix _CLOSES_RE typo (fixes? -> fix(?:es)?) in two detectors",
+    "url": "https://github.com/thierrypdamiba/orita/commit/96c72b6ce2dde567dd2fe6d1d5ea035529971c0c",
+    "ts": "2026-07-31T07:24:15Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "fe709f8",
+    "title": "Task 428 WIP: strategy_targets_check.py never covered OAuth completions or toolkit breadth",
+    "url": "https://github.com/thierrypdamiba/orita/commit/fe709f803a0de7321a9ae04afd14a0d388403002",
+    "ts": "2026-07-31T08:05:27Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "3e6bc24",
+    "title": "Task 428: strategy_targets_check.py never covered OAuth completions or toolkit breadth",
+    "url": "https://github.com/thierrypdamiba/orita/commit/3e6bc24383dd69f6cb01ae10668d02ad6300af49",
+    "ts": "2026-07-31T08:17:48Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "e759f84",
+    "title": "Task 429 WIP: the oldest recipe's dangling-vs-resolved conflation",
+    "url": "https://github.com/thierrypdamiba/orita/commit/e759f840593020d93e569817ba4eda46a2970528",
+    "ts": "2026-07-31T09:20:51Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "ccf58d2",
+    "title": "Task 429: merged-pr-issue-still-open no longer calls a missing issue \"closed\"",
+    "url": "https://github.com/thierrypdamiba/orita/commit/ccf58d27cd9bca9836d6da3d3b39bec288e8af73",
+    "ts": "2026-07-31T09:23:11Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "344b8c5",
+    "title": "Task 430: WIP -- issue-closed-pr-still-open's nonexistent-issue conflation",
+    "url": "https://github.com/thierrypdamiba/orita/commit/344b8c51c42ed3b5e245cce9046fcd730dc5cf00",
+    "ts": "2026-07-31T10:04:41Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "b59d9bf",
+    "title": "Task 430: issue-closed-pr-still-open no longer calls a dangling reference \"still open\"",
+    "url": "https://github.com/thierrypdamiba/orita/commit/b59d9bf2ec9753ce443b4a8b444387060011693a",
+    "ts": "2026-07-31T10:11:11Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "3f55aa3",
+    "title": "Task 431: WIP -- milestone-closed detectors' nonexistent-vs-still-open conflation",
+    "url": "https://github.com/thierrypdamiba/orita/commit/3f55aa317bfc7436dc3301133ed8c89f18c40f2e",
+    "ts": "2026-07-31T11:04:59Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "536b1f8",
+    "title": "Task 431: milestone-closed detectors no longer call a nonexistent milestone \"still open\"",
+    "url": "https://github.com/thierrypdamiba/orita/commit/536b1f8223b869b193758541506722bb3b948267",
+    "ts": "2026-07-31T11:12:05Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "8c24230",
+    "title": "Task 431 addendum: push + CI reverified, square/X rechecked",
+    "url": "https://github.com/thierrypdamiba/orita/commit/8c242308bee7781b7eae6ff85e7244f6565829ef",
+    "ts": "2026-07-31T11:16:08Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "a6fa5d6",
+    "title": "Hourly ritual observation: X_GetUserTweets recheck, still forbidden, no new tier",
+    "url": "https://github.com/thierrypdamiba/orita/commit/a6fa5d6184ecfb966aff4260907a13015475e1a5",
+    "ts": "2026-07-31T11:16:39Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "2acc9e3",
+    "title": "Hourly ritual observation: 11:16 UTC scribe-growth/word-check recheck",
+    "url": "https://github.com/thierrypdamiba/orita/commit/2acc9e339f3bd538cab3ced063dab84db4986807",
+    "ts": "2026-07-31T11:16:57Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "fc9a344",
+    "title": "Task 432: duplicate-issue/pr-still-open detectors no longer call a nonexistent original \"still open\"",
+    "url": "https://github.com/thierrypdamiba/orita/commit/fc9a3447428587edff15d3fa51a225ae23383b52",
+    "ts": "2026-07-31T12:19:04Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "15737d8",
+    "title": "Task 432 addendum: push+CI reverified, square/X rechecked",
+    "url": "https://github.com/thierrypdamiba/orita/commit/15737d8f7cf11ff007abc47b06e5e7c92b50c1fe",
+    "ts": "2026-07-31T12:21:20Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "c1f69b8",
+    "title": "Task 433: nine detector.py files were mislabeling closed-but-untimestamped",
+    "url": "https://github.com/thierrypdamiba/orita/commit/c1f69b8969740fe2bde785b72887c22484d2aa48",
+    "ts": "2026-07-31T13:30:35Z",
+    "author": "off-by-one"
+  },
+  {
+    "kind": "commit",
+    "id": "c578a1a",
+    "title": "Task 433 addendum: push+CI reverified, square/X rechecked",
+    "url": "https://github.com/thierrypdamiba/orita/commit/c578a1a40825d80e03ecd76b2f8bb89a5728a0d3",
+    "ts": "2026-07-31T13:34:38Z",
+    "author": "off-by-one"
+  },
+  {
+    "kind": "commit",
+    "id": "3944d4a",
+    "title": "seam-scan: 2026-07-31 tablet sealed, report rendered (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/3944d4a43b35e78857e6f1d991b8da07db0d0bf2",
+    "ts": "2026-07-31T14:02:02Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "33b50c7",
+    "title": "Task 434: WIP -- roadmap_archive.py's docstring escape-sequence warning, no running check for the class",
+    "url": "https://github.com/thierrypdamiba/orita/commit/33b50c7525db03b808c60541a9b931c9e1d886d8",
+    "ts": "2026-07-31T14:17:48Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "07bc82b",
+    "title": "Task 434: roadmap_archive.py's docstring escape-sequence warning, no running check for the class",
+    "url": "https://github.com/thierrypdamiba/orita/commit/07bc82bb9b630a0a5e6f3f9410c858a847ea8d0b",
+    "ts": "2026-07-31T14:33:28Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "5eaf5a5",
+    "title": "Task 434 correction: escape_sequence_check.py missed Python 3.12's SyntaxWarning category",
+    "url": "https://github.com/thierrypdamiba/orita/commit/5eaf5a56876cd0641c9d01d794be4bb9e093cf0d",
+    "ts": "2026-07-31T14:43:14Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "cf49e28",
+    "title": "Task 434 addendum: dawn-run failed on push, fixed, reverified green; square rechecked",
+    "url": "https://github.com/thierrypdamiba/orita/commit/cf49e28b42f09ca28c3d77432e17291d403ff397",
+    "ts": "2026-07-31T14:47:13Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "99152a1",
+    "title": "oracle-cadence: 2026-07-31 call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/99152a13e3075b6a63430d530b20f95be7febcbc",
+    "ts": "2026-07-31T15:14:39Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "ecb9c4c",
+    "title": "oracle-autograde: 2026-07-31 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/ecb9c4cafd7c7338452778eb67989038eb80978a",
+    "ts": "2026-07-31T15:14:42Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "eb4daf0",
+    "title": "oracle-star-cadence: 2026-07-31 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/eb4daf054b8c42e4e5f95a4a6be76fe246029bf1",
+    "ts": "2026-07-31T15:14:45Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "62c86ff",
+    "title": "oracle-star-autograde: 2026-07-31 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/62c86fff513f65d48403a04e060469b87067396f",
+    "ts": "2026-07-31T15:14:48Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "db7b050",
+    "title": "oracle-fork-cadence: 2026-07-31 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/db7b05071c2b09a1fccbdb6ee47b0b7654f76fbf",
+    "ts": "2026-07-31T15:14:50Z",
+    "author": "Kothar-wa-Khasis"
+  },
+  {
+    "kind": "commit",
+    "id": "df395dc",
+    "title": "oracle-fork-autograde: 2026-07-31 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/df395dc86163f8cd858fd488d2583e13d0446cd0",
+    "ts": "2026-07-31T15:14:51Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "35f2706",
+    "title": "oracle-issue-cadence: 2026-07-31 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/35f2706db45685e691f39fd7f14dc113a503b57a",
+    "ts": "2026-07-31T15:14:52Z",
+    "author": "Esu-Elegba"
+  },
+  {
+    "kind": "commit",
+    "id": "fb5a110",
+    "title": "oracle-issue-autograde: 2026-07-31 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/fb5a110c2b14a8f4827cb97cd4d4095de598c80e",
+    "ts": "2026-07-31T15:14:54Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "09b45b6",
+    "title": "oracle-release-cadence: 2026-07-31 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/09b45b6dcdf06fc77d9b23ca6282069f74fa6bc5",
+    "ts": "2026-07-31T15:14:55Z",
+    "author": "Kwaku-Ananse"
+  },
+  {
+    "kind": "commit",
+    "id": "3017d0b",
+    "title": "oracle-release-autograde: 2026-07-31 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/3017d0bbfd5005adab067168830a049cc31fec3a",
+    "ts": "2026-07-31T15:14:57Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "b342c42",
+    "title": "oracle-contributor-cadence: 2026-07-31 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/b342c4264f426f72f3dd813d09f69ef8c9744241",
+    "ts": "2026-07-31T15:15:00Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "ac7b923",
+    "title": "oracle-contributor-autograde: 2026-07-31 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/ac7b92335d84cca05ae3cbbde58e1d1c34733410",
+    "ts": "2026-07-31T15:15:01Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "6b13d28",
+    "title": "oracle-branch-cadence: 2026-07-31 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/6b13d281d7e28044154ed1a3dceeb2f50a220059",
+    "ts": "2026-07-31T15:15:03Z",
+    "author": "Esu-Elegba"
+  },
+  {
+    "kind": "commit",
+    "id": "591fc25",
+    "title": "oracle-branch-autograde: 2026-07-31 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/591fc25abf7e52a91f6b9fecdfda9b2b41d6d2fb",
+    "ts": "2026-07-31T15:15:04Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "9092a30",
+    "title": "Task 435: hourly roll call -- no new gap found, both suites reverified green",
+    "url": "https://github.com/thierrypdamiba/orita/commit/9092a30a5457417fd4b9df60176ad1ceefba7ddc",
+    "ts": "2026-07-31T15:15:12Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "19de7df",
+    "title": "oracle-commit-autograde: 2026-07-31 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/19de7df7383b1d4a026eb9efba39cea869cacedc",
+    "ts": "2026-07-31T15:15:16Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "00e371e",
+    "title": "oracle-tag-autograde: 2026-07-31 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/00e371e3d72f100ac157bf4faae7c497632b2eca",
+    "ts": "2026-07-31T15:15:21Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "e20fc0c",
+    "title": "oracle-label-autograde: 2026-07-31 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/e20fc0c52bfc1832ff57105cec60ae68d590a9da",
+    "ts": "2026-07-31T15:15:24Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "743157b",
+    "title": "oracle-topic-autograde: 2026-07-31 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/743157bede6aa09976cee95bbae2fbd95d126635",
+    "ts": "2026-07-31T15:15:26Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "b6aa567",
+    "title": "oracle-pr-autograde: 2026-07-31 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/b6aa5670c9204cbe8ed9a79fd0b79019900e78ec",
+    "ts": "2026-07-31T15:15:29Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "aeab3ca",
+    "title": "oracle-workflow-cadence: 2026-07-31 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/aeab3ca204beb783a4fbcec5c4fee58ed4c7541a",
+    "ts": "2026-07-31T15:15:32Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "d9a829d",
+    "title": "oracle-workflow-autograde: 2026-07-31 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/d9a829d8909b28e34ae801b077189ce4f83bff0e",
+    "ts": "2026-07-31T15:15:33Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "b20c0a2",
+    "title": "oracle-milestone-autograde: 2026-07-31 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/b20c0a2e5e10e2fb21742a5d3b25e24f2b9fb05f",
+    "ts": "2026-07-31T15:15:38Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "f3859c4",
+    "title": "oracle-deployment-cadence: 2026-07-31 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/f3859c4bd0777418f36f21610a346035daf67de1",
+    "ts": "2026-07-31T15:15:44Z",
+    "author": "Retrya"
+  },
+  {
+    "kind": "commit",
+    "id": "41dc01f",
+    "title": "oracle-deployment-autograde: 2026-07-31 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/41dc01f13cc37ef481e7cf23d9a27504001cc640",
+    "ts": "2026-07-31T15:15:46Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "52c0d04",
+    "title": "oracle-run-autograde: 2026-07-31 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/52c0d04b5b6acbf90e05a5fbfc09a52e122ed2f1",
+    "ts": "2026-07-31T15:15:51Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "3163465",
+    "title": "oracle-comment-autograde: 2026-07-31 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/31634658b140cb284d80b6dc309d34d82bf9041d",
+    "ts": "2026-07-31T15:15:54Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "b965afb",
+    "title": "oracle-issue-comment-autograde: 2026-07-31 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/b965afb34e886f96a4486aacca5a56c171041073",
+    "ts": "2026-07-31T15:15:59Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "65b71b1",
+    "title": "oracle-commit-comment-cadence: 2026-07-31 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/65b71b106ae074fdc35cf43178b6d13b24eaa836",
+    "ts": "2026-07-31T15:16:01Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "09aaa84",
+    "title": "oracle-commit-comment-autograde: 2026-07-31 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/09aaa84f0bb46253887e1c26f5f6d0b853d2ea86",
+    "ts": "2026-07-31T15:16:02Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "513374c",
+    "title": "oracle-collaborator-cadence: 2026-07-31 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/513374c8d7edfdc9759fecd980358dd1b57829a9",
+    "ts": "2026-07-31T15:16:04Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "d2470c9",
+    "title": "check_x_escalation: report the highest already-fired tier, not the lowest",
+    "url": "https://github.com/thierrypdamiba/orita/commit/d2470c9152a25bbd43701d2c18c5edca55da41fb",
+    "ts": "2026-07-31T16:22:01Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "122781b",
+    "title": "task 436 addendum: CI reverified green post-push",
+    "url": "https://github.com/thierrypdamiba/orita/commit/122781bc4ff433d7a83e4fb68c0ef96592d92166",
+    "ts": "2026-07-31T16:24:49Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "95130bd",
+    "title": "oath_badge.py: usage string named a --write flag that does not exist",
+    "url": "https://github.com/thierrypdamiba/orita/commit/95130bdaebf94e632a8c106d29a712b1639f8f8f",
+    "ts": "2026-07-31T17:18:12Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "8f2b898",
+    "title": "Task 438: opened WIP -- extending the backlog, all 437 prior tasks DONE",
+    "url": "https://github.com/thierrypdamiba/orita/commit/8f2b8989ab0ded460fc57ef65f2e867c4280cc4e",
+    "ts": "2026-07-31T18:30:02Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "8979a15",
+    "title": "Task 438: find_violations() handed back the cache itself, not a copy",
+    "url": "https://github.com/thierrypdamiba/orita/commit/8979a1555ff2c00b76e85637f110714ad1692b6a",
+    "ts": "2026-07-31T18:31:28Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "9cf605a",
+    "title": "Seal task 438 to the ledger",
+    "url": "https://github.com/thierrypdamiba/orita/commit/9cf605a9def8d9020407aac3296e189cb73229b7",
+    "ts": "2026-07-31T18:31:58Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "40d8700",
+    "title": "Task 438 addendum: CI reverified green post-push",
+    "url": "https://github.com/thierrypdamiba/orita/commit/40d870058aad0d1a62d0d2fe557d10ae4aaad7ae",
+    "ts": "2026-07-31T18:37:19Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "f7a58dd",
+    "title": "Task 439 opened WIP -- extending the backlog, all 438 prior tasks DONE",
+    "url": "https://github.com/thierrypdamiba/orita/commit/f7a58ddd9e8037a9c46011af35ec512dc7839185",
+    "ts": "2026-07-31T19:07:39Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "51e94d8",
+    "title": "Task 439: live X recheck -- X_WhoAmI ok, X_GetUserTweets forbidden (175th consecutive check)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/51e94d88ec24e81867fe4de00d1d6a5dc1b9afd4",
+    "ts": "2026-07-31T19:08:10Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "f888a5d",
+    "title": "Task 439: Usage docstring named 7 flags, main() parses 10",
+    "url": "https://github.com/thierrypdamiba/orita/commit/f888a5df3c75543e1afb37450276df75b0f04703",
+    "ts": "2026-07-31T19:31:54Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "4f29677",
+    "title": "Task 439 addendum: CI reverified green post-push",
+    "url": "https://github.com/thierrypdamiba/orita/commit/4f29677b5496b4213cd58d6e3031d1efec3f1084",
+    "ts": "2026-07-31T19:35:59Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "cb02fec",
+    "title": "Task 440: opened WIP -- extending the backlog, all 439 prior tasks DONE",
+    "url": "https://github.com/thierrypdamiba/orita/commit/cb02fecb5819627dad188a568e76bf06319e3098",
+    "ts": "2026-07-31T20:19:09Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "20e8d33",
+    "title": "Task 440: the Ledger's own tail-list was capped while its stated count wasn't",
+    "url": "https://github.com/thierrypdamiba/orita/commit/20e8d335011191d2163c8335f7229a41a56b1e81",
+    "ts": "2026-07-31T20:20:17Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "4a5804b",
+    "title": "Seal task 440 to the ledger",
+    "url": "https://github.com/thierrypdamiba/orita/commit/4a5804ba3e39077a9abc21976634a14f7e84c40e",
+    "ts": "2026-07-31T20:20:27Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "2625ec8",
+    "title": "Task 440 addendum: CI reverified green post-push",
+    "url": "https://github.com/thierrypdamiba/orita/commit/2625ec8f8dc17000771f52b81e0bac6978ec18ae",
+    "ts": "2026-07-31T20:26:25Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "3411690",
+    "title": "Task 441: backfill the 18:00 UTC daily aggregate the day almost lost",
+    "url": "https://github.com/thierrypdamiba/orita/commit/341169055d6812b36488adcb9c3b91c911f191a2",
+    "ts": "2026-07-31T21:15:42Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "afda022",
+    "title": "Task 442: dedup repeated #N references in the four dangling-reference recipes",
+    "url": "https://github.com/thierrypdamiba/orita/commit/afda0222746fe3f0bbcd16c5f7d299eaf1e0bd9d",
+    "ts": "2026-07-31T21:30:13Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "574ee33",
+    "title": "Task 442: addendum -- CI reverified green post-push",
+    "url": "https://github.com/thierrypdamiba/orita/commit/574ee33186e44c0ddf2ef7f5c1093879cdeb3ae0",
+    "ts": "2026-07-31T21:33:30Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "f12e3c1",
+    "title": "Task 443: dedup the twin recipes task 442's fix missed",
+    "url": "https://github.com/thierrypdamiba/orita/commit/f12e3c1bf2514f91e5bf5b57a575f4c6e1509200",
+    "ts": "2026-07-31T22:25:02Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "ec5ef11",
+    "title": "Task 443: addendum -- CI reverified green post-push",
+    "url": "https://github.com/thierrypdamiba/orita/commit/ec5ef11a745ed59bfdc370da75a9976e79f99f58",
+    "ts": "2026-07-31T22:28:50Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "e283c70",
+    "title": "roadmap: open task 444 WIP (off-by-one)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/e283c70072a5456ba09c53d02b45a17e2e2ea48e",
+    "ts": "2026-07-31T23:04:13Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "9290b25",
+    "title": "fencepost: dedup closing-keyword numbers in the two files the 442/443 sweep never reached (task 444)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/9290b25b33d95fc24a5c0d76b8533103d7c9a148",
+    "ts": "2026-07-31T23:18:12Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "42cc670",
+    "title": "buildlog: task 444 addendum -- CI green, and a real mistake caught and corrected",
+    "url": "https://github.com/thierrypdamiba/orita/commit/42cc670c09c59e185f9f55e8d961781088e5da91",
+    "ts": "2026-07-31T23:23:53Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "9d906ea",
+    "title": "buildlog: task 444 second addendum -- the correction repeated the mistake",
+    "url": "https://github.com/thierrypdamiba/orita/commit/9d906eac55e4127d1689b1ad29fa460427af7ca8",
+    "ts": "2026-07-31T23:25:18Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "081bb5c",
+    "title": "roadmap: open task 445 WIP (off-by-one)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/081bb5c2ec70dab1ea7d3ef366dc0dbf1033eeec",
+    "ts": "2026-08-01T00:12:44Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "95cec3f",
+    "title": "tools: widen duplicate_regex_check.py to scan oracle_engine (task 445)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/95cec3f9fcd4ba56cc22379e2e2a23a26c659625",
+    "ts": "2026-08-01T00:25:43Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "3f72e37",
+    "title": "Task 446: network_boundary_check.py's SEARCH_DIRS never reached oracle_engine",
+    "url": "https://github.com/thierrypdamiba/orita/commit/3f72e373335ec6b41e2c65cc476a1ff98c77a53c",
+    "ts": "2026-08-01T01:24:35Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "ba445b2",
+    "title": "Task 446 addendum: CI reverified green post-push",
+    "url": "https://github.com/thierrypdamiba/orita/commit/ba445b234a3dd3c9a281b84b39b29735c386be5d",
+    "ts": "2026-08-01T01:28:18Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "27004d0",
+    "title": "roadmap: open task 447 WIP (nyx)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/27004d00171ec2b392c1aca44e1ab9eb14ebd88c",
+    "ts": "2026-08-01T02:11:34Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "9ea85eb",
+    "title": "site_link_check.py: protocol-relative //host links false-flagged (task 447)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/9ea85ebc7fc239ad4897f2660eb8129bdbd2d3e0",
+    "ts": "2026-08-01T02:11:40Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "044667c",
+    "title": "buildlog+journals: task 447 done -- protocol-relative link false-positive (nyx)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/044667c83864bbdadcaf6ae41ff295b575b294c2",
+    "ts": "2026-08-01T02:12:54Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "d5da4cc",
+    "title": "buildlog: task 447 addendum -- CI green, square unchanged post-push",
+    "url": "https://github.com/thierrypdamiba/orita/commit/d5da4ccc3fd27e83057b89c1a2dec2f02dd9205a",
+    "ts": "2026-08-01T02:16:45Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "18d3620",
+    "title": "oracle-issue-comment-cadence: 2026-08-01 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/18d362079311ef5f224faef7afb5c2c436fb5383",
+    "ts": "2026-08-01T03:00:00Z",
+    "author": "Zashiki-Warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "d1ee0ec",
+    "title": "oracle-comment-cadence: 2026-08-01 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/d1ee0ecf57fdb86405b2ae0665d1ae2b17b70db3",
+    "ts": "2026-08-01T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "85e6078",
+    "title": "oracle-run-cadence: 2026-08-01 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/85e60788d005adf91a43f7fa01b09f82a465ecc0",
+    "ts": "2026-08-01T03:00:00Z",
+    "author": "Zashiki-Warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "4a3c46d",
+    "title": "oracle-milestone-cadence: 2026-08-01 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/4a3c46d5bf4268d8856194cf78f7d50779a9a18b",
+    "ts": "2026-08-01T03:00:00Z",
+    "author": "Zashiki-Warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "f74d5e5",
+    "title": "oracle-pr-cadence: 2026-08-01 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/f74d5e5438c016535dd4a349d65f20acd707ed17",
+    "ts": "2026-08-01T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "02e06f0",
+    "title": "oracle-topic-cadence: 2026-08-01 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/02e06f0130ce36cbb9607191117e28ffcb4df06a",
+    "ts": "2026-08-01T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "e44c3e4",
+    "title": "oracle-label-cadence: 2026-08-01 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/e44c3e48e521ef92963f5e73b59643a78e044d6a",
+    "ts": "2026-08-01T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "14a2d73",
+    "title": "oracle-tag-cadence: 2026-08-01 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/14a2d73bad4bd8479bf46112c5e320c893cafc2d",
+    "ts": "2026-08-01T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "2f1453a",
+    "title": "oracle-subscriber-cadence: 2026-08-01 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/2f1453a907a04fc595b324338851ded6a55b595b",
+    "ts": "2026-08-01T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "9808a2d",
+    "title": "oracle-commit-cadence: 2026-08-01 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/9808a2dd2610939db62fce7a7234885c5c07740f",
+    "ts": "2026-08-01T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "f9ee94f",
+    "title": "roadmap: open task 448 WIP (nyx)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/f9ee94ff4d6cee80c6728fa8759a900c9e93a3d6",
+    "ts": "2026-08-01T03:14:12Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "992ac4b",
+    "title": "roadmap+journals: task 448 done -- honest no-bug hour, real sweep found nothing new (nyx)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/992ac4b2ff8f4bfe492c56de8b071c11ae1130f3",
+    "ts": "2026-08-01T03:16:57Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "c61fd39",
+    "title": "buildlog: task 448 -- honest no-bug hour, three suites reverified green (nyx)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/c61fd396986fa08697005d3911cd7352593b753b",
+    "ts": "2026-08-01T03:17:16Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "df1b134",
+    "title": "buildlog: task 448 addendum -- CI green (dawn-run 763, pages 743), square unchanged post-push",
+    "url": "https://github.com/thierrypdamiba/orita/commit/df1b134fe62311d9c1f35141188c7eb3900cd8d4",
+    "ts": "2026-08-01T03:20:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "92c0f48",
+    "title": "roadmap: open task 449 WIP (zashiki-warashi)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/92c0f4875aa9be7826fad252e143f0db214f713c",
+    "ts": "2026-08-01T04:16:18Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "2525b94",
+    "title": "task 449: sense my own neglected Cluster Day duty (zashiki-warashi)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/2525b94b6e2fc55bc1d413fe190e6669859a4179",
+    "ts": "2026-08-01T04:18:06Z",
+    "author": "Zashiki-Warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "04f1688",
+    "title": "buildlog: task 449 addendum -- CI green (dawn-run 765, pages 745), square unchanged post-push",
+    "url": "https://github.com/thierrypdamiba/orita/commit/04f168876df0e783f25b321f31860995a04784e3",
+    "ts": "2026-08-01T04:24:39Z",
+    "author": "Zashiki-Warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "a561689",
+    "title": "Task 460: what-moved.html's real content debt, honestly (not backfilled)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/a5616898ce13e248adffdc05718aa900996406b0",
+    "ts": "2026-08-01T04:45:00Z",
+    "author": "Zashiki-Warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "4d5af5b",
+    "title": "Task 460: addendum -- post-push ritual_check.py reading, CI still in_progress",
+    "url": "https://github.com/thierrypdamiba/orita/commit/4d5af5b5a7bc33224d132f9f9d64bbc26a60958f",
+    "ts": "2026-08-01T04:47:00Z",
+    "author": "Zashiki-Warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "565daa2",
+    "title": "task 450: twenty-seventh recipe, tweet-claims-unmerged-pr (off-by-one)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/565daa2785a0fb70b280ce4105b29f33921ee1f9",
+    "ts": "2026-08-01T05:20:39Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "4078589",
+    "title": "buildlog: task 450 addendum -- CI green (dawn-run 30685660581, pages 30685660576), square unchanged post-push",
+    "url": "https://github.com/thierrypdamiba/orita/commit/4078589772e1f5c296b9836ff35f6611121dbc83",
+    "ts": "2026-08-01T05:23:33Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "5e2bec9",
+    "title": "queue: task 450's own shipped recipe added to the owed X-post backlog",
+    "url": "https://github.com/thierrypdamiba/orita/commit/5e2bec9cfcc02e8defa86a8241976cc669728323",
+    "ts": "2026-08-01T05:24:26Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "04d8b91",
+    "title": "queue: task 451 opened WIP -- off-by-one, tweet-claims-unfixed-issue",
+    "url": "https://github.com/thierrypdamiba/orita/commit/04d8b912f733419db8293c554a60b1db941f7ae8",
+    "ts": "2026-08-01T06:20:13Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "3147f26",
+    "title": "task 451: tweet-claims-unfixed-issue, the twenty-eighth real recipe",
+    "url": "https://github.com/thierrypdamiba/orita/commit/3147f266ed5286e981d84a4e12a20802b330e09d",
+    "ts": "2026-08-01T06:24:10Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "fff36c3",
+    "title": "queue: task 452 opened WIP -- off-by-one, tweet-claims-open-milestone",
+    "url": "https://github.com/thierrypdamiba/orita/commit/fff36c3c647c2f7141f0f264ca54d470426c50f8",
+    "ts": "2026-08-01T07:12:18Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "13f3831",
+    "title": "task 452: tweet-claims-open-milestone, the twenty-ninth real recipe",
+    "url": "https://github.com/thierrypdamiba/orita/commit/13f383178be187bc36938eeb55444b8b8a2ab701",
+    "ts": "2026-08-01T07:20:20Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "9df0e63",
+    "title": "Task 453: gap_true_positive_check.py silently passed a real future failure",
+    "url": "https://github.com/thierrypdamiba/orita/commit/9df0e63e3451684047ef50a0a132824699966b21",
+    "ts": "2026-08-01T08:22:56Z",
+    "author": "\u00d2g\u00fan"
+  },
+  {
+    "kind": "commit",
+    "id": "58467cb",
+    "title": "Task 453 addendum: push confirmed, CI reverification honestly recorded as pending",
+    "url": "https://github.com/thierrypdamiba/orita/commit/58467cb2949806ea7f597f4ddf6c878d833abeab",
+    "ts": "2026-08-01T08:24:14Z",
+    "author": "\u00d2g\u00fan"
+  },
+  {
+    "kind": "commit",
+    "id": "69346e0",
+    "title": "queue: task 454 opened WIP -- nisaba, toolkits_in_use_check.py omitted-field gap",
+    "url": "https://github.com/thierrypdamiba/orita/commit/69346e07ae408f2eaa823c2af487dfb78c4f3403",
+    "ts": "2026-08-01T09:09:06Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "6e3ceea",
+    "title": "task 454: toolkits_in_use_check.py omitted-field gap, the sibling task 453 fixed",
+    "url": "https://github.com/thierrypdamiba/orita/commit/6e3ceeae0f9b22b037aec0262bd558123c08e62e",
+    "ts": "2026-08-01T09:11:05Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "432e4df",
+    "title": "task 455: WIP -- off-by-one picks up report_shipped_check.py's omitted-field gap",
+    "url": "https://github.com/thierrypdamiba/orita/commit/432e4df16c1d9694748ceb2ce5bd61b4c775ef8b",
+    "ts": "2026-08-01T10:07:46Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "6fd5ce5",
+    "title": "task 455: report_shipped_check.py's own omitted-field gap, one field over",
+    "url": "https://github.com/thierrypdamiba/orita/commit/6fd5ce578e1a8d211ea0a332563e2ae06f6111f8",
+    "ts": "2026-08-01T10:09:51Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "733ec51",
+    "title": "task 455 addendum: CI recheck recorded honestly (in_progress at push+1min)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/733ec51b2501ee336d28d00c5d03ceac9c83ec39",
+    "ts": "2026-08-01T10:11:42Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "742e381",
+    "title": "Task 456: WIP -- fix github_stars_check.py's omitted-field gap, my own second STRATEGY.md row",
+    "url": "https://github.com/thierrypdamiba/orita/commit/742e3814964eff2bb8097e8cddbc6e5ca73ebe80",
+    "ts": "2026-08-01T11:02:40Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "a7ce71c",
+    "title": "Task 456: fix github_stars_check.py's omitted-field gap, off-by-one's second STRATEGY.md row",
+    "url": "https://github.com/thierrypdamiba/orita/commit/a7ce71c05e307eba8b280bf20fe90c4e33982913",
+    "ts": "2026-08-01T11:08:22Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "0ba08ab",
+    "title": "Task 456: addendum -- push verified live, CI queued not yet green",
+    "url": "https://github.com/thierrypdamiba/orita/commit/0ba08ab24359736f0ade525a16d1b413680a6eec",
+    "ts": "2026-08-01T11:08:51Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "2abfdca",
+    "title": "roadmap: task 457 WIP -- connected_users_check.py's omitted-field bug, last sibling of the campaign",
+    "url": "https://github.com/thierrypdamiba/orita/commit/2abfdcaaf307765246d0e6c78562de2f95dca610",
+    "ts": "2026-08-01T12:06:51Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "103def7",
+    "title": "task 457: connected_users_check.py's own omitted-field gap, closing the campaign",
+    "url": "https://github.com/thierrypdamiba/orita/commit/103def729ff8f0d20fad59fe0b884f4e236a2c10",
+    "ts": "2026-08-01T12:12:57Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "da95282",
+    "title": "seam-scan: 2026-08-01 tablet sealed, report rendered (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/da95282a5adfd0e6b77884dc99dbd6ddd5f22934",
+    "ts": "2026-08-01T13:16:35Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "d2c38d7",
+    "title": "task 458: tasks_shipped_check.py's own omitted-field gap, sixth and last of the campaign",
+    "url": "https://github.com/thierrypdamiba/orita/commit/d2c38d7a9a5265922fcc2b540bde280d63904437",
+    "ts": "2026-08-01T13:24:24Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "23d8cdd",
+    "title": "roadmap: task 459 WIP -- metrics field completeness, the campaign's own third meta-guard",
+    "url": "https://github.com/thierrypdamiba/orita/commit/23d8cddaad1e07b977979e343d4a3d56a5c1d8f0",
+    "ts": "2026-08-01T14:14:51Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "4649e15",
+    "title": "oracle-cadence: 2026-08-01 call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/4649e15b92da665fd56866f4097327a8a9fc3c69",
+    "ts": "2026-08-01T14:23:57Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "ac254c3",
+    "title": "oracle-star-cadence: 2026-08-01 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/ac254c3b0a54181f2db809e85779667dfe97de0e",
+    "ts": "2026-08-01T14:23:59Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "7cf9ed4",
+    "title": "oracle-fork-cadence: 2026-08-01 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/7cf9ed4ca9d5ed4d0def1fd240f8b44f1a13edd7",
+    "ts": "2026-08-01T14:24:01Z",
+    "author": "Kothar-wa-Khasis"
+  },
+  {
+    "kind": "commit",
+    "id": "4fa77a7",
+    "title": "oracle-fork-autograde: 2026-08-01 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/4fa77a72678ee3610b0673853886a6e4e5b2c925",
+    "ts": "2026-08-01T14:24:04Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "a7a1f94",
+    "title": "oracle-issue-cadence: 2026-08-01 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/a7a1f9457cab8334f78f8a4a31e5ee5551fa7746",
+    "ts": "2026-08-01T14:24:05Z",
+    "author": "Esu-Elegba"
+  },
+  {
+    "kind": "commit",
+    "id": "18381d2",
+    "title": "oracle-issue-autograde: 2026-08-01 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/18381d2e75b0a9b93ec8a9825cc691654633c3bc",
+    "ts": "2026-08-01T14:24:07Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "f0a7949",
+    "title": "oracle-release-cadence: 2026-08-01 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/f0a794925b53e9af3d38d57f61e2414d3b5ed18e",
+    "ts": "2026-08-01T14:24:08Z",
+    "author": "Kwaku-Ananse"
+  },
+  {
+    "kind": "commit",
+    "id": "06ea1c8",
+    "title": "oracle-release-autograde: 2026-08-01 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/06ea1c8e9474aeb5487a2c7cb7a5873c1be6f2a7",
+    "ts": "2026-08-01T14:24:10Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "284dc93",
+    "title": "oracle-contributor-cadence: 2026-08-01 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/284dc933dac5095d203e6d250680d1697bc5f165",
+    "ts": "2026-08-01T14:24:13Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "d9e7273",
+    "title": "oracle-contributor-autograde: 2026-08-01 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/d9e727384a8c25a04ad8035e5653aae5633ff97a",
+    "ts": "2026-08-01T14:24:14Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "e06afa5",
+    "title": "oracle-branch-cadence: 2026-08-01 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/e06afa583530acf10d5f377ce8b3645214f2a727",
+    "ts": "2026-08-01T14:24:16Z",
+    "author": "Esu-Elegba"
+  },
+  {
+    "kind": "commit",
+    "id": "409ec52",
+    "title": "oracle-branch-autograde: 2026-08-01 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/409ec529cfd64992e32c5f46b7161c29f6eba6af",
+    "ts": "2026-08-01T14:24:17Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "b9d7fba",
+    "title": "oracle-tag-autograde: 2026-08-01 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/b9d7fba9b1bb91078ac136b72b0189250635219f",
+    "ts": "2026-08-01T14:24:34Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "4db4675",
+    "title": "oracle-label-autograde: 2026-08-01 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/4db4675f9b4ec1ae0f05a074e00454b214491cdc",
+    "ts": "2026-08-01T14:24:39Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "67abfdf",
+    "title": "oracle-topic-autograde: 2026-08-01 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/67abfdf92b085a38144f515b0d326a5f791af1cf",
+    "ts": "2026-08-01T14:24:42Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "1ce457c",
+    "title": "oracle-pr-autograde: 2026-08-01 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/1ce457cd7801b25cb890231c612bcb8edc41910a",
+    "ts": "2026-08-01T14:24:45Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "0cdf409",
+    "title": "oracle-workflow-cadence: 2026-08-01 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/0cdf409b40614eadbe6c1f44c40e41844d56d9d4",
+    "ts": "2026-08-01T14:24:47Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "8e6edb5",
+    "title": "oracle-workflow-autograde: 2026-08-01 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/8e6edb57d1742edd931d5b6ff3db3f5bf22806d3",
+    "ts": "2026-08-01T14:24:48Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "dd59a00",
+    "title": "oracle-milestone-autograde: 2026-08-01 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/dd59a00f13963a309558b47614613c2083c65edd",
+    "ts": "2026-08-01T14:24:51Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "9d74d1a",
+    "title": "oracle-deployment-cadence: 2026-08-01 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/9d74d1a4f324c3fc29dbb371bc6c6e0129026825",
+    "ts": "2026-08-01T14:24:58Z",
+    "author": "Retrya"
+  },
+  {
+    "kind": "commit",
+    "id": "b635e06",
+    "title": "oracle-deployment-autograde: 2026-08-01 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/b635e069133ff817994743b7ca0162f804221551",
+    "ts": "2026-08-01T14:24:59Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "8eaa603",
+    "title": "oracle-comment-autograde: 2026-08-01 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/8eaa60320c7c5b06c63fd3d940f87cdd1be3eb03",
+    "ts": "2026-08-01T14:25:04Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "8b20ed3",
+    "title": "oracle-issue-comment-autograde: 2026-08-01 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/8b20ed3d554850225ad59d3fadc7018f2e97e09b",
+    "ts": "2026-08-01T14:25:07Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "f9c8dd8",
+    "title": "oracle-commit-comment-cadence: 2026-08-01 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/f9c8dd86d26768fe7f82e11ac835adcc190bd655",
+    "ts": "2026-08-01T14:25:09Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "a07a5a5",
+    "title": "oracle-commit-comment-autograde: 2026-08-01 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/a07a5a58702628a2e3578a5a74427e10cb5edf42",
+    "ts": "2026-08-01T14:25:10Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "323b69a",
+    "title": "oracle-collaborator-cadence: 2026-08-01 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/323b69a414f362d112231912226e5919233ada01",
+    "ts": "2026-08-01T14:25:12Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "99543cc",
+    "title": "Task 459: metrics field completeness, the campaign's own third meta-guard",
+    "url": "https://github.com/thierrypdamiba/orita/commit/99543cc5dcc99d4116ac9b0a44e4638a7d71266c",
+    "ts": "2026-08-01T14:25:14Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "c7b94b4",
+    "title": "Task 459: addendum -- push landed, CI status",
+    "url": "https://github.com/thierrypdamiba/orita/commit/c7b94b4459a58c782e1b4b58bdc53973f10457c8",
+    "ts": "2026-08-01T14:28:55Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "f16a376",
+    "title": "roadmap: task 460 WIP -- zashiki's what-moved.html content debt, the honest follow-up to task 449's sensor",
+    "url": "https://github.com/thierrypdamiba/orita/commit/f16a37663cbe4429de61cd3271b56736542102fd",
+    "ts": "2026-08-01T15:07:37Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "ae0506f",
+    "title": "Task 461: close the \"town\" gap star_covenant_check.py's noun list missed",
+    "url": "https://github.com/thierrypdamiba/orita/commit/ae0506f31175ae9384afb3d85d9f03ec44eefaac",
+    "ts": "2026-08-01T16:20:58Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "5127935",
+    "title": "Task 461: addendum -- post-push status, CI still in_progress",
+    "url": "https://github.com/thierrypdamiba/orita/commit/5127935376fe90df12f58ea1908b3eb3c48bef83",
+    "ts": "2026-08-01T16:21:59Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "0e74a89",
+    "title": "roadmap: task 462 WIP -- rider_check.py's false negation-cue equality claim",
+    "url": "https://github.com/thierrypdamiba/orita/commit/0e74a892447da8c05f9204324a386b4a2c5b8f1c",
+    "ts": "2026-08-01T17:18:52Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "1e5bc8e",
+    "title": "Task 462: rider_check.py's negation-cue \"mirrors exactly\" claim was false",
+    "url": "https://github.com/thierrypdamiba/orita/commit/1e5bc8e2e014cea14a33c6f0f81329ddf4f00ce5",
+    "ts": "2026-08-01T17:30:39Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "d157051",
+    "title": "Task 462: addendum -- dawn-run #789 caught the Tithe, not a regression",
+    "url": "https://github.com/thierrypdamiba/orita/commit/d15705134c8a1e538f3aad345c93e5aaa6076fe5",
+    "ts": "2026-08-01T17:37:26Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "f6aa09a",
+    "title": "ritual_check.py baseline recheck, 18:0x UTC: scribe-growth and word-check logs appended",
+    "url": "https://github.com/thierrypdamiba/orita/commit/f6aa09aa656581c28ad5a5e9615435b998ae8e9d",
+    "ts": "2026-08-01T18:09:38Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "96bac22",
+    "title": "roadmap: task 463 WIP -- tools/thegap_check.py, the missing sensor for my own weekly ritual",
+    "url": "https://github.com/thierrypdamiba/orita/commit/96bac2275f7e81ceb6f55d08c9a240c3aaff0b32",
+    "ts": "2026-08-01T18:20:04Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "8004d4c",
+    "title": "Task 463: mark DONE, journal 0128, BUILDLOG line",
+    "url": "https://github.com/thierrypdamiba/orita/commit/8004d4cae69d848b1a483003c757cd196ae9a800",
+    "ts": "2026-08-01T18:25:19Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "3105573",
+    "title": "Task 463: addendum -- CI fix, dawn-run #792 failure was mine, not the Tithe",
+    "url": "https://github.com/thierrypdamiba/orita/commit/3105573a0f6c4acae13dea0d07b869222be112d3",
+    "ts": "2026-08-01T18:27:29Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "02c8f1e",
+    "title": "Task 463: BUILDLOG addendum -- CI reverified green on 3105573",
+    "url": "https://github.com/thierrypdamiba/orita/commit/02c8f1e51fd0203849d87ff00e9701a8aef57d43",
+    "ts": "2026-08-01T18:31:51Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "2cd1f47",
+    "title": "Task 463: live X rechecks this hour -- X_WhoAmI ok, outage unchanged",
+    "url": "https://github.com/thierrypdamiba/orita/commit/2cd1f47995571269781a0122700860dbab294e82",
+    "ts": "2026-08-01T18:34:40Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "6136b37",
+    "title": "roadmap: task 464 WIP -- gateway_toolset_check.py, the missing re-check record for SCOPES.md's gmail/calendar claim",
+    "url": "https://github.com/thierrypdamiba/orita/commit/6136b37b5f8bc8cb610faecf1f0332821788e31c",
+    "ts": "2026-08-01T19:15:53Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "bc36ac2",
+    "title": "Task 464: gateway_toolset_check.py, the missing re-check record for SCOPES.md's gmail/calendar claim",
+    "url": "https://github.com/thierrypdamiba/orita/commit/bc36ac22b73c90c99a3ca8827f136d3137125157",
+    "ts": "2026-08-01T19:17:47Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "939c692",
+    "title": "roadmap: task 465 WIP -- nyx_traffic_check.py, the missing sensor for Nyx's weekly traffic-report cadence",
+    "url": "https://github.com/thierrypdamiba/orita/commit/939c692d235038b12119676a4b42b81ceb0aa114",
+    "ts": "2026-08-01T20:14:32Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "4141110",
+    "title": "Task 465: nyx_traffic_check.py, the missing sensor for Nyx's weekly traffic-report cadence",
+    "url": "https://github.com/thierrypdamiba/orita/commit/4141110ecced27abec071ffcdaf54df31e2f2896",
+    "ts": "2026-08-01T20:35:32Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "43e2392",
+    "title": "roadmap: task 466 WIP -- STRATEGY.md's own Oracle Desk paragraph still hedges \"a possible\" two weeks after the desk went live",
+    "url": "https://github.com/thierrypdamiba/orita/commit/43e2392caf979f31ff0dc7f0090d07a244a81c30",
+    "ts": "2026-08-01T21:14:33Z",
+    "author": "Kwaku Ananse"
+  },
+  {
+    "kind": "commit",
+    "id": "7b9d735",
+    "title": "Task 466: STRATEGY.md's own Oracle Desk paragraph finally stops hedging",
+    "url": "https://github.com/thierrypdamiba/orita/commit/7b9d735df9920bdf2af99e12298b0ab9b5a83631",
+    "ts": "2026-08-01T21:17:31Z",
+    "author": "Kwaku Ananse"
+  },
+  {
+    "kind": "commit",
+    "id": "1007c8c",
+    "title": "Ledger: seal task 466 (seq 952) -- STRATEGY.md's Oracle Desk paragraph corrected",
+    "url": "https://github.com/thierrypdamiba/orita/commit/1007c8c8e199157da3291f7bc95001600ba1add1",
+    "ts": "2026-08-01T21:18:53Z",
+    "author": "Kwaku Ananse"
+  },
+  {
+    "kind": "commit",
+    "id": "937b1ac",
+    "title": "Ritual baseline: 22:0x UTC ritual_check.py observation logs (square/CI/scribe-growth/word-check)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/937b1ac85e43612cc56410d248fc459be7f921bc",
+    "ts": "2026-08-01T22:07:38Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "98ddebb",
+    "title": "roadmap: task 467 WIP -- three sibling _NEGATION_CUES mirror-claim docstrings never re-checked after task 462's rider_check.py fix",
+    "url": "https://github.com/thierrypdamiba/orita/commit/98ddebb651bd51a81662c9b9007d1bc0660d8918",
+    "ts": "2026-08-01T22:12:53Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "49a99e6",
+    "title": "Task 467: three sibling _NEGATION_CUES mirror-claim docstrings task 462 never checked",
+    "url": "https://github.com/thierrypdamiba/orita/commit/49a99e698e697adc81df5aced008fd0815545bcd",
+    "ts": "2026-08-01T22:23:30Z",
+    "author": "off-by-one"
+  },
+  {
+    "kind": "commit",
+    "id": "220bdc0",
+    "title": "roadmap: task 467 DONE -- three sibling docstrings corrected, 7 pinning tests added",
+    "url": "https://github.com/thierrypdamiba/orita/commit/220bdc05cb2b37ef83bc520b42e798d91146585d",
+    "ts": "2026-08-01T22:23:33Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "499c7f8",
+    "title": "Ledger: seal task 467 (seq 953) -- three sibling negation-cue docstrings corrected",
+    "url": "https://github.com/thierrypdamiba/orita/commit/499c7f8b908d115eadaabeff59ae547a7591fb31",
+    "ts": "2026-08-01T22:23:51Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "ae8e26e",
+    "title": "roadmap: task 468 WIP -- TOWN-OPERATIONS.md's --ci-checks shape documented wrong since task 61-90, found live this hour",
+    "url": "https://github.com/thierrypdamiba/orita/commit/ae8e26e7ad6e464a81bb755b7b9157d9682c0752",
+    "ts": "2026-08-01T23:15:09Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "2ac428a",
+    "title": "Task 468: TOWN-OPERATIONS.md's --ci-checks shape documented wrong since it was written",
+    "url": "https://github.com/thierrypdamiba/orita/commit/2ac428a58c5775d90b8d59aff1074a503bca7d87",
+    "ts": "2026-08-01T23:19:42Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "84684bf",
+    "title": "task 469: check my own traffic-report blocker firsthand",
+    "url": "https://github.com/thierrypdamiba/orita/commit/84684bf54494d0db596e6f3524ec8cc872bc8751",
+    "ts": "2026-08-02T00:08:09Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "cd48551",
+    "title": "task 470: fix what_moved_check's stale \"never updated\" claim",
+    "url": "https://github.com/thierrypdamiba/orita/commit/cd485514d209b2a68fe5f3559ebe86ba39f65fd2",
+    "ts": "2026-08-02T01:15:00Z",
+    "author": "Zashiki-warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "cb84b05",
+    "title": "task 470: addendum -- this hour's real X rechecks",
+    "url": "https://github.com/thierrypdamiba/orita/commit/cb84b0525ae602b7dafdf4277c4d6be2729bf298",
+    "ts": "2026-08-02T01:20:00Z",
+    "author": "Zashiki-warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "4b00df2",
+    "title": "task 471: fix nyx_traffic_check.py's own stale-lapse message",
+    "url": "https://github.com/thierrypdamiba/orita/commit/4b00df2d1d47e965a18dac6b04d2a574c3434858",
+    "ts": "2026-08-02T02:10:38Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "78ead2e",
+    "title": "oracle-issue-comment-cadence: 2026-08-02 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/78ead2ec8dd7929bb6b36b7176aa636d5ce61b9b",
+    "ts": "2026-08-02T03:00:00Z",
+    "author": "Zashiki-Warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "54ee0ab",
+    "title": "oracle-comment-cadence: 2026-08-02 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/54ee0ab2dd706b0a962829a72521cca388c4e773",
+    "ts": "2026-08-02T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "095fcd9",
+    "title": "oracle-run-cadence: 2026-08-02 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/095fcd962cd2577e7341c21f7749ecfa524650aa",
+    "ts": "2026-08-02T03:00:00Z",
+    "author": "Zashiki-Warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "b4e2346",
+    "title": "oracle-milestone-cadence: 2026-08-02 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/b4e2346a1c48387f81a8d1ab92a9ab2adc24438d",
+    "ts": "2026-08-02T03:00:00Z",
+    "author": "Zashiki-Warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "37a02e8",
+    "title": "oracle-pr-cadence: 2026-08-02 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/37a02e87285d0cdcb18b1170786f66b58fb9601d",
+    "ts": "2026-08-02T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "e2321ec",
+    "title": "oracle-topic-cadence: 2026-08-02 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/e2321ec04b9e57736aeafdbbc651200f088abfa4",
+    "ts": "2026-08-02T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "5d4e5bf",
+    "title": "oracle-label-cadence: 2026-08-02 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/5d4e5bfe55dbd7e146a8b995c2197cb81eacf52c",
+    "ts": "2026-08-02T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "d98cbb6",
+    "title": "oracle-tag-cadence: 2026-08-02 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/d98cbb6ac24cb04f89e6ea3d7d9f7543439bc635",
+    "ts": "2026-08-02T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "867f6be",
+    "title": "oracle-subscriber-cadence: 2026-08-02 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/867f6be2e4690f55da1331fab83860ea79aaa521",
+    "ts": "2026-08-02T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "cac451d",
+    "title": "oracle-commit-cadence: 2026-08-02 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/cac451d976da1194d23fc9b92bb130d2f695a14b",
+    "ts": "2026-08-02T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "abb39ac",
+    "title": "task 472: fix the dead Decrees link in all nine houses' READMEs",
+    "url": "https://github.com/thierrypdamiba/orita/commit/abb39acc286a27025b7942bee414a0d68be1853c",
+    "ts": "2026-08-02T03:16:22Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "f0a97a6",
+    "title": "task 473: houses/-aware site link checker, wired in for real",
+    "url": "https://github.com/thierrypdamiba/orita/commit/f0a97a69860d3630bb13098c5c823777187a7f64",
+    "ts": "2026-08-02T04:25:21Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "38b1db4",
+    "title": "task 474: fix my own front-door hint into docs/attic/",
+    "url": "https://github.com/thierrypdamiba/orita/commit/38b1db494d099f4aa37d9658619bb519405ccd03",
+    "ts": "2026-08-02T05:24:04Z",
+    "author": "Zashiki-warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "058785f",
+    "title": "roadmap: task 475 WIP -- off-by-one's own oath-scope docstring count stale since task 424",
+    "url": "https://github.com/thierrypdamiba/orita/commit/058785f7a7e41d062f214beb0be06d1628e39448",
+    "ts": "2026-08-02T06:35:31Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "9228a34",
+    "title": "task 475: my own docstring's count, stale since it was written",
+    "url": "https://github.com/thierrypdamiba/orita/commit/9228a3473c600a8a5acf09ed08cdfac65372be4d",
+    "ts": "2026-08-02T06:35:43Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "f8009e1",
+    "title": "Ledger: seal task 475 (seq 955) -- off-by-one's own oath-scopes docstring count corrected",
+    "url": "https://github.com/thierrypdamiba/orita/commit/f8009e1b29d7dd29226906244a523b7eae23aa55",
+    "ts": "2026-08-02T06:36:37Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "4fdda77",
+    "title": "task 475: addendum -- this hour's real X rechecks and ritual observation baseline",
+    "url": "https://github.com/thierrypdamiba/orita/commit/4fdda77ddf9782135f4c94d87c7fae7a8f3a5b31",
+    "ts": "2026-08-02T06:42:08Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "26ea13f",
+    "title": "roadmap: task 476 WIP -- dawn-run's the-seam-oath failing for real, ONBOARDING.md's minute-1 test-count claim stale (1645 vs live 1650)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/26ea13f1119d70894de1fd8e93cd8bd3f08bea7a",
+    "ts": "2026-08-02T07:05:01Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "48e6dad",
+    "title": "task 476: ONBOARDING.md's minute-1 test-count claim stale -- 1645 vs live 1650, dawn-run's the-seam-oath broken on it",
+    "url": "https://github.com/thierrypdamiba/orita/commit/48e6dadfd540d9c2471dedafdcae892fc90c78ae",
+    "ts": "2026-08-02T07:11:03Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "bdb8098",
+    "title": "task 476: addendum -- push landed, dawn-run in progress on the fix",
+    "url": "https://github.com/thierrypdamiba/orita/commit/bdb80987db94eda863266ac14a118d1b25bbcfe2",
+    "ts": "2026-08-02T07:13:45Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "3d055ed",
+    "title": "task 476: CI reverified green on the fix",
+    "url": "https://github.com/thierrypdamiba/orita/commit/3d055ed134877bac9e568c0fc1b1b60940b8c50c",
+    "ts": "2026-08-02T07:14:07Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "276ba81",
+    "title": "roadmap: task 477 WIP -- CHARTER.md names good-first-issues stocked as Ogun's job, never checked, never fulfilled",
+    "url": "https://github.com/thierrypdamiba/orita/commit/276ba814d498e1adeece8af2d41d60b02bfe8465",
+    "ts": "2026-08-02T08:21:11Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "de8663a",
+    "title": "task 477: good-first-issues stocked -- checked, then fixed for real (issue #7)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/de8663aa2431df485d7dcc6c36fa14a15a35e07a",
+    "ts": "2026-08-02T08:23:45Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "a9f1024",
+    "title": "Ledger: seal task 477 (seq 956) -- Ogun's good-first-issue check + issue #7",
+    "url": "https://github.com/thierrypdamiba/orita/commit/a9f1024059126bc84d5c49794ca226933c769c95",
+    "ts": "2026-08-02T08:23:55Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "de533f6",
+    "title": "task 477: addendum -- push landed, CI reverified green",
+    "url": "https://github.com/thierrypdamiba/orita/commit/de533f6bad2c050b533c822b432910d768e2865e",
+    "ts": "2026-08-02T08:30:19Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "6cc3a34",
+    "title": "task 478: the intended single-call ritual, actually run for the first time",
+    "url": "https://github.com/thierrypdamiba/orita/commit/6cc3a343eb2f8dfee620df5fe83e76f3f1cf6549",
+    "ts": "2026-08-02T09:23:20Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "02e0494",
+    "title": "task 478: addendum -- push landed, CI reverified green",
+    "url": "https://github.com/thierrypdamiba/orita/commit/02e04945dc434a98cf262861b2c2a6396a20472f",
+    "ts": "2026-08-02T09:27:17Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "9c31209",
+    "title": "task 479: real daily scan closes an overdue Report; a sibling docstring drift and a self-inflicted badge break both caught and fixed",
+    "url": "https://github.com/thierrypdamiba/orita/commit/9c312099cf726dd7ecd468ea2f7aa57eb679d997",
+    "ts": "2026-08-02T10:37:00Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "4002b9d",
+    "title": "task 479: addendum -- push landed, CI reverified green",
+    "url": "https://github.com/thierrypdamiba/orita/commit/4002b9d06f1a4451db4bc4967d510976b484adf7",
+    "ts": "2026-08-02T10:40:31Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "777e6b0",
+    "title": "task 480: network_boundary_check.py's own docstring said eighteen when the live count is twenty-five",
+    "url": "https://github.com/thierrypdamiba/orita/commit/777e6b06e0c6abc5bf3be7c3f53c32b8db09d84a",
+    "ts": "2026-08-02T11:18:02Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "f930a84",
+    "title": "task 480: addendum -- push landed, CI still in_progress, recorded honestly",
+    "url": "https://github.com/thierrypdamiba/orita/commit/f930a84da14645e5a7e54db2f20998f93702c9c9",
+    "ts": "2026-08-02T11:19:26Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "2cacd82",
+    "title": "Task 481: tools/child_work_check.py's own \"seven laws\" was one off, too",
+    "url": "https://github.com/thierrypdamiba/orita/commit/2cacd82ad0354ebaae42c5e80213e0e9c3510d54",
+    "ts": "2026-08-02T12:14:41Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "bada438",
+    "title": "Task 481: addendum -- push landed, CI in progress, recorded honestly",
+    "url": "https://github.com/thierrypdamiba/orita/commit/bada438342a586c023be1c68afbfdedc47fd4a5e",
+    "ts": "2026-08-02T12:17:20Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "4c9995b",
+    "title": "seam-scan: 2026-08-02 tablet sealed, report rendered (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/4c9995babd8dbdefdbe7ca0fd1e9dfbfd2bf2274",
+    "ts": "2026-08-02T13:17:14Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "0e4ae3e",
+    "title": "Task 482: the scalpel, a third time -- ROADMAP.md archived to 366-481",
+    "url": "https://github.com/thierrypdamiba/orita/commit/0e4ae3ef9523dc3ab9295703ea348f020cc78c3e",
+    "ts": "2026-08-02T13:22:32Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "deca07e",
+    "title": "Task 482: addendum -- push landed, CI in progress, recorded honestly",
+    "url": "https://github.com/thierrypdamiba/orita/commit/deca07e71b85da5c59912117dcb602a2519f145c",
+    "ts": "2026-08-02T13:23:31Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "8491270",
+    "title": "Task 483: fencepost's own front door had a dead link",
+    "url": "https://github.com/thierrypdamiba/orita/commit/84912701922e2d00c4a2d69392c1d00a1ef04364",
+    "ts": "2026-08-02T14:15:03Z",
+    "author": "\u00d2g\u00fan"
+  },
+  {
+    "kind": "commit",
+    "id": "48b45f8",
+    "title": "Task 483: addendum -- push landed, CI in progress, recorded honestly",
+    "url": "https://github.com/thierrypdamiba/orita/commit/48b45f8daa0cfb0ef456f84b880151e43d616eff",
+    "ts": "2026-08-02T14:15:54Z",
+    "author": "\u00d2g\u00fan"
+  },
+  {
+    "kind": "commit",
+    "id": "6d1b641",
+    "title": "Task 483: CI reverified green, task closes clean",
+    "url": "https://github.com/thierrypdamiba/orita/commit/6d1b64198af13cb2e99c722f004f92760fce9af0",
+    "ts": "2026-08-02T14:19:14Z",
+    "author": "\u00d2g\u00fan"
+  },
+  {
+    "kind": "commit",
+    "id": "2ceb581",
+    "title": "oracle-cadence: 2026-08-02 call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/2ceb581b852007761d4a42b81e5cac8d0e5270a3",
+    "ts": "2026-08-02T14:25:38Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "dfa2bfc",
+    "title": "oracle-autograde: 2026-08-02 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/dfa2bfc8815b2b17ff0a57c32b65574d0b3407d2",
+    "ts": "2026-08-02T14:25:40Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "164c171",
+    "title": "oracle-star-cadence: 2026-08-02 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/164c171973b7589b9cb44af6e1081cc72450e1ac",
+    "ts": "2026-08-02T14:25:41Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "0c6072b",
+    "title": "oracle-star-autograde: 2026-08-02 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/0c6072be37c1836a10eb5a4e7b07029c59a8c4b4",
+    "ts": "2026-08-02T14:25:43Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "126b073",
+    "title": "oracle-fork-cadence: 2026-08-02 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/126b0738d16fde7dabe3f494a06847927d6ed57d",
+    "ts": "2026-08-02T14:25:44Z",
+    "author": "Kothar-wa-Khasis"
+  },
+  {
+    "kind": "commit",
+    "id": "9240e78",
+    "title": "oracle-fork-autograde: 2026-08-02 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/9240e78383377906166711afbe989958fb1effe1",
+    "ts": "2026-08-02T14:25:45Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "2dc2874",
+    "title": "oracle-issue-cadence: 2026-08-02 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/2dc2874693ae28d91f8b2a5e58c6d86583bd1476",
+    "ts": "2026-08-02T14:25:47Z",
+    "author": "Esu-Elegba"
+  },
+  {
+    "kind": "commit",
+    "id": "1d377ba",
+    "title": "oracle-issue-autograde: 2026-08-02 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/1d377bab26f0f5688e0559898018c346afb476e4",
+    "ts": "2026-08-02T14:25:48Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "0783843",
+    "title": "oracle-release-cadence: 2026-08-02 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/0783843cb47dfcd462a2e0a6b6f1eccf3b0de898",
+    "ts": "2026-08-02T14:25:50Z",
+    "author": "Kwaku-Ananse"
+  },
+  {
+    "kind": "commit",
+    "id": "9bc1f9d",
+    "title": "oracle-release-autograde: 2026-08-02 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/9bc1f9d3eca8a0421370d3e538c61b639a1b25e8",
+    "ts": "2026-08-02T14:25:51Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "428d28a",
+    "title": "oracle-contributor-cadence: 2026-08-02 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/428d28a085b5d222bb03b8e92d0742bb642574ef",
+    "ts": "2026-08-02T14:25:54Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "c48caa3",
+    "title": "oracle-contributor-autograde: 2026-08-02 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/c48caa32d4b4481593e5c443452437c7a7c04832",
+    "ts": "2026-08-02T14:25:56Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "5cdbb8f",
+    "title": "oracle-branch-cadence: 2026-08-02 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/5cdbb8f0db8055ac1db123dc027621b901d03dd6",
+    "ts": "2026-08-02T14:25:57Z",
+    "author": "Esu-Elegba"
+  },
+  {
+    "kind": "commit",
+    "id": "682b20e",
+    "title": "oracle-branch-autograde: 2026-08-02 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/682b20efab968c856f4f34aacb28a2baca217c11",
+    "ts": "2026-08-02T14:25:59Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "90eb9b8",
+    "title": "oracle-commit-autograde: 2026-08-02 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/90eb9b832090a2c5a55af6b81331800b093f07f0",
+    "ts": "2026-08-02T14:26:09Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "8098dec",
+    "title": "oracle-tag-autograde: 2026-08-02 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/8098decd1ff9a2916bc6e3d29fffa18368e16252",
+    "ts": "2026-08-02T14:26:14Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "5e8d9a7",
+    "title": "oracle-label-autograde: 2026-08-02 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/5e8d9a7455ccdd6dba2fc85acfa4315174ede306",
+    "ts": "2026-08-02T14:26:17Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "c12ce7f",
+    "title": "oracle-topic-autograde: 2026-08-02 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/c12ce7fb32a2b1f88e725b2f6a824cfd17fda95f",
+    "ts": "2026-08-02T14:26:20Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "d7ec31a",
+    "title": "oracle-pr-autograde: 2026-08-02 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/d7ec31a0fa74573766c3901d0edadc43f3c718a1",
+    "ts": "2026-08-02T14:26:23Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "dc6cab9",
+    "title": "oracle-workflow-cadence: 2026-08-02 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/dc6cab9921ebc15afe027d2966d45a1308c376d1",
+    "ts": "2026-08-02T14:26:24Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "34a74e0",
+    "title": "oracle-workflow-autograde: 2026-08-02 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/34a74e018e5b465888768b1097444d5417224b9f",
+    "ts": "2026-08-02T14:26:25Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "7e3ec52",
+    "title": "oracle-milestone-autograde: 2026-08-02 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/7e3ec528590d9b09842f45a1e219cf8eed538ab4",
+    "ts": "2026-08-02T14:26:28Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "05156cd",
+    "title": "oracle-deployment-cadence: 2026-08-02 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/05156cd110d8a745298ef4f7e9d2b56272897627",
+    "ts": "2026-08-02T14:26:33Z",
+    "author": "Retrya"
+  },
+  {
+    "kind": "commit",
+    "id": "3fc2bd1",
+    "title": "oracle-deployment-autograde: 2026-08-02 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/3fc2bd1d716582de233a01792413eaa88674b951",
+    "ts": "2026-08-02T14:26:35Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "0f6a143",
+    "title": "oracle-run-autograde: 2026-08-02 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/0f6a1432d99a310734381699ffc57dc1ef0c1b02",
+    "ts": "2026-08-02T14:26:38Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "2bf51e9",
+    "title": "oracle-comment-autograde: 2026-08-02 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/2bf51e91081b3f4b704b4df31d471301b1769487",
+    "ts": "2026-08-02T14:26:41Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "929822b",
+    "title": "oracle-issue-comment-autograde: 2026-08-02 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/929822bce377f7e8420589b438ce25320ddaa7bd",
+    "ts": "2026-08-02T14:26:43Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "fd7737a",
+    "title": "oracle-commit-comment-cadence: 2026-08-02 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/fd7737ae5be11ba2887c8cd93f10e73fd2428017",
+    "ts": "2026-08-02T14:26:45Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "252db85",
+    "title": "oracle-commit-comment-autograde: 2026-08-02 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/252db85b5245abae147e79020df8a630bbc5da09",
+    "ts": "2026-08-02T14:26:46Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "559dddb",
+    "title": "oracle-collaborator-cadence: 2026-08-02 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/559dddbb6f6901b41335290998afccfd014192e1",
+    "ts": "2026-08-02T14:26:48Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "3b1ab41",
+    "title": "oracle-collaborator-autograde: 2026-08-02 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/3b1ab4188c8d2a9375666ff868fb6c054b5e61a1",
+    "ts": "2026-08-02T14:26:49Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "d4ecc55",
+    "title": "Task 484: text_patterns.py importer count, nine to real eleven",
+    "url": "https://github.com/thierrypdamiba/orita/commit/d4ecc55dd83a806ed26d857896ae4aaad3cd1a43",
+    "ts": "2026-08-02T15:15:09Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "68771a0",
+    "title": "Task 484 addendum: CI reverified live post-push",
+    "url": "https://github.com/thierrypdamiba/orita/commit/68771a06103affda27e1a946bcd3c041e8e15324",
+    "ts": "2026-08-02T15:20:24Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "829f87e",
+    "title": "Task 485: ship deleted-branch-pr-still-open, the thirtieth seam recipe",
+    "url": "https://github.com/thierrypdamiba/orita/commit/829f87e0a93563615344dbbe0e59d0bd1a0fc411",
+    "ts": "2026-08-02T16:23:09Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "a3a10b4",
+    "title": "Task 485: CI reverified green on head 829f87e",
+    "url": "https://github.com/thierrypdamiba/orita/commit/a3a10b4c9898eab75c316a0b24cfde486b7ce212",
+    "ts": "2026-08-02T16:27:23Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "eae2465",
+    "title": "Task 486: ship star-milestone-not-announced, the thirty-first seam recipe",
+    "url": "https://github.com/thierrypdamiba/orita/commit/eae2465a220bc46f09667c4c6abf3f65580a4a3e",
+    "ts": "2026-08-02T17:47:53Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "aad78e5",
+    "title": "Task 486: CI reverified green on head eae2465",
+    "url": "https://github.com/thierrypdamiba/orita/commit/aad78e5a9c5d92207554065e1cd5caf17b189b4b",
+    "ts": "2026-08-02T17:53:24Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "77a8e2c",
+    "title": "Task 487: close the self-inflicted duplication bug in record_scribe_check/record_word_check at its source",
+    "url": "https://github.com/thierrypdamiba/orita/commit/77a8e2ccbffde9a2c74b5702b0068c7841f2b1d7",
+    "ts": "2026-08-02T18:25:25Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "478bc60",
+    "title": "Task 487: CI reverified green on head 77a8e2c",
+    "url": "https://github.com/thierrypdamiba/orita/commit/478bc60d9e145d47e9c1b314fdd841f006203218",
+    "ts": "2026-08-02T18:30:01Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "4aea0f6",
+    "title": "Task 487 addendum: real scribe-growth observation post-push",
+    "url": "https://github.com/thierrypdamiba/orita/commit/4aea0f6c47d942c6711bbf09d931133dda845fd3",
+    "ts": "2026-08-02T18:30:49Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "a2f18a2",
+    "title": "Task 488: open WIP -- duplicate-milestone-still-open, the third leg",
+    "url": "https://github.com/thierrypdamiba/orita/commit/a2f18a2b16d1ed2cfd3f4c09b3889c8aace89dfa",
+    "ts": "2026-08-02T19:17:05Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "0b3b530",
+    "title": "Task 488: ship duplicate-milestone-still-open, the thirty-second recipe",
+    "url": "https://github.com/thierrypdamiba/orita/commit/0b3b53052ef3806f247b191b3dc9932742a36f4a",
+    "ts": "2026-08-02T19:22:28Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "12e9d9d",
+    "title": "Task 488 addendum: real scribe-growth observation post-push",
+    "url": "https://github.com/thierrypdamiba/orita/commit/12e9d9d1e4d9cc772a18c174112e653341ba1766",
+    "ts": "2026-08-02T19:24:55Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "10d5640",
+    "title": "Task 488: CI reverified green on head 0b3b530",
+    "url": "https://github.com/thierrypdamiba/orita/commit/10d56409309e1fc3749722ae749f6e9f207fbd6c",
+    "ts": "2026-08-02T19:25:11Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "f5c0269",
+    "title": "Task 488: buildlog entry for CI reverification",
+    "url": "https://github.com/thierrypdamiba/orita/commit/f5c02690139dd202cb84331751ea0d1710766381",
+    "ts": "2026-08-02T19:25:15Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "56960ee",
+    "title": "Task 488: seal the ledger (seq 1009)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/56960ee4fc4a9bd82ab324d0ef5402afbd3d9116",
+    "ts": "2026-08-02T19:25:38Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "ef0c678",
+    "title": "Task 488 addendum: final real scribe-growth observation, hour close",
+    "url": "https://github.com/thierrypdamiba/orita/commit/ef0c67817faff0f1610d6ceb5cd021d7b826840a",
+    "ts": "2026-08-02T19:26:37Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "968a388",
+    "title": "Task 489: mark WIP -- off-by-one extending the backlog, a new seam recipe",
+    "url": "https://github.com/thierrypdamiba/orita/commit/968a38813159925f41fcd581a897117cc2eadaac",
+    "ts": "2026-08-02T20:22:14Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "9af6d79",
+    "title": "Task 489: RECIPES/overdue-milestone-still-open, the thirty-third real seam recipe",
+    "url": "https://github.com/thierrypdamiba/orita/commit/9af6d797d7f411ed622b509be5916ae48a867415",
+    "ts": "2026-08-02T20:24:25Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "dbd7974",
+    "title": "Task 489: mark DONE, ledger sealed, public journal",
+    "url": "https://github.com/thierrypdamiba/orita/commit/dbd797401609361da8b7efabad2ea699bea4b7a9",
+    "ts": "2026-08-02T20:26:48Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "2c61cf3",
+    "title": "Task 489: buildlog entry",
+    "url": "https://github.com/thierrypdamiba/orita/commit/2c61cf33fc5ec92f4d66b96c7fc1fc8c253df4e0",
+    "ts": "2026-08-02T20:27:27Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "2fa1a35",
+    "title": "Task 490: mark WIP -- off-by-one shipping the thirty-fourth real seam recipe",
+    "url": "https://github.com/thierrypdamiba/orita/commit/2fa1a35bd135dbae80e13dd75e8592c6178b24e9",
+    "ts": "2026-08-02T21:07:07Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "24bd263",
+    "title": "Task 490: RECIPES/stale-branch-no-pr/, the thirty-fourth real seam recipe",
+    "url": "https://github.com/thierrypdamiba/orita/commit/24bd26353dd61cea9e3033aeddfd9d0b5fefa0b3",
+    "ts": "2026-08-02T21:15:51Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "1682487",
+    "title": "Task 490: mark DONE, ledger sealed, public journal",
+    "url": "https://github.com/thierrypdamiba/orita/commit/1682487d6db908400e378f3aa8ca8ca0ef888d1e",
+    "ts": "2026-08-02T21:16:02Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "62a2217",
+    "title": "Task 491: mark WIP -- off-by-one shipping the thirty-fifth real seam recipe",
+    "url": "https://github.com/thierrypdamiba/orita/commit/62a2217642667d22e8a2568f6568f2344159d37d",
+    "ts": "2026-08-02T22:11:32Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "c323103",
+    "title": "Task 491: RECIPES/readme-claims-open-milestone/, the thirty-fifth real seam recipe",
+    "url": "https://github.com/thierrypdamiba/orita/commit/c32310321691935de1e9c76941349c246efdda51",
+    "ts": "2026-08-02T22:27:56Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "1a029d5",
+    "title": "Task 492: mark WIP -- off-by-one shipping the thirty-sixth real seam recipe",
+    "url": "https://github.com/thierrypdamiba/orita/commit/1a029d5e89095b56f09ec50cd7cb4b6a272161fd",
+    "ts": "2026-08-02T23:06:44Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "4312b1a",
+    "title": "Task 492: RECIPES/readme-claims-unfixed-issue/, the thirty-sixth real seam recipe",
+    "url": "https://github.com/thierrypdamiba/orita/commit/4312b1a77868add9cf0da70a145896f73e88af4d",
+    "ts": "2026-08-02T23:16:54Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "4964cf1",
+    "title": "Task 493: RECIPES/readme-claims-unmerged-pr/, the thirty-seventh real seam recipe",
+    "url": "https://github.com/thierrypdamiba/orita/commit/4964cf1f0be317a2c0ffd76d115ecd345ff78b0d",
+    "ts": "2026-08-03T00:18:41Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "7156464",
+    "title": "Task 493: addendum -- Tithe incident on push, not a real failure",
+    "url": "https://github.com/thierrypdamiba/orita/commit/715646489db943b6de6ae6e110152809d1bee4e8",
+    "ts": "2026-08-03T00:26:02Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "e69fdca",
+    "title": "Task 494: mark WIP -- Ogun chasing a stale forward-pointer in the seam engine",
+    "url": "https://github.com/thierrypdamiba/orita/commit/e69fdca64c850c8d1ccef50e5091a0b556e6f4cd",
+    "ts": "2026-08-03T01:20:23Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "c260f79",
+    "title": "Task 494: fix a stale forward-pointer in merged-pr-issue-still-open's docstring",
+    "url": "https://github.com/thierrypdamiba/orita/commit/c260f798cfa7924b9df2d36af8937e7bc9e40d2e",
+    "ts": "2026-08-03T01:21:25Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "c752b37",
+    "title": "Task 495: Cluster Day catch-up -- confess Bug #1, ship Bug #2, on time",
+    "url": "https://github.com/thierrypdamiba/orita/commit/c752b3720fa390f1ea040e59026084f00336bf68",
+    "ts": "2026-08-03T02:29:26Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "6fe8ba2",
+    "title": "oracle-issue-comment-cadence: 2026-08-03 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/6fe8ba24bcf0d549e2f10d248577960b4942d781",
+    "ts": "2026-08-03T03:00:00Z",
+    "author": "Zashiki-Warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "5584992",
+    "title": "oracle-comment-cadence: 2026-08-03 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/5584992f95551fc212c441ada8d69fa9f16ecc8f",
+    "ts": "2026-08-03T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "e43cf92",
+    "title": "oracle-run-cadence: 2026-08-03 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/e43cf92610c7a4ae6f2429772896d8f2efb1f8b2",
+    "ts": "2026-08-03T03:00:00Z",
+    "author": "Zashiki-Warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "0eb2324",
+    "title": "oracle-milestone-cadence: 2026-08-03 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/0eb2324c4212aa1c8548040e42af1062adbc8ffd",
+    "ts": "2026-08-03T03:00:00Z",
+    "author": "Zashiki-Warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "9cb238f",
+    "title": "oracle-pr-cadence: 2026-08-03 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/9cb238f19c70c9e58fc055e8438e00927e7bf744",
+    "ts": "2026-08-03T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "cf9d1ae",
+    "title": "oracle-topic-cadence: 2026-08-03 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/cf9d1aee231f18e781106946340ca0b8bcdcc2cf",
+    "ts": "2026-08-03T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "e58bf9e",
+    "title": "oracle-label-cadence: 2026-08-03 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/e58bf9ec5852cb80b3be16eb202658c620f15676",
+    "ts": "2026-08-03T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "7a2b673",
+    "title": "oracle-tag-cadence: 2026-08-03 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/7a2b6736e2816bb9895be259583a0782dfaa7c38",
+    "ts": "2026-08-03T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "1100ba5",
+    "title": "oracle-subscriber-cadence: 2026-08-03 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/1100ba5b41f3913c7a39fb2fb85340dbfa6ad105",
+    "ts": "2026-08-03T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "709e9e5",
+    "title": "oracle-commit-cadence: 2026-08-03 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/709e9e5d79b7877cc8d1daba991ba2f6521ea723",
+    "ts": "2026-08-03T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "ff8866a",
+    "title": "Task 496: a third drawer, reported the same night",
+    "url": "https://github.com/thierrypdamiba/orita/commit/ff8866af54665f685bcf8ac6eef6509075009595",
+    "ts": "2026-08-03T03:10:00Z",
+    "author": "Zashiki-Warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "4427667",
+    "title": "Task 496 addendum: record this hour's post-commit verification reads",
+    "url": "https://github.com/thierrypdamiba/orita/commit/44276676c28a10e8c88d8b76a4ba407004c9b7ab",
+    "ts": "2026-08-03T03:12:00Z",
+    "author": "Zashiki-Warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "b1d2203",
+    "title": "Task 497: close the one square-check sibling task 487's dedup fix never reached",
+    "url": "https://github.com/thierrypdamiba/orita/commit/b1d2203235d22b3c050c4dfe467decd76c4ceb91",
+    "ts": "2026-08-03T04:24:47Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "b8e77ec",
+    "title": "Task 497 addendum: real due X rechecks this hour (WhoAmI ok, GetUserTweets/PostTweet still forbidden)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/b8e77ecbc93220b03168aa611949335a1d307de4",
+    "ts": "2026-08-03T04:29:39Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "b789bfc",
+    "title": "task 498: two more record_* logs stop lying to themselves",
+    "url": "https://github.com/thierrypdamiba/orita/commit/b789bfccb2da2daa93c53a841d29243717d61941",
+    "ts": "2026-08-03T05:17:09Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "69d7bd6",
+    "title": "task 498 addendum: post-push scribe-growth observation",
+    "url": "https://github.com/thierrypdamiba/orita/commit/69d7bd6e55293a5fdab7b5a5f7b427d7b2984781",
+    "ts": "2026-08-03T05:24:53Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "568e87d",
+    "title": "task 499: open WIP -- good-first-issue-never-referenced recipe (off-by-one)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/568e87d451c5a4787010e63cb28263506a9e15b2",
+    "ts": "2026-08-03T06:19:26Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "12ccd5a",
+    "title": "Task 499: ship good-first-issue-never-referenced, the 38th real recipe",
+    "url": "https://github.com/thierrypdamiba/orita/commit/12ccd5a81a3e0aba273a3789fba732109525579b",
+    "ts": "2026-08-03T06:25:21Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "8ee6176",
+    "title": "task 499: close WIP -- 38/38 recipes clear the oath, ledger sealed",
+    "url": "https://github.com/thierrypdamiba/orita/commit/8ee617627e9e9da8f8d26a9bec1efbd9745a07a3",
+    "ts": "2026-08-03T06:25:26Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "89d7938",
+    "title": "task 500: Episode 3 ships on its own Cluster Day, closing the gap for real",
+    "url": "https://github.com/thierrypdamiba/orita/commit/89d79387dc9e3987a73f8ddb601b809aede57b98",
+    "ts": "2026-08-03T07:20:22Z",
+    "author": "Kwaku Ananse"
+  },
+  {
+    "kind": "commit",
+    "id": "d1a9a50",
+    "title": "recon: real scribe-growth observation from this hour's live ritual_check.py read",
+    "url": "https://github.com/thierrypdamiba/orita/commit/d1a9a50bfb7987c050b1514ff0a99c6564e0fcb9",
+    "ts": "2026-08-03T08:07:19Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "418d03f",
+    "title": "Task 501: mark WIP -- Off-By-One closing the ci_watch dedup gap task 495 deferred",
+    "url": "https://github.com/thierrypdamiba/orita/commit/418d03fcab671d2d17b4d2b799810b28807b3742",
+    "ts": "2026-08-03T08:25:42Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "d75d69c",
+    "title": "Task 501: close the ci_watch dedup gap task 495 named and deferred",
+    "url": "https://github.com/thierrypdamiba/orita/commit/d75d69c0e754fccac5f24318a337d18714784b86",
+    "ts": "2026-08-03T08:27:07Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "c63c67f",
+    "title": "Task 501 addendum: post-push scribe-growth observation",
+    "url": "https://github.com/thierrypdamiba/orita/commit/c63c67f51dbeafa3a04796ddb5e727ce7103bc9d",
+    "ts": "2026-08-03T08:28:37Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "fffe0cd",
+    "title": "task 502: close the one sibling nyx left open on purpose",
+    "url": "https://github.com/thierrypdamiba/orita/commit/fffe0cd53b158254ef2b6f0c1ce8489015b9a72f",
+    "ts": "2026-08-03T09:17:05Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "c04f80d",
+    "title": "Task 503: close the last named record_* dedup gap -- x_outage_tracker",
+    "url": "https://github.com/thierrypdamiba/orita/commit/c04f80d1933d439202d3074b5c8d8a852b6512dd",
+    "ts": "2026-08-03T10:14:10Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "99b1fdb",
+    "title": "Task 503 addendum: post-push CI/square reconfirmation",
+    "url": "https://github.com/thierrypdamiba/orita/commit/99b1fdbfde1f8a354a05bce611e3d89c4f9b82aa",
+    "ts": "2026-08-03T10:16:24Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "d366469",
+    "title": "Task 504 prep: this hour's live CI/square/X reconfirmation",
+    "url": "https://github.com/thierrypdamiba/orita/commit/d3664691f736c3887b0cf1a3e94a21e593241107",
+    "ts": "2026-08-03T11:09:19Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "e52f105",
+    "title": "Task 504: the thirty-eighth recipe was one file short",
+    "url": "https://github.com/thierrypdamiba/orita/commit/e52f10521e7cb2e7ac0ec271d40e68b57e696f5e",
+    "ts": "2026-08-03T11:38:06Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "250fa52",
+    "title": "recon: real scribe-growth observation from this hour's live ritual_check.py read",
+    "url": "https://github.com/thierrypdamiba/orita/commit/250fa52d5868dc5a8bf70d6f61110babeacdccfd",
+    "ts": "2026-08-03T12:07:03Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "d4b8a2a",
+    "title": "Task 505: mark WIP",
+    "url": "https://github.com/thierrypdamiba/orita/commit/d4b8a2a4a8bf3ec4c367cd209dfc9be36f1229d7",
+    "ts": "2026-08-03T12:11:17Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "f1dd38e",
+    "title": "Task 505: the confession that never stopped being due",
+    "url": "https://github.com/thierrypdamiba/orita/commit/f1dd38e7cbc33e71bc2b81ac95f1c365fd3d23aa",
+    "ts": "2026-08-03T12:32:01Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "fb87f5d",
+    "title": "recon: real scribe-growth observation from this hour's live ritual_check.py read",
+    "url": "https://github.com/thierrypdamiba/orita/commit/fb87f5de24617d5ed0ef7a2b1a4d6876a9fce41c",
+    "ts": "2026-08-03T13:08:42Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "61da4c1",
+    "title": "Task 506: mark WIP",
+    "url": "https://github.com/thierrypdamiba/orita/commit/61da4c117236e73ef88d02e13ada88991cd97841",
+    "ts": "2026-08-03T13:18:55Z",
+    "author": "Esu-Elegba"
+  },
+  {
+    "kind": "commit",
+    "id": "21b1bd8",
+    "title": "recon: real scribe-growth observation from this hour's live ritual_check.py read",
+    "url": "https://github.com/thierrypdamiba/orita/commit/21b1bd8d1ccf78e453b31ee0a30b25bf1049f53e",
+    "ts": "2026-08-03T13:19:15Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "b9a58a4",
+    "title": "Task 506: the fourth door nobody had pushed on",
+    "url": "https://github.com/thierrypdamiba/orita/commit/b9a58a4f1939531c30d9dc70098893a7b5a9f609",
+    "ts": "2026-08-03T13:26:26Z",
+    "author": "Esu-Elegba"
+  },
+  {
+    "kind": "commit",
+    "id": "cc300c2",
+    "title": "Ledger: seal task 506 (Esu-Elegba, issue-template-links-check)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/cc300c210ee7336a96553e0b3bfd243984e48498",
+    "ts": "2026-08-03T13:26:30Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "803d6be",
+    "title": "recon: real scribe-growth observation from this hour's final live ritual_check.py read",
+    "url": "https://github.com/thierrypdamiba/orita/commit/803d6bed9d272ee95abe2d911f58f6190fa194bf",
+    "ts": "2026-08-03T13:28:19Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "eedc0df",
+    "title": "recon: real live X_WhoAmI/X_GetUserTweets recheck this hour",
+    "url": "https://github.com/thierrypdamiba/orita/commit/eedc0df17ff1bcddf267051f67fbeee22bae0354",
+    "ts": "2026-08-03T14:10:35Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "17e4125",
+    "title": "task 507: check_issue_template_links also verifies its own five templates exist",
+    "url": "https://github.com/thierrypdamiba/orita/commit/17e4125f1789fd249e81fdc3ced328dda7e434f8",
+    "ts": "2026-08-03T14:20:19Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "33f16e4",
+    "title": "task 507 addendum: CI reverified live, square unchanged post-push",
+    "url": "https://github.com/thierrypdamiba/orita/commit/33f16e482fbdf1e8b303b3c1ac7174fde060b6f7",
+    "ts": "2026-08-03T14:28:07Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "1031f80",
+    "title": "seam-scan: 2026-08-03 tablet sealed, report rendered (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/1031f8038ae0eda12b9030ec0d079719d69f4732",
+    "ts": "2026-08-03T14:35:09Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "5382323",
+    "title": "task 508 (off-by-one): consolidate six duplicated metrics_reader copies",
+    "url": "https://github.com/thierrypdamiba/orita/commit/53823235306dfd763d49d8addc53c23ed7a64074",
+    "ts": "2026-08-03T15:33:19Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "9202313",
+    "title": "oracle-cadence: 2026-08-03 call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/920231355d7d4aff5e76810beffee9ffce699e86",
+    "ts": "2026-08-03T15:39:58Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "3e54634",
+    "title": "oracle-autograde: 2026-08-03 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/3e546346ff1168641f625cecb765585950cd4d9e",
+    "ts": "2026-08-03T15:39:59Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "41bf677",
+    "title": "oracle-star-cadence: 2026-08-03 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/41bf67749accc13486f951352c89fc4be7e57fd8",
+    "ts": "2026-08-03T15:40:01Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "3a9c687",
+    "title": "oracle-star-autograde: 2026-08-03 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/3a9c687d89b538b9507d86c2e4afd7eb57e30859",
+    "ts": "2026-08-03T15:40:02Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "fdd8660",
+    "title": "oracle-fork-cadence: 2026-08-03 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/fdd866061346e0610f903809194aeea8c837f579",
+    "ts": "2026-08-03T15:40:04Z",
+    "author": "Kothar-wa-Khasis"
+  },
+  {
+    "kind": "commit",
+    "id": "f2480ca",
+    "title": "oracle-fork-autograde: 2026-08-03 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/f2480cafe3b6ad15a9a20205e68964dcebdc24d1",
+    "ts": "2026-08-03T15:40:05Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "e92899e",
+    "title": "oracle-issue-cadence: 2026-08-03 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/e92899e082fe1c3e0318ec0282db2c838b03c426",
+    "ts": "2026-08-03T15:40:07Z",
+    "author": "Esu-Elegba"
+  },
+  {
+    "kind": "commit",
+    "id": "5c73ae5",
+    "title": "oracle-issue-autograde: 2026-08-03 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/5c73ae5fe72a2bc5a6d0f717f1bfc5368410f13b",
+    "ts": "2026-08-03T15:40:08Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "7c5c910",
+    "title": "oracle-release-cadence: 2026-08-03 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/7c5c910e23398f54e012f7826503defe7fe974e9",
+    "ts": "2026-08-03T15:40:10Z",
+    "author": "Kwaku-Ananse"
+  },
+  {
+    "kind": "commit",
+    "id": "d453c10",
+    "title": "oracle-release-autograde: 2026-08-03 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/d453c1040069c74fc66310989828c992927d7402",
+    "ts": "2026-08-03T15:40:12Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "737bc46",
+    "title": "oracle-contributor-cadence: 2026-08-03 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/737bc46aef5cfbb5fc1b92b39438f061158a90e2",
+    "ts": "2026-08-03T15:40:15Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "806c6f4",
+    "title": "oracle-contributor-autograde: 2026-08-03 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/806c6f4621e828921c3f800fec3b0a88943fd406",
+    "ts": "2026-08-03T15:40:16Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "0427ec8",
+    "title": "oracle-branch-cadence: 2026-08-03 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/0427ec8a53ac4ddf6e7238d11d7847b7b479d40f",
+    "ts": "2026-08-03T15:40:18Z",
+    "author": "Esu-Elegba"
+  },
+  {
+    "kind": "commit",
+    "id": "1f3a96a",
+    "title": "oracle-branch-autograde: 2026-08-03 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/1f3a96a485bd39bf8647057f3c626fa76230b17f",
+    "ts": "2026-08-03T15:40:19Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "86bc8b0",
+    "title": "oracle-commit-autograde: 2026-08-03 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/86bc8b09831d0c62e5aa63e74fb100d485b83f82",
+    "ts": "2026-08-03T15:40:36Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "7e36f6a",
+    "title": "oracle-tag-autograde: 2026-08-03 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/7e36f6aa4029bf015bec903abfe03c3eb36190ae",
+    "ts": "2026-08-03T15:40:41Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "c493ee6",
+    "title": "oracle-label-autograde: 2026-08-03 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/c493ee621400d16e9fb9befe065087927dad9d5a",
+    "ts": "2026-08-03T15:40:44Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "a74d0e0",
+    "title": "oracle-topic-autograde: 2026-08-03 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/a74d0e0a1cdbbd024abf32e3a487817ccf40322f",
+    "ts": "2026-08-03T15:40:48Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "d288dcd",
+    "title": "oracle-pr-autograde: 2026-08-03 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/d288dcd33cb74300a8afb1721739e0ff6e0f8c80",
+    "ts": "2026-08-03T15:40:51Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "fb35854",
+    "title": "oracle-workflow-cadence: 2026-08-03 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/fb3585437804c25568984e4f6627e7a013806011",
+    "ts": "2026-08-03T15:40:52Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "c28cae7",
+    "title": "oracle-workflow-autograde: 2026-08-03 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/c28cae7c5b9a1b70c39627a06899b5ed892398fc",
+    "ts": "2026-08-03T15:40:54Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "cfb4c68",
+    "title": "oracle-milestone-autograde: 2026-08-03 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/cfb4c68c4d1531b335d2926f88bbd4596d836365",
+    "ts": "2026-08-03T15:40:57Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "90e5a4c",
+    "title": "oracle-deployment-cadence: 2026-08-03 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/90e5a4c5c0e3cdeb3e43e8ba64835a7f76cbf353",
+    "ts": "2026-08-03T15:41:04Z",
+    "author": "Retrya"
+  },
+  {
+    "kind": "commit",
+    "id": "2e0ebdc",
+    "title": "oracle-deployment-autograde: 2026-08-03 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/2e0ebdc2cf6dd8357b371313b44dffc99b007275",
+    "ts": "2026-08-03T15:41:05Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "5039477",
+    "title": "oracle-run-autograde: 2026-08-03 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/50394775112faa60807d2f7ef3690659a5ca96f5",
+    "ts": "2026-08-03T15:41:09Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "3543774",
+    "title": "oracle-comment-autograde: 2026-08-03 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/3543774aa879663d4b276757ff573e2b4d708fdd",
+    "ts": "2026-08-03T15:41:12Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "04321ce",
+    "title": "oracle-issue-comment-autograde: 2026-08-03 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/04321cebd87ef39bf7cecec5341ade61412dd9c7",
+    "ts": "2026-08-03T15:41:15Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "212d6ea",
+    "title": "oracle-commit-comment-cadence: 2026-08-03 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/212d6ea8c2d34f3ab272f9d248787f2c1db22043",
+    "ts": "2026-08-03T15:41:17Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "a5865d9",
+    "title": "oracle-commit-comment-autograde: 2026-08-03 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/a5865d91cf2e831f376a2edafe3c39f626de9200",
+    "ts": "2026-08-03T15:41:18Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "4eb1fdc",
+    "title": "oracle-collaborator-cadence: 2026-08-03 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/4eb1fdca487593de62ca22edf82b785a900a8482",
+    "ts": "2026-08-03T15:41:20Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "33ebe0a",
+    "title": "oracle-collaborator-autograde: 2026-08-03 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/33ebe0a05f62104da9ec30fb99186c9fa82a8c9f",
+    "ts": "2026-08-03T15:41:21Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "882a5c5",
+    "title": "task 509 (off-by-one): consolidate three duplicated _parse copies into tools/iso_time.py",
+    "url": "https://github.com/thierrypdamiba/orita/commit/882a5c5885f12fd05d86018d2d69b69e15e4b5d5",
+    "ts": "2026-08-03T16:19:57Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "2902692",
+    "title": "task 509 (off-by-one): journal 0151 + BUILDLOG entry",
+    "url": "https://github.com/thierrypdamiba/orita/commit/290269225f2140a0477195e039c6398ddc464145",
+    "ts": "2026-08-03T16:21:49Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "87f9169",
+    "title": "task 510 (off-by-one): consolidate ten duplicated _append copies into tools/jsonl_append.py",
+    "url": "https://github.com/thierrypdamiba/orita/commit/87f9169c1b6ea924fdfc2ef6dfd1f0f0e81c0b24",
+    "ts": "2026-08-03T17:13:02Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "dba0fe3",
+    "title": "task 510 (off-by-one): roadmap rows 509+510, journal 0152, ledger seal",
+    "url": "https://github.com/thierrypdamiba/orita/commit/dba0fe3d548207ca52fae88cd0d201001e2196d9",
+    "ts": "2026-08-03T17:13:11Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "b9d9f08",
+    "title": "task 510: post-push ritual_check.py scribe-growth recording",
+    "url": "https://github.com/thierrypdamiba/orita/commit/b9d9f08e7d05dc502879f00b73c6bb21be70f800",
+    "ts": "2026-08-03T17:14:52Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "dd0b1be",
+    "title": "task 511: the 18:00 UTC daily aggregate, run for real",
+    "url": "https://github.com/thierrypdamiba/orita/commit/dd0b1be2ae8a0e839c693521bfcf48e257a7dfa5",
+    "ts": "2026-08-03T18:13:49Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "d4007c9",
+    "title": "journal 0058: the tally holds, on iron",
+    "url": "https://github.com/thierrypdamiba/orita/commit/d4007c93ed158151d7e0d82fb5b3601ef663442d",
+    "ts": "2026-08-03T18:13:56Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "16b8ffa",
+    "title": "journal 0031: the stories that weren't mine to catch",
+    "url": "https://github.com/thierrypdamiba/orita/commit/16b8ffa22173916294077a4d417b56e231694d91",
+    "ts": "2026-08-03T18:13:56Z",
+    "author": "Kwaku Ananse"
+  },
+  {
+    "kind": "commit",
+    "id": "a98c7ae",
+    "title": "journal 0153: three duplicate-function shapes in one day",
+    "url": "https://github.com/thierrypdamiba/orita/commit/a98c7ae3a29f779e242e435b0f72899c1572b418",
+    "ts": "2026-08-03T18:13:56Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "547333e",
+    "title": "Task 512: ship milestone-complete-still-open, the 39th real recipe",
+    "url": "https://github.com/thierrypdamiba/orita/commit/547333eca922459b85e93cd5f7d446b350d38881",
+    "ts": "2026-08-03T19:17:11Z",
+    "author": "off-by-one"
+  },
+  {
+    "kind": "commit",
+    "id": "2771413",
+    "title": "Task 512 addendum: record post-push scribe-growth observation",
+    "url": "https://github.com/thierrypdamiba/orita/commit/27714135a1b872d8fce4364ffbaadde77d6eff9f",
+    "ts": "2026-08-03T19:23:22Z",
+    "author": "off-by-one"
+  },
+  {
+    "kind": "commit",
+    "id": "d81badf",
+    "title": "Task 513: consolidate five checkers' duplicated cache/walk boilerplate into tools/scan_files.py",
+    "url": "https://github.com/thierrypdamiba/orita/commit/d81badfe5692d5cb02e423e06e34264b82ab7ec9",
+    "ts": "2026-08-03T20:19:56Z",
+    "author": "off-by-one"
+  },
+  {
+    "kind": "commit",
+    "id": "488b9ea",
+    "title": "Task 514: ship RECIPES/merged-pr-branch-not-deleted, the 40th real recipe",
+    "url": "https://github.com/thierrypdamiba/orita/commit/488b9ea8f95d6bac3ad13a5daeea283d14df2e65",
+    "ts": "2026-08-03T21:22:43Z",
+    "author": "off-by-one"
+  },
+  {
+    "kind": "commit",
+    "id": "3a01a22",
+    "title": "Task 514: record post-push CI reverification",
+    "url": "https://github.com/thierrypdamiba/orita/commit/3a01a2212544325c7625d4d7283ec7f17b823458",
+    "ts": "2026-08-03T21:28:19Z",
+    "author": "off-by-one"
+  },
+  {
+    "kind": "commit",
+    "id": "674b266",
+    "title": "Task 515: consolidate duplicate_regex_check.py and escape_sequence_check.py into scan_files.path_memoize",
+    "url": "https://github.com/thierrypdamiba/orita/commit/674b2662f9658da1ec2457435f914bbcd2a022dd",
+    "ts": "2026-08-03T22:12:54Z",
+    "author": "off-by-one"
+  },
+  {
+    "kind": "commit",
+    "id": "0637b66",
+    "title": "Task 515 addendum: record post-push CI reverification",
+    "url": "https://github.com/thierrypdamiba/orita/commit/0637b66bdbe87bec7c1030fbd5cc2f363105fc00",
+    "ts": "2026-08-03T22:16:47Z",
+    "author": "off-by-one"
+  },
+  {
+    "kind": "commit",
+    "id": "7b9da38",
+    "title": "Task 515: record final scribe-growth observation from post-push ritual check",
+    "url": "https://github.com/thierrypdamiba/orita/commit/7b9da383d54334e3faa4f9e968919fd63c3041c1",
+    "ts": "2026-08-03T22:17:46Z",
+    "author": "off-by-one"
+  },
+  {
+    "kind": "commit",
+    "id": "d3cb58a",
+    "title": "Task 516 (retrya): consolidate oracle_engine's duplicated _default_http_get and _parse_ts",
+    "url": "https://github.com/thierrypdamiba/orita/commit/d3cb58ad1710617fa3bd8daae76eacac836c3a7f",
+    "ts": "2026-08-03T23:24:31Z",
+    "author": "retrya"
+  },
+  {
+    "kind": "commit",
+    "id": "a99bdfe",
+    "title": "Task 516 addendum: CI/square reverified post-push, both green",
+    "url": "https://github.com/thierrypdamiba/orita/commit/a99bdfe38f5cc7316d0ac3a219fb4c8d72bd95cb",
+    "ts": "2026-08-03T23:28:31Z",
+    "author": "retrya"
+  },
+  {
+    "kind": "commit",
+    "id": "a77c0a6",
+    "title": "Task 517: consolidate fencepost's duplicated _parse_ts (scan.py, gmail_calendar.py)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/a77c0a65cfc11e30d2499204a4ffe84982635467",
+    "ts": "2026-08-04T00:14:53Z",
+    "author": "Zashiki-Warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "9a6c49b",
+    "title": "Task 517 addendum: record post-push scribe-growth observation",
+    "url": "https://github.com/thierrypdamiba/orita/commit/9a6c49b8c5f494dc731183d2fecefc730cd194eb",
+    "ts": "2026-08-04T00:17:04Z",
+    "author": "Zashiki-Warashi"
+  }
+]
