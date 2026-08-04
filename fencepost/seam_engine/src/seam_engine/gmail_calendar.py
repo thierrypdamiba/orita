@@ -53,7 +53,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
-from seam_engine.scan import GapCandidate, _keywords
+from seam_engine.scan import GapCandidate, _keywords, _parse_ts
 
 if TYPE_CHECKING:
     from seam_engine.consent import ConsentRecord
@@ -69,10 +69,6 @@ DEFAULT_CALENDAR_FIXTURE = _FENCEPOST_ROOT / "fixtures" / "gmail_calendar" / "ca
 # minutes without re-sending the invite), so an exact-timestamp match would
 # under-count matches and over-count gaps — the opposite of Ogun's law.
 TIME_TOLERANCE = timedelta(hours=2)
-
-
-def _parse_ts(s: str) -> datetime:
-    return datetime.fromisoformat(s.replace("Z", "+00:00"))
 
 
 def _load_rows(path: Path) -> list[Any]:

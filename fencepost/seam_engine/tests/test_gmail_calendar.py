@@ -417,3 +417,17 @@ def test_module_marks_itself_as_fixture_backed_wip():
     text = mod.__doc__ or ""
     assert "WIP" in text
     assert "fixture" in text.lower()
+
+
+# --- shared-helper identity, same shape as _keywords ------------------------
+
+
+def test_parse_ts_is_the_same_object_as_scans():
+    """gmail_calendar._parse_ts used to be a byte-identical private copy of
+    scan.py's own _parse_ts (both `datetime.fromisoformat(s.replace("Z",
+    "+00:00"))`). Consolidated onto scan.py's definition the same way this
+    module already imports scan._keywords rather than redefining it --
+    identity (`is`), not source equality, so a future edit to one is
+    structurally an edit to both."""
+    from seam_engine import gmail_calendar, scan
+    assert gmail_calendar._parse_ts is scan._parse_ts
