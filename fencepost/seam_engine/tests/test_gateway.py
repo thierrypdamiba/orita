@@ -179,7 +179,10 @@ def test_real_pre_task_152_string_would_have_failed_the_coverage_check():
     # missing too: this string never named it either.
     missing = required_scopes_covered_by_capabilities(_PRE_TASK_152_CAPABILITIES)
     assert missing == {
-        "github": ["CountStargazers", "GetFileContents", "GetRepository", "ListMilestones", "ListRepositoryActivities"],
+        "github": [
+            "CountStargazers", "GetFileContents", "GetRepository", "ListMilestones",
+            "ListRepositoryActivities", "ListReviewCommentsInARepository",
+        ],
         "x": ["WhoAmI"],
     }
 

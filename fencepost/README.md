@@ -533,6 +533,27 @@ parent has been closed, mirroring `milestone-closed-issue-still-open`'s
 24-hour bar exactly. The one scope, `ListIssues`, already sits on
 `SCOPES.md`'s cleared oath table, no new scope wiring needed.
 
+[`RECIPES/review-comment-dangling-reference/`](RECIPES/review-comment-dangling-reference/)
+is the forty-fourth (ROADMAP.md #534): a seventh leg of the
+dangling-reference family alongside `dangling-issue-reference` (commit
+messages), `mention-dangling-reference` (a mortal's own mention),
+`release-note-dangling-reference` (release notes),
+`issue-body-dangling-reference` (issue/PR bodies),
+`milestone-body-dangling-reference` (milestone descriptions), and
+`own-tweet-dangling-reference` (the town's own tweets) — the fifth of
+those called itself "the fifth and final leg"; the sixth called itself
+"the sixth and final leg" one hour later. This one does not repeat the
+word: none of the six ever read a pull request's own inline **review
+comments**, a genuinely different GitHub object from the PR body
+`issue-body-dangling-reference` already covers. Age-gated on the
+comment's own `updated_at`, mirroring `issue-body-dangling-reference`'s
+and `milestone-body-dangling-reference`'s 24h edit-grace bar, since a
+review thread stays editable forever just like a body or a description.
+`ListReviewCommentsInARepository` is a real, currently-live, read-only
+tool on the-hand gateway — added to `SCOPES.md`'s cleared oath table by
+this same task, alongside the already-cleared `ListIssues` and
+`ListPullRequests`.
+
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)
 (ROADMAP.md #111) is that second promise, kept: it runs `scan.py`'s own

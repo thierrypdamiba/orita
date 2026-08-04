@@ -165,14 +165,14 @@ def test_all_claimed_ordinals_are_pairwise_distinct():
 
 
 def test_the_real_ordinal_claims_are_currently_clean():
-    """Regression pin against today's real, live tree: 43 real recipes,
-    the reference recipe unnumbered, the other 42 forming the unbroken
-    sequence 2..43 -- no duplicate, no gap. Was 42/41/2..42 until
-    issue-closed-subissue-still-open merged (ROADMAP.md #530)."""
+    """Regression pin against today's real, live tree: 44 real recipes,
+    the reference recipe unnumbered, the other 43 forming the unbroken
+    sequence 2..44 -- no duplicate, no gap. Was 43/42/2..43 until
+    review-comment-dangling-reference merged (ROADMAP.md #534)."""
     claims = live_ordinal_claims(FENCEPOST_ROOT)
     numbered = sorted(n for n in claims.values() if n is not None)
-    assert len(claims) == 43
-    assert numbered == list(range(2, 44))
+    assert len(claims) == 44
+    assert numbered == list(range(2, 45))
 
 
 def test_a_duplicate_ordinal_would_flip_this_check_red(tmp_path):

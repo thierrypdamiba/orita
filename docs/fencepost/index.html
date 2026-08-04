@@ -70,7 +70,7 @@
     reviewed and merged like any PR. The read-only oath does not loosen for outside code:
     <a href="https://github.com/thierrypdamiba/orita/blob/main/fencepost/CONTRIBUTING.md">CONTRIBUTING.md</a>
     is the schema in prose, enforced in code before a human reviewer ever reads a stranger's
-    detector. Forty-three real recipes stand today:</p>
+    detector. Forty-four real recipes stand today:</p>
     <p><b><a href="https://github.com/thierrypdamiba/orita/tree/main/fencepost/RECIPES/example-release-vs-changelog">example-release-vs-changelog</a></b>
     — the reference: proof a first external recipe PR is mergeable at all.<br>
     <b><a href="https://github.com/thierrypdamiba/orita/tree/main/fencepost/RECIPES/merged-pr-issue-still-open">merged-pr-issue-still-open</a></b>
@@ -276,7 +276,11 @@
     <b><a href="https://github.com/thierrypdamiba/orita/tree/main/fencepost/RECIPES/issue-closed-subissue-still-open">issue-closed-subissue-still-open</a></b>
     — one level down from milestone membership: an issue closes, but its own GitHub task-list
     checklist still names a sub-issue that's still open. Closing the parent never touches a
-    checklist target's own state, so nothing ever sweeps it.</p>
+    checklist target's own state, so nothing ever sweeps it.<br>
+    <b><a href="https://github.com/thierrypdamiba/orita/tree/main/fencepost/RECIPES/review-comment-dangling-reference">review-comment-dangling-reference</a></b>
+    — a seventh leg of the dangling-reference family (the sixth called itself "final" too):
+    a pull request's own inline review comment counts on a <code>#N</code> that isn't there,
+    the one text surface none of the other six ever read.</p>
     <p>Merging a recipe is one promise; letting it actually compete for the daily primary gap
     is another. <a href="https://github.com/thierrypdamiba/orita/blob/main/fencepost/seam_engine/src/seam_engine/combined_scan.py"><code>combined_scan.py</code></a>
     keeps the second: it pools a recipe's own candidates with <code>scan.py</code>'s, and ranks
