@@ -103,6 +103,29 @@ def test_a_from_import_of_a_network_module_is_caught(tmp_path: Path):
     assert _detector_network_imports(path) == ["urllib.request"]
 
 
+def test_the_urllib_request_submodule_form_is_caught_not_just_the_urlopen_form(tmp_path: Path):
+    # Task 532: `from urllib import request` parses to `ast.ImportFrom`
+    # with `module="urllib"`, `names=["request"]` -- never the dotted
+    # string "urllib.request" the deny-list holds -- so a bare
+    # `node.module in NETWORK_CAPABLE_IMPORTS` test (the shape this
+    # checker first shipped with, task 529) walks straight past this real
+    # stdlib form while still catching `from urllib.request import
+    # urlopen` (test above). Both forms make the identical live network
+    # call; both must be caught.
+    path = tmp_path / "detector.py"
+    path.write_text("from urllib import request\nrequest.urlopen('http://example.com')\n")
+    assert _detector_network_imports(path) == ["urllib.request"]
+
+
+def test_the_http_client_submodule_form_is_caught(tmp_path: Path):
+    # Same bypass shape, the deny-list's other dotted stdlib entry:
+    # `from http import client` parses to `module="http"`, never the
+    # string "http.client".
+    path = tmp_path / "detector.py"
+    path.write_text("from http import client\nclient.HTTPConnection('evil.example.com')\n")
+    assert _detector_network_imports(path) == ["http.client"]
+
+
 def test_a_network_import_hidden_inside_a_function_body_is_still_caught(tmp_path: Path):
     # Not just top-level statements -- `ast.walk` reaches every node in the
     # tree, so a network import guarded inside a function (or an `if`, a
@@ -142,6 +165,18 @@ def test_urllib_parse_is_not_flagged_it_has_no_network_capability_of_its_own(tmp
     # it shares a top-level package name with `urllib.request`.
     path = tmp_path / "detector.py"
     path.write_text("from urllib.parse import urlparse\n")
+    assert _detector_network_imports(path) == []
+
+
+def test_the_urllib_parse_submodule_form_is_still_not_flagged(tmp_path: Path):
+    # The reconstructed-dotted-path check added for task 532 must stay as
+    # exact-match as the direct one already was: `from urllib import
+    # parse` reconstructs to "urllib.parse", which is not on the
+    # deny-list (no network capability of its own) and must not be
+    # flagged just because it shares a parent package with the real
+    # `urllib.request` bypass this task closed.
+    path = tmp_path / "detector.py"
+    path.write_text("from urllib import parse\nparse.urlparse('a')\n")
     assert _detector_network_imports(path) == []
 
 

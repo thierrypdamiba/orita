@@ -155,7 +155,24 @@ def _detector_network_imports(detector_path: Path) -> list[str]:
     actually imported (via `import x` or `from x import y`); empty when the
     source is clean. Raises `RecipeValidationError` if the file is not
     parseable Python at all -- a detector that cannot even be read cannot be
-    proven safe either, so this fails closed, not silently clean."""
+    proven safe either, so this fails closed, not silently clean.
+
+    Task 532: `ast.ImportFrom.module` alone is only ever the PACKAGE side
+    of a dotted deny-list entry -- `from urllib import request` parses to
+    `module="urllib"`, `names=["request"]`, never the string `"urllib.
+    request"` the deny-list actually holds, so the check as first shipped
+    (task 529) tested `node.module in NETWORK_CAPABLE_IMPORTS` alone and
+    walked straight past `from urllib import request` / `from http import
+    client` -- the two real stdlib forms where a network submodule is
+    imported as an attribute of its parent package rather than named
+    directly. A contributor's own detector.py could carry either form,
+    unmodified stdlib code, and clear this gate while genuinely opening a
+    live socket. `tools/network_boundary_check.py`'s own `_imported_module_
+    names` (tasks 163/164/446, one repo layer up, not importable from here
+    since this package ships and tests standalone) already reconstructs the
+    dotted `f"{module}.{name}"` path for exactly this reason -- this
+    function now mirrors that reconstruction, closing the same hole in its
+    own independent copy of the deny-list logic."""
     try:
         source = detector_path.read_text(encoding="utf-8")
     except OSError as exc:
@@ -174,6 +191,11 @@ def _detector_network_imports(detector_path: Path) -> list[str]:
         elif isinstance(node, ast.ImportFrom):
             if node.module in NETWORK_CAPABLE_IMPORTS:
                 found.add(node.module)
+            if node.module:
+                for alias in node.names:
+                    dotted = f"{node.module}.{alias.name}"
+                    if dotted in NETWORK_CAPABLE_IMPORTS:
+                        found.add(dotted)
     return sorted(found)
 
 
