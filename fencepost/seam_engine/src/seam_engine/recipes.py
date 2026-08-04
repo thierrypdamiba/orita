@@ -39,15 +39,21 @@ extends a live gateway, and the fixture loader is swapped for a real call —
 the detection logic does not change.
 
 This is a schema-and-manifest gate, not a sandboxed code executor: it never
-runs a contributed `detector.py` as part of validating a PR is safe to
+*runs* a contributed `detector.py` as part of validating a PR is safe to
 consider — `load_recipe_manifest` never imports it, only checks its
-`recipe.json`. It makes no claim about what a recipe's Python *does* beyond
-what its manifest *declares*. A human still reads the code before merge —
-this module is what makes sure that human is never the only thing standing
-between a write-scoped recipe and the repo.
+`recipe.json` and (task 529) statically reads the detector's own source for
+one narrow, structural claim about what its code does, not what its
+manifest declares: that it names no network-capable import anywhere in its
+own AST, closing the gap where a fixture field pointed correctly under
+`fixtures/` while the code beside it could still open a live socket.
+Beyond that one static check, it still makes no broader claim about what a
+recipe's Python *does*. A human still reads the code before merge — this
+module is what makes sure that human is never the only thing standing
+between a write-scoped, or network-reaching, recipe and the repo.
 """
 from __future__ import annotations
 
+import ast
 import importlib.util
 import json
 import re
@@ -109,6 +115,66 @@ _PASCAL_WORD_RE = re.compile(r"[A-Z][a-z0-9]*")
 # the one place a scope author is forced to put something, and so the most
 # natural place to hide a write verb if the tokenizer can be fooled.
 _ALLOWED_PREFIXES_LOWER: tuple[str, ...] = ("get", "list", "read", "search", "count")
+
+# Task 529: the fixture-path check above ("fixture must live under
+# fixtures/") is the whole of this module's enforcement of "MOCK ONLY, per
+# the Hand's law" -- and it checks only the manifest's own DECLARED field,
+# a string. This module's own docstring admits the limit outright: "It
+# never runs a contributed detector.py as part of validating a PR is safe
+# to consider... It makes no claim about what a recipe's Python DOES beyond
+# what its manifest declares. A human still reads the code before merge —
+# this module is what makes sure that human is never the only thing
+# standing between a write-scoped recipe and the repo." That sentence is
+# true of scope names (checks 1/2 above) and false of network reach: a
+# recipe whose `fixture` field points correctly under `fixtures/` and whose
+# `scopes` are all read-only can still open a live socket in its own
+# detector.py and read a real account today, no Arcade tool and no scope
+# confirm involved at all -- nothing before this task ever looked. Mirrors
+# `tools/network_boundary_check.py`'s own NETWORK_MODULES deny-list (task
+# 163/164), independently here rather than imported: this package ships
+# and tests standalone (`fencepost/seam_engine`, its own pyproject, its own
+# `uv run pytest`) and must not reach across into the parent orita repo's
+# `tools/` to validate a recipe PR.
+NETWORK_CAPABLE_IMPORTS: frozenset[str] = frozenset({
+    "requests", "httpx", "aiohttp", "urllib.request", "urllib3",
+    "http.client", "socket", "ftplib", "smtplib", "telnetlib",
+    "poplib", "imaplib", "nntplib",
+})
+
+
+def _detector_network_imports(detector_path: Path) -> list[str]:
+    """Static AST scan only -- `ast.parse` reads text, it never executes it,
+    so this keeps `load_recipe_manifest`'s own promise that a manifest gate
+    "never runs a contributed detector.py." Walks the WHOLE tree, not just
+    top-level statements: a network call guarded inside an `if` or tucked
+    inside a function body is exactly as real a live-network risk as one at
+    module level, and a contributor shaping a violation to slip past a
+    lazier top-level-only scan is the same "shaped exactly to slip past the
+    exact-word check" adversary `_word_hides_glued_verb` already assumes
+    for scope names. Returns the sorted list of forbidden module names
+    actually imported (via `import x` or `from x import y`); empty when the
+    source is clean. Raises `RecipeValidationError` if the file is not
+    parseable Python at all -- a detector that cannot even be read cannot be
+    proven safe either, so this fails closed, not silently clean."""
+    try:
+        source = detector_path.read_text(encoding="utf-8")
+    except OSError as exc:
+        raise RecipeValidationError(f"{detector_path}: could not be read ({exc})") from exc
+    try:
+        tree = ast.parse(source, filename=str(detector_path))
+    except SyntaxError as exc:
+        raise RecipeValidationError(f"{detector_path}: not valid Python ({exc})") from exc
+
+    found: set[str] = set()
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            for alias in node.names:
+                if alias.name in NETWORK_CAPABLE_IMPORTS:
+                    found.add(alias.name)
+        elif isinstance(node, ast.ImportFrom):
+            if node.module in NETWORK_CAPABLE_IMPORTS:
+                found.add(node.module)
+    return sorted(found)
 
 
 def _word_hides_glued_verb(word: str) -> str | None:
@@ -374,7 +440,32 @@ def load_recipe_manifest(path: Path) -> RecipeManifest:
             f"directory name {path.parent.name!r} — RECIPES/<slug>/recipe.json, always"
         )
 
-    return validate_recipe(manifest)
+    manifest = validate_recipe(manifest)
+
+    # Task 529: closes the "declares read-only, reaches the network anyway"
+    # gap `_detector_network_imports`'s own docstring names -- checked here,
+    # not inside `validate_recipe`, because `validate_recipe` is documented
+    # as "Pure function, no I/O" and this check has to read the detector's
+    # own source off disk. `load_recipe_manifest` already does I/O (it just
+    # read `recipe.json`), so this is the right place, not a new one.
+    # Skipped, not failed, when the detector file itself does not exist yet
+    # -- `load_detector` already owns "does not exist" as its own named
+    # failure (`test_load_detector_on_a_missing_file_is_rejected`); this
+    # check only ever grades a detector that is actually there to read.
+    detector_path = path.parent / manifest.detector_file
+    if detector_path.exists():
+        forbidden = _detector_network_imports(detector_path)
+        if forbidden:
+            raise RecipeValidationError(
+                f"{detector_path}: imports network-capable module(s) {forbidden} "
+                "-- MOCK ONLY, per the Hand's law. A detector that can reach the "
+                "network can read a live account today, no matter how narrow its "
+                "declared scopes are or how correctly its fixture field points "
+                "under fixtures/ -- refused before a human reviewer is the only "
+                "thing standing between a live-network recipe and the repo."
+            )
+
+    return manifest
 
 
 def discover_recipes(fencepost_root: Path | None = None) -> list[RecipeManifest]:
