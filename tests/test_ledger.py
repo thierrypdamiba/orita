@@ -210,6 +210,29 @@ class ParseAppendArgsCase(unittest.TestCase):
         with self.assertRaises(self.mod.LedgerCLIError):
             self.mod.parse_append_args(["--actor=foo", "--act=bar", "--detail=baz"])
 
+    def test_blank_actor_raises(self):
+        # Task 533: an empty actor previously parsed clean and would have
+        # sealed an unattributed entry into the ledger forever.
+        with self.assertRaises(self.mod.LedgerCLIError) as ctx:
+            self.mod.parse_append_args(["", "note", "something happened"])
+        self.assertIn("blank", str(ctx.exception))
+
+    def test_blank_act_raises(self):
+        with self.assertRaises(self.mod.LedgerCLIError) as ctx:
+            self.mod.parse_append_args(["nisaba", "", "something happened"])
+        self.assertIn("blank", str(ctx.exception))
+
+    def test_whitespace_only_actor_raises(self):
+        # Whitespace is not a loophole around the blank check.
+        with self.assertRaises(self.mod.LedgerCLIError):
+            self.mod.parse_append_args(["   ", "note", "something happened"])
+
+    def test_blank_detail_is_allowed(self):
+        # Only actor/act are guarded; a terse act with no further detail
+        # is legitimate and must keep parsing.
+        actor, act, detail = self.mod.parse_append_args(["ogun", "seal"])
+        self.assertEqual((actor, act, detail), ("ogun", "seal", ""))
+
 
 class LedgerCLIDispatchCase(unittest.TestCase):
     """End-to-end through the real main() dispatch (the same function
@@ -252,6 +275,15 @@ class LedgerCLIDispatchCase(unittest.TestCase):
     def test_verify_dispatch_returns_zero_on_intact_chain(self):
         self.mod.main(["append", "nisaba", "test", "one"])
         self.assertEqual(self.mod.main(["verify"]), 0)
+
+    def test_blank_actor_dispatch_exits_nonzero_and_writes_nothing(self):
+        # Task 533: the real end-to-end path, not just parse_append_args
+        # in isolation -- proves `python3 tools/ledger.py append "" note ...`
+        # never reaches append() and never touches disk.
+        before_exists = os.path.exists(self.mod.LEDGER)
+        rc = self.mod.main(["append", "", "note", "something happened"])
+        self.assertNotEqual(rc, 0)
+        self.assertEqual(os.path.exists(self.mod.LEDGER), before_exists)
 
     def test_unknown_command_returns_nonzero(self):
         self.assertEqual(self.mod.main(["not-a-real-command"]), 1)

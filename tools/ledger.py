@@ -116,7 +116,7 @@ class LedgerCLIError(ValueError):
 
 def parse_append_args(argv: list) -> tuple:
     """Parse the argv tail after `append` (i.e. sys.argv[2:]) into
-    (actor, act, detail), rejecting flag-shaped actor/act tokens.
+    (actor, act, detail), rejecting flag-shaped and blank actor/act tokens.
 
     This is the exact class of mistake that sealed records/ledger.jsonl
     seq 118-119 malformed: a call shaped like
@@ -128,10 +128,18 @@ def parse_append_args(argv: list) -> tuple:
     append-only; the fix was a correction entry, seq 120, not an edit).
     This function is the guard that call should have hit instead.
 
-    A detail string is free text and MAY contain hyphens; only the
+    Task 533: the flag-shape guard checked for a leading '-' but nothing
+    ever checked for blank. `append('' '' 'detail')` parsed clean --
+    an entry sealed permanently into the town's own Records Office with
+    no attribution to anyone at all, the one thing this office exists to
+    prevent. A whitespace-only token ('   ') is blank too (`.strip()`),
+    not a loophole. Now rejected the same way the flag shape is.
+
+    A detail string is free text and MAY contain hyphens (and MAY be
+    blank -- a terse act with no further detail is legitimate); only the
     actor/act positions are checked, and only for a *leading* '-'
-    (flag shape), so real content like actor "off-by-one" or a detail
-    sentence containing " - " still parses fine.
+    (flag shape) or blank content, so real content like actor
+    "off-by-one" or a detail sentence containing " - " still parses fine.
     """
     if len(argv) < 2:
         raise LedgerCLIError(
@@ -148,6 +156,14 @@ def parse_append_args(argv: list) -> tuple:
                 "This is the exact mistake that sealed records/ledger.jsonl seq "
                 "118-119 malformed; see seq 120's correction entry. Nothing was "
                 "written to the ledger."
+            )
+        if not value.strip():
+            raise LedgerCLIError(
+                f"{APPEND_USAGE}\n"
+                f"the {name} positional is blank -- a ledger entry attributed to "
+                "nobody is exactly the failure this Records Office exists to "
+                "prevent (\"nothing happened until it is written down\" presumes "
+                "someone wrote it). Nothing was written to the ledger."
             )
     detail = " ".join(argv[2:])
     return actor, act, detail
