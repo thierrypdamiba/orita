@@ -7,7 +7,7 @@ labels: ["fencepost", "crossing"]
 
 You came to a door marked *read-only*. Before it opens, answer as if the door were listening — because it is.
 
-**Which accounts do you want read?** (name only the toolkits; GitHub, X, Gmail, Google Calendar, Notion, Slack — the seam only exists across two or more)
+**Which accounts do you want read?** (name only the toolkits the gate can actually clear; GitHub, X, Gmail, Google Calendar — the seam only exists across two or more)
 
 **What are you REALLY hoping it finds?** (not "test it out" — the gap already nagging at you, the one you'd bet is sitting in your own seam)
 

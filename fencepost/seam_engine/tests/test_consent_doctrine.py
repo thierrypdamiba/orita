@@ -116,6 +116,45 @@ def test_template_points_at_the_real_consent_module():
     assert "enforce_consent_gate" in text
 
 
+def test_which_accounts_line_names_only_gateable_toolkits():
+    """The intake's very first question ("Which accounts do you want
+    read?") must never invite a mortal to name a toolkit
+    `consent.REQUIRED_SCOPES` can never clear. Prior to this test the line
+    named "Notion, Slack" alongside the four real toolkits below it — but
+    `REQUIRED_SCOPES` has no `notion` entry at all, and SCOPES.md's own
+    "Every connected app, accounted for" table says outright that Slack is
+    "connected on the shared gateway, NOT used by Fencepost, no toolkit
+    integration planned". A mortal who read only this line, named exactly
+    what it invited them to name, and wrote a thoughtful true-intent
+    answer would still be refused at the second lock with "unknown
+    toolkit" — the threshold promising a door that was never there. Esu
+    greets crossings at the threshold; the threshold must not lie about
+    what's behind it.
+    """
+    text = _template_text()
+    marker = "**Which accounts do you want read?**"
+    assert marker in text, "the accounts-to-read question moved or was reworded — update this test's marker"
+    line_start = text.index(marker)
+    paren_start = text.index("(", line_start) + 1
+    paren_end = text.index(")", paren_start)
+    inside = text[paren_start:paren_end]
+    # Drop the "name only the toolkits..." lead-in clause and the trailing
+    # "the seam only exists..." clause — what remains is the comma-joined
+    # toolkit list itself.
+    if ";" in inside:
+        inside = inside.split(";", 1)[1]
+    if "—" in inside:
+        inside = inside.split("—", 1)[0]
+    named = [_normalize_toolkit_name(t) for t in inside.split(",") if t.strip()]
+    assert named, "parsed zero toolkit names from the accounts-to-read line — check the marker/parens"
+    for toolkit in named:
+        assert toolkit in REQUIRED_SCOPES, (
+            f"the accounts-to-read line names {toolkit!r}, but consent.REQUIRED_SCOPES "
+            "has no entry for it — a mortal who names exactly this toolkit can never "
+            "clear the second lock no matter how they fill out the form"
+        )
+
+
 def test_every_required_scope_name_appears_verbatim_on_the_template():
     text = _template_text()
     for toolkit, scopes in REQUIRED_SCOPES.items():
