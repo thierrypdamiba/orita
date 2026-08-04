@@ -336,11 +336,15 @@ class RealSeamEngineDirCase(unittest.TestCase):
     tools/'s meta-checkers -- and proves the real, unqualified
     `check_network_boundary(SEAM_ENGINE_SRC_DIR)` finds both clean.
     Deliberately updatable, same discipline as `RealToolsDirCase.
-    EXPECTED_TODAY`: a future third claiming file landing in this directory
+    EXPECTED_TODAY`: a future fourth claiming file landing in this directory
     should grow this set the same hour, not silently pass a stale
-    assertion."""
+    assertion. Task 529: `recipes.py` joined this set the hour it gained
+    `_detector_network_imports()` and the "that it names no
+    network-capable import anywhere in its [detector]" docstring line --
+    a true claim about the file's own AST-walking source, which imports
+    no network-capable module itself."""
 
-    EXPECTED_TODAY = {"consent.py", "draftback.py"}
+    EXPECTED_TODAY = {"consent.py", "draftback.py", "recipes.py"}
 
     def test_live_discovery_matches_todays_real_set(self):
         found = set(nbc.find_claiming_files(SEAM_ENGINE_SRC_DIR))
