@@ -39,6 +39,7 @@ TEMPLATE = REPO_ROOT / ".github" / "ISSUE_TEMPLATE" / "point-fencepost.md"
 FENCEPOST_ROOT = Path(__file__).resolve().parents[2]  # .../orita/fencepost
 SCOPES_MD = FENCEPOST_ROOT / "SCOPES.md"
 SCAN_PY = FENCEPOST_ROOT / "seam_engine" / "src" / "seam_engine" / "scan.py"
+GMAIL_CALENDAR_PY = FENCEPOST_ROOT / "seam_engine" / "src" / "seam_engine" / "gmail_calendar.py"
 
 # Matches one three-cell markdown table row (`| a | b | c |`), one line at a
 # time — re.MULTILINE is load-bearing here (task 135's own buildlog entry
@@ -266,5 +267,76 @@ def test_scan_py_claimed_github_tools_are_all_in_required_scopes():
     assert not missing, (
         f"scan.py's docstring claims GitHub tool(s) {sorted(missing)} that "
         "consent.REQUIRED_SCOPES['github'] does not declare — the sworn Oath "
+        "is narrower than what the engine actually reads"
+    )
+
+
+def _gmail_calendar_py_claimed_tools() -> tuple[frozenset[str], frozenset[str]]:
+    """The test above proves scan.py's own claimed GitHub tools never
+    outrun REQUIRED_SCOPES['github'] — but scan.py is only one of the two
+    modules `consent.py`'s own docstring names as consent-gated
+    human-account readers. `gmail_calendar.py` is the other (it calls
+    `enforce_consent_gate` from `run_consented_gmail_calendar_scan`) and
+    names its own claimed Gmail/Calendar tools in prose, the same way
+    scan.py names its GitHub tools — just without a single parenthesized
+    list, since v0.2 is fixture-only (ROADMAP.md #16) and the docstring
+    reads as two shorter clauses instead of one. Both are parsed here the
+    same structural way: the first parenthesized group after "read-only
+    Gmail (" is the claimed Gmail tools, the first parenthesized group
+    after the following "Google Calendar" is the claimed Calendar tools.
+    """
+    text = GMAIL_CALENDAR_PY.read_text(encoding="utf-8")
+    gmail_marker = "read-only Gmail ("
+    assert gmail_marker in text, (
+        f"{GMAIL_CALENDAR_PY} no longer names its claimed Gmail tool list this way — update this test's marker"
+    )
+    gmail_start = text.index(gmail_marker) + len(gmail_marker)
+    gmail_end = text.index(")", gmail_start)
+    gmail_claimed = frozenset(
+        name.strip().strip("`") for name in text[gmail_start:gmail_end].replace("\n", " ").split("/") if name.strip()
+    )
+
+    calendar_marker = "Google Calendar"
+    calendar_marker_at = text.index(calendar_marker, gmail_end)
+    calendar_paren_start = text.index("(", calendar_marker_at) + 1
+    calendar_paren_end = text.index(")", calendar_paren_start)
+    calendar_claimed = frozenset(
+        name.strip().strip("`")
+        for name in text[calendar_paren_start:calendar_paren_end].replace("\n", " ").split("/")
+        if name.strip()
+    )
+    return gmail_claimed, calendar_claimed
+
+
+def test_gmail_calendar_py_exists():
+    assert GMAIL_CALENDAR_PY.exists(), f"missing {GMAIL_CALENDAR_PY} — the Gmail/Calendar seam-scan engine must still exist"
+
+
+def test_gmail_calendar_py_claimed_tools_are_all_in_required_scopes():
+    """gmail_calendar.py's own docstring must never claim to use a Gmail or
+    Calendar tool the sworn Oath doesn't declare — the same drift class
+    `test_scan_py_claimed_github_tools_are_all_in_required_scopes` closed
+    for scan.py, aimed here at the sibling consent-gated reader for the
+    first time. v0.2 runs entirely against a fixture (no live tools are
+    actually called yet), but the claim itself — what this module SAYS it
+    will call once the Hand wires up the scopes — is real doctrine today:
+    it is the promise `REQUIRED_SCOPES['gmail']`/`['google_calendar']` must
+    already be broad enough to keep.
+    """
+    gmail_claimed, calendar_claimed = _gmail_calendar_py_claimed_tools()
+    assert gmail_claimed, "parsed zero claimed Gmail tools from gmail_calendar.py — check the marker text hasn't moved"
+    assert calendar_claimed, "parsed zero claimed Calendar tools from gmail_calendar.py — check the marker text hasn't moved"
+
+    missing_gmail = gmail_claimed - REQUIRED_SCOPES["gmail"]
+    assert not missing_gmail, (
+        f"gmail_calendar.py's docstring claims Gmail tool(s) {sorted(missing_gmail)} that "
+        "consent.REQUIRED_SCOPES['gmail'] does not declare — the sworn Oath "
+        "is narrower than what the engine actually reads"
+    )
+
+    missing_calendar = calendar_claimed - REQUIRED_SCOPES["google_calendar"]
+    assert not missing_calendar, (
+        f"gmail_calendar.py's docstring claims Calendar tool(s) {sorted(missing_calendar)} that "
+        "consent.REQUIRED_SCOPES['google_calendar'] does not declare — the sworn Oath "
         "is narrower than what the engine actually reads"
     )
