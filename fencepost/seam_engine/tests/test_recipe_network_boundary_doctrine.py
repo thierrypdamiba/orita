@@ -180,6 +180,99 @@ def test_the_urllib_parse_submodule_form_is_still_not_flagged(tmp_path: Path):
     assert _detector_network_imports(path) == []
 
 
+def test_a_dynamic_importlib_import_module_call_is_caught(tmp_path: Path):
+    # Task 536: `_detector_network_imports` (tasks 529/532) only ever
+    # walked `ast.Import`/`ast.ImportFrom` nodes -- but a detector doesn't
+    # have to write a static import statement to reach the network.
+    # `importlib.import_module("requests")` is a plain `ast.Call`, never
+    # either node type, so it cleared the check entirely while genuinely
+    # binding the real `requests` module and being just as capable of a
+    # live socket as `import requests`.
+    path = tmp_path / "detector.py"
+    path.write_text(
+        "import importlib\n\n"
+        "def run_recipe_scan():\n"
+        "    requests = importlib.import_module('requests')\n"
+        "    return requests.get('http://example.com')\n"
+    )
+    assert _detector_network_imports(path) == ["requests"]
+
+
+def test_a_dynamic_import_module_call_via_a_direct_from_import_is_caught(tmp_path: Path):
+    # `from importlib import import_module; import_module("socket")` names
+    # the function bare, not through the `importlib.` attribute -- a
+    # second real call shape, not just a second way to spell the first one.
+    path = tmp_path / "detector.py"
+    path.write_text(
+        "from importlib import import_module\n\n"
+        "def run_recipe_scan():\n"
+        "    return import_module('socket')\n"
+    )
+    assert _detector_network_imports(path) == ["socket"]
+
+
+def test_a_dunder_import_call_is_caught(tmp_path: Path):
+    # `__import__("socket")` is the builtin every static `import` statement
+    # itself lowers to -- calling it directly is exactly as real a live
+    # network reach and carries no `Import`/`ImportFrom` node at all.
+    path = tmp_path / "detector.py"
+    path.write_text(
+        "def run_recipe_scan():\n"
+        "    sock_mod = __import__('socket')\n"
+        "    return sock_mod.socket()\n"
+    )
+    assert _detector_network_imports(path) == ["socket"]
+
+
+def test_a_dynamic_import_of_a_dotted_stdlib_network_submodule_is_caught(tmp_path: Path):
+    # The dynamic form of the same task-532 bypass: import_module's `name`
+    # argument can be a dotted string just as legally as a static
+    # `from X import Y` can reconstruct one.
+    path = tmp_path / "detector.py"
+    path.write_text(
+        "import importlib\n\n"
+        "def run_recipe_scan():\n"
+        "    return importlib.import_module('urllib.request')\n"
+    )
+    assert _detector_network_imports(path) == ["urllib.request"]
+
+
+def test_a_dynamic_import_of_a_non_literal_name_is_not_flagged(tmp_path: Path):
+    # `importlib.import_module(some_variable)` cannot be statically proven
+    # to name a network-capable module -- this is a narrow, structural
+    # claim (recipes.py's own docstring), not a sound dataflow analysis, so
+    # a non-literal argument is correctly left unflagged rather than
+    # guessed at.
+    path = tmp_path / "detector.py"
+    path.write_text(
+        "import importlib\n\n"
+        "def run_recipe_scan(module_name='json'):\n"
+        "    return importlib.import_module(module_name)\n"
+    )
+    assert _detector_network_imports(path) == []
+
+
+def test_a_dynamic_import_of_a_clean_module_is_not_flagged(tmp_path: Path):
+    path = tmp_path / "detector.py"
+    path.write_text(
+        "import importlib\n\n"
+        "def run_recipe_scan():\n"
+        "    return importlib.import_module('json')\n"
+    )
+    assert _detector_network_imports(path) == []
+
+
+def test_load_recipe_manifest_rejects_a_recipe_whose_detector_dynamically_imports_requests(tmp_path: Path):
+    path = _write(
+        tmp_path,
+        "import importlib\n\n"
+        "def run_recipe_scan():\n"
+        "    return importlib.import_module('requests')\n",
+    )
+    with pytest.raises(RecipeValidationError, match="network-capable"):
+        load_recipe_manifest(path)
+
+
 def test_unparseable_detector_source_fails_closed(tmp_path: Path):
     path = tmp_path / "detector.py"
     path.write_text("def run_recipe_scan(:\n    this is not python\n")

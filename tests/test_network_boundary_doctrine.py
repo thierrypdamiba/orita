@@ -162,6 +162,49 @@ class SyntheticImportCheckCase(unittest.TestCase):
         )
         self.assertTrue(ok, reason)
 
+    def test_flags_a_dynamic_importlib_import_module_call(self):
+        # Task 536: every case above is a static `import`/`from ... import`
+        # statement -- an `ast.Import`/`ast.ImportFrom` node.
+        # `importlib.import_module("requests")` is a plain `ast.Call` and
+        # was never once looked at, so a file could claim "no network,"
+        # genuinely bind the real `requests` module through this call, and
+        # still pass. `fencepost/seam_engine/src/seam_engine/recipes.py`'s
+        # own independent copy of this deny-list logic had the identical
+        # gap, closed the same task.
+        ok, reason = nbc.check_source_has_no_network_import(
+            "import importlib\n\n\ndef f():\n    return importlib.import_module('requests')\n"
+        )
+        self.assertFalse(ok)
+        self.assertIn("requests", reason)
+
+    def test_flags_a_dynamic_import_module_call_via_a_direct_from_import(self):
+        ok, reason = nbc.check_source_has_no_network_import(
+            "from importlib import import_module\n\n\ndef f():\n    return import_module('socket')\n"
+        )
+        self.assertFalse(ok)
+        self.assertIn("socket", reason)
+
+    def test_flags_a_dunder_import_call(self):
+        ok, reason = nbc.check_source_has_no_network_import(
+            "def f():\n    return __import__('http.client')\n"
+        )
+        self.assertFalse(ok)
+        self.assertIn("http.client", reason)
+
+    def test_does_not_flag_a_dynamic_import_of_a_non_literal_name(self):
+        # Narrow, structural claim, not dataflow analysis: a variable
+        # argument cannot be statically proven to name a network module.
+        ok, reason = nbc.check_source_has_no_network_import(
+            "import importlib\n\n\ndef f(name='json'):\n    return importlib.import_module(name)\n"
+        )
+        self.assertTrue(ok, reason)
+
+    def test_does_not_flag_a_dynamic_import_of_a_clean_module(self):
+        ok, reason = nbc.check_source_has_no_network_import(
+            "import importlib\n\n\ndef f():\n    return importlib.import_module('json')\n"
+        )
+        self.assertTrue(ok, reason)
+
 
 # --- the live regression pin: today's real tools/ tree -----------------------
 

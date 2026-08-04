@@ -186,7 +186,22 @@ def _imported_module_names(tree: ast.Module) -> list[str]:
     named -- `ast.ImportFrom.module` alone is `"urllib"`/`"http"` for
     those two real stdlib network-submodule-as-attribute forms, which
     never matches the deny-list's exact dotted-submodule entries on its
-    own and would otherwise walk straight past NETWORK_MODULES."""
+    own and would otherwise walk straight past NETWORK_MODULES.
+
+    Task 536: this only ever named `ast.Import`/`ast.ImportFrom` nodes --
+    a *static* import statement. `importlib.import_module("requests")`,
+    `from importlib import import_module; import_module("socket")`, and
+    the bare builtin `__import__("http.client")` are each an `ast.Call`,
+    never either node type, so a file could carry any of the three, claim
+    "no network" in its own docstring, and pass this check while genuinely
+    binding a network-capable module at runtime. `_dynamic_import_targets`
+    below folds those three call shapes in, reading only a first-argument
+    STRING LITERAL -- a variable argument cannot be statically proven to
+    name a network module, so (matching this function's own narrow,
+    structural intent) it is left unflagged rather than guessed at.
+    `fencepost/seam_engine/src/seam_engine/recipes.py`'s own independent
+    copy of this deny-list logic had the identical gap, closed the same
+    task."""
     names = []
     for node in ast.walk(tree):
         if isinstance(node, ast.Import):
@@ -197,14 +212,41 @@ def _imported_module_names(tree: ast.Module) -> list[str]:
                 names.append(node.module)
                 for alias in node.names:
                     names.append(f"{node.module}.{alias.name}")
+        elif isinstance(node, ast.Call):
+            target = _dynamic_import_target(node)
+            if target is not None:
+                names.append(target)
     return names
+
+
+def _dynamic_import_target(call: ast.Call) -> str | None:
+    """If `call` is `importlib.import_module(...)`, a bare `import_module(...)`
+    (reachable via `from importlib import import_module`), or `__import__(...)`,
+    and its first positional argument is a literal string, return that
+    string. Returns `None` for every other call shape, or when the first
+    argument isn't a string literal -- never a guess at an unresolvable
+    target."""
+    func = call.func
+    is_import_module = (
+        isinstance(func, ast.Attribute) and func.attr == "import_module"
+    ) or (isinstance(func, ast.Name) and func.id == "import_module")
+    is_dunder_import = isinstance(func, ast.Name) and func.id == "__import__"
+    if not (is_import_module or is_dunder_import):
+        return None
+    if not call.args:
+        return None
+    first = call.args[0]
+    if isinstance(first, ast.Constant) and isinstance(first.value, str):
+        return first.value
+    return None
 
 
 def check_source_has_no_network_import(source: str) -> tuple[bool, str]:
     """True + reason iff `source` names no network-capable module in any
-    `import`/`from ... import` statement anywhere in the file. False +
-    a reason naming exactly which module and which real import triggered
-    it, so a failure is actionable, not just a bare assertion."""
+    `import`/`from ... import` statement, or dynamic `importlib.import_
+    module`/`__import__` call with a literal target, anywhere in the file.
+    False + a reason naming exactly which module and which real import
+    triggered it, so a failure is actionable, not just a bare assertion."""
     tree = ast.parse(source)
     for name in _imported_module_names(tree):
         if name in NETWORK_MODULES:

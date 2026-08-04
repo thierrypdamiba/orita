@@ -172,7 +172,25 @@ def _detector_network_imports(detector_path: Path) -> list[str]:
     since this package ships and tests standalone) already reconstructs the
     dotted `f"{module}.{name}"` path for exactly this reason -- this
     function now mirrors that reconstruction, closing the same hole in its
-    own independent copy of the deny-list logic."""
+    own independent copy of the deny-list logic.
+
+    Task 536: every case above is still an `ast.Import`/`ast.ImportFrom`
+    node -- a *static* import statement. `importlib.import_module("requests")`,
+    `from importlib import import_module; import_module("socket")`, and the
+    bare builtin `__import__("urllib.request")` are none of those; they are
+    an `ast.Call`, and this walk never once looked at a `Call` node. A
+    detector shaped exactly like the fixtures this file's own tests use to
+    prove the checker works -- clean scopes, a `fixtures/`-rooted manifest
+    -- could still bind the real `requests` module at runtime through any of
+    these three call shapes and open a live socket, no static import line
+    anywhere in the file for the walk above to catch. `_dynamic_import_
+    target` below reads only a first-argument STRING LITERAL -- a variable
+    name (`import_module(module_name)`) cannot be proven to name a
+    network-capable module by a static read, and this function's own
+    docstring is explicit that it makes "one narrow, structural claim," not
+    a sound dataflow analysis, so a non-literal argument is left unflagged
+    rather than guessed at, same as every static-import case above already
+    treats an unresolvable target as out of scope."""
     try:
         source = detector_path.read_text(encoding="utf-8")
     except OSError as exc:
@@ -196,7 +214,34 @@ def _detector_network_imports(detector_path: Path) -> list[str]:
                     dotted = f"{node.module}.{alias.name}"
                     if dotted in NETWORK_CAPABLE_IMPORTS:
                         found.add(dotted)
+        elif isinstance(node, ast.Call):
+            target = _dynamic_import_target(node)
+            if target is not None and target in NETWORK_CAPABLE_IMPORTS:
+                found.add(target)
     return sorted(found)
+
+
+def _dynamic_import_target(call: ast.Call) -> str | None:
+    """If `call` is `importlib.import_module(...)`, a bare `import_module(...)`
+    (reachable via `from importlib import import_module`), or `__import__(...)`,
+    and its first positional argument is a literal string, return that
+    string. Returns `None` for every other call shape, or when the first
+    argument isn't a string literal (a variable, an f-string, a call) --
+    this is a narrow, structural read, not an evaluator, and it never
+    guesses at a target it cannot see directly on the call itself."""
+    func = call.func
+    is_import_module = (
+        isinstance(func, ast.Attribute) and func.attr == "import_module"
+    ) or (isinstance(func, ast.Name) and func.id == "import_module")
+    is_dunder_import = isinstance(func, ast.Name) and func.id == "__import__"
+    if not (is_import_module or is_dunder_import):
+        return None
+    if not call.args:
+        return None
+    first = call.args[0]
+    if isinstance(first, ast.Constant) and isinstance(first.value, str):
+        return first.value
+    return None
 
 
 def _word_hides_glued_verb(word: str) -> str | None:
