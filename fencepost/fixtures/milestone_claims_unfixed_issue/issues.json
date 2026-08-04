@@ -1,0 +1,20 @@
+[
+  {
+    "number": 601,
+    "title": "Cleanup pass stragglers",
+    "state": "open",
+    "url": "https://github.com/thierrypdamiba/orita/issues/601"
+  },
+  {
+    "number": 602,
+    "title": "Bugfix backlog item",
+    "state": "open",
+    "url": "https://github.com/thierrypdamiba/orita/issues/602"
+  },
+  {
+    "number": 603,
+    "title": "Docs typo",
+    "state": "closed",
+    "url": "https://github.com/thierrypdamiba/orita/issues/603"
+  }
+]

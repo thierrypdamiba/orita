@@ -554,6 +554,25 @@ tool on the-hand gateway — added to `SCOPES.md`'s cleared oath table by
 this same task, alongside the already-cleared `ListIssues` and
 `ListPullRequests`.
 
+[`RECIPES/milestone-claims-unfixed-issue/`](RECIPES/milestone-claims-unfixed-issue/)
+is the forty-fifth (ROADMAP.md #535): the claims-X family's issue leg,
+applied to the one text surface it had never reached. README, a release
+body, and a tweet each already carry all three claims-X legs
+(unfixed-issue, unmerged-pr, open-milestone), but a milestone's own
+`description` — already read for *dangling* references by
+`milestone-body-dangling-reference` — had never been checked for this
+sibling shape: not "does `#N` exist" but "this text claims `#N` is
+FIXED, and it is not." Reuses `seam_engine.closing_keywords`'s shared
+grammar verbatim, the same discipline `readme-claims-unfixed-issue` and
+`release-claims-unfixed-issue` already established. Age-gated on the
+milestone's own `updated_at`, mirroring `milestone-body-dangling-
+reference`'s 24h edit-grace bar rather than `readme-claims-unfixed-
+issue`'s flat confidence, since a milestone description — unlike a live
+README read — carries a real per-record edit timestamp to weigh. Both
+scopes, `ListMilestones` and `ListIssues`, were already cleared on
+`SCOPES.md`'s oath table — no new scope asked for anywhere in this
+recipe.
+
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)
 (ROADMAP.md #111) is that second promise, kept: it runs `scan.py`'s own

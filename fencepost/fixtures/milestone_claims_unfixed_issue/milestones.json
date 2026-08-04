@@ -1,0 +1,58 @@
+[
+  {
+    "number": 60,
+    "title": "v2.1 Cleanup",
+    "state": "open",
+    "description": "This milestone fixes #601, closing out the whole cleanup pass.",
+    "updated_at": "2026-08-01T12:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/milestone/60"
+  },
+  {
+    "number": 61,
+    "title": "Bugfix backlog",
+    "state": "open",
+    "description": "closes #602 once this ships.",
+    "updated_at": "2026-08-04T10:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/milestone/61"
+  },
+  {
+    "number": 62,
+    "title": "Docs pass",
+    "state": "closed",
+    "description": "resolved #603 as part of this milestone.",
+    "updated_at": "2026-07-20T00:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/milestone/62"
+  },
+  {
+    "number": 63,
+    "title": "Typo in the tracker",
+    "state": "open",
+    "description": "fixes #9999, which I can no longer find.",
+    "updated_at": "2026-07-29T12:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/milestone/63"
+  },
+  {
+    "number": 64,
+    "title": "No description written",
+    "state": "open",
+    "description": null,
+    "updated_at": "2026-07-20T00:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/milestone/64"
+  },
+  {
+    "number": 65,
+    "title": "Pure housekeeping",
+    "state": "open",
+    "description": "Nothing to claim here, just cleanup.",
+    "updated_at": "2026-07-29T12:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/milestone/65"
+  },
+  {
+    "number": 66,
+    "title": "Present participle only",
+    "state": "open",
+    "description": "closing #601 slowly, still in progress.",
+    "updated_at": "2026-07-29T12:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/milestone/66"
+  }
+]

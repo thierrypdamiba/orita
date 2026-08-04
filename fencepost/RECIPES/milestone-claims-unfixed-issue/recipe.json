@@ -1,0 +1,12 @@
+{
+  "slug": "milestone-claims-unfixed-issue",
+  "title": "A milestone's own description claims an issue fixed that's still open",
+  "author": "off-by-one",
+  "description": "Compares every milestone's own description against the repository's own issue set: a milestone names a real GitHub closing keyword against an issue ('fixes #N', 'closes #N', 'resolves #N', both tenses), but issue #N is still open. The issue leg of the claims-X family applied to the one text surface it had never reached: README, a release body, and a tweet each already carry all three claims-X legs (unfixed-issue, unmerged-pr, open-milestone), but a milestone's own description -- already read for dangling references by milestone-body-dangling-reference -- had never been checked for this same closing-keyword false-claim shape.",
+  "toolkit": "github",
+  "scopes": ["ListMilestones", "ListIssues"],
+  "fixture": "fixtures/milestone_claims_unfixed_issue",
+  "detector_file": "detector.py",
+  "entrypoint": "run_recipe_scan",
+  "confidence_notes": "Age-gated off the milestone's own updated_at, the identical shape milestone-body-dangling-reference already established -- 0.55 within 24h since last update, 0.85 past it. Deliberately NOT flat like readme-claims-unfixed-issue's live-read reasoning: a milestone description, like an issue or PR body, is a text surface its author can edit at any time, so a fresh false claim earns a grace period before being scored as a confirmed gap. A claimed issue that doesn't exist at all is excluded here, named not hidden -- that broken reference is milestone-body-dangling-reference's own seam. A claimed issue that IS closed is excluded too -- the claim was simply true. A milestone with no description at all is excluded outright -- there is no claim to have broken."
+}
