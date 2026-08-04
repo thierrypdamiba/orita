@@ -63,6 +63,7 @@ Recorded.
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 from typing import Any
 
@@ -74,6 +75,13 @@ _FENCEPOST_ROOT = Path(__file__).resolve().parents[3]
 
 THE_LINE = "You were so close. You are always so close."
 
+# Matches a single-quoted span, e.g. 'Add calendar sync helper' -- the
+# convention every detector in the tree already follows for embedding
+# mortal-controlled free text into a headline/detail f-string. See
+# `suggest_move`'s own docstring note (task 537) for why this is stripped
+# before rule-matching rather than matched over.
+_QUOTED_SPAN_RE = re.compile(r"'[^']*'")
+
 # The single hand-off. One rule beneath the words: never a verb Fencepost can
 # perform itself. "Post it", "add it", "close it" — all reader-verbs. Never
 # "we posted", "we'll add", "we closed". Matched against the gap's own
@@ -83,6 +91,17 @@ THE_LINE = "You were so close. You are always so close."
 # most-specific first. The default line beneath the table fires only when a
 # future gap kind doesn't yet have a rule of its own here — it is deliberately
 # generic rather than silently wrong.
+#
+# Task 537 (retrya): the "post about it" rule only ever matched `scan.py`'s
+# own core headline phrasing ("...never reached @oritatown"). Four of
+# RECIPES/'s own real, shipped community recipes -- issue-closed-not-tweeted,
+# merged-pr-not-tweeted, release-not-tweeted, star-milestone-not-announced --
+# grew a different, equally real phrasing ("never tweeted" / "never
+# announced") and never once matched, so had any of the four ever ranked as
+# the report's primary gap, the reader would have gotten the generic default
+# line instead of the correct "post about it" hand-off. Confirmed live
+# pre-fix (`suggest_move` on each of the four's real headline shape returned
+# `_DEFAULT_MOVE`, not this rule) before adding the two missing needles.
 _MOVE_RULES: tuple[tuple[str, str], ...] = (
     (
         "calendar",
@@ -94,6 +113,14 @@ _MOVE_RULES: tuple[tuple[str, str], ...] = (
     ),
     (
         "@oritatown",
+        "Post about it yourself — a single line linking it is enough. Fencepost only found the seam; it does not cross it.",
+    ),
+    (
+        "never tweeted",
+        "Post about it yourself — a single line linking it is enough. Fencepost only found the seam; it does not cross it.",
+    ),
+    (
+        "never announced",
         "Post about it yourself — a single line linking it is enough. Fencepost only found the seam; it does not cross it.",
     ),
 )
@@ -132,7 +159,19 @@ def suggest_move(primary_gap: dict[str, Any] | None) -> str:
     """
     if not primary_gap:
         return _NO_GAP_MOVE
-    haystack = f"{primary_gap.get('headline', '')} {primary_gap.get('detail', '')}".lower()
+    raw = f"{primary_gap.get('headline', '')} {primary_gap.get('detail', '')}"
+    # Task 537 (retrya): every detector across scan.py and all 45 RECIPES/
+    # embeds mortal-controlled free text (a commit message, an issue/PR/
+    # milestone title, a tweet's own text) inside single quotes -- confirmed
+    # by grep across every headline=/detail= f-string in the tree, zero
+    # exceptions. Left in the haystack, that free text can accidentally
+    # contain a rule's needle and misfire the wrong move for an unrelated
+    # gap: a dangling-issue-reference gap whose commit message happened to
+    # read "Add calendar sync helper" rendered the Calendar move line for a
+    # gap that has nothing to do with calendars (reproduced live pre-fix).
+    # Stripping quoted spans first leaves only the recipe-authored template
+    # prose the rules are actually meant to match.
+    haystack = _QUOTED_SPAN_RE.sub(" ", raw).lower()
     for needle, move in _MOVE_RULES:
         if needle in haystack:
             return move

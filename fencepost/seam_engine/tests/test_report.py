@@ -345,6 +345,75 @@ def test_suggest_move_on_no_gap_is_the_fixed_quiet_day_line():
     assert report.suggest_move(None) == report._NO_GAP_MOVE
 
 
+# Task 537 (retrya): four of RECIPES/'s own real, shipped community recipes
+# (issue-closed-not-tweeted, merged-pr-not-tweeted, release-not-tweeted,
+# star-milestone-not-announced) produce a real gap headline reading "never
+# tweeted" / "never announced" -- never "@oritatown", which was the only
+# needle this rule matched on. Each shape below is copied verbatim from that
+# recipe's own detector.py headline= f-string, not invented, so a future
+# rewording of either side would go red here rather than silently drift
+# apart again the way the two already had.
+def test_suggest_move_matches_issue_closed_not_tweeted_headline():
+    move = report.suggest_move({"headline": "#42 closed, never tweeted", "detail": ""})
+    assert "post about it" in move.lower()
+
+
+def test_suggest_move_matches_merged_pr_not_tweeted_headline():
+    move = report.suggest_move({"headline": "#7 merged, never tweeted", "detail": ""})
+    assert "post about it" in move.lower()
+
+
+def test_suggest_move_matches_release_not_tweeted_headline():
+    move = report.suggest_move({"headline": "v1.2.0 shipped, never tweeted", "detail": ""})
+    assert "post about it" in move.lower()
+
+
+def test_suggest_move_matches_star_milestone_not_announced_headline():
+    move = report.suggest_move({"headline": "1000 stars, never announced", "detail": ""})
+    assert "post about it" in move.lower()
+
+
+# Task 537 (retrya): every detector embeds mortal-controlled free text (a
+# commit message, a title, a tweet's own words) inside single quotes in its
+# headline/detail f-strings -- confirmed by grep across the whole tree, zero
+# exceptions. Left unstripped, that free text can accidentally contain a
+# rule's needle and misfire the wrong move for a gap that has nothing to do
+# with it. Each case below reproduces a real detector's own quoting shape
+# (`'{commit.message}' ... references #{n}`, the dangling-reference family's
+# own template) with free text engineered to collide with a different rule.
+def test_suggest_move_ignores_a_rule_needle_hiding_inside_quoted_free_text():
+    gap = {
+        "headline": "A commit references #42, but no issue or PR #42 exists",
+        "detail": "'Add calendar sync helper, references #42' (https://github.com/x/y/commit/abc) "
+        "references #42; a real issue or pull request never existed.",
+    }
+    move = report.suggest_move(gap)
+    assert move == report._DEFAULT_MOVE
+    assert "calendar" not in move.lower()
+
+
+def test_suggest_move_ignores_reminder_hiding_inside_a_quoted_headline():
+    gap = {
+        "headline": "'Ship the reminder email' is open with no 'duplicate of #N' reference",
+        "detail": "",
+    }
+    move = report.suggest_move(gap)
+    assert move == report._DEFAULT_MOVE
+    assert "reminder" not in move.lower()
+
+
+def test_suggest_move_still_matches_calendar_when_unquoted_in_the_template():
+    # Guards the fix's own precision: stripping quoted spans must not eat the
+    # rule's own unquoted template word (gmail_calendar.py's real headline
+    # shape: "Invite '{event_title}' sits in Gmail, never reached Calendar").
+    gap = {
+        "headline": "Invite 'Add calendar sync helper' sits in Gmail, never reached Calendar",
+        "detail": "",
+    }
+    move = report.suggest_move(gap)
+    assert "add it to your calendar" in move.lower()
+
+
 def test_your_move_line_reads_correctly_from_a_live_ledger(tmp_path: Path):
     ledger.append_scan(
         {
