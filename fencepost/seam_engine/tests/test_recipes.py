@@ -532,7 +532,7 @@ _CARDINAL_WORDS = {
     "twenty-nine": 29, "thirty": 30, "thirty-one": 31, "thirty-two": 32,
     "thirty-three": 33, "thirty-four": 34, "thirty-five": 35, "thirty-six": 36,
     "thirty-seven": 37, "thirty-eight": 38, "thirty-nine": 39, "forty": 40,
-    "forty-one": 41,
+    "forty-one": 41, "forty-two": 42,
 }
 
 _PLUS_JOINED_CLAIM_RE = re.compile(
@@ -584,11 +584,12 @@ def test_plus_joined_claim_missing_sentence_raises():
         claimed_plus_joined_counts("Nothing here about plus-joined toolkits.")
 
 
-def test_real_plus_joined_counts_are_currently_eleven_of_forty_one():
-    # Regression pin: today's real, live counts under RECIPES/. Was (11, 40)
-    # until milestone-body-dangling-reference merged (the forty-first
-    # real recipe, single-toolkit "github" -- the plus-joined half stays 11).
-    assert real_plus_joined_counts(FENCEPOST_ROOT) == (11, 41)
+def test_real_plus_joined_counts_are_currently_twelve_of_forty_two():
+    # Regression pin: today's real, live counts under RECIPES/. Was (11, 41)
+    # until own-tweet-dangling-reference merged (the forty-second real
+    # recipe, plus-joined toolkit "x+github" -- the plus-joined half moves
+    # to 12, same as release-not-tweeted's own direction).
+    assert real_plus_joined_counts(FENCEPOST_ROOT) == (12, 42)
 
 
 def test_oath_scopes_for_toolkit_docstring_matches_the_real_live_counts():

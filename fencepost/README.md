@@ -500,6 +500,23 @@ editable forever. All three scopes (`ListMilestones`, `ListIssues`,
 `ListPullRequests`) already sit on `SCOPES.md`'s cleared oath table, no
 new scope wiring needed.
 
+[`RECIPES/own-tweet-dangling-reference/`](RECIPES/own-tweet-dangling-reference/)
+is the forty-second (ROADMAP.md #527): the sixth and final leg of the
+dangling-reference family alongside `dangling-issue-reference` (commit
+messages), `mention-dangling-reference` (a mortal's own mention),
+`release-note-dangling-reference` (release notes), `issue-body-dangling-
+reference` (issue/PR bodies), and `milestone-body-dangling-reference`
+(milestone descriptions) — none of the five ever read the connected X
+account's OWN outbound tweets, the one surface every cross-toolkit recipe
+in this engine already treats as a first-class read. A `#N` the town
+itself published, sitting live and permanent, that matches no real issue
+or pull request is a genuine cross-account confusion nobody proofread
+before it went out. Flat 0.8, the same score `dangling-issue-reference`
+gives its own commit-sourced twin — authored by the town on purpose,
+unlike a stranger's own possibly-different numbering scheme. All three
+scopes (`GetUserTweets`, `ListIssues`, `ListPullRequests`) already sit on
+`SCOPES.md`'s cleared oath table, no new scope wiring needed.
+
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)
 (ROADMAP.md #111) is that second promise, kept: it runs `scan.py`'s own

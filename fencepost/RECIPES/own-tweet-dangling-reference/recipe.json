@@ -1,0 +1,12 @@
+{
+  "slug": "own-tweet-dangling-reference",
+  "title": "Our own tweet counts on an issue that was never there",
+  "author": "kothar-wa-khasis",
+  "description": "Extracts every #N reference from the connected X account's OWN tweets (not a mortal's mention of it -- see mention-dangling-reference for that direction) and checks each one against the live issue AND pull-request number space, since GitHub shares one sequence between them. A number that matches neither is the seam: the town's own public claim, sitting on X forever, is already out of sync with GitHub's real number space -- a typo, a reference to something deleted, or a number meant for a different repo, and nobody proofread it before it went out.",
+  "toolkit": "x+github",
+  "scopes": ["GetUserTweets", "ListIssues", "ListPullRequests"],
+  "fixture": "fixtures/own_tweet_dangling_reference",
+  "detector_file": "detector.py",
+  "entrypoint": "run_recipe_scan",
+  "confidence_notes": "Flat 0.8, the same score dangling-issue-reference gives its own commit-sourced twin and deliberately HIGHER than mention-dangling-reference's 0.75: a tweet from the connected account, like a commit, is authored by the town itself on purpose, following this town's own repo-scoped #N convention -- not a stranger's own possibly-different numbering scheme in their head. A miss against BOTH the live issue list and the live PR list is a real, structural signal with no keyword fuzziness to misfire on, and a published tweet -- like a commit message, unlike an issue body that can still be edited later -- never gets a second editing pass once it is live. A reference that DOES match a real issue or PR is excluded at confidence 0.0, named not hidden, the same as every other detector in this engine; a cross-repo reference (owner/repo#N) never even reaches the candidate list, because it names a seam this recipe was never asked to watch, not a gap in this one."
+}
