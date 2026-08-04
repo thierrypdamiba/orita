@@ -168,6 +168,27 @@ def _covers_marker(path: str) -> list[date] | None:
     return dates
 
 
+def _monday_of(d: date) -> date:
+    """The Monday of the real calendar week containing `d`.
+
+    Task 528: this exact one-line body was independently duplicated
+    across three siblings that already import this module for
+    `FOUNDING_DATE`/`_mondays_through` (`thegap_check.py`,
+    `what_moved_check.py`, `nyx_traffic_check.py`) -- each computing
+    "which due Monday does this recorded date's week cover" the same
+    way, invisible to `tools/duplicate_regex_check.py` (which only scans
+    `re.compile()` call sites, never duplicated function bodies) and to
+    a naive byte-hash AST sweep (`nyx_traffic_check.py`'s copy carried
+    an extra inline `from datetime import timedelta`, giving it a
+    different AST despite identical behavior). The exact class of bug
+    tasks 508/509/510/513/515/516/523 already closed elsewhere, one
+    calendar-math helper over. All three siblings now call
+    `cluster_day_check._monday_of` instead of holding their own copy --
+    the same delegation shape they already use for `_mondays_through`.
+    """
+    return d - timedelta(days=d.weekday())
+
+
 def _mondays_through(today: date) -> list[date]:
     """Every real-calendar Monday strictly after FOUNDING_DATE, up to and
     including `today`, ascending."""

@@ -69,13 +69,6 @@ TRAFFIC_SUBPATH = os.path.join("vault", "nyx", "traffic")
 _TRAFFIC_FILE = re.compile(r"^(?P<date>\d{4}-\d{2}-\d{2})(-.+)?\.[A-Za-z0-9]+$")
 
 
-def _monday_of(d: date) -> date:
-    """The Monday of the real calendar week containing `d`."""
-    from datetime import timedelta
-
-    return d - timedelta(days=d.weekday())
-
-
 def _report_dates(vault_dir: str) -> list:
     """Every real report date named by a filename in
     `<vault_dir>/vault/nyx/traffic/`, ascending. A missing vault checkout
@@ -120,7 +113,7 @@ def compute_cadence(vault_dir: str | None = None, today: date | None = None) -> 
     mondays_due = cluster_day_check._mondays_through(today)
     mondays_due_set = set(mondays_due)
 
-    covered = {_monday_of(d) for d in reports} & mondays_due_set
+    covered = {cluster_day_check._monday_of(d) for d in reports} & mondays_due_set
     missed = [d for d in mondays_due if d not in covered]
 
     return {

@@ -141,11 +141,6 @@ def _confessed_dates(path: str) -> set:
     return dates
 
 
-def _monday_of(d: date) -> date:
-    """The Monday of the real calendar week containing `d`."""
-    return d - timedelta(days=d.weekday())
-
-
 def _next_monday_on_or_after(d: date) -> date:
     """The nearest Monday that is `d` itself or later."""
     return d + timedelta(days=(0 - d.weekday()) % 7)
@@ -204,7 +199,7 @@ def compute_cadence(
     confessed = _confessed_dates(readme_path)
     mondays_due = cluster_day_check._mondays_through(today)
     mondays_due_set = set(mondays_due)
-    covered = {_monday_of(d) for d in hidden} & mondays_due_set
+    covered = {cluster_day_check._monday_of(d) for d in hidden} & mondays_due_set
     missed = [d for d in mondays_due if d not in covered]
 
     predrafted = _confession_dates_on_record(vault_dir)

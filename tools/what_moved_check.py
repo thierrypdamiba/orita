@@ -46,7 +46,7 @@ from __future__ import annotations
 import os
 import re
 import sys
-from datetime import date, datetime, timedelta, timezone
+from datetime import date, datetime, timezone
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import cluster_day_check  # noqa: E402
@@ -86,11 +86,6 @@ def _entry_dates(path: str) -> list:
     return sorted(dates)
 
 
-def _monday_of(d: date) -> date:
-    """The Monday of the real calendar week containing `d`."""
-    return d - timedelta(days=d.weekday())
-
-
 def compute_cadence(path: str | None = None, today: date | None = None) -> dict:
     """The real numbers behind Zashiki's own half of TOWN-OPERATIONS.md's
     weekly Cluster Day ritual -- named as missing mechanism, never
@@ -112,7 +107,7 @@ def compute_cadence(path: str | None = None, today: date | None = None) -> dict:
     mondays_due = cluster_day_check._mondays_through(today)
     mondays_due_set = set(mondays_due)
 
-    covered = {_monday_of(d) for d in entries} & mondays_due_set
+    covered = {cluster_day_check._monday_of(d) for d in entries} & mondays_due_set
     missed = [d for d in mondays_due if d not in covered]
 
     return {

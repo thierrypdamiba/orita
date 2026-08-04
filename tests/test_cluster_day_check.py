@@ -260,5 +260,48 @@ class RealChronicleCase(unittest.TestCase):
         self.assertEqual(result["missed_mondays"], [])
 
 
+class MondayOfCase(unittest.TestCase):
+    """Task 528. `_monday_of` moved here from three siblings
+    (thegap_check, what_moved_check, nyx_traffic_check) that each held a
+    byte-for-byte independent copy of the same one-line calendar-math
+    helper -- one copy (nyx_traffic_check's) even had a different AST
+    shape (an inline `from datetime import timedelta`), which is exactly
+    why the naive AST-hash sweep tasks 508/509/510/513/515/516/523 ran
+    caught the other two but not this third one on the first pass."""
+
+    def test_a_monday_maps_to_itself(self):
+        self.assertEqual(cdc._monday_of(date(2026, 8, 3)), date(2026, 8, 3))
+
+    def test_a_midweek_day_maps_to_that_weeks_monday(self):
+        self.assertEqual(cdc._monday_of(date(2026, 8, 6)), date(2026, 8, 3))
+
+    def test_a_sunday_maps_to_the_preceding_monday(self):
+        self.assertEqual(cdc._monday_of(date(2026, 8, 9)), date(2026, 8, 3))
+
+
+SIBLINGS = ["thegap_check", "what_moved_check", "nyx_traffic_check"]
+
+
+class MondayOfIdentityAcrossSiblingsCase(unittest.TestCase):
+    """Every sibling must call `cluster_day_check._monday_of` itself
+    (the same function object), not hold a private re-implementation --
+    the only guarantee that makes the three-independent-copies drift
+    this task closed structurally unable to recur one copy at a time."""
+
+    def test_every_sibling_has_no_private_monday_of_of_its_own(self):
+        for name in SIBLINGS:
+            with self.subTest(sibling=name):
+                mod = _load(name, os.path.join(ROOT, "tools", f"{name}.py"))
+                self.assertFalse(
+                    hasattr(mod, "_monday_of"),
+                    f"{name} still holds its own _monday_of -- the "
+                    "consolidation into cluster_day_check regressed",
+                )
+                # And it must actually be USING the shared one, not a
+                # second silently-reintroduced private copy under a
+                # different name.
+                self.assertIs(mod.cluster_day_check._monday_of, cdc._monday_of)
+
+
 if __name__ == "__main__":
     unittest.main()
