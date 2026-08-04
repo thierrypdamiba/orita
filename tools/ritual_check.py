@@ -1718,6 +1718,37 @@ def check_hand_links(hand_dir: str | None = None) -> dict:
     return {"clean": not violations, "count": len(violations), "violations": violations}
 
 
+def check_chronicle_links(chronicle_dir: str | None = None) -> dict:
+    """Task 524 (Kwaku-Ananse): the sixth sibling of `check_site_links`/
+    `check_house_links`/`check_fencepost_links`/`check_issue_template_links`/
+    `check_hand_links` -- `chronicle/`, my own episode ledger
+    (`chronicle/README.md`'s own table of contents links each episode file
+    plus a cross-directory link out to `docs/story-so-far.md`), had never
+    once been pointed at by `site_link_check.py`. Picked as this hour's
+    task because rotation was overdue (kwaku-ananse's last turn was task
+    500, 24 tasks ago) and the surface is genuinely mine: an episode
+    renamed or a link typo in my own README is exactly the kind of thing
+    a chronicler should be first to catch, not last. `chronicle/` is
+    GitHub-browsed prose, never Pages-served, so it takes the same
+    `require_index=False` rule every prior sibling but `check_site_links`
+    itself already shares. A live first run against the real tree found
+    it already clean -- no break to fix today -- but "clean and never
+    checked" is exactly the gap each of the five siblings closed for its
+    own directory in turn; this is the same class of surface, just the
+    one nobody had reached yet. Unconditional, local-filesystem-only, the
+    same cheap always-on class every sibling already holds. Never edits
+    anything; a real broken link, if one is ever found, is a
+    god-on-duty escalation, not something this check silently repairs."""
+    mod = _site_link_check()
+    kwargs = {"require_index": False}
+    if chronicle_dir is not None:
+        kwargs["docs_dir"] = chronicle_dir
+    else:
+        kwargs["docs_dir"] = os.path.join(ROOT, "chronicle")
+    violations = mod.find_violations(**kwargs)
+    return {"clean": not violations, "count": len(violations), "violations": violations}
+
+
 def check_badge_freshness(badge_path: str | None = None) -> dict:
     """Task 425: fold badge_freshness_check.py's own live-recompute-vs-
     committed-file cross-check into the one block. `seam-scan.yml`'s daily
@@ -1891,6 +1922,7 @@ def run_ritual_check(
     fencepost_links_dir: str | None = None,
     issue_template_links_dir: str | None = None,
     hand_links_dir: str | None = None,
+    chronicle_links_dir: str | None = None,
     badge_path: str | None = None,
     recipe_readme_path: str | None = None,
     recipe_readme_fencepost_root: str | None = None,
@@ -2000,6 +2032,7 @@ def run_ritual_check(
     fencepost_links = check_fencepost_links(fencepost_dir=fencepost_links_dir)
     issue_template_links = check_issue_template_links(issue_template_dir=issue_template_links_dir)
     hand_links = check_hand_links(hand_dir=hand_links_dir)
+    chronicle_links = check_chronicle_links(chronicle_dir=chronicle_links_dir)
     badge_freshness = check_badge_freshness(badge_path=badge_path)
     recipe_readme = check_recipe_readme(
         readme_path=recipe_readme_path, recipe_fencepost_root=recipe_readme_fencepost_root
@@ -2060,6 +2093,7 @@ def run_ritual_check(
         or (not fencepost_links["clean"])
         or (not issue_template_links["clean"])
         or (not hand_links["clean"])
+        or (not chronicle_links["clean"])
         or (not badge_freshness["clean"])
         or (not recipe_readme["clean"])
         or (not strategy_true_positive["clean"])
@@ -2120,6 +2154,7 @@ def run_ritual_check(
         "fencepost_links": fencepost_links,
         "issue_template_links": issue_template_links,
         "hand_links": hand_links,
+        "chronicle_links": chronicle_links,
         "badge_freshness": badge_freshness,
         "recipe_readme": recipe_readme,
         "strategy_true_positive": strategy_true_positive,
@@ -2404,6 +2439,13 @@ def format_ritual_check(result: dict) -> str:
     else:
         lines.append(
             f"  hand links: {hl2['count']} BROKEN LINK(S) -- the Hand's own record is unmet, escalate now"
+        )
+    cl2 = result["chronicle_links"]
+    if cl2["clean"]:
+        lines.append("  chronicle links: clean (every chronicle/ link resolves, GitHub-browsed rule)")
+    else:
+        lines.append(
+            f"  chronicle links: {cl2['count']} BROKEN LINK(S) -- Ananse's own record is unmet, escalate now"
         )
     lines.append("  " + _badge_freshness_check().format_badge_freshness(result["badge_freshness"]))
     lines.append("  " + _recipe_readme_check().format_result(result["recipe_readme"]))

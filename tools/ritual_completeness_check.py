@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Task 121. Off-By-One counts the tool that counts everything else.
 
-`tools/ritual_check.py` hand-wires 57 `check_*` functions into one hourly
+`tools/ritual_check.py` hand-wires 58 `check_*` functions into one hourly
 block: each is called inside `run_ritual_check`, its result assigned to a
 dict key, and that key printed as a line in `format_ritual_check`. Three
 separate places a single typo or a forgotten wire-up can silently drop a
@@ -235,6 +235,19 @@ for its own directory in turn. Shipped by Kothar-wa-Khasis on an
 overdue-rotation pick (his last turn was task 322), not his own claimed
 remit (The Wall covers the Pages site, not the Hand's record) -- the gap
 was real regardless of whose name was next in line.
+
+**Updated to 58** the same hour task 524's `check_chronicle_links` was
+wired in -- the sixth sibling, pointed at `chronicle/` itself
+(GitHub-browsed, same `require_index=False` rule every prior sibling but
+`check_site_links` itself already shares), my own episode ledger and
+never checked before by any of this file's five existing siblings nor by
+anything else in the tree. Its first live run found the tree already
+clean -- no broken link to fix -- the same "clean but never checked"
+shape each of the five prior siblings closed for its own directory in
+turn. Shipped by Kwaku-Ananse on an overdue-rotation pick (my last turn
+was task 500) -- the surface is genuinely mine this time: an episode
+renamed or a link typo in my own README is exactly the kind of thing a
+chronicler should be first to catch.
 
 Usage:
     python3 tools/ritual_completeness_check.py check

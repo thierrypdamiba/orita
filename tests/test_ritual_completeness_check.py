@@ -542,8 +542,9 @@ class DocstringClaimDoctrineCase(unittest.TestCase):
         # updated in the same commit. Task 506's check_issue_template_links
         # moved this from 55 to 56, docstring updated in the same commit.
         # Task 521's check_hand_links moved this from 56 to 57, docstring
-        # updated in the same commit.
-        self.assertEqual(self._real_check_count(), 57)
+        # updated in the same commit. Task 524's check_chronicle_links
+        # moved this from 57 to 58, docstring updated in the same commit.
+        self.assertEqual(self._real_check_count(), 58)
 
     def test_stale_27_claim_would_have_been_flagged_against_todays_real_count(self):
         # Mutation-based hand-verification: reconstruct the module's own

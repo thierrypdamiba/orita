@@ -3566,6 +3566,67 @@ class HandLinksFoldCase(unittest.TestCase):
         self.assertTrue(result["hand_links"]["clean"])
 
 
+class ChronicleLinksFoldCase(unittest.TestCase):
+    """Task 524 (Kwaku-Ananse): the sixth sibling of `check_site_links`/
+    `check_house_links`/`check_fencepost_links`/`check_issue_template_links`/
+    `check_hand_links` -- `chronicle/`, my own episode ledger, had never
+    once been pointed at by `site_link_check.py`. Clean by default against
+    a fixture that mirrors `chronicle/README.md`'s real shape (a bare
+    relative link to a sibling file), and a genuinely missing target both
+    flips `broken` and surfaces in the printed block. `require_index=False`
+    (GitHub-browsed, same rule every prior sibling but `check_site_links`
+    itself already shares)."""
+
+    def setUp(self):
+        self.dir = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.dir, ignore_errors=True)
+
+    def _write(self, rel, content):
+        path = os.path.join(self.dir, rel)
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, "w") as f:
+            f.write(content)
+
+    def test_bare_directory_link_is_not_flagged_github_browsed_rule(self):
+        self._write("README.md", "[episodes](episodes/)")
+        os.makedirs(os.path.join(self.dir, "episodes"), exist_ok=True)
+        result = rc.run_ritual_check(chronicle_links_dir=self.dir)
+        self.assertTrue(result["chronicle_links"]["clean"])
+        self.assertFalse(result["broken"])
+        self.assertIn("chronicle links: clean", rc.format_ritual_check(result))
+
+    def test_synthetic_broken_link_flips_broken_and_prints(self):
+        self._write("README.md", "[nowhere](nowhere.md)")
+        result = rc.run_ritual_check(chronicle_links_dir=self.dir)
+        self.assertFalse(result["chronicle_links"]["clean"])
+        self.assertTrue(result["broken"])
+        formatted = rc.format_ritual_check(result)
+        self.assertIn("chronicle links: 1 BROKEN LINK(S)", formatted)
+
+    def test_default_chronicle_dir_reads_the_real_tree_and_matches_direct_call(self):
+        """No override: reads the real chronicle/ tree, the same default
+        check_chronicle_links falls back to -- proves the fold never
+        duplicates or diverges from the module it wraps, and that the
+        real tree is clean."""
+        slc = _load("_test_site_link_check", os.path.join(ROOT, "tools", "site_link_check.py"))
+        slc.clear_cache()
+        direct = slc.find_violations(docs_dir=os.path.join(ROOT, "chronicle"), require_index=False)
+        result = rc.run_ritual_check()
+        self.assertEqual(result["chronicle_links"]["count"], len(direct))
+        self.assertEqual(result["chronicle_links"]["clean"], not direct)
+        self.assertEqual(direct, [])
+
+    def test_chronicle_links_never_loosens_site_links_own_docs_rule(self):
+        """The two checks must stay independent: a bare directory link
+        with no index.html is valid for chronicle_links but still broken
+        for site_links, in the exact same fixture tree."""
+        self._write("README.md", "[episodes](episodes/)")
+        os.makedirs(os.path.join(self.dir, "episodes"), exist_ok=True)
+        result = rc.run_ritual_check(site_link_docs_dir=self.dir, chronicle_links_dir=self.dir)
+        self.assertFalse(result["site_links"]["clean"])
+        self.assertTrue(result["chronicle_links"]["clean"])
+
+
 class RecipeReadmeFoldCase(unittest.TestCase):
     """Task 426: run_ritual_check() folds recipe_readme_check.py's own
     two-way cross-check of fencepost/README.md's Community recipes
