@@ -1686,6 +1686,38 @@ def check_issue_template_links(issue_template_dir: str | None = None) -> dict:
     }
 
 
+def check_hand_links(hand_dir: str | None = None) -> dict:
+    """Task 521 (Kothar-wa-Khasis): the fifth sibling of `check_site_links`/
+    `check_house_links`/`check_fencepost_links`/`check_issue_template_links`
+    -- `HAND/`, the Hand's own public record (verdicts, the petition queue,
+    the escalation log's dated prose, `HAND/register-notes.md`) carries the
+    same relative-link surface `docs/`, `houses/`, `fencepost/`, and
+    `.github/ISSUE_TEMPLATE/` each already earned a dedicated check for,
+    and nothing had ever pointed `site_link_check.py` at it. Not this
+    task's own remit (The Wall covers the Pages site, not the Hand's
+    record) -- picked anyway because rotation was overdue (kothar-wa-khasis's
+    last turn was task 322, 199 tasks ago) and the gap was real: `HAND/`
+    is GitHub-browsed prose, not Pages-served, so it takes the same
+    `require_index=False` rule `check_house_links`/`check_fencepost_links`/
+    `check_issue_template_links` already share, never `check_site_links`'s
+    stricter Pages rule. A live first run against the real tree found it
+    already clean -- no break to fix today -- but "clean and never
+    checked" is exactly the gap each of the four siblings closed for its
+    own directory in turn; this is the same class of surface, just the
+    one nobody had reached yet. Unconditional, local-filesystem-only, same
+    cheap class as its four siblings. Never edits anything; a real broken
+    link, if one is ever found, is a god-on-duty escalation, not something
+    this check silently repairs."""
+    mod = _site_link_check()
+    kwargs = {"require_index": False}
+    if hand_dir is not None:
+        kwargs["docs_dir"] = hand_dir
+    else:
+        kwargs["docs_dir"] = os.path.join(ROOT, "HAND")
+    violations = mod.find_violations(**kwargs)
+    return {"clean": not violations, "count": len(violations), "violations": violations}
+
+
 def check_badge_freshness(badge_path: str | None = None) -> dict:
     """Task 425: fold badge_freshness_check.py's own live-recompute-vs-
     committed-file cross-check into the one block. `seam-scan.yml`'s daily
@@ -1858,6 +1890,7 @@ def run_ritual_check(
     house_links_houses_dir: str | None = None,
     fencepost_links_dir: str | None = None,
     issue_template_links_dir: str | None = None,
+    hand_links_dir: str | None = None,
     badge_path: str | None = None,
     recipe_readme_path: str | None = None,
     recipe_readme_fencepost_root: str | None = None,
@@ -1966,6 +1999,7 @@ def run_ritual_check(
     house_links = check_house_links(houses_dir=house_links_houses_dir)
     fencepost_links = check_fencepost_links(fencepost_dir=fencepost_links_dir)
     issue_template_links = check_issue_template_links(issue_template_dir=issue_template_links_dir)
+    hand_links = check_hand_links(hand_dir=hand_links_dir)
     badge_freshness = check_badge_freshness(badge_path=badge_path)
     recipe_readme = check_recipe_readme(
         readme_path=recipe_readme_path, recipe_fencepost_root=recipe_readme_fencepost_root
@@ -2025,6 +2059,7 @@ def run_ritual_check(
         or (not house_links["clean"])
         or (not fencepost_links["clean"])
         or (not issue_template_links["clean"])
+        or (not hand_links["clean"])
         or (not badge_freshness["clean"])
         or (not recipe_readme["clean"])
         or (not strategy_true_positive["clean"])
@@ -2084,6 +2119,7 @@ def run_ritual_check(
         "house_links": house_links,
         "fencepost_links": fencepost_links,
         "issue_template_links": issue_template_links,
+        "hand_links": hand_links,
         "badge_freshness": badge_freshness,
         "recipe_readme": recipe_readme,
         "strategy_true_positive": strategy_true_positive,
@@ -2361,6 +2397,13 @@ def format_ritual_check(result: dict) -> str:
     else:
         lines.append(
             f"  issue template links: {itl['count']} BROKEN LINK(S) -- Esu's own gate is unmet, escalate now"
+        )
+    hl2 = result["hand_links"]
+    if hl2["clean"]:
+        lines.append("  hand links: clean (every HAND/ link resolves, GitHub-browsed rule)")
+    else:
+        lines.append(
+            f"  hand links: {hl2['count']} BROKEN LINK(S) -- the Hand's own record is unmet, escalate now"
         )
     lines.append("  " + _badge_freshness_check().format_badge_freshness(result["badge_freshness"]))
     lines.append("  " + _recipe_readme_check().format_result(result["recipe_readme"]))

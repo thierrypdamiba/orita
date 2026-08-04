@@ -3504,6 +3504,68 @@ class IssueTemplateLinksFoldCase(unittest.TestCase):
         self.assertTrue(result["issue_template_links"]["clean"])
 
 
+class HandLinksFoldCase(unittest.TestCase):
+    """Task 521 (Kothar-wa-Khasis): the fifth sibling of `check_site_links`/
+    `check_house_links`/`check_fencepost_links`/`check_issue_template_links`
+    -- `HAND/`, the Hand's own public record, had never once been pointed
+    at by `site_link_check.py`. Clean by default against a fixture that
+    mirrors `HAND/register-notes.md`'s real shape (a bare relative link to
+    a sibling file), and a genuinely missing target both flips `broken`
+    and surfaces in the printed block. `require_index=False` (GitHub-
+    browsed, same rule `check_house_links`/`check_fencepost_links`/
+    `check_issue_template_links` all use), never `check_site_links`'s
+    stricter Pages rule."""
+
+    def setUp(self):
+        self.dir = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.dir, ignore_errors=True)
+
+    def _write(self, rel, content):
+        path = os.path.join(self.dir, rel)
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, "w") as f:
+            f.write(content)
+
+    def test_bare_directory_link_is_not_flagged_github_browsed_rule(self):
+        self._write("register-notes.md", "[verdicts](verdicts/)")
+        os.makedirs(os.path.join(self.dir, "verdicts"), exist_ok=True)
+        result = rc.run_ritual_check(hand_links_dir=self.dir)
+        self.assertTrue(result["hand_links"]["clean"])
+        self.assertFalse(result["broken"])
+        self.assertIn("hand links: clean", rc.format_ritual_check(result))
+
+    def test_synthetic_broken_link_flips_broken_and_prints(self):
+        self._write("register-notes.md", "[nowhere](nowhere.md)")
+        result = rc.run_ritual_check(hand_links_dir=self.dir)
+        self.assertFalse(result["hand_links"]["clean"])
+        self.assertTrue(result["broken"])
+        formatted = rc.format_ritual_check(result)
+        self.assertIn("hand links: 1 BROKEN LINK(S)", formatted)
+
+    def test_default_hand_dir_reads_the_real_tree_and_matches_direct_call(self):
+        """No override: reads the real HAND/ tree, the same default
+        check_hand_links falls back to -- proves the fold never
+        duplicates or diverges from the module it wraps, and that the
+        real tree is clean."""
+        slc = _load("_test_site_link_check", os.path.join(ROOT, "tools", "site_link_check.py"))
+        slc.clear_cache()
+        direct = slc.find_violations(docs_dir=os.path.join(ROOT, "HAND"), require_index=False)
+        result = rc.run_ritual_check()
+        self.assertEqual(result["hand_links"]["count"], len(direct))
+        self.assertEqual(result["hand_links"]["clean"], not direct)
+        self.assertEqual(direct, [])
+
+    def test_hand_links_never_loosens_site_links_own_docs_rule(self):
+        """The two checks must stay independent: a bare directory link
+        with no index.html is valid for hand_links but still broken for
+        site_links, in the exact same fixture tree."""
+        self._write("register-notes.md", "[verdicts](verdicts/)")
+        os.makedirs(os.path.join(self.dir, "verdicts"), exist_ok=True)
+        result = rc.run_ritual_check(site_link_docs_dir=self.dir, hand_links_dir=self.dir)
+        self.assertFalse(result["site_links"]["clean"])
+        self.assertTrue(result["hand_links"]["clean"])
+
+
 class RecipeReadmeFoldCase(unittest.TestCase):
     """Task 426: run_ritual_check() folds recipe_readme_check.py's own
     two-way cross-check of fencepost/README.md's Community recipes

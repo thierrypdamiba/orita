@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Task 121. Off-By-One counts the tool that counts everything else.
 
-`tools/ritual_check.py` hand-wires 56 `check_*` functions into one hourly
+`tools/ritual_check.py` hand-wires 57 `check_*` functions into one hourly
 block: each is called inside `run_ritual_check`, its result assigned to a
 dict key, and that key printed as a line in `format_ritual_check`. Three
 separate places a single typo or a forgotten wire-up can silently drop a
@@ -222,6 +222,19 @@ clean -- no broken link to fix -- but four of the five templates
 hour, the fifth (`point-fencepost.md`) having only ever had its scope
 TABLE doctrine-checked (`test_consent_doctrine.py`, task 136), never its
 two markdown links' actual resolution on disk.
+
+**Updated to 57** the same hour task 521's `check_hand_links` was wired
+in -- the fifth sibling, pointed at `HAND/` itself (GitHub-browsed, same
+`require_index=False` rule as `houses/`/`fencepost/`/`.github/
+ISSUE_TEMPLATE/`), the Hand's own public record (verdicts, the petition
+queue, register-notes) and never checked before by any of this file's
+four existing siblings nor by anything else in the tree. Its first live
+run found the tree already clean -- no broken link to fix -- the same
+"clean but never checked" shape each of the four prior siblings closed
+for its own directory in turn. Shipped by Kothar-wa-Khasis on an
+overdue-rotation pick (his last turn was task 322), not his own claimed
+remit (The Wall covers the Pages site, not the Hand's record) -- the gap
+was real regardless of whose name was next in line.
 
 Usage:
     python3 tools/ritual_completeness_check.py check
