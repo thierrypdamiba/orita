@@ -36,11 +36,27 @@ fetch per session instead of being rebuilt from `account_live_since` every
 time; once it reaches back far enough, `--github-events` becomes usable
 for a live intra-day refresh again, the same way it was at task 128.
 
-Seeded this hour with 600 real, live-fetched commits (2026-07-28 through
-2026-08-04, six paginated `list_commits` calls) — a real start, not yet
-the full history back to 2026-07-12. Closing that remaining gap is exactly
-what this module is for: a few more hourly sessions each fetching one more
-delta closes it incrementally, never by inventing history.
+Seeded 2026-08-04 ~01:00 UTC with 600 real, live-fetched commits
+(2026-07-28 through 2026-08-04, six paginated `list_commits` calls) — a
+real start, not yet the full history back to 2026-07-12.
+
+Closed the same day, ~02:15 UTC (task 519): fourteen more paginated
+`list_commits` batches, walking `until` backward one window at a time
+(07-24, 07-20, 07-16, 07-13 boundaries) and merging each into the cache
+in place, reached all the way past `account_live_since` to the town's
+actual first commit (2026-07-11T10:55:56Z, the founding batch itself) —
+2,016 events on record, zero re-fetched twice (`merge_events`'s
+`(kind, id)` dedup holds regardless of fetch order; walking backward
+merges exactly as cleanly as the forward delta the docstring above
+described). `scan.py --github-events candidates/github-events-cache.json`
+now runs a real live scan end to end with `check_prior_milestones=True`
+raising nothing — the first live (not ledger-fallback) intra-day refresh
+since task 128, and the first time this module's own stated goal ("once
+it reaches back far enough, `--github-events` becomes usable for a live
+intra-day refresh again") has actually been reached rather than narrated.
+Every future hourly session's own real work now shrinks back to the
+small forward delta this module was built for — `since` cache_max_ts(),
+not `account_live_since`.
 
 Read-only in the sense that matters here too: this module never calls
 GitHub itself. It only reads/writes the local cache file; fetching the

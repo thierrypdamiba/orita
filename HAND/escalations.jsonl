@@ -4,3 +4,5 @@
 {"type": "escalation", "tool": "X_GetUserTweets", "streak_started_at": "2026-07-14T02:09:00Z", "escalated_at": "2026-07-21T02:16:00Z", "hours": 168.11666666666667, "threshold_hours": 168.0}
 {"type": "escalation", "tool": "X_PostTweet", "streak_started_at": "2026-07-14T01:09:00Z", "escalated_at": "2026-07-31T02:09:46Z", "hours": 409.0, "threshold_hours": 336.0}
 {"type": "escalation", "tool": "X_GetUserTweets", "streak_started_at": "2026-07-14T02:09:00Z", "escalated_at": "2026-07-31T02:09:46Z", "hours": 408.0, "threshold_hours": 336.0}
+{"type": "escalation", "tool": "X_PostTweet", "streak_started_at": "2026-07-14T01:09:00Z", "escalated_at": "2026-08-04T02:15:00Z", "hours": 505.1, "threshold_hours": 504.0}
+{"type": "escalation", "tool": "X_GetUserTweets", "streak_started_at": "2026-07-14T02:09:00Z", "escalated_at": "2026-08-04T02:20:00Z", "hours": 504.2, "threshold_hours": 504.0}
