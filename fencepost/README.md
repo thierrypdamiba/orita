@@ -485,6 +485,21 @@ Age-gated on how long ago the PR resolved — 24 hours, mirroring
 Both scopes (`ListPullRequests`, `ListRepositoryActivities`) already sit
 on `SCOPES.md`'s cleared oath table, no new scope wiring needed.
 
+[`RECIPES/milestone-body-dangling-reference/`](RECIPES/milestone-body-dangling-reference/)
+is the forty-first (ROADMAP.md #520): the fifth and final leg of the
+dangling-reference family alongside `dangling-issue-reference` (commit
+messages), `mention-dangling-reference` (X mentions),
+`release-note-dangling-reference` (release notes), and
+`issue-body-dangling-reference` (issue/PR bodies) — none of the four ever
+read a milestone's own `description` field, where "tracks #501" and
+"blocked on #N" get written just as often and GitHub renders the same
+unchecked link. Age-gated on the milestone's own `updated_at`, mirroring
+`issue-body-dangling-reference`'s 24h edit-grace bar rather than the
+other three siblings' flat score, since a description, like a body, stays
+editable forever. All three scopes (`ListMilestones`, `ListIssues`,
+`ListPullRequests`) already sit on `SCOPES.md`'s cleared oath table, no
+new scope wiring needed.
+
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)
 (ROADMAP.md #111) is that second promise, kept: it runs `scan.py`'s own

@@ -1,0 +1,10 @@
+[
+  {
+    "number": 510,
+    "title": "Fix cold-start ledger append slowness",
+    "state": "merged",
+    "body": "The fix.",
+    "updated_at": "2026-07-28T08:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/pull/510"
+  }
+]

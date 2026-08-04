@@ -1,0 +1,58 @@
+[
+  {
+    "number": 20,
+    "title": "v1.3 Release",
+    "state": "open",
+    "description": "Tracks the work described in #501, on schedule.",
+    "updated_at": "2026-07-29T12:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/milestone/20"
+  },
+  {
+    "number": 21,
+    "title": "Security patch backlog",
+    "state": "open",
+    "description": "Blocked on #9999 until that lands, which I can't seem to find anymore.",
+    "updated_at": "2026-07-29T12:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/milestone/21"
+  },
+  {
+    "number": 22,
+    "title": "Future roadmap",
+    "state": "open",
+    "description": "Also touches #8888, still need to check on that one.",
+    "updated_at": "2026-08-01T10:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/milestone/22"
+  },
+  {
+    "number": 23,
+    "title": "No description written",
+    "state": "open",
+    "description": null,
+    "updated_at": "2026-07-20T00:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/milestone/23"
+  },
+  {
+    "number": 24,
+    "title": "Inspired by prior art",
+    "state": "closed",
+    "description": "Saw a similar pattern described in arcadeai/gasstation#42, worth a look for inspiration only.",
+    "updated_at": "2026-07-15T00:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/milestone/24"
+  },
+  {
+    "number": 25,
+    "title": "Waiting on the fix",
+    "state": "open",
+    "description": "Waiting on #510 to land before this can close.",
+    "updated_at": "2026-07-29T12:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/milestone/25"
+  },
+  {
+    "number": 26,
+    "title": "Pure housekeeping",
+    "state": "open",
+    "description": "Nothing to track here, just cleanup.",
+    "updated_at": "2026-07-29T12:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/milestone/26"
+  }
+]

@@ -1,0 +1,12 @@
+{
+  "slug": "milestone-body-dangling-reference",
+  "title": "A milestone's own description counts on a #N that isn't there",
+  "author": "off-by-one",
+  "description": "Compares every milestone's own description against the repository's own issue and PR sets: a milestone references '#N' in ordinary prose ('tracks #501', 'blocked on #N'), and no issue or PR numbered N exists in this repo. The fifth and final leg of the dangling-reference family alongside dangling-issue-reference (commit messages), mention-dangling-reference (X mentions), release-note-dangling-reference (release notes), and issue-body-dangling-reference (issue/PR bodies) -- none of the four ever checked the one other place GitHub itself invites this same mistake: a milestone's own description field.",
+  "toolkit": "github",
+  "scopes": ["ListMilestones", "ListIssues", "ListPullRequests"],
+  "fixture": "fixtures/milestone_body_dangling_reference",
+  "detector_file": "detector.py",
+  "entrypoint": "run_recipe_scan",
+  "confidence_notes": "Age-gated off the milestone's own updated_at, the identical shape issue-body-dangling-reference already established -- 0.55 within 24h since last update, 0.85 past it. Deliberately NOT flat, matching issue-body-dangling-reference rather than this family's three permanent-text siblings: a milestone description, like an issue or PR body, is a text surface its author can edit at any time, so a fresh dangling reference earns a grace period before being scored as a confirmed gap. A reference that resolves against either the issue list or the PR list is excluded at confidence 0.0, named not hidden. A cross-repo owner/repo#N reference is never even extracted as a candidate -- that names a different repo's own number space on purpose, the same exclusion every sibling recipe already makes. A milestone with no description at all is excluded outright -- there is no claim to have broken."
+}
