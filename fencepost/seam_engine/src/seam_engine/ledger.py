@@ -406,17 +406,31 @@ def append_scan(
 # --- CLI ----------------------------------------------------------------------
 
 
-def _load_scan(path: str) -> dict[str, Any]:
-    """Read a scan record for the CLI's `append` command from `path` ('-' for stdin).
+def _load_json_dict(path: str, noun: str) -> dict[str, Any]:
+    """Read a JSON object for a CLI from `path` ('-' for stdin), naming
+    `noun` in the error if the payload isn't one.
 
-    A CLI-supplied file (or stdin stream) can be any syntactically valid
-    JSON -- a bare list, int, bool, null, or string, not just an object --
-    and `append_scan` immediately treats its argument as a dict
-    (`scan.get(...)`). Left unguarded, a non-object payload would crash
-    `main(["append", ...])` with a bare
-    `AttributeError: '<type>' object has no attribute 'get'` instead of a
-    message naming the actual problem -- the same discipline
-    `report.py`'s `_load_sealed_arg` already holds in this package.
+    Task 538 (Kwaku Ananse): this was three independent copies of the exact
+    same load-and-validate logic -- this module's own former `_load_scan`,
+    `report.py`'s `_load_sealed_arg`, and `draftback.py`'s `_load_sealed` --
+    each guarding against the identical bug (a CLI-supplied file can be any
+    syntactically valid JSON, not just an object, so `[1, 2, 3]` on disk used
+    to crash with a bare `AttributeError` instead of a named `ValueError`).
+    An AST-hash sweep across the package's core modules (the same method
+    tasks 508-528 used to fold duplicate functions elsewhere) caught only
+    two of the three on its first pass: `report.py`'s copy and
+    `draftback.py`'s copy hashed identically (both say "sealed record" in
+    their error message), but this module's own copy said "scan record" --
+    one string literal apart, and invisible to a naive AST-dump comparison
+    for exactly the same reason task 528's inline-import case hid
+    `_monday_of` from the same sweep: structurally identical code, one
+    superficial difference away from matching. Parameterizing the noun
+    folds all three into one real implementation (not a bare rebind --
+    `_load_scan`/`_load_sealed_arg`/`_load_sealed` each still exist below and
+    in their own modules as thin delegating wrappers, so every existing
+    caller and docstring cross-reference keeps working unchanged) rather
+    than three copies that must be kept in sync by three authors remembering
+    to edit all three every time this logic ever needs a fourth guard.
     """
     if path == "-":
         import sys
@@ -426,10 +440,25 @@ def _load_scan(path: str) -> dict[str, Any]:
         data = json.loads(Path(path).read_text())
         where = path
     if not isinstance(data, dict):
-        raise ValueError(
-            f"{where}: scan record must be a JSON object, got {type(data).__name__}"
-        )
+        raise ValueError(f"{where}: {noun} must be a JSON object, got {type(data).__name__}")
     return data
+
+
+def _load_scan(path: str) -> dict[str, Any]:
+    """Read a scan record for the CLI's `append` command from `path` ('-' for stdin).
+
+    A CLI-supplied file (or stdin stream) can be any syntactically valid
+    JSON -- a bare list, int, bool, null, or string, not just an object --
+    and `append_scan` immediately treats its argument as a dict
+    (`scan.get(...)`). Left unguarded, a non-object payload would crash
+    `main(["append", ...])` with a bare
+    `AttributeError: '<type>' object has no attribute 'get'` instead of a
+    message naming the actual problem -- the same discipline `report.py`'s
+    `_load_sealed_arg` and `draftback.py`'s `_load_sealed` already hold in
+    this package (task 538: all three now delegate to `_load_json_dict`
+    above, one real implementation instead of three copies).
+    """
+    return _load_json_dict(path, "scan record")
 
 
 def main(argv: list[str] | None = None) -> int:

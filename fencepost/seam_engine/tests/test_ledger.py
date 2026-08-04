@@ -354,3 +354,73 @@ def test_main_append_with_stdin_raises_named_error_not_attributeerror_when_json_
         assert False, "expected a named ValueError, not a bare AttributeError"
     except ValueError as e:
         assert "object" in str(e)
+
+
+# --- _load_json_dict: one real implementation, not three copies (task 538) ----
+#
+# `ledger._load_scan`, `report.py`'s `_load_sealed_arg`, and `draftback.py`'s
+# `_load_sealed` used to each carry an independent copy of this exact
+# load-and-validate logic. An AST-hash sweep across the package's core
+# modules caught `report.py`'s copy and `draftback.py`'s copy as one exact
+# match (both said "sealed record" in their error message) but missed this
+# module's own copy, which said "scan record" -- one string literal apart,
+# the same class of blind spot task 528's inline-import case already proved
+# for `_monday_of`. These tests prove the fold: all three now delegate to
+# one function, `ledger._load_json_dict`, parameterized by the noun.
+
+
+def test_load_json_dict_reads_a_valid_object_from_a_file(tmp_path: Path):
+    p = tmp_path / "obj.json"
+    p.write_text('{"a": 1}')
+    assert ledger._load_json_dict(str(p), "widget") == {"a": 1}
+
+
+def test_load_json_dict_reads_a_valid_object_from_stdin(monkeypatch):
+    import io
+    import sys
+
+    monkeypatch.setattr(sys, "stdin", io.StringIO('{"a": 1}'))
+    assert ledger._load_json_dict("-", "widget") == {"a": 1}
+
+
+def test_load_json_dict_names_the_given_noun_in_a_non_object_error(tmp_path: Path):
+    p = tmp_path / "not_an_object.json"
+    p.write_text("[1, 2, 3]")
+    try:
+        ledger._load_json_dict(str(p), "widget record")
+        assert False, "expected a named ValueError"
+    except ValueError as e:
+        assert "widget record" in str(e)
+        assert "list" in str(e)
+
+
+def test_load_scan_delegates_to_load_json_dict_with_the_scan_record_noun(tmp_path: Path):
+    p = tmp_path / "not_an_object.json"
+    p.write_text("[1, 2, 3]")
+    try:
+        ledger._load_scan(str(p))
+        assert False, "expected a named ValueError"
+    except ValueError as e:
+        assert "scan record" in str(e)
+
+
+def test_load_sealed_arg_and_load_sealed_both_delegate_to_ledger_load_json_dict():
+    # report.py's `_load_sealed_arg` and draftback.py's `_load_sealed` are
+    # thin wrappers now, not independent copies -- proven by identity, not
+    # by re-reading their source: both call the exact same function object
+    # this module defines, the same "identity-asserted across siblings"
+    # proof task 523's `time_utils.load_snapshots` fold used.
+    import ast
+    import inspect
+
+    from seam_engine import draftback, report
+
+    for fn in (report._load_sealed_arg, draftback._load_sealed):
+        src = inspect.getsource(fn)
+        tree = ast.parse(src)
+        calls = [
+            n
+            for n in ast.walk(tree)
+            if isinstance(n, ast.Call) and isinstance(n.func, ast.Attribute) and n.func.attr == "_load_json_dict"
+        ]
+        assert len(calls) == 1, f"{fn.__qualname__} should call ledger._load_json_dict exactly once"

@@ -62,7 +62,6 @@ Recorded.
 """
 from __future__ import annotations
 
-import json
 import re
 from pathlib import Path
 from typing import Any
@@ -301,21 +300,12 @@ def _load_sealed_arg(path: str) -> dict[str, Any]:
     `AttributeError: '<type>' object has no attribute 'get'` instead of a
     message naming the actual problem -- the same "malformed input is named,
     never an opaque crash" discipline this module already holds for a
-    tampered ledger tip via `ledger.LedgerTamperedError`.
+    tampered ledger tip via `ledger.LedgerTamperedError`. Task 538: delegates
+    to `ledger._load_json_dict` now, alongside `ledger.py`'s own `_load_scan`
+    and `draftback.py`'s `_load_sealed` -- one real implementation instead of
+    three copies an AST-hash sweep only ever caught two of.
     """
-    if path == "-":
-        import sys
-
-        data = json.load(sys.stdin)
-        where = "stdin"
-    else:
-        data = json.loads(Path(path).read_text())
-        where = path
-    if not isinstance(data, dict):
-        raise ValueError(
-            f"{where}: sealed record must be a JSON object, got {type(data).__name__}"
-        )
-    return data
+    return ledger._load_json_dict(path, "sealed record")
 
 
 def main(argv: list[str] | None = None) -> int:

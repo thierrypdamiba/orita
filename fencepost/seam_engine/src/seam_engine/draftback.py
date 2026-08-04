@@ -73,12 +73,11 @@ Recorded.
 """
 from __future__ import annotations
 
-import json
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Any, Callable
 
-from seam_engine import report
+from seam_engine import ledger, report
 from seam_engine.wall import wall_for
 
 # fencepost/  (…/fencepost/seam_engine/src/seam_engine/draftback.py → parents[3])
@@ -319,21 +318,11 @@ def _load_sealed(path: str) -> dict[str, Any]:
     `AttributeError: '<type>' object has no attribute 'get'` instead of a
     message naming the actual problem -- the same discipline `report.py`'s
     `_load_sealed_arg` and `ledger.py`'s `_load_scan` already hold in this
-    same package.
+    same package. Task 538: all three now delegate to
+    `ledger._load_json_dict`, one real implementation instead of three
+    copies an AST-hash sweep only ever caught two of.
     """
-    if path == "-":
-        import sys
-
-        data = json.load(sys.stdin)
-        where = "stdin"
-    else:
-        data = json.loads(Path(path).read_text())
-        where = path
-    if not isinstance(data, dict):
-        raise ValueError(
-            f"{where}: sealed record must be a JSON object, got {type(data).__name__}"
-        )
-    return data
+    return ledger._load_json_dict(path, "sealed record")
 
 
 def main(argv: list[str] | None = None) -> int:
