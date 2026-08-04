@@ -11,6 +11,19 @@ matters: two independently-maintained copies with the same source today
 can still drift apart on the next edit to just one of them; an `is` check
 on the same function object makes that class of drift structurally
 impossible going forward.
+
+Task 523: the identical AST-hash sweep, re-run over the same 25
+`*_cadence.py` files, found a THIRD byte-identical function this
+sibling's own earlier pass (task 516) missed: `load_snapshots`. Unlike
+`_parse_ts`, a bare `load_snapshots = time_utils.load_snapshots` name
+rebinding is wrong here -- every sibling's own `load_snapshots(path=
+DEFAULT_SNAPSHOT_PATH)` default differs (each cadence writes its own
+snapshot file) and each module's own scan functions call
+`load_snapshots()` bare, relying on that default. So each sibling keeps
+a thin wrapper with its own default; `LoadSnapshotsDelegatesCase` below
+proves every wrapper genuinely calls through to the one shared
+`time_utils.load_snapshots` (by patching it and observing every sibling
+call the patch), not a reinlined copy of the old logic.
 """
 from __future__ import annotations
 
@@ -18,6 +31,7 @@ import datetime
 import os
 import sys
 import unittest
+from unittest import mock
 
 _TESTS_DIR = os.path.dirname(os.path.abspath(__file__))
 _ORACLE_ENGINE_ROOT = os.path.dirname(_TESTS_DIR)
@@ -99,6 +113,63 @@ class IdentityAcrossSiblingsCase(unittest.TestCase):
                     time_utils.parse_ts,
                     f"{mod.__name__}._parse_ts is a separate copy again, "
                     "not the shared oracle_engine.time_utils function",
+                )
+
+
+LOAD_SNAPSHOTS_SIBLINGS = [mod for mod in SIBLINGS if mod is not autograde]
+
+
+class LoadSnapshotsDelegatesCase(unittest.TestCase):
+    """Every sibling cadence module's own `load_snapshots(path=<its own
+    DEFAULT_SNAPSHOT_PATH>)` must genuinely call through to
+    `time_utils.load_snapshots` -- not carry a reinlined copy of the
+    read-and-mark-malformed logic. A bare `assertIs` on the function
+    object (the `_parse_ts` pattern above) doesn't fit here because each
+    sibling's own wrapper is a distinct function object by necessity (its
+    default argument differs module to module); patching the shared
+    target and observing every sibling's call reach it is the identity
+    guarantee's equivalent for a wrapper-with-its-own-default shape."""
+
+    def test_every_sibling_wrapper_delegates_to_the_shared_function(self):
+        self.assertEqual(
+            len(LOAD_SNAPSHOTS_SIBLINGS), 25, "sibling list drifted from the live sweep"
+        )
+        for mod in LOAD_SNAPSHOTS_SIBLINGS:
+            with self.subTest(sibling=mod.__name__):
+                sentinel = object()
+                calls = []
+
+                def fake_load_snapshots(path, _calls=calls, _sentinel=sentinel):
+                    _calls.append(path)
+                    return _sentinel
+
+                with mock.patch.object(time_utils, "load_snapshots", fake_load_snapshots):
+                    result = mod.load_snapshots("some/probe/path.jsonl")
+                self.assertIs(
+                    result,
+                    sentinel,
+                    f"{mod.__name__}.load_snapshots did not return the shared "
+                    "function's result -- it may hold a reinlined copy again",
+                )
+                self.assertEqual(
+                    calls,
+                    ["some/probe/path.jsonl"],
+                    f"{mod.__name__}.load_snapshots did not pass its path through "
+                    "to time_utils.load_snapshots unchanged",
+                )
+
+    def test_every_sibling_default_still_resolves_to_its_own_module_default(self):
+        import inspect
+
+        for mod in LOAD_SNAPSHOTS_SIBLINGS:
+            with self.subTest(sibling=mod.__name__):
+                sig = inspect.signature(mod.load_snapshots)
+                self.assertEqual(
+                    sig.parameters["path"].default,
+                    mod.DEFAULT_SNAPSHOT_PATH,
+                    f"{mod.__name__}.load_snapshots() no longer defaults to its "
+                    "own DEFAULT_SNAPSHOT_PATH -- bare load_snapshots() calls "
+                    "elsewhere in this module would silently read the wrong file",
                 )
 
 

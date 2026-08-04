@@ -1,9 +1,10 @@
-"""The one-line ISO-timestamp parser twenty-six Oracle Desk cadence
-modules (`branch_cadence.py` through `workflow_cadence.py`, plus
-`autograde.py`) each carried a private, byte-identical copy of: parse an
-ISO-8601 string, and if it names no timezone, assume it means UTC (the
-same assumption every snapshot writer in this package already makes when
-it stamps `ts` with `datetime.now(timezone.utc).isoformat()`).
+"""Shared helpers twenty-five-plus Oracle Desk cadence modules each once
+carried a private, byte-identical copy of.
+
+`parse_ts`: parse an ISO-8601 string, and if it names no timezone, assume
+it means UTC (the same assumption every snapshot writer in this package
+already makes when it stamps `ts` with
+`datetime.now(timezone.utc).isoformat()`).
 
 Found live by the same AST-hash sweep `tools/iso_time.py` (task 509) and
 `tools/metrics_reader.py` (task 508) already ran one directory over in
@@ -18,11 +19,31 @@ function object, not a copy — `tests/test_time_utils.py` asserts identity
 across every sibling), so a future fix to the parsing rule is a fix
 everywhere at once instead of twenty-six separate hand-edits.
 
+`load_snapshots`: task 516's own AST-hash sweep of this package caught
+`_parse_ts` and `_default_http_get` but missed a third byte-identical
+function living in the same 25 `*_cadence.py` files (task 523 caught it,
+a live re-run of the identical method one function further than task 516
+took it) — read every line of a JSONL snapshot log, marking any line that
+isn't valid JSON, or valid JSON but not an object, as `{"_malformed":
+True, ...}` rather than raising. Unlike `parse_ts`, this one can't be a
+bare name rebinding (`load_snapshots = time_utils.load_snapshots`):
+every sibling module's own `load_snapshots(path=DEFAULT_SNAPSHOT_PATH)`
+default differs (each cadence writes its own snapshot file), and
+`load_snapshots()` is called bare, relying on that default, all over
+each cadence module's own scan functions. So each sibling keeps a
+thin wrapper with its own default that delegates to `load_snapshots`
+below — `tests/test_time_utils.py` asserts every sibling's wrapper
+actually calls through to this shared function (not a reinlined copy),
+by patching this module's `load_snapshots` and observing every sibling
+call it.
+
 Usage: not run directly; imported by oracle_engine's cadence modules.
 """
 from __future__ import annotations
 
 import datetime
+import json
+import os
 
 
 def parse_ts(ts: str) -> datetime.datetime:
@@ -34,3 +55,36 @@ def parse_ts(ts: str) -> datetime.datetime:
     if dt.tzinfo is None:
         dt = dt.replace(tzinfo=datetime.timezone.utc)
     return dt
+
+
+def load_snapshots(path: str) -> list[dict]:
+    """Every snapshot line, in file order. Read-only: never touches the
+    file, takes its path and hands back plain dicts. A line that is not
+    even valid JSON any more (a bad hand-edit, a stray merge-conflict
+    marker, a truncated write) is not allowed to crash the caller with an
+    uncaught json.JSONDecodeError -- it comes back marked
+    {"_malformed": True, "_error": ...} instead, the same convention
+    tools/ledger.py's _entries() established (task 238) and tasks 239-249
+    mirrored across every tools/*.py sibling. A line that parses cleanly
+    as JSON but is not itself an object (a bare int/float/bool/null/list/
+    string -- a truncated write landing mid-value) is marked the same way
+    instead of sailing through unmarked, the second half of the guard
+    task 328 closed for tools/toolkits_in_use_check.py."""
+    if not os.path.exists(path):
+        return []
+    out = []
+    with open(path, encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                value = json.loads(line)
+            except json.JSONDecodeError as exc:
+                out.append({"_malformed": True, "_error": str(exc)})
+                continue
+            if not isinstance(value, dict):
+                out.append({"_malformed": True, "_error": "not a JSON object"})
+                continue
+            out.append(value)
+    return out

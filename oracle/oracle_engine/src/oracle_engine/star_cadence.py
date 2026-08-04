@@ -95,35 +95,14 @@ def fetch_star_count(repo: str = DEFAULT_REPO, http_get=None) -> int:
 
 
 def load_snapshots(path: str = DEFAULT_SNAPSHOT_PATH) -> list[dict]:
-    """Every snapshot line, in file order. Read-only: never touches the
-    file, takes its path and hands back plain dicts. A line that is not
-    even valid JSON any more (a bad hand-edit, a stray merge-conflict
-    marker, a truncated write) is not allowed to crash the caller with an
-    uncaught json.JSONDecodeError -- it comes back marked
-    {"_malformed": True, "_error": ...} instead, the same convention
-    tools/ledger.py's _entries() established (task 238) and tasks 239-268
-    mirrored across every sibling. A line that parses cleanly to a
-    well-formed JSON value that is not an object (a bare scalar, null, or
-    list -- a truncated write landing mid-value) is marked the same way
-    rather than sailing through unmarked (tasks 329-347)."""
-    if not os.path.exists(path):
-        return []
-    out = []
-    with open(path, encoding="utf-8") as f:
-        for line in f:
-            line = line.strip()
-            if not line:
-                continue
-            try:
-                value = json.loads(line)
-            except json.JSONDecodeError as exc:
-                out.append({"_malformed": True, "_error": str(exc)})
-                continue
-            if not isinstance(value, dict):
-                out.append({"_malformed": True, "_error": "not a JSON object"})
-                continue
-            out.append(value)
-    return out
+    """This module's own default-path wrapper around the shared
+    time_utils.load_snapshots (task 523). Kept here rather than a bare name
+    rebinding (unlike _parse_ts = time_utils.parse_ts) because every
+    sibling's DEFAULT_SNAPSHOT_PATH differs and this module's own
+    load_snapshots() call sites below rely on that default -- but the
+    actual read-and-mark-malformed logic lives in exactly one place now,
+    not twenty-five."""
+    return time_utils.load_snapshots(path)
 
 
 def record_snapshot(count: int, ts: str, path: str = DEFAULT_SNAPSHOT_PATH) -> dict:
