@@ -36,8 +36,8 @@ _SAMPLE_SECTION = """## Community recipes
 
 Some intro prose.
 
-[`RECIPES/alpha-gap/`](RECIPES/alpha-gap/) is the first.
-[`RECIPES/beta-gap/`](RECIPES/beta-gap/) is the second.
+[`RECIPES/alpha-gap/`](RECIPES/alpha-gap/) is the first (ROADMAP.md #1).
+[`RECIPES/beta-gap/`](RECIPES/beta-gap/) is the second (ROADMAP.md #2).
 
 ## Run your own
 
@@ -118,6 +118,7 @@ class CrossCheckCase(unittest.TestCase):
         self.assertEqual(result["missing_readme"], [])
         self.assertEqual(result["real_count"], 2)
         self.assertEqual(result["linked_count"], 2)
+        self.assertEqual(result["missing_roadmap_citation"], [])
 
     def test_real_recipe_never_linked_is_caught(self):
         """The direction test_fencepost_site_recipes.py's own
@@ -176,10 +177,10 @@ class MissingRecipeReadmeCase(unittest.TestCase):
         lines = ["## Community recipes", ""]
         for slug in slugs_with_readme:
             _write_recipe(tmpdir, slug, with_readme=True)
-            lines.append(f"[`RECIPES/{slug}/`](RECIPES/{slug}/) has one.")
+            lines.append(f"[`RECIPES/{slug}/`](RECIPES/{slug}/) has one (ROADMAP.md #1).")
         for slug in slugs_without_readme:
             _write_recipe(tmpdir, slug, with_readme=False)
-            lines.append(f"[`RECIPES/{slug}/`](RECIPES/{slug}/) does not.")
+            lines.append(f"[`RECIPES/{slug}/`](RECIPES/{slug}/) does not (ROADMAP.md #2).")
         lines += ["", "## Run your own"]
         readme_path = os.path.join(tmpdir, "README.md")
         with open(readme_path, "w", encoding="utf-8") as f:
@@ -212,6 +213,98 @@ class MissingRecipeReadmeCase(unittest.TestCase):
         self.assertTrue(fixed["clean"])
 
 
+class MissingRoadmapCitationCase(unittest.TestCase):
+    """Task 526: the fifth cross-check. Every real, live recipe entry in
+    the README carries `(ROADMAP.md #NNN)` right after its ordinal claim
+    -- except the reference recipe, which claims no ordinal at all and is
+    never expected to. Nothing checked this before: `merged-pr-branch-
+    not-deleted`'s own paragraph (task #514) silently shipped without its
+    citation, alone among the other 39 numbered entries, and stayed that
+    way undetected until this task's live sweep of `fencepost/README.md`
+    found it by hand."""
+
+    def _fixture(self, section_lines):
+        tmpdir = tempfile.mkdtemp()
+        self.addCleanup(__import__("shutil").rmtree, tmpdir, ignore_errors=True)
+        lines = ["## Community recipes", ""]
+        lines += section_lines
+        lines += ["", "## Run your own"]
+        readme_path = os.path.join(tmpdir, "README.md")
+        with open(readme_path, "w", encoding="utf-8") as f:
+            f.write("\n".join(lines))
+        return readme_path, tmpdir
+
+    def test_entry_with_no_citation_is_caught(self):
+        readme_path, fencepost_root = self._fixture(
+            [
+                "[`RECIPES/alpha-gap/`](RECIPES/alpha-gap/) is the second (ROADMAP.md #10).",
+                "[`RECIPES/beta-gap/`](RECIPES/beta-gap/) is the third: no citation at all.",
+            ]
+        )
+        for slug in ("alpha-gap", "beta-gap"):
+            _write_recipe(fencepost_root, slug)
+        result = rrc.check_recipe_readme(readme_path=readme_path, fencepost_root=fencepost_root)
+        self.assertFalse(result["clean"])
+        self.assertEqual(result["missing_roadmap_citation"], ["beta-gap"])
+        # the other cross-checks stay clean -- this is genuinely orthogonal
+        self.assertEqual(result["missing_from_readme"], [])
+        self.assertEqual(result["stale_in_readme"], [])
+        self.assertEqual(result["mismatched_links"], [])
+
+    def test_reference_recipe_is_exempt(self):
+        readme_path, fencepost_root = self._fixture(
+            [
+                f"[`RECIPES/{rrc._REFERENCE_RECIPE_SLUG}/`](RECIPES/{rrc._REFERENCE_RECIPE_SLUG}/) "
+                "is the reference: no citation, and none expected.",
+            ]
+        )
+        _write_recipe(fencepost_root, rrc._REFERENCE_RECIPE_SLUG)
+        result = rrc.check_recipe_readme(readme_path=readme_path, fencepost_root=fencepost_root)
+        self.assertTrue(result["clean"])
+        self.assertEqual(result["missing_roadmap_citation"], [])
+
+    def test_every_entry_with_a_citation_is_clean(self):
+        readme_path, fencepost_root = self._fixture(
+            ["[`RECIPES/alpha-gap/`](RECIPES/alpha-gap/) is the second (ROADMAP.md #10)."]
+        )
+        _write_recipe(fencepost_root, "alpha-gap")
+        result = rrc.check_recipe_readme(readme_path=readme_path, fencepost_root=fencepost_root)
+        self.assertTrue(result["clean"])
+        self.assertEqual(result["missing_roadmap_citation"], [])
+
+    def test_adding_the_missing_citation_flips_it_back_to_clean(self):
+        readme_path, fencepost_root = self._fixture(
+            ["[`RECIPES/alpha-gap/`](RECIPES/alpha-gap/) is the second: no citation yet."]
+        )
+        _write_recipe(fencepost_root, "alpha-gap")
+        broken = rrc.check_recipe_readme(readme_path=readme_path, fencepost_root=fencepost_root)
+        self.assertFalse(broken["clean"])
+        self.assertEqual(broken["missing_roadmap_citation"], ["alpha-gap"])
+
+        with open(readme_path, encoding="utf-8") as f:
+            text = f.read()
+        with open(readme_path, "w", encoding="utf-8") as f:
+            f.write(text.replace("is the second: no citation yet.", "is the second (ROADMAP.md #10)."))
+        fixed = rrc.check_recipe_readme(readme_path=readme_path, fencepost_root=fencepost_root)
+        self.assertTrue(fixed["clean"])
+        self.assertEqual(fixed["missing_roadmap_citation"], [])
+
+
+class RealRepoRoadmapCitationCase(unittest.TestCase):
+    """The real point: today's real fencepost/README.md carries a
+    `(ROADMAP.md #NNN)` citation on every one of its forty numbered
+    entries -- the reference recipe alone exempt. Regression pin for the
+    real bug this task found and fixed: `merged-pr-branch-not-deleted`'s
+    own paragraph shipped (task #514) without one."""
+
+    def test_real_readme_has_no_missing_citations(self):
+        result = rrc.check_recipe_readme()
+        self.assertEqual(
+            result["missing_roadmap_citation"], [],
+            msg=f"recipe entrie(s) missing a (ROADMAP.md #NNN) citation: {result['missing_roadmap_citation']}",
+        )
+
+
 class FormatResultCase(unittest.TestCase):
     def test_clean_result_names_the_real_count(self):
         text = rrc.format_result({"clean": True, "real_count": 26, "linked_count": 26,
@@ -229,12 +322,14 @@ class FormatResultCase(unittest.TestCase):
             "stale_in_readme": ["beta-gap"],
             "mismatched_links": [("alpha-gap", "beta-gap")],
             "missing_readme": ["delta-gap"],
+            "missing_roadmap_citation": ["epsilon-gap"],
         })
         self.assertIn("BROKEN", text)
         self.assertIn("gamma-gap", text)
         self.assertIn("beta-gap", text)
         self.assertIn("alpha-gap", text)
         self.assertIn("delta-gap", text)
+        self.assertIn("epsilon-gap", text)
 
 
 class RealRepoCase(unittest.TestCase):

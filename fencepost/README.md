@@ -473,7 +473,7 @@ signal, mirroring the `*-still-open` family's 24h bar. The one scope,
 new scope wiring needed.
 
 [`RECIPES/merged-pr-branch-not-deleted/`](RECIPES/merged-pr-branch-not-deleted/)
-is the fortieth: the third leg of a branch-lifecycle trio this engine now
+is the fortieth (ROADMAP.md #514): the third leg of a branch-lifecycle trio this engine now
 covers end to end, alongside `stale-branch-no-pr` (branch survives, no PR
 ever) and `deleted-branch-pr-still-open` (branch gone, PR still open) —
 this one watches a pull request reach a terminal state (merged or closed)

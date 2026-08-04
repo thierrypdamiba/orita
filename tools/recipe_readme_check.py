@@ -86,6 +86,12 @@ import text_patterns  # noqa: E402
 _SECTION_HEADER = re.compile(r"^## Community recipes\s*$", re.MULTILINE)
 _NEXT_HEADER = text_patterns.NEXT_MARKDOWN_HEADER
 _RECIPE_LINK_RE = re.compile(r"\[`RECIPES/([A-Za-z0-9_-]+)/`\]\(RECIPES/([A-Za-z0-9_-]+)/\)")
+_ROADMAP_CITATION_RE = re.compile(r"\(ROADMAP\.md #\d+\)")
+# The reference recipe (task 22, CONTRIBUTING.md's own copy-this-shape
+# scaffold) is deliberately never called "the Nth" anything and carries no
+# ROADMAP citation -- the same hardcoded exception
+# test_recipe_ordinal_doctrine.py already holds for the identical reason.
+_REFERENCE_RECIPE_SLUG = "example-release-vs-changelog"
 
 
 def _community_recipes_section(readme_text: str) -> str:
@@ -112,6 +118,46 @@ def _linked_recipes(section_text: str) -> list[tuple[str, str]]:
     the section, in document order, duplicates included -- the caller
     decides what to do with a slug linked more than once."""
     return _RECIPE_LINK_RE.findall(section_text)
+
+
+def _entry_spans(section_text: str) -> list[tuple[str, str]]:
+    """(href-slug, entry_text) for every linked recipe in the section,
+    where entry_text runs from that link's own start to the next link's
+    start (or the end of the section) -- the same span a human reads as
+    "this recipe's own paragraph" before the next one begins. Two links
+    for the SAME recipe back to back (a typo, not real today) would each
+    get their own span; nothing here assumes one link per slug, `_linked_
+    recipes`'s own duplicate-tolerant contract already covers that."""
+    link_matches = list(_RECIPE_LINK_RE.finditer(section_text))
+    spans = []
+    for i, m in enumerate(link_matches):
+        start = m.start()
+        end = link_matches[i + 1].start() if i + 1 < len(link_matches) else len(section_text)
+        spans.append((m.group(2), section_text[start:end]))
+    return spans
+
+
+def _missing_roadmap_citations(section_text: str) -> list[str]:
+    """Every numbered (non-reference) recipe entry names its own shipping
+    task with a `(ROADMAP.md #NNN)` citation right after its ordinal claim
+    -- forty of the forty-one real recipes do; the sole deliberate
+    exception is the reference recipe itself (never called "the Nth"
+    anything, see `_REFERENCE_RECIPE_SLUG`). Nothing before this task ever
+    checked that every OTHER entry actually kept its citation --
+    `merged-pr-branch-not-deleted`'s own paragraph (task #514) silently
+    shipped without one, the exact "prose claim, nothing re-checked
+    against the thing it names" shape this file's other three cross-
+    checks already guard against for the link itself, and
+    `test_recipe_ordinal_doctrine.py` already guards for the detector.py
+    ordinal word -- this is the ROADMAP-citation half of the same
+    paragraph neither of those ever read."""
+    missing = []
+    for slug, entry_text in _entry_spans(section_text):
+        if slug == _REFERENCE_RECIPE_SLUG:
+            continue
+        if not _ROADMAP_CITATION_RE.search(entry_text):
+            missing.append(slug)
+    return sorted(set(missing))
 
 
 def check_recipe_readme(
@@ -142,8 +188,17 @@ def check_recipe_readme(
         for slug in real_slugs
         if not os.path.isfile(os.path.join(fencepost_root, "RECIPES", slug, "README.md"))
     )
+    missing_roadmap_citation = [
+        slug for slug in _missing_roadmap_citations(section) if slug in real_slugs
+    ]
 
-    clean = not (missing_from_readme or stale_in_readme or mismatched_links or missing_readme)
+    clean = not (
+        missing_from_readme
+        or stale_in_readme
+        or mismatched_links
+        or missing_readme
+        or missing_roadmap_citation
+    )
     return {
         "clean": clean,
         "real_count": len(real_slugs),
@@ -152,6 +207,7 @@ def check_recipe_readme(
         "stale_in_readme": stale_in_readme,
         "mismatched_links": mismatched_links,
         "missing_readme": missing_readme,
+        "missing_roadmap_citation": missing_roadmap_citation,
     }
 
 
@@ -172,6 +228,10 @@ def format_result(result: dict) -> str:
         problems.append(f"link text/href disagree: {pairs}")
     if result["missing_readme"]:
         problems.append(f"recipe dir(s) with no own README.md: {', '.join(result['missing_readme'])}")
+    if result.get("missing_roadmap_citation"):
+        problems.append(
+            f"entry(ies) missing a (ROADMAP.md #NNN) citation: {', '.join(result['missing_roadmap_citation'])}"
+        )
     return "recipe readme: BROKEN -- " + "; ".join(problems)
 
 

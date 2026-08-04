@@ -3671,7 +3671,7 @@ class RecipeReadmeFoldCase(unittest.TestCase):
     def test_clean_fixture_is_not_broken(self):
         self._write_recipe("alpha-gap")
         readme_path = self._write_readme(
-            "## Community recipes\n\n[`RECIPES/alpha-gap/`](RECIPES/alpha-gap/) is the first.\n\n## Run your own\n"
+            "## Community recipes\n\n[`RECIPES/alpha-gap/`](RECIPES/alpha-gap/) is the first (ROADMAP.md #1).\n\n## Run your own\n"
         )
         result = rc.run_ritual_check(recipe_readme_path=readme_path, recipe_readme_fencepost_root=self.dir)
         self.assertTrue(result["recipe_readme"]["clean"])
@@ -3681,7 +3681,7 @@ class RecipeReadmeFoldCase(unittest.TestCase):
     def test_stale_link_to_a_removed_recipe_flips_broken_and_prints(self):
         # alpha-gap is linked but never written to disk -- a dead link.
         readme_path = self._write_readme(
-            "## Community recipes\n\n[`RECIPES/alpha-gap/`](RECIPES/alpha-gap/) is the first.\n\n## Run your own\n"
+            "## Community recipes\n\n[`RECIPES/alpha-gap/`](RECIPES/alpha-gap/) is the first (ROADMAP.md #1).\n\n## Run your own\n"
         )
         result = rc.run_ritual_check(recipe_readme_path=readme_path, recipe_readme_fencepost_root=self.dir)
         self.assertFalse(result["recipe_readme"]["clean"])
