@@ -1,0 +1,66 @@
+[
+  {
+    "number": 901,
+    "title": "Ship the v0.3 onboarding rewrite",
+    "state": "closed",
+    "closed_at": "2026-08-02T10:00:00Z",
+    "body": "Tracking the sub-tasks:\n- [ ] #904\n- [ ] #904\n- [x] #906\n- [ ] #999\n",
+    "url": "https://github.com/thierrypdamiba/orita/issues/901"
+  },
+  {
+    "number": 902,
+    "title": "Clean up the CONNECT.md walkthrough",
+    "state": "closed",
+    "closed_at": "2026-08-04T09:00:00Z",
+    "body": "- [ ] #905\n",
+    "url": "https://github.com/thierrypdamiba/orita/issues/902"
+  },
+  {
+    "number": 903,
+    "title": "Investigate the flaky Tithe test",
+    "state": "closed",
+    "closed_at": "2026-07-20T08:00:00Z",
+    "body": "No checklist here, just discussion. See #904 for related context, mentioned in passing.",
+    "url": "https://github.com/thierrypdamiba/orita/issues/903"
+  },
+  {
+    "number": 907,
+    "title": "Open umbrella issue, not yet closed",
+    "state": "open",
+    "closed_at": null,
+    "body": "- [ ] #904\n",
+    "url": "https://github.com/thierrypdamiba/orita/issues/907"
+  },
+  {
+    "number": 909,
+    "title": "Closed with a malformed record",
+    "state": "closed",
+    "closed_at": null,
+    "body": "- [ ] #904\n",
+    "url": "https://github.com/thierrypdamiba/orita/issues/909"
+  },
+  {
+    "number": 904,
+    "title": "Write the new onboarding copy",
+    "state": "open",
+    "closed_at": null,
+    "body": "",
+    "url": "https://github.com/thierrypdamiba/orita/issues/904"
+  },
+  {
+    "number": 905,
+    "title": "Fix the dead CONNECT.md anchor link",
+    "state": "open",
+    "closed_at": null,
+    "body": "",
+    "url": "https://github.com/thierrypdamiba/orita/issues/905"
+  },
+  {
+    "number": 906,
+    "title": "Rename the onboarding screenshot",
+    "state": "closed",
+    "closed_at": "2026-08-01T00:00:00Z",
+    "body": "",
+    "url": "https://github.com/thierrypdamiba/orita/issues/906"
+  }
+]

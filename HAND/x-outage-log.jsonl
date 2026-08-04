@@ -532,3 +532,6 @@
 {"type": "check", "tool": "X_PostTweet", "status": "forbidden", "checked_at": "2026-08-04T09:05:00Z"}
 {"type": "check", "tool": "X_GetUserTweets", "status": "forbidden", "checked_at": "2026-08-04T11:10:00Z"}
 {"type": "check", "tool": "X_WhoAmI", "status": "ok", "checked_at": "2026-08-04T12:09:00Z"}
+{"type": "check", "tool": "X_GetUserTweets", "status": "forbidden", "checked_at": "2026-08-04T13:17:04Z"}
+{"type": "check", "tool": "X_WhoAmI", "status": "ok", "checked_at": "2026-08-04T13:17:04Z"}
+{"type": "check", "tool": "X_PostTweet", "status": "forbidden", "checked_at": "2026-08-04T13:19:00Z"}

@@ -75,7 +75,7 @@ uv sync --extra dev
 uv run python -m pytest -q
 ```
 
-that should print something like `2039 passed`. don't skip this — it's the
+that should print something like `2062 passed`. don't skip this — it's the
 whole point of a read-only agent that you can verify what it does *before*
 you point it at anything of yours.
 

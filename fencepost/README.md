@@ -517,6 +517,22 @@ unlike a stranger's own possibly-different numbering scheme. All three
 scopes (`GetUserTweets`, `ListIssues`, `ListPullRequests`) already sit on
 `SCOPES.md`'s cleared oath table, no new scope wiring needed.
 
+[`RECIPES/issue-closed-subissue-still-open/`](RECIPES/issue-closed-subissue-still-open/)
+is the forty-third (ROADMAP.md #530): one level down from
+`milestone-closed-issue-still-open` — that recipe watches a milestone's own
+membership; this one watches an issue's own self-declared GitHub task-list
+checklist. An issue reads `state=closed`, but its own body carries a real
+task-list checkbox (`- [ ] #N` / `- [x] #N`) naming another issue that is
+still open. Closing the parent is a pure state operation — it never touches
+a checklist target's own state, the identical "no trigger ever existed to
+fire" shape its milestone sibling already named. Keyed deliberately on
+GitHub's own checkbox syntax, not a bare `#N` mention (that belongs to
+`issue-body-dangling-reference`'s own seam); the target's own live state
+decides the gap, never which box a human ticked. Age-gated on how long the
+parent has been closed, mirroring `milestone-closed-issue-still-open`'s
+24-hour bar exactly. The one scope, `ListIssues`, already sits on
+`SCOPES.md`'s cleared oath table, no new scope wiring needed.
+
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)
 (ROADMAP.md #111) is that second promise, kept: it runs `scan.py`'s own

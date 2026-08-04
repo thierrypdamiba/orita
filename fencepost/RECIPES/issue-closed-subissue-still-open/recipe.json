@@ -1,0 +1,12 @@
+{
+  "slug": "issue-closed-subissue-still-open",
+  "title": "An issue closes with its own checklist still pointing at an open sub-issue",
+  "author": "retrya",
+  "description": "Reads a closed issue's own body for a GitHub task-list reference (`- [ ] #N` / `- [x] #N`) to another issue, and cross-checks whether that referenced issue is still open. Closing the parent is a pure state operation that never touches a checklist target's own state -- the same 'no trigger ever existed to fire' shape milestone-closed-issue-still-open already named for milestone membership, applied here to an issue's own self-declared checklist.",
+  "toolkit": "github",
+  "scopes": ["ListIssues"],
+  "fixture": "fixtures/issue_closed_subissue_still_open",
+  "detector_file": "detector.py",
+  "entrypoint": "run_recipe_scan",
+  "confidence_notes": "Age-gated on how long the parent issue has been closed while the checklist target still sits open -- 24 hours, mirroring milestone-closed-issue-still-open, merged-pr-issue-still-open, and duplicate-issue-still-open's own bar exactly: a parent closed under 24h ago may not have had its own checklist swept yet. 0.85 at or past the bar, 0.5 under it. A checklist target that does not exist is excluded as a dangling reference (issue-body-dangling-reference's own seam, not this one's); a checklist target that is itself already closed is excluded as a claim that holds, whether its own checkbox reads checked or unchecked -- this recipe trusts the target issue's real state, not the checkbox mark."
+}
