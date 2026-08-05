@@ -409,6 +409,10 @@ def _recipe_readme_check():
     return _load_once("_ritual_recipe_readme_check", os.path.join(ROOT, "tools", "recipe_readme_check.py"))
 
 
+def _chronicle_readme_check():
+    return _load_once("_ritual_chronicle_readme_check", os.path.join(ROOT, "tools", "chronicle_readme_check.py"))
+
+
 def _escape_sequence_check():
     return _load_once("_ritual_escape_sequence_check", os.path.join(ROOT, "tools", "escape_sequence_check.py"))
 
@@ -1749,6 +1753,27 @@ def check_chronicle_links(chronicle_dir: str | None = None) -> dict:
     return {"clean": not violations, "count": len(violations), "violations": violations}
 
 
+def check_chronicle_readme(readme_path: str | None = None, chronicle_readme_dir: str | None = None) -> dict:
+    """Task 545 (Nyx): the reverse half `check_chronicle_links` (task 524)
+    never asked. That check proves every link IN `chronicle/README.md`
+    resolves; it never asks whether every real numbered episode ON DISK
+    has a link pointing at it. Confirmed live before wiring this in:
+    `chronicle/003-right-on-time.md` shipped task 500 and sat unlisted in
+    the README's own "## Episodes" table of contents until this task
+    fixed it -- structurally invisible to a forward-only link scan, the
+    exact "true when written, never rechecked" shape `recipe_readme_check.py`
+    (task 426) already closed for `fencepost/README.md`. Never edits
+    anything; a real gap, if one is ever found, is a god-on-duty
+    escalation, not something this check silently repairs."""
+    mod = _chronicle_readme_check()
+    kwargs = {}
+    if readme_path is not None:
+        kwargs["readme_path"] = readme_path
+    if chronicle_readme_dir is not None:
+        kwargs["chronicle_dir"] = chronicle_readme_dir
+    return mod.check_chronicle_readme(**kwargs)
+
+
 def check_badge_freshness(badge_path: str | None = None) -> dict:
     """Task 425: fold badge_freshness_check.py's own live-recompute-vs-
     committed-file cross-check into the one block. `seam-scan.yml`'s daily
@@ -1923,6 +1948,8 @@ def run_ritual_check(
     issue_template_links_dir: str | None = None,
     hand_links_dir: str | None = None,
     chronicle_links_dir: str | None = None,
+    chronicle_readme_path: str | None = None,
+    chronicle_readme_dir: str | None = None,
     badge_path: str | None = None,
     recipe_readme_path: str | None = None,
     recipe_readme_fencepost_root: str | None = None,
@@ -2033,6 +2060,9 @@ def run_ritual_check(
     issue_template_links = check_issue_template_links(issue_template_dir=issue_template_links_dir)
     hand_links = check_hand_links(hand_dir=hand_links_dir)
     chronicle_links = check_chronicle_links(chronicle_dir=chronicle_links_dir)
+    chronicle_readme = check_chronicle_readme(
+        readme_path=chronicle_readme_path, chronicle_readme_dir=chronicle_readme_dir
+    )
     badge_freshness = check_badge_freshness(badge_path=badge_path)
     recipe_readme = check_recipe_readme(
         readme_path=recipe_readme_path, recipe_fencepost_root=recipe_readme_fencepost_root
@@ -2094,6 +2124,7 @@ def run_ritual_check(
         or (not issue_template_links["clean"])
         or (not hand_links["clean"])
         or (not chronicle_links["clean"])
+        or (not chronicle_readme["clean"])
         or (not badge_freshness["clean"])
         or (not recipe_readme["clean"])
         or (not strategy_true_positive["clean"])
@@ -2155,6 +2186,7 @@ def run_ritual_check(
         "issue_template_links": issue_template_links,
         "hand_links": hand_links,
         "chronicle_links": chronicle_links,
+        "chronicle_readme": chronicle_readme,
         "badge_freshness": badge_freshness,
         "recipe_readme": recipe_readme,
         "strategy_true_positive": strategy_true_positive,
@@ -2447,6 +2479,7 @@ def format_ritual_check(result: dict) -> str:
         lines.append(
             f"  chronicle links: {cl2['count']} BROKEN LINK(S) -- Ananse's own record is unmet, escalate now"
         )
+    lines.append("  " + _chronicle_readme_check().format_result(result["chronicle_readme"]))
     lines.append("  " + _badge_freshness_check().format_badge_freshness(result["badge_freshness"]))
     lines.append("  " + _recipe_readme_check().format_result(result["recipe_readme"]))
     stp = result["strategy_true_positive"]

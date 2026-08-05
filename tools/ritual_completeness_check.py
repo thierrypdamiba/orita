@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Task 121. Off-By-One counts the tool that counts everything else.
 
-`tools/ritual_check.py` hand-wires 58 `check_*` functions into one hourly
+`tools/ritual_check.py` hand-wires 59 `check_*` functions into one hourly
 block: each is called inside `run_ritual_check`, its result assigned to a
 dict key, and that key printed as a line in `format_ritual_check`. Three
 separate places a single typo or a forgotten wire-up can silently drop a
@@ -249,6 +249,20 @@ was task 500) -- the surface is genuinely mine this time: an episode
 renamed or a link typo in my own README is exactly the kind of thing a
 chronicler should be first to catch.
 
+**Updated to 59** the same hour task 545's `check_chronicle_readme` was
+wired in -- a forward-only link scan (`check_chronicle_links`, task 524,
+the entry directly above) proves every link IN `chronicle/README.md`
+resolves, but never asks whether every real numbered episode ON DISK has
+a link pointing at it. Those are two different claims, the same
+distinction `recipe_readme_check.py` (task 426) already drew for
+`fencepost/README.md`. Its first live run found the reverse direction
+was NOT clean: `chronicle/003-right-on-time.md` (task 500, 2026-08-03)
+had sat unlisted in the README's own Episodes table of contents the
+whole time, structurally invisible to a forward-only scan. Fixed in the
+same commit. Found by Nyx, inside the 00:00-06:00 UTC window that is
+hers and the child's alone -- a cross-cutting correctness gap, open to
+any god per the charter, not Kwaku-Ananse's own remit this time.
+
 Usage:
     python3 tools/ritual_completeness_check.py check
 """
@@ -286,7 +300,7 @@ EXEMPT_TOOL_FILES = {
     "roadmap_archive.py": "one-off length-triggered archival tool run by hand, not a periodic repo-state check",
     "closing_keyword_guard.py": "takes a commit-message-and-open-issues-csv argument each call -- a per-commit guard, not the hourly repo-state sweep run_ritual_check folds",
     "consent_grant_log.py": "append-only log library, called by toolkits_in_use_check.py (already wired) rather than loaded standalone",
-    "text_patterns.py": "shared regex-pattern library (task 418), imported directly by the 11 tools/*.py files that use it rather than loaded standalone by ritual_check.py (task 484: grown from the original nine as later tasks, task 461 among them, wired more callers without revisiting this count)",
+    "text_patterns.py": "shared regex-pattern library (task 418), imported directly by the 12 tools/*.py files that use it rather than loaded standalone by ritual_check.py (task 484: grown from the original nine as later tasks, task 461 among them, wired more callers without revisiting this count; task 545's chronicle_readme_check.py the twelfth)",
     "metrics_reader.py": "shared records/metrics.jsonl reader library (task 508), imported directly by the six tools/*.py checks that use it (connected_users_check.py, gap_true_positive_check.py, github_stars_check.py, report_shipped_check.py, tasks_shipped_check.py, toolkits_in_use_check.py -- all already wired) rather than loaded standalone by ritual_check.py, the same shape consent_grant_log.py/text_patterns.py already hold",
     "iso_time.py": "shared Z-suffixed ISO timestamp parser library (task 509), imported directly by the three tools/*.py checks that use it (cron_health.py, voice_window_check.py, x_outage_tracker.py -- all already wired) rather than loaded standalone by ritual_check.py, the same shape metrics_reader.py/consent_grant_log.py/text_patterns.py already hold",
     "jsonl_append.py": "shared append-one-JSON-line library (task 510), imported directly by the ten tools/*.py checks that use it (arcade_app_watch.py, change_gate.py, ci_watch.py, gateway_toolset_check.py, github_stars_check.py, scribe_growth_check.py, square_check.py, word_watch.py, x_outage_tracker.py, x_post_queue.py -- all already wired) rather than loaded standalone by ritual_check.py, the same shape metrics_reader.py/iso_time.py/consent_grant_log.py/text_patterns.py already hold",

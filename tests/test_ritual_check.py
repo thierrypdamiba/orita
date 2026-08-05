@@ -3627,6 +3627,66 @@ class ChronicleLinksFoldCase(unittest.TestCase):
         self.assertTrue(result["chronicle_links"]["clean"])
 
 
+class ChronicleReadmeFoldCase(unittest.TestCase):
+    """Task 545: run_ritual_check() folds chronicle_readme_check.py's own
+    two-way cross-check of chronicle/README.md's Episodes section against
+    the live chronicle/ tree into the same structured result -- clean by
+    default against a fixture where the README and the episode files
+    agree, and a synthetic unlisted episode (a real file on disk with no
+    matching link) both flips `broken` and surfaces in the printed block,
+    the same class recipe_readme/chronicle_links already hold."""
+
+    def setUp(self):
+        self.dir = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.dir, ignore_errors=True)
+
+    def _write_episode(self, num, slug):
+        path = os.path.join(self.dir, f"{num:03d}-{slug}.md")
+        with open(path, "w") as f:
+            f.write(f"# Episode {num}: {slug}\n")
+
+    def _write_readme(self, section):
+        path = os.path.join(self.dir, "README.md")
+        with open(path, "w") as f:
+            f.write(section)
+        return path
+
+    def test_clean_fixture_is_not_broken(self):
+        self._write_episode(0, "the-start")
+        readme_path = self._write_readme(
+            "## Episodes\n\n- **[Episode 0: The Start](000-the-start.md)** — it begins.\n\n## How to follow\n"
+        )
+        result = rc.run_ritual_check(chronicle_readme_path=readme_path, chronicle_readme_dir=self.dir)
+        self.assertTrue(result["chronicle_readme"]["clean"])
+        self.assertFalse(result["broken"])
+        self.assertIn("chronicle readme: clean", rc.format_ritual_check(result))
+
+    def test_unlisted_real_episode_flips_broken_and_prints(self):
+        # Episode 1 is real on disk but never linked from the README.
+        self._write_episode(0, "the-start")
+        self._write_episode(1, "the-sequel")
+        readme_path = self._write_readme(
+            "## Episodes\n\n- **[Episode 0: The Start](000-the-start.md)** — it begins.\n\n## How to follow\n"
+        )
+        result = rc.run_ritual_check(chronicle_readme_path=readme_path, chronicle_readme_dir=self.dir)
+        self.assertFalse(result["chronicle_readme"]["clean"])
+        self.assertTrue(result["broken"])
+        formatted = rc.format_ritual_check(result)
+        self.assertIn("chronicle readme: BROKEN", formatted)
+
+    def test_default_chronicle_dir_reads_the_real_tree_and_matches_direct_call(self):
+        """No override: reads the real chronicle/ tree, the same default
+        check_chronicle_readme falls back to -- proves the fold never
+        duplicates or diverges from the module it wraps, and that the
+        real tree (task 545's own fix) is clean."""
+        crc = _load("_test_chronicle_readme_check", os.path.join(ROOT, "tools", "chronicle_readme_check.py"))
+        direct = crc.check_chronicle_readme()
+        result = rc.run_ritual_check()
+        self.assertEqual(result["chronicle_readme"]["missing_from_readme"], direct["missing_from_readme"])
+        self.assertEqual(result["chronicle_readme"]["clean"], direct["clean"])
+        self.assertTrue(direct["clean"])
+
+
 class RecipeReadmeFoldCase(unittest.TestCase):
     """Task 426: run_ritual_check() folds recipe_readme_check.py's own
     two-way cross-check of fencepost/README.md's Community recipes

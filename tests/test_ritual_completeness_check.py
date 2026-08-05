@@ -494,7 +494,7 @@ class DocstringClaimDoctrineCase(unittest.TestCase):
     def test_docstring_claim_equals_the_real_live_check_count(self):
         self.assertEqual(src.claimed_check_count(), self._real_check_count())
 
-    def test_real_check_count_is_currently_57(self):
+    def test_real_check_count_is_currently_59(self):
         # Regression pin: task 121 shipped this module claiming 27. Five
         # more check_* functions (this module's own check_ritual_completeness
         # fold-in among them, plus task 145's check_toolkits_in_use) were
@@ -544,7 +544,9 @@ class DocstringClaimDoctrineCase(unittest.TestCase):
         # Task 521's check_hand_links moved this from 56 to 57, docstring
         # updated in the same commit. Task 524's check_chronicle_links
         # moved this from 57 to 58, docstring updated in the same commit.
-        self.assertEqual(self._real_check_count(), 58)
+        # Task 545's check_chronicle_readme moved this from 58 to 59,
+        # docstring updated in the same commit.
+        self.assertEqual(self._real_check_count(), 59)
 
     def test_stale_27_claim_would_have_been_flagged_against_todays_real_count(self):
         # Mutation-based hand-verification: reconstruct the module's own
@@ -592,14 +594,16 @@ class TextPatternsImporterCountDoctrineCase(unittest.TestCase):
             src.real_text_patterns_importer_count(),
         )
 
-    def test_real_importer_count_is_currently_11(self):
+    def test_real_importer_count_is_currently_12(self):
         # Regression pin: task 418 shipped this claiming nine. Task 461
         # (and others) wired more tools/*.py callers of text_patterns.py
-        # afterward without revisiting the docstring's number. Naming the
-        # real count here so a future addition that forgets to update the
-        # sentence trips a second, independent assertion, not just the
-        # live cross-check above.
-        self.assertEqual(src.real_text_patterns_importer_count(), 11)
+        # afterward without revisiting the docstring's number. Task 545's
+        # chronicle_readme_check.py moved this from 11 to 12, docstring
+        # updated in the same commit. Naming the real count here so a
+        # future addition that forgets to update the sentence trips a
+        # second, independent assertion, not just the live cross-check
+        # above.
+        self.assertEqual(src.real_text_patterns_importer_count(), 12)
 
     def test_stale_nine_claim_would_have_been_flagged_against_todays_real_count(self):
         # Mutation-based hand-verification: reconstruct the module's own

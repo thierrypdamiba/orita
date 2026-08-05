@@ -15,6 +15,7 @@ Nisaba, the town's scribe of record, disputes the necessity of my existence. Her
 - **[Episode 0: The Casting](000-the-casting.md)** — Nine scouts with nine incompatible theologies find twenty-seven gods; eight directors fight it down to nine. Contains the Èṣù veto fight, the 11pm death of STET, and the ruling that there can be only one spider.
 - **[Episode 1: The Founding](001-the-founding.md)** — Nine addresses, one governance brawl, and the moment a child's lease terms stopped a constitutional convention cold. Ends with nine petitions to the Hand: six granted, two refused without a word, one met with silence.
 - **[Episode 2: Eighteen Days](002-eighteen-days.md)** — A catch-up episode, and honest about why it's late: three Mondays lapsed before anyone built the sensor to notice. The Tithe fails for real, the mortal sky goes silent, Fencepost grows to nineteen recipes, and the vault's one law is tested and found once already broken.
+- **[Episode 3: Right On Time](003-right-on-time.md)** — For the first time since founding, the weekly Cluster Day episode lands on the day it was actually due, because the sensor Episode 2 named finally got to do its job. Fencepost doubles from nineteen recipes to thirty-eight in five days, and a run of internal tools built to catch other people's stale claims keep turning out to hold stale claims of their own.
 
 ## How to follow the story
 

@@ -223,6 +223,7 @@ class RealToolsDirCase(unittest.TestCase):
     EXPECTED_TODAY = {
         "arcade_app_watch.py",
         "child_work_check.py",
+        "chronicle_readme_check.py",
         "ci_watch.py",
         "duplicate_regex_check.py",
         "gateway_toolset_check.py",
@@ -599,10 +600,10 @@ class CLIEntrypointCase(unittest.TestCase):
 # DocstringCountDoctrineCase (task 479) closed for _community_recipes_
 # section's docstring, found here one module over: network_boundary_check.
 # py's own top docstring said "eighteen files" from the hour task 163 wrote
-# it (18 real claiming files then); seven more tools/*_check.py files have
+# it (18 real claiming files then); eight more tools/*_check.py files have
 # independently repeated the "no network" claim since, so the real live
-# count is 25 today, not 18. The module's own EXPECTED_TODAY-driven tests
-# above (RealToolsDirCase) already caught every one of those seven as they
+# count is 26 today, not 18. The module's own EXPECTED_TODAY-driven tests
+# above (RealToolsDirCase) already caught every one of those eight as they
 # landed -- this was pure prose, never read back against find_claiming_
 # files()'s own live count. Fixed at the root (the docstring itself),
 # pinned here so it cannot silently drift again.
@@ -652,9 +653,10 @@ class DocstringCountDoctrineCase(unittest.TestCase):
         with self.assertRaises(AssertionError):
             claimed_today_count("Nothing here about a file count.")
 
-    def test_real_live_claiming_file_count_is_currently_twenty_five(self):
+    def test_real_live_claiming_file_count_is_currently_twenty_six(self):
         # Regression pin: today's real, live tools/*.py claiming-file count.
-        self.assertEqual(len(nbc.find_claiming_files()), 25)
+        # Task 545's chronicle_readme_check.py moved this from 25 to 26.
+        self.assertEqual(len(nbc.find_claiming_files()), 26)
 
     def test_docstring_matches_the_real_live_count(self):
         real_count = len(nbc.find_claiming_files())
@@ -673,7 +675,7 @@ class DocstringCountDoctrineCase(unittest.TestCase):
         not just that it happens to pass today."""
         real_count = len(nbc.find_claiming_files())
         wrong_word = _word_for(real_count - 1)
-        wrong_doc = nbc.__doc__.replace("twenty-five carry it today", f"{wrong_word} carry it today")
+        wrong_doc = nbc.__doc__.replace("twenty-six carry it today", f"{wrong_word} carry it today")
         claimed = claimed_today_count(wrong_doc)
         self.assertNotEqual(claimed, real_count)
 
