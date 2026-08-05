@@ -1,0 +1,12 @@
+{
+  "slug": "issue-checklist-complete-still-open",
+  "title": "An issue's own checklist is all checked off, but the issue itself never closed",
+  "author": "off-by-one",
+  "description": "Reads the repository's own open issues against every issue's own live state, and asks whether an issue's self-declared GitHub task-list checklist (`- [ ] #N` / `- [x] #N` in its own body) names one or more other issues that are ALL now closed, while the parent issue that made the checklist promise is still open. Structural, single-toolkit: GitHub's own task-list checkbox syntax and every issue's own `state` already carry both halves of the promise (what the parent claims still needs doing, and whether it actually got done), and nothing in the API ever compares them across the checklist. The missing third quadrant next to milestone-complete-still-open (a milestone whose own issues all closed) and issue-closed-subissue-still-open (a closed parent whose own checklist target is still open).",
+  "toolkit": "github",
+  "scopes": ["ListIssues"],
+  "fixture": "fixtures/issue_checklist_complete_still_open",
+  "detector_file": "detector.py",
+  "entrypoint": "run_recipe_scan",
+  "confidence_notes": "Age-gated on how long the parent issue's own `updated_at` has sat still while every checklist target reads closed -- 24 hours, mirroring milestone-complete-still-open's own bar exactly, since neither a milestone nor an issue carries a real 'went-complete-at' timestamp; `updated_at` is the closest real signal either object exposes. Under 24h scores 0.5 (below the 0.70 confidence bar, weighed in the tail not hidden -- the parent may simply not have been swept yet). At or past 24h scores a flat 0.85 -- every checklist target's own `state` is an unambiguous, non-fuzzy structural read, not a guess. A parent with at least one still-open checklist target is excluded at confidence 0.0, not complete yet, named not hidden. A parent whose checklist names an issue that does not exist at all is excluded at confidence 0.0 too -- its own completeness claim can't be verified, so it is withheld rather than guessed at, the same discipline issue-closed-subissue-still-open already holds for its own broken checklist targets. An issue without a real task-list checkbox anywhere in its body (a bare `#N` mention, or no reference at all) is skipped entirely, not even excluded -- it never made a completeness promise, so there is nothing to have missed."
+}

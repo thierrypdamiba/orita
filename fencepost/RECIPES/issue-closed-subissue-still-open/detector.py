@@ -36,16 +36,25 @@ and this recipe's own milestone sibling both already hold.
 Confidence is age-gated on how long the parent has been closed, mirroring
 `milestone-closed-issue-still-open`'s 24-hour bar exactly -- see
 `recipe.json`'s `confidence_notes` for the full reasoning.
+
+The checkbox grammar itself (`CHECKLIST_RE` / `checklist_targets`) moved to
+`seam_engine.checklist` (task 558) the day a second recipe,
+`issue-checklist-complete-still-open`, needed the identical parsing for the
+mirror-image seam one quadrant over -- the same "reuse the shared module,
+not a second retyped copy" discipline `closing_keywords.py` already holds
+for the closing-keyword family. Imported here as `_checklist_targets`, its
+own pre-existing module-level name, so nothing else in this file changes
+shape.
 """
 from __future__ import annotations
 
 import json
-import re
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from seam_engine.checklist import checklist_targets as _checklist_targets
 from seam_engine.scan import GapCandidate
 
 _HERE = Path(__file__).resolve().parent
@@ -54,12 +63,6 @@ DEFAULT_ISSUES_FIXTURE = _HERE.parents[1] / "fixtures" / "issue_closed_subissue_
 # A parent closed under this age may not have had its own checklist swept
 # yet -- not yet a gap. Mirrors milestone-closed-issue-still-open's bar.
 _STALE_HOURS = 24.0
-
-# GitHub's own task-list checkbox syntax: "- [ ] #N" / "- [x] #N", one per
-# line, optionally indented. The checked/unchecked mark itself is captured
-# but unused for the gap decision -- only the target issue's own live state
-# decides that (see module docstring).
-_CHECKLIST_RE = re.compile(r"^\s*-\s*\[([ xX])\]\s*#(\d+)", re.MULTILINE)
 
 
 def _parse_ts(s: str) -> datetime:
@@ -93,14 +96,6 @@ def load_issues(path: Path | None = None) -> list[Issue]:
         )
         for r in rows
     ]
-
-
-def _checklist_targets(body: str) -> list[int]:
-    """Every `#N` named by a real task-list checkbox line, in the order it
-    appears. A bare `#N` mention with no checkbox in front of it (a plain
-    sentence referencing another issue) never matches -- that is a
-    dangling-reference recipe's own seam, not this one's."""
-    return [int(n) for _mark, n in _CHECKLIST_RE.findall(body)]
 
 
 def compute_gaps(issues: list[Issue], *, now: datetime) -> tuple[list[GapCandidate], list[GapCandidate]]:

@@ -1,0 +1,90 @@
+[
+  {
+    "number": 1001,
+    "title": "Ship the checklist-completion recipe's own fixture set",
+    "state": "open",
+    "body": "Tracking issue for the fixture set.\n\n- [x] #1010\n- [x] #1011\n",
+    "updated_at": "2026-08-03T00:00:00Z",
+    "url": "https://github.com/example/example-repo/issues/1001"
+  },
+  {
+    "number": 1002,
+    "title": "Wrap up the release notes pass",
+    "state": "open",
+    "body": "- [x] #1012\n",
+    "updated_at": "2026-08-05T18:00:00Z",
+    "url": "https://github.com/example/example-repo/issues/1002"
+  },
+  {
+    "number": 1003,
+    "title": "Ready the migration train",
+    "state": "open",
+    "body": "- [x] #1010\n- [ ] #1013\n",
+    "updated_at": "2026-08-04T00:00:00Z",
+    "url": "https://github.com/example/example-repo/issues/1003"
+  },
+  {
+    "number": 1004,
+    "title": "Coordinate the vendor handoff",
+    "state": "open",
+    "body": "- [x] #1010\n- [x] #9999\n",
+    "updated_at": "2026-08-04T00:00:00Z",
+    "url": "https://github.com/example/example-repo/issues/1004"
+  },
+  {
+    "number": 1005,
+    "title": "Already wrapped up",
+    "state": "closed",
+    "body": "- [x] #1010\n",
+    "updated_at": "2026-08-01T00:00:00Z",
+    "url": "https://github.com/example/example-repo/issues/1005"
+  },
+  {
+    "number": 1006,
+    "title": "Loose mention, no checklist",
+    "state": "open",
+    "body": "See #1010 for context -- just a mention, no checkbox here.",
+    "updated_at": "2026-08-04T00:00:00Z",
+    "url": "https://github.com/example/example-repo/issues/1006"
+  },
+  {
+    "number": 1007,
+    "title": "Dedup the checklist test",
+    "state": "open",
+    "body": "- [x] #1010\n- [x] #1010\n",
+    "updated_at": "2026-08-05T19:00:00Z",
+    "url": "https://github.com/example/example-repo/issues/1007"
+  },
+  {
+    "number": 1010,
+    "title": "Foundational dependency merged",
+    "state": "closed",
+    "body": "",
+    "updated_at": "2026-08-01T12:00:00Z",
+    "url": "https://github.com/example/example-repo/issues/1010"
+  },
+  {
+    "number": 1011,
+    "title": "Second dependency merged",
+    "state": "closed",
+    "body": "",
+    "updated_at": "2026-08-01T13:00:00Z",
+    "url": "https://github.com/example/example-repo/issues/1011"
+  },
+  {
+    "number": 1012,
+    "title": "Docs dependency finished",
+    "state": "closed",
+    "body": "",
+    "updated_at": "2026-08-05T17:00:00Z",
+    "url": "https://github.com/example/example-repo/issues/1012"
+  },
+  {
+    "number": 1013,
+    "title": "Still cooking dependency",
+    "state": "open",
+    "body": "",
+    "updated_at": "2026-08-05T20:00:00Z",
+    "url": "https://github.com/example/example-repo/issues/1013"
+  }
+]

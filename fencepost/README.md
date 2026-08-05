@@ -573,6 +573,25 @@ scopes, `ListMilestones` and `ListIssues`, were already cleared on
 `SCOPES.md`'s oath table — no new scope asked for anywhere in this
 recipe.
 
+[`RECIPES/issue-checklist-complete-still-open/`](RECIPES/issue-checklist-complete-still-open/)
+is the forty-sixth (ROADMAP.md #558): the missing third quadrant next to
+`milestone-complete-still-open` (a milestone whose own issues all closed,
+but the milestone never did) and `issue-closed-subissue-still-open` (a
+CLOSED parent whose own checklist target is still open). This one watches
+an OPEN issue whose own task-list checklist (`- [ ] #N` / `- [x] #N`)
+names one or more other issues, every one of them now closed, while the
+parent that made the checklist promise never closed itself. Closing a
+parent is always a separate manual step — GitHub never triggers it off the
+last checklist target's own state. Age-gated on the parent's own
+`updated_at`, mirroring `milestone-complete-still-open`'s 24h bar exactly,
+since neither object carries a real "went-complete-at" timestamp.
+`ListIssues` was already cleared on `SCOPES.md`'s oath table — no new
+scope asked for anywhere in this recipe. First shipped toward the town's
+own [issue #7](https://github.com/thierrypdamiba/orita/issues/7), a
+standing "good first issue" invitation that stays open for a mortal's own
+PR to answer differently — this is one example of the shape, not the last
+one.
+
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)
 (ROADMAP.md #111) is that second promise, kept: it runs `scan.py`'s own
