@@ -124,6 +124,109 @@ class MissingAppDetectionCase(unittest.TestCase):
                 scc._last_connected_app_ids(log_path)
 
 
+class StaleGoogleClaimCase(unittest.TestCase):
+    """Task 542. `arcade-google`'s row naming the app_id was never the
+    whole claim -- what the status text SAYS about it can go stale too.
+    A row claiming "in use by Fencepost" while the last recorded
+    `gateway_toolset_check` shows zero live Gmail/Calendar tools is a
+    real, false public claim, and `check_scopes_completeness` must catch
+    it by content, not just by app_id presence."""
+
+    _STALE_SECTION = """## Every connected app, accounted for
+
+| app_id | status |
+|--|--|
+| `arcade-github` | in use by Fencepost |
+| `arcade-google` | in use by Fencepost |
+
+## The oath
+
+1. some other section
+"""
+
+    _HONEST_SECTION = """## Every connected app, accounted for
+
+| app_id | status |
+|--|--|
+| `arcade-github` | in use by Fencepost |
+| `arcade-google` | connected upstream, NOT used by Fencepost yet -- zero Gmail/Calendar tools live |
+
+## The oath
+
+1. some other section
+"""
+
+    def _write(self, tmpdir, scopes_text, connected_app_ids, has_gmail_calendar_tools):
+        scopes_path = os.path.join(tmpdir, "SCOPES.md")
+        with open(scopes_path, "w") as f:
+            f.write(scopes_text)
+        app_log_path = os.path.join(tmpdir, "app-log.jsonl")
+        with open(app_log_path, "w") as f:
+            f.write(json.dumps({"connected_app_ids": connected_app_ids, "checked_at": "2026-08-05T02:00:00+00:00"}) + "\n")
+        toolset_log_path = os.path.join(tmpdir, "toolset-log.jsonl")
+        with open(toolset_log_path, "w") as f:
+            f.write(json.dumps({
+                "has_gmail_calendar_tools": has_gmail_calendar_tools,
+                "matched_tools": [],
+                "checked_at": "2026-08-05T02:00:00+00:00",
+            }) + "\n")
+        return scopes_path, app_log_path, toolset_log_path
+
+    def test_stale_in_use_claim_while_zero_tools_live_is_flagged(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            scopes_path, app_log_path, toolset_log_path = self._write(
+                tmpdir, self._STALE_SECTION, ["arcade-github", "arcade-google"], has_gmail_calendar_tools=False
+            )
+            result = scc.check_scopes_completeness(
+                scopes_path=scopes_path, app_log_path=app_log_path, toolset_log_path=toolset_log_path
+            )
+            self.assertTrue(result["stale_google_claim"])
+            self.assertFalse(result["clean"])
+
+    def test_honest_not_yet_used_wording_is_not_flagged(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            scopes_path, app_log_path, toolset_log_path = self._write(
+                tmpdir, self._HONEST_SECTION, ["arcade-github", "arcade-google"], has_gmail_calendar_tools=False
+            )
+            result = scc.check_scopes_completeness(
+                scopes_path=scopes_path, app_log_path=app_log_path, toolset_log_path=toolset_log_path
+            )
+            self.assertFalse(result["stale_google_claim"])
+            self.assertTrue(result["clean"])
+
+    def test_in_use_claim_is_true_once_tools_actually_go_live(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            scopes_path, app_log_path, toolset_log_path = self._write(
+                tmpdir, self._STALE_SECTION, ["arcade-github", "arcade-google"], has_gmail_calendar_tools=True
+            )
+            result = scc.check_scopes_completeness(
+                scopes_path=scopes_path, app_log_path=app_log_path, toolset_log_path=toolset_log_path
+            )
+            self.assertFalse(result["stale_google_claim"])
+            self.assertTrue(result["clean"])
+
+    def test_no_toolset_check_ever_recorded_is_not_flagged(self):
+        """Silence about the toolset isn't a lie -- only a claim would be.
+        No prior gateway_toolset_check means nothing to compare against."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            scopes_path, app_log_path, _ = self._write(
+                tmpdir, self._STALE_SECTION, ["arcade-github", "arcade-google"], has_gmail_calendar_tools=False
+            )
+            missing_toolset_log_path = os.path.join(tmpdir, "does-not-exist.jsonl")
+            result = scc.check_scopes_completeness(
+                scopes_path=scopes_path, app_log_path=app_log_path, toolset_log_path=missing_toolset_log_path
+            )
+            self.assertFalse(result["stale_google_claim"])
+
+    def test_format_result_names_the_stale_claim(self):
+        msg = scc.format_result({
+            "clean": False, "connected_app_ids": ["arcade-google"],
+            "accounted_for_app_ids": ["arcade-google"], "missing": [],
+            "stale_google_claim": True,
+        })
+        self.assertIn("stale", msg.lower())
+
+
 class RealDocCase(unittest.TestCase):
     """The real point: today's real fencepost/SCOPES.md accounts for every
     app_id the real arcade_app_watch.py log currently knows, and hand-

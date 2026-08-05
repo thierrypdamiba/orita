@@ -61,7 +61,7 @@ the claim quietly aging past whatever it says.
 |--|--|
 | `arcade-github` | in use by Fencepost |
 | `ap_3GORxnS5T0YRHmzSRa0knq2nupY` (X auth) | in use by Fencepost |
-| `arcade-google` | in use by Fencepost |
+| `arcade-google` | connected upstream (Gmail/Calendar scopes granted), NOT used by Fencepost yet -- zero Gmail/Calendar-capable tools are exposed on the live gateway (see WIP note above; `tools/gateway_toolset_check.py` tracks the day this flips) |
 | `arcade-linear` | connected on the shared gateway, NOT used by Fencepost, no toolkit integration planned |
 | `arcade-slack` | connected on the shared gateway, NOT used by Fencepost, no toolkit integration planned |
 | `sybill` | connected on the shared gateway, NOT used by Fencepost, no toolkit integration planned |

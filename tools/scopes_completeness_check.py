@@ -30,15 +30,35 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import arcade_app_watch  # noqa: E402
+import gateway_toolset_check  # noqa: E402
 import text_patterns  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DEFAULT_SCOPES_PATH = os.path.join(ROOT, "fencepost", "SCOPES.md")
 DEFAULT_APP_LOG_PATH = os.path.join(ROOT, "HAND", "arcade-app-check-log.jsonl")
+DEFAULT_TOOLSET_LOG_PATH = gateway_toolset_check.LOG
 
 _SECTION_HEADER = re.compile(r"^## Every connected app, accounted for\s*$", re.MULTILINE)
 _NEXT_HEADER = text_patterns.NEXT_MARKDOWN_HEADER
 _TABLE_ROW_APP_ID = re.compile(r"^\|\s*`([^`]+)`", re.MULTILINE)
+_TABLE_ROW_STATUS = re.compile(r"^\|\s*`([^`]+)`\s*\|\s*([^|\n]+?)\s*\|\s*$", re.MULTILINE)
+
+# The one status phrasing that must never appear next to arcade-google while
+# zero Gmail/Calendar tools are actually live on the gateway -- the exact
+# stale claim task 541 found and named but didn't fix (not its remit).
+_IN_USE_CLAIM = "in use by fencepost"
+
+
+def _section(scopes_text: str) -> str:
+    """The `## Every connected app, accounted for` section's body text, or
+    "" if the section itself is missing."""
+    header_match = _SECTION_HEADER.search(scopes_text)
+    if header_match is None:
+        return ""
+    start = header_match.end()
+    next_match = _NEXT_HEADER.search(scopes_text, pos=start)
+    end = next_match.start() if next_match else len(scopes_text)
+    return scopes_text[start:end]
 
 
 def _accounted_for_app_ids(scopes_text: str) -> set:
@@ -47,14 +67,16 @@ def _accounted_for_app_ids(scopes_text: str) -> set:
     never a hardcoded list of expected ids. Returns an empty set if the
     section itself is missing (a real gap, not silently treated as
     vacuously accounted-for)."""
-    header_match = _SECTION_HEADER.search(scopes_text)
-    if header_match is None:
-        return set()
-    start = header_match.end()
-    next_match = _NEXT_HEADER.search(scopes_text, pos=start)
-    end = next_match.start() if next_match else len(scopes_text)
-    section = scopes_text[start:end]
-    return {m.group(1) for m in _TABLE_ROW_APP_ID.finditer(section)}
+    return {m.group(1) for m in _TABLE_ROW_APP_ID.finditer(_section(scopes_text))}
+
+
+def _row_status(scopes_text: str, app_id: str) -> str | None:
+    """The status text of the named app_id's row in the accounted-for
+    section, or None if that row doesn't exist."""
+    for m in _TABLE_ROW_STATUS.finditer(_section(scopes_text)):
+        if m.group(1) == app_id:
+            return m.group(2)
+    return None
 
 
 def _last_connected_app_ids(app_log_path: str) -> list:
@@ -72,30 +94,60 @@ def _last_connected_app_ids(app_log_path: str) -> list:
     return state.get("connected_app_ids", [])
 
 
+def _google_row_is_stale(scopes_text: str, toolset_log_path: str) -> bool:
+    """True when `arcade-google`'s row claims "in use by Fencepost" while
+    the last recorded live gateway-toolset check (task 464) shows zero
+    Gmail/Calendar-capable tools actually exposed. A malformed toolset log
+    tip is treated as "cannot confirm staleness" (False), the same
+    cannot-confirm-past-a-corrupted-tip stance `_last_connected_app_ids`
+    takes on its own log; no toolset check ever recorded is likewise not
+    an error here -- silence is not a lie, only a claim would be."""
+    try:
+        toolset_state = gateway_toolset_check.last_toolset_state(toolset_log_path)
+    except gateway_toolset_check.GatewayToolsetCheckTamperedError:
+        return False
+    if toolset_state is None or toolset_state.get("has_gmail_calendar_tools"):
+        return False
+    status = _row_status(scopes_text, "arcade-google")
+    return status is not None and _IN_USE_CLAIM in status.lower()
+
+
 def check_scopes_completeness(
     scopes_path: str = DEFAULT_SCOPES_PATH,
     app_log_path: str = DEFAULT_APP_LOG_PATH,
+    toolset_log_path: str = DEFAULT_TOOLSET_LOG_PATH,
 ) -> dict:
     """Cross-check every currently-connected real app_id against
     `fencepost/SCOPES.md`'s own `## Every connected app, accounted for`
     section. Returns `clean: True` with the accounted-for set when every
-    connected app_id is named; otherwise `clean: False` and the specific
-    missing ids -- never a pass/fail without saying which app is
-    undocumented."""
+    connected app_id is named AND no row's status text outruns what's
+    actually live (task 542: the table naming an app_id was never the
+    whole claim -- what it says about that app_id can go stale too);
+    otherwise `clean: False`, the specific missing ids, and whether the
+    `arcade-google` row's own claim is stale -- never a pass/fail without
+    saying which specific thing is wrong."""
     with open(scopes_path, encoding="utf-8") as f:
         scopes_text = f.read()
     accounted = _accounted_for_app_ids(scopes_text)
     connected = _last_connected_app_ids(app_log_path)
     missing = sorted(set(connected) - accounted)
+    stale_google_claim = _google_row_is_stale(scopes_text, toolset_log_path)
     return {
-        "clean": not missing,
+        "clean": not missing and not stale_google_claim,
         "connected_app_ids": sorted(connected),
         "accounted_for_app_ids": sorted(accounted),
         "missing": missing,
+        "stale_google_claim": stale_google_claim,
     }
 
 
 def format_result(result: dict) -> str:
+    if result["stale_google_claim"]:
+        return (
+            "scopes completeness: BROKEN -- stale arcade-google claim: row says "
+            "\"in use by Fencepost\" but the last recorded gateway-toolset check "
+            "found zero Gmail/Calendar tools live"
+        )
     if not result["connected_app_ids"]:
         return "scopes completeness: clean (no apps recorded as connected)"
     if result["clean"]:
