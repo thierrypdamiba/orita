@@ -168,16 +168,17 @@ class FixtureFreshnessCase(unittest.TestCase):
 
 
 class RealMetricsFreshnessCase(unittest.TestCase):
-    """The real point: as of this task, records/metrics.jsonl's most recent
-    reading is 2026-08-03 -- the 2026-08-04 18:00 UTC daily aggregate was
-    silently skipped, so today (2026-08-05) the real live file is genuinely
-    stale, not a fixture standing in for it. Locks that this really is what
-    compute_metrics_freshness reports against the live checkout right now."""
+    """The real point: task 556's own daily-aggregate reading landed a real
+    2026-08-05 entry in records/metrics.jsonl this hour, closing the
+    staleness this same class asserted that morning (2026-08-04's 18:00
+    UTC aggregate having been silently skipped). Locks that this really is
+    what compute_metrics_freshness reports against the live checkout now --
+    current, not stale, evaluated later the same day the entry landed."""
 
-    def test_real_metrics_file_is_stale_as_of_2026_08_05(self):
-        now = datetime(2026, 8, 5, 9, 30, tzinfo=timezone.utc)
+    def test_real_metrics_file_is_current_as_of_2026_08_05(self):
+        now = datetime(2026, 8, 5, 19, 30, tzinfo=timezone.utc)
         result = mcc.compute_metrics_freshness(now, metrics_path=os.path.join(ROOT, "records", "metrics.jsonl"))
-        self.assertEqual(result["status"], "stale")
+        self.assertEqual(result["status"], "current")
 
 
 class RealMetricsCase(unittest.TestCase):

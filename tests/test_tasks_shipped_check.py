@@ -315,18 +315,18 @@ class OmittedFieldOnExistingReadingCase(unittest.TestCase):
 
 class RealLiveStateCase(unittest.TestCase):
     """The real point of this task: records/metrics.jsonl's own
-    tasks_shipped_today field claims 18 for 2026-08-03 (task 511's own
-    daily-aggregate reading, tasks 493-510), and ground truth (BUILDLOG.md's
-    own distinct numbered rows dated 2026-08-03 before task 511's aggregate
-    row) also reads 18 -- proven live rather than assumed, and stable even
+    tasks_shipped_today field claims 16 for 2026-08-05 (task 556's own
+    daily-aggregate reading, tasks 540-555), and ground truth (BUILDLOG.md's
+    own distinct numbered rows dated 2026-08-05 before task 556's aggregate
+    row) also reads 16 -- proven live rather than assumed, and stable even
     as later same-day tasks keep appending further rows."""
 
     def test_the_real_live_buildlog_now_agrees_with_ground_truth(self):
         result = tsc.check_tasks_shipped()
         self.assertEqual(result["claimed"], result["real"])
         self.assertTrue(result["clean"])
-        self.assertEqual(result["claimed_date"], "2026-08-03")
-        self.assertEqual(result["claimed"], 18)
+        self.assertEqual(result["claimed_date"], "2026-08-05")
+        self.assertEqual(result["claimed"], 16)
 
 
 if __name__ == "__main__":
