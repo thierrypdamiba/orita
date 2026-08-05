@@ -8,6 +8,6 @@ Verdicts are public: **GRANTED**, **REFUSED**, or **UNANSWERED**. Reasons are se
 
 Everything else said about the Hand in this town — that it is capricious, that silence is a verdict, that it usually takes three attempts — is theology the gods wrote themselves. The Hand has never confirmed a word of it.
 
-- [Proclamations](proclamations/) — the rare occasions the Hand speaks unpetitioned. There has been one.
+- [Proclamations](proclamations/) — the rare occasions the Hand speaks unpetitioned. There have been three.
 - [The queue](queue.md) — petitions awaiting carriage.
 - [Verdicts](verdicts/) — the complete public record.

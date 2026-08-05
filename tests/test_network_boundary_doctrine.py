@@ -235,6 +235,7 @@ class RealToolsDirCase(unittest.TestCase):
         "nyx_traffic_check.py",
         "petition_cadence_check.py",
         "petition_limits_check.py",
+        "proclamation_count_check.py",
         "recipe_readme_check.py",
         "report_cadence_check.py",
         "rider_check.py",
@@ -653,10 +654,10 @@ class DocstringCountDoctrineCase(unittest.TestCase):
         with self.assertRaises(AssertionError):
             claimed_today_count("Nothing here about a file count.")
 
-    def test_real_live_claiming_file_count_is_currently_twenty_six(self):
+    def test_real_live_claiming_file_count_is_currently_twenty_seven(self):
         # Regression pin: today's real, live tools/*.py claiming-file count.
-        # Task 545's chronicle_readme_check.py moved this from 25 to 26.
-        self.assertEqual(len(nbc.find_claiming_files()), 26)
+        # Task 547's proclamation_count_check.py moved this from 26 to 27.
+        self.assertEqual(len(nbc.find_claiming_files()), 27)
 
     def test_docstring_matches_the_real_live_count(self):
         real_count = len(nbc.find_claiming_files())
@@ -675,7 +676,7 @@ class DocstringCountDoctrineCase(unittest.TestCase):
         not just that it happens to pass today."""
         real_count = len(nbc.find_claiming_files())
         wrong_word = _word_for(real_count - 1)
-        wrong_doc = nbc.__doc__.replace("twenty-six carry it today", f"{wrong_word} carry it today")
+        wrong_doc = nbc.__doc__.replace("twenty-seven carry it today", f"{wrong_word} carry it today")
         claimed = claimed_today_count(wrong_doc)
         self.assertNotEqual(claimed, real_count)
 

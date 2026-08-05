@@ -3687,6 +3687,61 @@ class ChronicleReadmeFoldCase(unittest.TestCase):
         self.assertTrue(direct["clean"])
 
 
+class ProclamationCountFoldCase(unittest.TestCase):
+    """Task 547: run_ritual_check() folds proclamation_count_check.py's
+    cross-check of HAND/README.md's "There has/have been <word>."
+    sentence against the live HAND/proclamations/ tree into the same
+    structured result -- clean by default against a fixture where the
+    README and the directory agree, and a synthetic stale claim both
+    flips `broken` and surfaces in the printed block, the same class
+    chronicle_readme/recipe_readme already hold."""
+
+    def setUp(self):
+        self.dir = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.dir, ignore_errors=True)
+
+    def _write_proclamation(self, num, slug):
+        path = os.path.join(self.dir, f"{num:04d}-{slug}.md")
+        with open(path, "w") as f:
+            f.write(f"# Proclamation {num}: {slug}\n")
+
+    def _write_readme(self, sentence):
+        path = os.path.join(self.dir, "README.md")
+        with open(path, "w") as f:
+            f.write(f"# The Hand\n\nSome prose. {sentence}\n")
+        return path
+
+    def test_clean_fixture_is_not_broken(self):
+        self._write_proclamation(1, "first")
+        readme_path = self._write_readme("There has been one.")
+        result = rc.run_ritual_check(proclamation_count_readme_path=readme_path, proclamation_count_proclamations_dir=self.dir)
+        self.assertTrue(result["proclamation_count"]["clean"])
+        self.assertFalse(result["broken"])
+        self.assertIn("proclamation count: clean", rc.format_ritual_check(result))
+
+    def test_stale_claim_flips_broken_and_prints(self):
+        self._write_proclamation(1, "first")
+        self._write_proclamation(2, "second")
+        readme_path = self._write_readme("There has been one.")
+        result = rc.run_ritual_check(proclamation_count_readme_path=readme_path, proclamation_count_proclamations_dir=self.dir)
+        self.assertFalse(result["proclamation_count"]["clean"])
+        self.assertTrue(result["broken"])
+        formatted = rc.format_ritual_check(result)
+        self.assertIn("proclamation count: BROKEN", formatted)
+
+    def test_default_reads_the_real_tree_and_matches_direct_call(self):
+        """No override: reads the real HAND/README.md and HAND/proclamations/
+        tree, the same default check_proclamation_count falls back to --
+        proves the fold never duplicates or diverges from the module it
+        wraps, and that the real tree (task 547's own fix) is clean."""
+        pcc = _load("_test_proclamation_count_check", os.path.join(ROOT, "tools", "proclamation_count_check.py"))
+        direct = pcc.check_proclamation_count()
+        result = rc.run_ritual_check()
+        self.assertEqual(result["proclamation_count"]["real_count"], direct["real_count"])
+        self.assertEqual(result["proclamation_count"]["clean"], direct["clean"])
+        self.assertTrue(direct["clean"])
+
+
 class RecipeReadmeFoldCase(unittest.TestCase):
     """Task 426: run_ritual_check() folds recipe_readme_check.py's own
     two-way cross-check of fencepost/README.md's Community recipes

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Task 121. Off-By-One counts the tool that counts everything else.
 
-`tools/ritual_check.py` hand-wires 59 `check_*` functions into one hourly
+`tools/ritual_check.py` hand-wires 60 `check_*` functions into one hourly
 block: each is called inside `run_ritual_check`, its result assigned to a
 dict key, and that key printed as a line in `format_ritual_check`. Three
 separate places a single typo or a forgotten wire-up can silently drop a
@@ -262,6 +262,15 @@ whole time, structurally invisible to a forward-only scan. Fixed in the
 same commit. Found by Nyx, inside the 00:00-06:00 UTC window that is
 hers and the child's alone -- a cross-cutting correctness gap, open to
 any god per the charter, not Kwaku-Ananse's own remit this time.
+
+**Updated to 60** the same hour task 547's `check_proclamation_count`
+was wired in -- an Explore agent hunting the same class of gap found
+`HAND/README.md`'s own "There has been one." naming the Hand's
+unpetitioned proclamations, stale since only the first
+(`0001-the-seal.md`) existed; two more (`0002-eyes-and-a-brush.md`,
+`0003-the-gauntlet.md`) had since landed with nothing ever re-reading
+the sentence against the directory it describes. Fixed by Kothar-wa-
+Khasis in the same commit.
 
 Usage:
     python3 tools/ritual_completeness_check.py check
