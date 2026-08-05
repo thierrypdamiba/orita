@@ -59,6 +59,7 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import scan_files  # noqa: E402
 import text_patterns  # noqa: E402
+import violation_format  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DEFAULT_ORITA_DIR = ROOT
@@ -220,12 +221,13 @@ find_violations, clear_cache = scan_files.path_memoize(_find_violations_uncached
 
 
 def format_violations(violations: list) -> str:
-    if not violations:
-        return "hand lore check: clean -- no theology confirm/deny found in any public file"
-    lines = [f"hand lore check: {len(violations)} VIOLATION(S) FOUND -- Iron Rule #2 is broken"]
-    for v in violations:
-        lines.append(f"  {v['file']}:{v['line']} [{v['shape']}] :: {v['snippet']!r}")
-    return "\n".join(lines)
+    return violation_format.format_violations(
+        "hand lore check",
+        violations,
+        "shape",
+        "no theology confirm/deny found in any public file",
+        "Iron Rule #2 is broken",
+    )
 
 
 if __name__ == "__main__":

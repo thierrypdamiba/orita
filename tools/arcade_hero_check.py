@@ -42,6 +42,7 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import scan_files  # noqa: E402
 import text_patterns  # noqa: E402
+import violation_format  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DEFAULT_ORITA_DIR = ROOT
@@ -198,19 +199,14 @@ find_violations, clear_cache = scan_files.path_memoize(_find_violations_uncached
 
 
 def format_violations(violations: list) -> str:
-    if not violations:
-        return (
-            "arcade hero check: clean -- no direct-credential-handoff ask found in "
-            "any public file (constraint #4 holds, Arcade's per-user OAuth is the "
-            "only door)"
-        )
-    lines = [
-        f"arcade hero check: {len(violations)} VIOLATION(S) FOUND -- ROADMAP.md "
-        "constraint #4 broken"
-    ]
-    for v in violations:
-        lines.append(f"  {v['file']}:{v['line']} [{v['pattern']}] :: {v['snippet']!r}")
-    return "\n".join(lines)
+    return violation_format.format_violations(
+        "arcade hero check",
+        violations,
+        "pattern",
+        "no direct-credential-handoff ask found in any public file "
+        "(constraint #4 holds, Arcade's per-user OAuth is the only door)",
+        "ROADMAP.md constraint #4 broken",
+    )
 
 
 if __name__ == "__main__":

@@ -56,6 +56,7 @@ import unicodedata
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import text_patterns  # noqa: E402
+import violation_format  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DEFAULT_ORITA_DIR = ROOT
@@ -251,12 +252,13 @@ def _record(path: str, text: str, m: "re.Match", label: str) -> dict:
 
 
 def format_violations(violations: list) -> str:
-    if not violations:
-        return "petition limits check: clean -- no petition asks for a star, mentions the counter, or reaches into another god's house/Vault"
-    lines = [f"petition limits check: {len(violations)} VIOLATION(S) FOUND -- CHARTER.md Appendix D LIMITS broken"]
-    for v in violations:
-        lines.append(f"  {v['file']}:{v['line']} [{v['pattern']}] :: {v['snippet']!r}")
-    return "\n".join(lines)
+    return violation_format.format_violations(
+        "petition limits check",
+        violations,
+        "pattern",
+        "no petition asks for a star, mentions the counter, or reaches into another god's house/Vault",
+        "CHARTER.md Appendix D LIMITS broken",
+    )
 
 
 if __name__ == "__main__":

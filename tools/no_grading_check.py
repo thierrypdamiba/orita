@@ -46,6 +46,7 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import scan_files  # noqa: E402
 import text_patterns  # noqa: E402
+import violation_format  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DEFAULT_ORITA_DIR = ROOT
@@ -199,12 +200,13 @@ find_violations, clear_cache = scan_files.path_memoize(_find_violations_uncached
 
 
 def format_violations(violations: list) -> str:
-    if not violations:
-        return "no grading check: clean -- no blame/grading language found in any public file or recipe"
-    lines = [f"no grading check: {len(violations)} VIOLATION(S) FOUND -- ROADMAP.md constraint #2 broken"]
-    for v in violations:
-        lines.append(f"  {v['file']}:{v['line']} [{v['pattern']}] :: {v['snippet']!r}")
-    return "\n".join(lines)
+    return violation_format.format_violations(
+        "no grading check",
+        violations,
+        "pattern",
+        "no blame/grading language found in any public file or recipe",
+        "ROADMAP.md constraint #2 broken",
+    )
 
 
 if __name__ == "__main__":
