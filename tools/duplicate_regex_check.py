@@ -54,14 +54,22 @@ it bites, the same preventive shape task 418's own docstring opened with
 ("this checker never scanned the very directory it lives in"), not
 because it caught a sixth live instance this hour.
 
-One pair is a deliberate, already-documented exception, not a bug:
-`_CLOSES_RE` in `issue-closed-pr-still-open` and `merged-pr-issue-still-
-open` is textually identical between those two files on purpose --
-`tools/closing_keyword_guard.py`'s own docstring already names this pair
-explicitly as a real, working, narrower grammar that intentionally stays
+One pair used to be a deliberate, already-documented exception, not a
+bug: `_CLOSES_RE` in `issue-closed-pr-still-open` and `merged-pr-issue-
+still-open` was textually identical between those two files on purpose --
+`tools/closing_keyword_guard.py`'s own docstring named this pair
+explicitly as a real, working, narrower grammar that intentionally stayed
 a two-copy law (task 394's own closing note ruled it out the same way).
-It is seeded below as `_ALLOWED_DUPLICATES` so this check does not cry
-wolf on a duplicate the town already decided, in writing, to keep.
+ROADMAP.md #543 came back to it: the narrower grammar was shown to miss
+real past-tense closing promises GitHub itself honors (task 184's own
+live incident already proved that), so both files now import
+`seam_engine.closing_keywords.CLOSING_KEYWORD_RE` instead of carrying
+their own local copy. The seeded exception is trimmed below with it --
+`test_seeded_exception_still_describes_a_real_duplicate`
+(`tests/test_duplicate_regex_check.py`) is exactly the doctrine test that
+would catch a seed left in place after the duplicate it names stops being
+real, and it did: it failed red against the live tree the moment this
+task's own migration landed, before this trim.
 `tools/text_patterns.py` needs no such exception: every file that now
 uses one of its constants (e.g. `text_patterns.SENTENCE_BOUNDARY_LOOSE`)
 references it by attribute lookup, never calls `re.compile(...)` again
@@ -100,10 +108,6 @@ _SKIP_BASENAMES = {"__init__.py"}
 # nothing if their patterns differ, and two files disagreeing on a name
 # means nothing if their patterns (the live behavior) are identical.
 _ALLOWED_DUPLICATES: dict[str, frozenset[str]] = {
-    r"\b(?:closes?|fix(?:es)?|resolves?)\s+#(\d+)\b": frozenset({
-        os.path.join("fencepost", "RECIPES", "issue-closed-pr-still-open", "detector.py"),
-        os.path.join("fencepost", "RECIPES", "merged-pr-issue-still-open", "detector.py"),
-    }),
     # Task 418: widening the scan to tools/*.py surfaced this pair for the
     # first time. seam_engine.closing_keywords's own docstring already
     # rules deliberately does NOT import tools/closing_keyword_guard.py --

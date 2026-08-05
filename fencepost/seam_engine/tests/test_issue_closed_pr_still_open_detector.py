@@ -72,6 +72,19 @@ class TestNamedIssueNumbers:
         # extractor carried the identical gap, fixed in the same task.
         assert detector._named_issue_numbers("Closes #5 and also fixes #5") == [5]
 
+    def test_past_tense_closed_is_matched(self):
+        # ROADMAP.md #543: this recipe's own `_CLOSES_RE` used to mirror
+        # `merged-pr-issue-still-open`'s narrower, present-tense-only
+        # grammar -- "closed #42" never matched at all. Reproduced live
+        # against the pre-fix code before writing this test: the old
+        # `_CLOSES_RE` returned `[]` on this exact string. Now imports
+        # `seam_engine.closing_keywords.CLOSING_KEYWORD_RE`, which task
+        # 184's own live incident already proved matches past tense.
+        assert detector._named_issue_numbers("This PR closed #42.") == [42]
+
+    def test_past_tense_fixed_and_resolved_are_matched(self):
+        assert detector._named_issue_numbers("Fixed #1, resolved #2.") == [1, 2]
+
 
 class TestComputeGaps:
     def test_a_stale_closed_issue_is_surfaced_at_high_confidence(self):
@@ -164,6 +177,23 @@ class TestComputeGaps:
 
         assert surfaced == []
         assert excluded[0].slug == "nonexistent-target-100-999"
+
+    def test_a_past_tense_only_promise_is_still_surfaced_as_a_gap(self):
+        # ROADMAP.md #543: the real end-to-end case the past-tense fix
+        # protects -- a PR whose body ONLY ever phrases its reference in
+        # past tense ("This closed #42, before the fix regressed") used to
+        # fall all the way through to `no-closing-keyword-100` (excluded,
+        # "no seam here") because the old `_CLOSES_RE` never matched it at
+        # all. Reproduced live against the pre-fix code before writing this
+        # test.
+        pr = _pull("This closed #42, before the fix regressed.")
+        issues = [_issue(42, "closed", closed_at=datetime(2026, 7, 19, 0, 0, 0, tzinfo=timezone.utc))]
+
+        surfaced, excluded = detector.compute_gaps([pr], issues, now=_NOW)
+
+        assert excluded == []
+        assert len(surfaced) == 1
+        assert surfaced[0].slug == "issue-closed-pr-still-open-100-42"
 
 
 class TestNonexistentIssueIsNotMislabeledStillOpen:

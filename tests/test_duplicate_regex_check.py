@@ -104,29 +104,19 @@ class FixtureViolationCase(unittest.TestCase):
         violations = drc.find_violations(orita_dir=self.orita)
         self.assertEqual(violations, [])
 
-    def test_seeded_exception_pair_is_not_flagged(self):
-        pattern = r"\b(?:closes?|fix(?:es)?|resolves?)\s+#(\d+)\b"
-        allowed = drc._ALLOWED_DUPLICATES[pattern]
-        for rel in allowed:
-            _write(os.path.join(self.orita, rel), f'import re\n_CLOSES_RE = re.compile(r"{pattern}", re.IGNORECASE)\n')
-        violations = drc.find_violations(orita_dir=self.orita)
-        self.assertEqual(violations, [])
-
-    def test_exception_pair_widened_to_a_third_file_is_still_flagged(self):
-        # Task 397: the exception is seeded to an EXACT file set. A third
-        # file independently defining the same "allowed" pattern is a new
-        # fact the town never actually decided to allow -- must still bite.
-        pattern = r"\b(?:closes?|fix(?:es)?|resolves?)\s+#(\d+)\b"
-        allowed = drc._ALLOWED_DUPLICATES[pattern]
-        for rel in allowed:
-            _write(os.path.join(self.orita, rel), f'import re\n_CLOSES_RE = re.compile(r"{pattern}", re.IGNORECASE)\n')
-        _write(
-            os.path.join(self.orita, "fencepost", "RECIPES", "recipe-c", "detector.py"),
-            f'import re\n_CLOSES_RE = re.compile(r"{pattern}", re.IGNORECASE)\n',
-        )
-        violations = drc.find_violations(orita_dir=self.orita)
-        self.assertEqual(len(violations), 1)
-        self.assertEqual(violations[0]["pattern"], pattern)
+    # ROADMAP.md #543 trimmed the `_CLOSES_RE` seed from `_ALLOWED_
+    # DUPLICATES`: that pair no longer exists in the live tree (both
+    # `issue-closed-pr-still-open` and `merged-pr-issue-still-open` now
+    # import the shared `seam_engine.closing_keywords.CLOSING_KEYWORD_RE`
+    # grammar instead of carrying their own narrower local copy). The two
+    # tests that used to exercise the seeded-exception mechanism against
+    # that pattern (`test_seeded_exception_pair_is_not_flagged`,
+    # `test_exception_pair_widened_to_a_third_file_is_still_flagged`) are
+    # removed rather than repointed at the one remaining seed --
+    # `test_seeded_closing_keyword_guard_mirror_is_not_flagged` and
+    # `test_closing_keyword_guard_exception_widened_to_a_third_file_is_
+    # still_flagged` below already prove the identical mechanism against
+    # that surviving pattern; repointing would have only duplicated them.
 
     def test_non_literal_pattern_is_ignored(self):
         _write(

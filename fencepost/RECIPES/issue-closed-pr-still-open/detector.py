@@ -30,27 +30,32 @@ when no such issue was ever found. Split here, the same way task 429 split
 the identical conflation in `merged-pr-issue-still-open/detector.py`: a
 dangling reference (the number was never real) and a genuinely-still-open
 issue are different facts about the world.
+
+ROADMAP.md #543: this file's own `_CLOSES_RE` used to mirror
+`merged-pr-issue-still-open`'s own narrower, present-tense-only copy
+(`closes?|fix(?:es)?|resolves?`) of GitHub's closing-keyword grammar --
+same gap, same fix, applied here too: an open PR's body naming a past-tense
+promise ("This PR closed #42") was invisible to `_named_issue_numbers`,
+so a real "named issue already closed some other way, PR still open" gap
+could sit unsurfaced. `seam_engine.closing_keywords.CLOSING_KEYWORD_RE`
+(task 394) already proved GitHub's real grammar accepts past tense
+(task 184's own live incident); this recipe now imports it instead of
+retyping the narrower copy, the same fix task 543 made to its sibling.
 """
 from __future__ import annotations
 
 import json
-import re
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from seam_engine.closing_keywords import CLOSING_KEYWORD_RE
 from seam_engine.scan import GapCandidate
 
 _HERE = Path(__file__).resolve().parent
 DEFAULT_PULLS_FIXTURE = _HERE.parents[1] / "fixtures" / "issue_closed_pr_still_open" / "pulls.json"
 DEFAULT_ISSUES_FIXTURE = _HERE.parents[1] / "fixtures" / "issue_closed_pr_still_open" / "issues.json"
-
-# GitHub's own closing-keyword vocabulary (a subset; the real full list also
-# includes "close"/"closed"/"fix"/"fixed"/"resolve"/"resolved" -- these three
-# base forms cover every fixture case here, mirroring
-# `merged-pr-issue-still-open`'s own declared subset exactly).
-_CLOSES_RE = re.compile(r"\b(?:closes?|fix(?:es)?|resolves?)\s+#(\d+)\b", re.IGNORECASE)
 
 # An issue closed under this age may not have been noticed yet by whoever
 # has the open PR -- not yet a gap.
@@ -119,7 +124,7 @@ def _named_issue_numbers(body: str) -> list[int]:
     also fixes #5") must not produce two identically-scored `GapCandidate`s
     for `rank()` to tie against itself (ROADMAP.md #444)."""
     seen: list[int] = []
-    for n in _CLOSES_RE.findall(body):
+    for n in CLOSING_KEYWORD_RE.findall(body):
         num = int(n)
         if num not in seen:
             seen.append(num)

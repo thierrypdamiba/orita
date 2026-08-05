@@ -69,6 +69,21 @@ class TestClosedIssueNumbers:
         # own hand-rolled extractor did not.
         assert detector._closed_issue_numbers("Closes #5 and also fixes #5") == [5]
 
+    def test_past_tense_closed_is_matched(self):
+        # ROADMAP.md #543: this recipe's own `_CLOSES_RE` used to be a
+        # private, present-tense-only copy of GitHub's closing-keyword
+        # grammar (`closes?|fix(?:es)?|resolves?`) -- "closed #42" (a real,
+        # common way to phrase a merged PR's own promise) never matched at
+        # all. Reproduced live against the pre-fix code before writing this
+        # test: the old `_CLOSES_RE` returned `[]` on this exact string.
+        # Now imports `seam_engine.closing_keywords.CLOSING_KEYWORD_RE`,
+        # which task 184's own live incident already proved matches past
+        # tense.
+        assert detector._closed_issue_numbers("This PR closed #42.") == [42]
+
+    def test_past_tense_fixed_and_resolved_are_matched(self):
+        assert detector._closed_issue_numbers("Fixed #1, resolved #2.") == [1, 2]
+
 
 class TestComputeGapsMultiIssuePr:
     def test_a_pr_naming_two_closing_keywords_still_flags_the_one_left_open(self):
@@ -126,6 +141,22 @@ class TestComputeGapsMultiIssuePr:
         ranking = rank(surfaced)
         assert ranking.primary is not None
         assert ranking.primary.slug == "merged-pr-issue-still-open-100-5"
+
+    def test_a_past_tense_only_promise_is_still_surfaced_as_a_gap(self):
+        # ROADMAP.md #543: the real end-to-end case the past-tense fix
+        # protects -- a PR whose body ONLY ever phrases its promise in past
+        # tense ("This closed #42") used to fall all the way through to
+        # `no-closing-keyword-100` (excluded, "no seam here") because the
+        # old `_CLOSES_RE` never matched it at all. Reproduced live against
+        # the pre-fix code before writing this test.
+        pr = _pull("This closed #42, once the retry logic landed.", merged_at=datetime(2026, 7, 15, 0, 0, 0, tzinfo=timezone.utc))
+        issues = [_issue(42, "open")]
+
+        surfaced, excluded = detector.compute_gaps([pr], issues, now=_NOW)
+
+        assert excluded == []
+        assert len(surfaced) == 1
+        assert surfaced[0].slug == "merged-pr-issue-still-open-100-42"
 
 
 class TestNonexistentIssueIsNotMislabeledClosed:

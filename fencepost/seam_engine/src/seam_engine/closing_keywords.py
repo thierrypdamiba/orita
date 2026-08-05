@@ -18,22 +18,31 @@ those three sweeps touched, by grepping every `_RE = re.compile`/
 `RE = re.compile` line across all nineteen recipes rather than trusting any
 one recipe's own comment about itself.
 
-Ruled out one lookalike while doing that sweep: `_CLOSES_RE` in
-`issue-closed-pr-still-open` and `merged-pr-issue-still-open` is textually
-identical between those two files, but it is a deliberately DIFFERENT,
-narrower grammar (`closes?|fixes?|resolves?`, present tense only) --
-`tools/closing_keyword_guard.py`'s own module docstring already says so
-explicitly, by name, as an intentional design choice, not an accident. That
-pair is a real working two-copy law already cross-referenced in prose; it
-is not this bug and this task leaves it untouched.
+Ruled out one lookalike while doing that sweep, but NOT ruled out for
+good: `_CLOSES_RE` in `issue-closed-pr-still-open` and
+`merged-pr-issue-still-open` was textually identical between those two
+files, and was a deliberately DIFFERENT, narrower grammar
+(`closes?|fixes?|resolves?`, present tense only) at the time this module
+was first written -- `tools/closing_keyword_guard.py`'s own module
+docstring already said so explicitly, by name, and this task's own commit
+left that pair alone as "a real working two-copy law already
+cross-referenced in prose," not this bug. ROADMAP.md #543 came back to it:
+"declares exactly what it actually matches, not the full spec it doesn't
+yet implement" (both recipes' own comments, verbatim) was an honest
+admission of an incomplete grammar, not a closed design decision -- and
+`commit-closes-keyword-issue-still-open` had already proven, live, on this
+repo's own history (task 184), that GitHub's real grammar fires on past
+tense exactly as readily as present tense, the exact form this pair could
+never see. Both now import `CLOSING_KEYWORD_RE` from here too, closing the
+false-negative rather than leaving it as a documented gap.
 
-This module is now the one real source for the three recipes above. Each
+This module is now the one real source for all five recipes above. Each
 imports `CLOSING_KEYWORD_RE`/`closing_keyword_numbers` from here and binds
 them to its own existing module-level name (`CLOSING_KEYWORD_RE` or
 `CLAIM_RE`), so none of their `recipe.json`s, fixtures, or existing tests
-have to change shape. A fourth recipe that ever needs the same
+have to change shape. A sixth recipe that ever needs the same
 closing-keyword grammar reuses this module too, rather than writing a
-fourth copy.
+sixth copy.
 
 Deliberately does NOT import `tools/closing_keyword_guard.py` (the real
 canonical, safety-critical source of this grammar, guarding Iron Rule #8

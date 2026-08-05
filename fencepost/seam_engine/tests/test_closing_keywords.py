@@ -14,10 +14,11 @@ from drifting apart" shape task 389 found and fixed for `#N` extraction
 fixed a third time for the "ships/includes/merges/via #N" claim phrase
 (`pr_claims.py`), found here a fourth time (task 394) and fixed the same
 way. This module is now the one real source; these tests check its own
-behavior directly, and `TestAllThreeDetectorsShareTheLaw` below is the
-regression test that would go red the moment any of the three recipes'
-detectors goes back to defining its own local copy instead of importing
-this one.
+behavior directly, and `TestAllFiveDetectorsShareTheLaw` below is the
+regression test that would go red the moment any of the (now five, since
+task 543 migrated `merged-pr-issue-still-open` and
+`issue-closed-pr-still-open` too) recipes' detectors goes back to defining
+its own local copy instead of importing this one.
 """
 from __future__ import annotations
 
@@ -122,8 +123,8 @@ class TestClosingKeywordRe:
         )
 
 
-class TestAllThreeDetectorsShareTheLaw:
-    """The regression test: all three closing-keyword-grammar recipes must
+class TestAllFiveDetectorsShareTheLaw:
+    """The regression test: all five closing-keyword-grammar recipes must
     actually IMPORT `CLOSING_KEYWORD_RE` from `seam_engine.closing_keywords`
     and must NOT also define their own local `re.compile` for it. Checked
     two ways for each detector: (1) the loaded module's own attribute still
@@ -133,12 +134,22 @@ class TestAllThreeDetectorsShareTheLaw:
     object); (2) the detector's SOURCE TEXT names the real import and
     contains no local `re.compile(` call of its own -- the actual
     regression signal, since a reverted detector would still pass (1) via
-    `re`'s cache but would fail (2) immediately."""
+    `re`'s cache but would fail (2) immediately.
+
+    ROADMAP.md #543 added the last two cases: `merged-pr-issue-still-open`
+    and `issue-closed-pr-still-open` used to carry their own deliberately
+    narrower, present-tense-only `_CLOSES_RE` (ruled a real, working,
+    intentional two-copy law when this module was first written -- see this
+    module's own docstring) -- migrated here once that narrower grammar was
+    shown to actually miss real past-tense closing promises GitHub itself
+    honors."""
 
     _CASES = [
         ("commit-closes-keyword-issue-still-open", "CLOSING_KEYWORD_RE"),
         ("issue-closed-never-released", "CLAIM_RE"),
         ("release-claims-unfixed-issue", "CLOSING_KEYWORD_RE"),
+        ("merged-pr-issue-still-open", "CLOSING_KEYWORD_RE"),
+        ("issue-closed-pr-still-open", "CLOSING_KEYWORD_RE"),
     ]
 
     def test_functional_parity(self) -> None:

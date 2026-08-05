@@ -59,27 +59,41 @@ have held that split for real ever since -- this paragraph is the only
 place left still describing task 430's fix as future work. Corrected in
 place, past tense, rather than left to mislead the next reader who trusts
 a docstring over the code and tests sitting right below it.
+
+ROADMAP.md #543: this file's own `_CLOSES_RE` used to be a private,
+present-tense-only copy (`closes?|fix(?:es)?|resolves?`) that its own
+comment admitted was "a subset... not the full spec it doesn't yet
+implement." `commit-closes-keyword-issue-still-open/detector.py` (task
+394) already proved, live, on this repo's own history (task 184: issues #1
+and #2 closed themselves on a past-tense "closed #1"/"fixes #2" push),
+that GitHub's real closing-keyword grammar fires on past tense exactly as
+readily as present tense -- and a merged PR body is exactly as free to
+write "This PR closed #42" as a commit message is. A PR that used past
+tense to promise a close was invisible to this recipe: `_closed_issue_
+numbers` never matched it, so a real "merged, promised, still open" gap
+sat unsurfaced -- the opposite failure mode from Ogun's law (a false
+negative, not a false positive), but still a real hole in the one thing
+this recipe exists to watch. `seam_engine.closing_keywords.
+CLOSING_KEYWORD_RE` (task 394) is the one real source for GitHub's full
+nine-keyword grammar; this recipe now imports it instead of retyping a
+narrower fourth copy, the same fix three siblings
+(`commit-closes-keyword-issue-still-open`, `issue-closed-never-released`,
+`release-claims-unfixed-issue`) already made.
 """
 from __future__ import annotations
 
 import json
-import re
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from seam_engine.closing_keywords import CLOSING_KEYWORD_RE
 from seam_engine.scan import GapCandidate
 
 _HERE = Path(__file__).resolve().parent
 DEFAULT_PULLS_FIXTURE = _HERE.parents[1] / "fixtures" / "merged_pr_issue_still_open" / "pulls.json"
 DEFAULT_ISSUES_FIXTURE = _HERE.parents[1] / "fixtures" / "merged_pr_issue_still_open" / "issues.json"
-
-# GitHub's own closing-keyword vocabulary (a subset; the real full list also
-# includes "close"/"closed"/"fix"/"fixed"/"resolve"/"resolved" -- these three
-# base forms cover every fixture case here, and a recipe declares exactly
-# what it actually matches, not the full spec it doesn't yet implement).
-_CLOSES_RE = re.compile(r"\b(?:closes?|fix(?:es)?|resolves?)\s+#(\d+)\b", re.IGNORECASE)
 
 # A promised close under this age may just be lagging automation, not a gap.
 _STALE_HOURS = 24.0
@@ -138,7 +152,7 @@ def _closed_issue_numbers(body: str) -> list[int]:
     also fixes #5") must not produce two identically-scored `GapCandidate`s
     for `rank()` to tie against itself (ROADMAP.md #444)."""
     seen: list[int] = []
-    for n in _CLOSES_RE.findall(body):
+    for n in CLOSING_KEYWORD_RE.findall(body):
         num = int(n)
         if num not in seen:
             seen.append(num)
