@@ -20,7 +20,6 @@ either of the other two first.
 from __future__ import annotations
 
 import datetime
-import json
 import os
 from types import ModuleType
 
@@ -86,18 +85,11 @@ def load_snapshots(path: str = DEFAULT_SNAPSHOT_PATH) -> list[dict]:
 
 
 def record_snapshot(count: int, ts: str, path: str = DEFAULT_SNAPSHOT_PATH) -> dict:
-    """Append one `{"ts", "count"}` snapshot. Append-only, mirrors
-    `star_cadence.record_snapshot` and `BUILDLOG.md`'s own discipline — no
-    function in this module rewrites a prior line."""
-    if isinstance(count, bool) or not isinstance(count, int) or count < 0:
-        raise ForkCadenceError("count must be a non-negative integer")
-    entry = {"ts": ts, "count": int(count)}
-    parent = os.path.dirname(path)
-    if parent:
-        os.makedirs(parent, exist_ok=True)
-    with open(path, "a", encoding="utf-8") as f:
-        f.write(json.dumps(entry, sort_keys=True) + "\n")
-    return entry
+    """Append one `{"ts", "count"}` snapshot. Thin wrapper around
+    `time_utils.record_snapshot` (task 559) — keeps this module's own
+    default path and `ForkCadenceError`, delegates the actual
+    validate-and-write to the one shared implementation."""
+    return time_utils.record_snapshot(count, ts, path, error_cls=ForkCadenceError)
 
 
 _parse_ts = time_utils.parse_ts

@@ -37,6 +37,28 @@ actually calls through to this shared function (not a reinlined copy),
 by patching this module's `load_snapshots` and observing every sibling
 call it.
 
+`record_snapshot`: task 559's own re-run of the identical AST-hash sweep,
+carried one directory over from `tools/*.py` (where it had already run
+dry six times running — tasks 546/548/551/552/555/558) into
+`oracle_engine/*_cadence.py` for the first time, found this package's own
+FOURTH byte-identical function, still standing after `_parse_ts` and
+`load_snapshots` were both pulled out: append one `{"ts", "count"}`
+snapshot line, refusing a bool/non-int/negative count. Every one of the
+25 siblings carried its own copy, differing only in which module-specific
+`*CadenceError` subclass it raised on bad input and a few words of
+docstring — the write logic itself (`json.dumps(..., sort_keys=True)`,
+`os.makedirs(parent, exist_ok=True)`, append-only) was byte-identical
+across all 25. Same shape as `load_snapshots` above and for the same
+reason: not a bare name rebinding, since each sibling's own
+`record_snapshot(count, ts, path=DEFAULT_SNAPSHOT_PATH)` default and
+error class both differ. Each sibling keeps a thin wrapper with its own
+default and its own `error_cls`, delegating the actual validate-and-write
+to `record_snapshot` below — `tests/test_time_utils.py`'s
+`RecordSnapshotDelegatesCase` proves every wrapper genuinely calls
+through (by patching this module's `record_snapshot` and observing every
+sibling call it) and that the right error class still surfaces on bad
+input.
+
 Usage: not run directly; imported by oracle_engine's cadence modules.
 """
 from __future__ import annotations
@@ -88,3 +110,23 @@ def load_snapshots(path: str) -> list[dict]:
                 continue
             out.append(value)
     return out
+
+
+def record_snapshot(
+    count: int, ts: str, path: str, error_cls: type[Exception] = ValueError
+) -> dict:
+    """Append one `{"ts", "count"}` snapshot. Append-only — no caller
+    rewrites a prior line. `count` must be a non-negative, non-bool int;
+    on a bad value this raises `error_cls` (each cadence sibling passes
+    its own `*CadenceError` subclass here, so a caller sees the same
+    exception type it always has, not a generic one from a shared
+    module it may not import)."""
+    if isinstance(count, bool) or not isinstance(count, int) or count < 0:
+        raise error_cls("count must be a non-negative integer")
+    entry = {"ts": ts, "count": int(count)}
+    parent = os.path.dirname(path)
+    if parent:
+        os.makedirs(parent, exist_ok=True)
+    with open(path, "a", encoding="utf-8") as f:
+        f.write(json.dumps(entry, sort_keys=True) + "\n")
+    return entry

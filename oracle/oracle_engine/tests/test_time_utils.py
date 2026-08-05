@@ -24,6 +24,18 @@ a thin wrapper with its own default; `LoadSnapshotsDelegatesCase` below
 proves every wrapper genuinely calls through to the one shared
 `time_utils.load_snapshots` (by patching it and observing every sibling
 call the patch), not a reinlined copy of the old logic.
+
+Task 559 carried the identical AST-hash sweep one directory over from
+`tools/*.py` (where it had already run dry six times running) into this
+package for the first time, and found a FOURTH byte-identical function
+still standing: `record_snapshot`, differing only in which module's own
+`*CadenceError` subclass it raised on bad input and a few words of
+docstring. Same shape as `load_snapshots`, same reason it can't be a
+bare rebinding (differing default path AND differing error class); each
+sibling keeps a thin wrapper passing its own default and error class.
+`RecordSnapshotDelegatesCase` below proves delegation the same way
+`LoadSnapshotsDelegatesCase` does, plus a live (unmocked) check that the
+right exception type still surfaces end to end.
 """
 from __future__ import annotations
 
@@ -171,6 +183,80 @@ class LoadSnapshotsDelegatesCase(unittest.TestCase):
                     "own DEFAULT_SNAPSHOT_PATH -- bare load_snapshots() calls "
                     "elsewhere in this module would silently read the wrong file",
                 )
+
+
+RECORD_SNAPSHOT_SIBLINGS = LOAD_SNAPSHOTS_SIBLINGS
+
+
+def _expected_error_cls(mod):
+    """Derive `<Words>CadenceError` from a sibling module's own name
+    (`pr_cadence` -> `PrCadenceError`), the exact convention every one of
+    the 25 siblings' real error class already follows -- checked against
+    the live module, not assumed."""
+    stem = mod.__name__.rsplit(".", 1)[-1].replace("_cadence", "")
+    name = "".join(word.capitalize() for word in stem.split("_")) + "CadenceError"
+    return getattr(mod, name)
+
+
+class RecordSnapshotDelegatesCase(unittest.TestCase):
+    """Every sibling cadence module's own `record_snapshot(path=<its own
+    DEFAULT_SNAPSHOT_PATH>)` must genuinely call through to
+    `time_utils.record_snapshot` with its own `*CadenceError` subclass as
+    `error_cls` -- not carry a reinlined copy of the validate-and-write
+    logic (task 559's own AST-hash sweep found all 25 byte-identical
+    except for that error class and a few words of docstring, the same
+    shape `load_snapshots` above already closed)."""
+
+    def test_every_sibling_wrapper_delegates_to_the_shared_function(self):
+        self.assertEqual(
+            len(RECORD_SNAPSHOT_SIBLINGS), 25, "sibling list drifted from the live sweep"
+        )
+        for mod in RECORD_SNAPSHOT_SIBLINGS:
+            with self.subTest(sibling=mod.__name__):
+                sentinel = object()
+                calls = []
+
+                def fake_record_snapshot(count, ts, path, error_cls, _calls=calls, _sentinel=sentinel):
+                    _calls.append((count, ts, path, error_cls))
+                    return _sentinel
+
+                with mock.patch.object(time_utils, "record_snapshot", fake_record_snapshot):
+                    result = mod.record_snapshot(3, "2026-08-05T00:00:00Z", "some/probe/path.jsonl")
+                self.assertIs(
+                    result,
+                    sentinel,
+                    f"{mod.__name__}.record_snapshot did not return the shared "
+                    "function's result -- it may hold a reinlined copy again",
+                )
+                self.assertEqual(
+                    calls,
+                    [(3, "2026-08-05T00:00:00Z", "some/probe/path.jsonl", _expected_error_cls(mod))],
+                    f"{mod.__name__}.record_snapshot did not pass its arguments and "
+                    "own error class through to time_utils.record_snapshot unchanged",
+                )
+
+    def test_every_sibling_default_still_resolves_to_its_own_module_default(self):
+        import inspect
+
+        for mod in RECORD_SNAPSHOT_SIBLINGS:
+            with self.subTest(sibling=mod.__name__):
+                sig = inspect.signature(mod.record_snapshot)
+                self.assertEqual(
+                    sig.parameters["path"].default,
+                    mod.DEFAULT_SNAPSHOT_PATH,
+                    f"{mod.__name__}.record_snapshot() no longer defaults to its "
+                    "own DEFAULT_SNAPSHOT_PATH -- bare record_snapshot() calls "
+                    "elsewhere in this module would silently write the wrong file",
+                )
+
+    def test_every_sibling_still_raises_its_own_error_class_on_bad_input(self):
+        """Not mocked: proves the real, live delegation still surfaces the
+        right exception type end to end, not just that the mock saw the
+        right kwarg."""
+        for mod in RECORD_SNAPSHOT_SIBLINGS:
+            with self.subTest(sibling=mod.__name__):
+                with self.assertRaises(_expected_error_cls(mod)):
+                    mod.record_snapshot(-1, "2026-08-05T00:00:00Z", "unused/path.jsonl")
 
 
 class ParseTsCase(unittest.TestCase):
