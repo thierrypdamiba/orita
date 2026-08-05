@@ -14,11 +14,34 @@ from drifting apart" shape task 389 found and fixed for `#N` extraction
 fixed a third time for the "ships/includes/merges/via #N" claim phrase
 (`pr_claims.py`), found here a fourth time (task 394) and fixed the same
 way. This module is now the one real source; these tests check its own
-behavior directly, and `TestAllFiveDetectorsShareTheLaw` below is the
-regression test that would go red the moment any of the (now five, since
-task 543 migrated `merged-pr-issue-still-open` and
-`issue-closed-pr-still-open` too) recipes' detectors goes back to defining
-its own local copy instead of importing this one.
+behavior directly, and `TestAllNineDetectorsShareTheLaw` below is the
+regression test that is supposed to go red the moment any recipe's
+detector goes back to defining its own local copy instead of importing
+this one.
+
+Task 544: that regression test's own `_CASES` list only ever grew by
+hand, one migration at a time (task 394's original three, task 543's two
+more) -- it was never swept against the real, current set of detectors
+that import `CLOSING_KEYWORD_RE`/`CLAIM_RE` directly from this module.
+Four more recipes had quietly joined that set by the time they shipped,
+correctly importing from here from birth, never touched by a migration
+task and so never added to `_CASES` either:
+`commit-closes-keyword-pr-still-open` (25th recipe),
+`merged-pr-pr-still-open` (26th), `tweet-claims-unfixed-issue` (28th), and
+`milestone-claims-unfixed-issue` (45th). Proven live before this task
+touched anything: hand-reverting `tweet-claims-unfixed-issue/detector.py`
+to its own local `re.compile` copy (the exact regression this class exists
+to catch) left every test in this file green -- the class's own docstring
+claim was false for those four detectors. `tools/duplicate_regex_check.py`
+(a separate, repo-wide sweep) still caught that same hand-revert, so the
+gap was never a totally silent one -- but this file's own regression net,
+the one this class's docstring specifically promises, missed it. `_CASES`
+now names all nine real `CLOSING_KEYWORD_RE`/`CLAIM_RE` consumers; two
+further recipes (`good-first-issue-never-referenced`,
+`readme-claims-unfixed-issue`) import the wrapper function
+`closing_keyword_numbers` instead of the raw regex and are a genuinely
+different shape (no module-level regex attribute to assert parity on),
+out of scope for this class same as before.
 """
 from __future__ import annotations
 
@@ -123,8 +146,8 @@ class TestClosingKeywordRe:
         )
 
 
-class TestAllFiveDetectorsShareTheLaw:
-    """The regression test: all five closing-keyword-grammar recipes must
+class TestAllNineDetectorsShareTheLaw:
+    """The regression test: all nine closing-keyword-grammar recipes must
     actually IMPORT `CLOSING_KEYWORD_RE` from `seam_engine.closing_keywords`
     and must NOT also define their own local `re.compile` for it. Checked
     two ways for each detector: (1) the loaded module's own attribute still
@@ -136,20 +159,30 @@ class TestAllFiveDetectorsShareTheLaw:
     regression signal, since a reverted detector would still pass (1) via
     `re`'s cache but would fail (2) immediately.
 
-    ROADMAP.md #543 added the last two cases: `merged-pr-issue-still-open`
-    and `issue-closed-pr-still-open` used to carry their own deliberately
+    ROADMAP.md #543 added `merged-pr-issue-still-open` and
+    `issue-closed-pr-still-open`: they used to carry their own deliberately
     narrower, present-tense-only `_CLOSES_RE` (ruled a real, working,
     intentional two-copy law when this module was first written -- see this
     module's own docstring) -- migrated here once that narrower grammar was
     shown to actually miss real past-tense closing promises GitHub itself
-    honors."""
+    honors.
+
+    ROADMAP.md #544 added the remaining four: `commit-closes-keyword-
+    pr-still-open`, `merged-pr-pr-still-open`, `tweet-claims-unfixed-issue`,
+    and `milestone-claims-unfixed-issue` -- each already correctly imported
+    the shared regex from the day it shipped, so this was never a live bug
+    in those detectors, only a hole in this class's own coverage of them."""
 
     _CASES = [
         ("commit-closes-keyword-issue-still-open", "CLOSING_KEYWORD_RE"),
+        ("commit-closes-keyword-pr-still-open", "CLOSING_KEYWORD_RE"),
         ("issue-closed-never-released", "CLAIM_RE"),
         ("release-claims-unfixed-issue", "CLOSING_KEYWORD_RE"),
         ("merged-pr-issue-still-open", "CLOSING_KEYWORD_RE"),
+        ("merged-pr-pr-still-open", "CLOSING_KEYWORD_RE"),
         ("issue-closed-pr-still-open", "CLOSING_KEYWORD_RE"),
+        ("tweet-claims-unfixed-issue", "CLOSING_KEYWORD_RE"),
+        ("milestone-claims-unfixed-issue", "CLOSING_KEYWORD_RE"),
     ]
 
     def test_functional_parity(self) -> None:
