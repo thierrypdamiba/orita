@@ -37,7 +37,7 @@ import json
 import os
 import re
 import sys
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta, timezone
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DEFAULT_METRICS_PATH = os.path.join(ROOT, "records", "metrics.jsonl")
@@ -134,6 +134,46 @@ def compute_cadence(metrics_path: str | None = None, target: int = TARGET_STREAK
     }
 
 
+def compute_metrics_freshness(now: datetime, metrics_path: str | None = None) -> dict:
+    """Task 549. The freshness half `compute_cadence` above doesn't hold
+    and structurally can't: `missing_dates` only ever walks calendar days
+    STRICTLY BETWEEN `first_date` and `most_recent_date`, so a gap more
+    recent than the last shipped reading -- the cadence stalled RIGHT NOW,
+    the single most urgent case -- can never appear there. It would only
+    get named retroactively once some future reading pushes
+    `most_recent_date` forward past it. `report_cadence_check.py`'s own
+    sibling cadence (`fencepost/REPORTS/`, one file per day) already hit
+    this identical split and solved it with a second, freshness-only
+    function -- `check_report_freshness(now, reports_dir)`, living in
+    `tools/ritual_check.py` itself since it is cheap enough to just check
+    file existence. `records/metrics.jsonl` is one append-only file, not
+    one-file-per-day, so its freshness check needs the same date parsing
+    `_read_dates` already does -- hence living here, not in ritual_check.py.
+
+    Mirrors `check_report_freshness`'s current/pending/stale shape
+    exactly: missing-today-but-present-yesterday is the EXPECTED state
+    before the 18:00 UTC daily-aggregate hour has landed yet (`pending`,
+    not a violation); missing both today AND yesterday is a real, live
+    gap (`stale`)."""
+    metrics_path = metrics_path or DEFAULT_METRICS_PATH
+    today = now.date()
+    yesterday = today - timedelta(days=1)
+    shipped = set(_read_dates(metrics_path))
+    if today in shipped:
+        return {"status": "current", "date": today.isoformat()}
+    if yesterday in shipped:
+        return {"status": "pending", "date": today.isoformat(), "fallback_date": yesterday.isoformat()}
+    return {"status": "stale", "date": today.isoformat(), "fallback_date": None}
+
+
+def format_metrics_freshness(result: dict) -> str:
+    if result["status"] == "current":
+        return f"metrics freshness: current ({result['date']})"
+    if result["status"] == "pending":
+        return f"metrics freshness: pending for {result['date']} (falls back to {result['fallback_date']})"
+    return f"metrics freshness: STALE -- no daily-aggregate reading for {result['date']} or the day before"
+
+
 def format_cadence(result: dict) -> str:
     if result["total_shipped"] == 0:
         return "metrics cadence: no daily-aggregate reading has ever shipped -- nothing to count yet"
@@ -158,4 +198,6 @@ if __name__ == "__main__":
         sys.exit(1)
     out = compute_cadence()
     print(format_cadence(out))
+    fresh = compute_metrics_freshness(datetime.now(timezone.utc))
+    print(format_metrics_freshness(fresh))
     sys.exit(0)

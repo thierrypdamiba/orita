@@ -5,12 +5,21 @@ the live, current records/metrics.jsonl's honest numbers before this task's
 own catch-up entry lands: three historical gap days (07-13, 07-15, 07-17)
 that TOWN-OPERATIONS.md's 18:00 UTC daily aggregate silently skipped and no
 prior tool ever named.
+
+Task 549 adds `compute_metrics_freshness`/`format_metrics_freshness`: the
+freshness half `compute_cadence` above structurally cannot hold, since its
+own `missing_dates` walk only ever covers days strictly between the first
+and most recent shipped reading -- a gap more recent than the last reading
+(the cadence stalled RIGHT NOW) can never appear there. Mirrors
+`tools/ritual_check.py`'s own `check_report_freshness` current/pending/
+stale shape for the sibling `fencepost/REPORTS/` cadence.
 """
 import importlib.util
 import os
 import sys
 import tempfile
 import unittest
+from datetime import datetime, timezone
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -109,6 +118,66 @@ class FixtureCadenceCase(unittest.TestCase):
         formatted = mcc.format_cadence(result)
         self.assertIn("1-day streak", formatted)
         self.assertIn("2026-07-14", formatted)
+
+
+class FixtureFreshnessCase(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.mkdtemp()
+        self.path = os.path.join(self.tmp, "metrics.jsonl")
+
+    def tearDown(self):
+        import shutil
+
+        shutil.rmtree(self.tmp, ignore_errors=True)
+
+    def test_current_when_todays_reading_exists(self):
+        _write_jsonl(self.path, ['{"date": "2026-07-14"}'])
+        now = datetime(2026, 7, 14, 20, 0, tzinfo=timezone.utc)
+        result = mcc.compute_metrics_freshness(now, metrics_path=self.path)
+        self.assertEqual(result["status"], "current")
+        self.assertEqual(result["date"], "2026-07-14")
+
+    def test_pending_when_only_yesterdays_reading_exists(self):
+        _write_jsonl(self.path, ['{"date": "2026-07-13"}'])
+        now = datetime(2026, 7, 14, 9, 0, tzinfo=timezone.utc)
+        result = mcc.compute_metrics_freshness(now, metrics_path=self.path)
+        self.assertEqual(result["status"], "pending")
+        self.assertEqual(result["fallback_date"], "2026-07-13")
+
+    def test_stale_when_neither_reading_exists(self):
+        _write_jsonl(self.path, ['{"date": "2026-07-10"}'])
+        now = datetime(2026, 7, 14, 9, 0, tzinfo=timezone.utc)
+        result = mcc.compute_metrics_freshness(now, metrics_path=self.path)
+        self.assertEqual(result["status"], "stale")
+        self.assertIsNone(result["fallback_date"])
+
+    def test_stale_when_file_missing_entirely(self):
+        now = datetime(2026, 7, 14, 9, 0, tzinfo=timezone.utc)
+        result = mcc.compute_metrics_freshness(now, metrics_path=os.path.join(self.tmp, "nope.jsonl"))
+        self.assertEqual(result["status"], "stale")
+
+    def test_format_each_status(self):
+        _write_jsonl(self.path, ['{"date": "2026-07-14"}'])
+        now = datetime(2026, 7, 14, 9, 0, tzinfo=timezone.utc)
+        current = mcc.format_metrics_freshness(mcc.compute_metrics_freshness(now, metrics_path=self.path))
+        self.assertIn("current", current)
+        stale = mcc.format_metrics_freshness(
+            mcc.compute_metrics_freshness(now, metrics_path=os.path.join(self.tmp, "nope.jsonl"))
+        )
+        self.assertIn("STALE", stale)
+
+
+class RealMetricsFreshnessCase(unittest.TestCase):
+    """The real point: as of this task, records/metrics.jsonl's most recent
+    reading is 2026-08-03 -- the 2026-08-04 18:00 UTC daily aggregate was
+    silently skipped, so today (2026-08-05) the real live file is genuinely
+    stale, not a fixture standing in for it. Locks that this really is what
+    compute_metrics_freshness reports against the live checkout right now."""
+
+    def test_real_metrics_file_is_stale_as_of_2026_08_05(self):
+        now = datetime(2026, 8, 5, 9, 30, tzinfo=timezone.utc)
+        result = mcc.compute_metrics_freshness(now, metrics_path=os.path.join(ROOT, "records", "metrics.jsonl"))
+        self.assertEqual(result["status"], "stale")
 
 
 class RealMetricsCase(unittest.TestCase):

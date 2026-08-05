@@ -1049,6 +1049,28 @@ def check_metrics_cadence(metrics_path: str | None = None) -> dict:
     return mod.compute_cadence(**kwargs)
 
 
+def check_metrics_freshness(now: datetime, metrics_path: str | None = None) -> dict:
+    """Task 549: the freshness half `check_metrics_cadence` doesn't and
+    structurally can't hold -- its own `missing_dates` walk only ever
+    covers days strictly BETWEEN the first and most recent shipped
+    reading, so a gap more recent than the last reading (the cadence is
+    stalled RIGHT NOW) can never appear there. Mirrors
+    `check_report_freshness` exactly, one ground below it: that function
+    lives here because a per-day file's existence is a cheap direct
+    check; `records/metrics.jsonl` is one append-only file, so its
+    freshness read needs `metrics_cadence_check.py`'s own date parsing --
+    `compute_metrics_freshness` lives there, this is the thin wrapper.
+    Never flips `broken`: a missed daily aggregate is a fact worth
+    surfacing to the next hour's run, not a currently-live law
+    violation -- the same distinction `check_metrics_cadence` itself
+    already holds."""
+    mod = _metrics_cadence_check()
+    kwargs = {}
+    if metrics_path is not None:
+        kwargs["metrics_path"] = metrics_path
+    return mod.compute_metrics_freshness(now, **kwargs)
+
+
 def check_shared_reports(shared_path: str | None = None) -> dict:
     """Task 120: fold `shared_reports_check.py`'s own scan into the one
     block. Unconditional, local-filesystem-only, the same cheap
@@ -2057,6 +2079,7 @@ def run_ritual_check(
         journal_numbering = check_journal_numbering(orita_dir=journal_numbering_dir)
     report_cadence = check_report_cadence(reports_dir=report_cadence_dir)
     metrics_cadence = check_metrics_cadence(metrics_path=metrics_cadence_path)
+    metrics_freshness = check_metrics_freshness(now, metrics_path=metrics_cadence_path)
     shared_reports = check_shared_reports(shared_path=shared_reports_path)
     ritual_completeness = check_ritual_completeness(
         source_path=ritual_completeness_path,
@@ -2199,6 +2222,7 @@ def run_ritual_check(
         "journal_numbering": journal_numbering,
         "report_cadence": report_cadence,
         "metrics_cadence": metrics_cadence,
+        "metrics_freshness": metrics_freshness,
         "shared_reports": shared_reports,
         "ritual_completeness": ritual_completeness,
         "wip_reclaim": wip_reclaim,
@@ -2381,6 +2405,13 @@ def format_ritual_check(result: dict) -> str:
             f"  metrics cadence: {mcad['current_streak']}-day streak "
             f"(records/metrics.jsonl, daily-aggregate readings, target {mcad['target']}/{mcad['target']}){gap_note}"
         )
+    mf = result["metrics_freshness"]
+    if mf["status"] == "current":
+        lines.append(f"  metrics freshness: current ({mf['date']})")
+    elif mf["status"] == "pending":
+        lines.append(f"  metrics freshness: pending for {mf['date']} (falls back to {mf['fallback_date']})")
+    else:
+        lines.append(f"  metrics freshness: STALE -- no daily-aggregate reading for {mf['date']} or the day before")
     sr = result["shared_reports"]
     if sr["total_shared"] == 0:
         lines.append(f"  shared reports in the wild: 0/{sr['target']} (kwaku-ananse's lagging metric, none yet)")

@@ -190,6 +190,51 @@ class ReportFreshnessCase(unittest.TestCase):
         self.assertIsNone(result["fallback_path"])
 
 
+class MetricsFreshnessCase(unittest.TestCase):
+    """Task 549. Wrapper-level proof for `check_metrics_freshness`,
+    mirroring `ReportFreshnessCase` above one ground down: the fencepost
+    Report's freshness is a bare file-existence check living directly in
+    ritual_check.py, while metrics.jsonl's is a single append-only file
+    whose date-parsing already lives in metrics_cadence_check.py -- this
+    class proves the thin wrapper here delegates to it correctly."""
+
+    def setUp(self):
+        self.tmpdir = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.tmpdir, ignore_errors=True)
+        self.path = os.path.join(self.tmpdir, "metrics.jsonl")
+
+    def _write(self, date_str):
+        with open(self.path, "a") as f:
+            f.write(f'{{"date": "{date_str}"}}\n')
+
+    def test_current_when_todays_reading_exists(self):
+        self._write("2026-07-14")
+        now = datetime(2026, 7, 14, 12, 0, tzinfo=timezone.utc)
+        result = rc.check_metrics_freshness(now, metrics_path=self.path)
+        self.assertEqual(result["status"], "current")
+
+    def test_pending_when_only_yesterdays_reading_exists(self):
+        self._write("2026-07-13")
+        now = datetime(2026, 7, 14, 12, 0, tzinfo=timezone.utc)
+        result = rc.check_metrics_freshness(now, metrics_path=self.path)
+        self.assertEqual(result["status"], "pending")
+        self.assertEqual(result["fallback_date"], "2026-07-13")
+
+    def test_stale_when_neither_reading_exists(self):
+        now = datetime(2026, 7, 14, 12, 0, tzinfo=timezone.utc)
+        result = rc.check_metrics_freshness(now, metrics_path=self.path)
+        self.assertEqual(result["status"], "stale")
+        self.assertIsNone(result["fallback_date"])
+
+    def test_folded_into_run_ritual_check(self):
+        self._write("2026-07-13")
+        now = datetime(2026, 7, 14, 12, 0, tzinfo=timezone.utc)
+        result = rc.run_ritual_check(now=now, metrics_cadence_path=self.path)
+        self.assertEqual(result["metrics_freshness"]["status"], "pending")
+        formatted = rc.format_ritual_check(result)
+        self.assertIn("metrics freshness: pending", formatted)
+
+
 class XRecheckCase(unittest.TestCase):
     def setUp(self):
         self.tmpdir = tempfile.mkdtemp()
