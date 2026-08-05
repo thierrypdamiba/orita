@@ -44,6 +44,7 @@ import os
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import adoption_metric_format  # noqa: E402
 import consent_grant_log  # noqa: E402
 import metrics_reader  # noqa: E402
 
@@ -115,26 +116,8 @@ def check_connected_users(
 
 
 def format_result(result: dict) -> str:
-    if result["claimed"] is None:
-        if result["claimed_date"] is None:
-            return f"connected users (OAuth): clean (no metrics.jsonl reading yet; real ground truth is {result['real']})"
-        if result["clean"]:
-            return (
-                f"connected users (OAuth): clean (metrics.jsonl's {result['claimed_date']} reading names no "
-                f"connected_users_oauth field; real ground truth is honestly 0, nothing omitted)"
-            )
-        return (
-            f"connected users (OAuth): BROKEN -- metrics.jsonl's {result['claimed_date']} reading names no "
-            f"connected_users_oauth field, but real ground truth (HAND/consent-grants-log.jsonl, "
-            f"gate-verified) is already {result['real']} -- a real count exists and was not recorded, "
-            "escalate now"
-        )
-    if result["clean"]:
-        return f"connected users (OAuth): clean ({result['real']} real connected user(s), metrics.jsonl's {result['claimed_date']} reading agrees)"
-    return (
-        f"connected users (OAuth): BROKEN -- metrics.jsonl's {result['claimed_date']} reading claims "
-        f"{result['claimed']}, real ground truth (HAND/consent-grants-log.jsonl, gate-verified) is "
-        f"{result['real']} -- STRATEGY.md's adoption metric is misreporting live"
+    return adoption_metric_format.format_adoption_result(
+        "connected users (OAuth)", result, "connected_users_oauth", "real connected user(s)"
     )
 
 

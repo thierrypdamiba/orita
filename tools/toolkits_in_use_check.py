@@ -45,6 +45,7 @@ import os
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import adoption_metric_format  # noqa: E402
 import consent_grant_log  # noqa: E402
 import metrics_reader  # noqa: E402
 
@@ -120,26 +121,8 @@ def check_toolkits_in_use(
 
 
 def format_result(result: dict) -> str:
-    if result["claimed"] is None:
-        if result["claimed_date"] is None:
-            return f"toolkits in use: clean (no metrics.jsonl reading yet; real ground truth is {result['real']})"
-        if result["clean"]:
-            return (
-                f"toolkits in use: clean (metrics.jsonl's {result['claimed_date']} reading names no "
-                f"distinct_toolkits_in_use field; real ground truth is honestly 0, nothing omitted)"
-            )
-        return (
-            f"toolkits in use: BROKEN -- metrics.jsonl's {result['claimed_date']} reading names no "
-            f"distinct_toolkits_in_use field, but real ground truth (HAND/consent-grants-log.jsonl, "
-            f"gate-verified) is already {result['real']} -- a real count exists and was not recorded, "
-            "escalate now"
-        )
-    if result["clean"]:
-        return f"toolkits in use: clean ({result['real']} real toolkit(s), metrics.jsonl's {result['claimed_date']} reading agrees)"
-    return (
-        f"toolkits in use: BROKEN -- metrics.jsonl's {result['claimed_date']} reading claims "
-        f"{result['claimed']}, real ground truth (HAND/consent-grants-log.jsonl, gate-verified) is "
-        f"{result['real']} -- STRATEGY.md's adoption metric is misreporting live"
+    return adoption_metric_format.format_adoption_result(
+        "toolkits in use", result, "distinct_toolkits_in_use", "real toolkit(s)"
     )
 
 
