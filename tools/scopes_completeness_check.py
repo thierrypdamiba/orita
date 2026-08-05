@@ -39,7 +39,6 @@ DEFAULT_APP_LOG_PATH = os.path.join(ROOT, "HAND", "arcade-app-check-log.jsonl")
 DEFAULT_TOOLSET_LOG_PATH = gateway_toolset_check.LOG
 
 _SECTION_HEADER = re.compile(r"^## Every connected app, accounted for\s*$", re.MULTILINE)
-_NEXT_HEADER = text_patterns.NEXT_MARKDOWN_HEADER
 _TABLE_ROW_APP_ID = re.compile(r"^\|\s*`([^`]+)`", re.MULTILINE)
 _TABLE_ROW_STATUS = re.compile(r"^\|\s*`([^`]+)`\s*\|\s*([^|\n]+?)\s*\|\s*$", re.MULTILINE)
 
@@ -51,14 +50,10 @@ _IN_USE_CLAIM = "in use by fencepost"
 
 def _section(scopes_text: str) -> str:
     """The `## Every connected app, accounted for` section's body text, or
-    "" if the section itself is missing."""
-    header_match = _SECTION_HEADER.search(scopes_text)
-    if header_match is None:
-        return ""
-    start = header_match.end()
-    next_match = _NEXT_HEADER.search(scopes_text, pos=start)
-    end = next_match.start() if next_match else len(scopes_text)
-    return scopes_text[start:end]
+    "" if the section itself is missing. Delegates to `text_patterns.
+    bounded_section` (task 552), the shared read this file's own logic was
+    the first of three to hand-write."""
+    return text_patterns.bounded_section(scopes_text, _SECTION_HEADER)
 
 
 def _accounted_for_app_ids(scopes_text: str) -> set:

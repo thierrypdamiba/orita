@@ -14,6 +14,7 @@ text -- only a source-text check catches that.
 """
 import importlib.util
 import os
+import re
 import sys
 import unittest
 
@@ -171,6 +172,42 @@ class StarBeggingPatternsCase(unittest.TestCase):
             tp.STAR_THIS_OUR_THE_REPO,
         ):
             self.assertIsNone(pattern.search(prose))
+
+
+class BoundedSectionCase(unittest.TestCase):
+    """Task 552's own `bounded_section`, exercised directly -- the shared
+    function `scopes_completeness_check.py`'s `_section`, `recipe_readme_
+    check.py`'s `_community_recipes_section`, and `chronicle_readme_check.py`'s
+    `_episodes_section` each hand-wrote independently before this task."""
+
+    _TARGET_HEADER = re.compile(r"^## Target\s*$", re.MULTILINE)
+
+    def test_returns_text_between_header_and_next_header(self):
+        text = "intro\n## Target\nbody line\n## Next\ntail"
+        result = tp.bounded_section(text, self._TARGET_HEADER)
+        self.assertEqual(result, "\nbody line\n")
+
+    def test_returns_text_to_end_of_string_when_no_next_header(self):
+        text = "## Target\nbody line one\nbody line two"
+        result = tp.bounded_section(text, self._TARGET_HEADER)
+        self.assertEqual(result, "\nbody line one\nbody line two")
+
+    def test_returns_empty_string_when_header_missing(self):
+        text = "## Something Else\nbody"
+        result = tp.bounded_section(text, self._TARGET_HEADER)
+        self.assertEqual(result, "")
+
+    def test_default_next_header_is_next_markdown_header(self):
+        text = "## Target\nbody\n## Anything\ntail"
+        result = tp.bounded_section(text, self._TARGET_HEADER)
+        self.assertEqual(result, "\nbody\n")
+
+    def test_custom_next_header_overrides_the_default(self):
+        # A custom, narrower next-header pattern that does NOT match "## Anything"
+        text = "## Target\nbody\n## Anything\ntail"
+        custom_next = re.compile(r"^## STOP\s*$", re.MULTILINE)
+        result = tp.bounded_section(text, self._TARGET_HEADER, next_header=custom_next)
+        self.assertEqual(result, "\nbody\n## Anything\ntail")
 
 
 class ConsumerRegressionCase(unittest.TestCase):

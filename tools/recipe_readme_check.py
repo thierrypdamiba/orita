@@ -84,7 +84,6 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import text_patterns  # noqa: E402
 
 _SECTION_HEADER = re.compile(r"^## Community recipes\s*$", re.MULTILINE)
-_NEXT_HEADER = text_patterns.NEXT_MARKDOWN_HEADER
 _RECIPE_LINK_RE = re.compile(r"\[`RECIPES/([A-Za-z0-9_-]+)/`\]\(RECIPES/([A-Za-z0-9_-]+)/\)")
 _ROADMAP_CITATION_RE = re.compile(r"\(ROADMAP\.md #\d+\)")
 # The reference recipe (task 22, CONTRIBUTING.md's own copy-this-shape
@@ -96,21 +95,16 @@ _REFERENCE_RECIPE_SLUG = "example-release-vs-changelog"
 
 def _community_recipes_section(readme_text: str) -> str:
     """The text strictly between the "## Community recipes" header and the
-    next `## ` header (or end of file) -- the same bounded-section read
-    `scopes_completeness_check.py`'s `_accounted_for_app_ids` already
-    holds for `SCOPES.md`, so a `RECIPES/<slug>/` link mentioned in some
-    OTHER section (there are none today, but nothing should assume that
-    forever) is never mistaken for one of the forty-five community
+    next `## ` header (or end of file), so a `RECIPES/<slug>/` link
+    mentioned in some OTHER section (there are none today, but nothing
+    should assume that forever) is never mistaken for one of the forty-five community
     recipes this section actually enumerates today. Empty string if the
     header itself is missing -- a real gap, not silently treated as
-    vacuously documented."""
-    header_match = _SECTION_HEADER.search(readme_text)
-    if header_match is None:
-        return ""
-    start = header_match.end()
-    next_match = _NEXT_HEADER.search(readme_text, pos=start)
-    end = next_match.start() if next_match else len(readme_text)
-    return readme_text[start:end]
+    vacuously documented. Delegates to `text_patterns.bounded_section`
+    (task 552), the shared bounded-section read this file's own docstring
+    already claimed to mirror `scopes_completeness_check.py`'s `_section`
+    without actually importing it."""
+    return text_patterns.bounded_section(readme_text, _SECTION_HEADER)
 
 
 def _linked_recipes(section_text: str) -> list[tuple[str, str]]:

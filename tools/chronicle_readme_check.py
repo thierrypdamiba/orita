@@ -57,23 +57,18 @@ import cluster_day_check  # noqa: E402
 import text_patterns  # noqa: E402
 
 _SECTION_HEADER = re.compile(r"^## Episodes\s*$", re.MULTILINE)
-_NEXT_HEADER = text_patterns.NEXT_MARKDOWN_HEADER
 _EPISODE_LINK_RE = re.compile(r"\[Episode (\d+):[^\]]*\]\(([^)]+)\)")
 
 
 def _episodes_section(readme_text: str) -> str:
     """The text strictly between the "## Episodes" header and the next
-    `## ` header (or end of file) -- the same bounded-section read
-    `recipe_readme_check.py`'s `_community_recipes_section` already holds
-    for `fencepost/README.md`. Empty string if the header itself is
-    missing -- a real gap, not silently treated as vacuously documented."""
-    header_match = _SECTION_HEADER.search(readme_text)
-    if header_match is None:
-        return ""
-    start = header_match.end()
-    next_match = _NEXT_HEADER.search(readme_text, pos=start)
-    end = next_match.start() if next_match else len(readme_text)
-    return readme_text[start:end]
+    `## ` header (or end of file). Empty string if the header itself is
+    missing -- a real gap, not silently treated as vacuously documented.
+    Delegates to `text_patterns.bounded_section` (task 552), the shared
+    read this file's own docstring already claimed to mirror `recipe_
+    readme_check.py`'s `_community_recipes_section` without actually
+    importing it."""
+    return text_patterns.bounded_section(readme_text, _SECTION_HEADER)
 
 
 def _linked_episode_numbers(section_text: str) -> list[int]:

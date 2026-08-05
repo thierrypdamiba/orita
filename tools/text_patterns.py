@@ -82,6 +82,28 @@ PETITIONER_LINE = re.compile(r"\*\*Petitioner:\*\*\s*(.+)")
 # both walk a `## <name>` ... next `## ` window the same way.
 NEXT_MARKDOWN_HEADER = re.compile(r"^## ", re.MULTILINE)
 
+
+def bounded_section(
+    text: str, section_header: re.Pattern, next_header: re.Pattern = NEXT_MARKDOWN_HEADER
+) -> str:
+    """The text strictly between `section_header`'s own match and the next
+    `next_header` match (or end of `text`) -- the same walk `scopes_
+    completeness_check.py`'s `_section` (task 135), `recipe_readme_check.py`'s
+    `_community_recipes_section` (task 426), and `chronicle_readme_check.py`'s
+    `_episodes_section` (task 545) each hand-wrote independently, byte-
+    identical apart from the header pattern and a local variable name --
+    each of those own docstrings already claimed to "hold the same
+    bounded-section read" as the others, but none actually imported a
+    shared function until now. Returns "" if `section_header` itself has
+    no match -- a real gap, not silently treated as vacuously empty."""
+    header_match = section_header.search(text)
+    if header_match is None:
+        return ""
+    start = header_match.end()
+    next_match = next_header.search(text, pos=start)
+    end = next_match.start() if next_match else len(text)
+    return text[start:end]
+
 # The six star/follow-begging shapes petition_limits_check.py copied
 # verbatim out of star_covenant_check.py's own curated list (task 99).
 PLEASE_STAR = re.compile(r"\bplease\s+star\b", re.IGNORECASE)
