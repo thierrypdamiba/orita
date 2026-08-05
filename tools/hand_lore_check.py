@@ -57,7 +57,9 @@ import re
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import quoted_citation  # noqa: E402
 import scan_files  # noqa: E402
+import sentence_negation  # noqa: E402
 import text_patterns  # noqa: E402
 import violation_format  # noqa: E402
 
@@ -138,7 +140,6 @@ _SENTENCE_BOUNDARY = text_patterns.SENTENCE_BOUNDARY_TIGHT
 _NEGATION_CUES = re.compile(
     r"\b(never|not|no|won't|wasn't|isn't|doesn't|didn't|n't|without|zero)\b", re.IGNORECASE
 )
-_QUOTE_CHARS = set('"\'“‘')
 
 
 # Task 513: consolidated into tools/scan_files.py -- five sibling checks
@@ -150,33 +151,28 @@ _QUOTE_CHARS = set('"\'“‘')
 _iter_public_files = scan_files.iter_public_files
 
 
+# Task 548: consolidated into tools/sentence_negation.py -- this module's
+# `_sentences`/`_is_negated` carried byte-identical bodies to
+# rider_check.py's own copies (only the docstrings differed). Both now
+# name one-line closures over this file's own `_SENTENCE_BOUNDARY`/
+# `_NEGATION_CUES` globals rather than local copies of the loop and the
+# guard; tests/test_sentence_negation.py asserts each sibling's real
+# output matches its own frozen pre-refactor fixture.
 def _sentences(text: str):
-    """Yield (start, end) offsets of each sentence in text, split on
-    ./!/?/;/newline boundaries, mirroring rider_check's/star_covenant_check's
-    window (task 208's semicolon fix to that shared boundary, applied here
-    too -- this module was the one sibling the campaign missed)."""
-    start = 0
-    for boundary in _SENTENCE_BOUNDARY.finditer(text):
-        yield start, boundary.end()
-        start = boundary.end()
-    if start < len(text):
-        yield start, len(text)
+    return sentence_negation.iter_sentences(text, _SENTENCE_BOUNDARY)
 
 
 def _is_negated(sentence: str, match_start: int) -> bool:
-    """Scope the negation check to the text BEFORE the match, within the
-    current sentence only -- mirroring star_covenant_check's/rider_check's
-    own negation guard (task 100's own fix to this exact whole-sentence
-    bug). An unrelated negation cue AFTER the violation match, elsewhere in
-    the same sentence, must never mask a real, present-tense violation."""
-    return bool(_NEGATION_CUES.search(sentence[:match_start]))
+    return sentence_negation.is_negated_prefix(sentence, match_start, _NEGATION_CUES)
 
 
-def _is_quoted_citation(text: str, match_start: int) -> bool:
-    """A phrase opening immediately on a quote mark is a cited example, not
-    a live violation -- the same self-referential trap task 99 hit and
-    guarded."""
-    return match_start > 0 and text[match_start - 1] in _QUOTE_CHARS
+# Task 548: consolidated into tools/quoted_citation.py -- five sibling
+# checks (this one, no_grading_check.py, star_covenant_check.py,
+# arcade_hero_check.py, rider_check.py) each carried a byte-identical
+# `_is_quoted_citation`/`_QUOTE_CHARS` pair. tests/test_quoted_citation.py
+# asserts every sibling's own name is that shared function, and that its
+# output matches each sibling's frozen pre-refactor fixture.
+_is_quoted_citation = quoted_citation.is_quoted_citation
 
 
 def _find_violations_uncached(orita_dir: str = DEFAULT_ORITA_DIR) -> list:

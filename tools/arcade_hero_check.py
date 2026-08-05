@@ -40,6 +40,7 @@ import re
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import quoted_citation  # noqa: E402
 import scan_files  # noqa: E402
 import text_patterns  # noqa: E402
 import violation_format  # noqa: E402
@@ -108,7 +109,6 @@ _NEGATION_CUES = re.compile(
     r"\b(never|not|won't|wasn't|isn't|doesn't|didn't|n't|no|nobody|without)\b",
     re.IGNORECASE,
 )
-_QUOTE_CHARS = set('"\'“‘')
 
 
 # Task 513: consolidated into tools/scan_files.py -- carried the identical
@@ -151,13 +151,13 @@ def _is_negated_or_predictive(text: str, match_start: int) -> bool:
     return bool(_NEGATION_CUES.search(sentence_so_far))
 
 
-def _is_quoted_citation(text: str, match_start: int) -> bool:
-    """Documentation ABOUT this check (this module's own docstring,
-    ROADMAP.md's task text quoting the rule, a test file) legitimately
-    cites the exact credential-handoff phrases it hunts for as quoted
-    examples. A phrase opening immediately on a quote mark is a cited
-    example, not a live ask."""
-    return match_start > 0 and text[match_start - 1] in _QUOTE_CHARS
+# Task 548: consolidated into tools/quoted_citation.py -- five sibling
+# checks (this one, no_grading_check.py, star_covenant_check.py,
+# hand_lore_check.py, rider_check.py) each carried a byte-identical
+# `_is_quoted_citation`/`_QUOTE_CHARS` pair. tests/test_quoted_citation.py
+# asserts every sibling's own name is that shared function, and that its
+# output matches each sibling's frozen pre-refactor fixture.
+_is_quoted_citation = quoted_citation.is_quoted_citation
 
 
 def _find_violations_uncached(orita_dir: str = DEFAULT_ORITA_DIR) -> list:

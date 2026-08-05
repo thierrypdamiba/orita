@@ -38,6 +38,7 @@ import re
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import quoted_citation  # noqa: E402
 import scan_files  # noqa: E402
 import text_patterns  # noqa: E402
 import violation_format  # noqa: E402
@@ -81,7 +82,6 @@ _PATTERNS = [
 
 _SENTENCE_BOUNDARY = text_patterns.SENTENCE_BOUNDARY_TIGHT
 _NEGATION_CUES = text_patterns.NEGATION_CUES_STANDARD
-_QUOTE_CHARS = set('"\'“‘')
 
 
 # Task 513: consolidated into tools/scan_files.py -- five sibling checks
@@ -116,13 +116,13 @@ def _is_negated_or_predictive(text: str, match_start: int) -> bool:
     return bool(_NEGATION_CUES.search(sentence_so_far))
 
 
-def _is_quoted_citation(text: str, match_start: int) -> bool:
-    """Documentation ABOUT this check (this module's own docstring,
-    ROADMAP.md's task text, a test file) legitimately lists the exact
-    begging phrases it hunts for as quoted examples -- e.g. `("please
-    star", "give us a star", ...)`. A phrase opening immediately on a
-    quote mark is a cited example, not a live ask of a reader."""
-    return match_start > 0 and text[match_start - 1] in _QUOTE_CHARS
+# Task 548: consolidated into tools/quoted_citation.py -- five sibling
+# checks (this one, no_grading_check.py, arcade_hero_check.py,
+# hand_lore_check.py, rider_check.py) each carried a byte-identical
+# `_is_quoted_citation`/`_QUOTE_CHARS` pair. tests/test_quoted_citation.py
+# asserts every sibling's own name is that shared function, and that its
+# output matches each sibling's frozen pre-refactor fixture.
+_is_quoted_citation = quoted_citation.is_quoted_citation
 
 
 _AUTOMATIC_CONSEQUENCE_RE = re.compile(r"(,|\s+and)\s+it\s+\w+s\b", re.IGNORECASE)
