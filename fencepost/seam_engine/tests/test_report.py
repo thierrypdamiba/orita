@@ -373,6 +373,82 @@ def test_suggest_move_matches_star_milestone_not_announced_headline():
     assert "post about it" in move.lower()
 
 
+# Task 557 (retrya): `milestone-closed-not-tweeted`'s real headline shape
+# copied verbatim from its own detector.py f-string -- the milestone-side
+# twin of the four recipes task 537 already covers, a genuine "post about
+# it" gap the pre-existing needles never caught (confirmed live pre-fix:
+# fell to `_DEFAULT_MOVE`, telling the reader to "close" a milestone that is
+# already closed).
+def test_suggest_move_matches_milestone_closed_not_tweeted_headline():
+    move = report.suggest_move(
+        {"headline": "Milestone #4001 closed, but no tweet has ever named it", "detail": ""}
+    )
+    assert "post about it" in move.lower()
+
+
+# Task 557 (retrya): the systemic guard 537/550 didn't have. Rather than
+# trust the next manual sweep to catch a fourth recurrence of the same
+# drift, this walks every real recipe's own fixture-generated gap headline
+# (via `discover_recipes`/`load_detector`, the same mechanism
+# `test_recipes.py` already exercises per recipe -- not a hand-typed guess)
+# and refuses if any headline that itself claims a tweet/announcement never
+# happened produces the generic "close it yourself" line instead of a real
+# "post about it" hand-off. Two named, checked exceptions, both confirmed by
+# hand before being excluded rather than assumed safe: `contributor-thanked-
+# not-credited` (task 550) is a real gap whose correct hand-off is a README
+# edit, not a post; `own-tweet-dangling-reference`'s headline ("Our own
+# tweet references #{n}, but no issue or PR #{n} exists") mentions "tweet"
+# only because the gap's SOURCE is a tweet, not because posting one is the
+# fix -- it is the same dangling-reference family as `dangling-issue-
+# reference`/`mention-dangling-reference`/etc, correctly generic, out of
+# scope for this task. The three `tweet-claims-*` recipes (`-open-milestone`,
+# `-unfixed-issue`, `-unmerged-pr`) say "tweet" only as the noun naming
+# where the false claim came from ("Tweet T-1201 claims milestone #5001
+# shipped, but it's still open") -- the actual gap is the still-open
+# milestone/issue/PR the tweet claimed was done, and "close it yourself" is
+# the genuinely correct hand-off, same family as their `readme-claims-*`/
+# `release-claims-*`/`milestone-claims-*` siblings (none of which mention
+# "tweet" and so never tripped this heuristic in the first place). Nothing
+# else may join this set silently.
+def test_no_recipe_with_a_tweet_or_announce_shaped_headline_falls_through_to_default():
+    from seam_engine.recipes import discover_recipes, load_detector
+
+    exceptions = {
+        "contributor-thanked-not-credited",
+        "own-tweet-dangling-reference",
+        "tweet-claims-open-milestone",
+        "tweet-claims-unfixed-issue",
+        "tweet-claims-unmerged-pr",
+    }
+    fencepost_root = Path(__file__).resolve().parents[2]
+    checked_any = False
+    for manifest in discover_recipes(fencepost_root):
+        if manifest.slug in exceptions:
+            continue
+        result = load_detector(manifest)()
+        gap = result.get("primary_gap") or (result.get("tail") or [None])[0]
+        if gap is None:
+            continue
+        headline = gap.get("headline", "")
+        # Strip mortal-controlled quoted spans first, the same discipline
+        # `suggest_move` itself uses (task 537), so a commit message that
+        # happens to contain "tweet" can't false-trigger this guard.
+        stripped = report._QUOTED_SPAN_RE.sub(" ", headline).lower()
+        if "tweet" not in stripped and "announce" not in stripped:
+            continue
+        checked_any = True
+        move = report.suggest_move(gap)
+        assert move != report._DEFAULT_MOVE, (
+            f"{manifest.slug}'s real headline ({headline!r}) claims a tweet/"
+            "announcement gap but suggest_move fell through to the generic "
+            "close-it-yourself line -- add a needle to _MOVE_RULES."
+        )
+    # If discover_recipes() ever returns nothing that mentions tweet/announce
+    # at all, this guard would pass vacuously and silently stop meaning
+    # anything -- fail loudly instead so a future refactor can't do that.
+    assert checked_any, "expected at least one real recipe headline to mention tweet/announce"
+
+
 # Task 537 (retrya): every detector embeds mortal-controlled free text (a
 # commit message, a title, a tweet's own words) inside single quotes in its
 # headline/detail f-strings -- confirmed by grep across the whole tree, zero

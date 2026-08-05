@@ -113,6 +113,22 @@ _QUOTED_SPAN_RE = re.compile(r"'[^']*'")
 # X, not yet in the README credits") is the mirror gap and a genuinely
 # different hand-off -- nothing to post, a README line to add -- so it gets
 # its own new rule rather than being folded into the post-about-it family.
+#
+# Task 557 (retrya): a third recurrence of the exact same drift shape, found
+# this time by walking every real recipe's own fixture-generated gap
+# headline through `suggest_move` (`discover_recipes`/`load_detector`, the
+# same mechanism `test_recipes.py` already exercises per recipe) instead of
+# re-reading detector.py source by eye, which is what let this one slip past
+# both 537's and 550's manual sweeps. `milestone-closed-not-tweeted`'s real
+# headline ("Milestone #{n} closed, but no tweet has ever named it") is a
+# genuine "post about it" gap -- the milestone-side twin of
+# `issue-closed-not-tweeted`/`merged-pr-not-tweeted`/`release-not-tweeted`,
+# which this same rule table already covers -- but its own phrasing ("no
+# tweet has ever named it") matches none of "never tweeted"/"never
+# announced"/"@oritatown", so it fell through to `_DEFAULT_MOVE` too
+# (confirmed live pre-fix: `suggest_move` on the recipe's own real fixture
+# gap returned "Close it yourself..." for a milestone that is already
+# closed -- a doubly wrong hand-off, since there is nothing left to close).
 _MOVE_RULES: tuple[tuple[str, str], ...] = (
     (
         "calendar",
@@ -136,6 +152,10 @@ _MOVE_RULES: tuple[tuple[str, str], ...] = (
     ),
     (
         "never thanked on x",
+        "Post about it yourself — a single line linking it is enough. Fencepost only found the seam; it does not cross it.",
+    ),
+    (
+        "no tweet has ever named it",
         "Post about it yourself — a single line linking it is enough. Fencepost only found the seam; it does not cross it.",
     ),
     (
