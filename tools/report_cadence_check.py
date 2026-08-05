@@ -36,9 +36,10 @@ from __future__ import annotations
 
 import os
 import sys
-from datetime import date, timedelta
+from datetime import date
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import date_cadence  # noqa: E402
 import text_patterns  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -91,41 +92,7 @@ def compute_cadence(reports_dir: str | None = None, target: int = TARGET_STREAK_
     """
     reports_dir = reports_dir or DEFAULT_REPORTS_DIR
     dates = _shipped_dates(reports_dir)
-    if not dates:
-        return {
-            "total_shipped": 0,
-            "first_date": None,
-            "most_recent_date": None,
-            "current_streak": 0,
-            "missing_dates": [],
-            "target": target,
-        }
-
-    first_date = dates[0]
-    most_recent_date = dates[-1]
-    shipped_set = set(dates)
-
-    current_streak = 0
-    cursor = most_recent_date
-    while cursor in shipped_set:
-        current_streak += 1
-        cursor -= timedelta(days=1)
-
-    missing_dates = []
-    cursor = first_date + timedelta(days=1)
-    while cursor < most_recent_date:
-        if cursor not in shipped_set:
-            missing_dates.append(cursor.isoformat())
-        cursor += timedelta(days=1)
-
-    return {
-        "total_shipped": len(dates),
-        "first_date": first_date.isoformat(),
-        "most_recent_date": most_recent_date.isoformat(),
-        "current_streak": current_streak,
-        "missing_dates": missing_dates,
-        "target": target,
-    }
+    return date_cadence.compute_date_streak_and_gaps(dates, target)
 
 
 def format_cadence(result: dict) -> str:
