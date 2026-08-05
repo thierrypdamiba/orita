@@ -43,3 +43,24 @@ jobs:
         env:
           PYTHONPATH: src
         run: python -m pytest -q
+
+  # Task 560. Off-By-One's task 559 found it: the oracle desk's own
+  # 1291-test suite ran nowhere in CI. `oracle-cadence.yml` calls
+  # `cadence`/`autograde` daily but never `pytest` -- a real prediction
+  # module could break and the badge would stay green. Same lean install
+  # `oracle-cadence.yml`'s own production step already proves live
+  # (httpx, arcade-mcp-server), plus pytest, mirroring the-seam-oath.
+  the-oracle-oath:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: install the desk's test deps
+        run: pip install 'httpx>=0.28.0,<1.0.0' 'arcade-mcp-server>=1.17.0,<2.0.0' pytest
+      - name: THE DESK'S OWN SUITE. EVERY CADENCE, EVERY GRADE.
+        working-directory: oracle/oracle_engine
+        env:
+          PYTHONPATH: src
+        run: python -m pytest -q
