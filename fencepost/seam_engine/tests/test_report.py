@@ -402,6 +402,29 @@ def test_suggest_move_ignores_reminder_hiding_inside_a_quoted_headline():
     assert "reminder" not in move.lower()
 
 
+# Task 550 (retrya): `readme-credited-not-thanked`'s real headline shape
+# copied verbatim from its own detector.py f-string -- a genuine
+# "post about it" gap the pre-existing needles never caught (confirmed live
+# pre-fix: fell to `_DEFAULT_MOVE`).
+def test_suggest_move_matches_readme_credited_not_thanked_headline():
+    move = report.suggest_move(
+        {"headline": "@thierry is credited in the README, never thanked on X", "detail": ""}
+    )
+    assert "post about it" in move.lower()
+
+
+# Task 550 (retrya): the mirror recipe, `contributor-thanked-not-credited`.
+# The correct hand-off here is a README edit, not an X post -- a real,
+# distinct third rule, not a re-use of the post-about-it line.
+def test_suggest_move_matches_contributor_thanked_not_credited_headline():
+    move = report.suggest_move(
+        {"headline": "@thierry was thanked on X, not yet in the README credits", "detail": ""}
+    )
+    lowered = move.lower()
+    assert "readme" in lowered
+    assert "post about it" not in lowered
+
+
 def test_suggest_move_still_matches_calendar_when_unquoted_in_the_template():
     # Guards the fix's own precision: stripping quoted spans must not eat the
     # rule's own unquoted template word (gmail_calendar.py's real headline

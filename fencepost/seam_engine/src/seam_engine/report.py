@@ -101,6 +101,18 @@ _QUOTED_SPAN_RE = re.compile(r"'[^']*'")
 # line instead of the correct "post about it" hand-off. Confirmed live
 # pre-fix (`suggest_move` on each of the four's real headline shape returned
 # `_DEFAULT_MOVE`, not this rule) before adding the two missing needles.
+#
+# Task 550 (retrya): the same drift, found in the one pair of recipes that
+# swept in afterward without anyone re-running this check against them --
+# `readme-credited-not-thanked` and `contributor-thanked-not-credited`. The
+# first's real headline ("@{handle} is credited in the README, never thanked
+# on X") is a genuine "post about it" gap -- thank them on X -- but its own
+# phrasing ("never thanked on x") never matched "never tweeted" or "never
+# announced" either, so it fell through to `_DEFAULT_MOVE` too (confirmed
+# live pre-fix). The second recipe's real headline ("@{handle} was thanked on
+# X, not yet in the README credits") is the mirror gap and a genuinely
+# different hand-off -- nothing to post, a README line to add -- so it gets
+# its own new rule rather than being folded into the post-about-it family.
 _MOVE_RULES: tuple[tuple[str, str], ...] = (
     (
         "calendar",
@@ -121,6 +133,14 @@ _MOVE_RULES: tuple[tuple[str, str], ...] = (
     (
         "never announced",
         "Post about it yourself — a single line linking it is enough. Fencepost only found the seam; it does not cross it.",
+    ),
+    (
+        "never thanked on x",
+        "Post about it yourself — a single line linking it is enough. Fencepost only found the seam; it does not cross it.",
+    ),
+    (
+        "not yet in the readme credits",
+        "Add them to the README yourself — a line in the credits is enough. Fencepost only found the seam; it does not cross it.",
     ),
 )
 _DEFAULT_MOVE = (
