@@ -30,13 +30,13 @@ Usage:
     python3 tools/change_gate.py check <report_path>
     python3 tools/change_gate.py record <report_path> <posted_at>
 """
-import json
 import os
 import re
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import jsonl_append  # noqa: E402
+import jsonl_read  # noqa: E402
 
 LOG = os.path.join(os.path.dirname(__file__), "..", "HAND", "posted-gap-log.jsonl")
 
@@ -102,50 +102,10 @@ class PostedGapLogTamperedError(RuntimeError):
 
 
 def _entries(path=LOG):
-    """Every line in the posted-gap log, parsed.
-
-    A line that is not even valid JSON any more (a bad hand-edit, a stray
-    merge-conflict marker, a truncated write) is not allowed to crash the
-    caller with an uncaught json.JSONDecodeError -- it comes back marked
-    {"_malformed": True, "_error": ...} instead, the same convention
-    tools/ledger.py's _entries() already uses for its own tampered-tablet
-    case (itself mirroring fencepost/seam_engine/ledger.py's read_records()).
-
-    A line that parses cleanly but not to a JSON object (a bare number,
-    null, list, or string -- a hand-edit or a truncated write that still
-    happens to be syntactically valid) gets the same {"_malformed": True}
-    sentinel: every real entry this log ever writes (record_posted_gap())
-    is a dict, so a successfully-parsed non-dict is exactly as untrustworthy
-    as a decode failure, and every caller already checks entries[-1].get(
-    "_malformed") -- guarding here means they get that protection for free
-    instead of each needing its own isinstance() check.
-    """
-    if not os.path.exists(path):
-        return []
-    entries = []
-    with open(path) as f:
-        for line in f:
-            if not line.strip():
-                continue
-            try:
-                parsed = json.loads(line)
-            except json.JSONDecodeError as exc:
-                entries.append({"_malformed": True, "_error": str(exc)})
-                continue
-            if not isinstance(parsed, dict):
-                entries.append(
-                    {
-                        "_malformed": True,
-                        "_error": (
-                            f"line parsed to {type(parsed).__name__}, "
-                            "not a JSON object"
-                        ),
-                    }
-                )
-                continue
-            entries.append(parsed)
-    return entries
-
+    """Delegates to jsonl_read.read_jsonl_entries (task 540) -- see
+    that module's own docstring for the fourteen-copy history this
+    replaced."""
+    return jsonl_read.read_jsonl_entries(path)
 
 # Task 510: consolidated into tools/jsonl_append.py -- ten sibling checks
 # each carried a byte-identical copy of this helper. This name now points

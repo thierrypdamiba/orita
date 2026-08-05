@@ -41,6 +41,9 @@ import os
 import subprocess
 import sys
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import jsonl_read  # noqa: E402
+
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 LOG = os.path.join(ROOT, "HAND", "child-work-log.jsonl")
 
@@ -59,32 +62,9 @@ class ChildWorkLogTamperedError(RuntimeError):
 
 
 def _entries(path: str) -> list[dict]:
-    if not os.path.exists(path):
-        return []
-    entries = []
-    with open(path, encoding="utf-8") as fh:
-        for line in fh:
-            line = line.strip()
-            if not line:
-                continue
-            try:
-                parsed = json.loads(line)
-            except json.JSONDecodeError as exc:
-                entries.append({"_malformed": True, "_error": str(exc)})
-                continue
-            if not isinstance(parsed, dict):
-                entries.append(
-                    {
-                        "_malformed": True,
-                        "_error": (
-                            f"line parsed to {type(parsed).__name__}, "
-                            "not a JSON object"
-                        ),
-                    }
-                )
-                continue
-            entries.append(parsed)
-    return entries
+    """Delegates to jsonl_read.read_jsonl_entries (task 540) -- see that
+    module's own docstring for the fourteen-copy history this replaced."""
+    return jsonl_read.read_jsonl_entries(path)
 
 
 def load_known_files(path: str = LOG) -> dict:

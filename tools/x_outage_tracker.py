@@ -94,6 +94,7 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import iso_time  # noqa: E402
 import jsonl_append  # noqa: E402
+import jsonl_read  # noqa: E402
 
 DEFAULT_COOLDOWN_HOURS = 2.0
 DEFAULT_ESCALATION_THRESHOLD_HOURS = 48.0
@@ -130,41 +131,10 @@ class XOutageTrackerTamperedError(RuntimeError):
 
 
 def _entries(path=LOG):
-    """Every line in the X-outage check log, parsed.
-
-    A line that is not even valid JSON any more (a bad hand-edit, a stray
-    merge-conflict marker, a truncated write) is not allowed to crash the
-    caller with an uncaught json.JSONDecodeError -- it comes back marked
-    {"_malformed": True, "_error": ...} instead, the same convention
-    tools/ledger.py's _entries() uses (mirrored since in change_gate.py,
-    x_post_queue.py, word_watch.py, consent_grant_log.py, ci_watch.py,
-    scribe_growth_check.py, voice_window_check.py, square_check.py). A
-    line that parses cleanly but isn't a JSON object (a bare number, null,
-    list, or stray string) gets the same treatment -- otherwise it comes
-    back as e.g. a bare int, and _tool_entries()'s e.get("_malformed")
-    crashes with an uncaught AttributeError instead of the named
-    XOutageTrackerTamperedError this module already promises.
-    """
-    if not os.path.exists(path):
-        return []
-    entries = []
-    with open(path) as f:
-        for line in f:
-            if not line.strip():
-                continue
-            try:
-                parsed = json.loads(line)
-            except json.JSONDecodeError as exc:
-                entries.append({"_malformed": True, "_error": str(exc)})
-                continue
-            if not isinstance(parsed, dict):
-                entries.append(
-                    {"_malformed": True, "_error": f"not a JSON object: {parsed!r}"}
-                )
-                continue
-            entries.append(parsed)
-    return entries
-
+    """Delegates to jsonl_read.read_jsonl_entries (task 540) -- see
+    that module's own docstring for the fourteen-copy history this
+    replaced."""
+    return jsonl_read.read_jsonl_entries(path)
 
 # Task 510: consolidated into tools/jsonl_append.py -- ten sibling checks
 # each carried a byte-identical copy of this helper. This name now points

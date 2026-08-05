@@ -64,6 +64,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import iso_time  # noqa: E402
+import jsonl_read  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 LOG = os.path.join(ROOT, "HAND", "voice-window-log.jsonl")
@@ -102,25 +103,9 @@ class VoiceWindowTamperedError(RuntimeError):
 
 
 def _entries(path: str = LOG) -> list:
-    if not os.path.exists(path):
-        return []
-    entries = []
-    with open(path, encoding="utf-8") as f:
-        for line in f:
-            if not line.strip():
-                continue
-            try:
-                parsed = json.loads(line)
-            except json.JSONDecodeError as exc:
-                entries.append({"_malformed": True, "_error": str(exc)})
-                continue
-            if not isinstance(parsed, dict):
-                entries.append(
-                    {"_malformed": True, "_error": f"not a JSON object: {parsed!r}"}
-                )
-                continue
-            entries.append(parsed)
-    return entries
+    """Delegates to jsonl_read.read_jsonl_entries (task 540) -- see that
+    module's own docstring for the fourteen-copy history this replaced."""
+    return jsonl_read.read_jsonl_entries(path)
 
 
 def _assert_untampered(entries: list) -> None:

@@ -14,42 +14,21 @@ import json
 import os
 import sys
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import jsonl_read  # noqa: E402
+
 LEDGER = os.path.join(os.path.dirname(__file__), "..", "records", "ledger.jsonl")
 GENESIS = "0" * 64
 
 
 def _entries():
-    """Every line in the ledger, parsed.
-
-    A line that is not even valid JSON any more (a bad hand-edit, a stray
-    merge-conflict marker, a truncated write) is not allowed to crash the
-    caller -- that is exactly the "the record has been touched" case verify()
-    already exists to report, not an uncaught json.JSONDecodeError. Such a
-    line comes back as {"_malformed": True, "_error": ...} instead, mirroring
-    the same convention fencepost/seam_engine/ledger.py's read_records()
-    already uses for its own tampered-tablet case. A line that parses cleanly
-    to a non-dict JSON value (a bare number, null, list, or stray string) is
-    the same tampering, just not a decode failure -- it is marked _malformed
-    too, so every downstream .get("_malformed") call site gets the guard for
-    free instead of crashing with an uncaught AttributeError.
-    """
-    if not os.path.exists(LEDGER):
-        return []
-    entries = []
-    with open(LEDGER) as f:
-        for line in f:
-            if not line.strip():
-                continue
-            try:
-                parsed = json.loads(line)
-            except json.JSONDecodeError as exc:
-                entries.append({"_malformed": True, "_error": str(exc)})
-                continue
-            if not isinstance(parsed, dict):
-                entries.append({"_malformed": True, "_error": f"not a JSON object: {parsed!r}"})
-                continue
-            entries.append(parsed)
-    return entries
+    """Every line in the ledger, parsed. Delegates to
+    jsonl_read.read_jsonl_entries (task 540) -- see that module's own
+    docstring for the fourteen-copy history this replaced; this file's own
+    convention was the one every other copy's docstring cited as the
+    original to mirror, without any of them ever sharing real code with
+    it until now."""
+    return jsonl_read.read_jsonl_entries(LEDGER)
 
 
 def _hash(entry_without_hash: dict, prev_hash: str) -> str:

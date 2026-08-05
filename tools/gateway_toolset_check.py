@@ -36,6 +36,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import jsonl_append  # noqa: E402
+import jsonl_read  # noqa: E402
 
 LOG = os.path.join(os.path.dirname(__file__), "..", "HAND", "gateway-toolset-check-log.jsonl")
 
@@ -65,31 +66,10 @@ def compute_toolset_state(tool_names: list[str]) -> dict:
 
 
 def _entries(path=LOG):
-    """Same malformed-line tolerance as arcade_app_watch.py's _entries()
-    (task 311's convention): a line that fails to parse, or parses to
-    something other than a dict, is marked {"_malformed": True, ...}
-    instead of crashing the caller."""
-    if not os.path.exists(path):
-        return []
-    entries = []
-    with open(path) as f:
-        for line in f:
-            if not line.strip():
-                continue
-            try:
-                parsed = json.loads(line)
-            except json.JSONDecodeError as exc:
-                entries.append({"_malformed": True, "_error": str(exc)})
-                continue
-            if not isinstance(parsed, dict):
-                entries.append({
-                    "_malformed": True,
-                    "_error": f"parsed to {type(parsed).__name__}, not an object",
-                })
-                continue
-            entries.append(parsed)
-    return entries
-
+    """Delegates to jsonl_read.read_jsonl_entries (task 540) -- see
+    that module's own docstring for the fourteen-copy history this
+    replaced."""
+    return jsonl_read.read_jsonl_entries(path)
 
 # Task 510: consolidated into tools/jsonl_append.py -- ten sibling checks
 # each carried a byte-identical copy of this helper. This name now points

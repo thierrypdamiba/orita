@@ -57,12 +57,12 @@ Usage:
 """
 from __future__ import annotations
 
-import json
 import os
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import jsonl_append  # noqa: E402
+import jsonl_read  # noqa: E402
 import metrics_reader  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -88,33 +88,10 @@ class GitHubStarsTamperedError(RuntimeError):
 
 
 def _entries(path=LOG):
-    """Every line in the github-stars log, parsed.
-
-    A line that is not even valid JSON any more (a bad hand-edit, a stray
-    merge-conflict marker, a truncated write) is not allowed to crash the
-    caller with an uncaught json.JSONDecodeError -- it comes back marked
-    {"_malformed": True, "_error": ...} instead, the same convention
-    tools/ci_watch.py's/tools/square_check.py's own _entries() already use.
-    A line that parses cleanly to a non-dict JSON value (a bare number,
-    null, list, or string) gets the same sentinel."""
-    if not os.path.exists(path):
-        return []
-    entries = []
-    with open(path) as f:
-        for line in f:
-            if not line.strip():
-                continue
-            try:
-                value = json.loads(line)
-            except json.JSONDecodeError as exc:
-                entries.append({"_malformed": True, "_error": str(exc)})
-                continue
-            if not isinstance(value, dict):
-                entries.append({"_malformed": True, "_error": f"not a JSON object: {value!r}"})
-                continue
-            entries.append(value)
-    return entries
-
+    """Delegates to jsonl_read.read_jsonl_entries (task 540) -- see
+    that module's own docstring for the fourteen-copy history this
+    replaced."""
+    return jsonl_read.read_jsonl_entries(path)
 
 # Task 510: consolidated into tools/jsonl_append.py -- ten sibling checks
 # each carried a byte-identical copy of this helper. This name now points

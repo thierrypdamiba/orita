@@ -55,42 +55,20 @@ sys.path.insert(
 )
 from seam_engine.consent import ConsentRecord, enforce_consent_gate  # noqa: E402
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import jsonl_read  # noqa: E402
+
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 LOG = os.path.join(ROOT, "HAND", "consent-grants-log.jsonl")
 
 
 def _entries(path: str = LOG) -> list:
-    """Every real recorded grant, oldest first. Empty list if the log has
-    never been written -- no real consent ever having happened is not an
-    error, the same "never checked = honest zero" shape every other
-    durable log in this town already holds.
-
-    A line that is not even valid JSON any more (a bad hand-edit, a stray
-    merge-conflict marker, a truncated write) does not crash the caller --
-    it comes back as {"_malformed": True, "_error": ...} instead, mirroring
-    tools/ledger.py's, tools/change_gate.py's, tools/x_post_queue.py's, and
-    tools/word_watch.py's own convention (tasks 238-241). A line that
-    parses cleanly to a non-dict JSON value (a bare number, null, list,
-    or string) gets the same sentinel -- task 313, mirroring 309-312.
+    """Every real recorded grant, oldest first. Delegates to
+    jsonl_read.read_jsonl_entries (task 540) -- see that module's own
+    docstring for the fourteen-copy history this replaced.
     real_distinct_toolkit_count() is the one that decides a malformed line
     here is never safe to ignore."""
-    if not os.path.exists(path):
-        return []
-    entries = []
-    with open(path, encoding="utf-8") as f:
-        for line in f:
-            if not line.strip():
-                continue
-            try:
-                value = json.loads(line)
-            except json.JSONDecodeError as exc:
-                entries.append({"_malformed": True, "_error": str(exc)})
-                continue
-            if not isinstance(value, dict):
-                entries.append({"_malformed": True, "_error": f"not a JSON object: {value!r}"})
-                continue
-            entries.append(value)
-    return entries
+    return jsonl_read.read_jsonl_entries(path)
 
 
 def record_grant(

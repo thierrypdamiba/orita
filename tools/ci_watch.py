@@ -28,12 +28,12 @@ Usage:
     python3 tools/ci_watch.py record <workflow> <success|failure> <run_id> <checked_at>
     python3 tools/ci_watch.py status
 """
-import json
 import os
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import jsonl_append  # noqa: E402
+import jsonl_read  # noqa: E402
 
 LOG = os.path.join(os.path.dirname(__file__), "..", "HAND", "ci-watch-log.jsonl")
 
@@ -60,35 +60,10 @@ TRACKED_WORKFLOWS = ("dawn-run", "pages", "seam-scan", "oracle-cadence")
 
 
 def _entries(path=LOG):
-    """Every line in the CI-watch log, parsed.
-
-    A line that is not even valid JSON any more (a bad hand-edit, a stray
-    merge-conflict marker, a truncated write) is not allowed to crash the
-    caller with an uncaught json.JSONDecodeError -- it comes back marked
-    {"_malformed": True, "_error": ...} instead, the same convention
-    tools/ledger.py's _entries() uses (mirrored since in change_gate.py,
-    x_post_queue.py, word_watch.py, consent_grant_log.py). A line that
-    parses cleanly to a non-dict JSON value (a bare number, null, list,
-    or string) gets the same sentinel -- task 312, mirroring 309-311.
-    """
-    if not os.path.exists(path):
-        return []
-    entries = []
-    with open(path) as f:
-        for line in f:
-            if not line.strip():
-                continue
-            try:
-                value = json.loads(line)
-            except json.JSONDecodeError as exc:
-                entries.append({"_malformed": True, "_error": str(exc)})
-                continue
-            if not isinstance(value, dict):
-                entries.append({"_malformed": True, "_error": f"not a JSON object: {value!r}"})
-                continue
-            entries.append(value)
-    return entries
-
+    """Delegates to jsonl_read.read_jsonl_entries (task 540) -- see
+    that module's own docstring for the fourteen-copy history this
+    replaced."""
+    return jsonl_read.read_jsonl_entries(path)
 
 # Task 510: consolidated into tools/jsonl_append.py -- ten sibling checks
 # each carried a byte-identical copy of this helper. This name now points

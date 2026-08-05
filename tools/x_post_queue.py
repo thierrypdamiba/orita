@@ -67,39 +67,17 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import jsonl_append  # noqa: E402
+import jsonl_read  # noqa: E402
 
 QUEUE = os.path.join(os.path.dirname(__file__), "..", "HAND", "x-post-queue.jsonl")
 MAX_TWEET_CHARS = 280
 
 
 def _entries(path=QUEUE):
-    """Every line in the queue, parsed.
-
-    A line that is not even valid JSON any more (a bad hand-edit, a stray
-    merge-conflict marker, a truncated write) is not allowed to crash the
-    caller -- it comes back as {"_malformed": True, "_error": ...} instead,
-    mirroring tools/ledger.py's and tools/change_gate.py's own convention
-    (tasks 238, 239). pending_entries() is the one that decides whether a
-    malformed line here is safe to ignore or must refuse outright.
-    """
-    if not os.path.exists(path):
-        return []
-    entries = []
-    with open(path) as f:
-        for line in f:
-            if not line.strip():
-                continue
-            try:
-                parsed = json.loads(line)
-            except json.JSONDecodeError as exc:
-                entries.append({"_malformed": True, "_error": str(exc)})
-                continue
-            if not isinstance(parsed, dict):
-                entries.append({"_malformed": True, "_error": f"line parsed to {type(parsed).__name__}, not an object"})
-                continue
-            entries.append(parsed)
-    return entries
-
+    """Delegates to jsonl_read.read_jsonl_entries (task 540) -- see
+    that module's own docstring for the fourteen-copy history this
+    replaced."""
+    return jsonl_read.read_jsonl_entries(path)
 
 class QueueTamperedError(RuntimeError):
     """Raised by pending_entries() when any line in the queue is unreadable.

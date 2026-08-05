@@ -38,12 +38,12 @@ Usage:
     python3 tools/scribe_growth_check.py check
     python3 tools/scribe_growth_check.py record <checked_at>
 """
-import json
 import os
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import jsonl_append  # noqa: E402
+import jsonl_read  # noqa: E402
 
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
 LOG = os.path.join(ROOT, "HAND", "scribe-growth-log.jsonl")
@@ -86,38 +86,10 @@ class ScribeGrowthLogTamperedError(RuntimeError):
 
 
 def _entries(path=LOG):
-    """Every line in the scribe-growth log, parsed.
-
-    A line that is not even valid JSON any more (a bad hand-edit, a stray
-    merge-conflict marker, a truncated write) is not allowed to crash the
-    caller with an uncaught json.JSONDecodeError -- it comes back marked
-    {"_malformed": True, "_error": ...} instead, the same convention
-    tools/ledger.py's _entries() already uses for its own tampered-tablet
-    case (mirrored since in change_gate.py, x_post_queue.py, word_watch.py,
-    consent_grant_log.py, ci_watch.py). A line that parses cleanly but to a
-    non-dict value (a bare number, null, list, or stray string) is marked
-    the same way -- last_scribe_state()'s unconditional entries[-1].get(...)
-    would otherwise crash with an uncaught AttributeError instead of the
-    named ScribeGrowthLogTamperedError below.
-    """
-    if not os.path.exists(path):
-        return []
-    entries = []
-    with open(path) as f:
-        for line in f:
-            if not line.strip():
-                continue
-            try:
-                parsed = json.loads(line)
-            except json.JSONDecodeError as exc:
-                entries.append({"_malformed": True, "_error": str(exc)})
-                continue
-            if not isinstance(parsed, dict):
-                entries.append({"_malformed": True, "_error": f"not a JSON object: {parsed!r}"})
-                continue
-            entries.append(parsed)
-    return entries
-
+    """Delegates to jsonl_read.read_jsonl_entries (task 540) -- see
+    that module's own docstring for the fourteen-copy history this
+    replaced."""
+    return jsonl_read.read_jsonl_entries(path)
 
 # Task 510: consolidated into tools/jsonl_append.py -- ten sibling checks
 # each carried a byte-identical copy of this helper. This name now points
