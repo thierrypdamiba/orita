@@ -153,6 +153,63 @@ _MAX_COMMIT_PAGES = 50  # 5,000 commits' worth of headroom -- a real safety valv
 # of silently truncating.
 
 
+def commit_event_fields(c: dict[str, Any]) -> dict[str, Any]:
+    """Map one raw GitHub REST `/commits` entry (the exact shape
+    `fetch_github_activity`'s own `client.get(.../commits)` returns, and the
+    exact shape `mcp__github__list_commits` returns per commit) to this
+    package's six-key event shape (`kind`/`id`/`title`/`url`/`ts`/`author`).
+    `ts` stays the original ISO-8601 string — never parsed to a `datetime`
+    here — so this function's output is directly the dict shape
+    `github_events_cache.py`'s on-disk cache already stores (task 553:
+    before this, an hourly session holding a live, already-authorized
+    `github` MCP `list_commits` read had to hand-type this exact six-field
+    mapping itself to build a `--github-events` override, the same mapping
+    already sitting inline in this function's caller below — reproduced
+    live this hour, tediously and by hand, merging a raw multi-page
+    `list_commits` result into the cache one JSON blob at a time). Pure —
+    a pure dict-in, dict-out mapping with no side effect of its own, raises
+    `KeyError` naming the missing field for a malformed entry rather than
+    guessing.
+
+    `fetch_github_activity`'s own loop below parses this function's `ts`
+    through `_parse_ts` to build a `GithubEvent`;
+    `github_events_cache.normalize_raw_commits` uses the dict exactly as
+    returned — the same string-ts cache shape `merge_events`/`save_cache`
+    already sort and store by. One mapping, two callers, instead of the
+    inline duplicate this function replaces.
+    """
+    return {
+        "kind": "commit",
+        "id": c["sha"][:7],
+        "title": c["commit"]["message"].splitlines()[0],
+        "url": c["html_url"],
+        "ts": c["commit"]["author"]["date"],
+        "author": c["commit"]["author"]["name"],
+    }
+
+
+def release_event_fields(r: dict[str, Any]) -> dict[str, Any]:
+    """Map one raw GitHub REST `/releases/latest` response body (the exact
+    shape `mcp__github__get_latest_release` also returns) to this package's
+    six-key event shape, `ts` left as the original ISO-8601 string — the
+    same string-ts convention `commit_event_fields` holds, and the shape
+    `github_events_cache.normalize_raw_release` hands straight to
+    `merge_events` without a second parse. `_release_event_from_json`
+    (below) is the one caller that still needs a `datetime` — it parses
+    this function's `ts` through `_parse_ts` itself rather than duplicating
+    the six-field mapping a second time. A pure dict-in, dict-out mapping,
+    same as its commit-side sibling above.
+    """
+    return {
+        "kind": "release",
+        "id": r["tag_name"],
+        "title": r["name"] or r["tag_name"],
+        "url": r["html_url"],
+        "ts": r["published_at"],
+        "author": r.get("author", {}).get("login", "unknown"),
+    }
+
+
 def fetch_github_activity(owner: str, repo: str, since: datetime) -> list[GithubEvent]:
     """Read-only: commits + the latest release, since `since`. GET only.
 
@@ -190,13 +247,14 @@ def fetch_github_activity(owner: str, repo: str, since: datetime) -> list[Github
             commits.raise_for_status()
             batch = commits.json()
             for c in batch:
+                fields = commit_event_fields(c)
                 events.append(GithubEvent(
-                    kind="commit",
-                    id=c["sha"][:7],
-                    title=c["commit"]["message"].splitlines()[0],
-                    url=c["html_url"],
-                    ts=_parse_ts(c["commit"]["author"]["date"]),
-                    author=c["commit"]["author"]["name"],
+                    kind=fields["kind"],
+                    id=fields["id"],
+                    title=fields["title"],
+                    url=fields["url"],
+                    ts=_parse_ts(fields["ts"]),
+                    author=fields["author"],
                 ))
             if len(batch) < 100:
                 break
@@ -224,11 +282,14 @@ def _release_event_from_json(r: dict[str, Any]) -> GithubEvent:
     """Build the shared `GithubEvent` shape from a raw `/releases/latest`
     response body — factored out of `fetch_github_activity` so
     `fetch_latest_release` (below) can reuse the exact same parsing without
-    a second hand-typed copy."""
-    ts = _parse_ts(r["published_at"])
+    a second hand-typed copy. Task 553: the six-field mapping itself now
+    lives once in `release_event_fields`; this function's only remaining
+    job is parsing that dict's string `ts` into the `datetime` the
+    dataclass carries."""
+    fields = release_event_fields(r)
     return GithubEvent(
-        kind="release", id=r["tag_name"], title=r["name"] or r["tag_name"],
-        url=r["html_url"], ts=ts, author=r.get("author", {}).get("login", "unknown"),
+        kind=fields["kind"], id=fields["id"], title=fields["title"],
+        url=fields["url"], ts=_parse_ts(fields["ts"]), author=fields["author"],
     )
 
 

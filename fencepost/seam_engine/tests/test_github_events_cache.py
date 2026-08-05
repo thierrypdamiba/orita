@@ -178,6 +178,123 @@ def test_default_cache_path_lives_under_candidates() -> None:
     assert gec.DEFAULT_CACHE_PATH.name == "github-events-cache.json"
 
 
+RAW_COMMIT = {
+    "sha": "ddddddd1234567890abcdef1234567890abcdef",
+    "commit": {
+        "message": "Task 553: ingest-raw closes the hand-typed gap\n\nbody",
+        "author": {"name": "Nisaba", "date": "2026-08-05T13:00:00Z"},
+    },
+    "html_url": "https://github.com/thierrypdamiba/orita/commit/ddddddd1234567890abcdef1234567890abcdef",
+}
+
+RAW_RELEASE = {
+    "tag_name": "episode-001",
+    "name": "Episode 1 — The Founding",
+    "html_url": "https://github.com/thierrypdamiba/orita/releases/tag/episode-001",
+    "published_at": "2026-07-11T10:58:26Z",
+    "author": {"login": "thierrypdamiba"},
+}
+
+
+def test_normalize_raw_commits_produces_cache_ready_dicts() -> None:
+    normalized = gec.normalize_raw_commits([RAW_COMMIT])
+    assert normalized == [{
+        "kind": "commit",
+        "id": "ddddddd",
+        "title": "Task 553: ingest-raw closes the hand-typed gap",
+        "url": RAW_COMMIT["html_url"],
+        "ts": "2026-08-05T13:00:00Z",
+        "author": "Nisaba",
+    }]
+    # The output is directly mergeable -- no further hand-typing.
+    merged = gec.merge_events([], normalized)
+    assert merged == normalized
+
+
+def test_normalize_raw_commits_empty_list_is_a_no_op() -> None:
+    assert gec.normalize_raw_commits([]) == []
+
+
+def test_normalize_raw_release_produces_a_cache_ready_dict() -> None:
+    normalized = gec.normalize_raw_release(RAW_RELEASE)
+    assert normalized == {
+        "kind": "release",
+        "id": "episode-001",
+        "title": "Episode 1 — The Founding",
+        "url": RAW_RELEASE["html_url"],
+        "ts": "2026-07-11T10:58:26Z",
+        "author": "thierrypdamiba",
+    }
+
+
+def test_cli_ingest_raw_round_trips_through_real_files(tmp_path: Path) -> None:
+    cache_path = tmp_path / "cache.json"
+    gec.save_cache([COMMIT_A], cache_path)
+    raw_commits_path = tmp_path / "raw-commits.json"
+    raw_commits_path.write_text(json.dumps([RAW_COMMIT]))
+
+    rc = gec.main([
+        "ingest-raw", str(raw_commits_path),
+        "--cache", str(cache_path),
+    ])
+
+    assert rc == 0
+    merged = gec.load_cache(cache_path)
+    assert [e["id"] for e in merged] == ["aaaaaaa", "ddddddd"]
+
+
+def test_cli_ingest_raw_with_release_flag_adds_both_events(tmp_path: Path) -> None:
+    cache_path = tmp_path / "cache.json"
+    raw_commits_path = tmp_path / "raw-commits.json"
+    raw_commits_path.write_text(json.dumps([RAW_COMMIT]))
+    raw_release_path = tmp_path / "raw-release.json"
+    raw_release_path.write_text(json.dumps(RAW_RELEASE))
+
+    rc = gec.main([
+        "ingest-raw", str(raw_commits_path),
+        "--release", str(raw_release_path),
+        "--cache", str(cache_path),
+    ])
+
+    assert rc == 0
+    merged = gec.load_cache(cache_path)
+    kinds = {e["kind"] for e in merged}
+    assert kinds == {"commit", "release"}
+    assert len(merged) == 2
+
+
+def test_cli_ingest_raw_is_idempotent_on_replay(tmp_path: Path) -> None:
+    cache_path = tmp_path / "cache.json"
+    raw_commits_path = tmp_path / "raw-commits.json"
+    raw_commits_path.write_text(json.dumps([RAW_COMMIT]))
+
+    gec.main(["ingest-raw", str(raw_commits_path), "--cache", str(cache_path)])
+    first = gec.load_cache(cache_path)
+    gec.main(["ingest-raw", str(raw_commits_path), "--cache", str(cache_path)])
+    second = gec.load_cache(cache_path)
+
+    assert first == second  # replaying the same raw page merges to a no-op
+
+
+def test_cli_ingest_raw_not_a_list_fails_named(tmp_path: Path, capsys) -> None:
+    raw_commits_path = tmp_path / "raw-commits.json"
+    raw_commits_path.write_text(json.dumps({"oops": True}))
+
+    rc = gec.main([
+        "ingest-raw", str(raw_commits_path),
+        "--cache", str(tmp_path / "c.json"),
+    ])
+
+    assert rc == 1
+    assert "expected a JSON list" in capsys.readouterr().err
+
+
+def test_cli_ingest_raw_no_path_prints_usage(capsys) -> None:
+    rc = gec.main(["ingest-raw"])
+    assert rc == 2
+    assert "usage:" in capsys.readouterr().out
+
+
 def test_seeded_cache_is_real_and_scan_compatible_shape() -> None:
     """The real seed committed this hour (600 live-fetched commits,
     2026-07-28 through 2026-08-04) round-trips through `load_cache` and

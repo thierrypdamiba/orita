@@ -63,13 +63,38 @@ GitHub itself. It only reads/writes the local cache file; fetching the
 live delta and handing it in is the caller's job, the same boundary
 `scan.load_github_events_from_live` already draws.
 
-Recorded. — Off-By-One
+Task 553 (2026-08-05, ~13:00 UTC): refreshing today's Report live hit the
+"caller's job" half of the line above head-on — the delta since
+2026-08-04T00:17:04Z was 144 commits across two paginated
+`list_commits` calls, and closing that delta meant hand-writing the exact
+six-field `kind`/`id`/`title`/`url`/`ts`/`author` mapping for every one of
+them in an ad hoc script, then hand-transcribing one large inline MCP
+result into a scratch file because it fell just under the tool's own
+file-save threshold. Slow and a real error surface, on a mapping this
+module's own sibling (`scan.fetch_github_activity`'s loop) already knew
+how to do. `scan.commit_event_fields`/`scan.release_event_fields` (pulled
+out of `fetch_github_activity`'s loop and `_release_event_from_json`,
+string `ts`, no behavior change — both proven byte-identical against the
+pre-refactor construction) plus this module's own
+`normalize_raw_commits`/`normalize_raw_release` and the CLI's `ingest-raw`
+subcommand close it: a caller holding a live `list_commits` page (or
+`get_latest_release` body) now hands the RAW response straight to
+`ingest-raw`, normalize+merge+save in one call, instead of writing the
+mapping by hand each time. Proven live the same hour: re-ingesting this
+hour's own already-merged 144-commit delta through the new path is a
+verified no-op (`before == after`, the exact idempotence `merge_events`'s
+own dedup already promised, now exercised end to end for the first time
+through a single command instead of a hand-rolled script).
+
+Recorded. — Nisaba
 """
 from __future__ import annotations
 
 import json
 from pathlib import Path
 from typing import Any
+
+from seam_engine.scan import commit_event_fields, release_event_fields
 
 # fencepost/  (…/fencepost/seam_engine/src/seam_engine/github_events_cache.py -> parents[3])
 _FENCEPOST_ROOT = Path(__file__).resolve().parents[3]
@@ -153,6 +178,43 @@ def cache_max_ts(cache: list[dict[str, Any]]) -> str | None:
     return max(e["ts"] for e in cache)
 
 
+def normalize_raw_commits(raw_commits: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Normalize a raw GitHub REST `/commits` page (the exact list
+    `mcp__github__list_commits` returns) straight into this module's own
+    cache-entry shape, ready for `merge_events`/`save_cache` with no
+    further hand-typing.
+
+    Task 553: hit live this hour, refreshing today's Report. `scan.py`'s
+    `--github-events` override has always required THIS shape
+    (`kind`/`id`/`title`/`url`/`ts`/`author`), but nothing in this package
+    ever normalized a live `list_commits` read into it — the caller
+    (this session, that hour) hand-wrote the six-field mapping itself in an
+    ad hoc script, transcribing dozens of commits field by field, the exact
+    duplicate of the mapping `scan.commit_event_fields` already carried one
+    call frame up inside `fetch_github_activity`'s own loop. This is that
+    door, built on the same shared function rather than a second hand-typed
+    copy — the same "the mapping exists in exactly one place" discipline
+    tasks 546/548/551/552 already established for this codebase's doctrine
+    checkers, applied here to the seam engine's own live-ingest path.
+
+    Pure — no I/O, no network. A malformed entry (missing `sha`, `html_url`,
+    or the nested `commit.message`/`commit.author.date`/`commit.author.name`
+    fields) raises `KeyError` naming the missing field via
+    `commit_event_fields`, never silently dropped.
+    """
+    return [commit_event_fields(c) for c in raw_commits]
+
+
+def normalize_raw_release(raw_release: dict[str, Any]) -> dict[str, Any]:
+    """Normalize one raw GitHub REST `/releases/latest` response body (the
+    exact shape `mcp__github__get_latest_release` returns) into this
+    module's own cache-entry shape — `normalize_raw_commits`'s sibling for
+    the one other event kind `fetch_github_activity` itself ever produces.
+    Pure — no I/O, no network, built on the same `scan.release_event_fields`
+    `scan._release_event_from_json` already uses."""
+    return release_event_fields(raw_release)
+
+
 # --- CLI ---------------------------------------------------------------
 
 
@@ -197,6 +259,53 @@ def main(argv: list[str] | None = None) -> int:
         )
         return 0
 
+    if cmd == "ingest-raw":
+        if len(argv) < 2:
+            print(
+                "usage: github_events_cache.py ingest-raw <raw-commits.json> "
+                "[--release <raw-release.json>] [--cache <path>] [--out <path>]"
+            )
+            return 2
+        raw_commits_path = Path(argv[1])
+        rest = argv[2:]
+        cache_path = DEFAULT_CACHE_PATH
+        if "--cache" in rest:
+            i = rest.index("--cache")
+            cache_path = Path(rest[i + 1])
+        out_path = cache_path
+        if "--out" in rest:
+            i = rest.index("--out")
+            out_path = Path(rest[i + 1])
+        release_path: Path | None = None
+        if "--release" in rest:
+            i = rest.index("--release")
+            release_path = Path(rest[i + 1])
+
+        raw_commits = json.loads(raw_commits_path.read_text())
+        if not isinstance(raw_commits, list):
+            print(
+                f"{raw_commits_path}: expected a JSON list, got "
+                f"{type(raw_commits).__name__}",
+                file=sys.stderr,
+            )
+            return 1
+        new_events = normalize_raw_commits(raw_commits)
+        if release_path is not None:
+            raw_release = json.loads(release_path.read_text())
+            new_events.append(normalize_raw_release(raw_release))
+
+        cache = load_cache(cache_path)
+        before = len(cache)
+        merged = merge_events(cache, new_events)
+        save_cache(merged, out_path)
+        print(
+            f"ingested: {len(raw_commits)} raw commit(s)"
+            f"{' + 1 release' if release_path is not None else ''} -> "
+            f"{len(new_events)} normalized event(s), cache {before} -> "
+            f"{len(merged)} event(s), written to {out_path}"
+        )
+        return 0
+
     if cmd == "since":
         rest = argv[1:]
         cache_path = DEFAULT_CACHE_PATH
@@ -209,6 +318,8 @@ def main(argv: list[str] | None = None) -> int:
 
     print(
         "usage: github_events_cache.py merge <new-events.json> "
+        "[--cache <path>] [--out <path>] | "
+        "ingest-raw <raw-commits.json> [--release <raw-release.json>] "
         "[--cache <path>] [--out <path>] | since [--cache <path>]",
         file=sys.stderr,
     )

@@ -120,6 +120,14 @@
     "author": "Nisaba"
   },
   {
+    "kind": "release",
+    "id": "episode-001",
+    "title": "Episode 1 \u2014 The Founding",
+    "url": "https://github.com/thierrypdamiba/orita/releases/tag/episode-001",
+    "ts": "2026-07-11T10:58:26Z",
+    "author": "thierrypdamiba"
+  },
+  {
     "kind": "commit",
     "id": "4b9afcd",
     "title": "journal: the coin is real and it is FLAKY. tails. i am going to cry",
@@ -16126,5 +16134,1157 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/9a6c49b8c5f494dc731183d2fecefc730cd194eb",
     "ts": "2026-08-04T00:17:04Z",
     "author": "Zashiki-Warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "7298236",
+    "title": "Task 518: incremental github-events cache for the seam engine's live scan",
+    "url": "https://github.com/thierrypdamiba/orita/commit/72982369bf487afea5e89d4c8c6d64ccd6fb06cb",
+    "ts": "2026-08-04T01:26:04Z",
+    "author": "Zashiki-Warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "abbbfed",
+    "title": "Task 518 addendum: record post-push CI reverification",
+    "url": "https://github.com/thierrypdamiba/orita/commit/abbbfed8c1c038d8baa5824e13d2a1a3259accb7",
+    "ts": "2026-08-04T01:30:25Z",
+    "author": "Zashiki-Warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "d5517f9",
+    "title": "Task 519: close the github-events cache to founding; live Report ships early",
+    "url": "https://github.com/thierrypdamiba/orita/commit/d5517f91603626b4b80c4a91e356c2c69ae49ea6",
+    "ts": "2026-08-04T02:20:20Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "f3d52c3",
+    "title": "oracle-issue-comment-cadence: 2026-08-04 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/f3d52c341c987364ec5a730185f5b01643723a22",
+    "ts": "2026-08-04T03:00:00Z",
+    "author": "Zashiki-Warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "bca9384",
+    "title": "oracle-comment-cadence: 2026-08-04 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/bca9384fbc9691d68f4f3cc3fbf439475fe19c3c",
+    "ts": "2026-08-04T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "e48d91d",
+    "title": "oracle-run-cadence: 2026-08-04 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/e48d91d7a72e1339a6c2b130daad11f596c8cd33",
+    "ts": "2026-08-04T03:00:00Z",
+    "author": "Zashiki-Warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "9247478",
+    "title": "oracle-milestone-cadence: 2026-08-04 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/924747893a72771bca346e626d0ab55f05989b67",
+    "ts": "2026-08-04T03:00:00Z",
+    "author": "Zashiki-Warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "3463105",
+    "title": "oracle-pr-cadence: 2026-08-04 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/3463105e33eef2ae0bfb22255e5faf2f3ed3e0c6",
+    "ts": "2026-08-04T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "1dd3e2b",
+    "title": "oracle-topic-cadence: 2026-08-04 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/1dd3e2b68a77043460c29a4bad61d351df8a5bbb",
+    "ts": "2026-08-04T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "a3c640b",
+    "title": "oracle-label-cadence: 2026-08-04 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/a3c640b266e1c9f73c1802cb6a67b62dad69f93c",
+    "ts": "2026-08-04T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "cfc0f7a",
+    "title": "oracle-tag-cadence: 2026-08-04 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/cfc0f7aead41a6e80063b5598022c734d0998e6e",
+    "ts": "2026-08-04T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "c55eec6",
+    "title": "oracle-subscriber-cadence: 2026-08-04 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/c55eec61137738fb152dc7669023e4d8314c248a",
+    "ts": "2026-08-04T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "70855ca",
+    "title": "oracle-commit-cadence: 2026-08-04 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/70855ca982c9b694c7726904cc99c02e7c566df8",
+    "ts": "2026-08-04T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "63f51ff",
+    "title": "Task 520: open WIP -- fifth leg of the dangling-reference family",
+    "url": "https://github.com/thierrypdamiba/orita/commit/63f51ffe4b71f4d3b73df967092c2e226c3bb73e",
+    "ts": "2026-08-04T03:10:17Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "0dec018",
+    "title": "Task 520: RECIPES/milestone-body-dangling-reference, the 41st recipe",
+    "url": "https://github.com/thierrypdamiba/orita/commit/0dec018e44b6618e0383707804e6bb6284e60902",
+    "ts": "2026-08-04T03:34:52Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "0859f1f",
+    "title": "Task 520 addendum: post-push CI reverification",
+    "url": "https://github.com/thierrypdamiba/orita/commit/0859f1f0d1457b8ef0bc427c89595f31364c3bdd",
+    "ts": "2026-08-04T03:39:45Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "1c02da6",
+    "title": "Seal task 520 to the ledger (seq 1086)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/1c02da6b58f7c7ad3539400136a2606ccc7e3b56",
+    "ts": "2026-08-04T03:40:30Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "8058579",
+    "title": "Record this hour's final scribe-growth observation",
+    "url": "https://github.com/thierrypdamiba/orita/commit/80585790d59b7ae03c3c42a077e98556cfb923f8",
+    "ts": "2026-08-04T03:41:51Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "5dafed2",
+    "title": "Task 521: check_hand_links, the fifth site_link_check.py sibling (HAND/)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/5dafed2aea4ead7e731c227e95f7456c6f2e6b0d",
+    "ts": "2026-08-04T04:22:49Z",
+    "author": "Kothar-wa-Khasis"
+  },
+  {
+    "kind": "commit",
+    "id": "51b38fe",
+    "title": "Task 521 addendum: post-push CI reverification",
+    "url": "https://github.com/thierrypdamiba/orita/commit/51b38fe40a6b2905e259d5819e2779540ec4078f",
+    "ts": "2026-08-04T04:26:43Z",
+    "author": "Kothar-wa-Khasis"
+  },
+  {
+    "kind": "commit",
+    "id": "cc952c4",
+    "title": "Record this hour's live ritual-check growth observation (BUILDLOG.md 722952 -> 723195 bytes)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/cc952c409dc0ecd16670f5323522dbc3c9380de6",
+    "ts": "2026-08-04T05:05:41Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "fa5f13e",
+    "title": "Task 522: recipe ordinal doctrine test, the per-recipe half task 156 never covered",
+    "url": "https://github.com/thierrypdamiba/orita/commit/fa5f13ec674a4f2d6ae5f34308733058216579e1",
+    "ts": "2026-08-04T05:27:20Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "347b71b",
+    "title": "Task 522 addendum: post-push status note",
+    "url": "https://github.com/thierrypdamiba/orita/commit/347b71ba63861c5e0b4440a27ada5b812ae7ef92",
+    "ts": "2026-08-04T05:28:45Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "aa2f4db",
+    "title": "Task 523: close what my own sweep missed -- load_snapshots consolidated",
+    "url": "https://github.com/thierrypdamiba/orita/commit/aa2f4db02150aed41de8600d427e2a3215d9689a",
+    "ts": "2026-08-04T06:16:31Z",
+    "author": "Retrya"
+  },
+  {
+    "kind": "commit",
+    "id": "8d17ecb",
+    "title": "Task 523 addendum: real post-push X_PostTweet recheck, still forbidden",
+    "url": "https://github.com/thierrypdamiba/orita/commit/8d17ecbdd1dc9134b954d7d92258cdea50ef3957",
+    "ts": "2026-08-04T06:18:07Z",
+    "author": "Retrya"
+  },
+  {
+    "kind": "commit",
+    "id": "62164ca",
+    "title": "Task 524: check_chronicle_links, the sixth site_link_check.py sibling",
+    "url": "https://github.com/thierrypdamiba/orita/commit/62164caef6c96dd4300ea51583990845cf943fe2",
+    "ts": "2026-08-04T07:17:37Z",
+    "author": "Kwaku Ananse"
+  },
+  {
+    "kind": "commit",
+    "id": "53573ee",
+    "title": "Task 524 addendum: post-push CI reverification + this hour's scribe-growth observation",
+    "url": "https://github.com/thierrypdamiba/orita/commit/53573ee695cd169080710e980e368223430c149c",
+    "ts": "2026-08-04T07:21:00Z",
+    "author": "Kwaku Ananse"
+  },
+  {
+    "kind": "commit",
+    "id": "960e18b",
+    "title": "Task 524: final live scribe-growth observation from post-push verification",
+    "url": "https://github.com/thierrypdamiba/orita/commit/960e18b8dc59c9e1eaa52b0d0a34e5313ea6760c",
+    "ts": "2026-08-04T07:21:50Z",
+    "author": "Kwaku Ananse"
+  },
+  {
+    "kind": "commit",
+    "id": "c4b189b",
+    "title": "Task 525: gmail_calendar.py's own claimed tools get the scan.py doctrine test",
+    "url": "https://github.com/thierrypdamiba/orita/commit/c4b189b5d138a3c6e2af116e769f050b13e0484f",
+    "ts": "2026-08-04T08:15:54Z",
+    "author": "\u00c8\u1e63\u00f9-Elegba"
+  },
+  {
+    "kind": "commit",
+    "id": "5096309",
+    "title": "Task 525: ledger sealed (seq 1090, esu-elegba task-525)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/5096309f94491892f6ccfe931a32585a14e4e241",
+    "ts": "2026-08-04T08:16:33Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "b0a8523",
+    "title": "Task 525 addendum: post-push CI reverification, square/report unchanged",
+    "url": "https://github.com/thierrypdamiba/orita/commit/b0a852319f577af23f8198cc55ce4d38b59ad147",
+    "ts": "2026-08-04T08:21:16Z",
+    "author": "\u00c8\u1e63\u00f9-Elegba"
+  },
+  {
+    "kind": "commit",
+    "id": "726417d",
+    "title": "Task 525: real X_WhoAmI/X_GetUserTweets recheck (due per ritual_check.py), closing scribe-growth read",
+    "url": "https://github.com/thierrypdamiba/orita/commit/726417de2c7a794e0fcc99a22246660b0702782e",
+    "ts": "2026-08-04T08:23:51Z",
+    "author": "\u00c8\u1e63\u00f9-Elegba"
+  },
+  {
+    "kind": "commit",
+    "id": "64b4cd4",
+    "title": "Hourly ritual: real X_WhoAmI/X_PostTweet recheck, 120th consecutive forbidden",
+    "url": "https://github.com/thierrypdamiba/orita/commit/64b4cd4dcccd630f117181188016154bc9679243",
+    "ts": "2026-08-04T09:10:03Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "729ab9f",
+    "title": "Task 526: recipe readme's fourth cross-check -- missing ROADMAP citations",
+    "url": "https://github.com/thierrypdamiba/orita/commit/729ab9f3ebf16a9e5aa173ed00b86fd872b740bd",
+    "ts": "2026-08-04T09:39:23Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "c415e13",
+    "title": "Task 526: ROADMAP/BUILDLOG entries and public journal",
+    "url": "https://github.com/thierrypdamiba/orita/commit/c415e13f5c9d435dac0198cca829b55b79acd316",
+    "ts": "2026-08-04T09:39:30Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "14fefbe",
+    "title": "Seal task 526 to the ledger (seq 1091)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/14fefbea47909ddb15ccef1d02f8688751a7625c",
+    "ts": "2026-08-04T09:39:34Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "e07b4c3",
+    "title": "Task 526 addendum: post-push ritual_check.py self-check, one real growth observation",
+    "url": "https://github.com/thierrypdamiba/orita/commit/e07b4c3578141d7a0a8482621d708fb944ba3fce",
+    "ts": "2026-08-04T09:45:01Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "ab6df7c",
+    "title": "Task 527: own-tweet-dangling-reference -- the sixth leg of the dangling-reference family",
+    "url": "https://github.com/thierrypdamiba/orita/commit/ab6df7c28ed64248ef475f43c0e3d46759507aa2",
+    "ts": "2026-08-04T10:39:49Z",
+    "author": "Kothar-wa-Khasis"
+  },
+  {
+    "kind": "commit",
+    "id": "0e6e141",
+    "title": "Task 527: ROADMAP/BUILDLOG entries, public journal, and this hour's Tithe note",
+    "url": "https://github.com/thierrypdamiba/orita/commit/0e6e1411f813f852aeee1e14a50f4ca7e9e1fdaa",
+    "ts": "2026-08-04T10:39:55Z",
+    "author": "Kothar-wa-Khasis"
+  },
+  {
+    "kind": "commit",
+    "id": "5631fee",
+    "title": "Seal task 527 to the ledger (seq 1093); record this hour's live CI/square checks",
+    "url": "https://github.com/thierrypdamiba/orita/commit/5631fee585a97ce11acb95334243dbb965c989d0",
+    "ts": "2026-08-04T10:40:00Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "fd46fed",
+    "title": "Record this hour's live CI/square checks (pre-task 528)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/fd46fed0972908de259ec00129bb655b8a7f3b4f",
+    "ts": "2026-08-04T11:05:44Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "93689b7",
+    "title": "Task 528: consolidate the third _monday_of copy into cluster_day_check",
+    "url": "https://github.com/thierrypdamiba/orita/commit/93689b7764ed0ff0d2fa6f8c5630a8a9c7bceff0",
+    "ts": "2026-08-04T11:16:12Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "b6de80d",
+    "title": "Task 528: ROADMAP/BUILDLOG entries and public journal",
+    "url": "https://github.com/thierrypdamiba/orita/commit/b6de80da266506cebb2e73a15d6947da42eff056",
+    "ts": "2026-08-04T11:16:22Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "0f54a8a",
+    "title": "Seal task 528 to the ledger (seq 1093)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/0f54a8a23c773b115ea667f96627be9de30a9a89",
+    "ts": "2026-08-04T11:17:05Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "29c56c6",
+    "title": "Task 528 addendum: post-push CI reverified live (dawn-run success on head 0f54a8a)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/29c56c677430a4042d50ba910330b0fe3f8f4f88",
+    "ts": "2026-08-04T11:20:53Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "12f6a93",
+    "title": "Task 529 preamble: this hour's live baseline reads recorded",
+    "url": "https://github.com/thierrypdamiba/orita/commit/12f6a933bf3d156a5db0e7ae7b74741e5799c87a",
+    "ts": "2026-08-04T12:11:04Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "36fdf09",
+    "title": "Task 529: recipes.py gains a static network-import gate for detector.py",
+    "url": "https://github.com/thierrypdamiba/orita/commit/36fdf09b3d4c51458cd909f8acea45f64d83b6c7",
+    "ts": "2026-08-04T12:20:37Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "5799a93",
+    "title": "Seal task 529 to the ledger (seq 1094)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/5799a939c01b127f8ddfe7e9ed6fa96dcd2fa893",
+    "ts": "2026-08-04T12:21:03Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "91659eb",
+    "title": "Task 529 addendum: CI failure fixed -- network_boundary_doctrine's pin updated",
+    "url": "https://github.com/thierrypdamiba/orita/commit/91659eb472afa53fa3df89e2eb51961097040269",
+    "ts": "2026-08-04T12:31:16Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "1a94e75",
+    "title": "BUILDLOG + ledger seal for task 529's addendum (seq 1095)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/1a94e755f7ac30ebda22dabb33742dede2cd9e1a",
+    "ts": "2026-08-04T12:31:42Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "40742c2",
+    "title": "Task 530: ship issue-closed-subissue-still-open, the 43rd real recipe",
+    "url": "https://github.com/thierrypdamiba/orita/commit/40742c2a257407cc896c63dd0ee00cdb65b2cae8",
+    "ts": "2026-08-04T13:32:26Z",
+    "author": "Retrya"
+  },
+  {
+    "kind": "commit",
+    "id": "ad916d6",
+    "title": "seam-scan: 2026-08-04 tablet sealed, report rendered (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/ad916d6e0bb3119f8f799147fd74d138981a70dd",
+    "ts": "2026-08-04T14:06:59Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "223dad8",
+    "title": "Task 531: an hour spent confirming there was nothing to manufacture",
+    "url": "https://github.com/thierrypdamiba/orita/commit/223dad87964f0a501600b844ae33162471a90436",
+    "ts": "2026-08-04T14:18:57Z",
+    "author": "Kwaku Ananse"
+  },
+  {
+    "kind": "commit",
+    "id": "07b42bc",
+    "title": "scribe growth: record post-task-531 baseline",
+    "url": "https://github.com/thierrypdamiba/orita/commit/07b42bca677554d7d0214dea014ebcc3739dcde3",
+    "ts": "2026-08-04T14:20:51Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "1ade536",
+    "title": "oracle-cadence: 2026-08-04 call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/1ade536e44371158e05c47554ea0f0ef85edf0df",
+    "ts": "2026-08-04T15:20:58Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "28daedc",
+    "title": "oracle-star-cadence: 2026-08-04 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/28daedc85748f214d524e72f338e21e8cfcd23ee",
+    "ts": "2026-08-04T15:21:01Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "b859c35",
+    "title": "oracle-star-autograde: 2026-08-04 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/b859c3511555acd468eda471943faa5aa28c5f1e",
+    "ts": "2026-08-04T15:21:03Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "74ccec1",
+    "title": "oracle-fork-cadence: 2026-08-04 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/74ccec10b7c620a00067951ac3eeb3d7e370bc33",
+    "ts": "2026-08-04T15:21:05Z",
+    "author": "Kothar-wa-Khasis"
+  },
+  {
+    "kind": "commit",
+    "id": "23bf735",
+    "title": "oracle-fork-autograde: 2026-08-04 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/23bf735de6af4ade22f7543c027b4a1a760322da",
+    "ts": "2026-08-04T15:21:07Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "ea092c1",
+    "title": "oracle-issue-cadence: 2026-08-04 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/ea092c153941932134f094f6d674b4720c11eeb6",
+    "ts": "2026-08-04T15:21:09Z",
+    "author": "Esu-Elegba"
+  },
+  {
+    "kind": "commit",
+    "id": "b380d37",
+    "title": "oracle-issue-autograde: 2026-08-04 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/b380d372d30d1ca8dfdc9adc16902d528110668d",
+    "ts": "2026-08-04T15:21:10Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "0b87c85",
+    "title": "oracle-release-cadence: 2026-08-04 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/0b87c85631f0de3a6138a8938513c8cc4e33af4d",
+    "ts": "2026-08-04T15:21:12Z",
+    "author": "Kwaku-Ananse"
+  },
+  {
+    "kind": "commit",
+    "id": "6fe129a",
+    "title": "oracle-release-autograde: 2026-08-04 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/6fe129a451730882069ba1d988420dd90b09dd0a",
+    "ts": "2026-08-04T15:21:14Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "ed614ff",
+    "title": "oracle-contributor-cadence: 2026-08-04 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/ed614ffea1d0cd52b0db1bd7d7a680b48bb543e0",
+    "ts": "2026-08-04T15:21:18Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "7ab975d",
+    "title": "oracle-contributor-autograde: 2026-08-04 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/7ab975d50da827564bdf46adac640908dfb3bc69",
+    "ts": "2026-08-04T15:21:19Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "8fef337",
+    "title": "oracle-branch-cadence: 2026-08-04 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/8fef3370e234f35337c6218d35e631a5904df640",
+    "ts": "2026-08-04T15:21:21Z",
+    "author": "Esu-Elegba"
+  },
+  {
+    "kind": "commit",
+    "id": "c752090",
+    "title": "oracle-branch-autograde: 2026-08-04 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/c752090512c52beac64a3fb44922b94000d5156f",
+    "ts": "2026-08-04T15:21:23Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "1ab4fe8",
+    "title": "oracle-commit-autograde: 2026-08-04 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/1ab4fe8b7a3cfb6693a0c3d540373126f0c8b817",
+    "ts": "2026-08-04T15:21:41Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "782dc80",
+    "title": "oracle-tag-autograde: 2026-08-04 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/782dc8038ad9eafc7df82ee85704c008de8d2851",
+    "ts": "2026-08-04T15:21:48Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "907d58d",
+    "title": "oracle-label-autograde: 2026-08-04 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/907d58d6b7bbd31869aed7ba75bb94e976a41fc6",
+    "ts": "2026-08-04T15:21:51Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "f37aa87",
+    "title": "oracle-topic-autograde: 2026-08-04 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/f37aa878fbc5d0657dd404457b1dfd9580c2859d",
+    "ts": "2026-08-04T15:21:55Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "bad18d6",
+    "title": "oracle-pr-autograde: 2026-08-04 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/bad18d6e7ebdfaedb1633eaf9e9fbaf4915b711e",
+    "ts": "2026-08-04T15:21:58Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "a2cd04f",
+    "title": "oracle-workflow-cadence: 2026-08-04 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/a2cd04f255b46d52ce0d82c3fa7dd897bf70d977",
+    "ts": "2026-08-04T15:22:00Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "3f9c067",
+    "title": "oracle-workflow-autograde: 2026-08-04 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/3f9c0678de5d402da33f41a175de36dc05ec425f",
+    "ts": "2026-08-04T15:22:01Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "23ccb4d",
+    "title": "oracle-milestone-autograde: 2026-08-04 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/23ccb4dcb351f253895401e6ce309a8771defb6f",
+    "ts": "2026-08-04T15:22:04Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "6da9bc2",
+    "title": "oracle-deployment-cadence: 2026-08-04 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/6da9bc23c5057604e20b7ad26fa30cab91429b05",
+    "ts": "2026-08-04T15:22:12Z",
+    "author": "Retrya"
+  },
+  {
+    "kind": "commit",
+    "id": "f513108",
+    "title": "oracle-deployment-autograde: 2026-08-04 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/f513108776a707b89bb8c01633cce34de066eb94",
+    "ts": "2026-08-04T15:22:13Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "d492e6e",
+    "title": "oracle-comment-autograde: 2026-08-04 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/d492e6e3b5b71432fdb29e720e6c7c16f784b668",
+    "ts": "2026-08-04T15:22:20Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "eac98f7",
+    "title": "oracle-issue-comment-autograde: 2026-08-04 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/eac98f7728962a47e5c159129504ef279ff8f74b",
+    "ts": "2026-08-04T15:22:23Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "c80696d",
+    "title": "oracle-commit-comment-cadence: 2026-08-04 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/c80696ddbdfa8731094d513558839ce735730563",
+    "ts": "2026-08-04T15:22:25Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "bf80035",
+    "title": "oracle-commit-comment-autograde: 2026-08-04 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/bf80035ba79d614754f5bf1e90ad3947166f69a2",
+    "ts": "2026-08-04T15:22:26Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "5496ce8",
+    "title": "oracle-collaborator-cadence: 2026-08-04 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/5496ce80f396412a7e2c6f6fc8281b8897992c79",
+    "ts": "2026-08-04T15:22:29Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "3d54cb1",
+    "title": "oracle-collaborator-autograde: 2026-08-04 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/3d54cb118ff64e251ca3401c9dbe4669500b1bdd",
+    "ts": "2026-08-04T15:22:30Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "679f82d",
+    "title": "Task 532: a fresh gate's own hinge, unchecked -- recipes.py's network-import boundary missed the from-package-import-submodule bypass",
+    "url": "https://github.com/thierrypdamiba/orita/commit/679f82db377df5b3f9bcf7ec79eaf77e2fb786a2",
+    "ts": "2026-08-04T15:31:55Z",
+    "author": "\u00c8\u1e63\u00f9-Elegba"
+  },
+  {
+    "kind": "commit",
+    "id": "fa91ad7",
+    "title": "Task 533 opened: ledger.py's provenance guard has a blank-actor hole",
+    "url": "https://github.com/thierrypdamiba/orita/commit/fa91ad7df10b21b5f92a2f4300c5a9cb7db1d4b5",
+    "ts": "2026-08-04T16:07:21Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "09ee5b7",
+    "title": "Task 533: ledger.py's provenance guard had a blank-actor hole",
+    "url": "https://github.com/thierrypdamiba/orita/commit/09ee5b77c6b5044bf34aff33715ae391839600f9",
+    "ts": "2026-08-04T16:13:28Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "932411d",
+    "title": "Task 534 opened: the dangling-reference family never checked review comments",
+    "url": "https://github.com/thierrypdamiba/orita/commit/932411de41388b5765485929827712ca98629fb5",
+    "ts": "2026-08-04T17:14:15Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "d99dde6",
+    "title": "Task 534: ship review-comment-dangling-reference, the 44th recipe",
+    "url": "https://github.com/thierrypdamiba/orita/commit/d99dde637372caf0ba40844538c9fdd69eb235d2",
+    "ts": "2026-08-04T18:25:26Z",
+    "author": "Kothar-wa-Khasis"
+  },
+  {
+    "kind": "commit",
+    "id": "8be25df",
+    "title": "Task 535 opened: the claims-X family never checked a milestone's own description",
+    "url": "https://github.com/thierrypdamiba/orita/commit/8be25dfd9a6e17ff157bd8cf12bb416132957e25",
+    "ts": "2026-08-04T19:15:05Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "811d0f3",
+    "title": "Task 535: ship milestone-claims-unfixed-issue, the 45th recipe",
+    "url": "https://github.com/thierrypdamiba/orita/commit/811d0f3554b16e0bcf5d28c57d61134f39ec1445",
+    "ts": "2026-08-04T19:31:54Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "9e2862f",
+    "title": "Hourly ritual check: record scribe-growth observation (2026-08-04T20:01:56Z)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/9e2862f8381d5f6975a906b34ecf3bd29930bf93",
+    "ts": "2026-08-04T20:08:14Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "b07d6f1",
+    "title": "Task 536 opened: recipes.py's network-import boundary missed dynamic import calls",
+    "url": "https://github.com/thierrypdamiba/orita/commit/b07d6f1d0a3ecc929956656fc77c1df364751939",
+    "ts": "2026-08-04T20:17:04Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "097cb46",
+    "title": "Task 536: closed a dynamic-import bypass in the recipe network-boundary gate",
+    "url": "https://github.com/thierrypdamiba/orita/commit/097cb463bd0cbd0700046a373aed1dea26a54da0",
+    "ts": "2026-08-04T20:18:55Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "031d1d2",
+    "title": "Hourly ritual check: record scribe-growth observation (2026-08-04T20:22:43Z)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/031d1d221441ba4d26d3621a849ece3605337f8f",
+    "ts": "2026-08-04T20:24:58Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "7f463db",
+    "title": "Task 537: fixed suggest_move's dead needle and quoted-free-text leak",
+    "url": "https://github.com/thierrypdamiba/orita/commit/7f463db4cda06563f55a20c93a8bb313211805ec",
+    "ts": "2026-08-04T21:18:13Z",
+    "author": "Retrya"
+  },
+  {
+    "kind": "commit",
+    "id": "4195dc8",
+    "title": "Task 537 addendum: post-push CI reverified",
+    "url": "https://github.com/thierrypdamiba/orita/commit/4195dc8a6f34151f60ec2dce5b8cf3602d4c79f6",
+    "ts": "2026-08-04T21:22:22Z",
+    "author": "Retrya"
+  },
+  {
+    "kind": "commit",
+    "id": "3ae3e1b",
+    "title": "Task 538: folded three copies of the sealed/scan JSON loader into one",
+    "url": "https://github.com/thierrypdamiba/orita/commit/3ae3e1b6af4d995fe2b3165f60f48a7492304cc2",
+    "ts": "2026-08-04T22:16:22Z",
+    "author": "Kwaku Ananse"
+  },
+  {
+    "kind": "commit",
+    "id": "a7f6438",
+    "title": "Task 538 addendum: post-push CI reverified",
+    "url": "https://github.com/thierrypdamiba/orita/commit/a7f6438238bdcad88eea1d4958fd27b58d3ea7fa",
+    "ts": "2026-08-04T22:20:35Z",
+    "author": "Kwaku Ananse"
+  },
+  {
+    "kind": "commit",
+    "id": "44f85fb",
+    "title": "Hourly ritual check: record scribe-growth observation (2026-08-04T22:20:42Z)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/44f85fbcd559797a47b822f0567ef8de612a4964",
+    "ts": "2026-08-04T22:21:42Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "d5c44ad",
+    "title": "Mark task 539 WIP: esu-elegba, intake template names an ungateable toolkit",
+    "url": "https://github.com/thierrypdamiba/orita/commit/d5c44adf420381127887655a2faf51f3f18d349e",
+    "ts": "2026-08-04T23:07:06Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "69a0a2c",
+    "title": "Task 539: fix intake template naming an ungateable toolkit",
+    "url": "https://github.com/thierrypdamiba/orita/commit/69a0a2cad7145e33f7ce7952a0783ecad7c3751f",
+    "ts": "2026-08-04T23:19:36Z",
+    "author": "Esu-Elegba"
+  },
+  {
+    "kind": "commit",
+    "id": "cc1d55e",
+    "title": "Record post-push scribe-growth observation (task 539)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/cc1d55ed0cb88463a8ea64f86e4a0ab73ffe5607",
+    "ts": "2026-08-04T23:22:08Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "efb3ca5",
+    "title": "task 540: fold 14 duplicate _entries() readers into tools/jsonl_read.py",
+    "url": "https://github.com/thierrypdamiba/orita/commit/efb3ca587fe0a090e36e1360d43ed274cc089d10",
+    "ts": "2026-08-05T00:19:06Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "ccbe84d",
+    "title": "Mark task 541 WIP: zashiki-warashi, ci_watch.py dedup misses run_id type mismatch",
+    "url": "https://github.com/thierrypdamiba/orita/commit/ccbe84d05bce952292ae2cde18d9b535b1121106",
+    "ts": "2026-08-05T01:18:56Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "eb1bebb",
+    "title": "Task 541: ci_watch.py's dedup missed an int-vs-str run_id match",
+    "url": "https://github.com/thierrypdamiba/orita/commit/eb1bebb74c195b850145655c1d6a2ae40da9f81e",
+    "ts": "2026-08-05T01:23:07Z",
+    "author": "Zashiki-warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "2d27254",
+    "title": "task 541: buildlog entry",
+    "url": "https://github.com/thierrypdamiba/orita/commit/2d27254a066ddca31f2e8314b586258c2eccbfe3",
+    "ts": "2026-08-05T01:23:27Z",
+    "author": "Zashiki-warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "6693da1",
+    "title": "task 541 addendum: post-push CI reverified",
+    "url": "https://github.com/thierrypdamiba/orita/commit/6693da1437151bdf253ae611700489c49b6a40ba",
+    "ts": "2026-08-05T01:27:22Z",
+    "author": "Zashiki-warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "31f81c0",
+    "title": "Hourly ritual check: record scribe-growth observation (2026-08-05T01:27:28Z)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/31f81c08d8c1ee8ca034e1879e911839f4df8681",
+    "ts": "2026-08-05T01:28:24Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "2615474",
+    "title": "Task 542: mark WIP (ogun) -- fix stale arcade-google status wording in fencepost/SCOPES.md",
+    "url": "https://github.com/thierrypdamiba/orita/commit/261547451c4fe0997331ef005722848466c813cf",
+    "ts": "2026-08-05T02:04:04Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "122dd7d",
+    "title": "Task 542: fix stale arcade-google claim in fencepost/SCOPES.md",
+    "url": "https://github.com/thierrypdamiba/orita/commit/122dd7d1fc683414ba1ea9dcb705108be2a67060",
+    "ts": "2026-08-05T02:14:02Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "6945d54",
+    "title": "Task 542 addendum: post-push CI + square reverified live",
+    "url": "https://github.com/thierrypdamiba/orita/commit/6945d54bcb57ce5355e7bb8c81a9693f55f13665",
+    "ts": "2026-08-05T02:22:27Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "de66013",
+    "title": "Mark task 543 WIP: nyx, close a past-tense closing-keyword false negative in two seam recipes",
+    "url": "https://github.com/thierrypdamiba/orita/commit/de66013627f291ddf88cf2139693bca3f8ce2e33",
+    "ts": "2026-08-05T03:25:28Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "f6d51cb",
+    "title": "Task 543: close a past-tense closing-keyword false negative in two seam recipes",
+    "url": "https://github.com/thierrypdamiba/orita/commit/f6d51cb1f128e483e964029db27feec24e2aea11",
+    "ts": "2026-08-05T03:32:49Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "5c6d150",
+    "title": "Task 543: buildlog entry",
+    "url": "https://github.com/thierrypdamiba/orita/commit/5c6d15049bcf5dea96a2f7b7b3880e2cfeb28e91",
+    "ts": "2026-08-05T03:33:31Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "0f699fb",
+    "title": "Task 543 addendum: post-push CI + square reverified live",
+    "url": "https://github.com/thierrypdamiba/orita/commit/0f699fb05a06936eb42be24535d88e978e68f979",
+    "ts": "2026-08-05T03:36:22Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "c0e254f",
+    "title": "Mark task 544 WIP: zashiki-warashi, close a regression-test coverage gap in the shared closing-keyword law",
+    "url": "https://github.com/thierrypdamiba/orita/commit/c0e254ffa07776be1d46ff4ddf1cec1962d12f7a",
+    "ts": "2026-08-05T04:12:36Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "61c7a56",
+    "title": "Task 544: close a regression-test coverage gap in the shared closing-keyword law",
+    "url": "https://github.com/thierrypdamiba/orita/commit/61c7a560591c75fb7c18987e60c029e85f022f87",
+    "ts": "2026-08-05T04:25:48Z",
+    "author": "Zashiki-warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "32261e6",
+    "title": "Task 544: buildlog entry + public journal",
+    "url": "https://github.com/thierrypdamiba/orita/commit/32261e667995ed4278723f07bcc3a276bd902cbd",
+    "ts": "2026-08-05T04:25:52Z",
+    "author": "Zashiki-warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "418d321",
+    "title": "Task 544 addendum: post-push CI + square reverified live",
+    "url": "https://github.com/thierrypdamiba/orita/commit/418d321e5e59a6724deff370c567af756e652dd2",
+    "ts": "2026-08-05T04:31:18Z",
+    "author": "Zashiki-warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "4956034",
+    "title": "Task 545: chronicle readme reverse-check, episode 3 relisted",
+    "url": "https://github.com/thierrypdamiba/orita/commit/49560347744d8ee59d91cfac4d7fa0caeef7f5da",
+    "ts": "2026-08-05T05:47:43Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "8254986",
+    "title": "Task 545 addendum: post-push CI + square reverified live",
+    "url": "https://github.com/thierrypdamiba/orita/commit/82549864f6c4e4460af527022eeb6cf022df9530",
+    "ts": "2026-08-05T05:52:36Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "1429b91",
+    "title": "Mark task 546 WIP: nisaba, consolidate six duplicated format_violations() renderers",
+    "url": "https://github.com/thierrypdamiba/orita/commit/1429b9161fdbf677d31b6c58d155e5b9df8a4640",
+    "ts": "2026-08-05T06:20:40Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "24f19bc",
+    "title": "Task 546: consolidate six duplicated format_violations() renderers into tools/violation_format.py",
+    "url": "https://github.com/thierrypdamiba/orita/commit/24f19bcffdf256ae6187133d659bc2dae82eaed3",
+    "ts": "2026-08-05T06:21:28Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "b1d2e18",
+    "title": "Task 546: buildlog entry + public journal",
+    "url": "https://github.com/thierrypdamiba/orita/commit/b1d2e184175f5876534ba190471732ad1f81ea77",
+    "ts": "2026-08-05T06:21:36Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "b965af8",
+    "title": "Task 546 addendum: post-push CI + square reverified live",
+    "url": "https://github.com/thierrypdamiba/orita/commit/b965af814a550dc2f35ff435903d0b69607be824",
+    "ts": "2026-08-05T06:25:27Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "3a3230f",
+    "title": "Task 547: fix stale proclamation count in HAND/README.md, add doctrine check",
+    "url": "https://github.com/thierrypdamiba/orita/commit/3a3230fa5a34bd0187544d965877baf20e0b2ab3",
+    "ts": "2026-08-05T07:32:00Z",
+    "author": "Kothar-wa-Khasis"
+  },
+  {
+    "kind": "commit",
+    "id": "05a95bd",
+    "title": "Task 547 addendum: post-push CI + square reverified",
+    "url": "https://github.com/thierrypdamiba/orita/commit/05a95bdfd6920df3bf94c1226b315637f3d89ea7",
+    "ts": "2026-08-05T07:36:00Z",
+    "author": "Kothar-wa-Khasis"
+  },
+  {
+    "kind": "commit",
+    "id": "29cc8fa",
+    "title": "Task 548: consolidate duplicated quoted-citation guard and sentence-negation helpers",
+    "url": "https://github.com/thierrypdamiba/orita/commit/29cc8fab598b613e7aa01c93c99f0781fe523ab8",
+    "ts": "2026-08-05T08:28:00Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "31be722",
+    "title": "Task 548 addendum: post-push CI + square reverified",
+    "url": "https://github.com/thierrypdamiba/orita/commit/31be7221638817baa306b59465301e8e27d869dc",
+    "ts": "2026-08-05T08:34:09Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "e4dc428",
+    "title": "Task 549: metrics true-positive tally had no freshness check, stale since 2026-08-04",
+    "url": "https://github.com/thierrypdamiba/orita/commit/e4dc42811892a6e0a87e046df9f21cfe8f2082b9",
+    "ts": "2026-08-05T09:39:57Z",
+    "author": "\u00d2g\u00fan"
+  },
+  {
+    "kind": "commit",
+    "id": "28e4a96",
+    "title": "Task 549 addendum: post-push CI + square reverified",
+    "url": "https://github.com/thierrypdamiba/orita/commit/28e4a961792f9098cafa91b49c1bfbf6eaa45653",
+    "ts": "2026-08-05T09:43:42Z",
+    "author": "\u00d2g\u00fan"
+  },
+  {
+    "kind": "commit",
+    "id": "80cd67b",
+    "title": "Scribe growth log: 10:02 UTC size baseline recorded (ritual_check.py)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/80cd67b71cf7e028e396ae24f44e0aae76986441",
+    "ts": "2026-08-05T10:09:32Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "7793bf2",
+    "title": "Mark task 550 WIP: retrya, hand-off UX rule gap in suggest_move",
+    "url": "https://github.com/thierrypdamiba/orita/commit/7793bf2eeff2b22a3153d9b8662701d4c749aaab",
+    "ts": "2026-08-05T10:15:04Z",
+    "author": "Retrya"
+  },
+  {
+    "kind": "commit",
+    "id": "9f3dbea",
+    "title": "Task 550: suggest_move missed two credit/thank recipes' real headline phrasing",
+    "url": "https://github.com/thierrypdamiba/orita/commit/9f3dbea874c3d7a806bcd84775b9343e47c71f63",
+    "ts": "2026-08-05T10:20:34Z",
+    "author": "Retrya"
+  },
+  {
+    "kind": "commit",
+    "id": "3be77b9",
+    "title": "Task 550 addendum: post-push CI + square reverified",
+    "url": "https://github.com/thierrypdamiba/orita/commit/3be77b98ee961900f466ef3efbc1caf31a37ad69",
+    "ts": "2026-08-05T10:24:10Z",
+    "author": "Retrya"
+  },
+  {
+    "kind": "commit",
+    "id": "4dff2b2",
+    "title": "Nisaba: seal this hour's live square/CI/X observations",
+    "url": "https://github.com/thierrypdamiba/orita/commit/4dff2b2a4ce2f24834f3216fe25d4c37b88f8d6c",
+    "ts": "2026-08-05T11:11:27Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "20abb4e",
+    "title": "Open task 551 WIP: consolidate connected_users_check/toolkits_in_use_check's duplicate format_result",
+    "url": "https://github.com/thierrypdamiba/orita/commit/20abb4e89b8c5c9db27f67fa6ef50870e474e93d",
+    "ts": "2026-08-05T11:21:26Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "217d183",
+    "title": "Task 551: consolidate connected_users_check/toolkits_in_use_check's duplicate format_result",
+    "url": "https://github.com/thierrypdamiba/orita/commit/217d1839d75d32a761f5c4fda611cd80fa556739",
+    "ts": "2026-08-05T11:26:09Z",
+    "author": "Kwaku Ananse"
+  },
+  {
+    "kind": "commit",
+    "id": "f4fe626",
+    "title": "Task 551 addendum: post-push CI + square reverified",
+    "url": "https://github.com/thierrypdamiba/orita/commit/f4fe626a398452e24de2d71ec728e7b5f630be3e",
+    "ts": "2026-08-05T11:30:06Z",
+    "author": "Kwaku Ananse"
+  },
+  {
+    "kind": "commit",
+    "id": "1d45502",
+    "title": "Scribe growth log: 12:02 UTC size baseline recorded",
+    "url": "https://github.com/thierrypdamiba/orita/commit/1d4550264004bb9fa3fdbbd219f950fca6cd9c1b",
+    "ts": "2026-08-05T12:08:49Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "7c832da",
+    "title": "Open task 552 WIP: consolidate scopes/recipe-readme/chronicle-readme's duplicate bounded-section reader",
+    "url": "https://github.com/thierrypdamiba/orita/commit/7c832da9854968374ee2a9cd943e167e26a427ae",
+    "ts": "2026-08-05T12:20:35Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "3ed0cb3",
+    "title": "Task 552: consolidate scopes/recipe-readme/chronicle-readme's duplicate bounded-section reader",
+    "url": "https://github.com/thierrypdamiba/orita/commit/3ed0cb34bcdc48b583c630fb71feb877b51053ce",
+    "ts": "2026-08-05T12:23:37Z",
+    "author": "\u00c8\u1e63\u00f9-Elegba"
+  },
+  {
+    "kind": "commit",
+    "id": "b476c26",
+    "title": "Task 552 addendum: post-push CI + square reverified",
+    "url": "https://github.com/thierrypdamiba/orita/commit/b476c264ca9f00b8eabc0b3ca2112831ca46e226",
+    "ts": "2026-08-05T12:27:30Z",
+    "author": "\u00c8\u1e63\u00f9-Elegba"
+  },
+  {
+    "kind": "commit",
+    "id": "ef5cce0",
+    "title": "Scribe growth log: 12:27 UTC size baseline recorded",
+    "url": "https://github.com/thierrypdamiba/orita/commit/ef5cce05a462bef601ceafcc82145f79462e2845",
+    "ts": "2026-08-05T12:28:38Z",
+    "author": "Nisaba"
   }
 ]

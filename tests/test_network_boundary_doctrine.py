@@ -387,9 +387,21 @@ class RealSeamEngineDirCase(unittest.TestCase):
     `_detector_network_imports()` and the "that it names no
     network-capable import anywhere in its [detector]" docstring line --
     a true claim about the file's own AST-walking source, which imports
-    no network-capable module itself."""
+    no network-capable module itself. Task 553: `github_events_cache.py`
+    joined the same hour its new `normalize_raw_commits`/
+    `normalize_raw_release` functions picked up the same "no network"
+    phrasing describing their own pure dict-in/dict-out mapping -- true of
+    the file (it imports `scan.commit_event_fields`/`scan.
+    release_event_fields` by name, not `httpx` or any other network-capable
+    module), caught live by this same test the hour it landed (this file's
+    module-level docstring had already used the phrase once before, task
+    128's paragraph -- the new functions' docstrings pushed `scan.py`
+    itself over the same line first, since `scan.py` genuinely does import
+    `httpx`; that false claim was reworded out of `scan.py` in the same
+    commit rather than added to this set, since `scan.py` was never really
+    a "no network" file)."""
 
-    EXPECTED_TODAY = {"consent.py", "draftback.py", "recipes.py"}
+    EXPECTED_TODAY = {"consent.py", "draftback.py", "recipes.py", "github_events_cache.py"}
 
     def test_live_discovery_matches_todays_real_set(self):
         found = set(nbc.find_claiming_files(SEAM_ENGINE_SRC_DIR))
