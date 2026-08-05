@@ -2,14 +2,15 @@
 """Task 163. Zashiki-Warashi's first real module.
 
 A phrase ran through eighteen files in `tools/` when this module first
-swept them at task 163; twenty-seven carry it today -- nine more `tools/
+swept them at task 163; twenty-eight carry it today -- ten more `tools/
 *_check.py` files (`duplicate_regex_check.py`, `gateway_toolset_check.py`,
 `good_first_issue_check.py`, `metrics_field_completeness_check.py`,
 `nyx_traffic_check.py`, `recipe_readme_check.py`, `site_link_check.py`,
-`chronicle_readme_check.py`, `proclamation_count_check.py`) have
-independently repeated the same "no network" claim since, each caught by
-this module's own live discovery with no docstring edit required -- which
-is the whole point of never hand-typing the list below.
+`chronicle_readme_check.py`, `proclamation_count_check.py`,
+`site_recipe_check.py`) have independently repeated the same "no network"
+claim since, each caught by this module's own live discovery with no
+docstring edit required -- which is the whole point of never hand-typing
+the list below.
 The original eighteen's genealogy is almost
 identical in shape to task 147's `DEFAULT_ACTOR` chain: `vault_leak_check.
 py` claims to mirror `check_checkout`'s "boundary" exactly ("no network");
@@ -27,7 +28,7 @@ itself all repeat some form of the same sentence about individual
 functions or the whole module: "makes no network call of its own."
 
 Every one of these claims is true today (confirmed by grep: none of the
-now-twenty-seven files import a network-capable module). None of them has ever
+now-twenty-eight files import a network-capable module). None of them has ever
 been checked structurally -- the same "claims a mirror, never checked
 against the thing it mirrors" pattern tasks 136/137/141/146/147/160/162
 already closed elsewhere in this codebase, found here for the first time
@@ -44,12 +45,12 @@ This module discovers every claiming file structurally -- a live scan of
 `tools/*.py` for the phrase "no network" (tolerant of a mid-phrase line
 wrap, the way `petition_limits_check.py`'s own docstring happens to wrap
 it) in its own source, never a second hand-typed list of filenames
-(eighteen at task 163, twenty-seven today) that could itself go stale --
+(eighteen at task 163, twenty-eight today) that could itself go stale --
 and checks each one's real, live-loaded AST: no `import` or
 `from ... import` statement anywhere in the file names a module on the
 network-capable deny-list. A module that imports
 `os`/`re`/`sys`/`json`/`subprocess`/`hashlib`/`datetime`/
-`importlib.util` (everything these twenty-seven files actually use today)
+`importlib.util` (everything these twenty-eight files actually use today)
 passes; a module that imports `requests`, `httpx`, `urllib.request`,
 `urllib3`, `http.client`, `socket`, `aiohttp`, `ftplib`, `smtplib`,
 `telnetlib`, `poplib`, `imaplib`, or `nntplib` does not.

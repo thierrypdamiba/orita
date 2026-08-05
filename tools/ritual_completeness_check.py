@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Task 121. Off-By-One counts the tool that counts everything else.
 
-`tools/ritual_check.py` hand-wires 61 `check_*` functions into one hourly
+`tools/ritual_check.py` hand-wires 62 `check_*` functions into one hourly
 block: each is called inside `run_ritual_check`, its result assigned to a
 dict key, and that key printed as a line in `format_ritual_check`. Three
 separate places a single typo or a forgotten wire-up can silently drop a
@@ -272,6 +272,26 @@ unpetitioned proclamations, stale since only the first
 the sentence against the directory it describes. Fixed by Kothar-wa-
 Khasis in the same commit.
 
+**Updated to 62** the same hour task 554's `check_site_recipe_readme`
+was wired in -- `recipe_readme_check.py` (task 426) had already closed
+the reverse-direction gap (does every LINK still point at a real
+recipe?) for `fencepost/README.md`, but `docs/fencepost/index.html` --
+the Wall, kothar-wa-khasis's own remit per STRATEGY.md's Team table, the
+one page a real stranger actually lands on -- carries the identical
+hand-written recipe catalog and had never been given the same reverse
+check. Confirmed live before writing the fix: temporarily removing
+`fencepost/RECIPES/stale-branch-no-pr/` correctly flipped `recipe_
+readme_check.py` to BROKEN for `fencepost/README.md`, while `site_link_
+check.py` (the site's recipe links are absolute `https://github.com/...`
+URLs, out of that check's local-filesystem-only scope by design) and
+`tests/test_fencepost_site_recipes.py` (forward-only substring match)
+both stayed clean throughout -- the Wall's own public recipe catalog
+could carry a dead link to a removed recipe with nothing, running or
+in the test suite, ever noticing. `site_recipe_check.py` closes it the
+same structural way its sibling does, cross-checking the site's own
+`<a href="https://github.com/.../fencepost/RECIPES/<slug>">` links
+against `seam_engine.recipes.discover_recipes()` in both directions.
+
 Usage:
     python3 tools/ritual_completeness_check.py check
 """
@@ -309,7 +329,7 @@ EXEMPT_TOOL_FILES = {
     "roadmap_archive.py": "one-off length-triggered archival tool run by hand, not a periodic repo-state check",
     "closing_keyword_guard.py": "takes a commit-message-and-open-issues-csv argument each call -- a per-commit guard, not the hourly repo-state sweep run_ritual_check folds",
     "consent_grant_log.py": "append-only log library, called by toolkits_in_use_check.py (already wired) rather than loaded standalone",
-    "text_patterns.py": "shared regex-pattern library (task 418), imported directly by the 12 tools/*.py files that use it rather than loaded standalone by ritual_check.py (task 484: grown from the original nine as later tasks, task 461 among them, wired more callers without revisiting this count; task 545's chronicle_readme_check.py the twelfth)",
+    "text_patterns.py": "shared regex-pattern library (task 418), imported directly by the 13 tools/*.py files that use it rather than loaded standalone by ritual_check.py (task 484: grown from the original nine as later tasks, task 461 among them, wired more callers without revisiting this count; task 545's chronicle_readme_check.py the twelfth, task 554's site_recipe_check.py the thirteenth)",
     "metrics_reader.py": "shared records/metrics.jsonl reader library (task 508), imported directly by the six tools/*.py checks that use it (connected_users_check.py, gap_true_positive_check.py, github_stars_check.py, report_shipped_check.py, tasks_shipped_check.py, toolkits_in_use_check.py -- all already wired) rather than loaded standalone by ritual_check.py, the same shape consent_grant_log.py/text_patterns.py already hold",
     "iso_time.py": "shared Z-suffixed ISO timestamp parser library (task 509), imported directly by the three tools/*.py checks that use it (cron_health.py, voice_window_check.py, x_outage_tracker.py -- all already wired) rather than loaded standalone by ritual_check.py, the same shape metrics_reader.py/consent_grant_log.py/text_patterns.py already hold",
     "jsonl_append.py": "shared append-one-JSON-line library (task 510), imported directly by the ten tools/*.py checks that use it (arcade_app_watch.py, change_gate.py, ci_watch.py, gateway_toolset_check.py, github_stars_check.py, scribe_growth_check.py, square_check.py, word_watch.py, x_outage_tracker.py, x_post_queue.py -- all already wired) rather than loaded standalone by ritual_check.py, the same shape metrics_reader.py/iso_time.py/consent_grant_log.py/text_patterns.py already hold",

@@ -409,6 +409,10 @@ def _recipe_readme_check():
     return _load_once("_ritual_recipe_readme_check", os.path.join(ROOT, "tools", "recipe_readme_check.py"))
 
 
+def _site_recipe_check():
+    return _load_once("_ritual_site_recipe_check", os.path.join(ROOT, "tools", "site_recipe_check.py"))
+
+
 def _chronicle_readme_check():
     return _load_once("_ritual_chronicle_readme_check", os.path.join(ROOT, "tools", "chronicle_readme_check.py"))
 
@@ -1873,6 +1877,41 @@ def check_recipe_readme(readme_path: str | None = None, recipe_fencepost_root: s
     return mod.check_recipe_readme(**kwargs)
 
 
+def check_site_recipe_readme(site_path: str | None = None, site_recipe_fencepost_root: str | None = None) -> dict:
+    """Task 554 (Kothar-wa-Khasis): fold `site_recipe_check.py`'s own
+    two-way cross-check of `docs/fencepost/index.html`'s Community recipes
+    section against the live `seam_engine.recipes.discover_recipes()` tree
+    into the one block -- the SAME reverse-direction gap `check_recipe_
+    readme` (task 426) already closed for `fencepost/README.md`, never
+    closed for the Wall itself. `tests/test_fencepost_site_recipes.py`
+    (task 417) already proves every real recipe is named somewhere on the
+    site, but only forward, and only by loose substring match -- nothing
+    before this task ever asked the reverse question live against the
+    Wall: does every recipe link on the public site still point at a
+    recipe directory that actually exists, and does a link's own anchor
+    text agree with its own href. Confirmed live before writing this fix:
+    temporarily removing `fencepost/RECIPES/stale-branch-no-pr/` left
+    `recipe_readme_check.py` correctly BROKEN for `fencepost/README.md`
+    while `site_link_check.py` (the site's recipe links are absolute
+    `https://github.com/...` URLs, out of that check's local-filesystem-
+    only scope) and `test_fencepost_site_recipes.py` both stayed clean --
+    the Wall's own public catalog could carry a dead link to a removed
+    recipe with nothing, running or test-suite, ever noticing. Uncondi-
+    tional, local-filesystem-only, the same cheap always-on class `check_
+    recipe_readme`/`check_wip_reclaim` already hold. A real hit here DOES
+    flip `broken`: a stale or mismatched recipe link is a live documenta-
+    tion regression on the flagship's own public onboarding surface, the
+    identical severity `check_recipe_readme` already assigns its sibling
+    document."""
+    mod = _site_recipe_check()
+    kwargs = {}
+    if site_path is not None:
+        kwargs["site_path"] = site_path
+    if site_recipe_fencepost_root is not None:
+        kwargs["fencepost_root"] = site_recipe_fencepost_root
+    return mod.check_site_recipe_readme(**kwargs)
+
+
 def check_escape_sequences(orita_dir: str | None = None) -> dict:
     """Task 434: fold escape_sequence_check.py's own repo-wide compile-
     time scan into the one block. Found by accident this hour running
@@ -2002,6 +2041,8 @@ def run_ritual_check(
     badge_path: str | None = None,
     recipe_readme_path: str | None = None,
     recipe_readme_fencepost_root: str | None = None,
+    site_recipe_path: str | None = None,
+    site_recipe_fencepost_root: str | None = None,
     escape_sequence_orita_dir: str | None = None,
     metrics_field_completeness_metrics_path: str | None = None,
     metrics_field_completeness_tools_dir: str | None = None,
@@ -2120,6 +2161,9 @@ def run_ritual_check(
     recipe_readme = check_recipe_readme(
         readme_path=recipe_readme_path, recipe_fencepost_root=recipe_readme_fencepost_root
     )
+    site_recipe_readme = check_site_recipe_readme(
+        site_path=site_recipe_path, site_recipe_fencepost_root=site_recipe_fencepost_root
+    )
     escape_sequences = check_escape_sequences(orita_dir=escape_sequence_orita_dir)
     metrics_field_completeness = check_metrics_field_completeness(
         metrics_path=metrics_field_completeness_metrics_path,
@@ -2181,6 +2225,7 @@ def run_ritual_check(
         or (not proclamation_count["clean"])
         or (not badge_freshness["clean"])
         or (not recipe_readme["clean"])
+        or (not site_recipe_readme["clean"])
         or (not strategy_true_positive["clean"])
         or (not gap_true_positive["clean"])
         or (not report_shipped["clean"])
@@ -2245,6 +2290,7 @@ def run_ritual_check(
         "proclamation_count": proclamation_count,
         "badge_freshness": badge_freshness,
         "recipe_readme": recipe_readme,
+        "site_recipe_readme": site_recipe_readme,
         "strategy_true_positive": strategy_true_positive,
         "gap_true_positive": gap_true_positive,
         "report_shipped": report_shipped,
@@ -2546,6 +2592,7 @@ def format_ritual_check(result: dict) -> str:
     lines.append("  " + _proclamation_count_check().format_result(result["proclamation_count"]))
     lines.append("  " + _badge_freshness_check().format_badge_freshness(result["badge_freshness"]))
     lines.append("  " + _recipe_readme_check().format_result(result["recipe_readme"]))
+    lines.append("  " + _site_recipe_check().format_result(result["site_recipe_readme"]))
     stp = result["strategy_true_positive"]
     if stp["clean"]:
         lines.append(

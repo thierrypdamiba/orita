@@ -549,7 +549,9 @@ class DocstringClaimDoctrineCase(unittest.TestCase):
         # check_proclamation_count moved this from 59 to 60, docstring
         # updated in the same commit. Task 549's check_metrics_freshness
         # moved this from 60 to 61, docstring updated in the same commit.
-        self.assertEqual(self._real_check_count(), 61)
+        # Task 554's check_site_recipe_readme moved this from 61 to 62,
+        # docstring updated in the same commit.
+        self.assertEqual(self._real_check_count(), 62)
 
     def test_stale_27_claim_would_have_been_flagged_against_todays_real_count(self):
         # Mutation-based hand-verification: reconstruct the module's own
@@ -597,16 +599,17 @@ class TextPatternsImporterCountDoctrineCase(unittest.TestCase):
             src.real_text_patterns_importer_count(),
         )
 
-    def test_real_importer_count_is_currently_12(self):
+    def test_real_importer_count_is_currently_13(self):
         # Regression pin: task 418 shipped this claiming nine. Task 461
         # (and others) wired more tools/*.py callers of text_patterns.py
         # afterward without revisiting the docstring's number. Task 545's
         # chronicle_readme_check.py moved this from 11 to 12, docstring
-        # updated in the same commit. Naming the real count here so a
-        # future addition that forgets to update the sentence trips a
-        # second, independent assertion, not just the live cross-check
-        # above.
-        self.assertEqual(src.real_text_patterns_importer_count(), 12)
+        # updated in the same commit. Task 554's site_recipe_check.py
+        # moved this from 12 to 13, docstring updated in the same commit.
+        # Naming the real count here so a future addition that forgets to
+        # update the sentence trips a second, independent assertion, not
+        # just the live cross-check above.
+        self.assertEqual(src.real_text_patterns_importer_count(), 13)
 
     def test_stale_nine_claim_would_have_been_flagged_against_todays_real_count(self):
         # Mutation-based hand-verification: reconstruct the module's own
