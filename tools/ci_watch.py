@@ -119,9 +119,37 @@ def record_check(workflow: str, conclusion: str, run_id, checked_at: str, path=L
         last = last_check(_entries(path), workflow)
     except CIWatchTamperedError:
         last = None
-    if last is not None and last == entry:
+    if last is not None and _same_observation(last, entry):
         return False
     _append(entry, path)
+    return True
+
+
+def _same_observation(a: dict, b: dict) -> bool:
+    """True if two recorded check entries name the identical real moment.
+
+    Task 541: `record_check`'s dedup used to compare entry dicts with a bare
+    `==`. `ritual_check.py`'s `check_ci` feeds `run_id` straight off a
+    JSON-decoded `--ci-checks` file (a bare number parses as a Python int),
+    while the standalone `ci_watch.py record` CLI always hands `run_id`
+    through as a `str` (every `sys.argv` element is one). The same real
+    GitHub run recorded once via each entry point in the same hour -- exactly
+    what happened live in `HAND/ci-watch-log.jsonl` this hour -- produced two
+    `run_id` values that are equal in value but unequal in type, so
+    `{"run_id": 111} == {"run_id": "111"}` reads False and task 501's dedup
+    silently missed it. Every other field is compared as-is; only `run_id`
+    is compared by its string form, since it is an identifier, never
+    arithmetic.
+    """
+    if a.keys() != b.keys():
+        return False
+    for key, a_val in a.items():
+        b_val = b[key]
+        if key == "run_id":
+            if str(a_val) != str(b_val):
+                return False
+        elif a_val != b_val:
+            return False
     return True
 
 

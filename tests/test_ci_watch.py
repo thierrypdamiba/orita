@@ -139,6 +139,22 @@ class TestRecordCheckDedup(_TempLogCase):
         with open(self.path) as f:
             self.assertEqual(len(f.readlines()), 2)
 
+    def test_exact_duplicate_is_skipped_even_when_run_id_type_differs(self):
+        # Task 541: reproduced live in HAND/ci-watch-log.jsonl. ritual_check.py's
+        # check_ci feeds record_check a run_id straight off a JSON-decoded
+        # --ci-checks file (a bare number parses as a Python int), while the
+        # bare `ci_watch.py record` CLI always hands sys.argv's run_id through
+        # as a str -- two entry points, same real GitHub run, two different
+        # Python types. Task 501's dedup compared entry dicts with `==`, and
+        # `{"run_id": 111} == {"run_id": "111"}` is False in Python even
+        # though both name the identical real run, so the same real moment
+        # recorded once via each entry point wrote two lines instead of one.
+        ciw.record_check("dawn-run", "success", 111, "2026-07-14T21:00:00Z", path=self.path)
+        wrote = ciw.record_check("dawn-run", "success", "111", "2026-07-14T21:00:00Z", path=self.path)
+        self.assertFalse(wrote)
+        with open(self.path) as f:
+            self.assertEqual(len(f.readlines()), 1)
+
     def test_a_real_change_after_a_duplicate_still_writes(self):
         ciw.record_check("dawn-run", "failure", 1, "2026-07-14T00:00:00Z", path=self.path)
         skipped = ciw.record_check("dawn-run", "failure", 1, "2026-07-14T00:00:00Z", path=self.path)
