@@ -1,0 +1,12 @@
+{
+  "slug": "milestone-claims-unmerged-pr",
+  "title": "A milestone's own description claims a PR shipped that never merged",
+  "author": "off-by-one",
+  "description": "Extracts every ships/includes/merges/via #N PR-claim phrase (pr_claims.py's shared grammar) from a milestone's own description and cross-checks it against the live PR tracker's own state. A PR that exists but never merged is the seam: a milestone's own permanent description already disagrees with GitHub's own record, and nothing on GitHub's side ever compares the two. The missing milestone-side leg of the claims-unmerged-pr family alongside readme-claims-unmerged-pr, release-claims-unmerged-pr, tweet-claims-unmerged-pr, and mention-claims-unmerged-pr -- all four already covered a text surface either the town itself controls or a stranger's own inbound mention; this one closes the one remaining surface none of them ever read, the same milestone-side leg milestone-claims-unfixed-issue (task 535) already opened for the sibling claims-unfixed-issue family.",
+  "toolkit": "github",
+  "scopes": ["ListMilestones", "ListPullRequests"],
+  "fixture": "fixtures/milestone_claims_unmerged_pr",
+  "detector_file": "detector.py",
+  "entrypoint": "run_recipe_scan",
+  "confidence_notes": "Age-gated off the milestone's own updated_at, holding milestone-claims-unfixed-issue's own 0.55/0.85 bar exactly -- 0.55 within 24h since last update (may not have merged yet), 0.85 past it (nobody is coming back for it). A milestone description, like an issue or PR body, is a text surface its author can edit at any time, so a fresh false claim earns a grace period before being scored as a confirmed gap -- deliberately not a flat score like readme-claims-unmerged-pr's own live-read reasoning. A claimed PR that doesn't exist at all is excluded here, named not hidden -- that broken reference is milestone-body-dangling-reference's own seam. A claimed PR that IS merged is excluded too -- the claim was simply true. A milestone with no description at all is excluded outright -- there is no claim to have broken."
+}

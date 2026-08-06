@@ -646,6 +646,22 @@ exactly, not a discounted copy of it. `GetMyMentions` and
 `ListPullRequests` were both already cleared on `SCOPES.md`'s oath table —
 no new scope asked for anywhere in this recipe.
 
+[`RECIPES/milestone-claims-unmerged-pr/`](RECIPES/milestone-claims-unmerged-pr/)
+is the fiftieth (ROADMAP.md #567): the missing milestone-side leg of the
+claims-unmerged-pr family. `readme-claims-unmerged-pr`, `release-claims-unmerged-pr`,
+`tweet-claims-unmerged-pr`, and `mention-claims-unmerged-pr` already check whether
+a ships/includes/merges/via `#N` claim phrase made on some other surface actually
+holds against the PR tracker — but none of them ever reads a milestone's own
+`description` field. This one reads that surface, the same milestone-side leg
+`milestone-claims-unfixed-issue` (task 535) already opened for the sibling
+claims-unfixed-issue family, applied here to close the last remaining
+claims-unmerged-pr surface. Confidence mirrors `milestone-claims-unfixed-issue`'s
+own 0.55/0.85 24h age-gated bar exactly, not a discounted copy of it — a milestone
+description is a text surface its author can still edit at any time, so a fresh
+claim earns the same grace window before being scored as a confirmed gap.
+`ListMilestones` and `ListPullRequests` were both already cleared on `SCOPES.md`'s
+oath table — no new scope asked for anywhere in this recipe.
+
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)
 (ROADMAP.md #111) is that second promise, kept: it runs `scan.py`'s own

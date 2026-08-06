@@ -1,0 +1,58 @@
+[
+  {
+    "number": 70,
+    "title": "v2.2 Ship list",
+    "state": "open",
+    "description": "This milestone ships #901, closing out the ship list.",
+    "updated_at": "2026-08-01T12:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/milestone/70"
+  },
+  {
+    "number": 71,
+    "title": "Fast follow",
+    "state": "open",
+    "description": "includes #903 once this lands.",
+    "updated_at": "2026-08-04T10:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/milestone/71"
+  },
+  {
+    "number": 72,
+    "title": "Already true",
+    "state": "closed",
+    "description": "merges #902 as part of this milestone.",
+    "updated_at": "2026-07-20T00:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/milestone/72"
+  },
+  {
+    "number": 73,
+    "title": "Typo in the tracker",
+    "state": "open",
+    "description": "via #9999, which I can no longer find.",
+    "updated_at": "2026-07-29T12:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/milestone/73"
+  },
+  {
+    "number": 74,
+    "title": "No description written",
+    "state": "open",
+    "description": null,
+    "updated_at": "2026-07-20T00:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/milestone/74"
+  },
+  {
+    "number": 75,
+    "title": "Pure housekeeping",
+    "state": "open",
+    "description": "Nothing to claim here, just cleanup.",
+    "updated_at": "2026-07-29T12:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/milestone/75"
+  },
+  {
+    "number": 76,
+    "title": "Bare mention only",
+    "state": "open",
+    "description": "see #901 for background, still pending.",
+    "updated_at": "2026-07-29T12:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/milestone/76"
+  }
+]
