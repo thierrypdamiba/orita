@@ -7,7 +7,6 @@ returns something other than the shape its own run_recipe_scan promises.
 import importlib.util
 import json
 import os
-import stat
 import sys
 import tempfile
 import unittest

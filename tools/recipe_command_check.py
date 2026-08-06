@@ -44,10 +44,10 @@ Local subprocess only — no repo file is written, no Arcade tool is
 called, no real account is touched; `uv run` resolves against this repo's
 own already-committed `uv.lock` and the local cache the standing
 `pytest`/CI environment already builds, the same local-only shape
-`child_work_check.py`'s own `git cat-file -e` subprocess call holds (not
-claimed here as "no network" verbatim, since a cold, never-synced
-environment could in principle need one — the hourly ritual's own
-checkout is never cold).
+`child_work_check.py`'s own `git cat-file -e` subprocess call holds (the
+network-boundary guarantee itself is deliberately not asserted verbatim
+here, since a cold, never-synced environment could in principle need a
+fetch — the hourly ritual's own checkout is never cold).
 
 Usage:
     python3 tools/recipe_command_check.py check
@@ -91,7 +91,44 @@ def _run_it_yourself_block(readme_text: str) -> str | None:
     return m.group(1) if m else None
 
 
+_RESULTS_CACHE: dict[tuple[str, str, float], dict] = {}
+
+
+def clear_cache() -> None:
+    """Task 588: drop every memoized `check_recipe_commands()` result.
+    Only real callers are tests that want to force a genuinely fresh
+    live run (e.g. after rewriting a recipe's own README in place);
+    production's one-call-per-process shape never needs this."""
+    _RESULTS_CACHE.clear()
+
+
 def check_recipe_commands(
+    fencepost_root: str = DEFAULT_FENCEPOST_ROOT,
+    seam_engine_dir: str = DEFAULT_SEAM_ENGINE_DIR,
+    timeout: float = _DEFAULT_TIMEOUT_S,
+) -> dict:
+    """Task 588: memoized per (fencepost_root, seam_engine_dir, timeout)
+    for the lifetime of the process, the same fix `vault_leak_check.py`'s
+    `find_leaks()` got at task 367 and for the identical reason:
+    `run_ritual_check()`'s `check_recipe_commands()` call has no way to
+    skip this check, so every one of `tests/test_ritual_check.py`'s
+    FoldCase methods that calls `run_ritual_check()` without a
+    `recipe_command_*` override was triggering a fresh live run of all
+    51 real recipes' own `uv run` subprocess commands -- work that
+    cannot have changed between calls within one process, and expensive
+    enough (dozens of subprocess spawns each) that CI's own dawn-run
+    #1023 timed out mid-suite and failed 72 unrelated FoldCase tests
+    that never touch a recipe at all. A real hourly `ritual_check.py`
+    run is a fresh process that calls this exactly once, so the cache
+    is inert there -- production still runs every recipe fresh every
+    single hour."""
+    key = (os.path.realpath(fencepost_root), os.path.realpath(seam_engine_dir), timeout)
+    if key not in _RESULTS_CACHE:
+        _RESULTS_CACHE[key] = _check_recipe_commands_uncached(fencepost_root, seam_engine_dir, timeout)
+    return dict(_RESULTS_CACHE[key])
+
+
+def _check_recipe_commands_uncached(
     fencepost_root: str = DEFAULT_FENCEPOST_ROOT,
     seam_engine_dir: str = DEFAULT_SEAM_ENGINE_DIR,
     timeout: float = _DEFAULT_TIMEOUT_S,
