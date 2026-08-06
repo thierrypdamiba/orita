@@ -55,6 +55,7 @@ import sys
 import unicodedata
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import quoted_citation  # noqa: E402
 import text_patterns  # noqa: E402
 import violation_format  # noqa: E402
 
@@ -82,7 +83,6 @@ _PETITIONER_RE = text_patterns.PETITIONER_LINE
 
 _SENTENCE_BOUNDARY = text_patterns.SENTENCE_BOUNDARY_LOOSE
 _NEGATION_CUES = text_patterns.NEGATION_CUES_STANDARD
-_QUOTE_CHARS = set('"\'“‘')
 
 # (a) Star/follow ask -- same curated imperative shapes star_covenant_check
 # uses, aimed at petitions specifically now. Seven of these are the exact
@@ -151,8 +151,7 @@ def _is_negated_or_predictive(text: str, match_start: int) -> bool:
     return bool(_NEGATION_CUES.search(text[window_start:match_start]))
 
 
-def _is_quoted_citation(text: str, match_start: int) -> bool:
-    return match_start > 0 and text[match_start - 1] in _QUOTE_CHARS
+_is_quoted_citation = quoted_citation.is_quoted_citation
 
 
 def _iter_petition_files(orita_dir: str):

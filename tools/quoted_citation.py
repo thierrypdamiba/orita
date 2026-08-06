@@ -1,13 +1,19 @@
 #!/usr/bin/env python3
-"""Task 548. The one-line guard five doctrine checkers each carried a
-private copy of.
+"""Task 548 (widened task 561). The one-line guard six doctrine checkers
+each carried a private copy of.
 
 `no_grading_check.py`, `star_covenant_check.py`, `arcade_hero_check.py`,
-`hand_lore_check.py`, and `rider_check.py` each defined their own
-`_is_quoted_citation(text, match_start)` and `_QUOTE_CHARS = set('"\\'\u201c\u2018')`
--- byte-for-byte identical in every one of the five, confirmed by direct
-diff before writing this, not assumed from the AST-hash sweep alone. Every
-sibling's own docstring already narrates this as a shared "SEARCH
+`hand_lore_check.py`, `rider_check.py`, and `petition_limits_check.py`
+each defined their own `_is_quoted_citation(text, match_start)` and
+`_QUOTE_CHARS = set('"\\'\u201c\u2018')` -- byte-for-byte identical in every
+one of the six, confirmed by direct diff before writing this, not assumed
+from the AST-hash sweep alone. Task 546's own ROADMAP row had already
+named all six siblings in this family one hour before task 548 shipped,
+but task 548's migration only actually touched five of them --
+`petition_limits_check.py` kept its local copy for 13 more tasks until
+task 561 found the sixth still standing and finished the migration.
+
+Every sibling's own docstring already narrates this as a shared "SEARCH
 TECHNIQUE" borrowed from `star_covenant_check.py` (task 99) or
 `no_grading_check.py` (task 105), but -- the same disease task 510 named
 for `_append`, task 540 named for `_entries`, and task 546 named for

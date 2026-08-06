@@ -45,6 +45,7 @@ SIBLINGS = [
     "arcade_hero_check",
     "hand_lore_check",
     "rider_check",
+    "petition_limits_check",
 ]
 
 
