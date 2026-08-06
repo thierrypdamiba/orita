@@ -413,6 +413,10 @@ def _site_recipe_check():
     return _load_once("_ritual_site_recipe_check", os.path.join(ROOT, "tools", "site_recipe_check.py"))
 
 
+def _recipe_command_check():
+    return _load_once("_ritual_recipe_command_check", os.path.join(ROOT, "tools", "recipe_command_check.py"))
+
+
 def _chronicle_readme_check():
     return _load_once("_ritual_chronicle_readme_check", os.path.join(ROOT, "tools", "chronicle_readme_check.py"))
 
@@ -1912,6 +1916,39 @@ def check_site_recipe_readme(site_path: str | None = None, site_recipe_fencepost
     return mod.check_site_recipe_readme(**kwargs)
 
 
+def check_recipe_commands(
+    recipe_command_fencepost_root: str | None = None,
+    recipe_command_seam_engine_dir: str | None = None,
+) -> dict:
+    """Task 571 (Ogun): fold `recipe_command_check.py`'s own live
+    execution of every recipe README's "Run it yourself" block into the
+    one hourly pass. `check_recipe_readme`/`check_site_recipe_readme`
+    already prove every recipe's own LINK stays honest; nothing before
+    this task ever proved the documented COMMAND itself still runs --
+    `test_recipes.py` calls each detector's `run_recipe_scan` directly
+    through pytest's own import path, never the literal `cd fencepost/
+    seam_engine` + `PYTHONPATH=... uv run python ...` line a stranger
+    reading the README would actually copy and paste. A future recipe
+    edit that adds a local-helper import and forgets to widen its own
+    README's `PYTHONPATH` line accordingly would ship a broken copy-paste
+    instruction on the flagship's own onboarding surface with nothing,
+    running or test-suite, ever noticing -- the same "documented, not
+    verified" shape `check_recipe_readme`'s own link check closed for
+    text, closed here for execution. Local subprocess only (`uv run`
+    against this repo's own already-synced environment) -- no repo file
+    is written, no Arcade tool is called, no real account is touched. A
+    real hit here DOES flip `broken`: a dead copy-paste command on the
+    public onboarding path is the identical severity `check_recipe_
+    readme`/`check_site_recipe_readme` already assign a stale link."""
+    mod = _recipe_command_check()
+    kwargs = {}
+    if recipe_command_fencepost_root is not None:
+        kwargs["fencepost_root"] = recipe_command_fencepost_root
+    if recipe_command_seam_engine_dir is not None:
+        kwargs["seam_engine_dir"] = recipe_command_seam_engine_dir
+    return mod.check_recipe_commands(**kwargs)
+
+
 def check_escape_sequences(orita_dir: str | None = None) -> dict:
     """Task 434: fold escape_sequence_check.py's own repo-wide compile-
     time scan into the one block. Found by accident this hour running
@@ -2043,6 +2080,8 @@ def run_ritual_check(
     recipe_readme_fencepost_root: str | None = None,
     site_recipe_path: str | None = None,
     site_recipe_fencepost_root: str | None = None,
+    recipe_command_fencepost_root: str | None = None,
+    recipe_command_seam_engine_dir: str | None = None,
     escape_sequence_orita_dir: str | None = None,
     metrics_field_completeness_metrics_path: str | None = None,
     metrics_field_completeness_tools_dir: str | None = None,
@@ -2164,6 +2203,10 @@ def run_ritual_check(
     site_recipe_readme = check_site_recipe_readme(
         site_path=site_recipe_path, site_recipe_fencepost_root=site_recipe_fencepost_root
     )
+    recipe_commands = check_recipe_commands(
+        recipe_command_fencepost_root=recipe_command_fencepost_root,
+        recipe_command_seam_engine_dir=recipe_command_seam_engine_dir,
+    )
     escape_sequences = check_escape_sequences(orita_dir=escape_sequence_orita_dir)
     metrics_field_completeness = check_metrics_field_completeness(
         metrics_path=metrics_field_completeness_metrics_path,
@@ -2226,6 +2269,7 @@ def run_ritual_check(
         or (not badge_freshness["clean"])
         or (not recipe_readme["clean"])
         or (not site_recipe_readme["clean"])
+        or (not recipe_commands["clean"])
         or (not strategy_true_positive["clean"])
         or (not gap_true_positive["clean"])
         or (not report_shipped["clean"])
@@ -2291,6 +2335,7 @@ def run_ritual_check(
         "badge_freshness": badge_freshness,
         "recipe_readme": recipe_readme,
         "site_recipe_readme": site_recipe_readme,
+        "recipe_commands": recipe_commands,
         "strategy_true_positive": strategy_true_positive,
         "gap_true_positive": gap_true_positive,
         "report_shipped": report_shipped,
@@ -2593,6 +2638,7 @@ def format_ritual_check(result: dict) -> str:
     lines.append("  " + _badge_freshness_check().format_badge_freshness(result["badge_freshness"]))
     lines.append("  " + _recipe_readme_check().format_result(result["recipe_readme"]))
     lines.append("  " + _site_recipe_check().format_result(result["site_recipe_readme"]))
+    lines.append("  " + _recipe_command_check().format_result(result["recipe_commands"]))
     stp = result["strategy_true_positive"]
     if stp["clean"]:
         lines.append(

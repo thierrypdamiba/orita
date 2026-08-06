@@ -3861,6 +3861,77 @@ class RecipeReadmeFoldCase(unittest.TestCase):
         self.assertEqual(result["recipe_readme"]["real_count"], direct["real_count"])
 
 
+class RecipeCommandFoldCase(unittest.TestCase):
+    """Task 571: run_ritual_check() folds recipe_command_check.py's own
+    live execution of every recipe README's "Run it yourself" block into
+    the same structured result -- clean against a fixture whose
+    documented command actually runs and returns the promised shape, and
+    BROKEN (surfaced in the printed block) against one whose documented
+    command fails, the same class RecipeReadmeFoldCase already holds one
+    layer up (the link text, not the executable command)."""
+
+    _GOOD_JSON = (
+        "{'generated_at': '2026-08-06T00:00:00+00:00', 'source': 'fixture', "
+        "'confidence_bar': 0.7, 'separation_margin': 0.15, 'primary_gap': None, "
+        "'tail': [], 'excluded': []}"
+    )
+
+    def setUp(self):
+        self.dir = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.dir, ignore_errors=True)
+        self.seam_engine_dir = os.path.join(self.dir, "seam_engine")
+        os.makedirs(self.seam_engine_dir, exist_ok=True)
+
+    def _write_recipe(self, slug, detector_body, cd_line="cd fencepost/seam_engine"):
+        import json as _json
+        recipe_dir = os.path.join(self.dir, "RECIPES", slug)
+        os.makedirs(recipe_dir, exist_ok=True)
+        manifest = {
+            "slug": slug, "title": f"{slug} title", "author": "ogun",
+            "description": f"{slug} description", "toolkit": "github",
+            "scopes": ["GetRepository"], "fixture": "fixtures/dummy",
+            "detector_file": "detector.py", "entrypoint": "run_recipe_scan",
+            "confidence_notes": "fixed 0.80",
+        }
+        with open(os.path.join(recipe_dir, "recipe.json"), "w") as f:
+            _json.dump(manifest, f)
+        with open(os.path.join(recipe_dir, "detector.py"), "w") as f:
+            f.write(detector_body)
+        with open(os.path.join(recipe_dir, "README.md"), "w") as f:
+            f.write(f"# {slug}\n\nRun it yourself:\n\n```\n{cd_line}\npython3 ../RECIPES/{slug}/detector.py\n```\n")
+
+    def test_clean_fixture_is_not_broken(self):
+        self._write_recipe("alpha-gap", f"import json\nprint(json.dumps({self._GOOD_JSON}))\n")
+        result = rc.run_ritual_check(
+            recipe_command_fencepost_root=self.dir, recipe_command_seam_engine_dir=self.seam_engine_dir
+        )
+        self.assertTrue(result["recipe_commands"]["clean"])
+        self.assertFalse(result["broken"])
+        self.assertIn("recipe commands: clean", rc.format_ritual_check(result))
+
+    def test_a_failing_documented_command_flips_broken_and_prints(self):
+        self._write_recipe("broken-gap", "import sys\nsys.exit(1)\n")
+        result = rc.run_ritual_check(
+            recipe_command_fencepost_root=self.dir, recipe_command_seam_engine_dir=self.seam_engine_dir
+        )
+        self.assertFalse(result["recipe_commands"]["clean"])
+        self.assertTrue(result["broken"])
+        formatted = rc.format_ritual_check(result)
+        self.assertIn("recipe commands: BROKEN", formatted)
+        self.assertIn("broken-gap", formatted)
+
+    def test_default_paths_read_the_real_tree_and_match_direct_call(self):
+        """No override: reads the real RECIPES/ tree, the same default
+        check_recipe_commands falls back to -- proves the fold never
+        duplicates or diverges from the module it wraps."""
+        rcc = _load("_test_recipe_command_check", os.path.join(ROOT, "tools", "recipe_command_check.py"))
+        direct = rcc.check_recipe_commands()
+        result = rc.run_ritual_check()
+        self.assertEqual(result["recipe_commands"]["clean"], direct["clean"])
+        self.assertEqual(result["recipe_commands"]["real_count"], direct["real_count"])
+        self.assertTrue(direct["clean"])
+
+
 class EscapeSequenceFoldCase(unittest.TestCase):
     """Task 434: run_ritual_check() folds escape_sequence_check.py's own
     repo-wide compile-time scan into the same structured result -- clean

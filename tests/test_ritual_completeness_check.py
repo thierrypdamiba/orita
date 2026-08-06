@@ -550,8 +550,10 @@ class DocstringClaimDoctrineCase(unittest.TestCase):
         # updated in the same commit. Task 549's check_metrics_freshness
         # moved this from 60 to 61, docstring updated in the same commit.
         # Task 554's check_site_recipe_readme moved this from 61 to 62,
-        # docstring updated in the same commit.
-        self.assertEqual(self._real_check_count(), 62)
+        # docstring updated in the same commit. Task 571's
+        # check_recipe_commands moved this from 62 to 63, docstring
+        # updated in the same commit.
+        self.assertEqual(self._real_check_count(), 63)
 
     def test_stale_27_claim_would_have_been_flagged_against_todays_real_count(self):
         # Mutation-based hand-verification: reconstruct the module's own

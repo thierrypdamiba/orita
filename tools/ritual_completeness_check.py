@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Task 121. Off-By-One counts the tool that counts everything else.
 
-`tools/ritual_check.py` hand-wires 62 `check_*` functions into one hourly
+`tools/ritual_check.py` hand-wires 63 `check_*` functions into one hourly
 block: each is called inside `run_ritual_check`, its result assigned to a
 dict key, and that key printed as a line in `format_ritual_check`. Three
 separate places a single typo or a forgotten wire-up can silently drop a
@@ -291,6 +291,16 @@ in the test suite, ever noticing. `site_recipe_check.py` closes it the
 same structural way its sibling does, cross-checking the site's own
 `<a href="https://github.com/.../fencepost/RECIPES/<slug>">` links
 against `seam_engine.recipes.discover_recipes()` in both directions.
+
+**Updated to 63** the same hour task 571's `check_recipe_commands` was
+wired in -- `check_recipe_readme`/`check_site_recipe_readme` (tasks
+426/554) already prove every recipe's own LINK stays honest; neither, nor
+any test in the suite, had ever proved the recipe's own documented
+COMMAND still runs. `recipe_command_check.py` actually executes each
+recipe README's literal "Run it yourself" block live and checks it exits
+0 and returns the shape its own `run_recipe_scan` promises -- the
+"documented, not verified" gap closed for the text of a link, now closed
+for the executable copy-paste instruction sitting right below it.
 
 Usage:
     python3 tools/ritual_completeness_check.py check
