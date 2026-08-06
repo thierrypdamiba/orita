@@ -629,6 +629,23 @@ instead. Confidence mirrors `tweet-claims-open-milestone`'s own 0.85/0.5
 `ListMilestones` were both already cleared on `SCOPES.md`'s oath table —
 no new scope asked for anywhere in this recipe.
 
+[`RECIPES/mention-claims-unmerged-pr/`](RECIPES/mention-claims-unmerged-pr/)
+is the forty-ninth (ROADMAP.md #566): the mention-side leg the claims-unmerged-pr
+family had never grown. `readme-claims-unmerged-pr`, `release-claims-unmerged-pr`,
+and `tweet-claims-unmerged-pr` already check whether a ships/includes/merges/via
+`#N` claim phrase made on a text surface the town itself controls actually
+holds against the PR tracker — but all three only ever check a claim the
+town made ABOUT itself. This one reads the one inbound surface none of
+them ever touch: a stranger's own X mention of the account, sourced from
+`GetMyMentions` rather than `GetUserTweets`, the same tweet-vs-mention
+split `mention-claims-unfixed-issue` and `mention-claims-open-milestone`
+already opened for their own sibling families, applied here to the third
+and last claims-X family, claims-unmerged-pr, to grow its mention leg.
+Confidence mirrors `tweet-claims-unmerged-pr`'s own 0.85/0.5 24h bar
+exactly, not a discounted copy of it. `GetMyMentions` and
+`ListPullRequests` were both already cleared on `SCOPES.md`'s oath table —
+no new scope asked for anywhere in this recipe.
+
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)
 (ROADMAP.md #111) is that second promise, kept: it runs `scan.py`'s own

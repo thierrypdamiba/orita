@@ -1,0 +1,12 @@
+{
+  "slug": "mention-claims-unmerged-pr",
+  "title": "A mortal's own X mention claims a PR shipped that never merged",
+  "author": "off-by-one",
+  "description": "Extracts every ships/includes/merges/via #N PR-claim phrase (pr_claims.py's shared grammar) from a mortal's own X mention of the connected account and cross-checks it against the live PR tracker's own state. A PR that exists but never merged is the seam: a stranger's own permanent public claim about the project, sitting on X, already disagrees with GitHub's own record, and nothing on either platform ever compares them. The missing mention-side leg of the claims-unmerged-pr family alongside readme-claims-unmerged-pr, release-claims-unmerged-pr, and tweet-claims-unmerged-pr -- all three already covered a text surface the town itself controls; this one closes the one inbound surface none of them ever read, the same tweet-vs-mention split mention-claims-unfixed-issue opened against tweet-claims-unfixed-issue and mention-claims-open-milestone opened against tweet-claims-open-milestone -- the third and last claims-X family to grow its mention leg.",
+  "toolkit": "x+github",
+  "scopes": ["GetMyMentions", "ListPullRequests"],
+  "fixture": "fixtures/mention_claims_unmerged_pr",
+  "detector_file": "detector.py",
+  "entrypoint": "run_recipe_scan",
+  "confidence_notes": "Age-gated by hours since the mention's own created_at, mirroring tweet-claims-unmerged-pr's identical reasoning exactly, not a discounted copy of it: a claim checked within 24 hours of posting might still be a race (the real merge landing moments after the mention went out) rather than a settled public overclaim (0.5, below the 0.70 bar, shown as a weighed-and-dropped coincidence, not hidden). At or past 24 hours with the named PR still unmerged, it is unambiguous (flat 0.85, no further keyword fuzziness to misfire on). This recipe's check is objective: the claimed PR's own live state/merged fields, verified against ListPullRequests, not the mortal's guess at the repo's number space. A mortal cannot be wrong about the number space and still land a real, existing PR number attached to a real ships/includes/merges/via claim -- that uncertainty does not apply here, so this recipe holds tweet-claims-unmerged-pr's own 0.85/0.5 bar exactly. A named PR that does not exist at all is excluded at confidence 0.0 -- that broken reference is dangling-issue-reference's/mention-dangling-reference's own seam, not this one's. A named PR that IS merged is excluded too, named not hidden -- the claim was true."
+}
