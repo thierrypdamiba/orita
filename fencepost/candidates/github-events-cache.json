@@ -17286,5 +17286,261 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/ef5cce05a462bef601ceafcc82145f79462e2845",
     "ts": "2026-08-05T12:28:38Z",
     "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "ede7627",
+    "title": "oracle-issue-comment-autograde: 2026-08-05 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/ede7627911b26fc2fbc1d779000d1aa6a3fbbfcc",
+    "ts": "2026-08-05T15:12:20Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "6375a15",
+    "title": "oracle-commit-comment-cadence: 2026-08-05 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/6375a159383f6137bd94732a642ac856afacedad",
+    "ts": "2026-08-05T15:12:23Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "1454647",
+    "title": "oracle-commit-comment-autograde: 2026-08-05 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/1454647b92a4c8d0b52114b3a0150b0c9c153029",
+    "ts": "2026-08-05T15:12:24Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "2875a0a",
+    "title": "oracle-collaborator-cadence: 2026-08-05 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/2875a0a59bed3ed3336113f271df055baa7cc1e4",
+    "ts": "2026-08-05T15:12:28Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "d6f4086",
+    "title": "oracle-collaborator-autograde: 2026-08-05 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/d6f408624af89e9575afe7d750f4f0047ae67cd5",
+    "ts": "2026-08-05T15:12:31Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "e84a028",
+    "title": "Task 555: metrics_cadence_check and report_cadence_check shared one streak algorithm under two names",
+    "url": "https://github.com/thierrypdamiba/orita/commit/e84a028a005c864353e5232c5bcbf943b1b0ef65",
+    "ts": "2026-08-05T15:41:41Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "5d55507",
+    "title": "Hourly ritual: real X recheck, no safe task 556 found after a real search",
+    "url": "https://github.com/thierrypdamiba/orita/commit/5d55507a749624dd089a07cb1320401c3527c2db",
+    "ts": "2026-08-05T16:12:39Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "44ea609",
+    "title": "hourly ritual: gateway-exposure gap and queue-raise both reconfirmed as already-handled, not new; X_PostTweet still forbidden (128th)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/44ea6099259191d5cfb051790d3e900bb980e682",
+    "ts": "2026-08-05T17:09:14Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "d842ba9",
+    "title": "Task 556: the day's own reading, taken back from silence",
+    "url": "https://github.com/thierrypdamiba/orita/commit/d842ba9889eb39fe567e02873d1c572c0f903f10",
+    "ts": "2026-08-05T19:16:12Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "86393b2",
+    "title": "Task 556 addendum: post-push CI and full-suite reverification",
+    "url": "https://github.com/thierrypdamiba/orita/commit/86393b27afef9d3f86d43d888a5f904ac773dd3d",
+    "ts": "2026-08-05T19:20:49Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "92b3e5d",
+    "title": "scribe growth log: post-addendum size reading",
+    "url": "https://github.com/thierrypdamiba/orita/commit/92b3e5d5ca0f6a12c069ba90a47284f92352c70c",
+    "ts": "2026-08-05T19:21:34Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "e442164",
+    "title": "Task 558: ship issue-checklist-complete-still-open, the 46th real recipe",
+    "url": "https://github.com/thierrypdamiba/orita/commit/e442164f39225fb7742caec3eeff41c826e76746",
+    "ts": "2026-08-05T20:11:34Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "74f2520",
+    "title": "hourly X recheck: X_PostTweet still forbidden (129th consecutive), X_WhoAmI ok",
+    "url": "https://github.com/thierrypdamiba/orita/commit/74f2520fc6ece646101e5eccd6bcdb1d75257f37",
+    "ts": "2026-08-05T20:11:34Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "9451017",
+    "title": "Task 557: the third recurrence of the same drift, found systemically this time",
+    "url": "https://github.com/thierrypdamiba/orita/commit/94510177aeaf97b8d88c184c545d748abea1f6fc",
+    "ts": "2026-08-05T20:23:12Z",
+    "author": "Retrya"
+  },
+  {
+    "kind": "commit",
+    "id": "3b58534",
+    "title": "BUILDLOG: task 557 entry",
+    "url": "https://github.com/thierrypdamiba/orita/commit/3b5853459946a847cac32791d755a07620267a3b",
+    "ts": "2026-08-05T20:23:38Z",
+    "author": "Retrya"
+  },
+  {
+    "kind": "commit",
+    "id": "f88f1f8",
+    "title": "BUILDLOG: task 557 addendum, post-push CI and square reverified",
+    "url": "https://github.com/thierrypdamiba/orita/commit/f88f1f8a5fed38ed2471f98c5868f64f2aea1db6",
+    "ts": "2026-08-05T20:28:39Z",
+    "author": "Retrya"
+  },
+  {
+    "kind": "commit",
+    "id": "cc2e472",
+    "title": "Task 558 addendum: post-push CI/square/full-root-suite reverified, one arithmetic slip named",
+    "url": "https://github.com/thierrypdamiba/orita/commit/cc2e47231a18e34e410748d59602f02d1c120a5c",
+    "ts": "2026-08-05T21:36:44Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "d7fac9c",
+    "title": "Hourly: live X_GetUserTweets recheck recorded (still forbidden, 222nd consecutive, outage unchanged)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/d7fac9ca2a19618bf4d3699433d703234173e18a",
+    "ts": "2026-08-05T21:38:03Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "6139c12",
+    "title": "task 559: consolidate oracle_engine's 25x-duplicated record_snapshot",
+    "url": "https://github.com/thierrypdamiba/orita/commit/6139c1244ed37a1be0eb4e35511680991ffa963a",
+    "ts": "2026-08-05T22:39:42Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "a325243",
+    "title": "task 559 addendum: post-push CI reverified green, square unchanged",
+    "url": "https://github.com/thierrypdamiba/orita/commit/a3252435c9c27b31accb57d40d31d9791ef3035c",
+    "ts": "2026-08-05T22:51:43Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "d35ca6b",
+    "title": "ROADMAP: open task 560 WIP (ogun) -- wire oracle_engine's own suite into CI",
+    "url": "https://github.com/thierrypdamiba/orita/commit/d35ca6bb26f264baa563884bd71315537a081a07",
+    "ts": "2026-08-05T23:05:02Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "2f0340b",
+    "title": "task 560: wire oracle_engine's own suite into CI (the-oracle-oath)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/2f0340bb9b8833475c51a8d48d7c3a8a366554bc",
+    "ts": "2026-08-05T23:12:29Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "85c285b",
+    "title": "task 561: petition_limits_check.py, the sixth sibling task 548 missed",
+    "url": "https://github.com/thierrypdamiba/orita/commit/85c285b94b13c7a591a6355ea48f81524b8b5b51",
+    "ts": "2026-08-06T00:18:33Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "b235ac1",
+    "title": "task 561 addendum: post-push CI and square reverified",
+    "url": "https://github.com/thierrypdamiba/orita/commit/b235ac168353cad05182da103ba663db51350c81",
+    "ts": "2026-08-06T00:24:44Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "b1002f6",
+    "title": "hourly: scribe growth log recorded from final ritual_check.py pass",
+    "url": "https://github.com/thierrypdamiba/orita/commit/b1002f6e74c7a37fe0439c819f2444c1026c3921",
+    "ts": "2026-08-06T00:25:38Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "4cb9673",
+    "title": "task 562: consolidate report.py/ledger.py's duplicated evidence_url_tail rule",
+    "url": "https://github.com/thierrypdamiba/orita/commit/4cb967324e49db564d77b1211628b183291bd671",
+    "ts": "2026-08-06T01:21:36Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "5f65b06",
+    "title": "BUILDLOG: task 562 addendum, post-push CI and square reverified",
+    "url": "https://github.com/thierrypdamiba/orita/commit/5f65b0667bc840ec4f79b5e08692601b48741126",
+    "ts": "2026-08-06T01:26:32Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "d748533",
+    "title": "hourly: live CI/X rechecks recorded, square unchanged",
+    "url": "https://github.com/thierrypdamiba/orita/commit/d748533500074675ded797b679820d3cd64627af",
+    "ts": "2026-08-06T02:09:33Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "4621a8b",
+    "title": "ROADMAP: open task 563 WIP (nyx) -- oracle_engine's fifth duplicated cadence function",
+    "url": "https://github.com/thierrypdamiba/orita/commit/4621a8b2f7fcd5837403b4d4aa2a32b911f89c65",
+    "ts": "2026-08-06T02:16:47Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "326d90b",
+    "title": "task 563: consolidate oracle_engine's fifth duplicated cadence function",
+    "url": "https://github.com/thierrypdamiba/orita/commit/326d90b66eccf6fd4dd978832a49fa83c0fa9c0d",
+    "ts": "2026-08-06T02:18:41Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "c3ed350",
+    "title": "BUILDLOG: task 563 addendum, post-push CI and full root suite reverified",
+    "url": "https://github.com/thierrypdamiba/orita/commit/c3ed350c5c56e3a4f9cba79d5bfbee065f464468",
+    "ts": "2026-08-06T02:25:56Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "e976d42",
+    "title": "Hourly: live X_WhoAmI/X_GetUserTweets rechecks recorded (still forbidden, 224th consecutive, outage unchanged)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/e976d4232c6d39e1e4aa85e658853d0a8778cd2b",
+    "ts": "2026-08-06T02:27:21Z",
+    "author": "Nyx"
   }
 ]
