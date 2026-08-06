@@ -46,6 +46,7 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import quoted_citation  # noqa: E402
 import scan_files  # noqa: E402
+import sentence_negation  # noqa: E402
 import text_patterns  # noqa: E402
 import violation_format  # noqa: E402
 
@@ -141,12 +142,16 @@ def _is_negated_or_predictive(text: str, match_start: int) -> bool:
     `;` to the boundary too, the same fix task 200 made to
     `star_covenant_check.py`: a semicolon joins two independent clauses
     exactly the way a period does, and an unrelated cue on the near side
-    of one must not mask a real violation on the far side."""
-    window_start = 0
-    for boundary in _SENTENCE_BOUNDARY.finditer(text, 0, match_start):
-        window_start = boundary.end()
-    sentence_so_far = text[window_start:match_start]
-    return bool(_NEGATION_CUES.search(sentence_so_far))
+    of one must not mask a real violation on the far side.
+
+    Task 569: the scan-and-slice control flow itself now lives once, in
+    `sentence_negation.is_negated_or_predictive` -- this stays a thin
+    wrapper closing over this file's own `_SENTENCE_BOUNDARY`/
+    `_NEGATION_CUES` (task 467's documented on-purpose divergence from
+    `star_covenant_check.py`/`arcade_hero_check.py`'s own word lists),
+    the same shape `_is_quoted_citation` already delegates in (task
+    548)."""
+    return sentence_negation.is_negated_or_predictive(text, match_start, _SENTENCE_BOUNDARY, _NEGATION_CUES)
 
 
 # Task 548: consolidated into tools/quoted_citation.py -- five sibling

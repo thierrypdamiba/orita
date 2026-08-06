@@ -12,20 +12,36 @@ this is that shape's third instance, found by the same AST-hash sweep
 pointed past `_is_quoted_citation` at the two functions sitting right next
 to it in both files.
 
-Unlike `quoted_citation.is_quoted_citation`, these two genuinely need a
-parameter per call: `_SENTENCE_BOUNDARY` and `_NEGATION_CUES` are
-deliberately tuned per file (task 467's documented on-purpose divergence,
-the same reason `_is_negated_or_predictive` in `no_grading_check.py`/
-`star_covenant_check.py`/`arcade_hero_check.py` was left untouched by this
-task -- three-way divergent word lists AND a different calling shape,
-sentence-boundary-scan-over-full-text rather than slice-a-pre-cut-
-sentence, a larger and riskier refactor than one hour should reach for
-alongside this one). `hand_lore_check.py`/`rider_check.py` share the
-narrower shape exactly: split text into sentences up front, then check a
-negation cue only in the prefix of one already-cut sentence.
+Unlike `quoted_citation.is_quoted_citation`, `iter_sentences`/
+`is_negated_prefix` genuinely need a parameter per call: `_SENTENCE_
+BOUNDARY` and `_NEGATION_CUES` are deliberately tuned per file (task 467's
+documented on-purpose divergence). `hand_lore_check.py`/`rider_check.py`
+share one narrow shape exactly: split text into sentences up front, then
+check a negation cue only in the prefix of one already-cut sentence.
+
+Task 569: this module's own docstring named a second, sibling shape at
+task 548 and explicitly deferred it -- "a larger and riskier refactor than
+one hour should reach for alongside this one" -- rather than leaving it
+unnamed. `no_grading_check.py`/`star_covenant_check.py`/
+`arcade_hero_check.py`'s own `_is_negated_or_predictive` bodies are, since
+that note was written, still a fourth AST-identical instance of the exact
+same control-flow (confirmed live, this task, by the same normalized-
+constants AST-hash sweep): scan the FULL text backward from `match_start`
+for the last sentence boundary, then search only the slice between that
+boundary and `match_start` for a negation cue. A different calling shape
+from `iter_sentences`/`is_negated_prefix` (one pre-cuts every sentence up
+front; this one finds only the boundary immediately before one match), so
+it earns its own function rather than a forced fit into the first -- but
+it is one function, parameterized by `sentence_boundary`/`negation_cues`
+exactly the way the first two already are, not three more independently
+retyped copies. `_SENTENCE_BOUNDARY`/`_NEGATION_CUES` themselves stay
+put, one set per file, genuinely tuned per file (task 467) -- only the
+scan-and-slice CONTROL FLOW moves here.
 
 Usage: import and call directly.
-    from sentence_negation import iter_sentences, is_negated_prefix
+    from sentence_negation import (
+        iter_sentences, is_negated_prefix, is_negated_or_predictive,
+    )
 """
 from __future__ import annotations
 
@@ -53,3 +69,23 @@ def is_negated_prefix(sentence: str, match_start: int, negation_cues) -> bool:
     elsewhere in the same sentence, must never mask a real, present-tense
     violation."""
     return bool(negation_cues.search(sentence[:match_start]))
+
+
+def is_negated_or_predictive(text: str, match_start: int, sentence_boundary, negation_cues) -> bool:
+    """Scope the negation/prediction check to the CURRENT SENTENCE only --
+    the exact `window_start`/`sentence_so_far` two-liner `no_grading_
+    check._is_negated_or_predictive`, `star_covenant_check._is_negated_or_
+    predictive`, and `arcade_hero_check._is_negated_or_predictive` each
+    carried independently, over their own (deliberately different)
+    `_SENTENCE_BOUNDARY`/`_NEGATION_CUES` regex pair (task 467). Unlike
+    `is_negated_prefix`, this scans the FULL `text` backward from
+    `match_start` to find the nearest sentence boundary itself -- callers
+    here never pre-cut sentences, so there is no already-cut `sentence` to
+    slice a prefix from. An unrelated negation/prediction cue several
+    sentences earlier, or anywhere after `match_start`, must never mask a
+    real, present-tense violation."""
+    window_start = 0
+    for boundary in sentence_boundary.finditer(text, 0, match_start):
+        window_start = boundary.end()
+    sentence_so_far = text[window_start:match_start]
+    return bool(negation_cues.search(sentence_so_far))
