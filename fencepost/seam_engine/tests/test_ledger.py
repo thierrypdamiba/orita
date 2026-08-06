@@ -70,6 +70,26 @@ def test_readable_evidence_links_are_rendered(tmp_path: Path):
     assert "Evidence:" in text
 
 
+def test_evidence_url_tail_is_last_segment_trimmed_to_12():
+    assert ledger.evidence_url_tail("https://github.com/x/orita/commit/abcdef0123456789") == "abcdef012345"
+    assert ledger.evidence_url_tail("https://github.com/x/orita/pull/42/") == "42"
+
+
+def test_report_reuses_ledgers_evidence_url_tail_not_a_second_copy():
+    """report.py's own _fmt_evidence imports this instead of retyping the
+    rstrip/rsplit/slice rule a second time -- the same shared-law shape
+    references.py already documents for the #N reference grammar."""
+    import ast
+    import inspect
+
+    from seam_engine import report
+
+    src = inspect.getsource(report._fmt_evidence)
+    assert "ledger.evidence_url_tail" in src
+    assert "rsplit" not in src
+    ast.parse(src)  # sanity: still valid Python after the edit
+
+
 # --- the chain ---------------------------------------------------------------
 
 

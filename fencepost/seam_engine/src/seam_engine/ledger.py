@@ -229,13 +229,23 @@ def _tablet_header(date: str, opened_at: str, chains_from: str) -> str:
     )
 
 
+def evidence_url_tail(url: str) -> str:
+    """The short, readable label an evidence link renders under: the last
+    path segment, trimmed to 12 chars (a commit/issue/PR URL's own SHA or
+    number). `report.py`'s `_fmt_evidence` renders this same tail for the
+    same evidence links a second time (a report and a ledger entry can
+    describe the same sealed record) — shared here, rather than the two
+    kept as independently-typed copies of one rule, so a future change to
+    the tail's shape can't apply to only one of the two renderers."""
+    return url.rstrip("/").rsplit("/", 1)[-1][:12]
+
+
 def _fmt_evidence(urls: list[str]) -> str:
     if not urls:
         return "  - _(no evidence links recorded)_\n"
     lines = []
     for u in urls:
-        tail = u.rstrip("/").rsplit("/", 1)[-1][:12]
-        lines.append(f"  - [{tail}]({u})")
+        lines.append(f"  - [{evidence_url_tail(u)}]({u})")
     return "\n".join(lines) + "\n"
 
 

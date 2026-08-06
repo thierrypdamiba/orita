@@ -227,8 +227,7 @@ def _fmt_evidence(urls: list[str], limit: int = 3) -> str:
         return ""
     lines = []
     for u in urls[:limit]:
-        tail = u.rstrip("/").rsplit("/", 1)[-1][:12]
-        lines.append(f"- [{tail}]({u})")
+        lines.append(f"- [{ledger.evidence_url_tail(u)}]({u})")
     return "\n".join(lines)
 
 
