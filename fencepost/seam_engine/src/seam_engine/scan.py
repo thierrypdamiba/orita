@@ -570,13 +570,31 @@ def compute_candidates(
         matched_keyword = overlap & MILESTONE_KEYWORDS
         if not matched_keyword:
             confidence = min(0.85, 0.35 + 0.1 * len(milestones))
+            # Task 577: `commits`' own order silently depends on which of the
+            # two data sources fed it -- the direct `fetch_github_activity`
+            # path returns GitHub's own `/commits` page order (newest-first,
+            # unsorted across pages), while the `--github-events` override
+            # reads `github_events_cache.json`, which `github_events_cache.
+            # save_cache`/`merge_events` always write oldest-first. Before
+            # this fix, `evidence=[m.url for m in milestones][:5]` silently
+            # inherited whichever order the caller's source happened to
+            # produce -- so the SAME 97-commit, 0.85-confidence gap showed
+            # the 5 OLDEST commits (from 2026-07-12) when scanned via the
+            # cache override and the 5 NEWEST (today's) when scanned via a
+            # live direct fetch, with nothing in the report distinguishing
+            # the two. Caught live comparing this hour's fresh override scan
+            # against today's already-sealed 14:04 UTC tablet entry: same
+            # slug/count/confidence, zero evidence-URL overlap. Sorting here
+            # makes evidence deterministic (oldest-first, matching the
+            # persisted cache's own convention) regardless of data source.
+            milestones_oldest_first = sorted(milestones, key=lambda c: c.ts)
             surfaced.append(GapCandidate(
                 slug="milestone-unannounced",
                 headline="Milestone-level work shipped but never reached @oritatown",
                 detail=f"{len(milestones)} milestone commit(s) since {account_live_since.date()} "
                        f"(matching {sorted(MILESTONE_KEYWORDS)}), none echoed in a post.",
                 confidence=round(confidence, 2),
-                evidence=[m.url for m in milestones][:5],
+                evidence=[m.url for m in milestones_oldest_first][:5],
             ))
 
     surfaced.sort(key=lambda g: g.confidence, reverse=True)

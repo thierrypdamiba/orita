@@ -749,3 +749,49 @@ def test_keyword_bearing_release_title_keeps_the_exact_pre_fix_overlap_behavior(
     )[0]
     assert not any(g.slug == "release-ep-3" for g in announced)
     assert any(g.slug == "release-ep-3" for g in silent)
+
+
+def _milestone_commit(cid: str, ts: datetime) -> GithubEvent:
+    return GithubEvent(
+        kind="commit", id=cid, title=f"fencepost: milestone commit {cid}",
+        url=f"https://github.com/thierrypdamiba/orita/commit/{cid}",
+        ts=ts, author="test",
+    )
+
+
+def test_milestone_evidence_is_oldest_first_regardless_of_input_commit_order():
+    # Task 577: caught live comparing a fresh scan (via the `--github-events`
+    # override, whose cache is always saved oldest-first) against today's
+    # already-sealed tablet entry (generated via the direct-fetch path,
+    # which returns GitHub's own `/commits` page order -- newest-first): same
+    # slug, same count, same 0.85 confidence, ZERO evidence-URL overlap.
+    # Pre-fix, `evidence=[m.url for m in milestones][:5]` silently inherited
+    # whichever order `commits` happened to arrive in. Two commit lists
+    # below carry the exact same five milestone commits, one oldest-first
+    # (the override/cache convention) and one newest-first (the direct-fetch
+    # convention) -- both must produce identical, oldest-first evidence.
+    oldest_first = [
+        _milestone_commit("aaa0001", datetime(2026, 7, 12, 8, 0, tzinfo=timezone.utc)),
+        _milestone_commit("aaa0002", datetime(2026, 7, 15, 8, 0, tzinfo=timezone.utc)),
+        _milestone_commit("aaa0003", datetime(2026, 7, 20, 8, 0, tzinfo=timezone.utc)),
+        _milestone_commit("aaa0004", datetime(2026, 8, 1, 8, 0, tzinfo=timezone.utc)),
+        _milestone_commit("aaa0005", datetime(2026, 8, 6, 8, 0, tzinfo=timezone.utc)),
+    ]
+    newest_first = list(reversed(oldest_first))
+    posts = [_post("unrelated chatter, no milestone keyword here")]
+
+    gap_from_oldest_first_input = next(
+        g for g in compute_candidates(oldest_first, posts, _LIVE)[0]
+        if g.slug == "milestone-unannounced"
+    )
+    gap_from_newest_first_input = next(
+        g for g in compute_candidates(newest_first, posts, _LIVE)[0]
+        if g.slug == "milestone-unannounced"
+    )
+
+    expected_evidence = [c.url for c in oldest_first]
+    assert gap_from_oldest_first_input.evidence == expected_evidence
+    assert gap_from_newest_first_input.evidence == expected_evidence, (
+        "evidence must be deterministic (oldest-first) regardless of "
+        "which order the caller's github_events happened to arrive in"
+    )
