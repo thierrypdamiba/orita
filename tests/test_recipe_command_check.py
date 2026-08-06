@@ -10,6 +10,7 @@ import os
 import sys
 import tempfile
 import unittest
+from unittest import mock
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "tools"))
@@ -178,10 +179,110 @@ class CheckRecipeCommandsCase(unittest.TestCase):
         self.assertEqual(result["real_count"], 1)
 
 
+def _write_recipe_with_command(fencepost_root, slug, command_lines):
+    """Like `_write_recipe`, but the caller controls every line of the
+    documented block after the `cd` line verbatim -- needed to write a
+    recipe whose command actually invokes `uv` (real recipes' shape),
+    unlike `_write_recipe`'s own fixtures, which always document a plain
+    `python3` command on purpose."""
+    recipe_dir = os.path.join(fencepost_root, "RECIPES", slug)
+    os.makedirs(recipe_dir, exist_ok=True)
+    manifest = {
+        "slug": slug, "title": f"{slug} title", "author": "ogun",
+        "description": f"{slug} description", "toolkit": "github",
+        "scopes": ["GetRepository"], "fixture": "fixtures/dummy",
+        "detector_file": "detector.py", "entrypoint": "run_recipe_scan",
+        "confidence_notes": "fixed 0.80",
+    }
+    with open(os.path.join(recipe_dir, "recipe.json"), "w", encoding="utf-8") as f:
+        json.dump(manifest, f)
+    with open(os.path.join(recipe_dir, "detector.py"), "w", encoding="utf-8") as f:
+        f.write("print('unused -- this fixture is never meant to actually run')\n")
+    block = "\n".join(["cd fencepost/seam_engine", *command_lines])
+    with open(os.path.join(recipe_dir, "README.md"), "w", encoding="utf-8") as f:
+        f.write(f"# {slug}\n\nRun it yourself:\n\n```\n{block}\n```\n")
+
+
+class UvUnavailableCase(unittest.TestCase):
+    """Task 588. `dawn-run.yml`'s `the-oath` job installs only PyYAML
+    (task 404's own lean-root-job boundary) -- no `uv`. A recipe whose
+    documented command actually invokes `uv` must not read as BROKEN
+    just because that one external tool isn't on PATH there; same class
+    of fix `badge_freshness_check.py` (task 425) already made for a
+    missing `arcade-mcp-server`, but scoped per command rather than a
+    blanket skip -- a fixture recipe that never mentions `uv` at all
+    (like every other fixture in this file) still gets checked for real
+    even when `uv` is absent from the machine running the test."""
+
+    def setUp(self):
+        self._tmp = tempfile.TemporaryDirectory()
+        self.fencepost_root = self._tmp.name
+        self.seam_engine_dir = os.path.join(self.fencepost_root, "seam_engine")
+        os.makedirs(self.seam_engine_dir, exist_ok=True)
+
+    def tearDown(self):
+        self._tmp.cleanup()
+
+    def _check(self):
+        return rcc.check_recipe_commands(
+            fencepost_root=self.fencepost_root,
+            seam_engine_dir=self.seam_engine_dir,
+            timeout=15,
+        )
+
+    def test_uv_command_skipped_clean_when_uv_missing(self):
+        _write_recipe_with_command(
+            self.fencepost_root, "needs-uv",
+            ["PYTHONPATH=src uv run python detector.py"],
+        )
+        with mock.patch.object(rcc.shutil, "which", return_value=None):
+            result = self._check()
+        self.assertTrue(result["clean"], result)
+        self.assertEqual(result["status"], "unavailable")
+        self.assertEqual(result["checked_count"], 0)
+        self.assertEqual(result["real_count"], 1)
+        self.assertIn("needs-uv", result["skipped_no_uv"])
+
+    def test_uv_command_still_runs_for_real_when_uv_present(self):
+        _write_recipe_with_command(
+            self.fencepost_root, "needs-uv",
+            ["PYTHONPATH=src uv run python detector.py"],
+        )
+        with mock.patch.object(rcc.shutil, "which", return_value="/usr/bin/uv"):
+            # `uv` "present" per the mock, but not actually runnable in
+            # this sandbox -- the point of this test is only that the
+            # command is attempted (not silently skipped), so a real
+            # subprocess failure is the expected, correct outcome here.
+            result = self._check()
+        self.assertEqual(result["status"], "checked")
+        self.assertEqual(result["checked_count"], 1)
+        self.assertEqual(result["skipped_no_uv"], [])
+
+    def test_non_uv_command_still_checked_for_real_even_when_uv_missing(self):
+        _write_recipe(
+            self.fencepost_root, "plain-python",
+            f"import json\nprint(json.dumps({_GOOD_JSON!r}))\n",
+        )
+        with mock.patch.object(rcc.shutil, "which", return_value=None):
+            result = self._check()
+        self.assertTrue(result["clean"], result)
+        self.assertEqual(result["status"], "checked")
+        self.assertEqual(result["checked_count"], 1)
+        self.assertEqual(result["skipped_no_uv"], [])
+
+
 class FormatResultCase(unittest.TestCase):
     def test_clean_line_names_the_counts(self):
-        line = rcc.format_result({"clean": True, "checked_count": 51, "real_count": 51})
+        line = rcc.format_result({"clean": True, "status": "checked", "checked_count": 51, "real_count": 51})
         self.assertIn("51/51", line)
+
+    def test_unavailable_line_names_it_explicitly(self):
+        line = rcc.format_result({
+            "clean": True, "status": "unavailable",
+            "real_count": 0, "checked_count": 0,
+        })
+        self.assertIn("unavailable", line)
+        self.assertIn("uv", line)
 
     def test_broken_line_names_every_problem_kind(self):
         line = rcc.format_result({
@@ -200,13 +301,34 @@ class FormatResultCase(unittest.TestCase):
 class LiveRealRepoCase(unittest.TestCase):
     """The same live, unmocked full-sweep discipline test_recipes.py's own
     test_all_real_shipped_recipes_pass_the_oath_coverage_check already
-    holds -- every real recipe's own documented command, actually run."""
+    holds -- every real recipe's own documented command, actually run.
+
+    Task 588: `uv` genuinely isn't installed in `dawn-run.yml`'s
+    `the-oath` job (this test's own root `tests/` suite runs there), so
+    a bare unmocked call against the real 51 recipes -- every one
+    documenting a `uv run` command -- gets every one skipped there, not
+    checked. Either every real recipe's command actually ran clean, or
+    every one was honestly skipped for the one documented environment
+    reason; both are `clean`, the same either/or
+    `test_badge_freshness_check.py`'s own
+    `test_the_real_committed_badge_is_not_currently_stale` already holds
+    for a missing `arcade-mcp-server`. A real `checked_count` short of
+    `real_count` with nothing in `skipped_no_uv` accounting for the gap
+    would still mean something genuinely didn't run and wasn't named --
+    that stays a real failure here, not silently waved through."""
 
     def test_every_real_shipped_recipe_command_runs_clean(self):
         result = rcc.check_recipe_commands()
         self.assertTrue(result["clean"], result)
-        self.assertEqual(result["checked_count"], result["real_count"])
         self.assertGreater(result["real_count"], 0)
+        self.assertEqual(
+            result["checked_count"] + len(result["skipped_no_uv"]),
+            result["real_count"],
+        )
+        if result["status"] == "checked":
+            self.assertEqual(result["checked_count"], result["real_count"])
+        else:
+            self.assertIn(result["status"], ("unavailable", "partially_unavailable"))
 
 
 if __name__ == "__main__":

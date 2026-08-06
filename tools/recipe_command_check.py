@@ -57,6 +57,7 @@ from __future__ import annotations
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -71,6 +72,13 @@ if _SEAM_ENGINE_SRC not in sys.path:
 from seam_engine.recipes import discover_recipes  # noqa: E402
 
 _RUN_BLOCK_RE = re.compile(r"Run it yourself:\s*\n\n```\n(.*?)\n```", re.DOTALL)
+
+# Matches a documented command that actually invokes the `uv` binary (a
+# bare word boundary around `uv`, not e.g. a path fragment that merely
+# contains those letters) -- every real recipe's own "Run it yourself"
+# block opens with `PYTHONPATH=... uv run python ...`; this module's own
+# test fixtures deliberately don't, so they're never matched here.
+_UV_INVOCATION_RE = re.compile(r"(?:^|[\s;&|])uv(?:\s|$)")
 
 # The keys every real detector's own run_recipe_scan() output dict promises
 # (see e.g. RECIPES/issue-body-dangling-reference/detector.py's own
@@ -136,14 +144,44 @@ def _check_recipe_commands_uncached(
     """Execute every real recipe's own README-documented command, live,
     and return `clean: True` only when every one exists, runs, and
     produces the shape it promises. Never a bare pass/fail -- every
-    problem names the exact recipe and the exact reason."""
+    problem names the exact recipe and the exact reason.
+
+    `dawn-run.yml`'s `the-oath` job (the root `tests/` suite this check's
+    own `run_ritual_check()` fold gets exercised from) deliberately
+    installs only `PyYAML` -- task 404's own note, the same lean-root-job
+    boundary `badge_freshness_check.py` (task 425) already had to respect
+    for `arcade-mcp-server`. Every real recipe's documented command
+    starts with `PYTHONPATH=... uv run python ...` and needs `uv` on
+    PATH; that job doesn't have it, so a bare subprocess call would fail
+    every real recipe with `exit 127: uv: command not found` --
+    dawn-run #1023/#1025 lived this for real. Same fix as task 425's
+    `live_badge_state()` in spirit -- detect the missing dependency and
+    report it as `status: "unavailable"`, clean, rather than
+    misreporting an environment gap as a doctrine violation -- but
+    scoped PER COMMAND, not a blanket process-wide skip: this module's
+    own test fixtures (`tests/test_recipe_command_check.py`,
+    `RecipeCommandFoldCase` in `tests/test_ritual_check.py`) document a
+    plain `python3 ...` command that needs no `uv` at all, and a bare
+    `shutil.which("uv") is None` early-return would wrongly stop
+    checking those too -- turning a genuinely broken fixture recipe into
+    a false "clean" and a genuinely clean one into an unverifiable
+    "unavailable", neither of which the fixture tests intend. Only a
+    documented command that actually invokes `uv` is skipped when `uv`
+    isn't on PATH; every other command (real or fixture) still runs and
+    is judged for real. `the-seam-oath` job (which does install `uv` via
+    its own `fencepost/seam_engine` setup) and any real hourly
+    `ritual_check.py` run in a full dev environment both still execute
+    every real recipe for real -- none of their documented commands ever
+    hit the skip."""
     real_slugs = sorted(m.slug for m in discover_recipes(Path(fencepost_root)))
 
     no_block: list[str] = []
     unexpected_shape: list[str] = []
     command_failed: list[dict] = []
     malformed_output: list[dict] = []
+    skipped_no_uv: list[str] = []
     checked = 0
+    uv_present = shutil.which("uv") is not None
 
     for slug in real_slugs:
         readme_path = os.path.join(fencepost_root, "RECIPES", slug, "README.md")
@@ -167,6 +205,10 @@ def _check_recipe_commands_uncached(
             continue
 
         command = "\n".join(lines[1:])
+        if not uv_present and _UV_INVOCATION_RE.search(command):
+            skipped_no_uv.append(slug)
+            continue
+
         checked += 1
         try:
             proc = subprocess.run(
@@ -201,19 +243,37 @@ def _check_recipe_commands_uncached(
             })
 
     clean = not (no_block or unexpected_shape or command_failed or malformed_output)
+    if skipped_no_uv:
+        status = "unavailable" if checked == 0 else "partially_unavailable"
+    else:
+        status = "checked"
     return {
         "clean": clean,
+        "status": status,
         "real_count": len(real_slugs),
         "checked_count": checked,
         "no_block": no_block,
         "unexpected_shape": unexpected_shape,
         "command_failed": command_failed,
         "malformed_output": malformed_output,
+        "skipped_no_uv": skipped_no_uv,
     }
 
 
 def format_result(result: dict) -> str:
+    status = result.get("status")
+    if status == "unavailable":
+        return (
+            f"recipe commands: clean (uv unavailable in this environment, "
+            f"{len(result.get('skipped_no_uv', []))} real recipe(s) skipped, nothing to execute)"
+        )
     if result["clean"]:
+        if status == "partially_unavailable":
+            return (
+                f"recipe commands: clean ({result['checked_count']}/{result['real_count']} real "
+                f"recipe(s) executed live and returned the shape it promises, "
+                f"{len(result['skipped_no_uv'])} skipped -- uv unavailable in this environment)"
+            )
         return (
             f"recipe commands: clean ({result['checked_count']}/{result['real_count']} real "
             f"recipe(s)' own documented 'Run it yourself' command executed live and returned "
