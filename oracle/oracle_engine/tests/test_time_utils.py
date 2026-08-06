@@ -36,6 +36,22 @@ sibling keeps a thin wrapper passing its own default and error class.
 `RecordSnapshotDelegatesCase` below proves delegation the same way
 `LoadSnapshotsDelegatesCase` does, plus a live (unmocked) check that the
 right exception type still surfaces end to end.
+
+Task 578 went one function further than task 563's own `reject_malformed`
+stop and found this file's own SIXTH and SEVENTH byte-identical
+functions: `X_count_at_or_before`/`X_count_at_or_after`, the scan-for-
+the-closest-snapshot loops every one of the 25 cadence siblings had
+carried untouched since before this module existed. Normalizing each
+sibling's own function name out of its body before hashing showed the
+executable logic byte-identical across all 25 -- the only variation
+anywhere was docstring prose (an em dash vs a double hyphen, one
+differently-wrapped line) and the caller-name string passed to
+`_reject_malformed`. Each sibling keeps its own `_reject_malformed` call
+first, then delegates the scan-and-compare to
+`count_at_or_before`/`count_at_or_after` below.
+`CountAtOrBeforeAfterDelegatesCase` proves delegation the same way
+`LoadSnapshotsDelegatesCase` does, plus live (unmocked) checks that the
+real scan still returns the right answer end to end.
 """
 from __future__ import annotations
 
@@ -336,6 +352,154 @@ class RejectMalformedDelegatesCase(unittest.TestCase):
         for mod in REJECT_MALFORMED_SIBLINGS:
             with self.subTest(sibling=mod.__name__):
                 mod._reject_malformed([{"ts": "2026-08-05T00:00:00Z", "count": 1}], "some_caller")
+
+
+COUNT_AT_OR_SIBLINGS = LOAD_SNAPSHOTS_SIBLINGS
+
+
+class CountAtOrBeforeAfterDelegatesCase(unittest.TestCase):
+    """Every sibling cadence module's own `X_count_at_or_before`/
+    `X_count_at_or_after` must genuinely call through to
+    `time_utils.count_at_or_before`/`time_utils.count_at_or_after` -- not
+    carry a reinlined copy of the scan-for-the-closest-snapshot loop
+    (task 578's own AST-hash sweep found both byte-identical across all
+    25 siblings, the sixth and seventh such functions this package's
+    sweep has found after `_parse_ts`/`load_snapshots`/`record_snapshot`/
+    `reject_malformed`)."""
+
+    def test_every_sibling_count_at_or_before_delegates(self):
+        self.assertEqual(len(COUNT_AT_OR_SIBLINGS), 25, "sibling list drifted from the live sweep")
+        for mod in COUNT_AT_OR_SIBLINGS:
+            with self.subTest(sibling=mod.__name__):
+                topic = _topic(mod)
+                fn = getattr(mod, f"{topic}_count_at_or_before")
+                sentinel = object()
+                calls = []
+
+                def fake_count_at_or_before(snapshots, when, _calls=calls, _sentinel=sentinel):
+                    _calls.append((snapshots, when))
+                    return _sentinel
+
+                probe_snapshots = [{"ts": "2026-08-05T00:00:00Z", "count": 1}]
+                probe_when = _NOW
+                with mock.patch.object(time_utils, "count_at_or_before", fake_count_at_or_before):
+                    result = fn(probe_snapshots, probe_when)
+                self.assertIs(
+                    result,
+                    sentinel,
+                    f"{mod.__name__}.{topic}_count_at_or_before did not return the shared "
+                    "function's result -- it may hold a reinlined copy again",
+                )
+                self.assertEqual(
+                    calls,
+                    [(probe_snapshots, probe_when)],
+                    f"{mod.__name__}.{topic}_count_at_or_before did not pass its arguments "
+                    "through to time_utils.count_at_or_before unchanged",
+                )
+
+    def test_every_sibling_count_at_or_after_delegates(self):
+        for mod in COUNT_AT_OR_SIBLINGS:
+            with self.subTest(sibling=mod.__name__):
+                topic = _topic(mod)
+                fn = getattr(mod, f"{topic}_count_at_or_after")
+                sentinel = object()
+                calls = []
+
+                def fake_count_at_or_after(snapshots, when, _calls=calls, _sentinel=sentinel):
+                    _calls.append((snapshots, when))
+                    return _sentinel
+
+                probe_snapshots = [{"ts": "2026-08-05T00:00:00Z", "count": 1}]
+                probe_when = _NOW
+                with mock.patch.object(time_utils, "count_at_or_after", fake_count_at_or_after):
+                    result = fn(probe_snapshots, probe_when)
+                self.assertIs(
+                    result,
+                    sentinel,
+                    f"{mod.__name__}.{topic}_count_at_or_after did not return the shared "
+                    "function's result -- it may hold a reinlined copy again",
+                )
+                self.assertEqual(
+                    calls,
+                    [(probe_snapshots, probe_when)],
+                    f"{mod.__name__}.{topic}_count_at_or_after did not pass its arguments "
+                    "through to time_utils.count_at_or_after unchanged",
+                )
+
+    def test_every_sibling_still_raises_its_own_tampered_error_on_a_malformed_line(self):
+        """Not mocked: proves each sibling's own `_reject_malformed` still
+        gets first say even though the scan itself now lives in
+        time_utils -- a malformed line must still surface that module's
+        own `*CadenceTamperedError`, not blow up inside the shared scan
+        with a bare KeyError on a `_malformed` marker dict."""
+        for mod in COUNT_AT_OR_SIBLINGS:
+            with self.subTest(sibling=mod.__name__):
+                topic = _topic(mod)
+                bad = [{"_malformed": True, "_error": "boom"}]
+                with self.assertRaises(_expected_tampered_error_cls(mod)):
+                    getattr(mod, f"{topic}_count_at_or_before")(bad, _NOW)
+                with self.assertRaises(_expected_tampered_error_cls(mod)):
+                    getattr(mod, f"{topic}_count_at_or_after")(bad, _NOW)
+
+    def test_every_sibling_still_scans_correctly_end_to_end(self):
+        """Not mocked: proves the real, live delegation still returns the
+        right closest-snapshot count, not just that the mock saw the
+        right arguments."""
+        snapshots = [
+            {"ts": "2026-08-01T00:00:00Z", "count": 1},
+            {"ts": "2026-08-03T00:00:00Z", "count": 3},
+            {"ts": "2026-08-05T00:00:00Z", "count": 5},
+        ]
+        when = datetime.datetime(2026, 8, 3, 0, 0, tzinfo=datetime.timezone.utc)
+        for mod in COUNT_AT_OR_SIBLINGS:
+            with self.subTest(sibling=mod.__name__):
+                topic = _topic(mod)
+                self.assertEqual(getattr(mod, f"{topic}_count_at_or_before")(snapshots, when), 3)
+                self.assertEqual(getattr(mod, f"{topic}_count_at_or_after")(snapshots, when), 3)
+                self.assertEqual(getattr(mod, f"{topic}_count_at_or_before")([], when), None)
+                self.assertEqual(getattr(mod, f"{topic}_count_at_or_after")([], when), None)
+
+
+class CountAtOrBeforeAfterCase(unittest.TestCase):
+    """Direct tests of the shared `time_utils.count_at_or_before`/
+    `time_utils.count_at_or_after` scan logic itself, independent of any
+    sibling's wrapper."""
+
+    def setUp(self):
+        self.snapshots = [
+            {"ts": "2026-08-01T00:00:00Z", "count": 1},
+            {"ts": "2026-08-03T00:00:00Z", "count": 3},
+            {"ts": "2026-08-05T00:00:00Z", "count": 5},
+        ]
+
+    def test_at_or_before_exact_match_returns_that_snapshot(self):
+        when = datetime.datetime(2026, 8, 3, 0, 0, tzinfo=datetime.timezone.utc)
+        self.assertEqual(time_utils.count_at_or_before(self.snapshots, when), 3)
+
+    def test_at_or_before_between_two_returns_the_earlier(self):
+        when = datetime.datetime(2026, 8, 4, 0, 0, tzinfo=datetime.timezone.utc)
+        self.assertEqual(time_utils.count_at_or_before(self.snapshots, when), 3)
+
+    def test_at_or_before_earlier_than_everything_returns_none(self):
+        when = datetime.datetime(2026, 7, 1, 0, 0, tzinfo=datetime.timezone.utc)
+        self.assertIsNone(time_utils.count_at_or_before(self.snapshots, when))
+
+    def test_at_or_after_exact_match_returns_that_snapshot(self):
+        when = datetime.datetime(2026, 8, 3, 0, 0, tzinfo=datetime.timezone.utc)
+        self.assertEqual(time_utils.count_at_or_after(self.snapshots, when), 3)
+
+    def test_at_or_after_between_two_returns_the_later(self):
+        when = datetime.datetime(2026, 8, 2, 0, 0, tzinfo=datetime.timezone.utc)
+        self.assertEqual(time_utils.count_at_or_after(self.snapshots, when), 3)
+
+    def test_at_or_after_later_than_everything_returns_none(self):
+        when = datetime.datetime(2026, 9, 1, 0, 0, tzinfo=datetime.timezone.utc)
+        self.assertIsNone(time_utils.count_at_or_after(self.snapshots, when))
+
+    def test_empty_snapshots_returns_none_both_directions(self):
+        when = datetime.datetime(2026, 8, 3, 0, 0, tzinfo=datetime.timezone.utc)
+        self.assertIsNone(time_utils.count_at_or_before([], when))
+        self.assertIsNone(time_utils.count_at_or_after([], when))
 
 
 SEAL_PREDICTION_SIBLINGS = LOAD_SNAPSHOTS_SIBLINGS

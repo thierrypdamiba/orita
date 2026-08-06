@@ -121,14 +121,14 @@ def _reject_malformed(snapshots: list[dict], caller: str) -> None:
 
 def topic_count_at_or_before(snapshots: list[dict], when: datetime.datetime) -> int | None:
     """The most recently recorded count at or before `when`; `None` if no
-    snapshot that early exists yet — never guessed at, never interpolated."""
+    snapshot that early exists yet -- never guessed at, never
+    interpolated. Thin wrapper: this module's own `_reject_malformed`
+    still gets first say (so a malformed line raises this module's own
+    `*CadenceTamperedError`, not a shared-module exception), then the
+    actual scan-and-compare delegates to `time_utils.count_at_or_before`
+    (task 578)."""
     _reject_malformed(snapshots, "topic_count_at_or_before")
-    best = None
-    for s in snapshots:
-        ts = _parse_ts(s["ts"])
-        if ts <= when and (best is None or ts > _parse_ts(best["ts"])):
-            best = s
-    return best["count"] if best else None
+    return time_utils.count_at_or_before(snapshots, when)
 
 
 def topic_count_at_or_after(snapshots: list[dict], when: datetime.datetime) -> int | None:
@@ -137,14 +137,10 @@ def topic_count_at_or_after(snapshots: list[dict], when: datetime.datetime) -> i
     `topic_count_at_or_before`: once a call's window closes, the honest
     outcome is the first real observation once the window is actually
     over, not a later one that could quietly wait for a friendlier
-    number."""
+    number. Thin wrapper around `time_utils.count_at_or_after` (task 578),
+    same shape as `topic_count_at_or_before` above."""
     _reject_malformed(snapshots, "topic_count_at_or_after")
-    best = None
-    for s in snapshots:
-        ts = _parse_ts(s["ts"])
-        if ts >= when and (best is None or ts < _parse_ts(best["ts"])):
-            best = s
-    return best["count"] if best else None
+    return time_utils.count_at_or_after(snapshots, when)
 
 
 def build_prediction(

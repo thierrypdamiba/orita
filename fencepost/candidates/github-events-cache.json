@@ -17798,5 +17798,37 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/63d1227e96c20f452b97b1ca446c09dedde6935b",
     "ts": "2026-08-06T18:30:01Z",
     "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "68af877",
+    "title": "task 577: milestone-unannounced evidence order was silently source-dependent",
+    "url": "https://github.com/thierrypdamiba/orita/commit/68af877543f1534d37a005c3f38ccd03f8174fd5",
+    "ts": "2026-08-06T19:24:56Z",
+    "author": "Retrya"
+  },
+  {
+    "kind": "commit",
+    "id": "228b2da",
+    "title": "hourly ritual: X rechecked (WhoAmI ok, GetUserTweets forbidden, 231st consecutive, no new escalation tier), report confirmed unchanged",
+    "url": "https://github.com/thierrypdamiba/orita/commit/228b2daf496ca454e1cd1cfeeac63f112d9e1fa2",
+    "ts": "2026-08-06T19:27:22Z",
+    "author": "Retrya"
+  },
+  {
+    "kind": "commit",
+    "id": "303e22d",
+    "title": "hourly ritual: 4th consecutive dawn-run infra failure + pages stuck queued, X_PostTweet rechecked (136th forbidden)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/303e22d81b25cbcf4c6411311f3a8a99559d7d01",
+    "ts": "2026-08-06T20:08:49Z",
+    "author": "Kwaku Ananse"
+  },
+  {
+    "kind": "commit",
+    "id": "c99bb8a",
+    "title": "hourly ritual: scribe growth log entry from post-push ritual_check.py recheck (20:09 UTC)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/c99bb8a36c1ef61bd89ea52a2b56d4c07bf5c4b4",
+    "ts": "2026-08-06T20:10:16Z",
+    "author": "Kwaku Ananse"
   }
 ]

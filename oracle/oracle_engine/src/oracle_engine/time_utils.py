@@ -75,6 +75,32 @@ discipline `record_snapshot`'s wrappers use — `tests/test_time_utils.py`'s
 through and that the right error class still surfaces on a malformed
 line.
 
+`count_at_or_before` / `count_at_or_after`: task 578's own re-run of the
+same AST-hash sweep, going one function further than task 563 stopped in
+this same file, found this package's own SIXTH and SEVENTH byte-identical
+functions, still standing untouched after `_parse_ts`/`load_snapshots`/
+`record_snapshot`/`reject_malformed` were each pulled out (task 573's
+`seal_generic_prediction` consolidation, the "sixth" by `prediction.py`'s
+own count, lives in that sibling module, not this one — these two are
+`time_utils.py`'s own sixth and seventh). All 25 `*_cadence.py` siblings
+carried `X_count_at_or_before`/`X_count_at_or_after` -- reject malformed
+lines via the sibling's own `_reject_malformed`, then scan every snapshot
+for the closest one at-or-before / at-or-after `when` -- with the
+executable logic byte-identical across every sibling; the only variation
+anywhere was docstring wording (an em dash vs a double-hyphen, one line
+wrapped differently) and the caller-name string literal, confirmed by
+normalizing each sibling's function name out of its own body before
+hashing (four distinct hashes for 25 files, and diffing them showed
+prose only, never logic). Each sibling keeps its own `_reject_malformed`
+call first (so a malformed line still raises that module's own
+`*CadenceTamperedError`, not a shared-module exception) and delegates
+only the scan-and-compare to `count_at_or_before`/`count_at_or_after`
+below, which assume the caller already rejected malformed lines --
+`tests/test_time_utils.py`'s `CountAtOrBeforeAfterDelegatesCase` proves
+every sibling wrapper genuinely calls through (by patching this module's
+two functions and observing every sibling reach them), not a reinlined
+copy of the old loop.
+
 Usage: not run directly; imported by oracle_engine's cadence modules.
 """
 from __future__ import annotations
@@ -163,3 +189,36 @@ def reject_malformed(
                 f"valid JSON ({s.get('_error')}) -- refusing rather than "
                 "silently skipping it."
             )
+
+
+def count_at_or_before(snapshots: list[dict], when: datetime.datetime) -> int | None:
+    """The most recently recorded count at or before `when`; `None` if no
+    snapshot that early exists yet -- never guessed at, never
+    interpolated. Assumes the caller has already rejected malformed lines
+    (via `reject_malformed`) -- this function only scans and compares,
+    it does not itself check for `_malformed` markers, so a caller that
+    skips that step could silently read `s["ts"]`/`s["count"]` off a
+    marker dict and raise a confusing `KeyError` instead of its own
+    `*CadenceTamperedError`."""
+    best = None
+    for s in snapshots:
+        ts = parse_ts(s["ts"])
+        if ts <= when and (best is None or ts > parse_ts(best["ts"])):
+            best = s
+    return best["count"] if best else None
+
+
+def count_at_or_after(snapshots: list[dict], when: datetime.datetime) -> int | None:
+    """The EARLIEST recorded count at or after `when`; `None` if no
+    snapshot that late has landed yet. The grading-side counterpart to
+    `count_at_or_before`: once a call's window closes, the honest outcome
+    is the first real observation once the window is actually over, not a
+    later one that could quietly wait for a friendlier number. Same
+    caller contract as `count_at_or_before` above -- malformed lines must
+    already be rejected."""
+    best = None
+    for s in snapshots:
+        ts = parse_ts(s["ts"])
+        if ts >= when and (best is None or ts < parse_ts(best["ts"])):
+            best = s
+    return best["count"] if best else None
