@@ -47,6 +47,32 @@ class TestRecordCheck(_TempLogCase):
             ciw.record_check("dawn-run", "flaky", 111, "2026-07-14T23:08:01Z", path=self.path)
         self.assertFalse(os.path.exists(self.path))
 
+    def test_accepts_every_real_github_terminal_conclusion(self):
+        # Task 580: GitHub Actions' own documented conclusion vocabulary is
+        # wider than bare success/failure -- this repo's own real incident
+        # (pages run 31119308176) hit "cancelled" live. Every one of these
+        # must record without raising, or an honest recheck of a real run
+        # crashes the whole ritual instead of recording the real outcome.
+        for i, conclusion in enumerate(ciw.CONCLUSIONS):
+            ciw.record_check("dawn-run", conclusion, i, f"2026-07-14T{i:02d}:00:00Z", path=self.path)
+        with open(self.path) as f:
+            lines = [ln for ln in f if ln.strip()]
+        self.assertEqual(len(lines), len(ciw.CONCLUSIONS))
+
+    def test_cancelled_is_not_conflated_with_failure_in_a_streak(self):
+        # A cancelled run is a genuinely different outcome from a failed
+        # one -- it must not silently extend (or count toward) a "failure"
+        # streak, the exact mislabeling task 577's BUILDLOG entry was
+        # forced into by this tuple's old binary-only shape.
+        import json
+
+        ciw.record_check("dawn-run", "failure", 1, "2026-07-14T00:00:00Z", path=self.path)
+        ciw.record_check("dawn-run", "cancelled", 2, "2026-07-14T01:00:00Z", path=self.path)
+        with open(self.path) as f:
+            entries = [json.loads(ln) for ln in f if ln.strip()]
+        self.assertEqual(ciw.current_streak(entries, "dawn-run", "failure"), 0)
+        self.assertEqual(ciw.current_streak(entries, "dawn-run", "cancelled"), 1)
+
     def test_never_edits_a_prior_line(self):
         ciw.record_check("dawn-run", "success", 111, "2026-07-14T21:00:00Z", path=self.path)
         with open(self.path) as f:

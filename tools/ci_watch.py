@@ -50,7 +50,31 @@ class CIWatchTamperedError(RuntimeError):
     guess, the same discipline tasks 238-242 already applied to their own
     logs. Run this tool's `status` command by hand to see the break, then
     repair the log before the next real check/record."""
-CONCLUSIONS = ("success", "failure")
+CONCLUSIONS = (
+    "success",
+    "failure",
+    # Task 580: this tuple used to be a bare binary ("success", "failure"),
+    # and record_check refuses (ValueError) anything outside it. GitHub
+    # Actions' own documented conclusion vocabulary is wider than that --
+    # confirmed live this hour on this repo's own real incident: pages run
+    # 31119308176 completed with conclusion "cancelled" (a genuinely
+    # different outcome from "failure": the run never ran to a red result,
+    # it was called off). Task 577's own BUILDLOG entry had already hit this
+    # exact wall and worked around it by recording a stuck-queued run AS
+    # "failure" -- the only two labels this tuple allowed -- which is a
+    # small honesty leak in a tool whose whole reason to exist is not
+    # trusting a human's felt "still green" glance (see this module's own
+    # header docstring). The remaining five are GitHub's real terminal
+    # conclusion values (a run still in progress or queued has conclusion
+    # `null`, not one of these, and correctly is not recorded here at all --
+    # only completed runs have a conclusion to record).
+    "cancelled",
+    "skipped",
+    "timed_out",
+    "action_required",
+    "neutral",
+    "stale",
+)
 # Task 80: dawn-run/pages essentially never fail -- seam-scan and
 # oracle-cadence are the two workflows that actually have (tasks 63/64/65/
 # 78/79 each fixed a real live crash in one of them). Watching only the
