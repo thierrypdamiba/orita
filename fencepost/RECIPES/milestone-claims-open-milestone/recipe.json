@@ -1,0 +1,12 @@
+{
+  "slug": "milestone-claims-open-milestone",
+  "title": "A milestone's own description claims a sibling milestone shipped that's still open",
+  "author": "kwaku-ananse",
+  "description": "Compares every milestone's own description against the repository's OWN milestone list: a milestone names a real 'milestone #N' claim phrase against a different milestone, but that milestone is still open. The last remaining leg of the claims-open-milestone family: README, a release, a tweet, and a stranger's own mention all already check this claim shape, but none of them ever read a milestone's own description -- the same milestone-side leg milestone-claims-unfixed-issue and milestone-claims-unmerged-pr already opened for their own sibling families.",
+  "toolkit": "github",
+  "scopes": ["ListMilestones"],
+  "fixture": "fixtures/milestone_claims_open_milestone",
+  "detector_file": "detector.py",
+  "entrypoint": "run_recipe_scan",
+  "confidence_notes": "Age-gated off the claiming milestone's own updated_at, the identical shape milestone-claims-unfixed-issue and milestone-claims-unmerged-pr already establish -- 0.55 within 24h since last update, 0.85 past it. Deliberately NOT flat like readme-claims-open-milestone's live-read reasoning: a milestone description, like an issue or PR body, is a text surface its author can edit at any time, so a fresh false claim earns a grace period before being scored as a confirmed gap. A milestone naming ITSELF is excluded outright, named not hidden -- that is not a claim about a second record. A claimed milestone that doesn't exist at all is excluded too -- that broken reference is milestone-body-dangling-reference's own seam. A claimed milestone that IS closed is excluded -- the claim was simply true. A milestone with no description at all is excluded outright -- there is no claim to have broken."
+}

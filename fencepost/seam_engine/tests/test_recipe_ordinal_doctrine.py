@@ -67,7 +67,7 @@ _ORDINAL_WORDS = {
     "fortieth": 40, "forty-first": 41, "forty-second": 42,
     "forty-third": 43, "forty-fourth": 44, "forty-fifth": 45,
     "forty-sixth": 46, "forty-seventh": 47, "forty-eighth": 48,
-    "forty-ninth": 49, "fiftieth": 50,
+    "forty-ninth": 49, "fiftieth": 50, "fifty-first": 51,
 }
 
 # Matches right at the top of the docstring only (``re.match``, not
@@ -167,14 +167,14 @@ def test_all_claimed_ordinals_are_pairwise_distinct():
 
 
 def test_the_real_ordinal_claims_are_currently_clean():
-    """Regression pin against today's real, live tree: 50 real recipes,
-    the reference recipe unnumbered, the other 49 forming the unbroken
-    sequence 2..50 -- no duplicate, no gap. Was 49/48/2..49 until
-    milestone-claims-unmerged-pr merged (the fiftieth real recipe)."""
+    """Regression pin against today's real, live tree: 51 real recipes,
+    the reference recipe unnumbered, the other 50 forming the unbroken
+    sequence 2..51 -- no duplicate, no gap. Was 50/49/2..50 until
+    milestone-claims-open-milestone merged (the fifty-first real recipe)."""
     claims = live_ordinal_claims(FENCEPOST_ROOT)
     numbered = sorted(n for n in claims.values() if n is not None)
-    assert len(claims) == 50
-    assert numbered == list(range(2, 51))
+    assert len(claims) == 51
+    assert numbered == list(range(2, 52))
 
 
 def test_a_duplicate_ordinal_would_flip_this_check_red(tmp_path):

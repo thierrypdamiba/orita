@@ -662,6 +662,25 @@ claim earns the same grace window before being scored as a confirmed gap.
 `ListMilestones` and `ListPullRequests` were both already cleared on `SCOPES.md`'s
 oath table — no new scope asked for anywhere in this recipe.
 
+[`RECIPES/milestone-claims-open-milestone/`](RECIPES/milestone-claims-open-milestone/)
+is the fifty-first (ROADMAP.md #568): the last remaining leg of the claims-open-milestone
+family. `readme-claims-open-milestone`, `release-claims-open-milestone`,
+`tweet-claims-open-milestone`, and `mention-claims-open-milestone` already check whether
+a `milestone #N` claim phrase made on some other surface actually holds against the
+milestone tracker — but none of them ever reads a milestone's own `description` field
+making the identical claim about a SIBLING milestone. This one reads that surface, the
+same milestone-side leg `milestone-claims-unfixed-issue` and `milestone-claims-unmerged-pr`
+already opened for their own sibling families, applied here to close the fifteenth and
+final leg of the whole claims-X grid (five surfaces — mention, milestone, readme,
+release, tweet — crossed with three claim types). Unlike every other sibling in this
+family, both halves of the comparison live in the same list, so this recipe reads only
+one fixture (`milestones.json`), not two. A milestone naming itself is excluded outright
+— that is not a claim about a second record. Confidence mirrors
+`milestone-claims-unfixed-issue`'s own 0.55/0.85 24h age-gated bar exactly, not a
+discounted copy of it. `ListMilestones` was already cleared on `SCOPES.md`'s oath table —
+no new scope asked for anywhere in this recipe, and the toolkit stays `github`-only, so
+only the total recipe count grows, not the plus-joined count.
+
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)
 (ROADMAP.md #111) is that second promise, kept: it runs `scan.py`'s own
