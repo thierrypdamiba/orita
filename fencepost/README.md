@@ -592,6 +592,27 @@ standing "good first issue" invitation that stays open for a mortal's own
 PR to answer differently — this is one example of the shape, not the last
 one.
 
+[`RECIPES/mention-claims-unfixed-issue/`](RECIPES/mention-claims-unfixed-issue/)
+is the forty-seventh: the missing mention-side leg of the
+claims-unfixed-issue family. `readme-claims-unfixed-issue`,
+`release-claims-unfixed-issue`, `milestone-claims-unfixed-issue`, and
+`tweet-claims-unfixed-issue` already check whether a real GitHub
+closing-keyword claim ("fixes #N" / "closes #N" / "resolves #N") made on a
+text surface the town itself controls actually holds against the issue
+tracker — but all four only ever check a claim the town made ABOUT itself.
+This one reads the one inbound surface none of them ever touch: a
+stranger's own X mention of the account, sourced from `GetMyMentions`
+rather than `GetUserTweets`, the same tweet-vs-mention split
+`mention-dangling-reference` already opened against
+`own-tweet-dangling-reference`, applied here to a claims-X seam instead of
+a dangling-reference one. Confidence mirrors `tweet-claims-unfixed-issue`'s
+own 0.85/0.5 24h bar exactly, not a discounted copy of it — deliberately
+NOT `mention-dangling-reference`'s own lower, flat score, since the check
+this recipe makes is objective (the claimed issue's own live `state` field)
+rather than resting on a mortal's own uncertain grasp of the repo's number
+space. `GetMyMentions` and `ListIssues` were both already cleared on
+`SCOPES.md`'s oath table — no new scope asked for anywhere in this recipe.
+
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)
 (ROADMAP.md #111) is that second promise, kept: it runs `scan.py`'s own
