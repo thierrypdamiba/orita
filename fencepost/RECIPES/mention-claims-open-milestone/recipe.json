@@ -1,0 +1,12 @@
+{
+  "slug": "mention-claims-open-milestone",
+  "title": "A mortal's own X mention claims a milestone shipped that's still open",
+  "author": "nyx",
+  "description": "Extracts every 'milestone #N' claim phrase (milestone_claims.py's shared grammar) from a mortal's own X mention of the connected account and cross-checks it against the live milestone tracker's own state. A milestone that exists but is still open is the seam: a stranger's own permanent public claim about the project, sitting on X, already disagrees with GitHub's own record, and nothing on either platform ever compares them. The missing mention-side leg of the claims-open-milestone family alongside readme-claims-open-milestone, release-claims-open-milestone, and tweet-claims-open-milestone -- all three already covered a text surface the town itself controls; this one closes the one inbound surface none of them ever read, the same tweet-vs-mention split mention-claims-unfixed-issue already opened against tweet-claims-unfixed-issue for the sibling claims-unfixed-issue family.",
+  "toolkit": "x+github",
+  "scopes": ["GetMyMentions", "ListMilestones"],
+  "fixture": "fixtures/mention_claims_open_milestone",
+  "detector_file": "detector.py",
+  "entrypoint": "run_recipe_scan",
+  "confidence_notes": "Age-gated by hours since the mention's own created_at, mirroring tweet-claims-open-milestone's identical reasoning exactly, not a discounted copy of it: a claim checked within 24 hours of posting might still be a race (the milestone actually closing out moments after the mention went out) rather than a settled public overclaim (0.5, below the 0.70 bar, shown as a weighed-and-dropped coincidence, not hidden). At or past 24 hours with the named milestone still open, it is unambiguous (flat 0.85, no further keyword fuzziness to misfire on). This recipe's check is objective: the claimed milestone's own live state field, verified against ListMilestones, not the mortal's guess. A mortal cannot be wrong about the number space and still land a real, existing milestone number attached to a real 'milestone #N' claim -- that uncertainty does not apply here, so this recipe holds tweet-claims-open-milestone's own 0.85/0.5 bar exactly. A named milestone that does not exist at all is excluded at confidence 0.0 -- that broken reference is a dangling-reference-family seam, not this one's. A named milestone that IS closed is excluded too, named not hidden -- the claim was true."
+}

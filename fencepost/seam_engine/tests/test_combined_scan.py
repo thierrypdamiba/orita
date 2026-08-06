@@ -226,8 +226,8 @@ def test_no_recipes_directory_is_the_same_as_scan_alone(monkeypatch, tmp_path):
 
 
 def test_runs_all_real_recipes_in_the_actual_repo_without_error(monkeypatch):
-    # The integration proof: against the real RECIPES/ tree (all forty-seven
-    # real recipes shipped by tasks 22, 108, 110, 368, 371, 373, 376, 377, 378, 379, 380, 381, 382, 383, 384, 385, 386, 388, 390, 398, 399, 400, 401, 402, 403, 419, 450, 451, 452, 485, 486, 488, 489, 490, 491, 492, 493, 499, 512, 514, 520, 527, 530, 534, 535, 558, plus mention-claims-unfixed-issue), the combined scan runs clean.
+    # The integration proof: against the real RECIPES/ tree (all forty-eight
+    # real recipes shipped by tasks 22, 108, 110, 368, 371, 373, 376, 377, 378, 379, 380, 381, 382, 383, 384, 385, 386, 388, 390, 398, 399, 400, 401, 402, 403, 419, 450, 451, 452, 485, 486, 488, 489, 490, 491, 492, 493, 499, 512, 514, 520, 527, 530, 534, 535, 558, 564, plus mention-claims-open-milestone), the combined scan runs clean.
     monkeypatch.setattr(scan_mod, "fetch_github_activity", lambda *a, **k: [])
 
     result = run_combined_scan("thierrypdamiba", "orita", x_posts=BASE_X_POSTS)
@@ -282,6 +282,7 @@ def test_runs_all_real_recipes_in_the_actual_repo_without_error(monkeypatch):
         "milestone-claims-unfixed-issue",
         "issue-checklist-complete-still-open",
         "mention-claims-unfixed-issue",
+        "mention-claims-open-milestone",
     }
 
 
