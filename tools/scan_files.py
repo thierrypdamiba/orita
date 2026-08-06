@@ -46,6 +46,24 @@ tuple, not a bare `orita_dir` -- `path_memoize`'s single-argument contract
 doesn't fit it, so it stays a genuine one-off, the same call task 513 made
 for `no_grading_check.py`'s own `_iter_scan_files`.
 
+Task 570: `no_grading_check.py` and `arcade_hero_check.py`'s own
+`_find_violations_uncached` bodies are, and remained after task 513/515's
+sweeps (which only ever looked at the wrapper/cache/walker shapes around
+this function, never this function itself), byte-for-byte identical
+control flow -- confirmed live by an AST-hash sweep of `tools/*.py` run
+after task 569 closed the `_is_negated_or_predictive` instance of this
+same class of duplication. Both walk their own `_iter_scan_files`, test
+each `(label, pattern)` in their own `_PATTERNS` against every file, skip
+a match under their own `_is_negated_or_predictive`/`_is_quoted_citation`
+guards, and build an identically-shaped violation record. Every one of
+those four names is deliberately per-file (different walk, different
+vocabulary, different tuned negation list per task 467) -- so, exactly
+the `is_negated_or_predictive`/`is_negated_prefix` precedent in
+`sentence_negation.py`, `find_pattern_violations` below takes all four as
+explicit parameters instead of closing over module globals. Each sibling
+keeps its own `_PATTERNS`/`_iter_scan_files`/`_is_negated_or_predictive`/
+`_is_quoted_citation`; only the scan-and-collect loop itself moves here.
+
 Usage: not run directly; imported by tools/*.py.
 """
 from __future__ import annotations
@@ -68,6 +86,39 @@ def iter_public_files(base_dir: str):
         for name in filenames:
             if name.endswith(PUBLIC_SCAN_EXTENSIONS):
                 yield os.path.join(dirpath, name)
+
+
+def find_pattern_violations(orita_dir, iter_files, patterns, is_negated_or_predictive, is_quoted_citation) -> list:
+    """The scan-and-collect loop `no_grading_check._find_violations_
+    uncached` and `arcade_hero_check._find_violations_uncached` each ran
+    independently, byte-identical apart from the four names it takes as
+    parameters here: which files to walk (`iter_files`), which `(label,
+    pattern)` pairs to test (`patterns`), and the two per-match guards
+    (`is_negated_or_predictive`, `is_quoted_citation`) -- each genuinely
+    tuned per caller (task 467), so callers keep them, not this function.
+    Returns a list of violation records, empty when nothing in the walked
+    files matches any pattern outside a guarded (negated, predictive, or
+    quoted-citation) context. Never writes."""
+    violations = []
+    for path in iter_files(orita_dir):
+        try:
+            with open(path, encoding="utf-8") as f:
+                text = f.read()
+        except (UnicodeDecodeError, OSError):
+            continue
+        for label, pattern in patterns:
+            for m in pattern.finditer(text):
+                if is_negated_or_predictive(text, m.start()) or is_quoted_citation(text, m.start()):
+                    continue
+                line_no = text.count("\n", 0, m.start()) + 1
+                snippet = text[max(0, m.start() - 20):m.end() + 20].replace("\n", " ").strip()
+                violations.append({
+                    "file": path,
+                    "line": line_no,
+                    "pattern": label,
+                    "snippet": snippet,
+                })
+    return violations
 
 
 def path_memoize(uncached_fn, default_dir: str):

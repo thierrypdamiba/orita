@@ -170,27 +170,18 @@ def _find_violations_uncached(orita_dir: str = DEFAULT_ORITA_DIR) -> list:
     #4 forbids -- a live ask routing a human's credential around Arcade's
     own per-user OAuth screen. Returns a list of violation records, empty
     when the town has never once asked a mortal to hand over a credential
-    directly. Never writes."""
-    violations = []
-    for path in _iter_scan_files(orita_dir):
-        try:
-            with open(path, encoding="utf-8") as f:
-                text = f.read()
-        except (UnicodeDecodeError, OSError):
-            continue
-        for label, pattern in _PATTERNS:
-            for m in pattern.finditer(text):
-                if _is_negated_or_predictive(text, m.start()) or _is_quoted_citation(text, m.start()):
-                    continue
-                line_no = text.count("\n", 0, m.start()) + 1
-                snippet = text[max(0, m.start() - 20):m.end() + 20].replace("\n", " ").strip()
-                violations.append({
-                    "file": path,
-                    "line": line_no,
-                    "pattern": label,
-                    "snippet": snippet,
-                })
-    return violations
+    directly. Never writes.
+
+    Task 570: the scan-and-collect loop itself now lives once, in
+    `scan_files.find_pattern_violations` -- this stays a thin wrapper
+    passing this file's own `_iter_scan_files`/`_PATTERNS`/
+    `_is_negated_or_predictive`/`_is_quoted_citation` (task 467's
+    documented on-purpose divergence from `no_grading_check.py`'s own walk
+    and word list), the same shape `_is_negated_or_predictive` already
+    delegates in (task 569)."""
+    return scan_files.find_pattern_violations(
+        orita_dir, _iter_scan_files, _PATTERNS, _is_negated_or_predictive, _is_quoted_citation
+    )
 
 
 # Task 513: consolidated into tools/scan_files.py -- five sibling checks

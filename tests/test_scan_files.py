@@ -18,7 +18,21 @@ apart on the next edit to just one of them; an `is` check on the same
 function object (or the same factory function, for path_memoize's per-
 caller closures) makes that class of drift structurally impossible going
 forward.
+
+Task 570: `no_grading_check.py`/`arcade_hero_check.py`'s own
+`_find_violations_uncached` scan-and-collect LOOP -- the part inside the
+memoization wrapper this file already covers -- was itself a sixth
+byte-identical duplicate, missed by every prior sweep because those only
+ever looked at the wrapper/cache/walker shapes around it. Now lives once
+as `find_pattern_violations`, parameterized on the four genuinely-per-file
+names (`iter_files`, `patterns`, `is_negated_or_predictive`,
+`is_quoted_citation`) the same way `sentence_negation.is_negated_or_
+predictive` already parameterizes its own two. `FindPatternViolationsCase`
+exercises the shared function directly; `UncachedDelegatesIdentityCase`
+proves both siblings' own `_find_violations_uncached` calls it exactly
+once rather than re-forking a copy.
 """
+import ast
 import importlib.util
 import os
 import sys
@@ -186,6 +200,141 @@ class PathMemoizeCase(unittest.TestCase):
         result = memoized("/x")
         result.append(4)
         self.assertEqual(memoized("/x"), [1, 2, 3])
+
+
+PATTERN_SIBLINGS = ["no_grading_check", "arcade_hero_check"]
+
+
+class FindPatternViolationsCase(unittest.TestCase):
+    """Direct exercise of the shared scan-and-collect loop, independent of
+    either real sibling's own patterns/guards."""
+
+    def setUp(self):
+        self.tmp = tempfile.mkdtemp()
+        self.addCleanup(lambda: __import__("shutil").rmtree(self.tmp, ignore_errors=True))
+
+    def _write(self, name, content):
+        path = os.path.join(self.tmp, name)
+        with open(path, "w", encoding="utf-8") as f:
+            f.write(content)
+        return path
+
+    def test_a_bare_match_outside_any_guard_is_a_violation(self):
+        import re
+        self._write("a.md", "the widget broke today.\n")
+        result = sf.find_pattern_violations(
+            self.tmp,
+            sf.iter_public_files,
+            [("broke", re.compile(r"\bbroke\b"))],
+            is_negated_or_predictive=lambda text, start: False,
+            is_quoted_citation=lambda text, start: False,
+        )
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0]["pattern"], "broke")
+        self.assertTrue(result[0]["file"].endswith("a.md"))
+
+    def test_negated_or_predictive_guard_suppresses_a_match(self):
+        import re
+        self._write("a.md", "the widget broke today.\n")
+        result = sf.find_pattern_violations(
+            self.tmp,
+            sf.iter_public_files,
+            [("broke", re.compile(r"\bbroke\b"))],
+            is_negated_or_predictive=lambda text, start: True,
+            is_quoted_citation=lambda text, start: False,
+        )
+        self.assertEqual(result, [])
+
+    def test_quoted_citation_guard_suppresses_a_match(self):
+        import re
+        self._write("a.md", "the widget broke today.\n")
+        result = sf.find_pattern_violations(
+            self.tmp,
+            sf.iter_public_files,
+            [("broke", re.compile(r"\bbroke\b"))],
+            is_negated_or_predictive=lambda text, start: False,
+            is_quoted_citation=lambda text, start: True,
+        )
+        self.assertEqual(result, [])
+
+    def test_iter_files_argument_controls_which_files_are_walked(self):
+        import re
+        self._write("a.md", "broke\n")
+        result = sf.find_pattern_violations(
+            self.tmp,
+            lambda base_dir: iter(()),  # a caller-supplied walk that yields nothing
+            [("broke", re.compile(r"\bbroke\b"))],
+            is_negated_or_predictive=lambda text, start: False,
+            is_quoted_citation=lambda text, start: False,
+        )
+        self.assertEqual(result, [])
+
+    def test_line_number_and_snippet_are_computed(self):
+        import re
+        self._write("a.md", "line one\nline two broke here\n")
+        result = sf.find_pattern_violations(
+            self.tmp,
+            sf.iter_public_files,
+            [("broke", re.compile(r"\bbroke\b"))],
+            is_negated_or_predictive=lambda text, start: False,
+            is_quoted_citation=lambda text, start: False,
+        )
+        self.assertEqual(result[0]["line"], 2)
+        self.assertIn("broke", result[0]["snippet"])
+
+
+class UncachedDelegatesIdentityCase(unittest.TestCase):
+    """Each sibling's own `_find_violations_uncached` source calls
+    straight through to `scan_files.find_pattern_violations` exactly once
+    -- proof of delegation, not just output that happens to match today
+    (the same standard `tests/test_sentence_negation.py`'s own
+    `SiblingDelegatesIdentityCase` already holds `_is_negated_or_
+    predictive` to)."""
+
+    def test_every_sibling_delegates_exactly_once(self):
+        for name in PATTERN_SIBLINGS:
+            path = os.path.join(TOOLS, f"{name}.py")
+            with open(path, encoding="utf-8") as f:
+                tree = ast.parse(f.read())
+            calls = 0
+            for node in ast.walk(tree):
+                if isinstance(node, ast.FunctionDef) and node.name == "_find_violations_uncached":
+                    for sub in ast.walk(node):
+                        if (
+                            isinstance(sub, ast.Call)
+                            and isinstance(sub.func, ast.Attribute)
+                            and sub.func.attr == "find_pattern_violations"
+                            and isinstance(sub.func.value, ast.Name)
+                            and sub.func.value.id == "scan_files"
+                        ):
+                            calls += 1
+                    with self.subTest(sibling=name):
+                        self.assertEqual(
+                            calls, 1,
+                            f"{name}._find_violations_uncached does not delegate to "
+                            "scan_files.find_pattern_violations exactly once -- it may "
+                            "have been re-forked into its own copy",
+                        )
+
+
+class PatternSiblingOutputMatchesPreRefactorFixtureCase(unittest.TestCase):
+    """Both real siblings' `find_violations()` output, exercised through
+    their own real `_PATTERNS`/`_is_negated_or_predictive`/`_is_quoted_
+    citation`/`_iter_scan_files`, is unchanged from before the refactor --
+    frozen by running each sibling's real `find_violations()` against the
+    live checkout immediately before this task's edit (both read zero
+    violations then, same as the live checkout still holds today; see
+    each module's own `tests/test_no_grading_check.py`/`test_arcade_hero_
+    check.py` for the synthetic-fixture proof that the scan still bites on
+    a real violation post-refactor)."""
+
+    def test_no_grading_check_matches_its_frozen_fixture(self):
+        mod = _load("no_grading_check", os.path.join(TOOLS, "no_grading_check.py"))
+        self.assertEqual(mod.find_violations(), [])
+
+    def test_arcade_hero_check_matches_its_frozen_fixture(self):
+        mod = _load("arcade_hero_check", os.path.join(TOOLS, "arcade_hero_check.py"))
+        self.assertEqual(mod.find_violations(), [])
 
 
 if __name__ == "__main__":
