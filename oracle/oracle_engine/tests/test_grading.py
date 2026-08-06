@@ -11,6 +11,7 @@ import json
 import os
 import sys
 import unittest
+from unittest import mock
 
 _TESTS_DIR = os.path.dirname(os.path.abspath(__file__))
 _ORACLE_ENGINE_ROOT = os.path.dirname(_TESTS_DIR)  # oracle/oracle_engine
@@ -20,7 +21,78 @@ _TOOLS_DIR = os.path.join(_ORITA_ROOT, "tools")
 
 sys.path.insert(0, os.path.join(_ORACLE_ENGINE_ROOT, "src"))
 
-from oracle_engine import grading, prediction  # noqa: E402
+from oracle_engine import (  # noqa: E402
+    autograde,
+    branch_autograde,
+    collaborator_autograde,
+    comment_autograde,
+    commit_autograde,
+    commit_comment_autograde,
+    contributor_autograde,
+    deployment_autograde,
+    follower_autograde,
+    following_autograde,
+    fork_autograde,
+    grading,
+    issue_autograde,
+    issue_comment_autograde,
+    label_autograde,
+    listed_autograde,
+    media_autograde,
+    milestone_autograde,
+    pr_autograde,
+    prediction,
+    release_autograde,
+    run_autograde,
+    star_autograde,
+    subscriber_autograde,
+    tag_autograde,
+    topic_autograde,
+    tweet_autograde,
+    workflow_autograde,
+)
+
+AUTOGRADE_SIBLINGS = [
+    autograde,
+    branch_autograde,
+    collaborator_autograde,
+    comment_autograde,
+    commit_autograde,
+    commit_comment_autograde,
+    contributor_autograde,
+    deployment_autograde,
+    follower_autograde,
+    following_autograde,
+    fork_autograde,
+    issue_autograde,
+    issue_comment_autograde,
+    label_autograde,
+    listed_autograde,
+    media_autograde,
+    milestone_autograde,
+    pr_autograde,
+    release_autograde,
+    run_autograde,
+    star_autograde,
+    subscriber_autograde,
+    tag_autograde,
+    topic_autograde,
+    tweet_autograde,
+    workflow_autograde,
+]
+
+
+def _expected_autograde_error_cls(mod):
+    """Derive `<Words>AutogradeError` from a sibling autograde module's own
+    name (`star_autograde` -> `StarAutogradeError`; the base `autograde`
+    module itself -> bare `AutogradeError`), the exact convention every one
+    of the 25 siblings' real error class already follows -- checked against
+    the live module, not assumed. Mirrors `test_time_utils.py`'s own
+    `_expected_error_cls` for the `*_cadence.py` family."""
+    mod_name = mod.__name__.rsplit(".", 1)[-1]
+    stem = "" if mod_name == "autograde" else mod_name.replace("_autograde", "")
+    name = "".join(word.capitalize() for word in stem.split("_")) + "AutogradeError" if stem else "AutogradeError"
+    return getattr(mod, name)
 
 
 def _fresh_ledger_module(tmp_ledger_path: str):
@@ -309,6 +381,105 @@ class TestParseGradeDetailRejectsNonDictPayloads(unittest.TestCase):
             grading.parse_grade_detail(detail),
             {"call_seq": 0, "outcome": "correct"},
         )
+
+
+class TestLoadClaimPayload(unittest.TestCase):
+    """`grading.load_claim_payload` -- the shared implementation every one
+    of the 25 `oracle_engine/*_autograde.py` modules' own private
+    `_load_claim_payload` used to carry a byte-identical copy of, differing
+    only in which module-local `*AutogradeError` it raised."""
+
+    def test_well_formed_dict_payload_passes_through(self):
+        detail = json.dumps({"claim": "By 2026-08-06T00:00:00Z, ..."}, sort_keys=True)
+        self.assertEqual(
+            grading.load_claim_payload(detail, grading.GradingError),
+            {"claim": "By 2026-08-06T00:00:00Z, ..."},
+        )
+
+    def test_list_shaped_detail_raises_the_given_error_cls(self):
+        with self.assertRaises(grading.GradingError):
+            grading.load_claim_payload("[1, 2]", grading.GradingError)
+
+    def test_null_shaped_detail_raises_the_given_error_cls(self):
+        with self.assertRaises(grading.GradingError):
+            grading.load_claim_payload("null", grading.GradingError)
+
+    def test_bare_number_detail_raises_the_given_error_cls(self):
+        with self.assertRaises(grading.GradingError):
+            grading.load_claim_payload("5", grading.GradingError)
+
+    def test_a_different_error_cls_is_the_one_actually_raised(self):
+        """Not `GradingError` itself -- proves `error_cls` is genuinely
+        used, not hardcoded, the same guarantee `record_snapshot`/
+        `reject_malformed`'s own `error_cls` parameter already proves for
+        the `*_cadence.py` family."""
+
+        class ProbeError(ValueError):
+            pass
+
+        with self.assertRaises(ProbeError):
+            grading.load_claim_payload("[1, 2]", ProbeError)
+
+    def test_malformed_json_still_raises_jsondecodeerror_not_the_error_cls(self):
+        """Unchanged from every sibling's own pre-consolidation behavior:
+        a `json.loads` failure is not caught here -- the caller's own
+        `except (..., json.JSONDecodeError)` handles that, same as
+        before."""
+        with self.assertRaises(json.JSONDecodeError):
+            grading.load_claim_payload("{not valid json", grading.GradingError)
+
+
+class LoadClaimPayloadDelegatesCase(unittest.TestCase):
+    """Every sibling autograde module's own `_load_claim_payload(detail)`
+    must genuinely call through to `grading.load_claim_payload` with its
+    own `*AutogradeError` subclass as `error_cls` -- not carry a reinlined
+    copy of the parse-and-validate logic. Mirrors `test_time_utils.py`'s
+    `RecordSnapshotDelegatesCase`/`RejectMalformedDelegatesCase` exactly,
+    one directory over, for the autograde family instead of the cadence
+    one."""
+
+    def test_every_sibling_wrapper_delegates_to_the_shared_function(self):
+        self.assertEqual(
+            len(AUTOGRADE_SIBLINGS), 26, "sibling list drifted from the live sweep"
+        )
+        for mod in AUTOGRADE_SIBLINGS:
+            with self.subTest(sibling=mod.__name__):
+                sentinel = object()
+                calls = []
+
+                def fake_load_claim_payload(detail, error_cls, _calls=calls, _sentinel=sentinel):
+                    _calls.append((detail, error_cls))
+                    return _sentinel
+
+                with mock.patch.object(grading, "load_claim_payload", fake_load_claim_payload):
+                    result = mod._load_claim_payload("some probe detail")
+                self.assertIs(
+                    result,
+                    sentinel,
+                    f"{mod.__name__}._load_claim_payload did not return the shared "
+                    "function's result -- it may hold a reinlined copy again",
+                )
+                self.assertEqual(
+                    calls,
+                    [("some probe detail", _expected_autograde_error_cls(mod))],
+                    f"{mod.__name__}._load_claim_payload did not pass its argument "
+                    "and own error class through to grading.load_claim_payload unchanged",
+                )
+
+    def test_every_sibling_still_raises_its_own_error_class_on_a_non_dict_payload(self):
+        """Not mocked: proves the real, live delegation still surfaces the
+        right exception type end to end, not just that the mock saw the
+        right kwarg."""
+        for mod in AUTOGRADE_SIBLINGS:
+            with self.subTest(sibling=mod.__name__):
+                with self.assertRaises(_expected_autograde_error_cls(mod)):
+                    mod._load_claim_payload("[1, 2]")
+
+    def test_a_well_formed_payload_still_parses_normally_through_every_sibling(self):
+        for mod in AUTOGRADE_SIBLINGS:
+            with self.subTest(sibling=mod.__name__):
+                detail = json.dumps({"claim": "probe"}, sort_keys=True)
+                self.assertEqual(mod._load_claim_payload(detail), {"claim": "probe"})
 
 
 class TestNoEditPathExists(unittest.TestCase):

@@ -59,10 +59,10 @@ def parse_listed_claim(claim: str) -> tuple[datetime.datetime, int]:
 
 
 def _load_claim_payload(detail: str) -> dict:
-    payload = json.loads(detail)
-    if not isinstance(payload, dict):
-        raise ListedAutogradeError(f"claim payload is not a JSON object: {payload!r}")
-    return payload
+    """Thin wrapper around `grading.load_claim_payload` (this module's
+    own default `error_cls`) -- see that function's own docstring for the
+    25-sibling consolidation this closes."""
+    return grading.load_claim_payload(detail, ListedAutogradeError)
 
 
 def find_due_calls(entries: list[dict], now: datetime.datetime) -> list[dict]:
