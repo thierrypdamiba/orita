@@ -534,7 +534,7 @@ _CARDINAL_WORDS = {
     "thirty-seven": 37, "thirty-eight": 38, "thirty-nine": 39, "forty": 40,
     "forty-one": 41, "forty-two": 42, "forty-three": 43, "forty-four": 44,
     "forty-five": 45, "forty-six": 46, "forty-seven": 47, "forty-eight": 48,
-    "forty-nine": 49, "fifty": 50, "fifty-one": 51,
+    "forty-nine": 49, "fifty": 50, "fifty-one": 51, "fifty-two": 52,
 }
 
 _PLUS_JOINED_CLAIM_RE = re.compile(
@@ -586,14 +586,12 @@ def test_plus_joined_claim_missing_sentence_raises():
         claimed_plus_joined_counts("Nothing here about plus-joined toolkits.")
 
 
-def test_real_plus_joined_counts_are_currently_fifteen_of_fifty_one():
-    # Regression pin: today's real, live counts under RECIPES/. Was (15, 50)
-    # until milestone-claims-open-milestone merged (the fifty-first real
+def test_real_plus_joined_counts_are_currently_fifteen_of_fifty_two():
+    # Regression pin: today's real, live counts under RECIPES/. Was (15, 51)
+    # until pr-checklist-complete-still-open merged (the fifty-second real
     # recipe, toolkit "github"-only -- only the total grows this time, the
-    # same shape milestone-claims-unmerged-pr's own merge held, unlike
-    # mention-claims-unmerged-pr's own "x+github" merge where both halves
-    # grew).
-    assert real_plus_joined_counts(FENCEPOST_ROOT) == (15, 51)
+    # same shape milestone-claims-open-milestone's own merge held.
+    assert real_plus_joined_counts(FENCEPOST_ROOT) == (15, 52)
 
 
 def test_oath_scopes_for_toolkit_docstring_matches_the_real_live_counts():

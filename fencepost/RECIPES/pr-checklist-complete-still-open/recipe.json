@@ -1,0 +1,12 @@
+{
+  "slug": "pr-checklist-complete-still-open",
+  "title": "A pull request's own checklist is all checked off, but the PR itself never merged",
+  "author": "off-by-one",
+  "description": "Reads the repository's own open pull requests against each PR's own live state, and asks whether a PR's self-declared GitHub task-list checklist (plain-text '- [ ] ...' items in its own body, not referencing any other GitHub object by number) is ALL checked, while the pull request that made the checklist promise is still open. Structural, single-toolkit: GitHub's own task-list checkbox syntax and every PR's own state/merged fields already carry both halves of the promise (what the author claimed still needed doing, and whether the door actually opened), and nothing in the API ever compares them. The pull-request-side mirror of issue-checklist-complete-still-open, using a distinct plain-text checklist grammar since a PR's own checklist items name no other issue or PR by number.",
+  "toolkit": "github",
+  "scopes": ["ListPullRequests"],
+  "fixture": "fixtures/pr_checklist_complete_still_open",
+  "detector_file": "detector.py",
+  "entrypoint": "run_recipe_scan",
+  "confidence_notes": "Age-gated on how long the PR's own updated_at has sat still while every checklist box reads checked -- 24 hours, mirroring issue-checklist-complete-still-open's own bar exactly, since a pull request carries no real 'went-complete-at' timestamp either; updated_at is the closest real signal it exposes. Under 24h scores 0.5 (below the 0.70 confidence bar, weighed in the tail not hidden -- the author may simply not have merged yet). At or past 24h scores a flat 0.85 -- a task-list checkbox's own checked/unchecked mark is an unambiguous, non-fuzzy structural read, not a guess. A PR with at least one unchecked box is excluded at confidence 0.0, not complete yet, named not hidden. A PR that is already merged or closed is excluded at confidence 0.0 too -- the door already resolved, whatever its checklist says. A PR with no real task-list checkbox anywhere in its body is skipped entirely, not even excluded -- it never made a completeness promise, so there is nothing to have missed."
+}

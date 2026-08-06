@@ -681,6 +681,19 @@ discounted copy of it. `ListMilestones` was already cleared on `SCOPES.md`'s oat
 no new scope asked for anywhere in this recipe, and the toolkit stays `github`-only, so
 only the total recipe count grows, not the plus-joined count.
 
+[`RECIPES/pr-checklist-complete-still-open/`](RECIPES/pr-checklist-complete-still-open/)
+is the fifty-second (ROADMAP.md #579): the pull-request-side mirror of
+`issue-checklist-complete-still-open` (task 558). That recipe watches an issue whose own
+checklist names OTHER issues by number (`- [ ] #N`); this one watches a PR's own
+self-declared, plain-text task-list checklist instead ("- [ ] Add tests", naming no other
+GitHub object at all) — a distinct grammar, not a reuse of `seam_engine.checklist`'s
+number-referencing one. GitHub tallies a live "N of M tasks done" count on every PR and
+does nothing with the moment it reaches M of M; merging stays a separate, forgettable,
+human step. Confidence mirrors `issue-checklist-complete-still-open`'s own 0.5/0.85 24h
+age-gated bar exactly. `ListPullRequests` was already cleared on `SCOPES.md`'s oath
+table — no new scope asked for anywhere in this recipe, and the toolkit stays
+`github`-only, so only the total recipe count grows, not the plus-joined count.
+
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)
 (ROADMAP.md #111) is that second promise, kept: it runs `scan.py`'s own

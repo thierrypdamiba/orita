@@ -1,0 +1,47 @@
+[
+  {
+    "number": 201,
+    "title": "Add seam recipe for reused milestone titles",
+    "body": "Closes part of #7.\n\n- [x] Detector reads live fixture\n- [x] Tests cover both exclusion branches\n- [x] README documents the seam\n- [x] ruff clean",
+    "state": "open",
+    "merged": false,
+    "updated_at": "2026-08-01T09:00:00Z",
+    "url": "https://github.com/example/example-repo/pull/201"
+  },
+  {
+    "number": 202,
+    "title": "Fix flaky ranking test",
+    "body": "- [x] Reproduce locally\n- [ ] Add regression test\n- [x] Fix root cause",
+    "state": "open",
+    "merged": false,
+    "updated_at": "2026-08-06T20:00:00Z",
+    "url": "https://github.com/example/example-repo/pull/202"
+  },
+  {
+    "number": 203,
+    "title": "Bump dependency pins",
+    "body": "- [x] Bump httpx\n- [x] Bump pytest\n- [x] Run full suite",
+    "state": "open",
+    "merged": false,
+    "updated_at": "2026-08-06T21:30:00Z",
+    "url": "https://github.com/example/example-repo/pull/203"
+  },
+  {
+    "number": 204,
+    "title": "Refactor gap ranking",
+    "body": "- [x] Extract rank()\n- [x] Add tests",
+    "state": "closed",
+    "merged": true,
+    "updated_at": "2026-07-20T00:00:00Z",
+    "url": "https://github.com/example/example-repo/pull/204"
+  },
+  {
+    "number": 205,
+    "title": "Typo fix in README",
+    "body": "One-line typo fix, no checklist here.",
+    "state": "open",
+    "merged": false,
+    "updated_at": "2026-07-01T00:00:00Z",
+    "url": "https://github.com/example/example-repo/pull/205"
+  }
+]
