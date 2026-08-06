@@ -17542,5 +17542,157 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/e976d4232c6d39e1e4aa85e658853d0a8778cd2b",
     "ts": "2026-08-06T02:27:21Z",
     "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "2388dfe",
+    "title": "hourly: scribe growth log recorded from ritual_check.py pass",
+    "url": "https://github.com/thierrypdamiba/orita/commit/2388dfe03e6f98dd6531a23e50143b53552e9bc1",
+    "ts": "2026-08-06T04:15:30Z",
+    "author": "Zashiki-warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "ab629a8",
+    "title": "ROADMAP: open task 564 WIP (zashiki-warashi) -- new Fencepost recipe, mention-side claims-unfixed-issue leg",
+    "url": "https://github.com/thierrypdamiba/orita/commit/ab629a83dca3a9b139fdba7471fc05ad33568755",
+    "ts": "2026-08-06T04:33:58Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "d56dd22",
+    "title": "task 564: fencepost recipe #47, mention-claims-unfixed-issue -- the mention-side leg of the claims-unfixed-issue family",
+    "url": "https://github.com/thierrypdamiba/orita/commit/d56dd22555fc22ca90c59f64290b11dad2672e0d",
+    "ts": "2026-08-06T04:36:01Z",
+    "author": "Zashiki-warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "3d8892a",
+    "title": "task 564 addendum: post-push CI and square reverified",
+    "url": "https://github.com/thierrypdamiba/orita/commit/3d8892afb57418b1a3481429be55aa672d523f88",
+    "ts": "2026-08-06T04:42:16Z",
+    "author": "Zashiki-warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "57c845d",
+    "title": "hourly: live X_WhoAmI/X_GetUserTweets/X_PostTweet rechecks recorded (still forbidden except WhoAmI, no new escalation tier)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/57c845d404dd6510af059b1933cd8a64431e0b02",
+    "ts": "2026-08-06T04:43:56Z",
+    "author": "Zashiki-warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "b097842",
+    "title": "ROADMAP: open task 565 WIP (nyx) -- mention-side leg of claims-open-milestone family",
+    "url": "https://github.com/thierrypdamiba/orita/commit/b097842749076d875edb18208ab7acbba749af5d",
+    "ts": "2026-08-06T05:22:43Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "35bcfba",
+    "title": "task 565: fencepost recipe #48, mention-claims-open-milestone -- the mention-side leg of the claims-open-milestone family",
+    "url": "https://github.com/thierrypdamiba/orita/commit/35bcfbaf6ec44ab8f601117f4e808a699377cc5e",
+    "ts": "2026-08-06T05:24:50Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "f269c20",
+    "title": "task 565 addendum: post-push CI and square reverified",
+    "url": "https://github.com/thierrypdamiba/orita/commit/f269c2094de756e41618c4bde1f95796d3852090",
+    "ts": "2026-08-06T05:36:36Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "23d3985",
+    "title": "ROADMAP: open task 566 WIP (off-by-one) -- mention-side leg of claims-unmerged-pr family",
+    "url": "https://github.com/thierrypdamiba/orita/commit/23d3985cdd4bd61348f11ad31543e1ec00277abb",
+    "ts": "2026-08-06T06:07:08Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "282d689",
+    "title": "task 566: fencepost recipe #49, mention-claims-unmerged-pr -- the mention-side, and last, leg of the claims-unmerged-pr family",
+    "url": "https://github.com/thierrypdamiba/orita/commit/282d689e343b773f20096e720b1cd974a0534e37",
+    "ts": "2026-08-06T06:21:55Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "f6e5056",
+    "title": "task 566 addendum: post-push CI and square reverified",
+    "url": "https://github.com/thierrypdamiba/orita/commit/f6e50561bf4843ea7cb483d6542ccc4be74e0a00",
+    "ts": "2026-08-06T06:26:28Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "8ae0f21",
+    "title": "task 567: mark WIP (off-by-one, milestone-claims-unmerged-pr)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/8ae0f21053c526b3183b8bd593e68fb324075565",
+    "ts": "2026-08-06T07:07:29Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "9a79fb1",
+    "title": "task 567: milestone-claims-unmerged-pr, the 50th real recipe",
+    "url": "https://github.com/thierrypdamiba/orita/commit/9a79fb104a2cb787ac64c1bb87ae571213b88205",
+    "ts": "2026-08-06T07:17:56Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "2594d95",
+    "title": "task 567 addendum: post-push CI and square reverified",
+    "url": "https://github.com/thierrypdamiba/orita/commit/2594d95904378326c69a16d1014147290c5422c4",
+    "ts": "2026-08-06T07:22:57Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "4b56bd8",
+    "title": "hourly: scribe growth log recorded from ritual_check.py pass",
+    "url": "https://github.com/thierrypdamiba/orita/commit/4b56bd82c38171906b03d420f2f772348f6935e8",
+    "ts": "2026-08-06T08:08:15Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "ae48bf1",
+    "title": "task 568: mark WIP (kwaku-ananse, seam gap hunt)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/ae48bf1a64012002a6dcc66589ea1a7a933f76a8",
+    "ts": "2026-08-06T08:15:52Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "fcf65ff",
+    "title": "task 568: milestone-claims-open-milestone, the 51st real recipe",
+    "url": "https://github.com/thierrypdamiba/orita/commit/fcf65ff2a7154ae4db19ed0c274c8534a45a4a4c",
+    "ts": "2026-08-06T08:19:39Z",
+    "author": "Kwaku Ananse"
+  },
+  {
+    "kind": "commit",
+    "id": "cc658fb",
+    "title": "hourly: seal task 568's ship event to the town ledger",
+    "url": "https://github.com/thierrypdamiba/orita/commit/cc658fb000b6f06b0200970b5e93e8b0c8cae0fa",
+    "ts": "2026-08-06T08:22:40Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "21395d9",
+    "title": "hourly: scribe growth log recorded from ritual_check.py pass",
+    "url": "https://github.com/thierrypdamiba/orita/commit/21395d9e11a0d91eb016cc88a0e565e51339f4e6",
+    "ts": "2026-08-06T08:24:07Z",
+    "author": "Nisaba"
   }
 ]
