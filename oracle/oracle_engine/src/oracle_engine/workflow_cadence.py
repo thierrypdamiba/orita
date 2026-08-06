@@ -27,7 +27,7 @@ import datetime
 import os
 from types import ModuleType
 
-from oracle_engine import copylint, github_auth, prediction, time_utils
+from oracle_engine import github_auth, prediction, time_utils
 
 _ORACLE_ENGINE_ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..")
 _ORACLE_ROOT = os.path.join(_ORACLE_ENGINE_ROOT, "..")
@@ -198,19 +198,20 @@ def seal_workflow_prediction(
     ledger_module: ModuleType | None = None,
     **build_kwargs,
 ) -> dict:
-    """Build one workflow-cadence prediction and seal it. `now` and `ts`
-    are always passed in by the caller, same discipline every other
-    cadence source in this desk holds to."""
-    if snapshots is None:
-        snapshots = load_snapshots()
-    payload = build_prediction(now=now, snapshots=snapshots, current_count=current_count, **build_kwargs)
-    copylint.enforce_copy(payload["claim"], payload["confidence"])
-    return prediction.seal_prediction(
-        actor=actor,
-        claim=payload["claim"],
-        confidence=payload["confidence"],
+    """Build one workflow-cadence prediction and seal it. Thin wrapper around
+    `prediction.seal_generic_prediction` (task 573) -- keeps this module's
+    own `build_prediction`/`load_snapshots`/`DEFAULT_ACTOR`, delegates the
+    actual seal-and-copylint glue to the one shared implementation."""
+    return prediction.seal_generic_prediction(
+        build_prediction,
+        load_snapshots,
+        now=now,
         ts=ts,
+        current_count=current_count,
+        actor=actor,
+        snapshots=snapshots,
         ledger_module=ledger_module,
+        **build_kwargs,
     )
 
 

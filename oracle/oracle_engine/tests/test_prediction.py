@@ -20,7 +20,7 @@ _TOOLS_DIR = os.path.join(_ORITA_ROOT, "tools")
 
 sys.path.insert(0, os.path.join(_ORACLE_ENGINE_ROOT, "src"))
 
-from oracle_engine import prediction  # noqa: E402
+from oracle_engine import copylint, prediction  # noqa: E402
 
 
 def _fresh_ledger_module(tmp_ledger_path: str):
@@ -133,6 +133,100 @@ class TestSealedShape(unittest.TestCase):
         with open(self.tmp_path) as f:
             lines = [json.loads(line) for line in f if line.strip()]
         self.assertEqual(lines[call["seq"]]["detail"], call["detail"])
+
+
+class TestSealGenericPrediction(unittest.TestCase):
+    """Task 573: `seal_generic_prediction` is the shared glue an AST-hash
+    sweep found byte-identical across all 25 `*_cadence.py` siblings' own
+    `seal_<topic>_prediction`. Exercised directly here (not through any
+    real cadence module) with a fake `build_prediction_fn`/
+    `load_snapshots_fn` pair, the same "prove the shared function itself
+    works" discipline the sibling-delegation proof in test_time_utils.py
+    complements rather than duplicates."""
+
+    def setUp(self):
+        self.tmp_path = os.path.join(_TESTS_DIR, "_scratch_generic_ledger.jsonl")
+        if os.path.exists(self.tmp_path):
+            os.remove(self.tmp_path)
+        self.mod = _fresh_ledger_module(self.tmp_path)
+
+    def tearDown(self):
+        if os.path.exists(self.tmp_path):
+            os.remove(self.tmp_path)
+
+    def _build(self, now, snapshots, current_count, **kwargs):
+        return {
+            "claim": f"there will be at least {current_count} things (built with {kwargs})",
+            "confidence": 0.5,
+        }
+
+    def test_seals_using_the_supplied_build_and_load_functions(self):
+        calls = {"load": 0}
+
+        def fake_load_snapshots():
+            calls["load"] += 1
+            return []
+
+        entry = prediction.seal_generic_prediction(
+            self._build,
+            fake_load_snapshots,
+            now="2026-08-06T14:00:00+00:00",
+            ts="2026-08-06T14:00:00+00:00",
+            current_count=3,
+            actor="esu-elegba",
+            ledger_module=self.mod,
+        )
+        self.assertEqual(calls["load"], 1, "snapshots=None must call the supplied loader")
+        self.assertEqual(entry["actor"], "esu-elegba")
+        payload = prediction.parse_prediction_detail(entry["detail"])
+        self.assertIn("at least 3 things", payload["claim"])
+        self.assertTrue(self.mod.verify())
+
+    def test_an_explicit_snapshots_list_skips_the_loader(self):
+        def fake_load_snapshots():
+            raise AssertionError("loader must not be called when snapshots is given")
+
+        prediction.seal_generic_prediction(
+            self._build,
+            fake_load_snapshots,
+            now="2026-08-06T14:00:00+00:00",
+            ts="2026-08-06T14:00:00+00:00",
+            current_count=1,
+            actor="esu-elegba",
+            snapshots=[{"ts": "2026-08-05T00:00:00Z", "count": 1}],
+            ledger_module=self.mod,
+        )
+        self.assertTrue(self.mod.verify())
+
+    def test_build_kwargs_pass_through_to_the_build_function(self):
+        entry = prediction.seal_generic_prediction(
+            self._build,
+            lambda: [],
+            now="2026-08-06T14:00:00+00:00",
+            ts="2026-08-06T14:00:00+00:00",
+            current_count=7,
+            actor="esu-elegba",
+            ledger_module=self.mod,
+            horizon_hours=336,
+        )
+        payload = prediction.parse_prediction_detail(entry["detail"])
+        self.assertIn("horizon_hours", payload["claim"])
+
+    def test_a_copylint_rejected_claim_never_reaches_the_ledger(self):
+        def build_bad(now, snapshots, current_count, **kwargs):
+            return {"claim": "it will definitely happen no matter what", "confidence": 0.9}
+
+        with self.assertRaises(copylint.CopyRejected):
+            prediction.seal_generic_prediction(
+                build_bad,
+                lambda: [],
+                now="2026-08-06T14:00:00+00:00",
+                ts="2026-08-06T14:00:00+00:00",
+                current_count=1,
+                actor="esu-elegba",
+                ledger_module=self.mod,
+            )
+        self.assertFalse(os.path.exists(self.tmp_path) and open(self.tmp_path).read().strip())
 
 
 class TestParsePredictionDetailRejectsNonDictPayloads(unittest.TestCase):

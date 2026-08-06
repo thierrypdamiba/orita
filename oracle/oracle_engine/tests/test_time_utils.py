@@ -69,6 +69,7 @@ from oracle_engine import (  # noqa: E402
     media_cadence,
     milestone_cadence,
     pr_cadence,
+    prediction,
     release_cadence,
     run_cadence,
     star_cadence,
@@ -108,6 +109,26 @@ SIBLINGS = [
     tweet_cadence,
     workflow_cadence,
 ]
+
+_TOOLS_DIR = os.path.join(os.path.dirname(os.path.dirname(_ORACLE_ENGINE_ROOT)), "tools")
+_NOW = datetime.datetime(2026, 7, 20, 12, 0, tzinfo=datetime.timezone.utc)
+
+
+def _fresh_ledger_module(tmp_path: str):
+    """Same scratch-ledger-module pattern every `test_<topic>_cadence.py`
+    file already uses (e.g. `test_workflow_cadence.py`) -- a real ledger,
+    pointed at a throwaway file, never the live chain."""
+    mod = prediction.load_ledger_module(_TOOLS_DIR)
+    mod.LEDGER = tmp_path
+    return mod
+
+
+def _topic(mod):
+    """Derive a sibling module's own claim-topic (`pr_cadence` -> `pr`,
+    `commit_comment_cadence` -> `commit_comment`) from its module name, to
+    build the right `seal_<topic>_prediction` attribute name -- the exact
+    inverse of `_expected_error_cls`'s own stem derivation below."""
+    return mod.__name__.rsplit(".", 1)[-1].replace("_cadence", "")
 
 
 class IdentityAcrossSiblingsCase(unittest.TestCase):
@@ -315,6 +336,101 @@ class RejectMalformedDelegatesCase(unittest.TestCase):
         for mod in REJECT_MALFORMED_SIBLINGS:
             with self.subTest(sibling=mod.__name__):
                 mod._reject_malformed([{"ts": "2026-08-05T00:00:00Z", "count": 1}], "some_caller")
+
+
+SEAL_PREDICTION_SIBLINGS = LOAD_SNAPSHOTS_SIBLINGS
+
+
+class SealGenericPredictionDelegatesCase(unittest.TestCase):
+    """Every sibling cadence module's own `seal_<topic>_prediction(now, ts,
+    current_count, actor=<its own DEFAULT_ACTOR>, snapshots=None,
+    ledger_module=None, **build_kwargs)` must genuinely call through to
+    `prediction.seal_generic_prediction` with its own `build_prediction`/
+    `load_snapshots` as the two positional functions -- not carry a
+    reinlined copy of the default-load/build/copylint/seal glue (task 573's
+    own AST-hash sweep found all 25 byte-identical except for which
+    module-local `build_prediction`/`load_snapshots`/`DEFAULT_ACTOR` they
+    close over, the sixth such function this package's sweep has found
+    after `_parse_ts`/`load_snapshots`/`record_snapshot`/
+    `reject_malformed`)."""
+
+    def test_every_sibling_wrapper_delegates_to_the_shared_function(self):
+        self.assertEqual(
+            len(SEAL_PREDICTION_SIBLINGS), 25, "sibling list drifted from the live sweep"
+        )
+        for mod in SEAL_PREDICTION_SIBLINGS:
+            with self.subTest(sibling=mod.__name__):
+                sentinel = object()
+                calls = []
+
+                def fake_seal_generic_prediction(
+                    build_fn, load_fn, _calls=calls, _sentinel=sentinel, **kwargs
+                ):
+                    _calls.append((build_fn, load_fn, kwargs))
+                    return _sentinel
+
+                with mock.patch.object(prediction, "seal_generic_prediction", fake_seal_generic_prediction):
+                    seal_fn = getattr(mod, f"seal_{_topic(mod)}_prediction")
+                    result = seal_fn(
+                        now="2026-08-06T14:00:00+00:00",
+                        ts="2026-08-06T14:00:00+00:00",
+                        current_count=5,
+                        snapshots=[],
+                        ledger_module="probe-ledger",
+                    )
+                self.assertIs(
+                    result,
+                    sentinel,
+                    f"{mod.__name__}.seal_{_topic(mod)}_prediction did not return the shared "
+                    "function's result -- it may hold a reinlined copy again",
+                )
+                self.assertEqual(len(calls), 1)
+                build_fn, load_fn, kwargs = calls[0]
+                self.assertIs(
+                    build_fn,
+                    mod.build_prediction,
+                    f"{mod.__name__} did not pass its own build_prediction through unchanged",
+                )
+                self.assertIs(
+                    load_fn,
+                    mod.load_snapshots,
+                    f"{mod.__name__} did not pass its own load_snapshots through unchanged",
+                )
+                self.assertEqual(
+                    kwargs,
+                    {
+                        "now": "2026-08-06T14:00:00+00:00",
+                        "ts": "2026-08-06T14:00:00+00:00",
+                        "current_count": 5,
+                        "actor": mod.DEFAULT_ACTOR,
+                        "snapshots": [],
+                        "ledger_module": "probe-ledger",
+                    },
+                    f"{mod.__name__}.seal_{_topic(mod)}_prediction did not pass its own "
+                    "DEFAULT_ACTOR default (or the caller's other arguments) through unchanged",
+                )
+
+    def test_every_sibling_still_seals_a_real_entry_end_to_end(self):
+        """Not mocked: proves the real, live delegation still produces a
+        verifiable ledger entry, not just that the mock saw the right
+        kwargs."""
+        import tempfile
+
+        for mod in SEAL_PREDICTION_SIBLINGS:
+            with self.subTest(sibling=mod.__name__):
+                with tempfile.TemporaryDirectory() as tmp:
+                    ledger_path = os.path.join(tmp, "ledger.jsonl")
+                    ledger_mod = _fresh_ledger_module(ledger_path)
+                    seal_fn = getattr(mod, f"seal_{_topic(mod)}_prediction")
+                    entry = seal_fn(
+                        now=_NOW,
+                        ts=_NOW.isoformat(timespec="seconds"),
+                        current_count=4,
+                        snapshots=[],
+                        ledger_module=ledger_mod,
+                    )
+                    self.assertEqual(entry["actor"], mod.DEFAULT_ACTOR)
+                    self.assertTrue(ledger_mod.verify())
 
 
 class ParseTsCase(unittest.TestCase):

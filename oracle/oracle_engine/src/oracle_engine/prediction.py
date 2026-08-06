@@ -27,6 +27,22 @@ This module is where that promise becomes code, not just prose:
    task 32 (Ogun) adds `act == "grade"` entries that reference the original
    prediction's `seq` — the sealed call itself never changes shape once
    written.
+
+Task 573: the AST-hash sweep that already pulled `_parse_ts`/`load_snapshots`/
+`record_snapshot`/`reject_malformed` out of the 25 `*_cadence.py` siblings
+(tasks 516/523/559/563) found a sixth byte-identical function still standing:
+each sibling's own `seal_<topic>_prediction(now, ts, current_count,
+actor=DEFAULT_ACTOR, snapshots=None, ledger_module=None, **build_kwargs)` —
+default-load snapshots, call the module's own `build_prediction`, run it
+through `copylint.enforce_copy`, seal the result. Unlike the four already in
+`time_utils.py`, this one's genuinely-per-module pieces are FUNCTIONS
+(`build_prediction`, `load_snapshots`), not a default value or an error
+class, so a bare rebind or an `error_cls=` parameter can't close it —
+`seal_generic_prediction` below takes them as explicit parameters instead,
+the same shape `tools/scan_files.py`'s `find_pattern_violations` (task 570)
+already established for that class of per-file-tuned duplication. Each
+sibling keeps its own thin wrapper, delegating the seal-and-copylint glue
+here.
 """
 from __future__ import annotations
 
@@ -37,6 +53,8 @@ import os
 import sys
 from types import ModuleType
 from typing import Any
+
+from oracle_engine import copylint
 
 PREDICTION_ACT = "predict"
 
@@ -123,6 +141,44 @@ def seal_prediction(
     mod = ledger_module or load_ledger_module()
     detail = json.dumps(prediction_payload(claim, confidence), sort_keys=True, ensure_ascii=False)
     return mod.append(actor, PREDICTION_ACT, detail, ts)
+
+
+def seal_generic_prediction(
+    build_prediction_fn,
+    load_snapshots_fn,
+    *,
+    now,
+    ts: str,
+    current_count: int,
+    actor: str,
+    snapshots: list[dict] | None = None,
+    ledger_module: ModuleType | None = None,
+    **build_kwargs,
+) -> dict:
+    """Build one cadence-source prediction and seal it — the shared glue
+    task 573's AST-hash sweep found byte-identical across all 25
+    `*_cadence.py` siblings' own `seal_<topic>_prediction`. `build_prediction_fn`
+    and `load_snapshots_fn` are each sibling's own module-local function
+    (genuinely different per topic: a different claim template, a different
+    snapshot file) — passed in explicitly rather than assumed, the same
+    "the tuned part is a parameter, not a name this module happens to
+    import" shape `scan_files.find_pattern_violations` (task 570) already
+    holds for the identical class of per-file-tuned duplication. `actor`
+    has no default here (unlike each sibling's own wrapper, which defaults
+    to its own `DEFAULT_ACTOR`) — a shared function has no one topic's
+    actor to default to; every caller must say who.
+    """
+    if snapshots is None:
+        snapshots = load_snapshots_fn()
+    payload = build_prediction_fn(now=now, snapshots=snapshots, current_count=current_count, **build_kwargs)
+    copylint.enforce_copy(payload["claim"], payload["confidence"])
+    return seal_prediction(
+        actor=actor,
+        claim=payload["claim"],
+        confidence=payload["confidence"],
+        ts=ts,
+        ledger_module=ledger_module,
+    )
 
 
 def parse_prediction_detail(detail: str) -> dict:
