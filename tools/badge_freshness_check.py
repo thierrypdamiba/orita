@@ -35,6 +35,20 @@ any exception from the live recompute and returns `None` rather than
 raising -- `check_badge_freshness` then reports `status: "unavailable"`,
 clean, never misreporting an environment gap as a doctrine violation.
 
+Task 574. That "unavailable" default had never once flipped to a real
+cross-check, anywhere -- `arcade-mcp-server` was never on the CALLING
+interpreter's own `sys.path`, but it lives, right now, inside
+`fencepost/seam_engine`'s own `uv`-managed venv (the same one
+`recipe_command_check.py`, task 571/572, already shells out to for the
+identical class of gap). `live_badge_state()` now falls back to invoking
+`uv run python -c ...` inside `fencepost/seam_engine` when the direct
+in-process import fails, parsing the single-line JSON `{color, message}`
+it prints to stdout (its own diagnostic logging lands on stderr only,
+confirmed live before writing this). `uv` absent, the subprocess failing,
+or its stdout not parsing as the expected shape all still fall through to
+`None` -- exactly `dawn-run.yml`'s lean root job's existing, correct
+"unavailable" outcome, unchanged.
+
 Usage:
     python3 tools/badge_freshness_check.py check
 """
@@ -42,10 +56,24 @@ from __future__ import annotations
 
 import json
 import os
+import shutil
+import subprocess
 import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DEFAULT_BADGE_PATH = os.path.join(ROOT, "fencepost", "BADGE.json")
+SEAM_ENGINE_DIR = os.path.join(ROOT, "fencepost", "seam_engine")
+DEFAULT_UV_TIMEOUT = 60.0
+
+# Printed as the last line of stdout by the uv subprocess below -- kept a
+# single `json.dumps` call on one line so a trailing newline is the only
+# thing to strip, no multi-line stdout parsing needed.
+_LIVE_BADGE_SCRIPT = (
+    "import json, sys; sys.path.insert(0, 'src'); "
+    "import seam_engine.badge as badge; "
+    "state = badge.compute_badge_state(); "
+    "print(json.dumps({'color': state.color, 'message': state.message}))"
+)
 
 # Sentinel distinguishing "caller passed no live state, compute it fresh"
 # from "caller explicitly passed live=None, meaning unavailable" -- a bare
@@ -67,19 +95,58 @@ def _seam_badge():
     return badge
 
 
+def _live_badge_state_via_uv(
+    seam_engine_dir: str = SEAM_ENGINE_DIR, timeout: float = DEFAULT_UV_TIMEOUT
+) -> dict | None:
+    """Fall back to the `fencepost/seam_engine` `uv` venv itself, the one
+    place `arcade-mcp-server` is actually installed, when a bare in-process
+    import can't reach it. Returns `None` on any of: no `uv` on PATH, the
+    subprocess failing or timing out, or stdout not parsing as the exact
+    `{color, message}` shape -- every failure mode collapses to the same
+    "can't verify here" `None` the in-process path already returns, never a
+    crash and never a guess."""
+    if shutil.which("uv") is None:
+        return None
+    try:
+        proc = subprocess.run(
+            ["uv", "run", "python", "-c", _LIVE_BADGE_SCRIPT],
+            cwd=seam_engine_dir,
+            capture_output=True,
+            text=True,
+            timeout=timeout,
+        )
+    except (subprocess.TimeoutExpired, OSError):
+        return None
+    if proc.returncode != 0:
+        return None
+    stdout = proc.stdout.strip()
+    if not stdout:
+        return None
+    try:
+        payload = json.loads(stdout.splitlines()[-1])
+    except json.JSONDecodeError:
+        return None
+    if not isinstance(payload, dict) or not {"color", "message"}.issubset(payload.keys()):
+        return None
+    return {"color": payload["color"], "message": payload["message"]}
+
+
 def live_badge_state() -> dict | None:
     """Recompute the badge fresh -- the identical live introspection
     `seam_engine.badge.compute_badge_state()` performs -- reduced to the
     same `{color, message}` shape `fencepost/BADGE.json` holds on disk.
 
-    Returns `None` if the live recompute can't run in this environment
-    (a missing `arcade-mcp-server` install, or any other exception widening
-    from it) -- never lets an environment gap crash the caller."""
+    Tries a bare in-process import first (unchanged from task 425); if that
+    raises -- `arcade-mcp-server` not on THIS interpreter's `sys.path`, the
+    common case -- falls back to running the same computation inside
+    `fencepost/seam_engine`'s own `uv` venv, where the dependency actually
+    lives. Returns `None` only once both paths have failed -- never lets an
+    environment gap crash the caller."""
     try:
         badge = _seam_badge()
         state = badge.compute_badge_state()
     except Exception:  # noqa: BLE001 -- "can't verify" must never mean "verified broken"
-        return None
+        return _live_badge_state_via_uv()
     return {"color": state.color, "message": state.message}
 
 
