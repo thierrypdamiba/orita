@@ -259,6 +259,64 @@ class RecordSnapshotDelegatesCase(unittest.TestCase):
                     mod.record_snapshot(-1, "2026-08-05T00:00:00Z", "unused/path.jsonl")
 
 
+REJECT_MALFORMED_SIBLINGS = LOAD_SNAPSHOTS_SIBLINGS
+
+
+def _expected_tampered_error_cls(mod):
+    """Derive `<Words>CadenceTamperedError` from a sibling module's own
+    name (`pr_cadence` -> `PrCadenceTamperedError`), mirroring
+    `_expected_error_cls` above but for the Tampered subclass each
+    sibling's `_reject_malformed` wrapper raises."""
+    stem = mod.__name__.rsplit(".", 1)[-1].replace("_cadence", "")
+    name = "".join(word.capitalize() for word in stem.split("_")) + "CadenceTamperedError"
+    return getattr(mod, name)
+
+
+class RejectMalformedDelegatesCase(unittest.TestCase):
+    """Every sibling cadence module's own `_reject_malformed(snapshots,
+    caller)` must genuinely call through to `time_utils.reject_malformed`
+    with its own `*CadenceTamperedError` subclass as `error_cls` -- not
+    carry a reinlined copy of the walk-and-raise logic (task 563's own
+    AST-hash sweep found all 25 byte-identical except for that error
+    class and a few words of docstring, the fifth such function this
+    package's sweep has found after `_parse_ts`/`load_snapshots`/
+    `record_snapshot`)."""
+
+    def test_every_sibling_wrapper_delegates_to_the_shared_function(self):
+        self.assertEqual(
+            len(REJECT_MALFORMED_SIBLINGS), 25, "sibling list drifted from the live sweep"
+        )
+        for mod in REJECT_MALFORMED_SIBLINGS:
+            with self.subTest(sibling=mod.__name__):
+                calls = []
+
+                def fake_reject_malformed(snapshots, caller, error_cls, _calls=calls):
+                    _calls.append((snapshots, caller, error_cls))
+
+                with mock.patch.object(time_utils, "reject_malformed", fake_reject_malformed):
+                    mod._reject_malformed([{"_malformed": True}], "some_caller")
+                self.assertEqual(
+                    calls,
+                    [([{"_malformed": True}], "some_caller", _expected_tampered_error_cls(mod))],
+                    f"{mod.__name__}._reject_malformed did not pass its arguments and "
+                    "own error class through to time_utils.reject_malformed unchanged",
+                )
+
+    def test_every_sibling_still_raises_its_own_error_class_on_a_malformed_line(self):
+        """Not mocked: proves the real, live delegation still surfaces the
+        right exception type end to end, not just that the mock saw the
+        right kwarg."""
+        for mod in REJECT_MALFORMED_SIBLINGS:
+            with self.subTest(sibling=mod.__name__):
+                with self.assertRaises(_expected_tampered_error_cls(mod)):
+                    mod._reject_malformed([{"_malformed": True, "_error": "boom"}], "some_caller")
+
+    def test_a_clean_snapshot_list_raises_nothing(self):
+        for mod in REJECT_MALFORMED_SIBLINGS:
+            with self.subTest(sibling=mod.__name__):
+                mod._reject_malformed([{"ts": "2026-08-05T00:00:00Z", "count": 1}], "some_caller")
+
+
 class ParseTsCase(unittest.TestCase):
     def test_z_suffixed_timestamp_parses_as_utc(self):
         dt = time_utils.parse_ts("2026-08-03T12:00:00+00:00")

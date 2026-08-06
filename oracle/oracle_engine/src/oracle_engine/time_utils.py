@@ -59,6 +59,22 @@ through (by patching this module's `record_snapshot` and observing every
 sibling call it) and that the right error class still surfaces on bad
 input.
 
+`reject_malformed`: task 563's own re-run of the same AST-hash sweep found
+this package's own FIFTH byte-identical function, still standing after
+`_parse_ts`/`load_snapshots`/`record_snapshot` were each pulled out —
+raise on any snapshot line `load_snapshots` had already marked
+`_malformed`, so a lookup walking the whole log never silently treats a
+corrupted line as absent. All 25 siblings carried their own copy, hand-
+written back in tasks 250-274 before this module existed and never
+revisited when the other three were consolidated — differing only in
+which module-specific `*CadenceError` subclass they raised, same shape
+`record_snapshot` already had. Each sibling keeps a thin wrapper
+delegating to `reject_malformed` below with its own `error_cls`, the same
+discipline `record_snapshot`'s wrappers use — `tests/test_time_utils.py`'s
+`RejectMalformedDelegatesCase` proves every wrapper genuinely calls
+through and that the right error class still surfaces on a malformed
+line.
+
 Usage: not run directly; imported by oracle_engine's cadence modules.
 """
 from __future__ import annotations
@@ -130,3 +146,20 @@ def record_snapshot(
     with open(path, "a", encoding="utf-8") as f:
         f.write(json.dumps(entry, sort_keys=True) + "\n")
     return entry
+
+
+def reject_malformed(
+    snapshots: list[dict], caller: str, error_cls: type[Exception] = ValueError
+) -> None:
+    """Raise `error_cls` if any snapshot line came back marked
+    `_malformed` by `load_snapshots()` -- every caller across the 25
+    cadence siblings walks every snapshot, not just the tip, so a
+    malformed line anywhere could be hiding the real closest one and
+    silently skipping it would misreport the delta/baseline."""
+    for s in snapshots:
+        if s.get("_malformed"):
+            raise error_cls(
+                f"{caller}: the snapshot log holds a line that is not "
+                f"valid JSON ({s.get('_error')}) -- refusing rather than "
+                "silently skipping it."
+            )

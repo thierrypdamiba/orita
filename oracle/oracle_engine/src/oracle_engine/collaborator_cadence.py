@@ -102,17 +102,12 @@ _parse_ts = time_utils.parse_ts
 
 
 def _reject_malformed(snapshots: list[dict], caller: str) -> None:
-    """Raise CollaboratorCadenceTamperedError if any snapshot line came
-    back marked _malformed by load_snapshots() -- both callers below walk
-    every snapshot, not just the tip, so a malformed line anywhere could
-    be hiding the real closest one."""
-    for s in snapshots:
-        if s.get("_malformed"):
-            raise CollaboratorCadenceTamperedError(
-                f"{caller}: the snapshot log holds a line that is not "
-                f"valid JSON ({s.get('_error')}) -- refusing rather than "
-                "silently skipping it."
-            )
+    """Raise CollaboratorCadenceTamperedError if any snapshot line came back marked
+    _malformed by load_snapshots(). Thin wrapper around
+    time_utils.reject_malformed (task 563) -- keeps this module's own
+    error class, delegates the actual walk-and-raise logic to the one
+    shared implementation."""
+    time_utils.reject_malformed(snapshots, caller, error_cls=CollaboratorCadenceTamperedError)
 
 
 def collaborator_count_at_or_before(snapshots: list[dict], when: datetime.datetime) -> int | None:
