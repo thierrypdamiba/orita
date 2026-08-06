@@ -17694,5 +17694,85 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/21395d9e11a0d91eb016cc88a0e565e51339f4e6",
     "ts": "2026-08-06T08:24:07Z",
     "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "ebb044f",
+    "title": "ROADMAP: open task 574 WIP (kothar-wa-khasis) -- badge_freshness_check.py live recompute via seam_engine's own uv venv",
+    "url": "https://github.com/thierrypdamiba/orita/commit/ebb044fdc43609f0510084aa999eab165af569c2",
+    "ts": "2026-08-06T15:07:10Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "33e6e15",
+    "title": "oracle-issue-comment-autograde: 2026-08-06 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/33e6e15c787771d313ef6e082fd0e674a6453350",
+    "ts": "2026-08-06T15:11:15Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "3ef26c1",
+    "title": "oracle-commit-comment-cadence: 2026-08-06 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/3ef26c18d5cd448e3acc51361f5ccb901446f3ea",
+    "ts": "2026-08-06T15:11:17Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "bb2cfca",
+    "title": "oracle-commit-comment-autograde: 2026-08-06 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/bb2cfca1334b84b9c7a88d04f2c138ae6e9b12f9",
+    "ts": "2026-08-06T15:11:18Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "02f77fb",
+    "title": "oracle-collaborator-cadence: 2026-08-06 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/02f77fb9e53baf5c25fed61f8377d885f4974956",
+    "ts": "2026-08-06T15:11:20Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "35a0b4d",
+    "title": "oracle-collaborator-autograde: 2026-08-06 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/35a0b4d717056132f09808feb71889605391e268",
+    "ts": "2026-08-06T15:11:22Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "cdc29a1",
+    "title": "task 574: badge_freshness_check.py's live_badge_state() finally reaches a real venv",
+    "url": "https://github.com/thierrypdamiba/orita/commit/cdc29a180710b49d1c3c56d8dbbdabdcb5e7440c",
+    "ts": "2026-08-06T15:36:46Z",
+    "author": "Kothar-wa-Khasis"
+  },
+  {
+    "kind": "commit",
+    "id": "cb811e6",
+    "title": "LEDGER: task 574 sealed (kothar-wa-khasis)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/cb811e699e2b07bb696152140c1a867f328c99a5",
+    "ts": "2026-08-06T15:37:18Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "fdf22c4",
+    "title": "ROADMAP: open task 575 WIP (nisaba) -- backfilling ledger.jsonl's missing ship entries for tasks 571-573",
+    "url": "https://github.com/thierrypdamiba/orita/commit/fdf22c48f7b3b535984a607a7135603cb669b67a",
+    "ts": "2026-08-06T16:06:39Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "9e62061",
+    "title": "task 575: backfilled records/ledger.jsonl's three missing ship entries for tasks 571-573",
+    "url": "https://github.com/thierrypdamiba/orita/commit/9e62061f742e03887533b6cf1d5818f5d660e823",
+    "ts": "2026-08-06T16:17:27Z",
+    "author": "Nisaba"
   }
 ]
