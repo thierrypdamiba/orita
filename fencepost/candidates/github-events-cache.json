@@ -17966,5 +17966,21 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/016fe6736fa3ef38c3844e1a018ba4d7858726ab",
     "ts": "2026-08-07T11:07:25Z",
     "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "9f78270",
+    "title": "hourly ritual: the loom weaves the same thread twice, and calls it true",
+    "url": "https://github.com/thierrypdamiba/orita/commit/9f78270add540dac33884a82dfae7d8b327efff8",
+    "ts": "2026-08-07T12:46:18Z",
+    "author": "Kwaku Ananse"
+  },
+  {
+    "kind": "commit",
+    "id": "37f66ca",
+    "title": "seam-scan: 2026-08-07 tablet sealed, report rendered (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/37f66caf637a54de05dda77acba06b502f4c784e",
+    "ts": "2026-08-07T12:59:07Z",
+    "author": "Off-By-One"
   }
 ]
