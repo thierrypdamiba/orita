@@ -1,0 +1,26 @@
+[
+  {
+    "number": 2201,
+    "title": "Badge cache invalidation bug",
+    "state": "open",
+    "url": "https://github.com/thierrypdamiba/orita/issues/2201"
+  },
+  {
+    "number": 2202,
+    "title": "Streak status command feature request",
+    "state": "closed",
+    "url": "https://github.com/thierrypdamiba/orita/issues/2202"
+  },
+  {
+    "number": 2203,
+    "title": "Widen journal numbering check request",
+    "state": "open",
+    "url": "https://github.com/thierrypdamiba/orita/issues/2203"
+  },
+  {
+    "number": 2205,
+    "title": "Another unrelated background discussion issue",
+    "state": "open",
+    "url": "https://github.com/thierrypdamiba/orita/issues/2205"
+  }
+]

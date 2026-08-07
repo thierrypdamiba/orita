@@ -825,6 +825,27 @@ copy of the same extraction regex. All three scopes (`GetFileContents`,
 `ListIssues`, `ListPullRequests`) already sit on `SCOPES.md`'s cleared
 oath table, no new scope wiring needed.
 
+[`RECIPES/issue-comment-claims-unfixed-issue/`](RECIPES/issue-comment-claims-unfixed-issue/)
+is the fifty-eighth (ROADMAP.md #590): the seventh source the claims-X
+family had never grown, alongside README, release, tweet, mention,
+milestone, and review-comment. `issue-comment-dangling-reference` (the
+fifty-third recipe) proved an issue or pull request's own ordinary
+timeline comment is a genuinely distinct GitHub object worth watching,
+but only ever checked whether its own `#N` reference existed — this
+recipe asks the claims-X family's sharper question of the identical
+surface: does a comment's own closing-keyword claim ("fixes #N"/"closes
+#N"/"resolves #N") actually hold. Reuses
+`seam_engine.closing_keywords.CLOSING_KEYWORD_RE` verbatim rather than an
+eighth retyped copy. Confidence mirrors `issue-comment-dangling-
+reference`'s own 0.55/0.85 24h age-gated bar — the same editable-surface
+reasoning every timeline-comment recipe already holds. Fixture-only
+(`source: "fixture"`), the identical honest WIP marker
+`issue-comment-dangling-reference` already carries: `SCOPES.md`'s own
+live check found no read-only "list issue/PR comments" tool exposed
+anywhere on the-hand gateway today, so `ListIssues` (already cleared) is
+the only scope this recipe declares — the detection logic does not
+change one line the day a live tool appears.
+
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)
 (ROADMAP.md #111) is that second promise, kept: it runs `scan.py`'s own

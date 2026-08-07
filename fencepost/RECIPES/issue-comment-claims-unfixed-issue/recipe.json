@@ -1,0 +1,14 @@
+{
+    "slug": "issue-comment-claims-unfixed-issue",
+    "title": "An issue or PR's own timeline comment claims an issue fixed that's still open",
+    "author": "kwaku-ananse",
+    "description": "Compares every ordinary issue/PR timeline comment's own body against the repository's own issue set: someone writes a real GitHub closing-keyword claim ('fixes #N', 'closes #N', 'resolves #N') into an issue or pull request's own conversation thread, but GitHub never auto-closes off a comment's own text and issue #N stays open. The seventh source the claims-X family had never grown -- issue-comment-dangling-reference (the fifty-third real recipe) proved the ordinary timeline thread is a genuinely distinct GitHub object worth watching, but only ever checked whether its own #N reference existed, not whether a closing-keyword claim on it actually held.",
+    "toolkit": "github",
+    "scopes": [
+        "ListIssues"
+    ],
+    "fixture": "fixtures/issue_comment_claims_unfixed_issue",
+    "detector_file": "detector.py",
+    "entrypoint": "run_recipe_scan",
+    "confidence_notes": "Age-gated off the comment's own updated_at, the identical shape issue-comment-dangling-reference, review-comment-claims-unfixed-issue, and issue-body-dangling-reference already established -- 0.55 within 24h since last update, 0.85 past it. Deliberately NOT flat, matching the editable-text-surface siblings rather than the permanent-text siblings: an ordinary timeline comment, like a review comment or an issue/PR body, is a text surface its author can edit at any time, so a fresh closing-keyword claim earns a grace period before being scored as a confirmed gap. A claimed issue that doesn't exist at all is excluded at confidence 0.0 and named, not hidden -- that broken reference is issue-body-dangling-reference's/issue-comment-dangling-reference's own seam, not this one's. A claimed issue that IS closed is excluded too -- the claim was simply true. A comment with no body at all is excluded outright -- there is no claim to have broken. Deliberately checks only the issue list, never the PR list -- a closing-keyword claim naming a real pull request is a future issue-comment-claims-unmerged-pr's own remit, not this one's. Fixture-only (source: \"fixture\") per SCOPES.md's own WIP note on issue-comment-dangling-reference: no read-only 'list issue/PR comments' tool is exposed anywhere on the-hand gateway today -- the detection logic is real, the live read waits on the Hand's gateway, and only the fixture loader swaps for a real call the day one appears."
+}

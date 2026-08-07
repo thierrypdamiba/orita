@@ -1,0 +1,51 @@
+[
+  {
+    "id": 7101,
+    "issue_number": 40,
+    "body": "This also fixes #2201 while we're in here, good catch.",
+    "updated_at": "2026-08-05T10:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/issues/40#issuecomment-7101"
+  },
+  {
+    "id": 7102,
+    "issue_number": 41,
+    "body": "I think this resolves #2203 too, worth double-checking after merge.",
+    "updated_at": "2026-08-07T08:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/pull/41#issuecomment-7102"
+  },
+  {
+    "id": 7103,
+    "issue_number": 42,
+    "body": "Closes #2202 as a side effect of this line.",
+    "updated_at": "2026-08-05T10:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/issues/42#issuecomment-7103"
+  },
+  {
+    "id": 7104,
+    "issue_number": 43,
+    "body": "Fix #2999 today, it's the same root cause.",
+    "updated_at": "2026-08-05T10:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/pull/43#issuecomment-7104"
+  },
+  {
+    "id": 7105,
+    "issue_number": 44,
+    "body": "Same root cause as #2205, but not touching that here.",
+    "updated_at": "2026-08-05T10:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/issues/44#issuecomment-7105"
+  },
+  {
+    "id": 7106,
+    "issue_number": 45,
+    "body": null,
+    "updated_at": "2026-08-05T10:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/pull/45#issuecomment-7106"
+  },
+  {
+    "id": 7107,
+    "issue_number": 46,
+    "body": "Fixes #2201 -- yes, really closes #2201, tested locally.",
+    "updated_at": "2026-08-07T09:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/issues/46#issuecomment-7107"
+  }
+]
