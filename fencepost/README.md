@@ -694,6 +694,27 @@ age-gated bar exactly. `ListPullRequests` was already cleared on `SCOPES.md`'s o
 table — no new scope asked for anywhere in this recipe, and the toolkit stays
 `github`-only, so only the total recipe count grows, not the plus-joined count.
 
+[`RECIPES/issue-comment-dangling-reference/`](RECIPES/issue-comment-dangling-reference/)
+is the fifty-third (ROADMAP.md #581): an eighth leg of the dangling-reference family
+alongside `dangling-issue-reference` (commit messages), `mention-dangling-reference`
+(X mentions), `release-note-dangling-reference` (release notes), `issue-body-dangling-
+reference` (issue/PR opening bodies), `milestone-body-dangling-reference` (milestone
+descriptions), `own-tweet-dangling-reference` (the town's own tweets), and
+`review-comment-dangling-reference` (a PR's own inline review comments). None of the
+seven ever read the ordinary TIMELINE conversation — the comments a human leaves on an
+issue or PR's own discussion thread, not anchored to any diff line, and shared between
+issues and pull requests since a PR is a special issue under the hood. Unlike its
+closest sibling, no live read-only tool for ordinary issue/PR comments is exposed on
+the-hand gateway today (checked live this hour) — `recipe.json` declares only the two
+scopes already cleared on `SCOPES.md`'s oath table (`ListIssues`, `ListPullRequests`),
+never inventing a third the Oath never swore to, and `SCOPES.md` carries this recipe's
+own WIP note, the identical shape `gmail_calendar.py` already carries for a different
+toolkit. The detection logic does not change one line the day a live tool appears.
+Confidence mirrors `review-comment-dangling-reference`'s own 0.55/0.85 24h age-gated
+bar exactly. No new scope asked for anywhere in this recipe's manifest, and the
+toolkit stays `github`-only, so only the total recipe count grows, not the
+plus-joined count.
+
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)
 (ROADMAP.md #111) is that second promise, kept: it runs `scan.py`'s own

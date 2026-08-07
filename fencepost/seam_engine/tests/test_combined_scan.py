@@ -287,6 +287,7 @@ def test_runs_all_real_recipes_in_the_actual_repo_without_error(monkeypatch):
         "milestone-claims-unmerged-pr",
         "milestone-claims-open-milestone",
         "pr-checklist-complete-still-open",
+        "issue-comment-dangling-reference",
     }
 
 

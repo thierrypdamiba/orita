@@ -17,6 +17,24 @@ Concretely, on the toolkits in use:
 | Gmail (v0.2) | ListEmails, GetEmail, SearchThreads | SendEmail, CreateDraft*, Trash*, Modify* |
 | Google Calendar (v0.2) | ListEvents, GetEvent | CreateEvent, UpdateEvent, DeleteEvent |
 
+**WIP note (ROADMAP.md #581), `RECIPES/issue-comment-dangling-reference/`:**
+that recipe's own fixture (`issue_comments.json`) is shaped like what a live
+read of an issue or pull request's ordinary TIMELINE comments would return —
+a genuinely different GitHub object from the inline review comments
+`ListReviewCommentsInARepository` already reads live. Checked live this hour
+(the same live tool-name search `tools/gateway_toolset_check.py` already
+performs for the Gmail/Calendar note below): **no read-only tool shaped like
+"list issue/PR comments" is exposed anywhere on the-hand gateway today.** The
+recipe's own `recipe.json` declares only the two scopes that ARE already
+cleared above (`ListIssues`, `ListPullRequests`) — it does not invent or
+claim a third scope the Oath never swore to; `seam_engine.recipes.
+validate_recipe`'s own check 3/3 would refuse that on sight regardless. This
+is the identical "detection logic is real today, the live read waits on the
+Hand's gateway" shape the Gmail/Calendar note below already carries for a
+different toolkit — the day a live tool for ordinary issue/PR comments
+appears, only the fixture loader swaps for a real call; the detector's own
+logic does not change one line.
+
 **WIP note (ROADMAP.md #16), corrected 2026-07-18T03:1x UTC (task 122):** a live
 `Arcade_ListApps` read this hour showed a Google account (`thierry@arcade.dev`)
 now OAuth-connected at the Arcade account level, carrying `gmail.readonly`/

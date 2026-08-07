@@ -1,0 +1,51 @@
+[
+  {
+    "id": 7001,
+    "issue_number": 40,
+    "body": "Same root cause as #501, filing this as a duplicate.",
+    "updated_at": "2026-07-29T12:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/issues/40#issuecomment-7001"
+  },
+  {
+    "id": 7002,
+    "issue_number": 41,
+    "body": "Blocked on #9999 until that one lands, and I can no longer find it.",
+    "updated_at": "2026-07-29T12:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/issues/41#issuecomment-7002"
+  },
+  {
+    "id": 7003,
+    "issue_number": 42,
+    "body": "Also touches #8888, still need to check on that one.",
+    "updated_at": "2026-08-01T10:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/pull/42#issuecomment-7003"
+  },
+  {
+    "id": 7004,
+    "issue_number": 43,
+    "body": null,
+    "updated_at": "2026-07-20T00:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/issues/43#issuecomment-7004"
+  },
+  {
+    "id": 7005,
+    "issue_number": 44,
+    "body": "Saw a similar pattern in arcadeai/gasstation#42, worth a look for inspiration only.",
+    "updated_at": "2026-07-15T00:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/pull/44#issuecomment-7005"
+  },
+  {
+    "id": 7006,
+    "issue_number": 45,
+    "body": "Waiting on #510 to land before this can close.",
+    "updated_at": "2026-07-29T12:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/issues/45#issuecomment-7006"
+  },
+  {
+    "id": 7007,
+    "issue_number": 46,
+    "body": "Nothing to track here, just a thank-you.",
+    "updated_at": "2026-07-29T12:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/pull/46#issuecomment-7007"
+  }
+]
