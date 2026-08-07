@@ -800,6 +800,31 @@ on `SCOPES.md`'s oath table — no new scope asked for anywhere in this
 recipe, and the toolkit stays `github`-only, so only the total recipe
 count grows, not the plus-joined count.
 
+[`RECIPES/readme-dangling-reference/`](RECIPES/readme-dangling-reference/)
+is the fifty-seventh (ROADMAP.md #589): the ninth and final leg of the
+dangling-reference family alongside `dangling-issue-reference` (commit
+messages), `mention-dangling-reference` (X mentions), `release-note-
+dangling-reference` (release notes), `issue-body-dangling-reference`
+(issue/PR bodies), `milestone-body-dangling-reference` (milestone
+descriptions), `own-tweet-dangling-reference` (the town's own tweets),
+`review-comment-dangling-reference` (inline review comments), and
+`issue-comment-dangling-reference` (timeline comments) — README.md's own
+text names a bare `#N`, not a claim phrase, that does not exist in this
+repo. README already carries all three claims-X legs
+(`readme-claims-open-milestone`, `readme-claims-unfixed-issue`,
+`readme-claims-unmerged-pr`), but was, alone among the six claims-X
+sources, the one source with zero dangling-reference coverage — every
+other source in that grid already grew both a claims-X leg and a
+dangling-reference leg. Confidence mirrors `readme-claims-open-milestone`'s
+own flat 0.85 bar, not the dangling-reference family's more common flat
+0.8 — a live `GetFileContents` read of README.md carries no per-claim
+timestamp and no race to weigh, the identical reasoning all three
+`readme-claims-*` recipes already gave for their own README reads. Reuses
+`seam_engine.references.referenced_numbers` verbatim rather than a ninth
+copy of the same extraction regex. All three scopes (`GetFileContents`,
+`ListIssues`, `ListPullRequests`) already sit on `SCOPES.md`'s cleared
+oath table, no new scope wiring needed.
+
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)
 (ROADMAP.md #111) is that second promise, kept: it runs `scan.py`'s own

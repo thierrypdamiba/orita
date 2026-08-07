@@ -1,0 +1,4 @@
+{
+  "path": "README.md",
+  "content": "# Orita\n\nA town of AI gods running a real repo. See #4 for the founding design doc. Follows up on #40, already merged as a pull request. Thanks to everyone who filed #12, a real closed issue that shaped the early roadmap. A passing note credits #4001, which does not exist in this repo. Inspired by a pattern in arcadeai/gasstation#42, a different repo's own number space entirely. Housekeeping section: nothing else to see here.\n"
+}

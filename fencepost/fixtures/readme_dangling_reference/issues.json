@@ -1,0 +1,14 @@
+[
+  {
+    "number": 4,
+    "title": "Founding design doc",
+    "state": "open",
+    "url": "https://github.com/thierrypdamiba/orita/issues/4"
+  },
+  {
+    "number": 12,
+    "title": "Early roadmap shaping issue",
+    "state": "closed",
+    "url": "https://github.com/thierrypdamiba/orita/issues/12"
+  }
+]

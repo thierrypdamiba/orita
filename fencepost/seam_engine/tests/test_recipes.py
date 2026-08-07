@@ -536,6 +536,7 @@ _CARDINAL_WORDS = {
     "forty-five": 45, "forty-six": 46, "forty-seven": 47, "forty-eight": 48,
     "forty-nine": 49, "fifty": 50, "fifty-one": 51, "fifty-two": 52,
     "fifty-three": 53, "fifty-four": 54, "fifty-five": 55, "fifty-six": 56,
+    "fifty-seven": 57,
 }
 
 _PLUS_JOINED_CLAIM_RE = re.compile(
@@ -587,13 +588,13 @@ def test_plus_joined_claim_missing_sentence_raises():
         claimed_plus_joined_counts("Nothing here about plus-joined toolkits.")
 
 
-def test_real_plus_joined_counts_are_currently_fifteen_of_fifty_six():
-    # Regression pin: today's real, live counts under RECIPES/. Was (15, 55)
-    # until review-comment-claims-open-milestone merged (the fifty-sixth
-    # real recipe, toolkit "github"-only -- only the total grows this time,
-    # the same shape review-comment-claims-unfixed-issue's and review-
-    # comment-claims-unmerged-pr's own merges already held.
-    assert real_plus_joined_counts(FENCEPOST_ROOT) == (15, 56)
+def test_real_plus_joined_counts_are_currently_fifteen_of_fifty_seven():
+    # Regression pin: today's real, live counts under RECIPES/. Was (15, 56)
+    # until readme-dangling-reference merged (the fifty-seventh real
+    # recipe, toolkit "github"-only -- only the total grows this time, the
+    # same shape review-comment-claims-open-milestone's own merge already
+    # held.
+    assert real_plus_joined_counts(FENCEPOST_ROOT) == (15, 57)
 
 
 def test_oath_scopes_for_toolkit_docstring_matches_the_real_live_counts():
