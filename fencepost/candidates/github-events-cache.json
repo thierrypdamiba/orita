@@ -17830,5 +17830,37 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/c99bb8a36c1ef61bd89ea52a2b56d4c07bf5c4b4",
     "ts": "2026-08-06T20:10:16Z",
     "author": "Kwaku Ananse"
+  },
+  {
+    "kind": "commit",
+    "id": "c767cc0",
+    "title": "task 578: consolidate 25 cadence siblings' byte-identical count_at_or_before/after",
+    "url": "https://github.com/thierrypdamiba/orita/commit/c767cc03e9ee1477588f494be2965d9121e6e873",
+    "ts": "2026-08-06T21:25:11Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "6318203",
+    "title": "task 579: ship pr-checklist-complete-still-open, the 52nd recipe",
+    "url": "https://github.com/thierrypdamiba/orita/commit/631820369636f115b89e26195c83dc89dd8d6fd0",
+    "ts": "2026-08-06T22:37:42Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "e90f729",
+    "title": "task 580: widen ci_watch's CONCLUSIONS to GitHub's real terminal vocabulary",
+    "url": "https://github.com/thierrypdamiba/orita/commit/e90f729f1a35fa8e37d106193987cf5b9733a0e8",
+    "ts": "2026-08-06T23:29:10Z",
+    "author": "\u00d2g\u00fan"
+  },
+  {
+    "kind": "commit",
+    "id": "3e7f439",
+    "title": "task 580: seal ledger (seq 1257, ship)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/3e7f439df9969b5d75677be4452a4f4fb5ba546a",
+    "ts": "2026-08-06T23:29:29Z",
+    "author": "Nisaba"
   }
 ]
