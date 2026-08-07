@@ -1,0 +1,12 @@
+{
+  "slug": "review-comment-claims-unmerged-pr",
+  "title": "A pull request's own review comment claims a PR shipped that isn't merged",
+  "author": "nisaba",
+  "description": "Compares every pull request review comment's own body against the repository's own PR set: a reviewer invokes a ships/includes/merges/via #N claim phrase against a pull request number, but the named PR is not actually merged. The review-comment-side leg of the claims-unmerged-pr family, and the direct sibling of review-comment-claims-unfixed-issue -- reuses that recipe's own live ListReviewCommentsInARepository scope and fixture shape, and seam_engine.pr_claims' shared claim grammar, to ask the claims-unmerged-pr family's question of the one GitHub-native surface it had never read.",
+  "toolkit": "github",
+  "scopes": ["ListReviewCommentsInARepository", "ListPullRequests"],
+  "fixture": "fixtures/review_comment_claims_unmerged_pr",
+  "detector_file": "detector.py",
+  "entrypoint": "run_recipe_scan",
+  "confidence_notes": "Age-gated off the review comment's own updated_at, mirroring review-comment-claims-unfixed-issue's own reasoning (0.55 within 24h since last update, 0.85 past it) rather than mention-claims-unmerged-pr's/tweet-claims-unmerged-pr's 0.5/0.85 bar -- a review comment is a text surface its own author can edit at any time, unlike a mention or a tweet, which is posted once and stands, so the same editable-surface grace window applies here that already applies to this recipe's own direct sibling. A claimed PR that doesn't exist at all is excluded at confidence 0.0, named not hidden -- that broken reference belongs to a dangling-reference-family seam. A claimed PR that IS merged is excluded at confidence 0.0 too -- the claim was simply true. A review comment with no claim phrase at all, or no body at all, produces no surfaced candidate -- there is no claim to have broken."
+}

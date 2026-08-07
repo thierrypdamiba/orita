@@ -746,6 +746,33 @@ mention or a tweet, posted once and standing. Both scopes (`ListReviewCommentsIn
 asked for anywhere in this recipe, and the toolkit stays `github`-only, so only
 the total recipe count grows, not the plus-joined count.
 
+[`RECIPES/review-comment-claims-unmerged-pr/`](RECIPES/review-comment-claims-unmerged-pr/)
+is the fifty-fifth (ROADMAP.md #585): the direct sibling of
+`review-comment-claims-unfixed-issue`, which named this exact recipe by its
+future filename, twice, before anyone built it — "a closing-keyword claim
+naming a real pull request is `review-comment-claims-unmerged-pr`'s own
+future seam, not this one's." This is that future seam, built: the
+review-comment-side leg of the claims-unmerged-pr family alongside
+`readme-claims-unmerged-pr`, `release-claims-unmerged-pr`, `tweet-claims-
+unmerged-pr`, `mention-claims-unmerged-pr`, and `milestone-claims-
+unmerged-pr`. Reuses `review-comment-claims-unfixed-issue`'s own live
+`ListReviewCommentsInARepository` scope and
+`seam_engine.pr_claims.claimed_pr_numbers` — the shared "ships/
+includes/merges/via #N" grammar every sibling `*-claims-unmerged-pr`
+recipe already imports — rather than a sixth independently typed copy.
+The seam: a review comment invokes a ships/includes/merges/via `#N` claim
+against a PR, but the PR never actually merged (still open, or closed
+without merging) — GitHub never merges anything off a review comment's
+own text, so the false claim was never going to resolve itself either.
+Confidence mirrors `review-comment-claims-unfixed-issue`'s own 0.55/0.85
+24h age-gated bar exactly, not the mention/tweet legs' 0.5/0.85 one — the
+same editable-surface reasoning applied to the PR-claim seam instead of
+the issue-claim one. Both scopes (`ListReviewCommentsInARepository`,
+`ListPullRequests`) were already cleared on `SCOPES.md`'s oath table — no
+new scope asked for anywhere in this recipe, and the toolkit stays
+`github`-only, so only the total recipe count grows, not the plus-joined
+count.
+
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)
 (ROADMAP.md #111) is that second promise, kept: it runs `scan.py`'s own
