@@ -129,6 +129,30 @@ _QUOTED_SPAN_RE = re.compile(r"'[^']*'")
 # (confirmed live pre-fix: `suggest_move` on the recipe's own real fixture
 # gap returned "Close it yourself..." for a milestone that is already
 # closed -- a doubly wrong hand-off, since there is nothing left to close).
+#
+# Task 586 (retrya): a fourth recurrence, this time not one recipe but a
+# whole family of eight -- `dangling-issue-reference`,
+# `issue-body-dangling-reference`, `issue-comment-dangling-reference`,
+# `mention-dangling-reference`, `milestone-body-dangling-reference`,
+# `own-tweet-dangling-reference`, `release-note-dangling-reference`, and
+# `review-comment-dangling-reference`. Every one of these shares the exact
+# same seam (a commit/issue/comment/mention/milestone/tweet/release
+# note/review comment names `#N`, and no issue or PR `#N` exists anywhere in
+# the repo) and every one of their real, shipped headlines shares the exact
+# same needle -- "no issue or PR #{n} exists[ here]" -- confirmed by
+# `grep -rh "no issue or PR" RECIPES/*/detector.py` returning exactly these
+# eight surfaced (not excluded) headline templates and no others. None of
+# the seven earlier needles match any of them, so all eight fell through to
+# `_DEFAULT_MOVE` ("Close it yourself, however it's meant to be closed") --
+# confirmed live pre-fix by feeding each recipe's own real fixture-generated
+# primary gap into `suggest_move`. That default is not merely generic here,
+# it is actively wrong: there is no `#N` to close, because `#N` does not
+# exist -- a reader told to "close it" goes looking for something that was
+# never there. Found by extending 557's own sweep method (grep every
+# detector's `headline=f"` literal for a shared substring, not just walking
+# the recipes `test_recipes.py` already names) rather than re-running it
+# unchanged, since a manual re-sweep of only the recipes 537/550/557 already
+# named would never have caught a family none of those three ever touched.
 _MOVE_RULES: tuple[tuple[str, str], ...] = (
     (
         "calendar",
@@ -161,6 +185,10 @@ _MOVE_RULES: tuple[tuple[str, str], ...] = (
     (
         "not yet in the readme credits",
         "Add them to the README yourself — a line in the credits is enough. Fencepost only found the seam; it does not cross it.",
+    ),
+    (
+        "no issue or pr",
+        "Correct or delete it yourself — the reference points at nothing. Fencepost only found the seam; it does not cross it.",
     ),
 )
 _DEFAULT_MOVE = (
@@ -198,7 +226,6 @@ def suggest_move(primary_gap: dict[str, Any] | None) -> str:
     """
     if not primary_gap:
         return _NO_GAP_MOVE
-    raw = f"{primary_gap.get('headline', '')} {primary_gap.get('detail', '')}"
     # Task 537 (retrya): every detector across scan.py and all 45 RECIPES/
     # embeds mortal-controlled free text (a commit message, an issue/PR/
     # milestone title, a tweet's own text) inside single quotes -- confirmed
@@ -210,7 +237,27 @@ def suggest_move(primary_gap: dict[str, Any] | None) -> str:
     # gap that has nothing to do with calendars (reproduced live pre-fix).
     # Stripping quoted spans first leaves only the recipe-authored template
     # prose the rules are actually meant to match.
-    haystack = _QUOTED_SPAN_RE.sub(" ", raw).lower()
+    #
+    # Task 586 (retrya): stripping used to happen on `headline` and `detail`
+    # concatenated first, then stripped once. `issue-comment-dangling-
+    # reference`'s own real headline template carries a bare possessive
+    # apostrophe ("#{n}'s own thread") -- not mortal text, just normal
+    # English -- and when concatenated with a `detail` field that opens its
+    # own mortal-quoted span, the single stray apostrophe paired off against
+    # the detail's OPENING quote instead of its partner, and `_QUOTED_SPAN_RE`
+    # swallowed everything in between -- including the headline's own real
+    # "no issue or PR #N exists" text -- as if it were mortal-controlled
+    # free text (confirmed live pre-fix: `suggest_move` on the recipe's real
+    # fixture gap fell through to `_DEFAULT_MOVE` because its own needle was
+    # eaten by a quote pairing that crossed a field boundary it should never
+    # have crossed). Stripping each field independently before concatenating
+    # fixes this at the root: a template's own stray apostrophe can never
+    # again pair against a different field's mortal quote to hide real
+    # recipe-authored prose, and each field's own genuinely-paired mortal
+    # quotes still strip exactly as before.
+    headline_stripped = _QUOTED_SPAN_RE.sub(" ", primary_gap.get("headline", ""))
+    detail_stripped = _QUOTED_SPAN_RE.sub(" ", primary_gap.get("detail", ""))
+    haystack = f"{headline_stripped} {detail_stripped}".lower()
     for needle, move in _MOVE_RULES:
         if needle in haystack:
             return move

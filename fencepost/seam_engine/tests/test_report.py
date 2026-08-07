@@ -400,11 +400,15 @@ def test_suggest_move_matches_milestone_closed_not_tweeted_headline():
 # tweet references #{n}, but no issue or PR #{n} exists") mentions "tweet"
 # only because the gap's SOURCE is a tweet, not because posting one is the
 # fix -- it is the same dangling-reference family as `dangling-issue-
-# reference`/`mention-dangling-reference`/etc, correctly generic, out of
-# scope for this task. The three `tweet-claims-*` recipes (`-open-milestone`,
-# `-unfixed-issue`, `-unmerged-pr`) say "tweet" only as the noun naming
-# where the false claim came from ("Tweet T-1201 claims milestone #5001
-# shipped, but it's still open") -- the actual gap is the still-open
+# reference`/`mention-dangling-reference`/etc, out of scope for this task
+# either way. (Task 586 gave that whole family its own real "correct or
+# delete it yourself" move, so this exception no longer means "correctly
+# generic" -- see `test_no_dangling_reference_headline_falls_through_to_default`
+# below for the check that now covers it.) The three `tweet-claims-*`
+# recipes (`-open-milestone`, `-unfixed-issue`, `-unmerged-pr`) say "tweet"
+# only as the noun naming where the false claim came from ("Tweet T-1201
+# claims milestone #5001 shipped, but it's still open") -- the actual gap
+# is the still-open
 # milestone/issue/PR the tweet claimed was done, and "close it yourself" is
 # the genuinely correct hand-off, same family as their `readme-claims-*`/
 # `release-claims-*`/`milestone-claims-*` siblings (none of which mention
@@ -449,6 +453,48 @@ def test_no_recipe_with_a_tweet_or_announce_shaped_headline_falls_through_to_def
     assert checked_any, "expected at least one real recipe headline to mention tweet/announce"
 
 
+# Task 586 (retrya): the sibling systemic guard for the dangling-reference
+# family (`dangling-issue-reference`, `issue-body-dangling-reference`,
+# `issue-comment-dangling-reference`, `mention-dangling-reference`,
+# `milestone-body-dangling-reference`, `own-tweet-dangling-reference`,
+# `release-note-dangling-reference`, `review-comment-dangling-reference`).
+# Every one of these eight names a `#N` that does not exist anywhere in the
+# repo, and every one of their real headlines shares the same "no issue or
+# PR #{n} exists[ here]" phrasing -- confirmed live pre-fix that all eight
+# fell through to `_DEFAULT_MOVE` ("Close it yourself"), a wrong hand-off
+# since there is no `#N` to close. Same walk-every-real-recipe-fixture
+# mechanism as the tweet/announce guard above, so a ninth recipe added to
+# this family later either gets a matching headline (caught for free by the
+# shared "no issue or pr" needle) or gets a genuinely new phrasing this
+# guard will refuse silently passing over.
+def test_no_dangling_reference_headline_falls_through_to_default():
+    from seam_engine.recipes import discover_recipes, load_detector
+
+    fencepost_root = Path(__file__).resolve().parents[2]
+    checked_any = False
+    for manifest in discover_recipes(fencepost_root):
+        result = load_detector(manifest)()
+        gap = result.get("primary_gap") or (result.get("tail") or [None])[0]
+        if gap is None:
+            continue
+        headline = gap.get("headline", "")
+        stripped = report._QUOTED_SPAN_RE.sub(" ", headline).lower()
+        if "no issue or pr" not in stripped:
+            continue
+        checked_any = True
+        move = report.suggest_move(gap)
+        assert move != report._DEFAULT_MOVE, (
+            f"{manifest.slug}'s real headline ({headline!r}) names a dangling "
+            "reference to a nonexistent issue/PR but suggest_move fell through "
+            "to the generic close-it-yourself line -- add a needle to _MOVE_RULES."
+        )
+        assert "correct or delete it yourself" in move.lower()
+    # Same vacuous-pass guard as the tweet/announce sweep: if discover_recipes()
+    # ever stops returning any dangling-reference recipe, fail loudly rather
+    # than silently pass with nothing actually checked.
+    assert checked_any, "expected at least one real recipe headline to name a dangling reference"
+
+
 # Task 537 (retrya): every detector embeds mortal-controlled free text (a
 # commit message, a title, a tweet's own words) inside single quotes in its
 # headline/detail f-strings -- confirmed by grep across the whole tree, zero
@@ -458,14 +504,41 @@ def test_no_recipe_with_a_tweet_or_announce_shaped_headline_falls_through_to_def
 # (`'{commit.message}' ... references #{n}`, the dangling-reference family's
 # own template) with free text engineered to collide with a different rule.
 def test_suggest_move_ignores_a_rule_needle_hiding_inside_quoted_free_text():
+    # Task 586: the headline's own real "no issue or PR #42 exists" phrasing
+    # now maps to the dangling-reference move (see _MOVE_RULES) -- the point
+    # of this test stays what it always was, that "calendar" hiding inside
+    # the quoted commit message never fires the unrelated Calendar rule.
     gap = {
         "headline": "A commit references #42, but no issue or PR #42 exists",
         "detail": "'Add calendar sync helper, references #42' (https://github.com/x/y/commit/abc) "
         "references #42; a real issue or pull request never existed.",
     }
     move = report.suggest_move(gap)
-    assert move == report._DEFAULT_MOVE
+    assert "correct or delete it yourself" in move.lower()
     assert "calendar" not in move.lower()
+
+
+# Task 586 (retrya): reproduces the real bug `issue-comment-dangling-
+# reference`'s own live fixture tripped -- a headline's bare possessive
+# apostrophe ("#41's own thread") is not a quoted span at all, but when
+# `headline` and `detail` used to be concatenated before stripping, that one
+# stray apostrophe paired against `detail`'s own OPENING mortal quote
+# instead of its real partner, and `_QUOTED_SPAN_RE` swallowed everything
+# between them -- including the headline's own real "no issue or PR #N
+# exists" text, the exact needle this gap needed matched. Confirmed live
+# pre-fix (concatenate-then-strip): `suggest_move` on this exact shape
+# returned `_DEFAULT_MOVE`, silently eating a real needle it should have
+# matched. Stripping each field independently (the fix) can't cross that
+# boundary, so the real needle survives.
+def test_suggest_move_survives_a_bare_apostrophe_in_the_headline_next_to_a_quoted_detail():
+    gap = {
+        "headline": "Comment #7002 (on #41's own thread) references #9999, but no issue or PR #9999 exists here",
+        "detail": "'Blocked on #9999 until that one lands, and I can no longer find it.' "
+        "(https://github.com/example/example-repo/issues/41#issuecomment-7002) references #9999; "
+        "no issue or pull request with that number exists in this repo.",
+    }
+    move = report.suggest_move(gap)
+    assert "correct or delete it yourself" in move.lower()
 
 
 def test_suggest_move_ignores_reminder_hiding_inside_a_quoted_headline():
