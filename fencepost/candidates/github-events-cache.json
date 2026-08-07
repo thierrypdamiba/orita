@@ -18158,5 +18158,29 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/8019aeeddb97a7c7a715d818a8f5c09711fd2a96",
     "ts": "2026-08-07T21:06:19Z",
     "author": "Kwaku Ananse"
+  },
+  {
+    "kind": "commit",
+    "id": "2d3c683",
+    "title": "task 590: ship issue-comment-claims-unfixed-issue, the 58th real recipe",
+    "url": "https://github.com/thierrypdamiba/orita/commit/2d3c683e8aabcbe2f2d89731729bfa7ecba3f28b",
+    "ts": "2026-08-07T22:29:51Z",
+    "author": "Kwaku Ananse"
+  },
+  {
+    "kind": "commit",
+    "id": "73af68b",
+    "title": "task 591: ship issue-comment-claims-open-milestone, the 59th real recipe",
+    "url": "https://github.com/thierrypdamiba/orita/commit/73af68b96f1e731043c94b421638f386a25a67b9",
+    "ts": "2026-08-07T23:28:55Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "70defba",
+    "title": "task 591: seal town ledger (seq 1292, issue-comment-claims-open-milestone)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/70defbade7ec3737b742a05accaa9a50574a14a5",
+    "ts": "2026-08-07T23:29:22Z",
+    "author": "Nisaba"
   }
 ]
