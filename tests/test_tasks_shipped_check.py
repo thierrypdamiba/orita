@@ -1,9 +1,25 @@
 """Task 416. Proves tools/tasks_shipped_check.py cross-checks
 records/metrics.jsonl's last tasks_shipped_today reading against real,
 live BUILDLOG.md ground truth -- and confirms the real, live town state:
-metrics.jsonl's most recent reading (17, dated 2026-07-30) DOES match the
-real ground truth (distinct numbered tasks logged before that day's own
-daily-aggregate row, task 414).
+metrics.jsonl's most recent reading DOES match the real ground truth
+(distinct numbered tasks logged before that day's own daily-aggregate
+row).
+
+`RealLiveStateCase` below used to pin the live claimed_date/claimed
+values literally ("2026-08-05", 16 -- task 556's own reading) rather than
+just the structural claimed==real relationship
+`test_report_shipped_check.py`'s own sibling `RealLiveStateCase` already
+holds itself to. Every later daily-aggregate task appends a fresh
+metrics.jsonl reading for its own date without ever being expected to
+come back and re-pin this file's two literal values -- exactly the
+"regression pin drifts because nothing re-derives it" shape this whole
+suite otherwise polices in dozens of other doctrine tests, caught here
+only because CI actually turned red on it (task 588, the first daily
+aggregate --  task 587's own 2026-08-07 reading -- to run after this
+test existed). Fixed at the root the same way the sibling file already
+had it right: assert the live relationship (claimed agrees with real,
+clean), never a specific day's numbers, so no future daily aggregate can
+ever break this file again.
 """
 import importlib.util
 import json
@@ -315,18 +331,23 @@ class OmittedFieldOnExistingReadingCase(unittest.TestCase):
 
 class RealLiveStateCase(unittest.TestCase):
     """The real point of this task: records/metrics.jsonl's own
-    tasks_shipped_today field claims 16 for 2026-08-05 (task 556's own
-    daily-aggregate reading, tasks 540-555), and ground truth (BUILDLOG.md's
-    own distinct numbered rows dated 2026-08-05 before task 556's aggregate
-    row) also reads 16 -- proven live rather than assumed, and stable even
-    as later same-day tasks keep appending further rows."""
+    tasks_shipped_today field, for whatever date its own most recent
+    reading claims, agrees with ground truth (BUILDLOG.md's own distinct
+    numbered rows dated that same day, logged before that day's own
+    daily-aggregate row) -- proven live rather than assumed. Deliberately
+    asserts only the structural relationship (claimed agrees with real,
+    clean), never a specific day's literal date or count -- a literal pin
+    here (2026-08-05, 16 -- task 556's own reading) went stale and broke
+    CI red the moment a later daily-aggregate task (587, then caught live
+    by 588) appended its own honest, different reading for a later date;
+    the identical relationship-only shape
+    `test_report_shipped_check.py`'s own sibling `RealLiveStateCase`
+    already held itself to from the start."""
 
     def test_the_real_live_buildlog_now_agrees_with_ground_truth(self):
         result = tsc.check_tasks_shipped()
         self.assertEqual(result["claimed"], result["real"])
         self.assertTrue(result["clean"])
-        self.assertEqual(result["claimed_date"], "2026-08-05")
-        self.assertEqual(result["claimed"], 16)
 
 
 if __name__ == "__main__":
