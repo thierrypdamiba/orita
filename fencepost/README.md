@@ -846,6 +846,22 @@ anywhere on the-hand gateway today, so `ListIssues` (already cleared) is
 the only scope this recipe declares — the detection logic does not
 change one line the day a live tool appears.
 
+[`RECIPES/issue-comment-claims-open-milestone/`](RECIPES/issue-comment-claims-open-milestone/)
+is the fifty-ninth (ROADMAP.md #591): the eighth leg the claims-X family
+has grown on the issue-comment side, the direct sibling of
+`review-comment-claims-open-milestone` (the fifty-sixth recipe) applied
+to an ordinary timeline comment instead of an inline review comment — an
+issue or PR's own conversation thread invokes a "milestone #N" claim
+phrase, but the named milestone is still open. Reuses
+`seam_engine.milestone_claims.claimed_milestone_numbers` verbatim rather
+than an eighth retyped copy. Confidence mirrors `issue-comment-claims-
+unfixed-issue`'s own 0.55/0.85 24h age-gated bar. Fixture-only
+(`source: "fixture"`), the identical honest WIP marker its timeline-
+comment siblings already carry: `SCOPES.md`'s own live check still finds
+no read-only "list issue/PR comments" tool exposed anywhere on the-hand
+gateway today, so `ListMilestones` (already cleared) is the only scope
+this recipe declares.
+
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)
 (ROADMAP.md #111) is that second promise, kept: it runs `scan.py`'s own

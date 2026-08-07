@@ -1,0 +1,51 @@
+[
+  {
+    "id": 8101,
+    "issue_number": 50,
+    "body": "This also ships milestone #6101 while we're in here, good catch.",
+    "updated_at": "2026-08-05T10:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/issues/50#issuecomment-8101"
+  },
+  {
+    "id": 8102,
+    "issue_number": 51,
+    "body": "I think this closes milestone #6103 too, worth double-checking after merge.",
+    "updated_at": "2026-08-07T08:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/pull/51#issuecomment-8102"
+  },
+  {
+    "id": 8103,
+    "issue_number": 52,
+    "body": "Milestone #6102 shipped as a side effect of this line.",
+    "updated_at": "2026-08-05T10:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/issues/52#issuecomment-8103"
+  },
+  {
+    "id": 8104,
+    "issue_number": 53,
+    "body": "Milestone #6999 today, same root cause.",
+    "updated_at": "2026-08-05T10:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/pull/53#issuecomment-8104"
+  },
+  {
+    "id": 8105,
+    "issue_number": 54,
+    "body": "Same root cause as #6105, but not touching that here.",
+    "updated_at": "2026-08-05T10:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/issues/54#issuecomment-8105"
+  },
+  {
+    "id": 8106,
+    "issue_number": 55,
+    "body": null,
+    "updated_at": "2026-08-05T10:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/pull/55#issuecomment-8106"
+  },
+  {
+    "id": 8107,
+    "issue_number": 56,
+    "body": "Milestone #6101 shipped today and milestone #6101 confirmed again.",
+    "updated_at": "2026-08-07T09:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/issues/56#issuecomment-8107"
+  }
+]
