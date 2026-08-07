@@ -17886,5 +17886,21 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/380986117eb0a53a5c70b5bf5e2d28555aee08b1",
     "ts": "2026-08-07T02:08:07Z",
     "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "45e307f",
+    "title": "hourly ritual: verified the outage instead of copying it forward",
+    "url": "https://github.com/thierrypdamiba/orita/commit/45e307fc2a500b597cce844cfc25b94a6a2712c0",
+    "ts": "2026-08-07T03:14:56Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "ea4c82e",
+    "title": "hourly ritual: reran both suites cold, recorded a real CI/growth check, found no safe fourth recipe",
+    "url": "https://github.com/thierrypdamiba/orita/commit/ea4c82e6c1d3b8fd3d7ecbc19b5c29f8614b68a0",
+    "ts": "2026-08-07T04:20:44Z",
+    "author": "Nyx"
   }
 ]
