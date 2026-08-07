@@ -773,6 +773,33 @@ new scope asked for anywhere in this recipe, and the toolkit stays
 `github`-only, so only the total recipe count grows, not the plus-joined
 count.
 
+[`RECIPES/review-comment-claims-open-milestone/`](RECIPES/review-comment-claims-open-milestone/)
+is the fifty-sixth (ROADMAP.md #588): the third and final review-comment-side
+leg, closing the claims-X grid complete at six sources times three claim
+types (eighteen legs) — `review-comment-claims-unfixed-issue` (task 582) and
+`review-comment-claims-unmerged-pr` (task 585) already proved a review
+comment is a real GitHub-native claim surface for the issue-side and
+PR-side legs; this recipe grows the milestone-side leg alongside
+`readme-claims-open-milestone`, `release-claims-open-milestone`,
+`tweet-claims-open-milestone`, `mention-claims-open-milestone`, and
+`milestone-claims-open-milestone`. The seam: a review comment invokes a
+"milestone #N" claim phrase against a milestone, but the milestone never
+actually closed. GitHub gives a milestone no auto-close-style keyword of
+its own at all — a review comment naming one was never wired to anything
+on GitHub's side regardless of whether the milestone ever closes, the
+identical durable-false-claim shape its two review-comment siblings
+already found for issues and PRs. Reuses
+`seam_engine.milestone_claims.claimed_milestone_numbers` verbatim rather
+than a seventh independently typed copy of the same grammar. Confidence
+mirrors `review-comment-claims-unfixed-issue`'s own 0.55/0.85 24h
+age-gated bar exactly, not `tweet-claims-open-milestone`'s/`release-claims-
+open-milestone`'s 0.5/0.85 one — the same editable-surface reasoning
+applied to the milestone-claim seam. Both scopes
+(`ListReviewCommentsInARepository`, `ListMilestones`) were already cleared
+on `SCOPES.md`'s oath table — no new scope asked for anywhere in this
+recipe, and the toolkit stays `github`-only, so only the total recipe
+count grows, not the plus-joined count.
+
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)
 (ROADMAP.md #111) is that second promise, kept: it runs `scan.py`'s own
