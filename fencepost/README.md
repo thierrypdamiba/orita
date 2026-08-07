@@ -715,6 +715,37 @@ bar exactly. No new scope asked for anywhere in this recipe's manifest, and the
 toolkit stays `github`-only, so only the total recipe count grows, not the
 plus-joined count.
 
+[`RECIPES/review-comment-claims-unfixed-issue/`](RECIPES/review-comment-claims-unfixed-issue/)
+is the fifty-fourth (ROADMAP.md #582): the missing review-comment-side leg of the
+claims-unfixed-issue family alongside `readme-claims-unfixed-issue`, `release-claims-
+unfixed-issue`, `milestone-claims-unfixed-issue`, `tweet-claims-unfixed-issue`, and
+`mention-claims-unfixed-issue` — five legs `test_recipe_ordinal_doctrine.py`'s own
+history already called a closed fifteen-leg grid (five sources times three claim
+types), but every one of those five reads either a surface the town itself controls
+(README, release notes, milestone descriptions, tweets) or a stranger's inbound X
+mention. None of them ever read a GitHub-native surface at all. This recipe reuses
+`review-comment-dangling-reference`'s own live `ListReviewCommentsInARepository`
+scope and fixture shape — that recipe asked only whether a review comment's `#N`
+reference exists; this one asks the claims-X family's sharper question of the
+identical surface: a pull request's own inline review comment invokes a real
+closing keyword (`fixes/closes/resolves #N`) against an issue, but the issue is
+still open. The seam is sharper than any of this family's other five legs: GitHub
+has never once honored a closing keyword typed into an ordinary review comment
+(only a PR's own body or a commit merged to the default branch triggers auto-close)
+— a reviewer's inline "fixes #N" was never going to resolve itself regardless of
+whether the parent PR merges. Reuses `seam_engine.closing_keywords.CLOSING_KEYWORD_RE`
+verbatim rather than a sixth independently typed copy of the same grammar.
+Deliberately checks only the issue list, never the PR list — the identical scope
+boundary every sibling `*-claims-unfixed-issue` recipe already holds itself to.
+Confidence is age-gated off the comment's own `updated_at`, mirroring
+`review-comment-dangling-reference`'s own 0.55/0.85 24h bar rather than
+`mention-claims-unfixed-issue`'s/`tweet-claims-unfixed-issue`'s 0.5/0.85 one — a
+review comment is a text surface its own author can edit at any time, unlike a
+mention or a tweet, posted once and standing. Both scopes (`ListReviewCommentsInARepository`,
+`ListIssues`) were already cleared on `SCOPES.md`'s oath table — no new scope
+asked for anywhere in this recipe, and the toolkit stays `github`-only, so only
+the total recipe count grows, not the plus-joined count.
+
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)
 (ROADMAP.md #111) is that second promise, kept: it runs `scan.py`'s own
