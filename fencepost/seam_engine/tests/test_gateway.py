@@ -121,6 +121,26 @@ def test_negation_does_not_launder_an_unrelated_clause_across_a_comma(text: str)
 @pytest.mark.parametrize(
     "text",
     [
+        # A contrastive/causal conjunction ("since", "though", "because", ...)
+        # reverses or breaks negation scope exactly the way a comma splice
+        # already does above -- but with no comma present, `_split_clauses`
+        # used to leave the whole sentence as one clause, and the earlier
+        # "never" (which negates something else entirely) was read as
+        # covering the later, unrelated, genuinely unnegated write ask.
+        # Reproduced live pre-fix: `is_read_only_capabilities` on each of
+        # these returned True.
+        "It will never merely watch idly since it will actually create new issues automatically.",
+        "The tool will never sit idle though it will happily publish updates to the public feed.",
+        "We will never act carelessly because we will actually delete stale branches automatically.",
+    ],
+)
+def test_negation_does_not_launder_a_verb_across_a_contrastive_conjunction_with_no_comma(text: str):
+    assert not is_read_only_capabilities(text)
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
         # A genuine bare, comma-separated enumeration of write verbs
         # sharing one trailing object must stay covered by a single
         # leading negation — this must not regress into false positives.

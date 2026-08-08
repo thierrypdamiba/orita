@@ -176,6 +176,37 @@ def _is_bare_verb_item(segment: str) -> bool:
     return bool(_BARE_VERB_RE.match(s))
 
 
+# A contrastive/causal conjunction ("but", "though", "since", ...) reverses
+# or breaks negation scope exactly the way a comma splice joining two
+# independent asks already does below — "It will never sit idle since it
+# will actually create new issues automatically" has "never" appear before
+# "create" in the very same comma-less sentence, but "never" negates "sit
+# idle", not the unrelated "create" ask "since" introduces afterward.
+# `is_read_only_capabilities`'s own scope check only ever looks at whether
+# a cue appears anywhere earlier in the same clause (see its docstring: "a
+# negation earlier in the same clause covers a verb that follows it") —
+# with no comma to trigger `_split_clauses`' existing clause boundary, nothing
+# stopped an unrelated earlier "never" from laundering a real, unnegated ask
+# on the far side of one of these conjunctions. Confirmed live pre-fix:
+# `is_read_only_capabilities("It will never merely watch idly since it will
+# actually create new issues automatically.")` returned `True`. Splitting on
+# these conjunctions too — the comma-less sibling of the existing comma
+# boundary — closes it.
+_CONTRAST_CONJUNCTIONS = (
+    "but", "though", "although", "however", "yet", "since", "because", "while", "except",
+)
+_CONTRAST_BOUNDARY_RE = re.compile(
+    r"\b(?:" + "|".join(_CONTRAST_CONJUNCTIONS) + r")\b", re.IGNORECASE
+)
+
+
+def _split_on_contrast(clause: str) -> list[str]:
+    """Further split one clause on a contrastive/causal conjunction — see
+    `_CONTRAST_BOUNDARY_RE`'s own comment. Empty/whitespace-only pieces (left
+    behind by a leading conjunction, or two adjacent ones) are dropped."""
+    return [p for p in _CONTRAST_BOUNDARY_RE.split(clause) if p.strip()]
+
+
 def _split_clauses(text: str) -> list[str]:
     """Split ``text`` into clauses for negation-scope checking.
 
@@ -186,7 +217,10 @@ def _split_clauses(text: str) -> list[str]:
     genuine clause boundary: a comma splice joining two independent asks
     ("Never trash old drafts, delete the connected account entirely") must
     not let the first ask's negation launder the second, unrelated one —
-    the comma-joined sibling of the semicolon/period case below.
+    the comma-joined sibling of the semicolon/period case below. Each
+    resulting clause is then further split on a contrastive/causal
+    conjunction (`_split_on_contrast`) — the comma-less sibling of the same
+    problem, see `_CONTRAST_BOUNDARY_RE`'s own comment.
     """
     clauses = []
     for sentence in re.split(r"[.;]\s*", text):
@@ -195,7 +229,10 @@ def _split_clauses(text: str) -> list[str]:
             clauses.append(sentence)
         else:
             clauses.extend(segments)
-    return clauses
+    out: list[str] = []
+    for clause in clauses:
+        out.extend(_split_on_contrast(clause))
+    return out
 
 
 def is_read_only_capabilities(text: str) -> bool:

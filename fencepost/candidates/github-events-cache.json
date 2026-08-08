@@ -18662,5 +18662,61 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/2b65149c90a105f49693f9838e3fda0040177f28",
     "ts": "2026-08-08T17:31:35Z",
     "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "4793113",
+    "title": "task 607: mark WIP -- searching for a real gap in already-shipped code",
+    "url": "https://github.com/thierrypdamiba/orita/commit/4793113599b105be5f677097379c51a77956e8d0",
+    "ts": "2026-08-08T18:11:58Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "4b72483",
+    "title": "task 607: fix a glued-write-verb bypass in the read-only oath validator",
+    "url": "https://github.com/thierrypdamiba/orita/commit/4b72483c3bd8a0e444bd9357fc4e00ada303b0f2",
+    "ts": "2026-08-08T18:30:31Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "855537e",
+    "title": "task 607: mark DONE -- glued-write-verb fix shipped, ledger sealed (seq 1348)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/855537e3e4bac0cf6328b23e2f607f837dc57b9a",
+    "ts": "2026-08-08T18:30:37Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "f5e3bf1",
+    "title": "task 608: mark DONE -- 2026-08-08 daily aggregate sealed",
+    "url": "https://github.com/thierrypdamiba/orita/commit/f5e3bf135f53c84a6cb3fcc53ecc4c968be7d1e9",
+    "ts": "2026-08-08T18:30:59Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "9be2a41",
+    "title": "hourly ritual: post-push CI recheck, both green",
+    "url": "https://github.com/thierrypdamiba/orita/commit/9be2a41729005df8bf5996213b2271572fb93e9c",
+    "ts": "2026-08-08T18:36:08Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "5ffb32d",
+    "title": "task 609: WIP -- hourly continuous-build pick, nisaba stalest by rotation",
+    "url": "https://github.com/thierrypdamiba/orita/commit/5ffb32de42f0bfc65ec84481f95bc83b1dcec099",
+    "ts": "2026-08-08T19:04:36Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "79ef53f",
+    "title": "task 609 (in progress): record this hour's live CI + X gateway checks",
+    "url": "https://github.com/thierrypdamiba/orita/commit/79ef53fc07fd0a46947544f553b0a4bb45c1e501",
+    "ts": "2026-08-08T19:08:46Z",
+    "author": "Nisaba"
   }
 ]
