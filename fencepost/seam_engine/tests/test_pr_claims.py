@@ -68,6 +68,51 @@ class TestClaimedPrNumbers:
         assert claimed_pr_numbers("ships #901 and via #901 again") == [901, 901]
 
 
+class TestNegatedClaimIsNotAClaim:
+    """Task 613: `claimed_pr_numbers` used to be a bare `PR_CLAIM_RE.
+    findall()`, no negation check at all -- a body that explicitly DENIES
+    shipping/merging/including a PR ("does not ship #N") still returned N,
+    the exact false-positive shape task 610 fixed for `thanks.py`'s "no
+    thanks @handle" and task 612 fixed for `duplicate_markers.py`'s "not a
+    duplicate of #N". Reproduced live pre-fix: each case below returned
+    the target number instead of an empty list."""
+
+    def test_does_not_ship(self) -> None:
+        assert claimed_pr_numbers("This release does not ship #45, deferred to next cycle.") == []
+
+    def test_will_not_merge(self) -> None:
+        assert claimed_pr_numbers("We will not merge #77 this sprint.") == []
+
+    def test_doesnt_include(self) -> None:
+        assert claimed_pr_numbers("Doesn't include #12 yet.") == []
+
+    def test_never_ships(self) -> None:
+        assert claimed_pr_numbers("Never ships #99, cut for scope reasons.") == []
+
+    def test_wont_ship_contraction(self) -> None:
+        assert claimed_pr_numbers("Won't ship #50 today.") == []
+
+    def test_unnegated_claim_still_matches(self) -> None:
+        # The negation check must not swallow a real, unnegated claim.
+        assert claimed_pr_numbers("this ships #901") == [901]
+
+    def test_falls_through_to_a_later_genuine_claim(self) -> None:
+        # A denied claim earlier in the text must not stop the scan -- the
+        # next, genuinely unnegated claim still returns, mirroring
+        # `duplicate_markers.py`'s own "not a duplicate of #12, but
+        # genuinely a duplicate of #45" fall-through test.
+        assert claimed_pr_numbers("not merges #12 but genuinely merges #45") == [45]
+
+    def test_distant_negation_is_out_of_scope(self) -> None:
+        # Documented residual limit (see module docstring): the negation
+        # check only looks at the words immediately in front of the claim
+        # verb, not the whole text, so a denial separated from its own
+        # claim by more than a few words can still slip through.
+        assert claimed_pr_numbers(
+            "There is no reason to hold this back any further, it ships #12"
+        ) == [12]
+
+
 class TestPrClaimRe:
     def test_pattern_source(self) -> None:
         assert PR_CLAIM_RE.pattern == r"\b(?:ships?|includes?|merges?|via)\s+#(\d+)\b"

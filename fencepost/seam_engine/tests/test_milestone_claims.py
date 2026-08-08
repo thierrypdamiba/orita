@@ -58,6 +58,48 @@ class TestClaimedMilestoneNumbers:
         assert claimed_milestone_numbers("milestone#7 is done") == []
 
 
+class TestNegatedClaimIsNotAClaim:
+    """Task 613: `claimed_milestone_numbers` used to be a bare
+    `MILESTONE_CLAIM_RE.findall()`, no negation check at all -- the sibling
+    bug to `pr_claims.py`'s own (fixed the same task). A sentence that
+    explicitly DENIES hitting a milestone still returned its number, the
+    same false-positive shape task 610 fixed for `thanks.py` and task 612
+    fixed for `duplicate_markers.py`. Reproduced live pre-fix: each case
+    below returned the target number instead of an empty list."""
+
+    def test_does_not_complete(self) -> None:
+        assert claimed_milestone_numbers("This release does not complete milestone #12 yet.") == []
+
+    def test_havent_hit(self) -> None:
+        assert claimed_milestone_numbers("We haven't hit milestone #7 this sprint.") == []
+
+    def test_never_milestone(self) -> None:
+        assert claimed_milestone_numbers("Never milestone #99, cut for scope reasons.") == []
+
+    def test_no_milestone(self) -> None:
+        assert claimed_milestone_numbers("No milestone #3 claim here, unrelated prose.") == []
+
+    def test_unnegated_claim_still_matches(self) -> None:
+        # The negation check must not swallow a real, unnegated claim.
+        assert claimed_milestone_numbers("this ships milestone #12") == [12]
+
+    def test_falls_through_to_a_later_genuine_claim(self) -> None:
+        # A denied claim earlier in the text must not stop the scan -- the
+        # next, genuinely unnegated claim still returns, mirroring
+        # `duplicate_markers.py`'s own fall-through test.
+        assert claimed_milestone_numbers("not milestone #7, but genuinely milestone #12") == [12]
+
+    def test_distant_negation_is_out_of_scope(self) -> None:
+        # Documented residual limit (see module docstring): the negation
+        # check only looks at the words immediately in front of the
+        # literal word "milestone", not the whole text, so a denial
+        # separated from its own claim by more than a few words can still
+        # slip through.
+        assert claimed_milestone_numbers(
+            "we do not expect to complete milestone #7 this cycle"
+        ) == [7]
+
+
 class TestMilestoneClaimRe:
     def test_pattern_source(self) -> None:
         assert MILESTONE_CLAIM_RE.pattern == r"\bmilestone\s+#(\d+)\b"

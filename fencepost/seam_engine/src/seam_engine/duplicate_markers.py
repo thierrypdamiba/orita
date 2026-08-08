@@ -45,21 +45,32 @@ still returns 45, and "not a duplicate of #12" now correctly returns
 words immediately in front of the match, not the whole body -- a denial
 separated from its own marker by more than a few words in front of it can
 still slip through.
+
+Task 613: `_NEGATION_PREFIX_RE` above used to be this module's own local
+`re.compile(...)`. `pr_claims.py` and `milestone_claims.py` each needed
+the identical negation fix this same task, and both got hand-retyped with
+this exact pattern instead of importing it -- the very "two [now three]
+independently written regexes... drifting apart" shape this whole family
+of modules exists to prevent, caught live by
+`tools/duplicate_regex_check.py` the moment this task ran it, in this
+task's own new code before it ever shipped. Moved the pattern itself to
+`seam_engine.negation` (one real definition, `is_negated()` doing the
+prefix-window check too) and this module now imports both; only the
+window size (`_NEGATION_PREFIX_WINDOW`, unchanged at 16) and the
+`finditer`-and-skip loop stay local, since those are this module's own
+tuned behavior, not the shared law. `tools/duplicate_regex_check.py`
+confirmed clean after the move.
 """
 from __future__ import annotations
 
 import re
 
+from seam_engine.negation import is_negated
+
 # "Duplicate of #700" / "dup of #703" / "Duplicate: #705" / "duplicate #705"
 # all match. A `\b` boundary right after "dup" rules out "dupe"/"duping" so
 # ordinary prose never becomes a false candidate.
 DUPLICATE_MARKER_RE = re.compile(r"\bdup(?:licate)?\s*(?:of|:)?\s+#(\d+)\b", re.IGNORECASE)
-
-# A negation word (or an "n't" contraction: isn't/wasn't/doesn't/...) sitting
-# immediately in front of a duplicate marker turns it into a denial rather
-# than a claim -- see this module's own docstring (task 612) for the live
-# reproduction.
-_NEGATION_PREFIX_RE = re.compile(r"\b(?:not|never|no)\b|n't\b", re.IGNORECASE)
 
 # "isn't a " is the longest realistic negated-article prefix mortals type
 # right in front of "duplicate"/"dup"; a little extra slack covers a comma
@@ -77,8 +88,7 @@ def named_duplicate_of(body: str) -> int | None:
     candidate -- see this module's own docstring (task 612) for the live
     reproduction."""
     for match in DUPLICATE_MARKER_RE.finditer(body):
-        prefix = body[max(0, match.start() - _NEGATION_PREFIX_WINDOW) : match.start()]
-        if _NEGATION_PREFIX_RE.search(prefix):
+        if is_negated(body, match.start(), _NEGATION_PREFIX_WINDOW):
             continue
         return int(match.group(1))
     return None
