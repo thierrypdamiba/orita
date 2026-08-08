@@ -70,7 +70,7 @@
     reviewed and merged like any PR. The read-only oath does not loosen for outside code:
     <a href="https://github.com/thierrypdamiba/orita/blob/main/fencepost/CONTRIBUTING.md">CONTRIBUTING.md</a>
     is the schema in prose, enforced in code before a human reviewer ever reads a stranger's
-    detector. Sixty-six real recipes stand today:</p>
+    detector. Sixty-seven real recipes stand today:</p>
     <p><b><a href="https://github.com/thierrypdamiba/orita/tree/main/fencepost/RECIPES/example-release-vs-changelog">example-release-vs-changelog</a></b>
     — the reference: proof a first external recipe PR is mergeable at all.<br>
     <b><a href="https://github.com/thierrypdamiba/orita/tree/main/fencepost/RECIPES/merged-pr-issue-still-open">merged-pr-issue-still-open</a></b>
@@ -479,6 +479,21 @@
     seam. Confidence is age-gated on the commit's own timestamp, mirroring
     <code>release-claims-open-milestone</code>'s and <code>tweet-claims-open-milestone</code>'s
     24h bar. Both scopes were already cleared — no new scope asked for anywhere in this recipe.</p>
+    <p><b><a href="https://github.com/thierrypdamiba/orita/tree/main/fencepost/RECIPES/slack-message-claims-unfixed-issue">slack-message-claims-unfixed-issue</a></b>
+    — the sixty-seventh: the first recipe under <code>RECIPES/</code> to read a toolkit besides
+    GitHub or X at all. Every one of the sixty-six recipes before it named a <code>toolkit</code>
+    of <code>github</code>, <code>github+x</code>, or <code>x+github</code> — grepped, not
+    assumed. Proposed per <code>CONTRIBUTING.md</code>'s own "New toolkits" section, the same way
+    <code>gmail_calendar.py</code> proposed <code>gmail</code>/<code>google_calendar</code> before
+    either had a live scope. A Slack channel message uses a real GitHub closing-keyword claim
+    (<code>fixes</code>/<code>closes</code>/<code>resolves #N</code>, both tenses, the same shared
+    grammar thirteen prior recipes already import) against an issue number, but the named issue is
+    still open — the Slack-side twin of <code>mention-claims-unfixed-issue</code>'s X-mention leg.
+    Confidence is age-gated on the message's own timestamp, holding
+    <code>mention-claims-unfixed-issue</code>'s and <code>tweet-claims-unfixed-issue</code>'s
+    identical 0.85/0.5 bar exactly. Fixture-only, MOCK ONLY — the-hand gateway holds a real,
+    connected upstream Slack app but exposes zero Slack-capable tools today (see
+    <code>SCOPES.md</code>'s own WIP note).</p>
     <p>Merging a recipe is one promise; letting it actually compete for the daily primary gap
     is another. <a href="https://github.com/thierrypdamiba/orita/blob/main/fencepost/seam_engine/src/seam_engine/combined_scan.py"><code>combined_scan.py</code></a>
     keeps the second: it pools a recipe's own candidates with <code>scan.py</code>'s, and ranks

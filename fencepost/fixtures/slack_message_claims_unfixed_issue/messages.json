@@ -1,0 +1,42 @@
+[
+  {
+    "id": "SLK-3101",
+    "channel": "#dev-updates",
+    "author": "town-crier",
+    "text": "heads up -- fixes #3101 and closes #3101 again, should be all set now",
+    "ts": "2026-08-05T10:00:00Z",
+    "url": "https://orita-town.slack.com/archives/C05DEVUPD/p1722852000000100"
+  },
+  {
+    "id": "SLK-3102",
+    "channel": "#dev-updates",
+    "author": "quiet-shipper",
+    "text": "resolves #3103 with the migration script, nice",
+    "ts": "2026-08-07T08:00:00Z",
+    "url": "https://orita-town.slack.com/archives/C05DEVUPD/p1723017600000200"
+  },
+  {
+    "id": "SLK-3103",
+    "channel": "#bugs",
+    "author": "helpful-mod",
+    "text": "closes #3102, thanks for flagging",
+    "ts": "2026-08-05T09:00:00Z",
+    "url": "https://orita-town.slack.com/archives/C06BUGS00/p1722848400000300"
+  },
+  {
+    "id": "SLK-3104",
+    "channel": "#random",
+    "author": "confused-newcomer",
+    "text": "fix #3999 today right? saw someone mention it in standup",
+    "ts": "2026-08-05T09:30:00Z",
+    "url": "https://orita-town.slack.com/archives/C07RANDOM0/p1722850200000400"
+  },
+  {
+    "id": "SLK-3105",
+    "channel": "#general",
+    "author": "quiet-watcher",
+    "text": "another quiet week for the town -- see #3105 for background, nothing fixed to claim here",
+    "ts": "2026-08-05T10:00:00Z",
+    "url": "https://orita-town.slack.com/archives/C08GENERL0/p1722852000000500"
+  }
+]

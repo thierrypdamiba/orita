@@ -538,7 +538,7 @@ _CARDINAL_WORDS = {
     "fifty-three": 53, "fifty-four": 54, "fifty-five": 55, "fifty-six": 56,
     "fifty-seven": 57, "fifty-eight": 58, "fifty-nine": 59, "sixty": 60,
     "sixty-one": 61, "sixty-two": 62, "sixty-three": 63, "sixty-four": 64,
-    "sixty-five": 65, "sixty-six": 66,
+    "sixty-five": 65, "sixty-six": 66, "sixty-seven": 67,
 }
 
 _PLUS_JOINED_CLAIM_RE = re.compile(
@@ -590,12 +590,16 @@ def test_plus_joined_claim_missing_sentence_raises():
         claimed_plus_joined_counts("Nothing here about plus-joined toolkits.")
 
 
-def test_real_plus_joined_counts_are_currently_fifteen_of_sixty_six():
-    # Regression pin: today's real, live counts under RECIPES/. Was (15, 65)
-    # until commit-claims-open-milestone merged (the sixty-sixth real
-    # recipe, toolkit "github"-only -- only the total grows this time, the
-    # same shape draft-pr-closes-keyword-issue's own merge already held.
-    assert real_plus_joined_counts(FENCEPOST_ROOT) == (15, 66)
+def test_real_plus_joined_counts_are_currently_sixteen_of_sixty_seven():
+    # Regression pin: today's real, live counts under RECIPES/. Was (15, 66)
+    # until slack-message-claims-unfixed-issue merged (the sixty-seventh
+    # real recipe, toolkit "slack+github" -- a genuinely new plus-joined
+    # pair, the first to name a toolkit besides github/x on either side of
+    # the "+", so both the plus-joined count and the total grow together
+    # this time, unlike draft-pr-closes-keyword-issue's/commit-claims-open-
+    # milestone's own single-toolkit "github"-only merges which only grew
+    # the total.
+    assert real_plus_joined_counts(FENCEPOST_ROOT) == (16, 67)
 
 
 def test_oath_scopes_for_toolkit_docstring_matches_the_real_live_counts():

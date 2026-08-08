@@ -1,0 +1,26 @@
+[
+  {
+    "number": 3101,
+    "title": "Badge rendering regression on mobile",
+    "state": "open",
+    "url": "https://github.com/thierrypdamiba/orita/issues/3101"
+  },
+  {
+    "number": 3102,
+    "title": "Duplicate command registration bug",
+    "state": "closed",
+    "url": "https://github.com/thierrypdamiba/orita/issues/3102"
+  },
+  {
+    "number": 3103,
+    "title": "Add /streak slash command",
+    "state": "open",
+    "url": "https://github.com/thierrypdamiba/orita/issues/3103"
+  },
+  {
+    "number": 3105,
+    "title": "Another unrelated background discussion issue",
+    "state": "open",
+    "url": "https://github.com/thierrypdamiba/orita/issues/3105"
+  }
+]

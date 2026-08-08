@@ -67,6 +67,18 @@ from datetime import datetime, timezone
 # checked a RECIPE's declared scopes against this dict at all -- only
 # scan.py's own claimed tools were ever cross-checked (test_consent_doctrine.
 # py, task 136). recipes.validate_recipe now closes that gap structurally.
+#
+# ROADMAP.md #599: `slack` is the first toolkit this dict ever names that
+# is not GitHub, X, Gmail, or Calendar -- added the same way `gmail`/
+# `google_calendar` were, the day `RECIPES/slack-message-claims-unfixed-
+# issue/` proposed it (CONTRIBUTING.md's own "New toolkits" section: "the
+# same way gmail_calendar.py proposed gmail/google_calendar before either
+# had a live scope"). `ListIssues` for that recipe's own github-side read
+# already sits under the `github` row below; only `SearchChannelMessages`
+# is new. Zero Slack-capable tools are exposed on the-hand's live gateway
+# today (SCOPES.md's own WIP note for this recipe) -- the identical
+# "registered on the Oath, not yet wired into the gateway" shape `gmail`/
+# `google_calendar` already carry here.
 REQUIRED_SCOPES: dict[str, frozenset[str]] = {
     "github": frozenset({
         "GetRepository", "ListRepoCommits", "ListIssues", "GetIssue",
@@ -77,6 +89,7 @@ REQUIRED_SCOPES: dict[str, frozenset[str]] = {
     "x": frozenset({"GetUserTweets", "GetMyMentions", "WhoAmI"}),
     "gmail": frozenset({"ListEmails", "GetEmail", "SearchThreads"}),
     "google_calendar": frozenset({"ListEvents", "GetEvent"}),
+    "slack": frozenset({"SearchChannelMessages"}),
 }
 
 # A public issue must be a real, reachable GitHub issue URL — not a private

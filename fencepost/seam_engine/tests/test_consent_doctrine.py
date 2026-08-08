@@ -59,13 +59,15 @@ def _scopes_md_text() -> str:
 
 
 def _normalize_toolkit_name(raw: str) -> str:
-    """"Gmail (v0.2)" -> "gmail"; "Google Calendar (v0.2)" -> "google_calendar" —
-    matches `consent.REQUIRED_SCOPES`'s own key convention (lowercase, spaces
-    to underscores). The "(v0.2)" suffix is stripped because it labels the
-    doc row's maturity, not the toolkit's identity — `consent.py` has no
-    separate "v0.2" toolkit key and was never meant to.
+    """"Gmail (v0.2)" -> "gmail"; "Google Calendar (v0.2)" -> "google_calendar";
+    "Slack (proposed)" -> "slack" — matches `consent.REQUIRED_SCOPES`'s own
+    key convention (lowercase, spaces to underscores). The "(v0.2)"/
+    "(proposed)" suffix is stripped because it labels the doc row's
+    maturity, not the toolkit's identity — `consent.py` has no separate
+    "v0.2" or "proposed" toolkit key and was never meant to (task 599 added
+    the second maturity label the same way task 16 added the first).
     """
-    name = re.sub(r"\s*\(v0\.2\)\s*$", "", raw.strip())
+    name = re.sub(r"\s*\((?:v0\.2|proposed)\)\s*$", "", raw.strip())
     return name.lower().replace(" ", "_")
 
 

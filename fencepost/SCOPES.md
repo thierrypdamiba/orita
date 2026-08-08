@@ -16,6 +16,27 @@ Concretely, on the toolkits in use:
 | X | GetUserTweets, GetMyMentions, WhoAmI | PostTweet, ReplyToTweet |
 | Gmail (v0.2) | ListEmails, GetEmail, SearchThreads | SendEmail, CreateDraft*, Trash*, Modify* |
 | Google Calendar (v0.2) | ListEvents, GetEvent | CreateEvent, UpdateEvent, DeleteEvent |
+| Slack (proposed) | SearchChannelMessages | PostMessage, chat:write, UpdateMessage, DeleteMessage |
+
+**WIP note (ROADMAP.md #599), `RECIPES/slack-message-claims-unfixed-issue/`:**
+the first recipe under `RECIPES/` to name a toolkit besides GitHub or X at
+all -- proposed per `CONTRIBUTING.md`'s own "New toolkits" section, the
+same way `gmail_calendar.py` proposed `gmail`/`google_calendar` before
+either had a live scope. Its own fixture (`messages.json`) is shaped like
+what a real read of Slack channel messages would return;
+`SearchChannelMessages` clears `seam_engine.recipes.validate_recipe`'s oath
+the same way every scope in this engine does (matches the allowed
+`Search*` prefix, names no forbidden write word). Checked live this hour by
+the orchestrating session (2026-08-08, the same live tool-name search
+`tools/gateway_toolset_check.py` already performs for the Gmail/Calendar
+note below, confirmed via `Arcade_ListApps`): **the-hand gateway holds a real,
+connected upstream Slack app (`arcade-slack`), but exposes zero
+Slack-capable tools anywhere in its live MCP toolset today.** This is the
+identical "connected upstream, not wired into the gateway" shape the
+Gmail/Calendar note below already carries for a different toolkit -- the
+day a live `SearchChannelMessages`-shaped tool appears on the gateway, only
+the recipe's own fixture loader swaps for a real call; the detector's own
+logic does not change one line.
 
 **WIP note (ROADMAP.md #581), `RECIPES/issue-comment-dangling-reference/`:**
 that recipe's own fixture (`issue_comments.json`) is shaped like what a live
@@ -81,7 +102,7 @@ the claim quietly aging past whatever it says.
 | `ap_3GORxnS5T0YRHmzSRa0knq2nupY` (X auth) | in use by Fencepost |
 | `arcade-google` | connected upstream (Gmail/Calendar scopes granted), NOT used by Fencepost yet -- zero Gmail/Calendar-capable tools are exposed on the live gateway (see WIP note above; `tools/gateway_toolset_check.py` tracks the day this flips) |
 | `arcade-linear` | connected on the shared gateway, NOT used by Fencepost, no toolkit integration planned |
-| `arcade-slack` | connected on the shared gateway, NOT used by Fencepost, no toolkit integration planned |
+| `arcade-slack` | connected on the shared gateway; `RECIPES/slack-message-claims-unfixed-issue/` proposes it as a fixture-only toolkit (task 599) -- no live Slack-capable tool exposed on the-hand gateway yet, see the WIP note above |
 | `sybill` | connected on the shared gateway, NOT used by Fencepost, no toolkit integration planned |
 | `ap_3Fdn9uGDlF9Cj0ix9PJZbkMKDrF` (app management) | connected on the shared gateway, NOT used by Fencepost, no toolkit integration planned |
 

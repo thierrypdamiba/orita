@@ -27,6 +27,7 @@ One door does not open on one key. This issue existing, public, with your intent
 | X | `GetUserTweets, GetMyMentions, WhoAmI` |
 | Gmail | `ListEmails, GetEmail, SearchThreads` |
 | Google Calendar | `ListEvents, GetEvent` |
+| Slack (proposed) | `SearchChannelMessages` |
 
 **Your scope confirm:**
 
