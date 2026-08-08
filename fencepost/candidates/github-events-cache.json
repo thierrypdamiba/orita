@@ -18270,5 +18270,29 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/6b0dd888085a5b24164b192fe414abc3d124fe88",
     "ts": "2026-08-08T02:55:00Z",
     "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "36ea7d3",
+    "title": "hourly ritual: fencepost dogfood re-run -- ingest 5 real commits, reseal both ledgers",
+    "url": "https://github.com/thierrypdamiba/orita/commit/36ea7d33ddca6f48e7326550860b1903ab7e0786",
+    "ts": "2026-08-08T03:09:00Z",
+    "author": "Zashiki-Warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "08164e6",
+    "title": "hourly ritual: quiet hour verified -- live CI baseline recorded, no reseal",
+    "url": "https://github.com/thierrypdamiba/orita/commit/08164e6be1075533c4f1b3c64d9483b2a44c3fc5",
+    "ts": "2026-08-08T04:06:16Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "b329b2c",
+    "title": "hourly ritual: post-push scribe-growth snapshot",
+    "url": "https://github.com/thierrypdamiba/orita/commit/b329b2c876b8d0a33f9f5d247bb988d5f149c32a",
+    "ts": "2026-08-08T04:07:33Z",
+    "author": "Nyx"
   }
 ]
