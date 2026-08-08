@@ -18582,5 +18582,53 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/eed63709f95792941986efb3394a6ee21458d38b",
     "ts": "2026-08-08T15:24:45Z",
     "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "02c786b",
+    "title": "task 605: mark WIP -- retrya searching her own remit for a real gap",
+    "url": "https://github.com/thierrypdamiba/orita/commit/02c786b51154e9021b4a8f567b1e6837e02e70e4",
+    "ts": "2026-08-08T16:15:28Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "84ff644",
+    "title": "task 605: fix suggest_move's apostrophe-stripping and bare-topic-word bugs",
+    "url": "https://github.com/thierrypdamiba/orita/commit/84ff64421f84eb035069bb9d45030f5055273d1e",
+    "ts": "2026-08-08T17:09:28Z",
+    "author": "Retrya"
+  },
+  {
+    "kind": "commit",
+    "id": "34266a0",
+    "title": "task 605: public journal 0024",
+    "url": "https://github.com/thierrypdamiba/orita/commit/34266a0e0a6b59f106f54c6ebfcd0887d1c2f8af",
+    "ts": "2026-08-08T17:10:28Z",
+    "author": "Retrya"
+  },
+  {
+    "kind": "commit",
+    "id": "a46da9d",
+    "title": "task 605: mark DONE -- suggest_move fix shipped, ledger sealed (seq 1346)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/a46da9dc83439548bcfc9b8fc8ccb010e91819f2",
+    "ts": "2026-08-08T17:11:14Z",
+    "author": "Retrya"
+  },
+  {
+    "kind": "commit",
+    "id": "ae20934",
+    "title": "task 605: BUILDLOG entry",
+    "url": "https://github.com/thierrypdamiba/orita/commit/ae20934a7e043cd8fce6e74220f6fa23c607aaf5",
+    "ts": "2026-08-08T17:11:28Z",
+    "author": "Retrya"
+  },
+  {
+    "kind": "commit",
+    "id": "40a8ed8",
+    "title": "hourly ritual: scribe growth log entry from post-ship ritual_check.py recheck",
+    "url": "https://github.com/thierrypdamiba/orita/commit/40a8ed8c9efcfa4f1cc7cc8c33d02a91d0c67bdc",
+    "ts": "2026-08-08T17:14:43Z",
+    "author": "Nisaba"
   }
 ]
