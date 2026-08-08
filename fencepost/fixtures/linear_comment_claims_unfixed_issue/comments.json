@@ -1,0 +1,42 @@
+[
+  {
+    "id": "LIN-C-4201",
+    "issue_identifier": "ENG-142",
+    "author": "town-crier",
+    "text": "heads up -- fixes #4201 and closes #4201 again, should be all set now",
+    "ts": "2026-08-05T10:00:00Z",
+    "url": "https://linear.app/orita-town/issue/ENG-142#comment-4201a"
+  },
+  {
+    "id": "LIN-C-4202",
+    "issue_identifier": "ENG-158",
+    "author": "quiet-shipper",
+    "text": "resolves #4203 with the migration script, nice",
+    "ts": "2026-08-07T08:00:00Z",
+    "url": "https://linear.app/orita-town/issue/ENG-158#comment-4202a"
+  },
+  {
+    "id": "LIN-C-4203",
+    "issue_identifier": "ENG-101",
+    "author": "helpful-mod",
+    "text": "closes #4202, thanks for flagging",
+    "ts": "2026-08-05T09:00:00Z",
+    "url": "https://linear.app/orita-town/issue/ENG-101#comment-4203a"
+  },
+  {
+    "id": "LIN-C-4204",
+    "issue_identifier": "ENG-203",
+    "author": "confused-newcomer",
+    "text": "fix #4999 today right? saw someone mention it in standup",
+    "ts": "2026-08-05T09:30:00Z",
+    "url": "https://linear.app/orita-town/issue/ENG-203#comment-4204a"
+  },
+  {
+    "id": "LIN-C-4205",
+    "issue_identifier": "ENG-77",
+    "author": "quiet-watcher",
+    "text": "another quiet week for the town -- see #4205 for background, nothing fixed to claim here",
+    "ts": "2026-08-05T10:00:00Z",
+    "url": "https://linear.app/orita-town/issue/ENG-77#comment-4205a"
+  }
+]

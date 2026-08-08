@@ -17,6 +17,7 @@ Concretely, on the toolkits in use:
 | Gmail (v0.2) | ListEmails, GetEmail, SearchThreads | SendEmail, CreateDraft*, Trash*, Modify* |
 | Google Calendar (v0.2) | ListEvents, GetEvent | CreateEvent, UpdateEvent, DeleteEvent |
 | Slack (proposed) | SearchChannelMessages | PostMessage, chat:write, UpdateMessage, DeleteMessage |
+| Linear (proposed) | SearchIssueComments | CreateComment, CreateIssue, UpdateIssue, DeleteIssue |
 
 **WIP note (ROADMAP.md #599), `RECIPES/slack-message-claims-unfixed-issue/`:**
 the first recipe under `RECIPES/` to name a toolkit besides GitHub or X at
@@ -37,6 +38,26 @@ Gmail/Calendar note below already carries for a different toolkit -- the
 day a live `SearchChannelMessages`-shaped tool appears on the gateway, only
 the recipe's own fixture loader swaps for a real call; the detector's own
 logic does not change one line.
+
+**WIP note (ROADMAP.md #600), `RECIPES/linear-comment-claims-unfixed-issue/`:**
+the second recipe under `RECIPES/` to name a toolkit besides GitHub or X at
+all -- `slack-message-claims-unfixed-issue` above was the first. Proposed
+per `CONTRIBUTING.md`'s own "New toolkits" section, the identical citation
+the Slack note above already gives. Its own fixture (`comments.json`) is
+shaped like what a real read of Linear issue comments would return;
+`SearchIssueComments` clears `seam_engine.recipes.validate_recipe`'s oath
+the same way every scope in this engine does (matches the allowed
+`Search*` prefix, names no forbidden write word). Checked live this hour
+by the orchestrating session (2026-08-08, the same live tool-name search
+`tools/gateway_toolset_check.py` already performs for the Gmail/Calendar
+note above, confirmed via `Arcade_ListApps`): **the-hand gateway holds a
+real, connected upstream Linear app (`arcade-linear`), but exposes zero
+Linear-capable tools anywhere in its live MCP toolset today.** This is the
+identical "connected upstream, not wired into the gateway" shape the
+Gmail/Calendar and Slack notes above already carry for two other
+toolkits -- the day a live `SearchIssueComments`-shaped tool appears on the
+gateway, only the recipe's own fixture loader swaps for a real call; the
+detector's own logic does not change one line.
 
 **WIP note (ROADMAP.md #581), `RECIPES/issue-comment-dangling-reference/`:**
 that recipe's own fixture (`issue_comments.json`) is shaped like what a live
@@ -101,12 +122,12 @@ the claim quietly aging past whatever it says.
 | `arcade-github` | in use by Fencepost |
 | `ap_3GORxnS5T0YRHmzSRa0knq2nupY` (X auth) | in use by Fencepost |
 | `arcade-google` | connected upstream (Gmail/Calendar scopes granted), NOT used by Fencepost yet -- zero Gmail/Calendar-capable tools are exposed on the live gateway (see WIP note above; `tools/gateway_toolset_check.py` tracks the day this flips) |
-| `arcade-linear` | connected on the shared gateway, NOT used by Fencepost, no toolkit integration planned |
+| `arcade-linear` | connected on the shared gateway; `RECIPES/linear-comment-claims-unfixed-issue/` proposes it as a fixture-only toolkit (task 600) -- no live Linear-capable tool exposed on the-hand gateway yet, see the WIP note above |
 | `arcade-slack` | connected on the shared gateway; `RECIPES/slack-message-claims-unfixed-issue/` proposes it as a fixture-only toolkit (task 599) -- no live Slack-capable tool exposed on the-hand gateway yet, see the WIP note above |
 | `sybill` | connected on the shared gateway, NOT used by Fencepost, no toolkit integration planned |
 | `ap_3Fdn9uGDlF9Cj0ix9PJZbkMKDrF` (app management) | connected on the shared gateway, NOT used by Fencepost, no toolkit integration planned |
 
-`arcade-linear` (`read`,`write`) and `arcade-slack` (nine scopes including `chat:write`) are write-capable upstream connections. Fencepost's own code never calls either (grepped `fencepost/seam_engine/src` for "linear"/"slack"/"sybill" — zero hits) — the write capability sits on the shared gateway for reasons unrelated to Fencepost, not inside anything this repo ships. `tools/scopes_completeness_check.py` proves this table stays honest: any app_id the durable log records as connected but this table does not name is a real, named violation, not a silent gap.
+`arcade-linear` (`read`,`write`) and `arcade-slack` (nine scopes including `chat:write`) are write-capable upstream connections. Fencepost's own registered toolkits (`consent.REQUIRED_SCOPES["linear"]`/`["slack"]`) name only their read-only halves (`SearchIssueComments`, `SearchChannelMessages`) — grepped `fencepost/seam_engine/src` for "linear"/"slack": the only hits are those two read-only dict entries and the fixture-only recipes that read them, zero hits for `sybill` — the write capability itself sits on the shared gateway for reasons unrelated to Fencepost, not inside anything this repo ships or calls. `tools/scopes_completeness_check.py` proves this table stays honest: any app_id the durable log records as connected but this table does not name is a real, named violation, not a silent gap.
 
 ## The oath
 

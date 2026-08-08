@@ -1059,6 +1059,34 @@ this engine does. Fixture-only, MOCK ONLY: the-hand gateway holds a real,
 connected upstream Slack app but exposes zero Slack-capable tools on its
 live toolset today — see `SCOPES.md`'s own WIP note for this recipe.
 
+[`RECIPES/linear-comment-claims-unfixed-issue/`](RECIPES/linear-comment-claims-unfixed-issue/)
+is the sixty-eighth (ROADMAP.md #600): the second recipe under `RECIPES/`
+to read a toolkit besides GitHub or X at all — `slack-message-claims-
+unfixed-issue` above was the first. Every one of the 67 recipes before it
+named a `toolkit` of `github`, `github+x`, `x+github`, or `slack+github`
+— grepped, not assumed, across every `recipe.json` in the tree before
+this one was written. Proposed per `CONTRIBUTING.md`'s own "New toolkits"
+section, the same way `slack-message-claims-unfixed-issue` proposed
+`slack`/`github` before either had a live scope. A comment left on a
+Linear issue uses a real GitHub closing-keyword claim
+(`fixes`/`closes`/`resolves #N`, both tenses, the same shared
+`seam_engine.closing_keywords` grammar fourteen prior recipes already
+import directly) against an issue number, but the named issue is still
+open — the Linear-side twin of `mention-claims-unfixed-issue`'s
+X-mention leg and `slack-message-claims-unfixed-issue`'s
+Slack-channel-message leg: same seam shape, a third inbound surface
+neither of those recipes nor any of their `claims-unfixed-issue` siblings
+ever reads. Confidence is age-gated on the comment's own `created_at`
+(0.5 under 24h, 0.85 at/past), holding `mention-claims-unfixed-issue`'s
+and `slack-message-claims-unfixed-issue`'s identical bar exactly, not an
+independently re-reasoned number just because the toolkit is new again.
+`ListIssues` was already cleared on `SCOPES.md`'s oath table under the
+`github` row; `SearchIssueComments` is the one new scope, clearing
+`seam_engine.recipes.validate_recipe`'s oath the same way every scope in
+this engine does. Fixture-only, MOCK ONLY: the-hand gateway holds a real,
+connected upstream Linear app but exposes zero Linear-capable tools on
+its live toolset today — see `SCOPES.md`'s own WIP note for this recipe.
+
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)
 (ROADMAP.md #111) is that second promise, kept: it runs `scan.py`'s own

@@ -79,6 +79,18 @@ from datetime import datetime, timezone
 # today (SCOPES.md's own WIP note for this recipe) -- the identical
 # "registered on the Oath, not yet wired into the gateway" shape `gmail`/
 # `google_calendar` already carry here.
+#
+# ROADMAP.md #600: `linear` is the second toolkit this dict ever names that
+# is not GitHub, X, Gmail, or Calendar -- added the same way `slack` was,
+# the day `RECIPES/linear-comment-claims-unfixed-issue/` proposed it
+# (CONTRIBUTING.md's own "New toolkits" section, the identical citation
+# `slack`'s own comment above already gives). `ListIssues` for that
+# recipe's own github-side read already sits under the `github` row below;
+# only `SearchIssueComments` is new. Zero Linear-capable tools are exposed
+# on the-hand's live gateway today (SCOPES.md's own WIP note for this
+# recipe, checked live via `Arcade_ListApps` the same hour) -- the
+# identical "registered on the Oath, not yet wired into the gateway" shape
+# `gmail`/`google_calendar`/`slack` already carry here.
 REQUIRED_SCOPES: dict[str, frozenset[str]] = {
     "github": frozenset({
         "GetRepository", "ListRepoCommits", "ListIssues", "GetIssue",
@@ -90,6 +102,7 @@ REQUIRED_SCOPES: dict[str, frozenset[str]] = {
     "gmail": frozenset({"ListEmails", "GetEmail", "SearchThreads"}),
     "google_calendar": frozenset({"ListEvents", "GetEvent"}),
     "slack": frozenset({"SearchChannelMessages"}),
+    "linear": frozenset({"SearchIssueComments"}),
 }
 
 # A public issue must be a real, reachable GitHub issue URL — not a private

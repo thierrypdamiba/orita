@@ -28,6 +28,7 @@ One door does not open on one key. This issue existing, public, with your intent
 | Gmail | `ListEmails, GetEmail, SearchThreads` |
 | Google Calendar | `ListEvents, GetEvent` |
 | Slack (proposed) | `SearchChannelMessages` |
+| Linear (proposed) | `SearchIssueComments` |
 
 **Your scope confirm:**
 
