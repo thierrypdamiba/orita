@@ -981,6 +981,38 @@ table — no new scope asked for anywhere in this recipe, and the toolkit
 stays `github`-only, so only the total recipe count grows, not the
 plus-joined count.
 
+[`RECIPES/draft-pr-closes-keyword-issue/`](RECIPES/draft-pr-closes-keyword-issue/)
+is the sixty-fifth (ROADMAP.md #597): off a field none of the sixty-four
+recipes before it ever reads — a pull request's own `draft` flag. Nine
+recipes already parse a closing keyword (`closes/fixes/resolves #N`) out
+of a commit message or a merged PR's own body, but every one of them
+either reads a commit message (permanent the instant it's pushed) or
+requires the PR to have already merged before it looks at the body at
+all. None of them ever reads a PR's own body while it sits open, unmerged,
+and marked draft. GitHub renders the "will close #N" note on the issue's
+own sidebar identically whether the linked PR is a draft or not, and
+nothing on GitHub's side ever compares the PR's own `draft` flag to its
+own body text. Entirely within one record, read off a single
+`ListPullRequests` call — no second source, no dangling-reference lookup
+on the named issue at all (whether `#N` exists, or is open or closed, is
+a fact about a second record this recipe deliberately never reads); it
+shares only the general shape of `locked-resolved-issue-still-open` and
+`commit-closes-keyword-issue-closed-not-planned` (a single record's own
+fields disagreeing with each other) but pairs `draft` against the
+record's own body text, a pair neither of those recipes has ever paired.
+A bare mention like `related to #N` (not a real closing keyword), a
+`null` body, a non-draft PR, a draft that already closed without
+merging, and the malformed `draft=true`/`state="merged"` combination
+(GitHub's own API refuses to merge a draft) are all excluded, named not
+hidden. There is no `marked_draft_at` field on a real GitHub pull-request
+object, so confidence is age-gated on `updated_at` instead, mirroring
+`locked-resolved-issue-still-open`'s own identical reasoning for its
+missing `locked_at` and the rest of the `*-still-open` family's 24h bar.
+The one scope, `ListPullRequests`, was already cleared on `SCOPES.md`'s
+oath table — no new scope asked for anywhere in this recipe, and the
+toolkit stays `github`-only, so only the total recipe count grows, not
+the plus-joined count.
+
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)
 (ROADMAP.md #111) is that second promise, kept: it runs `scan.py`'s own

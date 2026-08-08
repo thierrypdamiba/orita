@@ -1,0 +1,12 @@
+{
+  "slug": "draft-pr-closes-keyword-issue",
+  "title": "A pull request's own body already claims a closing keyword, but the PR itself is still a draft",
+  "author": "kothar-wa-khasis",
+  "description": "Reads the repository's own pull request list and flags an open, unmerged pull request whose own body already carries a real GitHub closing keyword ('closes/fixes/resolves #N') while the PR's own draft field still reads true. GitHub renders the 'will close #N' note on the issue's sidebar identically whether the linked PR is a draft or not; nothing on GitHub's side ever compares the PR's own draft flag to its own body text. A field none of the sixty-four prior recipes has ever read.",
+  "toolkit": "github",
+  "scopes": ["ListPullRequests"],
+  "fixture": "fixtures/draft_pr_closes_keyword_issue",
+  "detector_file": "detector.py",
+  "entrypoint": "run_recipe_scan",
+  "confidence_notes": "Age-gated on how long updated_at has sat still while draft reads true and the body's own closing keyword claim stands -- not flat. GitHub's pull-request object has no marked_draft_at field, so updated_at (the closest real signal GitHub exposes, moving whenever the PR's own metadata changes) is used the same way locked-resolved-issue-still-open already uses it in place of a missing locked_at. Under 24 hours since the last update scores 0.5 (below the 0.70 bar, weighed in the tail not hidden -- a draft PR opened with its own closing keyword already written is completely ordinary scaffolding, not yet a gap). At or past 24 hours it scores a flat 0.85 -- an unambiguous, non-fuzzy signal read directly off two fields GitHub's own API already returns (draft, body). The 24h window matches locked-resolved-issue-still-open's and the rest of the *-still-open family's own bar. A PR that is not a draft, a draft PR whose own body carries no real closing keyword (a bare mention like 'related to #N' does not count), a draft PR that has since closed without merging, or the malformed draft=true/state=merged combination (GitHub's own API refuses to merge a draft) is excluded at confidence 0.0, named not hidden -- none of those states makes the 'claims a close while not ready' claim this recipe checks."
+}

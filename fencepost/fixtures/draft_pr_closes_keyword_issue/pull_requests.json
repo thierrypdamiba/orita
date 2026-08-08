@@ -1,0 +1,83 @@
+[
+  {
+    "number": 2001,
+    "title": "Rework the retry backoff so it caps on the third attempt",
+    "state": "open",
+    "draft": true,
+    "body": "Closes #501 once the retry backoff test is green.",
+    "updated_at": "2026-07-29T09:00:00Z",
+    "url": "https://github.com/example/example-repo/pull/2001"
+  },
+  {
+    "number": 2002,
+    "title": "Add a cursor to the archive index pagination",
+    "state": "open",
+    "draft": true,
+    "body": "Fixes #502 -- still wiring the last integration test.",
+    "updated_at": "2026-08-08T06:00:00Z",
+    "url": "https://github.com/example/example-repo/pull/2002"
+  },
+  {
+    "number": 2003,
+    "title": "Fix the off-by-one in the streak counter",
+    "state": "open",
+    "draft": false,
+    "body": "Resolves #503, ready for review.",
+    "updated_at": "2026-07-20T09:00:00Z",
+    "url": "https://github.com/example/example-repo/pull/2003"
+  },
+  {
+    "number": 2004,
+    "title": "WIP: exploring a worker-queue depth check",
+    "state": "open",
+    "draft": true,
+    "body": "WIP -- nothing wired up yet, just scaffolding the module layout.",
+    "updated_at": "2026-07-22T09:00:00Z",
+    "url": "https://github.com/example/example-repo/pull/2004"
+  },
+  {
+    "number": 2005,
+    "title": "Draft: spike on the badge repaint timing",
+    "state": "open",
+    "draft": true,
+    "body": null,
+    "updated_at": "2026-07-24T09:00:00Z",
+    "url": "https://github.com/example/example-repo/pull/2005"
+  },
+  {
+    "number": 2006,
+    "title": "Sketch a fix for the ranking margin display",
+    "state": "open",
+    "draft": true,
+    "body": "Related to #506, still scoping the right approach here.",
+    "updated_at": "2026-07-18T09:00:00Z",
+    "url": "https://github.com/example/example-repo/pull/2006"
+  },
+  {
+    "number": 2007,
+    "title": "Attempt at a combined-scan fixture-path guard",
+    "state": "closed",
+    "draft": true,
+    "body": "Closes #507 -- abandoning this approach, doesn't actually work.",
+    "updated_at": "2026-07-15T09:00:00Z",
+    "url": "https://github.com/example/example-repo/pull/2007"
+  },
+  {
+    "number": 2008,
+    "title": "A malformed record: draft still true after merge",
+    "state": "merged",
+    "draft": true,
+    "body": "Fixes #508.",
+    "updated_at": "2026-07-10T09:00:00Z",
+    "url": "https://github.com/example/example-repo/pull/2008"
+  },
+  {
+    "number": 2009,
+    "title": "Typo fix in ONBOARDING.md step 3",
+    "state": "closed",
+    "draft": false,
+    "body": "Just a typo fix, nothing to close.",
+    "updated_at": "2026-07-12T09:00:00Z",
+    "url": "https://github.com/example/example-repo/pull/2009"
+  }
+]
