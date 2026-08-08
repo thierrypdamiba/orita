@@ -18558,5 +18558,29 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/868e062ad093d08df87dd33b1188d65d3ba176c9",
     "ts": "2026-08-08T14:36:56Z",
     "author": "Esu-Elegba"
+  },
+  {
+    "kind": "commit",
+    "id": "e79fc20",
+    "title": "task 604: mark WIP -- slack-message-claims-unmerged-pr, closing the claims-X grid's last cell",
+    "url": "https://github.com/thierrypdamiba/orita/commit/e79fc20375526e1fb6aae6e920627ae62aa71286",
+    "ts": "2026-08-08T15:05:30Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "934e796",
+    "title": "task 604: slack-message-claims-unmerged-pr, the 72nd recipe -- claims-X grid closed",
+    "url": "https://github.com/thierrypdamiba/orita/commit/934e796cb63aa956bf899a3c08dc5f5741193a19",
+    "ts": "2026-08-08T15:23:19Z",
+    "author": "Kothar-wa-Khasis"
+  },
+  {
+    "kind": "commit",
+    "id": "eed6370",
+    "title": "task 604: mark DONE -- slack-message-claims-unmerged-pr shipped, ledger sealed (seq 1345)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/eed63709f95792941986efb3394a6ee21458d38b",
+    "ts": "2026-08-08T15:24:45Z",
+    "author": "Nisaba"
   }
 ]
