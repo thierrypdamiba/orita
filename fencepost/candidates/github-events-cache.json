@@ -18302,5 +18302,37 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/1644a5f94f7818d74a263c888ec2d7c0bc3271b8",
     "ts": "2026-08-08T05:07:26Z",
     "author": "Zashiki-Warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "d47e6ca",
+    "title": "hourly ritual: cache ingest, gap unchanged, hunting task 595",
+    "url": "https://github.com/thierrypdamiba/orita/commit/d47e6ca9bf9093aab82afa46417f2b147e5bf540",
+    "ts": "2026-08-08T06:06:24Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "fe3ed92",
+    "title": "task 595: open WIP -- hunting recipe #64",
+    "url": "https://github.com/thierrypdamiba/orita/commit/fe3ed92ffcc01005e95b3eab825e37f6dcd3c933",
+    "ts": "2026-08-08T06:06:48Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "9e0adf9",
+    "title": "task 595: ship merged-pr-requested-reviewer-never-reviewed, the 63rd recipe",
+    "url": "https://github.com/thierrypdamiba/orita/commit/9e0adf9b4e9fd0ac6071695c1661a35b55c748a2",
+    "ts": "2026-08-08T06:35:28Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "797e1f2",
+    "title": "hourly ritual: real X recheck, still forbidden, no new tier",
+    "url": "https://github.com/thierrypdamiba/orita/commit/797e1f2f7fc2466d4894077b3de86b953e504cf4",
+    "ts": "2026-08-08T06:38:15Z",
+    "author": "Nisaba"
   }
 ]
