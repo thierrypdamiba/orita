@@ -1,0 +1,98 @@
+[
+  {
+    "number": 900,
+    "title": "Schema migration for the v2 ledger format",
+    "state": "closed",
+    "body": "Rewrites the ledger's own on-disk schema to the v2 shape.",
+    "closed_at": "2026-07-18T09:00:00Z",
+    "url": "https://github.com/example/example-repo/issues/900"
+  },
+  {
+    "number": 901,
+    "title": "Wire the report generator to the v2 ledger schema",
+    "state": "open",
+    "body": "Blocked by #900 -- can't start the report-side work until the schema migration lands.",
+    "closed_at": null,
+    "url": "https://github.com/example/example-repo/issues/901"
+  },
+  {
+    "number": 903,
+    "title": "Cut the v1.4 release",
+    "state": "closed",
+    "body": "Tags and publishes the v1.4 release artifacts.",
+    "closed_at": "2026-07-27T06:00:00Z",
+    "url": "https://github.com/example/example-repo/issues/903"
+  },
+  {
+    "number": 902,
+    "title": "Announce v1.4 in the town square channel",
+    "state": "open",
+    "body": "Blocked on #903 -- waiting on the release before announcing it.",
+    "closed_at": null,
+    "url": "https://github.com/example/example-repo/issues/902"
+  },
+  {
+    "number": 905,
+    "title": "Design the new onboarding flow",
+    "state": "open",
+    "body": "Still gathering feedback on the current flow's own pain points.",
+    "closed_at": null,
+    "url": "https://github.com/example/example-repo/issues/905"
+  },
+  {
+    "number": 904,
+    "title": "Build the new onboarding flow's first screen",
+    "state": "open",
+    "body": "Blocked by #905.",
+    "closed_at": null,
+    "url": "https://github.com/example/example-repo/issues/904"
+  },
+  {
+    "number": 906,
+    "title": "Ledger append is not atomic on a killed process",
+    "state": "open",
+    "body": "A regular bug report, no blocker mention at all.",
+    "closed_at": null,
+    "url": "https://github.com/example/example-repo/issues/906"
+  },
+  {
+    "number": 908,
+    "title": "Retire the legacy config loader",
+    "state": "closed",
+    "body": "Removes the old INI-based config loader in favor of the new one.",
+    "closed_at": "2026-07-22T10:00:00Z",
+    "url": "https://github.com/example/example-repo/issues/908"
+  },
+  {
+    "number": 907,
+    "title": "Update the docs once the legacy loader is gone",
+    "state": "closed",
+    "body": "Blocked by #908 -- closed this alongside it once I noticed the loader was gone.",
+    "closed_at": "2026-07-22T11:00:00Z",
+    "url": "https://github.com/example/example-repo/issues/907"
+  },
+  {
+    "number": 909,
+    "title": "Gap Ledger site 404s on a direct refresh",
+    "state": "open",
+    "body": "blocked on #999 -- filed against the wrong number by mistake.",
+    "closed_at": null,
+    "url": "https://github.com/example/example-repo/issues/909"
+  },
+  {
+    "number": 911,
+    "title": "Rotate the demo account's own API key",
+    "state": "closed",
+    "body": "Rotates the shared demo account's own API credential.",
+    "closed_at": null,
+    "url": "https://github.com/example/example-repo/issues/911"
+  },
+  {
+    "number": 910,
+    "title": "Re-point the demo scripts at the new API key",
+    "state": "open",
+    "body": "Blocked by #911.",
+    "closed_at": null,
+    "url": "https://github.com/example/example-repo/issues/910"
+  }
+]

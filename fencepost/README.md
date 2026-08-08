@@ -880,6 +880,29 @@ still finds no read-only "list issue/PR comments" tool exposed anywhere
 on the-hand gateway today, so `ListPullRequests` (already cleared) is the
 only scope this recipe declares.
 
+[`RECIPES/unblocked-issue-still-open/`](RECIPES/unblocked-issue-still-open/)
+is the sixty-first (ROADMAP.md #593): a close cousin of
+`duplicate-issue-still-open`, reading the same self-declared, pure-prose
+marker shape on an issue's own body, but for a genuinely different claim —
+not "duplicate of #N" (equivalence: closing the original should have
+closed this one too) but "blocked by #N" / "blocked on #N" (dependency:
+closing the blocker doesn't mean this issue is done, it means this
+issue's own work just became possible again). The named blocker has
+since closed, but the blocked issue was never revisited — no comment, no
+state change, nothing — and GitHub gives that transition no wiring at
+all: no auto-close (rightly, since clearing a dependency isn't the same
+as finishing the work), no auto-comment, no flag anywhere in the API.
+This recipe is careful never to claim the blocked issue should close —
+that overreach belongs to `duplicate-issue-still-open`'s own seam, not
+this one's — it surfaces only the narrower, honest fact that a
+dependency the issue itself named has resolved. Confidence mirrors
+`duplicate-issue-still-open`'s and `overdue-milestone-still-open`'s own
+24h age-gated 0.5/0.85 bar rather than inventing a new number for a
+structurally similar family. Both scopes (`ListIssues`, `GetIssue`) were
+already cleared on `SCOPES.md`'s oath table — no new scope asked for
+anywhere in this recipe, and the toolkit stays `github`-only, so only the
+total recipe count grows, not the plus-joined count.
+
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)
 (ROADMAP.md #111) is that second promise, kept: it runs `scan.py`'s own
