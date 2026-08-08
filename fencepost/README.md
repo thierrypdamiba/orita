@@ -1158,6 +1158,34 @@ one genuinely open cell left: `slack-message-claims-unmerged-pr` —
 `commit-claims-unfixed-issue` and `commit-claims-unmerged-pr` remain the
 two structurally-unfillable cells noted since task 599's own history.
 
+[`RECIPES/slack-message-claims-unmerged-pr/`](RECIPES/slack-message-claims-unmerged-pr/)
+is the seventy-second (ROADMAP.md #604): the Slack source's third and
+final `claims-X` leg, alongside `slack-message-claims-unfixed-issue` and
+`slack-message-claims-open-milestone` above — the second of those two
+named this exact leg as its own future seam before anyone built it. Also
+the Slack-side twin of `linear-comment-claims-unmerged-pr` above, which
+closed the identical PR-claim leg for the Linear issue-comment surface
+and named this recipe as the claims-X grid's one remaining genuinely
+open cell. A Slack channel message invokes a `ships/includes/merges/via
+#N` claim phrase (the same shared `seam_engine.pr_claims` grammar seven
+prior recipes already import) against a pull request number, but the
+named PR is not actually merged — the identical PR-claim check
+`linear-comment-claims-unmerged-pr` already runs against a Linear issue
+comment, applied here to the Slack channel-message surface
+`slack-message-claims-unfixed-issue`/`slack-message-claims-open-milestone`
+already opened. Confidence is age-gated on the message's own timestamp,
+holding `slack-message-claims-open-milestone`'s/`linear-comment-claims-
+unmerged-pr`'s identical 0.85/0.5 bar exactly — a message posted once
+and stands, the same shape a tweet, a mention, or a Linear comment
+holds, not `review-comment-claims-unmerged-pr`'s lower 0.55/0.85 bar for
+an editable surface. `ListPullRequests` and `SearchChannelMessages` were
+both already cleared on `SCOPES.md`'s oath table — no new scope asked
+for anywhere in this recipe, and `slack+github` is not a new toolkit
+pair either. With this recipe shipped, the claims-X grid (ten sources
+times three targets) has **zero genuinely open cells left** —
+`commit-claims-unfixed-issue` and `commit-claims-unmerged-pr` remain the
+two structurally-unfillable cells noted since task 599's own history.
+
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)
 (ROADMAP.md #111) is that second promise, kept: it runs `scan.py`'s own

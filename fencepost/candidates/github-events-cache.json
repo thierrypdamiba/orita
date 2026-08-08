@@ -18526,5 +18526,37 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/7bcbd910d5fc71657c506284d54bcf64c58183bc",
     "ts": "2026-08-08T13:59:17Z",
     "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "94c5ec3",
+    "title": "task 603: mark WIP -- linear-comment-claims-unmerged-pr, the 71st recipe, closing Linear's third and final claims-X leg",
+    "url": "https://github.com/thierrypdamiba/orita/commit/94c5ec3f2087eac999fce2272451d99114a0ed62",
+    "ts": "2026-08-08T14:05:47Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "91bbca8",
+    "title": "hourly ritual: dogfood ingest, 7 real commits into the events cache (2309->2316)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/91bbca8672d941789bac85415189c6168845944d",
+    "ts": "2026-08-08T14:11:31Z",
+    "author": "Esu-Elegba"
+  },
+  {
+    "kind": "commit",
+    "id": "3278847",
+    "title": "task 603: linear-comment-claims-unmerged-pr, the 71st recipe",
+    "url": "https://github.com/thierrypdamiba/orita/commit/3278847e3d39ef028d9839361aa4b8ce9ba89cfd",
+    "ts": "2026-08-08T14:35:04Z",
+    "author": "Esu-Elegba"
+  },
+  {
+    "kind": "commit",
+    "id": "868e062",
+    "title": "hourly ritual: post-ship doctrine recheck, all clean (scribe-growth observation only)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/868e062ad093d08df87dd33b1188d65d3ba176c9",
+    "ts": "2026-08-08T14:36:56Z",
+    "author": "Esu-Elegba"
   }
 ]

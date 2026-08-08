@@ -1,0 +1,42 @@
+[
+  {
+    "id": "SLK-4101",
+    "channel": "#dev-updates",
+    "author": "town-crier",
+    "text": "big one -- ships #601 finally, and via #601 again for good measure",
+    "ts": "2026-08-06T10:00:00Z",
+    "url": "https://orita-town.slack.com/archives/C05DEVUPD/p1722852000000101"
+  },
+  {
+    "id": "SLK-4102",
+    "channel": "#dev-updates",
+    "author": "eager-shipper",
+    "text": "heard this merges #603, nice fix",
+    "ts": "2026-08-08T08:00:00Z",
+    "url": "https://orita-town.slack.com/archives/C05DEVUPD/p1723104000000102"
+  },
+  {
+    "id": "SLK-4103",
+    "channel": "#bugs",
+    "author": "helpful-mod",
+    "text": "includes #602, thanks for confirming",
+    "ts": "2026-08-06T11:00:00Z",
+    "url": "https://orita-town.slack.com/archives/C06BUGS00/p1722855600000103"
+  },
+  {
+    "id": "SLK-4104",
+    "channel": "#random",
+    "author": "confused-newcomer",
+    "text": "ships #999 today, guess it landed while nobody was watching",
+    "ts": "2026-08-06T11:30:00Z",
+    "url": "https://orita-town.slack.com/archives/C07RANDOM0/p1722857400000104"
+  },
+  {
+    "id": "SLK-4105",
+    "channel": "#general",
+    "author": "quiet-watcher",
+    "text": "another quiet week for the town -- see #605 for background, nothing shipped to claim here",
+    "ts": "2026-08-06T12:00:00Z",
+    "url": "https://orita-town.slack.com/archives/C08GENERL0/p1722859200000105"
+  }
+]

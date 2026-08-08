@@ -539,7 +539,7 @@ _CARDINAL_WORDS = {
     "fifty-seven": 57, "fifty-eight": 58, "fifty-nine": 59, "sixty": 60,
     "sixty-one": 61, "sixty-two": 62, "sixty-three": 63, "sixty-four": 64,
     "sixty-five": 65, "sixty-six": 66, "sixty-seven": 67, "sixty-eight": 68,
-    "sixty-nine": 69, "seventy": 70, "seventy-one": 71,
+    "sixty-nine": 69, "seventy": 70, "seventy-one": 71, "seventy-two": 72,
 }
 
 _PLUS_JOINED_CLAIM_RE = re.compile(
@@ -591,20 +591,20 @@ def test_plus_joined_claim_missing_sentence_raises():
         claimed_plus_joined_counts("Nothing here about plus-joined toolkits.")
 
 
-def test_real_plus_joined_counts_are_currently_twenty_of_seventy_one():
-    # Regression pin: today's real, live counts under RECIPES/. Was (19, 70)
-    # until linear-comment-claims-unmerged-pr merged (the seventy-first
-    # real recipe, toolkit "linear+github"). `real_plus_joined_counts`
+def test_real_plus_joined_counts_are_currently_twenty_one_of_seventy_two():
+    # Regression pin: today's real, live counts under RECIPES/. Was (20, 71)
+    # until slack-message-claims-unmerged-pr merged (the seventy-second
+    # real recipe, toolkit "slack+github"). `real_plus_joined_counts`
     # counts every recipe whose OWN toolkit string contains "+" -- not
     # distinct toolkit-pair strings -- so a second (or third) recipe
     # reusing an already-named pair still increments this count, the same
-    # way slack-message-claims-open-milestone's own merge (task 601,
-    # reusing "slack+github") grew both halves together, and this recipe's
-    # own merge (reusing "linear+github" a third time) does again. Verified
-    # against the live tree, not assumed from "linear+github already
+    # way linear-comment-claims-unmerged-pr's own merge (task 603, reusing
+    # "linear+github") grew both halves together, and this recipe's own
+    # merge (reusing "slack+github" a third time) does again. Verified
+    # against the live tree, not assumed from "slack+github already
     # exists": every one of today's plus-joined recipes was grepped by
     # hand before pinning this number.
-    assert real_plus_joined_counts(FENCEPOST_ROOT) == (20, 71)
+    assert real_plus_joined_counts(FENCEPOST_ROOT) == (21, 72)
 
 
 def test_oath_scopes_for_toolkit_docstring_matches_the_real_live_counts():
