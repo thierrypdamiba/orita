@@ -50,7 +50,7 @@ from pathlib import Path
 from typing import Any
 
 from seam_engine.scan import GapCandidate
-from seam_engine.thanks import THANKS_RE
+from seam_engine.thanks import THANKS_RE, thanked_handle
 
 _HERE = Path(__file__).resolve().parent
 DEFAULT_README_FIXTURE = _HERE.parents[1] / "fixtures" / "readme_credited_not_thanked" / "readme.json"
@@ -142,11 +142,18 @@ def _thanked_handles(tweets: list[Tweet]) -> set[str]:
     unlike the twin recipe, which asks this per tweet, this recipe asks it
     once, across every tweet, since what matters here is whether a thank-you
     ever happened at all, not which single tweet it came from."""
+    # Task 610 (Kwaku Ananse): used to re-run `_THANKS_RE.search` here
+    # directly instead of calling the shared `thanked_handle` -- the same
+    # regex, reused, but the negation-scope check that function now holds
+    # ("no thanks @handle" is a decline, not credit) never reached this
+    # detector, because this loop never called the function it lives in.
+    # See `seam_engine.thanks`'s own docstring for the live reproduction;
+    # see the twin recipe's `_thanked_handle` for the mirror fix.
     thanked: set[str] = set()
     for tweet in tweets:
-        match = _THANKS_RE.search(tweet.text)
-        if match:
-            thanked.add(match.group(1).lower())
+        handle = thanked_handle(tweet.text)
+        if handle:
+            thanked.add(handle.lower())
     return thanked
 
 

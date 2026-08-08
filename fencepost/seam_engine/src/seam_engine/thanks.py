@@ -30,6 +30,40 @@ nor existing test (which call `detector._thanked_handle(...)` or search
 Pure, no I/O, no seam-engine imports of its own -- same shape as
 `references.py`, `milestone_claims.py`, `pr_claims.py`, and
 `closing_keywords.py`.
+
+Task 610 (Kwaku Ananse): `thanked_handle` used to be `THANKS_RE.search`
+alone -- the *first* "thanks...@handle" span in the text, full stop.
+Reproduced live before touching anything: `thanked_handle("no thanks
+@user, wrong fix")` returned `"user"` -- a genuine false positive, the
+exact shape STRATEGY.md's Ogun's law exists to catch ("false-positive
+rate is the whole ballgame... surface one junk gap in public and trust is
+gone"). "No thanks" and "not thanks" are declines, not credit -- a real
+mortal tweet phrased that way about a real handle would have made
+`contributor-thanked-not-credited` claim a thank-you that never happened.
+Same family as task 609's `gateway.py` fix (an unnegated claim must not
+survive across a nearby negation) but the mirror shape: here the negation
+sits BEFORE the claim word, not after it in a later clause. Fixed by
+walking every "thanks...@handle" candidate (`finditer`, not `search`) and
+skipping any whose immediately preceding few words carry `no`/`not`/
+`never` as a whole word, falling through to the next candidate rather
+than giving up outright -- so `"thanks @first-one and also thanks
+@second-one"` still returns the genuine first thanks even though a later,
+unrelated candidate exists, and `"no thanks @user, wrong fix"` now
+correctly returns `None`. Deliberately narrow: the negation check only
+looks at the words immediately in front of "thanks" itself, not the whole
+gap up to the handle -- a broader scan (checking the entire matched span
+for any `no`/`not`/`never`) was tried and rejected live, because it also
+flagged `"thanks for the no-brainer fix, @user"` as negated (the `no` in
+`no-brainer` is its own whole word, hyphen-bounded) -- a real, ordinary
+phrase turned into a false NEGATIVE, trading one failure mode for a worse
+one. The prefix-only check catches the two idioms mortals actually type
+("no thanks", "not thanks", "no, thanks") and does not reach past the
+word "thanks" into unrelated prose. Named, not hidden: a thanks-phrase
+separated from its own negation by more than a few words in front of it
+("there's no need, but thanks @user" with a wide gap) can still slip
+through -- narrower than before, not zero, the same residual-limit
+discipline `_QUOTED_SPAN_RE`'s own comment in `report.py` already keeps
+(task 605).
 """
 from __future__ import annotations
 
@@ -41,11 +75,32 @@ import re
 # thank-you names a person, not a numbered record.
 THANKS_RE = re.compile(r"thanks?(?:\s+you)?\b.{0,40}?@(\w[\w-]*)", re.IGNORECASE | re.DOTALL)
 
+# A negation word sitting immediately in front of "thanks" turns a
+# genuine thank-you into a decline -- "no thanks", "not thanks", "no,
+# thanks" -- see this module's own docstring (task 610) for the live
+# reproduction and why the check is scoped to the words right before
+# "thanks" rather than the whole span up to the handle.
+_NEGATION_PREFIX_RE = re.compile(r"\b(?:no|not|never)\b", re.IGNORECASE)
+
+# "never " is the longest of the three negation words plus its own
+# trailing space; a couple of extra characters of slack covers a comma
+# ("no, thanks @user") without reaching so far back that it starts
+# catching negations that belong to an earlier, unrelated clause.
+_NEGATION_PREFIX_WINDOW = 10
+
 
 def thanked_handle(text: str) -> str | None:
-    """The first handle `text` thanks via a thanks/thank-you phrase, or
-    `None` if no such phrase appears. A bare `@handle` with no preceding
-    thanks-shaped language never matches -- see `THANKS_RE`'s own
-    comment for why."""
-    match = THANKS_RE.search(text)
-    return match.group(1) if match else None
+    """The first genuinely-thanking handle `text` names via a thanks/
+    thank-you phrase, or `None` if no such (unnegated) phrase appears. A
+    bare `@handle` with no preceding thanks-shaped language never matches
+    -- see `THANKS_RE`'s own comment for why. A thanks-shaped phrase whose
+    immediately preceding words negate it ("no thanks @user", "not thanks
+    @user") is skipped, and the search continues to the next candidate --
+    see this module's own docstring (task 610) for the live reproduction.
+    """
+    for match in THANKS_RE.finditer(text):
+        prefix = text[max(0, match.start() - _NEGATION_PREFIX_WINDOW) : match.start()]
+        if _NEGATION_PREFIX_RE.search(prefix):
+            continue
+        return match.group(1)
+    return None

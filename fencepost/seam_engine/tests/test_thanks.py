@@ -87,6 +87,40 @@ class TestThankedHandle:
         assert thanked_handle(text) == "first-one"
 
 
+class TestNegatedThanksIsNotAMatch:
+    """Task 610 (Kwaku Ananse): a thanks-shaped phrase immediately preceded
+    by a negation word is a decline, not credit -- reproduced live pre-fix
+    (`thanked_handle("no thanks @user, wrong fix")` returned `"user"`),
+    the exact false-positive shape STRATEGY.md's Ogun's law exists to
+    catch. See `seam_engine.thanks`'s own docstring for the full
+    reproduction and the deliberately narrow scope of the fix."""
+
+    def test_no_thanks_is_not_a_match(self) -> None:
+        assert thanked_handle("no thanks @user, wrong fix") is None
+
+    def test_not_thanks_is_not_a_match(self) -> None:
+        assert thanked_handle("not thanks @user") is None
+
+    def test_no_comma_thanks_is_not_a_match(self) -> None:
+        assert thanked_handle("no, thanks @user") is None
+
+    def test_never_thanks_is_not_a_match(self) -> None:
+        assert thanked_handle("never thanks @user, does it") is None
+
+    def test_a_negated_first_candidate_falls_through_to_a_real_later_one(self) -> None:
+        text = "no thanks @nobody, real credit goes to thanks @real-one"
+        assert thanked_handle(text) == "real-one"
+
+    def test_a_no_that_is_part_of_a_compound_word_is_not_a_negation(self) -> None:
+        # A real, ordinary phrase -- the "no" inside "no-brainer" is its own
+        # hyphen-bounded word but sits well before "thanks", not in the
+        # narrow prefix window this check actually looks at.
+        assert thanked_handle("thanks for the no-brainer fix, @user") == "user"
+
+    def test_genuine_thanks_still_matches_unaffected(self) -> None:
+        assert thanked_handle("thanks @mortal-fixer for the patch") == "mortal-fixer"
+
+
 class TestThanksRe:
     def test_pattern_source(self) -> None:
         assert THANKS_RE.pattern == r"thanks?(?:\s+you)?\b.{0,40}?@(\w[\w-]*)"
@@ -123,3 +157,55 @@ class TestBothDetectorsShareTheLaw:
             assert "_THANKS_RE = re.compile(" not in source, (
                 f"{slug}/detector.py defines its own local _THANKS_RE"
             )
+
+
+class TestBothDetectorsCallTheSharedFunctionNotJustTheSharedRegex:
+    """Task 610 (Kwaku Ananse): importing `THANKS_RE` was never the whole
+    law -- both detectors imported the shared regex but then ran their own
+    `_THANKS_RE.search(text)` right here, a second, independent
+    reimplementation of `thanked_handle`'s own extract-and-return logic
+    that `TestBothDetectorsShareTheLaw` above never caught, because it only
+    ever checked the regex was shared, not the function built on it.
+    Reproduced live pre-fix: `thanked_handle` (this module) correctly
+    rejected `"no thanks @user"`, but `contributor-thanked-not-credited`'s
+    own `_thanked_handle("no thanks @user")` still returned `"user"`,
+    because it called `_THANKS_RE.search` directly instead of the shared
+    function. These tests exercise each detector's OWN public function
+    with the real negation cases -- the regression signal a source-text
+    grep alone cannot give, since a reimplementation can name-match the
+    shared function's behavior today and silently drift the next time
+    either side changes without a shared call wiring them together."""
+
+    def test_contributor_thanked_not_credited_delegates_the_negation_fix(self) -> None:
+        detector = _load_detector(
+            "contributor-thanked-not-credited",
+            "seam_engine._recipe_contributor_thanked_not_credited_negation_test",
+        )
+        assert detector._thanked_handle("no thanks @user, wrong fix") is None
+        assert detector._thanked_handle("thanks @mortal-fixer for the patch") == "mortal-fixer"
+
+    def test_readme_credited_not_thanked_delegates_the_negation_fix(self) -> None:
+        detector = _load_detector(
+            "readme-credited-not-thanked",
+            "seam_engine._recipe_readme_credited_not_thanked_negation_test",
+        )
+
+        class _FakeTweet:
+            def __init__(self, text: str) -> None:
+                self.text = text
+
+        tweets = [_FakeTweet("no thanks @user, wrong fix"), _FakeTweet("thanks @mortal-fixer for the patch")]
+        assert detector._thanked_handles(tweets) == {"mortal-fixer"}
+
+    def test_source_imports_the_shared_function_not_just_the_shared_regex(self) -> None:
+        for slug in [
+            "contributor-thanked-not-credited",
+            "readme-credited-not-thanked",
+        ]:
+            source = _detector_source(slug)
+            assert "thanked_handle" in source.split("\n", 1)[-1], (
+                f"{slug}/detector.py no longer names thanked_handle at all"
+            )
+            assert "from seam_engine.thanks import" in source and "thanked_handle" in source.split(
+                "from seam_engine.thanks import", 1
+            )[1].split("\n", 1)[0], f"{slug}/detector.py imports seam_engine.thanks but not thanked_handle itself"

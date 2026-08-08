@@ -40,7 +40,7 @@ from pathlib import Path
 from typing import Any
 
 from seam_engine.scan import GapCandidate
-from seam_engine.thanks import THANKS_RE
+from seam_engine.thanks import THANKS_RE, thanked_handle
 
 _HERE = Path(__file__).resolve().parent
 DEFAULT_TWEETS_FIXTURE = _HERE.parents[1] / "fixtures" / "contributor_thanked_not_credited" / "tweets.json"
@@ -105,9 +105,19 @@ def load_readme(path: Path | None = None) -> str:
     return content
 
 
-def _thanked_handle(text: str) -> str | None:
-    match = _THANKS_RE.search(text)
-    return match.group(1) if match else None
+# Task 610 (Kwaku Ananse): this used to be its own `_THANKS_RE.search(text)`
+# call -- the regex was shared via `seam_engine.thanks`, but the actual
+# search-and-extract logic was reimplemented a second time right here,
+# bypassing `seam_engine.thanks.thanked_handle` entirely (the exact "two
+# independently written... drifting apart" shape this module's own
+# docstring already names five prior instances of, found here a sixth
+# time). That mattered the moment `thanked_handle` grew a real behavior
+# this local copy didn't have: a negation-scope check so "no thanks
+# @handle" is a decline, not credit. Delegating to the shared function
+# closes that gap for real, not just in the module that happens to hold
+# the regex -- `text` a mortal actually tweets flows through the one place
+# the fix lives.
+_thanked_handle = thanked_handle
 
 
 def _is_credited(handle: str, readme_content: str) -> bool:
