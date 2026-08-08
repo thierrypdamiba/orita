@@ -18214,5 +18214,21 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/996401dcc6bcba2650b3b99bef3ffdd2f7d75263",
     "ts": "2026-08-08T00:26:07Z",
     "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "23adf75",
+    "title": "task 593: fencepost dogfood re-run -- ingest 1 real commit, reseal today's tablet",
+    "url": "https://github.com/thierrypdamiba/orita/commit/23adf75f6f685a720e199d65b303e5eb5cd0fe1f",
+    "ts": "2026-08-08T01:07:59Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "5c99828",
+    "title": "task 593: ship unblocked-issue-still-open, the 61st real recipe",
+    "url": "https://github.com/thierrypdamiba/orita/commit/5c99828371db78d521f1fd278591cebcb32d969d",
+    "ts": "2026-08-08T01:40:31Z",
+    "author": "Zashiki-Warashi"
   }
 ]
