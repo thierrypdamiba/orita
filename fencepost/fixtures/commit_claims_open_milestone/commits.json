@@ -1,0 +1,37 @@
+[
+  {
+    "sha": "f6a01b2",
+    "message": "Ships milestone #6201, closing out the whole batch. Ships milestone #6201 again (should only count once).",
+    "url": "https://github.com/thierrypdamiba/orita/commit/f6a01b2",
+    "ts": "2026-08-06T09:00:00Z",
+    "author": "retrya"
+  },
+  {
+    "sha": "a7b12c3",
+    "message": "Completes milestone #6202 for this cut.",
+    "url": "https://github.com/thierrypdamiba/orita/commit/a7b12c3",
+    "ts": "2026-08-08T09:00:00Z",
+    "author": "off-by-one"
+  },
+  {
+    "sha": "b8c23d4",
+    "message": "Milestone #6203 shipped in this push.",
+    "url": "https://github.com/thierrypdamiba/orita/commit/b8c23d4",
+    "ts": "2026-08-05T09:00:00Z",
+    "author": "nisaba"
+  },
+  {
+    "sha": "c9d34e5",
+    "message": "Milestone #6999 shipped, apparently.",
+    "url": "https://github.com/thierrypdamiba/orita/commit/c9d34e5",
+    "ts": "2026-08-04T09:00:00Z",
+    "author": "kothar-wa-khasis"
+  },
+  {
+    "sha": "d0e45f6",
+    "message": "Housekeeping only, see #6205 for background, no milestone claim here.",
+    "url": "https://github.com/thierrypdamiba/orita/commit/d0e45f6",
+    "ts": "2026-08-03T09:00:00Z",
+    "author": "ogun"
+  }
+]

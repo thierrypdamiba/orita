@@ -1,0 +1,12 @@
+{
+  "slug": "commit-claims-open-milestone",
+  "title": "A commit message claims a milestone shipped that's still open",
+  "author": "retrya",
+  "description": "Extracts every 'milestone #N' claim phrase (the shared seam_engine.milestone_claims grammar ten prior recipes already import) from a commit's own message and checks the named milestone's real state. A milestone that exists but is still open is the seam: the commit log is a permanent record claiming a bundle of work shipped that, in fact, never closed out. The first recipe to pair ListRepoCommits with ListMilestones -- dangling-issue-reference already reads commit messages, but only for bare #N against issues/PRs; the commit-closes-keyword-* family already reads commit messages, but only for GitHub's real closing-keyword grammar, which targets issues and PRs, not milestones (GitHub gives a milestone no closing keyword of its own at all).",
+  "toolkit": "github",
+  "scopes": ["ListRepoCommits", "ListMilestones"],
+  "fixture": "fixtures/commit_claims_open_milestone",
+  "detector_file": "detector.py",
+  "entrypoint": "run_recipe_scan",
+  "confidence_notes": "Age-gated on hours since the commit's own ts, mirroring release-claims-open-milestone's and tweet-claims-open-milestone's own reasoning rather than dangling-issue-reference's flat score: a claim checked within a few hours of the commit landing may simply be a race (the commit pushed moments before the milestone is actually closed out) rather than a settled documentation error (0.5, below the 0.70 bar, shown as a weighed-and-dropped coincidence, not hidden); at or past 24 hours with the named milestone still open it is unambiguous (flat 0.85, a commit message is immutable once pushed, so nothing about the claim itself will ever change). A named milestone that does not exist at all is excluded at confidence 0.0 -- a broken reference belongs to a future milestone-side dangling-reference recipe, not this one. A named milestone that IS closed is excluded too, named not hidden -- the claim was simply true. A commit with no 'milestone #N' claim phrase at all (a bare #N mention, or no reference at all) is excluded the same way -- no claim was ever made for this recipe to check against the tracker."
+}

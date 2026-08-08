@@ -1013,6 +1013,27 @@ oath table — no new scope asked for anywhere in this recipe, and the
 toolkit stays `github`-only, so only the total recipe count grows, not
 the plus-joined count.
 
+[`RECIPES/commit-claims-open-milestone/`](RECIPES/commit-claims-open-milestone/)
+is the sixty-sixth (ROADMAP.md #598): the first recipe to pair
+`ListRepoCommits` with `ListMilestones`, a scope combination none of the
+sixty-five recipes before it ever declared together. Ten recipes already
+read the `milestone #N` claim phrase (`seam_engine.milestone_claims`) off
+release notes, tweets, mentions, README text, review comments, issue
+comments, and milestone bodies — but none of them ever read it off a
+commit message. The three `commit-closes-keyword-*` recipes read commit
+messages too, but only for GitHub's own closing-keyword grammar
+(`close(s)/fix(es)/resolve(s) #N`), which targets issues and pull
+requests; GitHub gives milestones no auto-close keyword at all, so that
+family structurally cannot see a `milestone #N` phrase. A commit's own
+message claiming a milestone shipped, checked against that milestone's
+real tracker state, was a genuinely open axis. Confidence is age-gated
+on the commit's own `ts` (0.5 under 24h, 0.85 at/past), mirroring
+`release-claims-open-milestone`'s and `tweet-claims-open-milestone`'s own
+reasoning rather than `dangling-issue-reference`'s flat score. Both
+scopes were already cleared on `SCOPES.md`'s oath table under the
+`github` row — no new scope asked for anywhere in this recipe, and the
+toolkit stays `github`-only.
+
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)
 (ROADMAP.md #111) is that second promise, kept: it runs `scan.py`'s own
