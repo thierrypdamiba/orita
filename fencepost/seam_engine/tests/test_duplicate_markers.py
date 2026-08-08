@@ -51,6 +51,53 @@ class TestNamedDuplicateOf:
         assert named_duplicate_of("This is not a dupe situation, see #700 for a different reason") is None
 
 
+class TestNegatedDuplicateMarkerIsNotAClaim:
+    """Task 612: `named_duplicate_of` used to return the number on a plain
+    `DUPLICATE_MARKER_RE.search()` hit alone, with no negation check at all
+    -- a body that explicitly DENIES being a duplicate ("not a duplicate of
+    #N") still returned N, the exact false-positive shape task 610 fixed
+    for `thanks.py`'s "no thanks @handle". Reproduced live pre-fix: each
+    case below returned the target number instead of None."""
+
+    def test_not_a_duplicate_of(self) -> None:
+        assert named_duplicate_of("This is not a duplicate of #700, unrelated.") is None
+
+    def test_not_a_dup_of(self) -> None:
+        assert named_duplicate_of("Not a dup of #12") is None
+
+    def test_isnt_a_duplicate_of(self) -> None:
+        assert named_duplicate_of("This isn't a duplicate of #5") is None
+
+    def test_never_a_duplicate_of(self) -> None:
+        assert named_duplicate_of("Never a duplicate of #99, closing for a different reason") is None
+
+    def test_no_duplicate_colon(self) -> None:
+        assert named_duplicate_of("No duplicate: #8, this is a fresh report") is None
+
+    def test_doesnt_duplicate(self) -> None:
+        assert named_duplicate_of("This doesn't duplicate #21, filing separately") is None
+
+    def test_unnegated_marker_still_matches(self) -> None:
+        # The negation check must not swallow a real, unnegated marker.
+        assert named_duplicate_of("Duplicate of #700") == 700
+
+    def test_falls_through_to_a_later_genuine_marker(self) -> None:
+        # A denied marker earlier in the body must not stop the search --
+        # the next, genuinely unnegated marker still returns, mirroring
+        # `thanks.py`'s own "thanks @first-one and also thanks @second-one"
+        # fall-through test.
+        assert named_duplicate_of("not a duplicate of #12, but genuinely a duplicate of #45") == 45
+
+    def test_distant_negation_is_out_of_scope(self) -> None:
+        # Documented residual limit (see module docstring): the negation
+        # check only looks at the words immediately in front of the
+        # marker, not the whole body, so a denial separated from its own
+        # marker by more than a few words can still slip through.
+        assert named_duplicate_of(
+            "There is no need to close this separately, it is a duplicate of #12"
+        ) == 12
+
+
 class TestDuplicateMarkerRe:
     def test_pattern_source(self) -> None:
         assert DUPLICATE_MARKER_RE.pattern == r"\bdup(?:licate)?\s*(?:of|:)?\s+#(\d+)\b"
