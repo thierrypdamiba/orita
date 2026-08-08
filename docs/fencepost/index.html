@@ -70,7 +70,7 @@
     reviewed and merged like any PR. The read-only oath does not loosen for outside code:
     <a href="https://github.com/thierrypdamiba/orita/blob/main/fencepost/CONTRIBUTING.md">CONTRIBUTING.md</a>
     is the schema in prose, enforced in code before a human reviewer ever reads a stranger's
-    detector. Sixty-two real recipes stand today:</p>
+    detector. Sixty-three real recipes stand today:</p>
     <p><b><a href="https://github.com/thierrypdamiba/orita/tree/main/fencepost/RECIPES/example-release-vs-changelog">example-release-vs-changelog</a></b>
     — the reference: proof a first external recipe PR is mergeable at all.<br>
     <b><a href="https://github.com/thierrypdamiba/orita/tree/main/fencepost/RECIPES/merged-pr-issue-still-open">merged-pr-issue-still-open</a></b>
@@ -420,7 +420,22 @@
     when the target is closed with <code>state_reason=not_planned</code>. Confidence mirrors
     <code>commit-closes-keyword-issue-still-open</code>'s own 24h age-gated 0.5/0.85 bar. Both
     scopes (<code>ListRepoCommits</code>, <code>ListIssues</code>) were already cleared — no new
-    scope asked for anywhere in this recipe.</p>
+    scope asked for anywhere in this recipe.<br>
+    <b><a href="https://github.com/thierrypdamiba/orita/tree/main/fencepost/RECIPES/merged-pr-requested-reviewer-never-reviewed">merged-pr-requested-reviewer-never-reviewed</a></b>
+    — the sixty-third: off a field none of the sixty-two recipes before it ever read — a pull
+    request's own <code>requested_reviewers</code> list, GitHub's real, structured record of
+    exactly who was explicitly asked to sign off before the work landed. A pull request merges,
+    but a login its own <code>requested_reviewers</code> field names never leaves a single review
+    comment on it anywhere in the read-so-far history. GitHub does not require an answered review
+    request before a PR can merge, and nothing retroactively flags or clears the unanswered
+    request once it does. Not the claims-X grid (no claim phrase, no body text parsed at all) or
+    the dangling-reference grid (no <code>#N</code> reference read); shares only the general
+    shape of <code>merged-pr-branch-not-deleted</code> and <code>deleted-branch-pr-still-open</code>
+    — a post-resolution, GitHub-native expectation nothing forces closed — but watches a named
+    person's solicited review rather than a branch's survival. Confidence mirrors those two
+    siblings' own 24h age-gated 0.5/0.85 bar. Both scopes (<code>ListPullRequests</code>,
+    <code>ListReviewCommentsInARepository</code>) were already cleared — this is the first recipe
+    to pair the two together — no new scope asked for anywhere in this recipe.</p>
     <p>Merging a recipe is one promise; letting it actually compete for the daily primary gap
     is another. <a href="https://github.com/thierrypdamiba/orita/blob/main/fencepost/seam_engine/src/seam_engine/combined_scan.py"><code>combined_scan.py</code></a>
     keeps the second: it pools a recipe's own candidates with <code>scan.py</code>'s, and ranks

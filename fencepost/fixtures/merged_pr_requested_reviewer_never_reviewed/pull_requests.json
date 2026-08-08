@@ -1,0 +1,74 @@
+[
+  {
+    "number": 950,
+    "title": "Add pagination cursor to the archive index",
+    "state": "merged",
+    "merged_at": "2026-07-30T09:00:00Z",
+    "requested_reviewers": ["reviewer-a"],
+    "url": "https://github.com/example/example-repo/pull/950"
+  },
+  {
+    "number": 951,
+    "title": "Widen the recipe-count regex for hyphenated cardinals",
+    "state": "merged",
+    "merged_at": "2026-08-08T06:00:00Z",
+    "requested_reviewers": ["reviewer-b"],
+    "url": "https://github.com/example/example-repo/pull/951"
+  },
+  {
+    "number": 952,
+    "title": "Fix the off-by-one in the streak counter",
+    "state": "merged",
+    "merged_at": "2026-08-01T09:00:00Z",
+    "requested_reviewers": ["reviewer-c"],
+    "url": "https://github.com/example/example-repo/pull/952"
+  },
+  {
+    "number": 953,
+    "title": "WIP: draft of the draft-back Notion target",
+    "state": "open",
+    "merged_at": null,
+    "requested_reviewers": ["reviewer-d"],
+    "url": "https://github.com/example/example-repo/pull/953"
+  },
+  {
+    "number": 954,
+    "title": "Typo fix in ONBOARDING.md step 3",
+    "state": "merged",
+    "merged_at": "2026-08-02T09:00:00Z",
+    "requested_reviewers": [],
+    "url": "https://github.com/example/example-repo/pull/954"
+  },
+  {
+    "number": 955,
+    "title": "Legacy import, merged before merged_at was tracked",
+    "state": "merged",
+    "merged_at": null,
+    "requested_reviewers": ["reviewer-e"],
+    "url": "https://github.com/example/example-repo/pull/955"
+  },
+  {
+    "number": 956,
+    "title": "Share the duplicate-marker regex across two more recipes",
+    "state": "merged",
+    "merged_at": "2026-08-08T02:00:00Z",
+    "requested_reviewers": ["reviewer-f", "reviewer-g"],
+    "url": "https://github.com/example/example-repo/pull/956"
+  },
+  {
+    "number": 957,
+    "title": "Abandoned approach to the badge cache, closed without merging",
+    "state": "closed",
+    "merged_at": null,
+    "requested_reviewers": ["reviewer-d"],
+    "url": "https://github.com/example/example-repo/pull/957"
+  },
+  {
+    "number": 958,
+    "title": "Add the confidence age-gate to the milestone recipe",
+    "state": "merged",
+    "merged_at": "2026-07-25T09:00:00Z",
+    "requested_reviewers": ["", "reviewer-h"],
+    "url": "https://github.com/example/example-repo/pull/958"
+  }
+]

@@ -1,0 +1,30 @@
+[
+  {
+    "id": 20001,
+    "pull_request_number": 950,
+    "author": "other-dev",
+    "body": "Nit: this cursor helper could use a docstring.",
+    "url": "https://github.com/example/example-repo/pull/950#discussion_r20001"
+  },
+  {
+    "id": 20002,
+    "pull_request_number": 952,
+    "author": "reviewer-c",
+    "body": "LGTM, thanks for the fix.",
+    "url": "https://github.com/example/example-repo/pull/952#discussion_r20002"
+  },
+  {
+    "id": 20003,
+    "pull_request_number": 956,
+    "author": "reviewer-f",
+    "body": "One inline comment on the extraction, otherwise fine.",
+    "url": "https://github.com/example/example-repo/pull/956#discussion_r20003"
+  },
+  {
+    "id": 20004,
+    "pull_request_number": 958,
+    "author": "reviewer-h",
+    "body": "Confirmed the age-gate matches the sibling recipe's own bar.",
+    "url": "https://github.com/example/example-repo/pull/958#discussion_r20004"
+  }
+]

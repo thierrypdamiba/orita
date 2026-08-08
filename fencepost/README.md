@@ -930,6 +930,31 @@ uses — no new scope asked for anywhere in this recipe, and the toolkit
 stays `github`-only, so only the total recipe count grows, not the
 plus-joined count.
 
+[`RECIPES/merged-pr-requested-reviewer-never-reviewed/`](RECIPES/merged-pr-requested-reviewer-never-reviewed/)
+is the sixty-third (ROADMAP.md #595): a genuinely different axis from
+every family this repo has already saturated, off a field none of the
+sixty-two recipes before it ever reads — a pull request's own
+`requested_reviewers` list, GitHub's real, structured record of exactly
+who was explicitly asked to sign off before the work landed. A pull
+request merges, but a login its own `requested_reviewers` field names
+never leaves a single review comment on it anywhere in the read-so-far
+history. GitHub does not require an answered review request before a PR
+can merge, and nothing retroactively flags or clears the unanswered
+request once it does — the solicitation and the outcome just quietly
+drift apart forever. This is not the claims-X grid (no claim phrase, no
+body text parsed at all — a structured field compared against a
+structured fact) or the dangling-reference grid (no `#N` reference read
+anywhere); it shares only the general shape of `merged-pr-branch-not-
+deleted` and `deleted-branch-pr-still-open` — a post-resolution,
+GitHub-native expectation nothing forces closed — but watches a named
+person's solicited review rather than a branch's survival. Confidence
+mirrors those two siblings' own 24h age-gated 0.5/0.85 bar. Both scopes
+(`ListPullRequests`, `ListReviewCommentsInARepository`) were already
+cleared on `SCOPES.md`'s oath table — this is simply the first recipe to
+pair the two together — no new scope asked for anywhere in this recipe,
+and the toolkit stays `github`-only, so only the total recipe count
+grows, not the plus-joined count.
+
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)
 (ROADMAP.md #111) is that second promise, kept: it runs `scan.py`'s own
