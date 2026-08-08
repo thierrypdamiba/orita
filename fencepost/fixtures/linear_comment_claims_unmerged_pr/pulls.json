@@ -1,0 +1,23 @@
+[
+  {
+    "number": 501,
+    "title": "Badge cache invalidation fix",
+    "state": "open",
+    "merged": false,
+    "url": "https://github.com/thierrypdamiba/orita/pull/501"
+  },
+  {
+    "number": 502,
+    "title": "Streak status command feature",
+    "state": "closed",
+    "merged": true,
+    "url": "https://github.com/thierrypdamiba/orita/pull/502"
+  },
+  {
+    "number": 503,
+    "title": "Widen journal numbering check",
+    "state": "open",
+    "merged": false,
+    "url": "https://github.com/thierrypdamiba/orita/pull/503"
+  }
+]

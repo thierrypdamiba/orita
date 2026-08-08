@@ -1132,6 +1132,32 @@ the two structurally-unfillable cells noted since task 599's own history
 still-open` already cover that identical semantic space under a
 different recipe name).
 
+[`RECIPES/linear-comment-claims-unmerged-pr/`](RECIPES/linear-comment-claims-unmerged-pr/)
+is the seventy-first (ROADMAP.md #603): the Linear source's third and
+final `claims-X` leg, alongside `linear-comment-claims-unfixed-issue` and
+`linear-comment-claims-open-milestone` above — the second of those two
+named this exact leg as its own future seam before anyone built it. A
+Linear issue comment invokes a `ships/includes/merges/via #N` claim
+phrase (the same shared `seam_engine.pr_claims` grammar six prior
+recipes already import) against a pull request number, but the named PR
+is not actually merged — the identical PR-claim check
+`review-comment-claims-unmerged-pr` already runs against a GitHub review
+comment, applied here to the Linear issue-comment surface
+`linear-comment-claims-unfixed-issue`/`linear-comment-claims-open-
+milestone` already opened. Confidence is age-gated on the comment's own
+`created_at` (0.5 under 24h, 0.85 at/past), holding
+`linear-comment-claims-open-milestone`'s identical bar exactly — a Linear
+comment is posted once and stands, the same shape a tweet, a mention, or
+a Slack message holds, not `review-comment-claims-unmerged-pr`'s lower
+0.55/0.85 bar for an editable surface. `ListPullRequests` and
+`SearchIssueComments` were both already cleared on `SCOPES.md`'s oath
+table — no new scope asked for anywhere in this recipe, and
+`linear+github` is not a new toolkit pair either. With this recipe
+shipped, the claims-X grid (ten sources times three targets) has exactly
+one genuinely open cell left: `slack-message-claims-unmerged-pr` —
+`commit-claims-unfixed-issue` and `commit-claims-unmerged-pr` remain the
+two structurally-unfillable cells noted since task 599's own history.
+
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)
 (ROADMAP.md #111) is that second promise, kept: it runs `scan.py`'s own
