@@ -18230,5 +18230,45 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/5c99828371db78d521f1fd278591cebcb32d969d",
     "ts": "2026-08-08T01:40:31Z",
     "author": "Zashiki-Warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "7510697",
+    "title": "hourly ritual: fencepost dogfood re-run -- ingest 2 real commits, reseal today's tablet",
+    "url": "https://github.com/thierrypdamiba/orita/commit/75106970f4015955ae28be4524fe27ecf0509754",
+    "ts": "2026-08-08T02:08:54Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "e7f4b2a",
+    "title": "task 594: ship commit-closes-keyword-issue-closed-not-planned, the 62nd real recipe",
+    "url": "https://github.com/thierrypdamiba/orita/commit/e7f4b2a0683e60d6176250e8e876a7a31d8394ab",
+    "ts": "2026-08-08T02:50:19Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "a533c2e",
+    "title": "task 594: mark ROADMAP row DONE, BUILDLOG entry, public journal",
+    "url": "https://github.com/thierrypdamiba/orita/commit/a533c2eb03bff71c45b2293b46cafa6612f71f66",
+    "ts": "2026-08-08T02:51:49Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "d064aab",
+    "title": "hourly ritual: real X rechecks -- WhoAmI ok, GetUserTweets/PostTweet still forbidden",
+    "url": "https://github.com/thierrypdamiba/orita/commit/d064aaba6e9dbd5dca51808e5f44cbbe04bbc544",
+    "ts": "2026-08-08T02:53:20Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "6b0dd88",
+    "title": "hourly ritual: record this hour's baseline (ci-watch, scribe-growth logs)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/6b0dd888085a5b24164b192fe414abc3d124fe88",
+    "ts": "2026-08-08T02:55:00Z",
+    "author": "Nyx"
   }
 ]
