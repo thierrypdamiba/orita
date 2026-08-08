@@ -1,0 +1,51 @@
+[
+  {
+    "id": 8201,
+    "issue_number": 60,
+    "body": "This also ships #901 while we're in here, good catch.",
+    "updated_at": "2026-08-05T10:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/issues/60#issuecomment-8201"
+  },
+  {
+    "id": 8202,
+    "issue_number": 61,
+    "body": "I think this merges #903 too, worth checking after this lands.",
+    "updated_at": "2026-08-07T08:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/pull/61#issuecomment-8202"
+  },
+  {
+    "id": 8203,
+    "issue_number": 62,
+    "body": "Includes #902 as a side effect of this line.",
+    "updated_at": "2026-08-05T10:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/issues/62#issuecomment-8203"
+  },
+  {
+    "id": 8204,
+    "issue_number": 63,
+    "body": "Ships #999 today, same root cause.",
+    "updated_at": "2026-08-05T10:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/pull/63#issuecomment-8204"
+  },
+  {
+    "id": 8205,
+    "issue_number": 64,
+    "body": "Same root cause as #905, but not touching that here.",
+    "updated_at": "2026-08-05T10:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/issues/64#issuecomment-8205"
+  },
+  {
+    "id": 8206,
+    "issue_number": 65,
+    "body": null,
+    "updated_at": "2026-08-05T10:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/pull/65#issuecomment-8206"
+  },
+  {
+    "id": 8207,
+    "issue_number": 66,
+    "body": "Ships #901 today and via #901 confirmed again.",
+    "updated_at": "2026-08-07T09:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/issues/66#issuecomment-8207"
+  }
+]

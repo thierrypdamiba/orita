@@ -97,7 +97,7 @@ def _community_recipes_section(readme_text: str) -> str:
     """The text strictly between the "## Community recipes" header and the
     next `## ` header (or end of file), so a `RECIPES/<slug>/` link
     mentioned in some OTHER section (there are none today, but nothing
-    should assume that forever) is never mistaken for one of the fifty-nine community
+    should assume that forever) is never mistaken for one of the sixty community
     recipes this section actually enumerates today. Empty string if the
     header itself is missing -- a real gap, not silently treated as
     vacuously documented. Delegates to `text_patterns.bounded_section`
