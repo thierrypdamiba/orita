@@ -1087,6 +1087,24 @@ this engine does. Fixture-only, MOCK ONLY: the-hand gateway holds a real,
 connected upstream Linear app but exposes zero Linear-capable tools on
 its live toolset today — see `SCOPES.md`'s own WIP note for this recipe.
 
+[`RECIPES/slack-message-claims-open-milestone/`](RECIPES/slack-message-claims-open-milestone/)
+is the sixty-ninth (ROADMAP.md #601): the Slack source's second `claims-X`
+leg, alongside `slack-message-claims-unfixed-issue` above — a third leg,
+`slack-message-claims-unmerged-pr`, remains open for a future hour. A
+Slack channel message uses a `milestone #N` claim phrase (the same shared
+`seam_engine.milestone_claims` grammar five prior recipes already import)
+against a milestone number, but the named milestone is still open — the
+identical milestone-claim check `mention-claims-open-milestone` already
+runs against X's own mentions, applied here to the Slack
+channel-message surface `slack-message-claims-unfixed-issue` already
+opened. Confidence is age-gated on the message's own `ts` (0.5 under 24h,
+0.85 at/past), holding `slack-message-claims-unfixed-issue`'s identical
+bar exactly — a Slack message is posted once and stands, the same shape a
+tweet or a mention holds, not `review-comment-claims-open-milestone`'s
+lower 0.55/0.85 bar for an editable surface. `ListMilestones` and
+`SearchChannelMessages` were both already cleared on `SCOPES.md`'s oath
+table — no new scope asked for anywhere in this recipe.
+
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)
 (ROADMAP.md #111) is that second promise, kept: it runs `scan.py`'s own

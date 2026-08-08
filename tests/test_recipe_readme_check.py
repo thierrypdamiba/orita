@@ -410,6 +410,7 @@ _CARDINAL_WORDS = {
     "fifty-seven": 57, "fifty-eight": 58, "fifty-nine": 59, "sixty": 60,
     "sixty-one": 61, "sixty-two": 62, "sixty-three": 63, "sixty-four": 64,
     "sixty-five": 65, "sixty-six": 66, "sixty-seven": 67, "sixty-eight": 68,
+    "sixty-nine": 69,
 }
 
 _SECTION_COUNT_CLAIM_RE = re.compile(
@@ -462,14 +463,14 @@ class DocstringCountDoctrineCase(unittest.TestCase):
         with self.assertRaises(AssertionError):
             claimed_section_count("Nothing here about a recipe count.")
 
-    def test_real_live_section_count_is_currently_sixty_eight(self):
-        # Regression pin: today's real, live linked-recipe count. Was 67
-        # until linear-comment-claims-unfixed-issue merged (the
-        # sixty-eighth real recipe).
+    def test_real_live_section_count_is_currently_sixty_nine(self):
+        # Regression pin: today's real, live linked-recipe count. Was 68
+        # until slack-message-claims-open-milestone merged (the
+        # sixty-ninth real recipe).
         with open(rrc.DEFAULT_README_PATH, encoding="utf-8") as f:
             text = f.read()
         section = rrc._community_recipes_section(text)
-        self.assertEqual(len(rrc._linked_recipes(section)), 68)
+        self.assertEqual(len(rrc._linked_recipes(section)), 69)
 
     def test_docstring_matches_the_real_live_count(self):
         with open(rrc.DEFAULT_README_PATH, encoding="utf-8") as f:

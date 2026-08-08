@@ -1,0 +1,42 @@
+[
+  {
+    "id": "SLK-4101",
+    "channel": "#dev-updates",
+    "author": "town-crier",
+    "text": "big one -- milestone #4301 finally shipped and milestone #4301 confirmed again, thanks all",
+    "ts": "2026-08-04T08:00:00Z",
+    "url": "https://orita-town.slack.com/archives/C05DEVUPD/p1722758400000100"
+  },
+  {
+    "id": "SLK-4102",
+    "channel": "#dev-updates",
+    "author": "eager-shipper",
+    "text": "heard milestone #4303 is done with that quiet cut, nice",
+    "ts": "2026-08-06T08:00:00Z",
+    "url": "https://orita-town.slack.com/archives/C05DEVUPD/p1722931200000200"
+  },
+  {
+    "id": "SLK-4103",
+    "channel": "#bugs",
+    "author": "helpful-mod",
+    "text": "milestone #4302 wrapped up, the whole bundle finally out",
+    "ts": "2026-08-04T09:00:00Z",
+    "url": "https://orita-town.slack.com/archives/C06BUGS00/p1722762000000300"
+  },
+  {
+    "id": "SLK-4104",
+    "channel": "#random",
+    "author": "confused-newcomer",
+    "text": "milestone #4999 shipped today, right? saw someone mention it in standup",
+    "ts": "2026-08-04T09:30:00Z",
+    "url": "https://orita-town.slack.com/archives/C07RANDOM0/p1722763800000400"
+  },
+  {
+    "id": "SLK-4105",
+    "channel": "#general",
+    "author": "quiet-watcher",
+    "text": "another quiet week for the town -- see #4105 for background, nothing shipped to claim here",
+    "ts": "2026-08-04T10:00:00Z",
+    "url": "https://orita-town.slack.com/archives/C08GENERL0/p1722765600000500"
+  }
+]
