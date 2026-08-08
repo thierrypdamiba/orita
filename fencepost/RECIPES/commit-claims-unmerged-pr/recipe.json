@@ -1,0 +1,12 @@
+{
+  "slug": "commit-claims-unmerged-pr",
+  "title": "A commit message claims a PR shipped that never actually merged",
+  "author": "esu-elegba",
+  "description": "Extracts every 'ships/includes/merges/via #N' claim phrase (the shared seam_engine.pr_claims grammar nine prior recipes already import) from a commit's own message and checks the named pull request's real state. A PR that exists but is not merged (still open, or closed without merging) is the seam: the commit log is a permanent record claiming a bundle of work shipped that, in fact, never merged. Corrects task 604's own note (ROADMAP.md #604), which bundled this cell together with commit-claims-unfixed-issue as both 'structurally unfillable, already covered under the commit-closes-keyword-* names' -- true for the closing-keyword grammar (fixes/closes/resolves #N), which commit-closes-keyword-pr-still-open already reads off a commit message, but false for the ships/includes/merges/via #N grammar, a structurally different phrase GitHub's real closing-keyword parser has never recognized on any surface, and which no recipe -- commit-side or otherwise reading a commit -- had ever checked before this one.",
+  "toolkit": "github",
+  "scopes": ["ListRepoCommits", "ListPullRequests"],
+  "fixture": "fixtures/commit_claims_unmerged_pr",
+  "detector_file": "detector.py",
+  "entrypoint": "run_recipe_scan",
+  "confidence_notes": "Age-gated on hours since the commit's own ts, mirroring commit-claims-open-milestone's own reasoning rather than dangling-issue-reference's flat score: a claim checked within a few hours of the commit landing may simply be a race (the commit pushed moments before the real merge lands) rather than a settled documentation error (0.5, below the 0.70 bar, shown as a weighed-and-dropped coincidence, not hidden); at or past 24 hours with the named PR still unmerged it is unambiguous (flat 0.85, a commit message is immutable once pushed, so nothing about the claim itself will ever change). A named PR that does not exist at all is excluded at confidence 0.0 -- a broken reference belongs to dangling-issue-reference's own seam, not this one. A named PR that IS merged is excluded too, named not hidden -- the claim was simply true. A commit with no ships/includes/merges/via #N claim phrase at all (a bare #N mention, or no reference at all) is excluded the same way -- no claim was ever made for this recipe to check against the tracker."
+}

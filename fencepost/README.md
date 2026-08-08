@@ -1181,10 +1181,40 @@ holds, not `review-comment-claims-unmerged-pr`'s lower 0.55/0.85 bar for
 an editable surface. `ListPullRequests` and `SearchChannelMessages` were
 both already cleared on `SCOPES.md`'s oath table — no new scope asked
 for anywhere in this recipe, and `slack+github` is not a new toolkit
-pair either. With this recipe shipped, the claims-X grid (ten sources
-times three targets) has **zero genuinely open cells left** —
-`commit-claims-unfixed-issue` and `commit-claims-unmerged-pr` remain the
-two structurally-unfillable cells noted since task 599's own history.
+pair either. This task's own note at the time read the claims-X grid
+(ten sources times three targets) as having **zero genuinely open cells
+left**, with `commit-claims-unfixed-issue` and `commit-claims-unmerged-pr`
+marked as two structurally-unfillable cells — corrected below.
+
+[`RECIPES/commit-claims-unmerged-pr/`](RECIPES/commit-claims-unmerged-pr/)
+is the seventy-third (ROADMAP.md #611), and a correction of the prior
+task's own recorded reasoning: task 604 named `commit-claims-unfixed-issue` and
+`commit-claims-unmerged-pr` together as "structurally unfillable, already
+covered under the `commit-closes-keyword-*` names." Rechecked against the
+live code rather than trusted on its own word: true for
+`commit-claims-unfixed-issue` — its claim grammar is
+`seam_engine.closing_keywords.CLOSING_KEYWORD_RE`
+(`fixes/closes/resolves #N`), the identical grammar
+`commit-closes-keyword-issue-still-open` already reads off a commit
+message, so a second recipe watching it would be a pure duplicate. False
+for `commit-claims-unmerged-pr`: nine prior recipes —
+[`release-claims-unmerged-pr`](RECIPES/release-claims-unmerged-pr/) and
+eight siblings — all key off the structurally different
+`seam_engine.pr_claims.PR_CLAIM_RE` grammar
+(`ships/includes/merges/via #N`), a phrase GitHub's real closing-keyword
+parser has never recognized on any surface. `commit-closes-keyword-pr-
+still-open` imports only `CLOSING_KEYWORD_RE`, never `PR_CLAIM_RE` — the
+door task 604 read as shut was open the whole time; it was only ever
+checked from one side. A commit's own message invokes a real
+`ships/includes/merges/via #N` claim phrase against a pull request
+number, but the named PR is not actually merged — the identical PR-claim
+check `commit-claims-open-milestone` already proved a commit message can
+carry (there, against the milestone tracker), applied here to the
+PR tracker. `ListRepoCommits` and `ListPullRequests` were both already
+cleared on `SCOPES.md`'s oath table — no new scope asked for anywhere in
+this recipe. With this recipe shipped, the claims-X grid stands at
+**29/30 genuinely open cells filled**; `commit-claims-unfixed-issue`
+remains the one real, permanently unfillable cell.
 
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)

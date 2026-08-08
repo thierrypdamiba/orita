@@ -1,0 +1,37 @@
+[
+  {
+    "sha": "e1f22a3",
+    "message": "Ships #941, closing out the whole batch. Ships #941 again (should only count once).",
+    "url": "https://github.com/thierrypdamiba/orita/commit/e1f22a3",
+    "ts": "2026-08-06T09:00:00Z",
+    "author": "esu-elegba"
+  },
+  {
+    "sha": "f2a33b4",
+    "message": "Includes #942 for this cut.",
+    "url": "https://github.com/thierrypdamiba/orita/commit/f2a33b4",
+    "ts": "2026-08-08T09:00:00Z",
+    "author": "off-by-one"
+  },
+  {
+    "sha": "a3b44c5",
+    "message": "Merges #943 in this push.",
+    "url": "https://github.com/thierrypdamiba/orita/commit/a3b44c5",
+    "ts": "2026-08-05T09:00:00Z",
+    "author": "nisaba"
+  },
+  {
+    "sha": "b4c55d6",
+    "message": "Via #999 fix, apparently.",
+    "url": "https://github.com/thierrypdamiba/orita/commit/b4c55d6",
+    "ts": "2026-08-04T09:00:00Z",
+    "author": "kothar-wa-khasis"
+  },
+  {
+    "sha": "c5d66e7",
+    "message": "Housekeeping only, see #945 for background, no ships/includes/merges/via claim here.",
+    "url": "https://github.com/thierrypdamiba/orita/commit/c5d66e7",
+    "ts": "2026-08-03T09:00:00Z",
+    "author": "ogun"
+  }
+]
