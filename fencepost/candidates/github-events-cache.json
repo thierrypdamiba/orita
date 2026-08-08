@@ -18182,5 +18182,29 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/70defbade7ec3737b742a05accaa9a50574a14a5",
     "ts": "2026-08-07T23:29:22Z",
     "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "6c82191",
+    "title": "task 591: fencepost dogfood re-run -- ingest 3 real commits into the events cache",
+    "url": "https://github.com/thierrypdamiba/orita/commit/6c821917a0a33d6912aa72d6960c0655e57e0737",
+    "ts": "2026-08-07T23:34:51Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "f716aeb",
+    "title": "task 592: ship issue-comment-claims-unmerged-pr, the 60th real recipe",
+    "url": "https://github.com/thierrypdamiba/orita/commit/f716aeb31e0af7467d87854d44dad2dcaf1222e7",
+    "ts": "2026-08-08T00:23:19Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "c99d5c7",
+    "title": "task 592: seal town ledger (seq 1293, issue-comment-claims-unmerged-pr)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/c99d5c7fc5f3c56cc397f7411771abbbbc5d30fc",
+    "ts": "2026-08-08T00:23:43Z",
+    "author": "Nisaba"
   }
 ]
