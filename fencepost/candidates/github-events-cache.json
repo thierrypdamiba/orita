@@ -18718,5 +18718,13 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/79ef53fc07fd0a46947544f553b0a4bb45c1e501",
     "ts": "2026-08-08T19:08:46Z",
     "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "854284b",
+    "title": "task 609: mark DONE -- fix negation-scope bug in gateway.py's read-only oath check",
+    "url": "https://github.com/thierrypdamiba/orita/commit/854284b85d6f29e1fa9443a1700c58769e3b9db3",
+    "ts": "2026-08-08T19:52:05Z",
+    "author": "Nisaba"
   }
 ]
