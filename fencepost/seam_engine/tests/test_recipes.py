@@ -539,7 +539,7 @@ _CARDINAL_WORDS = {
     "fifty-seven": 57, "fifty-eight": 58, "fifty-nine": 59, "sixty": 60,
     "sixty-one": 61, "sixty-two": 62, "sixty-three": 63, "sixty-four": 64,
     "sixty-five": 65, "sixty-six": 66, "sixty-seven": 67, "sixty-eight": 68,
-    "sixty-nine": 69,
+    "sixty-nine": 69, "seventy": 70,
 }
 
 _PLUS_JOINED_CLAIM_RE = re.compile(
@@ -591,15 +591,19 @@ def test_plus_joined_claim_missing_sentence_raises():
         claimed_plus_joined_counts("Nothing here about plus-joined toolkits.")
 
 
-def test_real_plus_joined_counts_are_currently_eighteen_of_sixty_nine():
-    # Regression pin: today's real, live counts under RECIPES/. Was (17, 68)
-    # until slack-message-claims-open-milestone merged (the sixty-ninth
-    # real recipe, toolkit "slack+github" -- the same plus-joined pair
-    # slack-message-claims-unfixed-issue already named, so both the
-    # plus-joined count and the total grow together this time, unlike
-    # draft-pr-closes-keyword-issue's/commit-claims-open-milestone's own
-    # single-toolkit "github"-only merges which only grew the total.
-    assert real_plus_joined_counts(FENCEPOST_ROOT) == (18, 69)
+def test_real_plus_joined_counts_are_currently_nineteen_of_seventy():
+    # Regression pin: today's real, live counts under RECIPES/. Was (18, 69)
+    # until linear-comment-claims-open-milestone merged (the seventieth
+    # real recipe, toolkit "linear+github"). `real_plus_joined_counts`
+    # counts every recipe whose OWN toolkit string contains "+" -- not
+    # distinct toolkit-pair strings -- so a second recipe reusing an
+    # already-named pair still increments this count, the same way
+    # slack-message-claims-open-milestone's own merge (task 601, reusing
+    # "slack+github") grew both halves together. Verified against the live
+    # tree, not assumed from "linear+github already exists": every one of
+    # today's plus-joined recipes was grepped by hand before pinning this
+    # number.
+    assert real_plus_joined_counts(FENCEPOST_ROOT) == (19, 70)
 
 
 def test_oath_scopes_for_toolkit_docstring_matches_the_real_live_counts():

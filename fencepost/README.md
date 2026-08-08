@@ -1105,6 +1105,33 @@ lower 0.55/0.85 bar for an editable surface. `ListMilestones` and
 `SearchChannelMessages` were both already cleared on `SCOPES.md`'s oath
 table — no new scope asked for anywhere in this recipe.
 
+[`RECIPES/linear-comment-claims-open-milestone/`](RECIPES/linear-comment-claims-open-milestone/)
+is the seventieth (ROADMAP.md #602): the Linear source's second `claims-X`
+leg, alongside `linear-comment-claims-unfixed-issue` above — a third leg,
+`linear-comment-claims-unmerged-pr`, remains open for a future hour. A
+Linear issue comment uses a `milestone #N` claim phrase (the same shared
+`seam_engine.milestone_claims` grammar eleven prior recipes already import)
+against a milestone number, but the named milestone is still open — the
+identical milestone-claim check `slack-message-claims-open-milestone`
+already runs against a Slack channel message, applied here to the Linear
+issue-comment surface `linear-comment-claims-unfixed-issue` already
+opened. Confidence is age-gated on the comment's own `created_at` (0.5
+under 24h, 0.85 at/past), holding `slack-message-claims-open-milestone`'s
+identical bar exactly — a Linear comment is posted once and stands, the
+same shape a tweet, a mention, or a Slack message holds, not
+`review-comment-claims-open-milestone`'s lower 0.55/0.85 bar for an
+editable surface. `ListMilestones` and `SearchIssueComments` were both
+already cleared on `SCOPES.md`'s oath table — no new scope asked for
+anywhere in this recipe, and `linear+github` is not a new toolkit pair
+either. With this recipe shipped, the claims-X grid (ten sources times
+three targets) has exactly two genuinely open cells left:
+`slack-message-claims-unmerged-pr` and `linear-comment-claims-unmerged-pr`
+— `commit-claims-unfixed-issue` and `commit-claims-unmerged-pr` remain
+the two structurally-unfillable cells noted since task 599's own history
+(`commit-closes-keyword-issue-still-open`/`commit-closes-keyword-pr-
+still-open` already cover that identical semantic space under a
+different recipe name).
+
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)
 (ROADMAP.md #111) is that second promise, kept: it runs `scan.py`'s own

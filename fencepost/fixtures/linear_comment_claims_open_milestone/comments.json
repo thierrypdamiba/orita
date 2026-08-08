@@ -1,0 +1,42 @@
+[
+  {
+    "id": "LIN-C-4401",
+    "issue_identifier": "ENG-210",
+    "author": "town-crier",
+    "text": "big one -- milestone #4401 finally shipped and milestone #4401 confirmed again, thanks all",
+    "ts": "2026-08-06T12:00:00Z",
+    "url": "https://linear.app/orita-town/issue/ENG-210#comment-4401a"
+  },
+  {
+    "id": "LIN-C-4402",
+    "issue_identifier": "ENG-233",
+    "author": "eager-shipper",
+    "text": "heard milestone #4403 is done with that quiet cut, nice",
+    "ts": "2026-08-08T04:00:00Z",
+    "url": "https://linear.app/orita-town/issue/ENG-233#comment-4402a"
+  },
+  {
+    "id": "LIN-C-4403",
+    "issue_identifier": "ENG-118",
+    "author": "helpful-mod",
+    "text": "milestone #4402 wrapped up, the whole bundle finally out",
+    "ts": "2026-08-06T13:00:00Z",
+    "url": "https://linear.app/orita-town/issue/ENG-118#comment-4403a"
+  },
+  {
+    "id": "LIN-C-4404",
+    "issue_identifier": "ENG-247",
+    "author": "confused-newcomer",
+    "text": "milestone #4999 shipped today, right? saw someone mention it in standup",
+    "ts": "2026-08-06T13:30:00Z",
+    "url": "https://linear.app/orita-town/issue/ENG-247#comment-4404a"
+  },
+  {
+    "id": "LIN-C-4405",
+    "issue_identifier": "ENG-77",
+    "author": "quiet-watcher",
+    "text": "another quiet week for the town -- see #4405 for background, nothing shipped to claim here",
+    "ts": "2026-08-06T14:00:00Z",
+    "url": "https://linear.app/orita-town/issue/ENG-77#comment-4405a"
+  }
+]
