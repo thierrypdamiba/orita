@@ -79,7 +79,67 @@ THE_LINE = "You were so close. You are always so close."
 # mortal-controlled free text into a headline/detail f-string. See
 # `suggest_move`'s own docstring note (task 537) for why this is stripped
 # before rule-matching rather than matched over.
-_QUOTED_SPAN_RE = re.compile(r"'[^']*'")
+#
+# Task 605 (retrya): this pattern used to read `'[^']*'` -- every apostrophe
+# in the field treated as a quote delimiter, paired off left to right. An
+# apostrophe is not always a delimiter. English writes possessives and
+# contractions with the same character, and the engine's own recipe-authored
+# templates are full of them: "#50's own thread", "PR #88's branch", "Draft
+# PR #2001's own body", "but it isn't ready", "while we're in here". Every
+# one of those is template prose, not mortal free text, and pairing them off
+# as delimiters broke the strip in BOTH directions -- confirmed live pre-fix
+# against the real fixture-generated gap of every shipped recipe:
+#
+#   * It LEAKS. `deleted-branch-pr-still-open`'s own real headline template
+#     is `PR #{n}'s branch '{branch}' was deleted, ...`. The possessive in
+#     `#88's` consumed the OPENING delimiter of the genuinely mortal branch
+#     name, so the branch name itself survived into the haystack. Reproduced
+#     live pre-fix: a PR whose branch is named `feature/calendar-sync` --
+#     an entirely ordinary branch name -- rendered "Add it to your Calendar
+#     yourself" for a deleted-branch gap that has nothing to do with a
+#     calendar. That is precisely the misfire task 537 added this strip to
+#     prevent, still live through the possessive path.
+#   * It EATS. Two stray apostrophes in one field pair with each other and
+#     swallow the recipe's own prose between them -- task 586's bug, which
+#     was only ever fixed at the field boundary, never inside a single
+#     field. Live pre-fix, `Draft PR #2001's own body claims a closing
+#     keyword, but it isn't ready` stripped down to `Draft PR #2001 t ready`
+#     (the whole headline gone), and `Comment #8101 (on #50's own thread)
+#     claims milestone #6101 shipped, but it's still open` down to
+#     `Comment #8101 (on #50 s still open`. A needle can never match prose
+#     that has been eaten.
+#
+# The fix is the distinction the old pattern lacked: an apostrophe sitting
+# between two word characters is a possessive or a contraction and is never
+# a quote delimiter; only apostrophes at a word boundary open or close a
+# mortal span. That is exactly the convention every detector already writes
+# by hand -- a mortal span opens after a space or `(` and closes before a
+# space, `,`, `)` or `.` -- so this reads the templates as they are actually
+# written rather than as a naive scan assumed. Mortal text may itself carry
+# a possessive ("'Fix the vault leak checker's whole-line-only matching
+# gap'") and still strips whole, because that interior apostrophe is
+# inter-word too and is passed over on the way to the real closing quote.
+#
+# One residual limit, named rather than hidden: mortal text whose own words
+# end on a plural possessive ("'Ship the gods' work'") still closes the span
+# one apostrophe early, leaking the tail. The old pattern leaked there too
+# (and in far more ordinary cases besides), so this is strictly narrower --
+# but it is not zero, and a future needle should keep assuming the haystack
+# is best-effort rather than guaranteed clean.
+_QUOTED_SPAN_RE = re.compile(r"(?<!\w)'(?:[^']|(?<=\w)'(?=\w))*?'(?!\w)")
+
+
+def _strip_mortal_text(field: str) -> str:
+    """Blank out the mortal-controlled quoted spans in ONE field.
+
+    Always one field at a time, never two concatenated first — see task 586's
+    note in `suggest_move`: a template's own stray apostrophe must never be
+    able to pair against a different field's mortal quote. Kept as a named
+    function so `suggest_move` and the doctrine tests that sweep every real
+    recipe headline share one implementation and cannot drift apart.
+    """
+    return _QUOTED_SPAN_RE.sub(" ", field)
+
 
 # The single hand-off. One rule beneath the words: never a verb Fencepost can
 # perform itself. "Post it", "add it", "close it" — all reader-verbs. Never
@@ -153,13 +213,35 @@ _QUOTED_SPAN_RE = re.compile(r"'[^']*'")
 # the recipes `test_recipes.py` already names) rather than re-running it
 # unchanged, since a manual re-sweep of only the recipes 537/550/557 already
 # named would never have caught a family none of those three ever touched.
+#
+# Task 605 (retrya): the two oldest needles in this table, "calendar" and
+# "reminder", were bare topic words -- they matched any gap whose prose
+# happened to mention the subject, rather than the seam the move answers to.
+# Every other needle here is a seam phrase lifted from a real template
+# ("never tweeted", "not yet in the readme credits", "no issue or pr"); those
+# two were the exceptions, and one of them was already misfiring in the
+# shipped tree. `good-first-issue-never-referenced`'s own detail prose reads
+# "...checks nothing else about it -- no reminder, no staleness flag..." --
+# a NEGATION, recipe-authored and unquoted, so no amount of quote-stripping
+# touches it -- and the bare "reminder" needle matched it. Confirmed live
+# pre-fix by walking every shipped recipe's real fixture gap through
+# `suggest_move`: that recipe, and only that recipe, was handed "Set the
+# reminder yourself" for an unclaimed good-first-issue with no reminder
+# anywhere in it. Both needles are now anchored to the phrase the seam is
+# actually named by in this tree, neither of them invented here:
+# "never reached Calendar" is `gmail_calendar.py`'s own live headline
+# template verbatim, and "never became a reminder" is `fencepost/README.md`'s
+# own opening line naming that seam ("the renewal in your inbox that never
+# became a reminder") -- the only place in the repo it is named at all.
+# `test_no_recipe_gap_is_handed_a_calendar_or_reminder_move` sweeps every
+# real recipe fixture so a future recipe cannot quietly re-open this.
 _MOVE_RULES: tuple[tuple[str, str], ...] = (
     (
-        "calendar",
+        "never reached calendar",
         "Add it to your Calendar yourself. Fencepost only found the seam; it does not cross it.",
     ),
     (
-        "reminder",
+        "never became a reminder",
         "Set the reminder yourself. Fencepost only found the seam; it does not cross it.",
     ),
     (
@@ -255,8 +337,15 @@ def suggest_move(primary_gap: dict[str, Any] | None) -> str:
     # again pair against a different field's mortal quote to hide real
     # recipe-authored prose, and each field's own genuinely-paired mortal
     # quotes still strip exactly as before.
-    headline_stripped = _QUOTED_SPAN_RE.sub(" ", primary_gap.get("headline", ""))
-    detail_stripped = _QUOTED_SPAN_RE.sub(" ", primary_gap.get("detail", ""))
+    #
+    # Task 605 (retrya): stripping each field independently is still the law
+    # 586 set; what changed is what counts as a delimiter inside one field.
+    # A possessive or a contraction ("#88's branch", "it isn't ready") is no
+    # longer read as a quote, so it can neither eat the template's own prose
+    # nor hand a mortal branch name / title straight into the haystack. See
+    # `_QUOTED_SPAN_RE`'s own note for both live reproductions.
+    headline_stripped = _strip_mortal_text(primary_gap.get("headline", ""))
+    detail_stripped = _strip_mortal_text(primary_gap.get("detail", ""))
     haystack = f"{headline_stripped} {detail_stripped}".lower()
     for needle, move in _MOVE_RULES:
         if needle in haystack:

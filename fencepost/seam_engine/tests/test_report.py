@@ -324,8 +324,19 @@ def test_suggest_move_is_deterministic():
     assert report.suggest_move(gap) == report.suggest_move(gap)
 
 
+# Task 605 (retrya): this used to assert against an invented headline ("The
+# invite never made it onto your Calendar") that no module in the tree has
+# ever produced, which is exactly what let the bare "calendar" topic-word
+# needle look tested while it was matching any prose that merely said the
+# word. The shape below is `gmail_calendar.py`'s own live headline template
+# verbatim -- the one real Calendar gap this engine knows how to build --
+# and `test_calendar_needle_is_gmail_calendars_own_headline_phrase` below
+# ties the needle itself back to that module's source so the two can never
+# drift apart silently again.
 def test_suggest_move_matches_calendar_gaps_to_a_calendar_verb():
-    move = report.suggest_move({"headline": "The invite never made it onto your Calendar", "detail": ""})
+    move = report.suggest_move(
+        {"headline": "Invite 'Q3 planning sync' sits in Gmail, never reached Calendar", "detail": ""}
+    )
     assert "add it to your calendar" in move.lower()
 
 
@@ -437,7 +448,7 @@ def test_no_recipe_with_a_tweet_or_announce_shaped_headline_falls_through_to_def
         # Strip mortal-controlled quoted spans first, the same discipline
         # `suggest_move` itself uses (task 537), so a commit message that
         # happens to contain "tweet" can't false-trigger this guard.
-        stripped = report._QUOTED_SPAN_RE.sub(" ", headline).lower()
+        stripped = report._strip_mortal_text(headline).lower()
         if "tweet" not in stripped and "announce" not in stripped:
             continue
         checked_any = True
@@ -478,7 +489,7 @@ def test_no_dangling_reference_headline_falls_through_to_default():
         if gap is None:
             continue
         headline = gap.get("headline", "")
-        stripped = report._QUOTED_SPAN_RE.sub(" ", headline).lower()
+        stripped = report._strip_mortal_text(headline).lower()
         if "no issue or pr" not in stripped:
             continue
         checked_any = True
@@ -584,6 +595,198 @@ def test_suggest_move_still_matches_calendar_when_unquoted_in_the_template():
     }
     move = report.suggest_move(gap)
     assert "add it to your calendar" in move.lower()
+
+
+# --- task 605 (retrya): an apostrophe is not always a quote ------------------
+#
+# `_QUOTED_SPAN_RE` used to read `'[^']*'` -- every apostrophe treated as a
+# delimiter, paired off left to right. English writes possessives and
+# contractions with that same character, and this engine's own recipe-authored
+# templates are full of them ("PR #{n}'s branch", "Draft PR #{n}'s own body",
+# "but it isn't ready", "while we're in here"). Pairing those off as
+# delimiters broke the strip in BOTH directions, live, in the shipped tree:
+# 43 of the 72 shipped recipes had at least one field (8 headlines, 41
+# details) stripped differently by the old pattern than by the fixed one.
+# Each test below reproduces one real, live shape -- copied from the
+# detector's own f-string, never invented.
+
+
+def test_strip_mortal_text_leaves_a_possessive_and_a_contraction_alone():
+    # `draft-pr-closes-keyword-issue`'s own real headline template. Two
+    # apostrophes, both ordinary English, no mortal free text at all. The old
+    # pattern paired them and stripped this whole headline down to
+    # "Draft PR #2001 t ready" -- confirmed live pre-fix.
+    headline = "Draft PR #2001's own body claims a closing keyword, but it isn't ready"
+    assert report._strip_mortal_text(headline) == headline
+
+
+def test_strip_mortal_text_leaves_a_templates_own_possessive_thread_reference_alone():
+    # `issue-comment-claims-open-milestone`'s own real headline template.
+    # Old pattern: "Comment #8101 (on #50 s still open" -- the entire claim,
+    # including the seam it names, eaten between "#50's" and "it's".
+    headline = (
+        "Comment #8101 (on #50's own thread) claims milestone #6101 shipped, but it's still open"
+    )
+    assert report._strip_mortal_text(headline) == headline
+
+
+def test_strip_mortal_text_still_removes_a_real_mortal_span_beside_a_possessive():
+    # `deleted-branch-pr-still-open`'s own real headline template: a template
+    # possessive immediately before a genuinely mortal quoted span.
+    stripped = report._strip_mortal_text(
+        "PR #88's branch 'feature/login-timeout-fix' was deleted, but the PR is still open"
+    )
+    assert "feature/login-timeout-fix" not in stripped
+    assert "PR #88's branch" in stripped
+    assert "was deleted, but the PR is still open" in stripped
+
+
+def test_strip_mortal_text_removes_a_mortal_span_that_itself_carries_a_possessive():
+    # `issue-closed-not-tweeted`'s own real detail template, whose mortal
+    # free text (a real issue title) contains a possessive of its own. That
+    # interior apostrophe is inter-word too, so the span still strips whole
+    # rather than closing early on it -- the old pattern closed early and
+    # leaked "s whole-line-only matching gap" into the haystack.
+    stripped = report._strip_mortal_text(
+        "'Fix the vault leak checker's whole-line-only matching gap' (#12) closed 2026-07-25; "
+        "no tweet from the connected account names it."
+    )
+    assert "vault leak" not in stripped
+    assert "whole-line-only" not in stripped
+    assert "no tweet from the connected account names it." in stripped
+
+
+def test_suggest_move_does_not_leak_a_mortal_branch_name_into_the_rule_haystack():
+    """The live reproduction, and the reason this is a bug and not a tidy-up.
+
+    `deleted-branch-pr-still-open` is a shipped recipe whose real headline
+    template embeds the branch name as mortal free text. Under the old
+    pattern the preceding possessive in "PR #88's" consumed that span's
+    OPENING delimiter, so the branch name survived into the rule haystack --
+    and a branch named `feature/calendar-sync`, an entirely ordinary branch
+    name, made `suggest_move` hand the reader "Add it to your Calendar
+    yourself" for a deleted-branch gap with no calendar anywhere in it.
+    Confirmed live pre-fix, against the pre-fix tree as it actually stood
+    (naive pattern AND the bare "calendar" needle). Asserted below on the
+    haystack itself rather than only on the rendered move, so this stays red
+    on the pattern alone -- the guarantee is that mortal free text never
+    reaches the rule table, not merely that today's needles happen to miss
+    it.
+    """
+    gap = {
+        "headline": "PR #88's branch 'feature/calendar-sync' was deleted, but the PR is still open",
+        "detail": (
+            "Activity feed shows 'feature/calendar-sync' deleted 2026-07-20T10:00:00+00:00; "
+            "PR #88 ('Wire the sync job') still reads open, pointing at a branch that no "
+            "longer exists."
+        ),
+    }
+    for field in ("headline", "detail"):
+        stripped = report._strip_mortal_text(gap[field]).lower()
+        assert "calendar" not in stripped, (
+            f"the mortal branch name leaked into the {field} haystack: {stripped!r}"
+        )
+        assert "wire the sync job" not in stripped
+    move = report.suggest_move(gap)
+    assert "calendar" not in move.lower()
+    assert move == report._DEFAULT_MOVE
+
+
+# --- task 605 (retrya): a needle names a seam, never a subject ---------------
+
+
+def test_no_move_rule_needle_is_a_bare_topic_word():
+    """Every needle must be a phrase, not a subject.
+
+    "calendar" and "reminder" were the two bare topic words left in the
+    table, and a bare topic word matches any prose that merely mentions the
+    subject -- including a negation, which is how
+    `good-first-issue-never-referenced` ("no reminder, no staleness flag")
+    came to be handed "Set the reminder yourself". Every needle now names the
+    seam in at least two words, the way every seam-phrase needle in the table
+    already did.
+
+    One deliberate, checked exemption: a literal `@handle`. `@oritatown` is
+    the town's own X account, not a common noun -- `scan.py` names it in
+    three genuinely different headline templates ("predates @oritatown",
+    "never reached @oritatown", "stays off @oritatown"), so the handle
+    itself is the only phrase all three share, and a word that can only mean
+    one account cannot drift onto an unrelated seam the way "calendar" did.
+    """
+    offenders = [
+        needle
+        for needle, _ in report._MOVE_RULES
+        if len(needle.split()) < 2 and not needle.startswith("@")
+    ]
+    assert offenders == [], (
+        f"bare topic-word needle(s) in _MOVE_RULES: {offenders} -- a needle must name "
+        "the seam ('never tweeted', 'no issue or pr'), not the subject it is about."
+    )
+
+
+def test_calendar_needle_is_gmail_calendars_own_headline_phrase():
+    """Ties the needle to the only real Calendar gap this engine can build.
+
+    Read out of `gmail_calendar.py`'s own source rather than hand-typed a
+    second time, so rewording either side goes red here instead of quietly
+    drifting apart -- the same discipline `test_readme_tool_count.py` and
+    `test_onboarding_test_count.py` already hold for their own claims.
+    """
+    from seam_engine import gmail_calendar
+
+    source = inspect.getsource(gmail_calendar)
+    needles = [needle for needle, _ in report._MOVE_RULES if "calendar" in needle]
+    assert needles == ["never reached calendar"], needles
+    assert "never reached Calendar" in source, (
+        "gmail_calendar.py no longer carries the headline phrase _MOVE_RULES matches on"
+    )
+
+
+def test_reminder_needle_is_the_phrase_the_readme_names_that_seam_by():
+    """The reminder seam has no detector yet, so its needle is anchored to
+    the one place in the repo that names it: fencepost/README.md's own
+    opening line ("the renewal in your inbox that never became a
+    reminder"). A forward-looking rule is fine; a forward-looking rule that
+    matches any sentence containing the word is not."""
+    readme = Path(__file__).resolve().parents[2] / "README.md"
+    needles = [needle for needle, _ in report._MOVE_RULES if "reminder" in needle]
+    assert needles == ["never became a reminder"], needles
+    assert "never became a reminder" in readme.read_text()
+
+
+def test_no_recipe_gap_is_handed_a_calendar_or_reminder_move():
+    """The systemic guard, in the shape tasks 557/586 already established.
+
+    Not one recipe in `RECIPES/` reads Gmail or Calendar -- the whole
+    directory is GitHub/X/Slack/Linear -- so no recipe's real gap may ever
+    be handed the Calendar or reminder hand-off. Pre-fix this failed live on
+    `good-first-issue-never-referenced`, whose own detail prose says
+    "checks nothing else about it -- no reminder, no staleness flag" and was
+    handed "Set the reminder yourself" for an unclaimed good-first-issue.
+    Walks every recipe's own fixture-generated gap, the same mechanism the
+    tweet/announce and dangling-reference sweeps above use.
+    """
+    from seam_engine.recipes import discover_recipes, load_detector
+
+    fencepost_root = Path(__file__).resolve().parents[2]
+    checked_any = False
+    for manifest in discover_recipes(fencepost_root):
+        result = load_detector(manifest)()
+        gap = result.get("primary_gap") or (result.get("tail") or [None])[0]
+        if gap is None:
+            continue
+        checked_any = True
+        move = report.suggest_move(gap)
+        lowered = move.lower()
+        assert "add it to your calendar" not in lowered, (
+            f"{manifest.slug}'s real gap was handed the Calendar hand-off; no recipe in "
+            "RECIPES/ reads Gmail or Calendar at all."
+        )
+        assert "set the reminder" not in lowered, (
+            f"{manifest.slug}'s real gap was handed the reminder hand-off; no recipe in "
+            "RECIPES/ reads a reminder surface at all."
+        )
+    assert checked_any, "expected at least one real recipe to produce a gap to check"
 
 
 def test_your_move_line_reads_correctly_from_a_live_ledger(tmp_path: Path):
