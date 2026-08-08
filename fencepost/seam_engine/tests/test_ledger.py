@@ -312,6 +312,42 @@ def test_no_primary_records_the_seam_held(tmp_path: Path):
     assert recs[0]["sealed"]["fenceposts_recorded_total"] == 0
 
 
+def test_no_primary_but_a_contender_cleared_the_bar_is_not_called_a_coincidence(tmp_path: Path):
+    # Task 605. ranking.rank() labels a tail entry CONTENDER when it cleared
+    # confidence_bar but lost the election on separation_margin (an ambiguous
+    # tie), distinct from COINCIDENCE (never cleared the bar at all). The
+    # renderer used to ignore the label entirely: no primary meant "None
+    # cleared the bar" and every tail entry got called a "coincidence... that
+    # sat below the bar" -- false when a contender's own confidence was AT or
+    # ABOVE that same bar. Two candidates at 0.85/0.75 (both >= the 0.7 bar,
+    # 0.10 lead < the 0.15 margin) reproduce the false claim.
+    scan = {
+        "generated_at": "q",
+        "repo": "x/orita",
+        "window_hours": 24,
+        "confidence_bar": 0.7,
+        "separation_margin": 0.15,
+        "primary_gap": None,
+        "tail": [
+            {"slug": "gap-a", "confidence": 0.85, "label": "contender"},
+            {"slug": "gap-b", "confidence": 0.75, "label": "contender"},
+            {"slug": "gap-c", "confidence": 0.5, "label": "coincidence"},
+        ],
+        "excluded": [],
+    }
+    tablet = ledger.append_scan(scan, now=_at(2026, 7, 12), base=tmp_path)
+    text = tablet.read_text()
+
+    assert "None cleared the bar" not in text
+    assert "None elected" in text
+    assert "`gap-a` (0.85)" in text
+    assert "`gap-b` (0.75)" in text
+
+    # The genuine coincidence still gets called one, and only one -- gap-a
+    # and gap-b (both contenders) are not folded into this count.
+    assert "1 coincidence(s) sat below the bar: `gap-c` (0.5)" in text
+
+
 def test_weighed_and_dropped_names_every_tail_entry_not_just_six(tmp_path: Path):
     # Task 440. The sentence claims "They are named, not hidden" and states
     # the true count via len(tail) -- but the printed list used to be

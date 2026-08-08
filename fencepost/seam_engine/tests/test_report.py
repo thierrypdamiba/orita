@@ -142,6 +142,20 @@ def test_no_primary_says_nothing_cleared_the_bar():
     assert "milestone-unannounced" not in text
 
 
+def test_no_primary_but_a_contender_cleared_the_bar_says_none_elected():
+    # Task 605. Same false-claim bug as the ledger's own no-primary path:
+    # a tied contender (label "contender", confidence >= the bar) used to be
+    # rendered the same as "nothing cleared the bar" -- the report still
+    # names no gap (it never shows the tail, by design), but it should stop
+    # asserting the bar was never cleared when it was.
+    sealed = _sealed(primary=False, recorded=0)
+    sealed["tail"] = [{"slug": "gap-a", "confidence": 0.85, "label": "contender"}]
+    text = report.render_report(sealed)
+    assert "Nothing cleared the bar" not in text
+    assert "None elected" in text
+    assert "gap-a" not in text  # the report still never names the tail
+
+
 # --- rendered from a live ledger, not a hand-built dict -----------------------
 
 

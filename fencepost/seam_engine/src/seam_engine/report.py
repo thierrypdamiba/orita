@@ -421,6 +421,17 @@ def render_report(
         if evidence:
             lines.append(evidence)
             lines.append("")
+    elif any(t.get("label") == "contender" for t in sealed.get("tail", [])):
+        # A candidate cleared confidence_bar but the field was too close to call
+        # (ranking.SEPARATION_MARGIN) -- distinct from nothing clearing the bar
+        # at all. The report still names no gap (see docstring); it just stops
+        # claiming one wasn't there.
+        lines.append(
+            "**None elected today.** A candidate cleared the bar, but the field "
+            "stood too close together to honestly call one THE gap — recorded "
+            "plainly, not padded."
+        )
+        lines.append("")
     else:
         lines.append("**Nothing cleared the bar today.** The seam held — recorded plainly, not padded.")
         lines.append("")

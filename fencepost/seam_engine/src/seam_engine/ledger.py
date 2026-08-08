@@ -264,6 +264,9 @@ def _entry_prose(seq: int, sealed: dict[str, Any]) -> str:
     )
     out.append("")
 
+    contenders = [t for t in tail if t.get("label") == "contender"]
+    coincidences = [t for t in tail if t.get("label") != "contender"]
+
     if primary:
         out.append(
             f"**The fencepost.** {primary['headline']} — confidence "
@@ -272,6 +275,15 @@ def _entry_prose(seq: int, sealed: dict[str, Any]) -> str:
         out.append("")
         out.append("Evidence:")
         out.append(_fmt_evidence(primary.get("evidence", [])).rstrip())
+        out.append("")
+    elif contenders:
+        named = ", ".join(f"`{t['slug']}` ({t['confidence']})" for t in contenders)
+        out.append(
+            f"**The fencepost.** None elected. {len(contenders)} candidate(s) "
+            f"cleared the bar — {named} — but stood too close together to "
+            f"honestly call one THE gap. Ogun's law: two look-alikes at the top "
+            f"means the engine names none rather than guess. Recorded as held."
+        )
         out.append("")
     else:
         out.append(
@@ -282,13 +294,13 @@ def _entry_prose(seq: int, sealed: dict[str, Any]) -> str:
         )
         out.append("")
 
-    if tail:
-        named = ", ".join(f"`{t['slug']}` ({t['confidence']})" for t in tail)
+    if coincidences:
+        named = ", ".join(f"`{t['slug']}` ({t['confidence']})" for t in coincidences)
         out.append(
-            f"**Weighed and dropped.** {len(tail)} coincidence(s) sat below the "
-            f"bar: {named}. They are named, not hidden — a ledger that flatters "
-            f"is a ledger that lies, and one that buries what it discarded is "
-            f"worse. These were weighed and set down."
+            f"**Weighed and dropped.** {len(coincidences)} coincidence(s) sat "
+            f"below the bar: {named}. They are named, not hidden — a ledger "
+            f"that flatters is a ledger that lies, and one that buries what it "
+            f"discarded is worse. These were weighed and set down."
         )
         out.append("")
 
