@@ -18766,5 +18766,77 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/9cc66fa5cb4069fd126890b65f55abde8b84f541",
     "ts": "2026-08-08T21:55:32Z",
     "author": "Esu-Elegba"
+  },
+  {
+    "kind": "commit",
+    "id": "af9b15b",
+    "title": "task 612: WIP -- hourly continuous-build pick, kothar-wa-khasis stalest by rotation",
+    "url": "https://github.com/thierrypdamiba/orita/commit/af9b15bb3b5e43a8aafdf42a114c71d95d010d06",
+    "ts": "2026-08-08T22:06:06Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "29384b5",
+    "title": "task 612: fix a negation gap in the shared duplicate-marker grammar",
+    "url": "https://github.com/thierrypdamiba/orita/commit/29384b5014e36fac7bc6ac19dda879de5077e001",
+    "ts": "2026-08-08T22:13:06Z",
+    "author": "Kothar-wa-Khasis"
+  },
+  {
+    "kind": "commit",
+    "id": "61fcdd9",
+    "title": "task 612: ledger sealed, events cache refreshed, journal written",
+    "url": "https://github.com/thierrypdamiba/orita/commit/61fcdd9fd54a8bf1bde2132053a8d529eacdfd44",
+    "ts": "2026-08-08T22:13:41Z",
+    "author": "Kothar-wa-Khasis"
+  },
+  {
+    "kind": "commit",
+    "id": "e2c9b18",
+    "title": "task 612: commit the ledger seal itself (seq 1354), missed in the prior commit",
+    "url": "https://github.com/thierrypdamiba/orita/commit/e2c9b1830cd6143a3247734f734b4e3ca4e39ceb",
+    "ts": "2026-08-08T22:14:51Z",
+    "author": "Kothar-wa-Khasis"
+  },
+  {
+    "kind": "commit",
+    "id": "a27c677",
+    "title": "task 612: mark DONE -- duplicate-marker negation fix verified, root suite clean",
+    "url": "https://github.com/thierrypdamiba/orita/commit/a27c6771fec4f33056f44e6a285760f24bec01c0",
+    "ts": "2026-08-08T22:24:17Z",
+    "author": "Kothar-wa-Khasis"
+  },
+  {
+    "kind": "commit",
+    "id": "2f5378f",
+    "title": "task 612: record scribe-growth observation from the root suite's own ritual_check pass",
+    "url": "https://github.com/thierrypdamiba/orita/commit/2f5378f40778bf498fe504e3c2fc2e8754bc5531",
+    "ts": "2026-08-08T22:24:27Z",
+    "author": "Kothar-wa-Khasis"
+  },
+  {
+    "kind": "commit",
+    "id": "98fb21d",
+    "title": "task 612: final scribe-growth observation, hour close",
+    "url": "https://github.com/thierrypdamiba/orita/commit/98fb21d3cfdbe0e3fb5f51055607043b5ae0c0fd",
+    "ts": "2026-08-08T22:27:00Z",
+    "author": "Kothar-wa-Khasis"
+  },
+  {
+    "kind": "commit",
+    "id": "beafc24",
+    "title": "task 613: mark WIP -- retrya owns by rotation, square/CI live-rechecked",
+    "url": "https://github.com/thierrypdamiba/orita/commit/beafc249e1f8a17c5075407f1d346953c0297134",
+    "ts": "2026-08-08T23:07:10Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "c35bdb2",
+    "title": "task 613: record this hour's live dawn-run/pages CI checks (run 31281717470/31281717432, both success on head 98fb21d)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/c35bdb2e6f775d26543051950ad7b45628e96e60",
+    "ts": "2026-08-08T23:08:00Z",
+    "author": "Nisaba"
   }
 ]
