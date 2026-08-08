@@ -1,0 +1,79 @@
+[
+  {
+    "sha": "a1c701d",
+    "message": "Fixes #701 -- normalization bug in the retry queue",
+    "url": "https://github.com/example/example-repo/commit/a1c701d",
+    "ts": "2026-08-05T09:00:00Z",
+    "author": "off-by-one"
+  },
+  {
+    "sha": "b2c702d",
+    "message": "closes #702: flaky login redirect",
+    "url": "https://github.com/example/example-repo/commit/b2c702d",
+    "ts": "2026-08-08T08:00:00Z",
+    "author": "nisaba"
+  },
+  {
+    "sha": "c3c703d",
+    "message": "Resolved #703 -- pagination cursor drift",
+    "url": "https://github.com/example/example-repo/commit/c3c703d",
+    "ts": "2026-08-01T09:00:00Z",
+    "author": "ogun"
+  },
+  {
+    "sha": "d4c704d",
+    "message": "fixes #704 per triage",
+    "url": "https://github.com/example/example-repo/commit/d4c704d",
+    "ts": "2026-08-07T09:00:00Z",
+    "author": "esu-elegba"
+  },
+  {
+    "sha": "e5c999d",
+    "message": "fixes #999 per the triage note",
+    "url": "https://github.com/example/example-repo/commit/e5c999d",
+    "ts": "2026-08-07T11:00:00Z",
+    "author": "kwaku-ananse"
+  },
+  {
+    "sha": "f6c705d",
+    "message": "Touches #705 while investigating, no promise made here",
+    "url": "https://github.com/example/example-repo/commit/f6c705d",
+    "ts": "2026-08-07T12:00:00Z",
+    "author": "off-by-one"
+  },
+  {
+    "sha": "g7c706d",
+    "message": "fixes #706 -- duplicate cleanup",
+    "url": "https://github.com/example/example-repo/commit/g7c706d",
+    "ts": "2026-08-04T09:00:00Z",
+    "author": "nisaba"
+  },
+  {
+    "sha": "h8c707d",
+    "message": "closes #707 -- retry logic",
+    "url": "https://github.com/example/example-repo/commit/h8c707d",
+    "ts": "2026-08-03T09:00:00Z",
+    "author": "off-by-one"
+  },
+  {
+    "sha": "i9c701d",
+    "message": "closing #701 the way the guard's own docstring describes it -- present participle, outside the grammar, never a real closing keyword",
+    "url": "https://github.com/example/example-repo/commit/i9c701d",
+    "ts": "2026-08-05T09:30:00Z",
+    "author": "off-by-one"
+  },
+  {
+    "sha": "j1c708d",
+    "message": "Fixes #710, closes #703 in the same sweep",
+    "url": "https://github.com/example/example-repo/commit/j1c708d",
+    "ts": "2026-08-06T09:00:00Z",
+    "author": "kothar-wa-khasis"
+  },
+  {
+    "sha": "k2c709d",
+    "message": "fixes #709 -- retry the release pipeline",
+    "url": "https://github.com/example/example-repo/commit/k2c709d",
+    "ts": "2026-08-06T10:00:00Z",
+    "author": "retrya"
+  }
+]

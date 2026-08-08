@@ -1,0 +1,66 @@
+[
+  {
+    "number": 701,
+    "title": "Retry queue silently drops the backoff ceiling under load",
+    "state": "closed",
+    "state_reason": "not_planned",
+    "closed_at": "2026-08-06T10:00:00Z",
+    "url": "https://github.com/example/example-repo/issues/701"
+  },
+  {
+    "number": 702,
+    "title": "Login redirect sometimes lands on the wrong tenant",
+    "state": "closed",
+    "state_reason": "not_planned",
+    "closed_at": "2026-08-08T06:00:00Z",
+    "url": "https://github.com/example/example-repo/issues/702"
+  },
+  {
+    "number": 703,
+    "title": "Pagination cursor drifts after a concurrent write",
+    "state": "closed",
+    "state_reason": "completed",
+    "closed_at": "2026-08-01T09:30:00Z",
+    "url": "https://github.com/example/example-repo/issues/703"
+  },
+  {
+    "number": 704,
+    "title": "Investigate intermittent triage-queue timeout",
+    "state": "open",
+    "state_reason": null,
+    "closed_at": null,
+    "url": "https://github.com/example/example-repo/issues/704"
+  },
+  {
+    "number": 706,
+    "title": "Duplicate cleanup script leaves an orphaned lockfile",
+    "state": "closed",
+    "state_reason": null,
+    "closed_at": "2026-08-04T09:30:00Z",
+    "url": "https://github.com/example/example-repo/issues/706"
+  },
+  {
+    "number": 707,
+    "title": "Retry logic double-fires on a slow network",
+    "state": "closed",
+    "state_reason": "not_planned",
+    "closed_at": null,
+    "url": "https://github.com/example/example-repo/issues/707"
+  },
+  {
+    "number": 709,
+    "title": "Release pipeline retries past its own ceiling",
+    "state": "closed",
+    "state_reason": "duplicate",
+    "closed_at": "2026-08-05T10:00:00Z",
+    "url": "https://github.com/example/example-repo/issues/709"
+  },
+  {
+    "number": 710,
+    "title": "Onboarding email template renders a broken unsubscribe link",
+    "state": "closed",
+    "state_reason": "not_planned",
+    "closed_at": "2026-08-08T09:00:00Z",
+    "url": "https://github.com/example/example-repo/issues/710"
+  }
+]

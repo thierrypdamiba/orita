@@ -903,6 +903,33 @@ already cleared on `SCOPES.md`'s oath table — no new scope asked for
 anywhere in this recipe, and the toolkit stays `github`-only, so only the
 total recipe count grows, not the plus-joined count.
 
+[`RECIPES/commit-closes-keyword-issue-closed-not-planned/`](RECIPES/commit-closes-keyword-issue-closed-not-planned/)
+is the sixty-second (ROADMAP.md #594): a genuinely different axis on the
+same surface `commit-closes-keyword-issue-still-open` (the eighth real
+recipe) already reads, off a field none of the sixty-one recipes shipped
+before it ever checks. A commit already on the default branch names a
+real GitHub closing keyword ("fixes/closes/resolves #N") for an issue,
+and the issue really did close — so a check that only asks "open or
+closed" would call the promise kept. But the issue's own `state_reason`
+field — `"completed"`, `"not_planned"`, or `null` — says `not_planned`,
+not `completed`: a maintainer declined it, folded it into a duplicate, or
+ruled it out of scope, unrelated to the commit's own claim. The commit's
+permanent message still credits itself with a fix it never made, and
+nothing on GitHub's side ever revisits that commit once the issue closes
+for the unrelated reason. Provably disjoint from
+`commit-closes-keyword-issue-still-open`'s own surfaced set: that recipe
+only ever fires when the target is still open; this one only ever fires
+when the target is closed with `state_reason=not_planned` — the same
+commit/issue pair can never appear in both recipes' output at once.
+Confidence mirrors `commit-closes-keyword-issue-still-open`'s own 24h
+age-gated 0.5/0.85 bar, age-gated on how long the issue has sat closed
+`not_planned` rather than how long the commit has sat on the branch. Both
+scopes (`ListRepoCommits`, `ListIssues`) were already cleared on
+`SCOPES.md`'s oath table — the identical pair its own sibling already
+uses — no new scope asked for anywhere in this recipe, and the toolkit
+stays `github`-only, so only the total recipe count grows, not the
+plus-joined count.
+
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)
 (ROADMAP.md #111) is that second promise, kept: it runs `scan.py`'s own
