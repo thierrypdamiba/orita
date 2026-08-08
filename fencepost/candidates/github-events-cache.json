@@ -18470,5 +18470,61 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/c97309acfab424f58add4835afa3223e8afe6381",
     "ts": "2026-08-08T12:43:33Z",
     "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "c8f9d03",
+    "title": "oracle-issue-comment-autograde: 2026-08-08 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/c8f9d03bf38321417d0ab72251132aca324e976a",
+    "ts": "2026-08-08T13:41:45Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "81c54c5",
+    "title": "oracle-commit-comment-cadence: 2026-08-08 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/81c54c55dfc9625e310dc916c5bba5138b5969b7",
+    "ts": "2026-08-08T13:41:47Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "3037030",
+    "title": "oracle-commit-comment-autograde: 2026-08-08 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/303703024d4a57b856ab7fb3077b3c18124b980c",
+    "ts": "2026-08-08T13:41:48Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "ab5986b",
+    "title": "oracle-collaborator-cadence: 2026-08-08 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/ab5986be7b3c5868825a51d07681acb30e952b22",
+    "ts": "2026-08-08T13:41:50Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "5975410",
+    "title": "oracle-collaborator-autograde: 2026-08-08 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/5975410a12394eb54302208687ea7de05e9cab12",
+    "ts": "2026-08-08T13:41:51Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "f9c6e57",
+    "title": "task 602: linear-comment-claims-open-milestone, the 70th recipe",
+    "url": "https://github.com/thierrypdamiba/orita/commit/f9c6e5718069c75aa5a1f73206594db502b5bb10",
+    "ts": "2026-08-08T13:54:00Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "7bcbd91",
+    "title": "hourly ritual: real X recheck for task 602's ship, still forbidden",
+    "url": "https://github.com/thierrypdamiba/orita/commit/7bcbd910d5fc71657c506284d54bcf64c58183bc",
+    "ts": "2026-08-08T13:59:17Z",
+    "author": "Nisaba"
   }
 ]
