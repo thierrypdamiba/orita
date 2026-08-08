@@ -1,0 +1,92 @@
+[
+  {
+    "number": 1201,
+    "title": "Report generator double-counts a candidate on a tied confidence score",
+    "state": "open",
+    "locked": true,
+    "active_lock_reason": "resolved",
+    "updated_at": "2026-08-01T09:00:00Z",
+    "url": "https://github.com/example/example-repo/issues/1201"
+  },
+  {
+    "number": 1202,
+    "title": "Ledger verify prints a misleading offset on a truncated tail",
+    "state": "open",
+    "locked": true,
+    "active_lock_reason": "resolved",
+    "updated_at": "2026-08-08T06:00:00Z",
+    "url": "https://github.com/example/example-repo/issues/1202"
+  },
+  {
+    "number": 1203,
+    "title": "Streak status double-prints the episode line on a fresh tablet",
+    "state": "closed",
+    "locked": true,
+    "active_lock_reason": "resolved",
+    "updated_at": "2026-07-30T09:00:00Z",
+    "url": "https://github.com/example/example-repo/issues/1203"
+  },
+  {
+    "number": 1204,
+    "title": "Whether the confidence bar should move with the recipe count",
+    "state": "open",
+    "locked": true,
+    "active_lock_reason": "off-topic",
+    "updated_at": "2026-07-20T09:00:00Z",
+    "url": "https://github.com/example/example-repo/issues/1204"
+  },
+  {
+    "number": 1205,
+    "title": "A repost of the same bug report from a different account",
+    "state": "open",
+    "locked": true,
+    "active_lock_reason": "spam",
+    "updated_at": "2026-07-15T09:00:00Z",
+    "url": "https://github.com/example/example-repo/issues/1205"
+  },
+  {
+    "number": 1206,
+    "title": "Which recipe should own the next dangling-reference leg",
+    "state": "open",
+    "locked": true,
+    "active_lock_reason": "too heated",
+    "updated_at": "2026-07-10T09:00:00Z",
+    "url": "https://github.com/example/example-repo/issues/1206"
+  },
+  {
+    "number": 1207,
+    "title": "Badge repaint lags the real ledger by one run on a slow CI box",
+    "state": "open",
+    "locked": true,
+    "active_lock_reason": null,
+    "updated_at": "2026-07-22T09:00:00Z",
+    "url": "https://github.com/example/example-repo/issues/1207"
+  },
+  {
+    "number": 1208,
+    "title": "Ranking margin reads flat when only one candidate clears the bar",
+    "state": "open",
+    "locked": false,
+    "active_lock_reason": null,
+    "updated_at": "2026-07-28T09:00:00Z",
+    "url": "https://github.com/example/example-repo/issues/1208"
+  },
+  {
+    "number": 1209,
+    "title": "A malformed record with a lock reason but no lock flag set",
+    "state": "open",
+    "locked": false,
+    "active_lock_reason": "resolved",
+    "updated_at": "2026-07-26T09:00:00Z",
+    "url": "https://github.com/example/example-repo/issues/1209"
+  },
+  {
+    "number": 1210,
+    "title": "Combined scan skips a recipe whose fixture path has moved",
+    "state": "closed",
+    "locked": false,
+    "active_lock_reason": null,
+    "updated_at": "2026-07-19T09:00:00Z",
+    "url": "https://github.com/example/example-repo/issues/1210"
+  }
+]

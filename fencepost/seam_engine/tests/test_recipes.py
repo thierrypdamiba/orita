@@ -537,7 +537,7 @@ _CARDINAL_WORDS = {
     "forty-nine": 49, "fifty": 50, "fifty-one": 51, "fifty-two": 52,
     "fifty-three": 53, "fifty-four": 54, "fifty-five": 55, "fifty-six": 56,
     "fifty-seven": 57, "fifty-eight": 58, "fifty-nine": 59, "sixty": 60,
-    "sixty-one": 61, "sixty-two": 62, "sixty-three": 63,
+    "sixty-one": 61, "sixty-two": 62, "sixty-three": 63, "sixty-four": 64,
 }
 
 _PLUS_JOINED_CLAIM_RE = re.compile(
@@ -589,13 +589,13 @@ def test_plus_joined_claim_missing_sentence_raises():
         claimed_plus_joined_counts("Nothing here about plus-joined toolkits.")
 
 
-def test_real_plus_joined_counts_are_currently_fifteen_of_sixty_three():
-    # Regression pin: today's real, live counts under RECIPES/. Was (15, 62)
-    # until merged-pr-requested-reviewer-never-reviewed merged (the
-    # sixty-third real recipe, toolkit "github"-only -- only the total
-    # grows this time, the same shape unblocked-issue-still-open's own
-    # merge already held.
-    assert real_plus_joined_counts(FENCEPOST_ROOT) == (15, 63)
+def test_real_plus_joined_counts_are_currently_fifteen_of_sixty_four():
+    # Regression pin: today's real, live counts under RECIPES/. Was (15, 63)
+    # until locked-resolved-issue-still-open merged (the sixty-fourth real
+    # recipe, toolkit "github"-only -- only the total grows this time, the
+    # same shape merged-pr-requested-reviewer-never-reviewed's own merge
+    # already held.
+    assert real_plus_joined_counts(FENCEPOST_ROOT) == (15, 64)
 
 
 def test_oath_scopes_for_toolkit_docstring_matches_the_real_live_counts():

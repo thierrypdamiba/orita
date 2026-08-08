@@ -955,6 +955,32 @@ pair the two together — no new scope asked for anywhere in this recipe,
 and the toolkit stays `github`-only, so only the total recipe count
 grows, not the plus-joined count.
 
+[`RECIPES/locked-resolved-issue-still-open/`](RECIPES/locked-resolved-issue-still-open/)
+is the sixty-fourth (ROADMAP.md #596): a genuinely different axis from
+every family this repo has already saturated, off a field pair none of
+the sixty-three recipes before it ever reads — an issue's own `locked`
+and `active_lock_reason` fields. Locking a conversation and closing the
+issue it belongs to are two independent GitHub actions: an issue can
+carry `active_lock_reason="resolved"` — a maintainer's own explicit claim
+that the matter is settled — while its own `state` still reads open, and
+nothing on GitHub's side ever compares the two. Entirely within one
+record, read off a single `ListIssues` call — no cross-account join, no
+claim phrase, no `#N` reference, and no task-list syntax; it shares only
+the general shape of `commit-closes-keyword-issue-closed-not-planned` (a
+single record's own two fields disagreeing with each other) but reads a
+field pair that recipe never touches. Only a lock reason of `resolved`
+is treated as a claim about resolution at all — `off-topic`/`spam`/`too
+heated`, no reason recorded, not locked, already closed, and the
+malformed `locked=false`-with-a-reason combination are all excluded,
+named not hidden. There is no `locked_at` field on a real GitHub issue
+object, so confidence is age-gated on `updated_at` instead, mirroring
+`milestone-complete-still-open`'s own identical reasoning for its missing
+`completed_at` and the rest of the `*-still-open` family's 24h bar. The
+one scope, `ListIssues`, was already cleared on `SCOPES.md`'s oath
+table — no new scope asked for anywhere in this recipe, and the toolkit
+stays `github`-only, so only the total recipe count grows, not the
+plus-joined count.
+
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)
 (ROADMAP.md #111) is that second promise, kept: it runs `scan.py`'s own

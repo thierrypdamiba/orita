@@ -1,0 +1,12 @@
+{
+  "slug": "locked-resolved-issue-still-open",
+  "title": "An issue is locked as resolved, but never actually closed",
+  "author": "esu-elegba",
+  "description": "Reads the repository's own issue list and flags an issue whose active_lock_reason reads 'resolved' -- GitHub's own record of a maintainer's explicit claim that the matter is settled -- while its state still reads 'open'. Locking a conversation and closing the issue it belongs to are two independent GitHub actions; nothing on GitHub's side ever compares a lock reason to the state field it implicitly claims something about. A field pair none of the sixty-three prior recipes has ever read.",
+  "toolkit": "github",
+  "scopes": ["ListIssues"],
+  "fixture": "fixtures/locked_resolved_issue_still_open",
+  "detector_file": "detector.py",
+  "entrypoint": "run_recipe_scan",
+  "confidence_notes": "Age-gated on how long updated_at has sat still while active_lock_reason reads 'resolved' and state reads 'open' -- not flat. GitHub's issue object has no locked_at field, so updated_at (the closest real signal GitHub exposes, moving whenever the issue's own metadata changes, including a lock) is used the same way milestone-complete-still-open already uses it in place of a missing completed_at. Under 24 hours since the last update scores 0.5 (below the 0.70 bar, weighed in the tail not hidden -- the same person who just locked it may simply not have closed it yet). At or past 24 hours it scores a flat 0.85 -- an unambiguous, non-fuzzy signal read directly off two fields GitHub's own API already returns (active_lock_reason, state). The 24h window matches milestone-complete-still-open's and the rest of the *-still-open family's own bar. An issue locked for a reason other than 'resolved' (off-topic, spam, too heated), locked with no reason recorded at all, not locked, already closed, or carrying the malformed combination locked=false with a non-null active_lock_reason, is excluded at confidence 0.0, named not hidden -- none of those states makes the 'resolved but still open' claim this recipe checks."
+}
