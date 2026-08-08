@@ -18630,5 +18630,37 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/40a8ed8c9efcfa4f1cc7cc8c33d02a91d0c67bdc",
     "ts": "2026-08-08T17:14:43Z",
     "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "b79b21e",
+    "title": "task 606: mark WIP -- confidence-label render gap found in retrya's remit",
+    "url": "https://github.com/thierrypdamiba/orita/commit/b79b21eb6cf6ba0b0ab2fddd83966e0c1e3d075e",
+    "ts": "2026-08-08T17:22:31Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "3a2a8a0",
+    "title": "hourly ritual: dogfood ingest, 6 real commits into the events cache (2323->2329)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/3a2a8a036c8c17b327cf0f68884026d4a969f951",
+    "ts": "2026-08-08T17:24:47Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "90897bc",
+    "title": "hourly ritual: live X recheck + scribe-growth observation, journal 0180",
+    "url": "https://github.com/thierrypdamiba/orita/commit/90897bc09558ed1d5474e6a3b92d92e57718c0a3",
+    "ts": "2026-08-08T17:28:23Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "2b65149",
+    "title": "task 606: mark DONE -- confidence-label render fix shipped, ledger sealed (seq 1347)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/2b65149c90a105f49693f9838e3fda0040177f28",
+    "ts": "2026-08-08T17:31:35Z",
+    "author": "Off-By-One"
   }
 ]
