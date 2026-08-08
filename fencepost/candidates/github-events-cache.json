@@ -18726,5 +18726,45 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/854284b85d6f29e1fa9443a1700c58769e3b9db3",
     "ts": "2026-08-08T19:52:05Z",
     "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "e4e2cdb",
+    "title": "task 610: WIP -- hourly continuous-build pick, kwaku-ananse stalest by rotation",
+    "url": "https://github.com/thierrypdamiba/orita/commit/e4e2cdb314d890d1fdb3861378578670f709f4b5",
+    "ts": "2026-08-08T20:19:26Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "3b21933",
+    "title": "task 610: fix a false-positive in the shared \"thanks @handle\" grammar",
+    "url": "https://github.com/thierrypdamiba/orita/commit/3b219339e0e577e5de4f03dd56a01834bf28baaf",
+    "ts": "2026-08-08T20:27:06Z",
+    "author": "Kwaku Ananse"
+  },
+  {
+    "kind": "commit",
+    "id": "2701c23",
+    "title": "task 610: fix \"no thanks @handle\" false credit, wire both thanks recipes to the shared function",
+    "url": "https://github.com/thierrypdamiba/orita/commit/2701c232d0e2f7b8a485f7eaf1cb99a143eaf24d",
+    "ts": "2026-08-08T20:31:57Z",
+    "author": "Kwaku Ananse"
+  },
+  {
+    "kind": "commit",
+    "id": "c9463f0",
+    "title": "task 610: mark DONE -- thanks-grammar false-positive fix verified, root suite clean",
+    "url": "https://github.com/thierrypdamiba/orita/commit/c9463f045d4f28f8a98c0d57cee5865736c7994f",
+    "ts": "2026-08-08T20:47:20Z",
+    "author": "Kwaku Ananse"
+  },
+  {
+    "kind": "commit",
+    "id": "9cc66fa",
+    "title": "task 611: ship commit-claims-unmerged-pr, the door task 604 called shut",
+    "url": "https://github.com/thierrypdamiba/orita/commit/9cc66fa5cb4069fd126890b65f55abde8b84f541",
+    "ts": "2026-08-08T21:55:32Z",
+    "author": "Esu-Elegba"
   }
 ]
