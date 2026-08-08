@@ -361,6 +361,27 @@ def test_a_write_verb_glued_onto_a_non_prefix_word_is_rejected(scope):
         validate_recipe(_manifest(scopes=(scope,)))
 
 
+@pytest.mark.parametrize(
+    "scope",
+    [
+        "GetUpdatedIssues",
+        "GetRemovedLabels",
+        "ListSharedFiles",
+        "GetUndeletedIssues",
+    ],
+)
+def test_a_write_verb_glued_into_the_middle_of_a_word_is_rejected(scope):
+    # Neither the front-of-prefix check (task 175) nor the true-end check
+    # covers a verb glued into the MIDDLE of an ordinary English inflection:
+    # "Updated" starts with no allowed prefix and doesn't end in "update"
+    # either, so "GetUpdatedIssues" cleared the read-only oath silently
+    # before this fix, with a literal Update inside one of its own words.
+    # Same shape for "Removed", "Shared", and "Undeleted" (verb glued with
+    # a prefix AND a suffix around it).
+    with pytest.raises(RecipeValidationError, match="glues the write verb"):
+        validate_recipe(_manifest(scopes=(scope,)))
+
+
 def test_scope_with_trailing_newline_is_rejected():
     # Same anchoring gap as test_slug_with_trailing_newline_is_rejected,
     # in _ALLOWED_SCOPE_RE this time: "GetIssues\n" clears the bare-`$`

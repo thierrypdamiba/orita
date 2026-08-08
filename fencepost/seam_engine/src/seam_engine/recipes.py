@@ -109,13 +109,6 @@ _FORBIDDEN_VERBS: frozenset[str] = frozenset({
 
 _PASCAL_WORD_RE = re.compile(r"[A-Z][a-z0-9]*")
 
-# The allow-list prefixes (check 1), lowercased once for the glued-verb check
-# below. Every scope that reaches check 2 is already guaranteed (by check 1)
-# to start with one of these -- which makes the very first PascalCase word
-# the one place a scope author is forced to put something, and so the most
-# natural place to hide a write verb if the tokenizer can be fooled.
-_ALLOWED_PREFIXES_LOWER: tuple[str, ...] = ("get", "list", "read", "search", "count")
-
 # Task 529: the fixture-path check above ("fixture must live under
 # fixtures/") is the whole of this module's enforcement of "MOCK ONLY, per
 # the Hand's law" -- and it checks only the manifest's own DECLARED field,
@@ -248,37 +241,36 @@ def _word_hides_glued_verb(word: str) -> str | None:
     """`_pascal_words` only starts a new word at an uppercase letter, so a
     forbidden verb spelled in lowercase with no capital letter marking its
     own boundary is swallowed into whichever word it's glued onto and never
-    reaches the exact-match check below. Two glue shapes, both checked here:
+    reaches the exact-match check below. Task 175 caught the verb glued onto
+    the front of the allowed prefix (`"GetdeleteIssues"` tokenizes as
+    `["Getdelete", "Issues"]`; `"Getdelete"` equals neither `"Get"` nor
+    `"Delete"`) and a later task caught the same shape at the true end of any
+    word (`"ListAnddeleteIssues"` -> `["List", "Anddelete", "Issues"]`).
+    Both were anchored checks (front-of-prefix, or true-end), so a verb
+    glued into the MIDDLE of an ordinary English inflection slipped past
+    both silently: `"Updated"` (`"Update"` + a past-tense `"d"`) starts with
+    no allowed prefix and does not end in `"update"` either, so
+    `"GetUpdatedIssues"` cleared the read-only oath with a literal `Update`
+    inside one of its own words -- found live this task
+    (`_check_scope_is_read_only("GetUpdatedIssues", where=...)` raised
+    nothing). Same shape: `"Removed"`, `"Shared"`, `"Undeleted"`.
 
-    1. Glued onto the front of the allowed prefix (task 175):
-       `"GetdeleteIssues"` tokenizes as `["Getdelete", "Issues"]`;
-       `"Getdelete"` equals neither `"Get"` nor `"Delete"`.
-    2. Glued onto the END of any word, not just the prefix word (this task):
-       `"ListAnddeleteIssues"` tokenizes as `["List", "Anddelete", "Issues"]`
-       -- `"Anddelete"` doesn't start with an allowed prefix at all, so shape
-       1's check never even looked at it, and it equals no forbidden verb
-       exactly either. Same for `"ListIssuesremove"` -> `["List",
-       "Issuesremove"]` and `"GetRepoAndtrash"` -> `["Get", "Repo",
-       "Andtrash"]`. The end-anchor deliberately does NOT flag a verb glued
-       onto the FRONT of a non-prefix word (`"Labels"` starts with the
-       forbidden verb `"Label"` but is a legitimate plural noun, not a
-       glued verb -- SCOPES.md's real `ListRepositoryLabels` must keep
-       passing); only a verb sitting at the true end of a word is safe to
-       treat as unambiguously glued-in.
+    Fixed by checking for the verb as a substring ANYWHERE in the word,
+    front/middle/end alike, with exactly one carve-out: a word that is
+    precisely `verb + "s"` is a legitimate plural noun, not a glued verb --
+    SCOPES.md's real `ListRepositoryLabels` depends on `"Labels"` (`"Label"`
+    + `"s"`) passing, the same reasoning this carve-out already existed for
+    under the old end-anchor check, generalized to every verb rather than
+    left implicit in where the old checks happened not to look.
 
-    Returns the forbidden verb found glued either way, or `None` if `word`
-    hides no forbidden verb behind a missing capital letter."""
+    Returns the forbidden verb found glued in, or `None` if `word` hides no
+    forbidden verb behind a missing capital letter."""
     lowered = word.lower()
-    for prefix in _ALLOWED_PREFIXES_LOWER:
-        if not lowered.startswith(prefix):
-            continue
-        remainder = lowered[len(prefix):]
-        for verb in _FORBIDDEN_VERBS:
-            if remainder.startswith(verb.lower()):
-                return verb
     for verb in _FORBIDDEN_VERBS:
         verb_lower = verb.lower()
-        if lowered != verb_lower and lowered.endswith(verb_lower):
+        if lowered == verb_lower + "s":
+            continue
+        if verb_lower in lowered:
             return verb
     return None
 
