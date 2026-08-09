@@ -84,6 +84,7 @@ import os
 import re
 import sys
 from datetime import datetime, timezone
+from typing import cast
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DEFAULT_ROADMAP_PATH = os.path.join(ROOT, "ROADMAP.md")
@@ -97,17 +98,17 @@ _WIP_OPENED_MARKER = re.compile(
 )
 
 
-def parse_table_rows(text: str) -> list:
+def parse_table_rows(text: str) -> list[dict[str, object]]:
     """Every `| # | status | owner | ... |` row in ROADMAP.md's own task
     table, in file order. `status` is read verbatim (TODO/WIP/DONE) -- the
     single source of truth for whether a task is currently open."""
-    rows = []
+    rows: list[dict[str, object]] = []
     for m in _TABLE_ROW.finditer(text):
         rows.append({"number": int(m.group(1)), "status": m.group(2), "owner": m.group(3).strip()})
     return rows
 
 
-def parse_wip_open_times(text: str) -> dict:
+def parse_wip_open_times(text: str) -> dict[int, str]:
     """{task_number: iso_timestamp} for when each task was marked WIP, from
     either convention this file recognizes (see module docstring). Legacy
     interludes are read first (later mentions in file order win, so a task
@@ -115,7 +116,7 @@ def parse_wip_open_times(text: str) -> dict:
     `wip-opened` markers are read second and OVERRIDE a legacy entry for
     the same task number, since a deliberate marker is more precise than
     an inferred one."""
-    opens = {}
+    opens: dict[int, str] = {}
     interludes = list(_INTERLUDE_START.finditer(text))
     for i, m in enumerate(interludes):
         start = m.end()
@@ -138,7 +139,7 @@ def find_stale(
     now: datetime | None = None,
     threshold_hours: float = RECLAIM_THRESHOLD_HOURS,
     roadmap_path: str = DEFAULT_ROADMAP_PATH,
-) -> dict:
+) -> dict[str, object]:
     if text is None:
         with open(roadmap_path, encoding="utf-8") as f:
             text = f.read()
@@ -147,11 +148,11 @@ def find_stale(
     rows = parse_table_rows(text)
     opens = parse_wip_open_times(text)
     open_wip = [r for r in rows if r["status"] == "WIP"]
-    stale: list[dict] = []
-    fresh: list[dict] = []
-    unknown: list[dict] = []
+    stale: list[dict[str, object]] = []
+    fresh: list[dict[str, object]] = []
+    unknown: list[dict[str, object]] = []
     for row in open_wip:
-        n = row["number"]
+        n = cast(int, row["number"])
         if n not in opens:
             unknown.append(dict(row))
             continue
@@ -169,7 +170,7 @@ def find_stale(
     }
 
 
-def format_result(result: dict) -> str:
+def format_result(result: dict[str, object]) -> str:
     if result["open_count"] == 0:
         return "wip reclaim check: clean (no task currently WIP)"
     if result["clean"]:
@@ -177,13 +178,15 @@ def format_result(result: dict) -> str:
             f"wip reclaim check: clean ({result['open_count']} WIP task(s), "
             f"all opened under {result['threshold_hours']}h ago)"
         )
-    lines = [f"wip reclaim check: {len(result['stale'])} RECLAIMABLE, {len(result['unknown'])} UNKNOWN-AGE"]
-    for s in result["stale"]:
+    stale = cast("list[dict[str, object]]", result["stale"])
+    unknown = cast("list[dict[str, object]]", result["unknown"])
+    lines = [f"wip reclaim check: {len(stale)} RECLAIMABLE, {len(unknown)} UNKNOWN-AGE"]
+    for s in stale:
         lines.append(
             f"  task {s['number']} ({s['owner']}): opened {s['opened_at']}, "
             f"{s['elapsed_hours']}h ago -- reclaim it, do not wait on the original owner"
         )
-    for u in result["unknown"]:
+    for u in unknown:
         lines.append(
             f"  task {u['number']} ({u['owner']}): table says WIP but no matching "
             "'Task N -> WIP' interlude was found -- age unknown, escalate now"

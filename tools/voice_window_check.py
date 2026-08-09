@@ -61,6 +61,7 @@ from __future__ import annotations
 import json
 import os
 import sys
+from typing import cast
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import iso_time  # noqa: E402
@@ -102,13 +103,13 @@ class VoiceWindowTamperedError(RuntimeError):
     before the next real check."""
 
 
-def _entries(path: str = LOG) -> list:
+def _entries(path: str = LOG) -> list[dict[str, object]]:
     """Delegates to jsonl_read.read_jsonl_entries (task 540) -- see that
     module's own docstring for the fourteen-copy history this replaced."""
     return jsonl_read.read_jsonl_entries(path)
 
 
-def _assert_untampered(entries: list) -> None:
+def _assert_untampered(entries: list[dict[str, object]]) -> None:
     for e in entries:
         if e.get("_malformed"):
             raise VoiceWindowTamperedError(
@@ -117,7 +118,9 @@ def _assert_untampered(entries: list) -> None:
             )
 
 
-def record_commits(commits: list, now_iso: str, path: str = LOG) -> list:
+def record_commits(
+    commits: list[dict[str, object]], now_iso: str, path: str = LOG
+) -> list[dict[str, object]]:
     """commits: caller-fetched live list of {"sha","author","author_date"}
     dicts (a `git log`/`mcp__github__list_commits` read for Nyx and
     Zashiki-Warashi, live this hour). Idempotent by sha -- repeated or
@@ -126,7 +129,7 @@ def record_commits(commits: list, now_iso: str, path: str = LOG) -> list:
     existing = _entries(path)
     _assert_untampered(existing)
     known = {e["sha"] for e in existing}
-    new_entries = []
+    new_entries: list[dict[str, object]] = []
     for c in commits:
         if c["sha"] in known:
             continue
@@ -134,7 +137,7 @@ def record_commits(commits: list, now_iso: str, path: str = LOG) -> list:
             "sha": c["sha"],
             "author": c["author"],
             "author_date": c["author_date"],
-            "in_window": in_window(c["author_date"]),
+            "in_window": in_window(cast(str, c["author_date"])),
             "logged_at": now_iso,
         }
         new_entries.append(entry)
@@ -148,16 +151,16 @@ def record_commits(commits: list, now_iso: str, path: str = LOG) -> list:
 
 
 def check(
-    commits: list | None = None,
+    commits: list[dict[str, object]] | None = None,
     now_iso: str | None = None,
     path: str = LOG,
     fix_landed_at: str = FIX_LANDED_AT,
-) -> dict:
+) -> dict[str, object]:
     """commits is optional (None unless the caller holds this hour's live
     GitHub commit read). Always re-derives the violation split against
     EVERY already-logged commit regardless, so a violation logged three
     hours ago is still counted this hour too."""
-    newly_logged = []
+    newly_logged: list[dict[str, object]] = []
     if commits:
         if now_iso is None:
             raise ValueError("now_iso is required when commits is supplied")
@@ -166,7 +169,7 @@ def check(
     _assert_untampered(known)
     violations = [e for e in known if not e["in_window"]]
     cutoff = _parse(fix_landed_at)
-    new_violations = [e for e in violations if _parse(e["author_date"]) >= cutoff]
+    new_violations = [e for e in violations if _parse(cast(str, e["author_date"])) >= cutoff]
     return {
         "known_count": len(known),
         "newly_logged": [e["sha"] for e in newly_logged],
@@ -176,17 +179,18 @@ def check(
     }
 
 
-def format_check(result: dict) -> str:
+def format_check(result: dict[str, object]) -> str:
     if result["clean"]:
         historical = (
             f", {result['violation_count']} historical (pre-fix, not rewritten)" if result["violation_count"] else ""
         )
         return f"voice window check: clean -- {result['known_count']} known Nyx/Zashiki-Warashi commit(s){historical}"
+    new_violations = cast("list[str]", result["new_violations"])
     lines = [
-        f"voice window check: {len(result['new_violations'])} NEW VIOLATION(S) since the fix "
+        f"voice window check: {len(new_violations)} NEW VIOLATION(S) since the fix "
         "-- Iron Rule #7's window clause broken, escalate now"
     ]
-    for sha in result["new_violations"]:
+    for sha in new_violations:
         lines.append(f"  {sha}")
     return "\n".join(lines)
 
@@ -199,14 +203,14 @@ class VoiceWindowArgError(ValueError):
     crashes with a bare TypeError instead of naming the real problem)."""
 
 
-def _load_commits_json(path: str) -> list:
+def _load_commits_json(path: str) -> list[dict[str, object]]:
     with open(path, encoding="utf-8") as f:
         raw = json.load(f)
     if not isinstance(raw, list):
         raise VoiceWindowArgError(
             f"--commits-json: expected a JSON list, got {type(raw).__name__}"
         )
-    return raw
+    return cast("list[dict[str, object]]", raw)
 
 
 if __name__ == "__main__":

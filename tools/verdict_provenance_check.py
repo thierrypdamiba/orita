@@ -46,6 +46,8 @@ import os
 import re
 import sys
 import unicodedata
+from collections.abc import Iterator
+from typing import cast
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import text_patterns  # noqa: E402
@@ -69,7 +71,7 @@ def _normalize_name(name: str) -> str:
     return re.sub(r"[^a-z]", "", ascii_only.lower())
 
 
-def _parse_hand_verdict(path: str) -> dict | None:
+def _parse_hand_verdict(path: str) -> dict[str, object] | None:
     with open(path, encoding="utf-8") as f:
         text = f.read()
     pet = _HAND_PETITIONER_RE.search(text)
@@ -85,7 +87,7 @@ def _parse_hand_verdict(path: str) -> dict | None:
     }
 
 
-def _parse_altar_petition(path: str) -> dict | None:
+def _parse_altar_petition(path: str) -> dict[str, object] | None:
     with open(path, encoding="utf-8") as f:
         text = f.read()
     pet = _ALTAR_PETITIONER_RE.search(text)
@@ -99,7 +101,7 @@ def _parse_altar_petition(path: str) -> dict | None:
     return {"file": path, "petitioner": pet.group(1).strip(), "verdict": ver.group(1).strip().upper(), "filed": filed}
 
 
-def _iter_hand_verdicts(orita_dir: str):
+def _iter_hand_verdicts(orita_dir: str) -> Iterator[str]:
     vdir = os.path.join(orita_dir, "HAND", "verdicts")
     if not os.path.isdir(vdir):
         return
@@ -108,7 +110,7 @@ def _iter_hand_verdicts(orita_dir: str):
             yield os.path.join(vdir, name)
 
 
-def _iter_altar_petitions(orita_dir: str):
+def _iter_altar_petitions(orita_dir: str) -> Iterator[str]:
     houses_dir = os.path.join(orita_dir, "houses")
     if not os.path.isdir(houses_dir):
         return
@@ -121,7 +123,7 @@ def _iter_altar_petitions(orita_dir: str):
                 yield os.path.join(pdir, name)
 
 
-def find_mismatches(orita_dir: str = DEFAULT_ORITA_DIR) -> list:
+def find_mismatches(orita_dir: str = DEFAULT_ORITA_DIR) -> list[dict[str, object]]:
     """Task 102: read-only compare of every public HAND/verdicts/ entry
     against its own house's sealed altar petition copy. Returns a list of
     mismatch records, empty when every public verdict is genuinely backed
@@ -129,16 +131,16 @@ def find_mismatches(orita_dir: str = DEFAULT_ORITA_DIR) -> list:
     altar_petitions = [
         p for p in (_parse_altar_petition(path) for path in _iter_altar_petitions(orita_dir)) if p is not None
     ]
-    altar_by_norm: dict[str, list] = {}
+    altar_by_norm: dict[str, list[dict[str, object]]] = {}
     for pet in altar_petitions:
-        altar_by_norm.setdefault(_normalize_name(pet["petitioner"]), []).append(pet)
+        altar_by_norm.setdefault(_normalize_name(cast(str, pet["petitioner"])), []).append(pet)
 
-    mismatches = []
+    mismatches: list[dict[str, object]] = []
     for hand_path in _iter_hand_verdicts(orita_dir):
         hv = _parse_hand_verdict(hand_path)
         if hv is None:
             continue
-        norm = _normalize_name(hv["petitioner"])
+        norm = _normalize_name(cast(str, hv["petitioner"]))
         candidates = altar_by_norm.get(norm)
         if not candidates:
             mismatches.append({
@@ -184,7 +186,7 @@ def find_mismatches(orita_dir: str = DEFAULT_ORITA_DIR) -> list:
     return mismatches
 
 
-def format_mismatches(mismatches: list) -> str:
+def format_mismatches(mismatches: list[dict[str, object]]) -> str:
     if not mismatches:
         return "verdict provenance check: clean -- every public verdict is backed by its house's own altar record"
     lines = [f"verdict provenance check: {len(mismatches)} MISMATCH(ES) FOUND -- Iron Rule #3 at risk"]
