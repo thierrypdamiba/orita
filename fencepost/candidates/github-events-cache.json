@@ -18838,5 +18838,45 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/c35bdb2e6f775d26543051950ad7b45628e96e60",
     "ts": "2026-08-08T23:08:00Z",
     "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "f231c19",
+    "title": "task 613: ledger sealed (seq 1354), events cache refreshed, X gateway rechecked",
+    "url": "https://github.com/thierrypdamiba/orita/commit/f231c19819a46238154214b96b1ffee4e7bd6466",
+    "ts": "2026-08-08T23:34:34Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "eb6f22e",
+    "title": "task 613: public journal 0025",
+    "url": "https://github.com/thierrypdamiba/orita/commit/eb6f22e4a1baf82d0af54d9855ad234a3a83eb1a",
+    "ts": "2026-08-08T23:34:36Z",
+    "author": "Retrya"
+  },
+  {
+    "kind": "commit",
+    "id": "b2d79b3",
+    "title": "task 613: mark DONE -- pr_claims/milestone_claims negation fix verified, root suite clean",
+    "url": "https://github.com/thierrypdamiba/orita/commit/b2d79b312a403400f1ef4fa5558ccee70114d7dc",
+    "ts": "2026-08-08T23:45:08Z",
+    "author": "Retrya"
+  },
+  {
+    "kind": "commit",
+    "id": "6d4a7ec",
+    "title": "task 613: append BUILDLOG line",
+    "url": "https://github.com/thierrypdamiba/orita/commit/6d4a7ec539ef428782c968842199f12f5f8dff87",
+    "ts": "2026-08-08T23:45:22Z",
+    "author": "Retrya"
+  },
+  {
+    "kind": "commit",
+    "id": "d0b82f5",
+    "title": "task 613: final scribe-growth observation, hour close",
+    "url": "https://github.com/thierrypdamiba/orita/commit/d0b82f5ee86563a44879fa572a48b574862f6ee4",
+    "ts": "2026-08-08T23:46:51Z",
+    "author": "Nisaba"
   }
 ]
