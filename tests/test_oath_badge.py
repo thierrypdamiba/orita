@@ -231,6 +231,64 @@ class TestMainCliPolicyArgGuard(unittest.TestCase):
             os.remove(policy_path)
 
 
+class TestMainCliTrailingFlagWithNoValue(unittest.TestCase):
+    """`_take()` used to index straight into `argv[i + 1]` with no bounds
+    check -- any flag (`--catalog`, `--policy`, `--label`, `--out`) given as
+    the last token with no following value crashed with a bare
+    `IndexError: list index out of range` instead of naming the real
+    problem. Reproduced live before the fix (mypy also flagged the
+    downstream symptom: `load_catalog(catalog_spec)` at a `str | None`
+    catalog_spec, since `_take` could return `None` for a genuinely present
+    but valueless flag). Must now raise the named OathBadgeArgError for
+    every one of the four flags, matching the discipline
+    TestMainCliPolicyArgGuard already established for `--policy`'s
+    wrong-JSON-shape case."""
+
+    def setUp(self):
+        import sys
+
+        class _FakeApp:
+            _catalog = [_MaterializedTool("ListIssues", True, False, ["read"])]
+
+        class _FakeModule:
+            app = _FakeApp()
+
+        sys.modules["_oath_badge_fixture_module"] = _FakeModule
+
+    def tearDown(self):
+        import sys
+        del sys.modules["_oath_badge_fixture_module"]
+
+    def test_catalog_with_no_value_raises_named_error_not_indexerror(self):
+        with self.assertRaises(oath_badge.OathBadgeArgError) as ctx:
+            oath_badge.main(["--catalog"])
+        self.assertIn("--catalog", str(ctx.exception))
+
+    def test_policy_with_no_value_raises_named_error_not_indexerror(self):
+        with self.assertRaises(oath_badge.OathBadgeArgError) as ctx:
+            oath_badge.main([
+                "--catalog", "_oath_badge_fixture_module:app",
+                "--policy",
+            ])
+        self.assertIn("--policy", str(ctx.exception))
+
+    def test_label_with_no_value_raises_named_error_not_indexerror(self):
+        with self.assertRaises(oath_badge.OathBadgeArgError) as ctx:
+            oath_badge.main([
+                "--catalog", "_oath_badge_fixture_module:app",
+                "--label",
+            ])
+        self.assertIn("--label", str(ctx.exception))
+
+    def test_out_with_no_value_raises_named_error_not_indexerror(self):
+        with self.assertRaises(oath_badge.OathBadgeArgError) as ctx:
+            oath_badge.main([
+                "--catalog", "_oath_badge_fixture_module:app",
+                "--out",
+            ])
+        self.assertIn("--out", str(ctx.exception))
+
+
 class TestUsageStringMatchesRealFlags(unittest.TestCase):
     """Task 437. The no-`--catalog` usage string advertised a `--write path`
     flag lifted from seam_engine/badge.py's own CLI -- oath_badge.py never

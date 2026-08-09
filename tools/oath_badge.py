@@ -275,6 +275,8 @@ def main(argv: list[str] | None = None) -> int:
         if flag not in argv:
             return None
         i = argv.index(flag)
+        if i + 1 >= len(argv):
+            raise OathBadgeArgError(f"{flag}: expected a value, got none")
         val = argv[i + 1]
         del argv[i : i + 2]
         return val
@@ -283,6 +285,13 @@ def main(argv: list[str] | None = None) -> int:
     policy_path = _take("--policy")
     label = _take("--label") or "read-only"
     out_path = _take("--out")
+
+    if catalog_spec is None:
+        # Unreachable given the "--catalog" in argv guard above (_take can
+        # only return None for a flag that is absent), but this keeps
+        # load_catalog's real `str`-only signature honest for a type
+        # checker without weakening it to `str | None` for every caller.
+        raise OathBadgeArgError("--catalog: expected a value, got none")
 
     policy = DEFAULT_POLICY
     if policy_path:
