@@ -55,6 +55,7 @@ import os
 import re
 import sys
 from datetime import date, datetime, timezone
+from typing import Any
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import cluster_day_check  # noqa: E402
@@ -69,7 +70,7 @@ TRAFFIC_SUBPATH = os.path.join("vault", "nyx", "traffic")
 _TRAFFIC_FILE = re.compile(r"^(?P<date>\d{4}-\d{2}-\d{2})(-.+)?\.[A-Za-z0-9]+$")
 
 
-def _report_dates(vault_dir: str) -> list:
+def _report_dates(vault_dir: str) -> list[date]:
     """Every real report date named by a filename in
     `<vault_dir>/vault/nyx/traffic/`, ascending. A missing vault checkout
     or a missing/empty traffic directory returns an empty list, not an
@@ -90,7 +91,7 @@ def _report_dates(vault_dir: str) -> list:
     return sorted(dates)
 
 
-def compute_cadence(vault_dir: str | None = None, today: date | None = None) -> dict:
+def compute_cadence(vault_dir: str | None = None, today: date | None = None) -> dict[str, Any]:
     """The real numbers behind Nyx's own half of TOWN-OPERATIONS.md's
     weekly Cluster Day ritual -- named as missing mechanism by
     `cluster_day_check.py`'s own docstring, never computed anywhere
@@ -125,7 +126,7 @@ def compute_cadence(vault_dir: str | None = None, today: date | None = None) -> 
     }
 
 
-def format_cadence(result: dict) -> str:
+def format_cadence(result: dict[str, Any]) -> str:
     if not result["missed_mondays"]:
         return (
             f"nyx traffic cadence: current -- {result['total_reports_on_record']} report(s) on record, "

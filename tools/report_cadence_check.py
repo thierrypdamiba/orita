@@ -37,6 +37,7 @@ from __future__ import annotations
 import os
 import sys
 from datetime import date
+from typing import Any
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import date_cadence  # noqa: E402
@@ -49,7 +50,7 @@ TARGET_STREAK_DAYS = 30  # STRATEGY.md: "1/day, 30 of 30 days"
 _DATE_NAME = text_patterns.DATE_NAME_MD
 
 
-def _shipped_dates(reports_dir: str) -> list:
+def _shipped_dates(reports_dir: str) -> list[date]:
     """Every real calendar date with a validly-named `YYYY-MM-DD.md`
     tablet directly inside `reports_dir`, sorted ascending. A name that
     doesn't match the pattern (README.md, a stray suffix, a malformed
@@ -75,7 +76,7 @@ def _shipped_dates(reports_dir: str) -> list:
     return sorted(set(dates))
 
 
-def compute_cadence(reports_dir: str | None = None, target: int = TARGET_STREAK_DAYS) -> dict:
+def compute_cadence(reports_dir: str | None = None, target: int = TARGET_STREAK_DAYS) -> dict[str, Any]:
     """The real numbers behind STRATEGY.md's "1/day, 30 of 30 days" row.
 
     - total_shipped: count of validly-named dated tablets found.
@@ -95,7 +96,7 @@ def compute_cadence(reports_dir: str | None = None, target: int = TARGET_STREAK_
     return date_cadence.compute_date_streak_and_gaps(dates, target)
 
 
-def format_cadence(result: dict) -> str:
+def format_cadence(result: dict[str, Any]) -> str:
     if result["total_shipped"] == 0:
         return "report cadence: no Fencepost Report has ever shipped -- nothing to count yet"
     lines = [

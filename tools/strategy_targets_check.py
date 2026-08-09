@@ -61,6 +61,8 @@ import importlib.util
 import os
 import re
 import sys
+from types import ModuleType
+from typing import Any
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STRATEGY_MD = os.path.join(ROOT, "STRATEGY.md")
@@ -164,7 +166,7 @@ def strategy_toolkits_target(strategy_text: str) -> int:
     return int(m.group(1))
 
 
-def _load(name: str, relpath: str):
+def _load(name: str, relpath: str) -> ModuleType:
     path = os.path.join(ROOT, relpath)
     spec = importlib.util.spec_from_file_location(name, path)
     if spec is None or spec.loader is None:
@@ -174,7 +176,7 @@ def _load(name: str, relpath: str):
     return mod
 
 
-def check_strategy_targets(strategy_path: str = STRATEGY_MD) -> dict:
+def check_strategy_targets(strategy_path: str = STRATEGY_MD) -> dict[str, Any]:
     """Cross-checks both live STRATEGY.md targets against the two real
     modules' real constants, live-loaded fresh each call -- never a hand-
     typed copy of either the doc number or the code constant."""
@@ -222,7 +224,7 @@ def check_strategy_targets(strategy_path: str = STRATEGY_MD) -> dict:
     }
 
 
-def format_strategy_targets(result: dict) -> str:
+def format_strategy_targets(result: dict[str, Any]) -> str:
     lines = []
     for key, label in (
         ("report_streak", "report cadence"),

@@ -47,6 +47,7 @@ import os
 import re
 import sys
 from datetime import date, datetime, timezone
+from typing import Any
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import cluster_day_check  # noqa: E402
@@ -64,7 +65,7 @@ class MalformedEntryMarkerError(ValueError):
     for chronicle's own marker."""
 
 
-def _entry_dates(path: str) -> list:
+def _entry_dates(path: str) -> list[date]:
     """Every `what-moved-entry` date found in `path`, ascending. An
     absent file (or a file with no markers at all -- the real state of
     `docs/what-moved.html` as of task 449) returns an empty list, not an
@@ -86,7 +87,7 @@ def _entry_dates(path: str) -> list:
     return sorted(dates)
 
 
-def compute_cadence(path: str | None = None, today: date | None = None) -> dict:
+def compute_cadence(path: str | None = None, today: date | None = None) -> dict[str, Any]:
     """The real numbers behind Zashiki's own half of TOWN-OPERATIONS.md's
     weekly Cluster Day ritual -- named as missing mechanism, never
     computed anywhere, the same way `cluster_day_check.compute_cadence`
@@ -119,7 +120,7 @@ def compute_cadence(path: str | None = None, today: date | None = None) -> dict:
     }
 
 
-def format_cadence(result: dict) -> str:
+def format_cadence(result: dict[str, Any]) -> str:
     if not result["missed_mondays"]:
         return (
             f"what-moved cadence: current -- {result['total_entries_on_record']} entry/entries on record, "

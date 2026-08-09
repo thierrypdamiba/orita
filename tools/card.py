@@ -78,7 +78,7 @@ def build_card(slug: str, img: str, title: str, alt: str) -> tuple[str, str]:
     return page, page_url
 
 
-def main():
+def main() -> None:
     slug, img, title, alt = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4]
     page, page_url = build_card(slug, img, title, alt)
     out_dir = os.path.join(ROOT, "docs", "cards")

@@ -107,6 +107,7 @@ import glob
 import os
 import re
 import sys
+from typing import Any
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TOOLS_DIR = os.path.join(ROOT, "tools")
@@ -256,7 +257,7 @@ def check_source_has_no_network_import(source: str) -> tuple[bool, str]:
     return True, "ok"
 
 
-def check_network_boundary(tools_dir: str = TOOLS_DIR) -> dict:
+def check_network_boundary(tools_dir: str = TOOLS_DIR) -> dict[str, Any]:
     """Cross-checks every real, live-discovered "no network" claim in
     `tools/*.py` against its real, live-loaded source -- never a hand-typed
     copy of either the file list or its contents."""
@@ -287,7 +288,7 @@ def find_claiming_files_all(dirs: tuple[str, ...] = SEARCH_DIRS) -> list[str]:
     return sorted(hits)
 
 
-def check_network_boundary_all(dirs: tuple[str, ...] = SEARCH_DIRS) -> dict:
+def check_network_boundary_all(dirs: tuple[str, ...] = SEARCH_DIRS) -> dict[str, Any]:
     """Cross-checks every real, live-discovered "no network" claim across
     every directory in `dirs`, keyed by repo-root-relative path. Delegates
     entirely to `check_network_boundary` per directory; never re-implements
@@ -300,7 +301,7 @@ def check_network_boundary_all(dirs: tuple[str, ...] = SEARCH_DIRS) -> dict:
     return results
 
 
-def format_network_boundary(result: dict) -> str:
+def format_network_boundary(result: dict[str, Any]) -> str:
     total = len(result)
     broken = {name: r for name, r in result.items() if not r["ok"]}
     if not broken:

@@ -34,6 +34,7 @@ import json
 import os
 import sys
 from datetime import datetime, timedelta
+from typing import Any
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import iso_time  # noqa: E402
@@ -49,7 +50,7 @@ STATUSES = ("on_time", "pending", "overdue")
 _parse = iso_time.parse_iso_utc
 
 
-def parse_daily_cron(cron_expr: str) -> tuple:
+def parse_daily_cron(cron_expr: str) -> tuple[int, int]:
     """Parse a fixed-hour daily cron ('MINUTE HOUR * * *') into (hour, minute).
 
     Every scheduled workflow in this repo (`seam-scan`, `oracle-cadence`)
@@ -76,7 +77,9 @@ def most_recent_scheduled_fire(cron_expr: str, now: datetime) -> datetime:
     return candidate
 
 
-def schedule_status(cron_expr: str, last_run_at, now: str, grace_hours: float = DEFAULT_GRACE_HOURS) -> dict:
+def schedule_status(
+    cron_expr: str, last_run_at: str | None, now: str, grace_hours: float = DEFAULT_GRACE_HOURS
+) -> dict[str, Any]:
     """Where a scheduled workflow stands against its own declared cron.
 
     - on_time: a run landed at or after today's scheduled fire time. A run

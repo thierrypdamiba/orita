@@ -34,6 +34,7 @@ import json
 import os
 import sys
 from datetime import date
+from typing import Any
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DEFAULT_SHARED_PATH = os.path.join(ROOT, "records", "shared-in-the-wild.jsonl")
@@ -50,7 +51,7 @@ def _parse_date(d: str) -> date:
     return date(year, month, day)
 
 
-def _read_entries(shared_path: str) -> list:
+def _read_entries(shared_path: str) -> list[dict[str, Any]]:
     """Every real, validly-shaped entry in `shared_path`: requires a
     `"date"` field parseable as a real calendar date and a non-empty
     `"url"` field naming where the share actually lives. A malformed line
@@ -88,7 +89,7 @@ def _read_entries(shared_path: str) -> list:
     return entries
 
 
-def compute_shared_reports(shared_path: str | None = None, target: int = TARGET_SHARES) -> dict:
+def compute_shared_reports(shared_path: str | None = None, target: int = TARGET_SHARES) -> dict[str, Any]:
     """The real numbers behind STRATEGY.md's "Shared Fencepost Reports in
     the wild" row.
 
@@ -123,7 +124,7 @@ def compute_shared_reports(shared_path: str | None = None, target: int = TARGET_
     }
 
 
-def format_shared_reports(result: dict) -> str:
+def format_shared_reports(result: dict[str, Any]) -> str:
     if result["total_shared"] == 0:
         return (
             f"shared reports in the wild: 0/{result['target']} "

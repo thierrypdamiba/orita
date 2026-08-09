@@ -32,6 +32,7 @@ import glob
 import os
 import re
 import sys
+from typing import Any
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DEFAULT_README_PATH = os.path.join(ROOT, "HAND", "README.md")
@@ -65,7 +66,7 @@ def _real_proclamation_count(proclamations_dir: str) -> int:
 def check_proclamation_count(
     readme_path: str = DEFAULT_README_PATH,
     proclamations_dir: str = DEFAULT_PROCLAMATIONS_DIR,
-) -> dict:
+) -> dict[str, Any]:
     """Cross-check `HAND/README.md`'s "There has/have been <word>."
     sentence against the real, live count of `HAND/proclamations/*.md`
     files. Returns `clean: True` only when the claimed number and the
@@ -120,13 +121,13 @@ def check_proclamation_count(
     }
 
 
-def format_result(result: dict) -> str:
+def format_result(result: dict[str, Any]) -> str:
     if result["clean"]:
         return (
             f"proclamation count: clean ({result['real_count']} real proclamation(s), "
             f"HAND/README.md's count and grammar both agree)"
         )
-    return "proclamation count: BROKEN -- " + result["reason"]
+    return "proclamation count: BROKEN -- " + str(result["reason"])
 
 
 if __name__ == "__main__":

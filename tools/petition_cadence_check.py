@@ -51,7 +51,7 @@ DEFAULT_ORITA_DIR = ROOT
 _DATE_NAME = text_patterns.DATE_NAME_MD
 
 
-def _petition_dirs(orita_dir: str) -> list:
+def _petition_dirs(orita_dir: str) -> list[tuple[str, str]]:
     houses_dir = os.path.join(orita_dir, "houses")
     if not os.path.isdir(houses_dir):
         return []
@@ -63,7 +63,7 @@ def _petition_dirs(orita_dir: str) -> list:
     return dirs
 
 
-def find_violations(orita_dir: str | None = None) -> list:
+def find_violations(orita_dir: str | None = None) -> list[dict[str, str]]:
     """Returns a list of violation dicts. Each names the house, the exact
     filename, and why: either the name doesn't match `YYYY-MM-DD.md` for
     a real calendar date (malformed), or it does but a different entry in
@@ -111,7 +111,7 @@ def find_violations(orita_dir: str | None = None) -> list:
     return violations
 
 
-def format_violations(violations: list) -> str:
+def format_violations(violations: list[dict[str, str]]) -> str:
     if not violations:
         return "petition cadence check: clean -- every altar petition filename is a real, unique YYYY-MM-DD.md"
     lines = [
