@@ -111,6 +111,22 @@ class TestComputeGapsAgeGate:
         assert confidences == sorted(confidences, reverse=True)
 
 
+class TestComputeGapsClosedAtGuard:
+    def test_an_issue_with_no_closed_at_raises_a_named_error_not_a_bare_assertionerror(self):
+        # compute_gaps() is a public function -- nothing in the type system
+        # stops a caller from handing it a ClosedIssue built directly (not
+        # through load_closed_issues()'s own filter) with closed_at=None.
+        # Reproduced live pre-fix: a bare `AssertionError` with no context,
+        # the same "assert stripped by python -O" shape task 618/621 already
+        # named. Fixed with an explicit, named ValueError.
+        issue = detector.ClosedIssue(
+            number=1, title="no closed_at", state="closed", closed_at=None,
+            url="https://github.com/example/example-repo/issues/1",
+        )
+        with pytest.raises(ValueError, match="reached the surfaced-gap branch"):
+            detector.compute_gaps([issue], [], now=_NOW)
+
+
 class TestLoadClosedIssuesFiltersState:
     def test_load_closed_issues_excludes_open(self, tmp_path: Path):
         rows = [

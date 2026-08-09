@@ -148,7 +148,12 @@ def compute_gaps(
             ))
             continue
 
-        assert issue.closed_at is not None  # guaranteed by load_closed_issues's own filter
+        if issue.closed_at is None:
+            raise ValueError(
+                f"compute_gaps(): issue #{issue.number} reached the surfaced-gap "
+                "branch with no closed_at -- load_closed_issues() should have "
+                "filtered it out before this call; ruff S101 (task 622)."
+            )
         age_hours = (now - issue.closed_at).total_seconds() / 3600.0
         confidence = 0.85 if age_hours >= _ANNOUNCE_WINDOW_HOURS else 0.55
         surfaced.append(GapCandidate(
