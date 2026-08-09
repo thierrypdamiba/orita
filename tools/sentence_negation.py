@@ -45,8 +45,11 @@ Usage: import and call directly.
 """
 from __future__ import annotations
 
+import re
+from collections.abc import Iterator
 
-def iter_sentences(text: str, sentence_boundary):
+
+def iter_sentences(text: str, sentence_boundary: re.Pattern[str]) -> Iterator[tuple[int, int]]:
     """Yield (start, end) offsets of each sentence in text, split on
     `sentence_boundary`'s own boundary matches -- the exact loop
     `hand_lore_check._sentences`/`rider_check._sentences` each ran
@@ -60,7 +63,7 @@ def iter_sentences(text: str, sentence_boundary):
         yield start, len(text)
 
 
-def is_negated_prefix(sentence: str, match_start: int, negation_cues) -> bool:
+def is_negated_prefix(sentence: str, match_start: int, negation_cues: re.Pattern[str]) -> bool:
     """Scope the negation check to the text BEFORE the match, within the
     current (already-cut) sentence only -- the exact one-liner
     `hand_lore_check._is_negated`/`rider_check._is_negated` each carried
@@ -71,7 +74,9 @@ def is_negated_prefix(sentence: str, match_start: int, negation_cues) -> bool:
     return bool(negation_cues.search(sentence[:match_start]))
 
 
-def is_negated_or_predictive(text: str, match_start: int, sentence_boundary, negation_cues) -> bool:
+def is_negated_or_predictive(
+    text: str, match_start: int, sentence_boundary: re.Pattern[str], negation_cues: re.Pattern[str]
+) -> bool:
     """Scope the negation/prediction check to the CURRENT SENTENCE only --
     the exact `window_start`/`sentence_so_far` two-liner `no_grading_
     check._is_negated_or_predictive`, `star_covenant_check._is_negated_or_

@@ -62,6 +62,8 @@ from __future__ import annotations
 import os
 import sys
 import warnings
+from collections.abc import Iterator
+from typing import cast
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import scan_files  # noqa: E402
@@ -73,7 +75,7 @@ _SKIP_DIRS = {".git", "__pycache__", "node_modules"}
 _INVALID_ESCAPE_MARKER = "invalid escape sequence"
 
 
-def _iter_python_files(orita_dir: str):
+def _iter_python_files(orita_dir: str) -> Iterator[str]:
     for dirpath, dirnames, filenames in os.walk(orita_dir):
         dirnames[:] = sorted(d for d in dirnames if d not in _SKIP_DIRS)
         for name in sorted(filenames):
@@ -124,8 +126,8 @@ def _invalid_escape_warnings(path: str) -> list[tuple[int, str]]:
     return hits
 
 
-def _find_violations_uncached(orita_dir: str = DEFAULT_ORITA_DIR) -> list:
-    violations = []
+def _find_violations_uncached(orita_dir: str = DEFAULT_ORITA_DIR) -> list[dict[str, object]]:
+    violations: list[dict[str, object]] = []
     for path in _iter_python_files(orita_dir):
         rel = os.path.relpath(path, orita_dir)
         for lineno, message in _invalid_escape_warnings(path):
@@ -142,15 +144,16 @@ def _find_violations_uncached(orita_dir: str = DEFAULT_ORITA_DIR) -> list:
 find_violations, clear_cache = scan_files.path_memoize(_find_violations_uncached, DEFAULT_ORITA_DIR)
 
 
-def check_escape_sequences(orita_dir: str = DEFAULT_ORITA_DIR) -> dict:
+def check_escape_sequences(orita_dir: str = DEFAULT_ORITA_DIR) -> dict[str, object]:
     violations = find_violations(orita_dir)
     return {"clean": not violations, "count": len(violations), "violations": violations}
 
 
-def format_result(result: dict) -> str:
+def format_result(result: dict[str, object]) -> str:
     if result["clean"]:
         return "escape sequences: clean (every tracked .py file compiles with zero invalid-escape-sequence warnings)"
-    lines = ", ".join(f"{v['file']}:{v['line']}" for v in result["violations"])
+    violations = cast("list[dict[str, object]]", result["violations"])
+    lines = ", ".join(f"{v['file']}:{v['line']}" for v in violations)
     return (
         f"escape sequences: BROKEN -- {result['count']} invalid escape sequence warning(s) "
         f"({lines}) -- a future Python turns these into SyntaxErrors, breaking import; fix now"

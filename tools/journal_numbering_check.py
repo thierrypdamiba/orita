@@ -67,11 +67,11 @@ KNOWN_VAULT_EXCEPTIONS = frozenset({
 })
 
 
-def _journal_dirs(orita_dir: str) -> list:
+def _journal_dirs(orita_dir: str) -> list[tuple[str, str]]:
     houses_dir = os.path.join(orita_dir, "houses")
     if not os.path.isdir(houses_dir):
         return []
-    dirs = []
+    dirs: list[tuple[str, str]] = []
     for house in sorted(os.listdir(houses_dir)):
         journal_dir = os.path.join(houses_dir, house, "journal")
         if os.path.isdir(journal_dir):
@@ -79,14 +79,14 @@ def _journal_dirs(orita_dir: str) -> list:
     return dirs
 
 
-def _vault_journal_dirs(vault_dir: str) -> list:
+def _vault_journal_dirs(vault_dir: str) -> list[tuple[str, str]]:
     """Task 370: the private-tree mirror of `_journal_dirs` -- same shape,
     rooted at `<vault_dir>/vault/<god>/journal/` instead of
     `<orita_dir>/houses/<god>/journal/`."""
     vault_root = os.path.join(vault_dir, "vault")
     if not os.path.isdir(vault_root):
         return []
-    dirs = []
+    dirs: list[tuple[str, str]] = []
     for house in sorted(os.listdir(vault_root)):
         journal_dir = os.path.join(vault_root, house, "journal")
         if os.path.isdir(journal_dir):
@@ -94,11 +94,11 @@ def _vault_journal_dirs(vault_dir: str) -> list:
     return dirs
 
 
-def _scan_journal_dirs(dirs: list, realm: str) -> list:
+def _scan_journal_dirs(dirs: list[tuple[str, str]], realm: str) -> list[dict[str, object]]:
     """Shared malformed/duplicate/missing scan, tagged with which realm
     (`"public"` for houses/, `"vault"` for vault/) each violation came
     from. Filenames only -- never opens a file to read its content."""
-    violations = []
+    violations: list[dict[str, object]] = []
     for house, journal_dir in dirs:
         seen_numbers: dict[int, str] = {}
         for name in sorted(os.listdir(journal_dir)):
@@ -149,7 +149,7 @@ def find_violations(
     orita_dir: str | None = None,
     vault_dir: str | None = None,
     filter_known_exceptions: bool = True,
-) -> list:
+) -> list[dict[str, object]]:
     """Returns a list of violation dicts. Each names the realm (`public`
     houses/ or `vault` vault/), the house, the exact filename (or the
     missing number itself), and why: the name doesn't open with exactly
@@ -178,7 +178,7 @@ def find_violations(
     return violations
 
 
-def format_violations(violations: list) -> str:
+def format_violations(violations: list[dict[str, object]]) -> str:
     if not violations:
         return "journal numbering check: clean -- every house's journal runs an unbroken 0001, 0002, ... count"
     lines = [

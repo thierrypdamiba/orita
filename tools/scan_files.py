@@ -69,12 +69,17 @@ Usage: not run directly; imported by tools/*.py.
 from __future__ import annotations
 
 import os
+import re
+from collections.abc import Callable, Iterator
+from typing import TypeVar
+
+_V = TypeVar("_V")
 
 PUBLIC_SKIP_DIR_NAMES = {".git", "node_modules", "__pycache__", ".safeword", ".claude", ".agents"}
 PUBLIC_SCAN_EXTENSIONS = (".md", ".html")
 
 
-def iter_public_files(base_dir: str):
+def iter_public_files(base_dir: str) -> Iterator[str]:
     """Yield every `.md`/`.html` file under `base_dir`, skipping the
     standard non-content directories. The read-only walk five checkers
     shared verbatim (three under this exact name, one under
@@ -88,7 +93,13 @@ def iter_public_files(base_dir: str):
                 yield os.path.join(dirpath, name)
 
 
-def find_pattern_violations(orita_dir, iter_files, patterns, is_negated_or_predictive, is_quoted_citation) -> list:
+def find_pattern_violations(
+    orita_dir: str,
+    iter_files: Callable[[str], Iterator[str]],
+    patterns: list[tuple[str, re.Pattern[str]]],
+    is_negated_or_predictive: Callable[[str, int], bool],
+    is_quoted_citation: Callable[[str, int], bool],
+) -> list[dict[str, object]]:
     """The scan-and-collect loop `no_grading_check._find_violations_
     uncached` and `arcade_hero_check._find_violations_uncached` each ran
     independently, byte-identical apart from the four names it takes as
@@ -99,7 +110,7 @@ def find_pattern_violations(orita_dir, iter_files, patterns, is_negated_or_predi
     Returns a list of violation records, empty when nothing in the walked
     files matches any pattern outside a guarded (negated, predictive, or
     quoted-citation) context. Never writes."""
-    violations = []
+    violations: list[dict[str, object]] = []
     for path in iter_files(orita_dir):
         try:
             with open(path, encoding="utf-8") as f:
@@ -121,7 +132,9 @@ def find_pattern_violations(orita_dir, iter_files, patterns, is_negated_or_predi
     return violations
 
 
-def path_memoize(uncached_fn, default_dir: str):
+def path_memoize(
+    uncached_fn: Callable[[str], list[_V]], default_dir: str
+) -> tuple[Callable[..., list[_V]], Callable[[], None]]:
     """Wrap `uncached_fn(orita_dir)` in a per-`os.path.realpath(orita_dir)`
     cache, mirroring `vault_leak_check.py`'s own `find_leaks()`/
     `clear_cache()` shape (task 367) for the simpler single-directory-
@@ -130,13 +143,17 @@ def path_memoize(uncached_fn, default_dir: str):
     factory call per checker module), so every checker keeps an
     independent cache instance while sharing the one caching
     implementation, the same way each module keeps its own
-    `_find_violations_uncached`."""
-    cache: dict = {}
+    `_find_violations_uncached`. Generic over the caller's own violation
+    element type (`_V`) so a caller with its own `TypedDict` shape (e.g.
+    `duplicate_regex_check.Violation`) keeps that precise type through the
+    wrapper instead of every caller being forced down to the generic
+    `dict[str, object]` shape most siblings use."""
+    cache: dict[str, list[_V]] = {}
 
     def clear_cache() -> None:
         cache.clear()
 
-    def memoized(orita_dir: str = default_dir) -> list:
+    def memoized(orita_dir: str = default_dir) -> list[_V]:
         key = os.path.realpath(orita_dir)
         if key not in cache:
             cache[key] = uncached_fn(orita_dir)

@@ -55,6 +55,7 @@ from __future__ import annotations
 import os
 import re
 import sys
+from collections.abc import Iterator
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import quoted_citation  # noqa: E402
@@ -158,7 +159,7 @@ _iter_public_files = scan_files.iter_public_files
 # `_NEGATION_CUES` globals rather than local copies of the loop and the
 # guard; tests/test_sentence_negation.py asserts each sibling's real
 # output matches its own frozen pre-refactor fixture.
-def _sentences(text: str):
+def _sentences(text: str) -> Iterator[tuple[int, int]]:
     return sentence_negation.iter_sentences(text, _SENTENCE_BOUNDARY)
 
 
@@ -175,12 +176,12 @@ def _is_negated(sentence: str, match_start: int) -> bool:
 _is_quoted_citation = quoted_citation.is_quoted_citation
 
 
-def _find_violations_uncached(orita_dir: str = DEFAULT_ORITA_DIR) -> list:
+def _find_violations_uncached(orita_dir: str = DEFAULT_ORITA_DIR) -> list[dict[str, object]]:
     """Task 104: read-only scan of every public .md/.html file in the town
     checkout for a sentence confirming or denying the Hand's theology past
     the sanctioned lore (Iron Rule #2). Returns a list of violation
     records, empty when the rule has genuinely held. Never writes."""
-    violations = []
+    violations: list[dict[str, object]] = []
     for path in _iter_public_files(orita_dir):
         try:
             with open(path, encoding="utf-8") as f:
@@ -216,7 +217,7 @@ def _find_violations_uncached(orita_dir: str = DEFAULT_ORITA_DIR) -> list:
 find_violations, clear_cache = scan_files.path_memoize(_find_violations_uncached, DEFAULT_ORITA_DIR)
 
 
-def format_violations(violations: list) -> str:
+def format_violations(violations: list[dict[str, object]]) -> str:
     return violation_format.format_violations(
         "hand lore check",
         violations,

@@ -38,6 +38,7 @@ import os
 import re
 import sys
 from datetime import date, datetime, timedelta, timezone
+from typing import cast
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import date_cadence  # noqa: E402
@@ -49,7 +50,7 @@ TARGET_STREAK_DAYS = 30  # mirrors report_cadence_check.py's own daily target
 _DATE_RE = re.compile(r"^(\d{4})-(\d{2})-(\d{2})$")
 
 
-def _read_dates(metrics_path: str) -> list:
+def _read_dates(metrics_path: str) -> list[date]:
     """Every real calendar date named by a `"date"` field in a valid JSON
     line of `metrics_path`, sorted ascending. A malformed line (bad JSON,
     missing/malformed date) is silently skipped -- the same "ignore what
@@ -83,7 +84,7 @@ def _read_dates(metrics_path: str) -> list:
     return sorted(set(dates))
 
 
-def compute_cadence(metrics_path: str | None = None, target: int = TARGET_STREAK_DAYS) -> dict:
+def compute_cadence(metrics_path: str | None = None, target: int = TARGET_STREAK_DAYS) -> dict[str, object]:
     """The real numbers behind the daily-aggregate cadence
     TOWN-OPERATIONS.md's 18:00 UTC hour promises.
 
@@ -103,7 +104,7 @@ def compute_cadence(metrics_path: str | None = None, target: int = TARGET_STREAK
     return date_cadence.compute_date_streak_and_gaps(dates, target)
 
 
-def compute_metrics_freshness(now: datetime, metrics_path: str | None = None) -> dict:
+def compute_metrics_freshness(now: datetime, metrics_path: str | None = None) -> dict[str, object]:
     """Task 549. The freshness half `compute_cadence` above doesn't hold
     and structurally can't: `missing_dates` only ever walks calendar days
     STRICTLY BETWEEN `first_date` and `most_recent_date`, so a gap more
@@ -135,7 +136,7 @@ def compute_metrics_freshness(now: datetime, metrics_path: str | None = None) ->
     return {"status": "stale", "date": today.isoformat(), "fallback_date": None}
 
 
-def format_metrics_freshness(result: dict) -> str:
+def format_metrics_freshness(result: dict[str, object]) -> str:
     if result["status"] == "current":
         return f"metrics freshness: current ({result['date']})"
     if result["status"] == "pending":
@@ -143,7 +144,7 @@ def format_metrics_freshness(result: dict) -> str:
     return f"metrics freshness: STALE -- no daily-aggregate reading for {result['date']} or the day before"
 
 
-def format_cadence(result: dict) -> str:
+def format_cadence(result: dict[str, object]) -> str:
     if result["total_shipped"] == 0:
         return "metrics cadence: no daily-aggregate reading has ever shipped -- nothing to count yet"
     lines = [
@@ -153,8 +154,9 @@ def format_cadence(result: dict) -> str:
         f"{result['total_shipped']} shipped total, most recent {result['most_recent_date']}"
     ]
     if result["missing_dates"]:
-        joined = ", ".join(result["missing_dates"])
-        lines.append(f"  {len(result['missing_dates'])} historical gap day(s), already on record: {joined}")
+        missing_dates = cast("list[str]", result["missing_dates"])
+        joined = ", ".join(missing_dates)
+        lines.append(f"  {len(missing_dates)} historical gap day(s), already on record: {joined}")
     else:
         lines.append("  no gap day between first and most recent shipped reading")
     return "\n".join(lines)

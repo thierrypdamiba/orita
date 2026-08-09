@@ -59,6 +59,7 @@ import json
 import os
 import re
 import sys
+from typing import cast
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DEFAULT_METRICS_PATH = os.path.join(ROOT, "records", "metrics.jsonl")
@@ -73,7 +74,7 @@ STRUCTURAL_FIELDS = frozenset({"date", "notes"})
 _SELF_PATH = os.path.abspath(__file__)
 
 
-def _metrics_fields(metrics_path: str) -> set:
+def _metrics_fields(metrics_path: str) -> set[str]:
     """Every non-structural field key that has ever appeared in any line
     of `records/metrics.jsonl`. A malformed line is skipped, not raised
     -- this check exists to name unguarded fields, not to duplicate a
@@ -96,12 +97,12 @@ def _metrics_fields(metrics_path: str) -> set:
     return fields - STRUCTURAL_FIELDS
 
 
-def _quoted_literal_pattern(field: str) -> re.Pattern:
+def _quoted_literal_pattern(field: str) -> re.Pattern[str]:
     escaped = re.escape(field)
     return re.compile(rf"""(["']){escaped}\1""")
 
 
-def _guarded_fields(tools_dir: str, fields: set) -> set:
+def _guarded_fields(tools_dir: str, fields: set[str]) -> set[str]:
     """The subset of `fields` that appear as a quoted string literal
     somewhere in a `tools/*_check.py` file's own source. This module's
     own file is excluded so it can never satisfy its own check merely by
@@ -129,7 +130,7 @@ def _guarded_fields(tools_dir: str, fields: set) -> set:
 def check_metrics_field_completeness(
     metrics_path: str = DEFAULT_METRICS_PATH,
     tools_dir: str = DEFAULT_TOOLS_DIR,
-) -> dict:
+) -> dict[str, object]:
     """Returns `clean: True` with the guarded field set when every
     non-structural field ever recorded in `records/metrics.jsonl` is
     referenced as a quoted string literal in some `tools/*_check.py` file
@@ -147,18 +148,20 @@ def check_metrics_field_completeness(
     }
 
 
-def format_result(result: dict) -> str:
+def format_result(result: dict[str, object]) -> str:
     if result["clean"]:
+        fields = cast("list[str]", result["fields"])
         return (
-            f"metrics field completeness: clean ({len(result['fields'])} field(s) ever recorded in "
+            f"metrics field completeness: clean ({len(fields)} field(s) ever recorded in "
             "records/metrics.jsonl, every one guarded by a tools/*_check.py cross-check)"
         )
+    unguarded = cast("list[str]", result["unguarded"])
     lines = [
-        f"metrics field completeness: {len(result['unguarded'])} UNGUARDED FIELD(S) -- "
+        f"metrics field completeness: {len(unguarded)} UNGUARDED FIELD(S) -- "
         "recorded in records/metrics.jsonl but never referenced as a quoted literal by any "
         "tools/*_check.py cross-check"
     ]
-    for field in result["unguarded"]:
+    for field in unguarded:
         lines.append(f"  {field!r}")
     return "\n".join(lines)
 

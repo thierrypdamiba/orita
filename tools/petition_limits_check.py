@@ -53,6 +53,7 @@ import os
 import re
 import sys
 import unicodedata
+from collections.abc import Iterator
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import quoted_citation  # noqa: E402
@@ -154,7 +155,7 @@ def _is_negated_or_predictive(text: str, match_start: int) -> bool:
 _is_quoted_citation = quoted_citation.is_quoted_citation
 
 
-def _iter_petition_files(orita_dir: str):
+def _iter_petition_files(orita_dir: str) -> Iterator[tuple[str, str]]:
     houses_dir = os.path.join(orita_dir, "houses")
     if not os.path.isdir(houses_dir):
         return
@@ -197,12 +198,12 @@ def _petitioner_prose(text: str) -> str:
     return "\n\n".join(parts)
 
 
-def find_violations(orita_dir: str = DEFAULT_ORITA_DIR) -> list:
+def find_violations(orita_dir: str = DEFAULT_ORITA_DIR) -> list[dict[str, object]]:
     """Task 107: read-only scan of every altar petition's own ask for
     CHARTER.md Appendix D's three LIMITS. Returns a list of violation
     records, empty when every petition genuinely held the clause. Never
     writes."""
-    violations = []
+    violations: list[dict[str, object]] = []
     for dir_slug, path in _iter_petition_files(orita_dir):
         try:
             with open(path, encoding="utf-8") as f:
@@ -244,13 +245,13 @@ def find_violations(orita_dir: str = DEFAULT_ORITA_DIR) -> list:
     return violations
 
 
-def _record(path: str, text: str, m: "re.Match", label: str) -> dict:
+def _record(path: str, text: str, m: "re.Match[str]", label: str) -> dict[str, object]:
     line_no = text.count("\n", 0, m.start()) + 1
     snippet = text[max(0, m.start() - 30):m.end() + 30].replace("\n", " ").strip()
     return {"file": path, "line": line_no, "pattern": label, "snippet": snippet}
 
 
-def format_violations(violations: list) -> str:
+def format_violations(violations: list[dict[str, object]]) -> str:
     return violation_format.format_violations(
         "petition limits check",
         violations,

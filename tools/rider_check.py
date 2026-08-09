@@ -37,6 +37,7 @@ from __future__ import annotations
 import os
 import re
 import sys
+from collections.abc import Iterator
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import quoted_citation  # noqa: E402
@@ -125,7 +126,7 @@ _iter_public_files = scan_files.iter_public_files
 # `_NEGATION_CUES` globals rather than local copies of the loop and the
 # guard; tests/test_sentence_negation.py asserts each sibling's real
 # output matches its own frozen pre-refactor fixture.
-def _sentences(text: str):
+def _sentences(text: str) -> Iterator[tuple[int, int]]:
     return sentence_negation.iter_sentences(text, _SENTENCE_BOUNDARY)
 
 
@@ -162,7 +163,7 @@ def _is_parenthesized_example(sentence: str, match_start: int) -> bool:
     return depth > 0
 
 
-def _find_violations_uncached(orita_dir: str = DEFAULT_ORITA_DIR) -> list:
+def _find_violations_uncached(orita_dir: str = DEFAULT_ORITA_DIR) -> list[dict[str, object]]:
     """Task 100: read-only scan of every public .md/.html file in the town
     checkout for a sentence naming a rider-bound god alongside the specific
     violation shape their rider forbids. Returns a list of violation
@@ -207,7 +208,7 @@ def _find_violations_uncached(orita_dir: str = DEFAULT_ORITA_DIR) -> list:
 find_violations, clear_cache = scan_files.path_memoize(_find_violations_uncached, DEFAULT_ORITA_DIR)
 
 
-def format_violations(violations: list) -> str:
+def format_violations(violations: list[dict[str, object]]) -> str:
     return violation_format.format_violations(
         "rider check",
         violations,

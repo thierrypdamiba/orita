@@ -161,7 +161,7 @@ def _target_exists(target: str, require_index: bool = True) -> bool:
     return False
 
 
-_VIOLATIONS_CACHE: dict[tuple[str, bool], list] = {}
+_VIOLATIONS_CACHE: dict[tuple[str, bool], list[dict[str, object]]] = {}
 
 
 def clear_cache() -> None:
@@ -172,14 +172,16 @@ def clear_cache() -> None:
     _VIOLATIONS_CACHE.clear()
 
 
-def find_violations(docs_dir: str = DEFAULT_DOCS_DIR, require_index: bool = True) -> list:
+def find_violations(docs_dir: str = DEFAULT_DOCS_DIR, require_index: bool = True) -> list[dict[str, object]]:
     key = (os.path.realpath(docs_dir), require_index)
     if key not in _VIOLATIONS_CACHE:
         _VIOLATIONS_CACHE[key] = _find_violations_uncached(docs_dir, require_index=require_index)
     return list(_VIOLATIONS_CACHE[key])
 
 
-def _find_violations_uncached(docs_dir: str = DEFAULT_DOCS_DIR, require_index: bool = True) -> list:
+def _find_violations_uncached(
+    docs_dir: str = DEFAULT_DOCS_DIR, require_index: bool = True
+) -> list[dict[str, object]]:
     """Read-only, local-filesystem-only scan (no network, no import,
     no execution of the pages it audits) of every `docs/**/*.html` and
     `docs/**/*.md` file for a relative link that does not resolve to a
@@ -187,7 +189,7 @@ def _find_violations_uncached(docs_dir: str = DEFAULT_DOCS_DIR, require_index: b
     every internal link in the live site holds. `require_index` threads
     straight to `_target_exists` -- see its docstring for the `docs/` vs.
     GitHub-browsed-tree distinction."""
-    violations = []
+    violations: list[dict[str, object]] = []
     for path in _iter_site_files(docs_dir):
         try:
             with open(path, encoding="utf-8") as f:
@@ -209,7 +211,7 @@ def _find_violations_uncached(docs_dir: str = DEFAULT_DOCS_DIR, require_index: b
     return violations
 
 
-def format_violations(violations: list) -> str:
+def format_violations(violations: list[dict[str, object]]) -> str:
     if not violations:
         return "site link check: clean -- every internal docs/ link resolves"
     lines = [f"site link check: {len(violations)} BROKEN LINK(S) FOUND"]

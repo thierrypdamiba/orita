@@ -42,6 +42,7 @@ from __future__ import annotations
 import os
 import re
 import sys
+from collections.abc import Iterator
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import quoted_citation  # noqa: E402
@@ -113,7 +114,7 @@ _NEGATION_CUES = re.compile(
 )
 
 
-def _iter_scan_files(base_dir: str):
+def _iter_scan_files(base_dir: str) -> Iterator[str]:
     if not os.path.isdir(base_dir):
         return
     for dirpath, dirnames, filenames in os.walk(base_dir):
@@ -166,7 +167,7 @@ def _is_negated_or_predictive(text: str, match_start: int) -> bool:
 _is_quoted_citation = quoted_citation.is_quoted_citation
 
 
-def _find_violations_uncached(orita_dir: str = DEFAULT_ORITA_DIR) -> list:
+def _find_violations_uncached(orita_dir: str = DEFAULT_ORITA_DIR) -> list[dict[str, object]]:
     """Task 105: read-only scan of every public .md/.html file plus every
     RECIPES/*/detector.py and recipe.json in the town checkout for the
     grading/blame shape ROADMAP.md's constraint #2 forbids. Returns a list
@@ -197,7 +198,7 @@ def _find_violations_uncached(orita_dir: str = DEFAULT_ORITA_DIR) -> list:
 find_violations, clear_cache = scan_files.path_memoize(_find_violations_uncached, DEFAULT_ORITA_DIR)
 
 
-def format_violations(violations: list) -> str:
+def format_violations(violations: list[dict[str, object]]) -> str:
     return violation_format.format_violations(
         "no grading check",
         violations,
