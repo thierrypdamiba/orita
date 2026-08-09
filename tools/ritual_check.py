@@ -177,6 +177,7 @@ import subprocess
 import sys
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
+from typing import Any, cast
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DEFAULT_FENCEPOST_BASE = os.path.join(ROOT, "fencepost")
@@ -454,7 +455,7 @@ def _seam_ledger():
     return seam_ledger
 
 
-def check_town_ledger() -> dict:
+def check_town_ledger() -> dict[str, object]:
     """Verify records/ledger.jsonl by importing tools/ledger.py's own
     entries()/verify logic rather than re-implementing the chain walk or
     shelling out to a subprocess."""
@@ -470,7 +471,7 @@ def check_town_ledger() -> dict:
     return {"ok": True, "count": len(entries), "broken_at_seq": None}
 
 
-def check_fencepost_ledger(base: str = DEFAULT_FENCEPOST_BASE) -> dict:
+def check_fencepost_ledger(base: str = DEFAULT_FENCEPOST_BASE) -> dict[str, object]:
     """Verify the fencepost Gap Ledger tablet chain via seam_engine.ledger's
     own verify(), which returns a problems list rather than printing."""
     from pathlib import Path
@@ -481,7 +482,7 @@ def check_fencepost_ledger(base: str = DEFAULT_FENCEPOST_BASE) -> dict:
     return {"ok": not problems, "count": len(records), "problems": list(problems)}
 
 
-def check_report_freshness(now: datetime, reports_dir: str = DEFAULT_REPORTS_DIR) -> dict:
+def check_report_freshness(now: datetime, reports_dir: str = DEFAULT_REPORTS_DIR) -> dict[str, str | None]:
     """Whether today's (UTC) Fencepost Report exists. Missing-today-but-
     present-yesterday is the EXPECTED state before seam-scan.yml's daily
     cron fires -- reported as `pending`, not `stale`. Missing both today
@@ -497,11 +498,11 @@ def check_report_freshness(now: datetime, reports_dir: str = DEFAULT_REPORTS_DIR
     return {"status": "stale", "date": today, "fallback_path": None}
 
 
-def check_x_recheck(now_iso: str, cooldown_hours: float = 2.0) -> dict:
+def check_x_recheck(now_iso: str, cooldown_hours: float = 2.0) -> dict[str, object]:
     """should_recheck() for both tracked X tools, via the real log."""
     mod = _outage_tracker()
     entries = mod._entries()
-    result = {}
+    result: dict[str, object] = {}
     for tool in mod.TRACKED_TOOLS:
         result[tool] = {
             "due": mod.should_recheck(entries, tool, now_iso, cooldown_hours),
@@ -510,7 +511,7 @@ def check_x_recheck(now_iso: str, cooldown_hours: float = 2.0) -> dict:
     return result
 
 
-def check_x_escalation(now_iso: str) -> dict:
+def check_x_escalation(now_iso: str) -> dict[str, object]:
     """next_escalation_tier() for every tool in x_outage_tracker.TRACKED_TOOLS,
     via the real outage log and the real HAND/escalations.jsonl. Mirrors
     `check_x_recheck`'s exact shape (task 61) -- read-only, makes no write
@@ -542,7 +543,7 @@ def check_x_escalation(now_iso: str) -> dict:
     mod = _outage_tracker()
     entries = mod._entries(mod.LOG)
     escalation_entries = mod._escalation_entries(mod.ESCALATION_LOG)
-    result = {}
+    result: dict[str, object] = {}
     for tool in mod.TRACKED_TOOLS:
         tier = mod.next_escalation_tier(entries, tool, now_iso, escalation_entries=escalation_entries)
         if tier is not None:
@@ -566,7 +567,7 @@ def check_x_escalation(now_iso: str) -> dict:
     return result
 
 
-def check_square(square_state: dict | None, now_iso: str) -> dict | None:
+def check_square(square_state: dict[str, object] | None, now_iso: str) -> dict[str, object] | None:
     """Fold a caller-supplied, already-computed square state (task 70's
     `square_check.compute_square_state` output) through `square_delta`.
     Makes no network call -- `square_state` is None unless the caller
@@ -585,7 +586,7 @@ def check_square(square_state: dict | None, now_iso: str) -> dict | None:
     return {"changed": changed, "reason": reason}
 
 
-def check_arcade_apps(arcade_apps_state: dict | None, now_iso: str) -> dict | None:
+def check_arcade_apps(arcade_apps_state: dict[str, object] | None, now_iso: str) -> dict[str, object] | None:
     """Fold a caller-supplied, already-computed the-hand app-connection state
     (task 122's `arcade_app_watch.compute_app_state` output) through
     `app_delta`, mirroring `check_square` exactly. Makes no network call --
@@ -608,7 +609,7 @@ def check_arcade_apps(arcade_apps_state: dict | None, now_iso: str) -> dict | No
     return {"changed": changed, "reason": reason}
 
 
-def check_gateway_toolset(gateway_toolset_state: dict | None, now_iso: str) -> dict | None:
+def check_gateway_toolset(gateway_toolset_state: dict[str, object] | None, now_iso: str) -> dict[str, object] | None:
     """Fold a caller-supplied, already-computed live the-hand tool-name list
     (task 464's `gateway_toolset_check.compute_toolset_state` output)
     through `toolset_delta`, mirroring `check_arcade_apps` exactly. Makes
@@ -629,7 +630,7 @@ def check_gateway_toolset(gateway_toolset_state: dict | None, now_iso: str) -> d
     return {"changed": changed, "reason": reason}
 
 
-def check_good_first_issues(open_issues: list | None) -> dict | None:
+def check_good_first_issues(open_issues: list[dict[str, object]] | None) -> dict[str, object] | None:
     """Task 477: fold `good_first_issue_check.py`'s own live-vs-Charter
     compare into the one block. Makes no network call -- `open_issues` is
     None unless the caller already holds this hour's live `list_issues`
@@ -642,7 +643,7 @@ def check_good_first_issues(open_issues: list | None) -> dict | None:
     return mod.check_good_first_issues(open_issues)
 
 
-def check_scribe_growth(now_iso: str, scribe_root: str | None = None, record: bool = True) -> dict:
+def check_scribe_growth(now_iso: str, scribe_root: str | None = None, record: bool = True) -> dict[str, object]:
     """Task 168: ROADMAP.md/BUILDLOG.md's real byte size, watched. Unlike
     `check_square`/`check_arcade_apps`, a tracked file's size is local
     filesystem state, not a live API call behind this sandbox's proxy
@@ -667,7 +668,7 @@ def check_scribe_growth(now_iso: str, scribe_root: str | None = None, record: bo
     return result
 
 
-def check_ci(ci_checks: list | None) -> dict | None:
+def check_ci(ci_checks: list[dict[str, object]] | None) -> dict[str, object] | None:
     """Fold this hour's already-observed CI conclusions (task 73's
     `ci_watch.record_check` shape: `{workflow, conclusion, run_id,
     checked_at}` dicts) through the durable log. Makes no network call --
@@ -685,7 +686,7 @@ def check_ci(ci_checks: list | None) -> dict | None:
     return {w: mod.format_status_line(entries, w) for w in mod.TRACKED_WORKFLOWS}
 
 
-def check_cron(cron_checks: list | None, now_iso: str) -> dict | None:
+def check_cron(cron_checks: list[dict[str, object]] | None, now_iso: str) -> dict[str, object] | None:
     """Fold this hour's already-fetched `{workflow, cron_expr, last_run_at}`
     dicts through `cron_health.schedule_status`, mirroring `check_ci`'s
     exact live-API-input-but-no-network-call shape (task 73) rather than
@@ -700,16 +701,17 @@ def check_cron(cron_checks: list | None, now_iso: str) -> dict | None:
     if cron_checks is None:
         return None
     mod = _cron_health()
-    result = {}
+    result: dict[str, object] = {}
     for c in cron_checks:
+        workflow = cast(str, c["workflow"])
         try:
-            result[c["workflow"]] = mod.schedule_status(c["cron_expr"], c.get("last_run_at"), now_iso)
+            result[workflow] = mod.schedule_status(c["cron_expr"], c.get("last_run_at"), now_iso)
         except ValueError as e:
-            result[c["workflow"]] = {"status": "error", "error": str(e)}
+            result[workflow] = {"status": "error", "error": str(e)}
     return result
 
 
-def check_words(now_iso: str, record: bool = True) -> dict:
+def check_words(now_iso: str, record: bool = True) -> dict[str, object]:
     """Read the four places Thierry's words land (task 74's
     `word_watch.compute_word_state`) and fold through `word_delta`.
     Local filesystem only -- no network call, unlike `check_square`/
@@ -745,7 +747,7 @@ def check_words(now_iso: str, record: bool = True) -> dict:
     return {"changed": changed, "reason": reason}
 
 
-def check_owed_posts() -> dict:
+def check_owed_posts() -> dict[str, object]:
     """Task 55's `x_post_queue.pending_entries` -- the owed-report backlog
     count every hourly note has re-derived by hand ("N now pending") since
     task 55 shipped -- folded in the same local-filesystem-only, no-network
@@ -757,7 +759,7 @@ def check_owed_posts() -> dict:
     return {"count": len(entries), "tasks": [e["task"] for e in entries]}
 
 
-def _checkout_state(repo_dir: str) -> dict | None:
+def _checkout_state(repo_dir: str) -> dict[str, object] | None:
     """Read-only detached-HEAD probe for one repo dir, mirroring
     sync_checkout.sh's own case-1 detection exactly, never its recovery.
     Returns None if repo_dir isn't a git checkout at all -- a missing
@@ -779,7 +781,7 @@ def _checkout_state(repo_dir: str) -> dict | None:
     return {"repo": repo_dir, "detached": detached, "head_sha": head_sha, "branch": branch}
 
 
-def check_checkout(repo_dirs: tuple | None = None) -> list:
+def check_checkout(repo_dirs: tuple[str, ...] | None = None) -> list[dict[str, object]]:
     """Task 90: fold sync_checkout.sh's own detached-HEAD signal into the
     one block. Unconditional, local-filesystem-only (a `git` subprocess
     call against a local working tree, no network) -- the same cheap class
@@ -789,7 +791,7 @@ def check_checkout(repo_dirs: tuple | None = None) -> list:
     return [s for s in (_checkout_state(d) for d in repo_dirs) if s is not None]
 
 
-def check_vault_leak(orita_dir: str | None = None, vault_dir: str | None = None) -> dict:
+def check_vault_leak(orita_dir: str | None = None, vault_dir: str | None = None) -> dict[str, object]:
     """Task 98: fold vault_leak_check.py's own Proclamation-0001 compare
     into the one block. Unconditional, local-filesystem-only (reads both
     checkouts already on disk, no network) -- the same cheap class
@@ -806,7 +808,7 @@ def check_vault_leak(orita_dir: str | None = None, vault_dir: str | None = None)
     return {"clean": not leaks, "count": len(leaks), "leaks": leaks}
 
 
-def check_star_covenant(orita_dir: str | None = None) -> dict:
+def check_star_covenant(orita_dir: str | None = None) -> dict[str, object]:
     """Task 99: fold star_covenant_check.py's own imperative-begging scan
     into the one block. Unconditional, local-filesystem-only (reads the
     checkout already on disk, no network) -- the same cheap class
@@ -821,7 +823,7 @@ def check_star_covenant(orita_dir: str | None = None) -> dict:
     return {"clean": not violations, "count": len(violations), "violations": violations}
 
 
-def check_duplicate_regex(orita_dir: str | None = None) -> dict:
+def check_duplicate_regex(orita_dir: str | None = None) -> dict[str, object]:
     """Task 397: fold duplicate_regex_check.py's own ast-based re.compile
     duplication scan into the one block -- the running-check graduation
     tasks 389/390/393/394/396 kept promising by hand (five separate
@@ -841,7 +843,7 @@ def check_duplicate_regex(orita_dir: str | None = None) -> dict:
     return {"clean": not violations, "count": len(violations), "violations": violations}
 
 
-def check_riders(orita_dir: str | None = None) -> dict:
+def check_riders(orita_dir: str | None = None) -> dict[str, object]:
     """Task 100: fold rider_check.py's own five-god rider scan (Iron Rule
     #5) into the one block. Unconditional, local-filesystem-only (reads
     the checkout already on disk, no network) -- the same cheap class
@@ -857,7 +859,7 @@ def check_riders(orita_dir: str | None = None) -> dict:
     return {"clean": not violations, "count": len(violations), "violations": violations}
 
 
-def check_hand_lore(orita_dir: str | None = None) -> dict:
+def check_hand_lore(orita_dir: str | None = None) -> dict[str, object]:
     """Task 104: fold hand_lore_check.py's own Hand-theology scan (Iron
     Rule #2, "never confirm or deny their theology") into the one block.
     Unconditional, local-filesystem-only (reads the checkout already on
@@ -874,7 +876,7 @@ def check_hand_lore(orita_dir: str | None = None) -> dict:
     return {"clean": not violations, "count": len(violations), "violations": violations}
 
 
-def check_no_grading(orita_dir: str | None = None) -> dict:
+def check_no_grading(orita_dir: str | None = None) -> dict[str, object]:
     """Task 105: fold no_grading_check.py's own blame/grading scan
     (ROADMAP.md's non-negotiable design constraint #2, "No grading/
     competing... Name and rank no one") into the one block. Unconditional,
@@ -892,7 +894,7 @@ def check_no_grading(orita_dir: str | None = None) -> dict:
     return {"clean": not violations, "count": len(violations), "violations": violations}
 
 
-def check_arcade_hero(orita_dir: str | None = None) -> dict:
+def check_arcade_hero(orita_dir: str | None = None) -> dict[str, object]:
     """Task 106: fold arcade_hero_check.py's own direct-credential-handoff
     scan (ROADMAP.md's non-negotiable design constraint #4, "Arcade is the
     hero, shown safely -- per-user OAuth, least privilege, revocable,
@@ -910,7 +912,7 @@ def check_arcade_hero(orita_dir: str | None = None) -> dict:
     return {"clean": not violations, "count": len(violations), "violations": violations}
 
 
-def check_petition_limits(orita_dir: str | None = None) -> dict:
+def check_petition_limits(orita_dir: str | None = None) -> dict[str, object]:
     """Task 107: fold petition_limits_check.py's own scan of every altar
     petition's own ask against CHARTER.md Appendix D's LIMITS clause ("No
     petition may request a star, mention the counter, or ask the Hand to
@@ -929,8 +931,8 @@ def check_petition_limits(orita_dir: str | None = None) -> dict:
 
 
 def check_child_work(
-    child_files: list | None, now_iso: str, path: str | None = None, repo_root: str | None = None
-) -> dict:
+    child_files: list[dict[str, object]] | None, now_iso: str, path: str | None = None, repo_root: str | None = None
+) -> dict[str, object]:
     """Task 101: fold `child_work_check.py`'s Iron Rule #6 check ("the
     child's work is never reverted. LAW.") into the one block. Unlike
     `check_riders`/`check_star_covenant`/`check_vault_leak`, this is NOT
@@ -946,7 +948,7 @@ def check_child_work(
     return mod.check(child_files=child_files, now_iso=now_iso, **kwargs)
 
 
-def check_verdict_provenance(orita_dir: str | None = None) -> dict:
+def check_verdict_provenance(orita_dir: str | None = None) -> dict[str, object]:
     """Task 102: fold verdict_provenance_check.py's own public-verdict-vs-
     altar-record compare (Iron Rule #3) into the one block. Unconditional,
     local-filesystem-only (reads the checkout already on disk, no network)
@@ -963,8 +965,8 @@ def check_verdict_provenance(orita_dir: str | None = None) -> dict:
 
 
 def check_voice_window(
-    commits: list | None, now_iso: str, path: str | None = None
-) -> dict:
+    commits: list[dict[str, object]] | None, now_iso: str, path: str | None = None
+) -> dict[str, object]:
     """Task 103: fold `voice_window_check.py`'s Iron Rule #7 window check
     ("Nyx- and Zashiki-voiced commits carry author timestamps in that
     window") into the one block. Mirrors `check_child_work`'s live-input
@@ -980,7 +982,7 @@ def check_voice_window(
     return mod.check(commits=commits, now_iso=now_iso, **kwargs)
 
 
-def check_petition_cadence(orita_dir: str | None = None) -> dict:
+def check_petition_cadence(orita_dir: str | None = None) -> dict[str, object]:
     """Task 109: fold `petition_cadence_check.py`'s own scan into the one
     block. Unconditional, local-filesystem-only (reads the checkout
     already on disk, no network) -- the same cheap class
@@ -996,7 +998,7 @@ def check_petition_cadence(orita_dir: str | None = None) -> dict:
     return {"clean": not violations, "count": len(violations), "violations": violations}
 
 
-def check_journal_numbering(orita_dir: str | None = None, vault_dir: str | None = None) -> dict:
+def check_journal_numbering(orita_dir: str | None = None, vault_dir: str | None = None) -> dict[str, object]:
     """Task 119 (widened task 370): fold `journal_numbering_check.py`'s
     own scan into the one block. Unconditional, local-filesystem-only,
     the same cheap class `check_petition_cadence` already holds -- every
@@ -1023,7 +1025,7 @@ def check_journal_numbering(orita_dir: str | None = None, vault_dir: str | None 
     return {"clean": not violations, "count": len(violations), "violations": violations}
 
 
-def check_report_cadence(reports_dir: str | None = None) -> dict:
+def check_report_cadence(reports_dir: str | None = None) -> dict[str, object]:
     """Task 116: fold `report_cadence_check.py`'s own scan into the one
     block. Unconditional, local-filesystem-only, the same cheap class
     `check_petition_cadence` already holds -- STRATEGY.md's own leading
@@ -1040,7 +1042,7 @@ def check_report_cadence(reports_dir: str | None = None) -> dict:
     return mod.compute_cadence(**kwargs)
 
 
-def check_metrics_cadence(metrics_path: str | None = None) -> dict:
+def check_metrics_cadence(metrics_path: str | None = None) -> dict[str, object]:
     """Task 117: fold `metrics_cadence_check.py`'s own scan into the one
     block. Unconditional, local-filesystem-only, the same cheap
     informational class `check_report_cadence`/`check_petition_cadence`
@@ -1059,7 +1061,7 @@ def check_metrics_cadence(metrics_path: str | None = None) -> dict:
     return mod.compute_cadence(**kwargs)
 
 
-def check_metrics_freshness(now: datetime, metrics_path: str | None = None) -> dict:
+def check_metrics_freshness(now: datetime, metrics_path: str | None = None) -> dict[str, object]:
     """Task 549: the freshness half `check_metrics_cadence` doesn't and
     structurally can't hold -- its own `missing_dates` walk only ever
     covers days strictly BETWEEN the first and most recent shipped
@@ -1081,7 +1083,7 @@ def check_metrics_freshness(now: datetime, metrics_path: str | None = None) -> d
     return mod.compute_metrics_freshness(now, **kwargs)
 
 
-def check_shared_reports(shared_path: str | None = None) -> dict:
+def check_shared_reports(shared_path: str | None = None) -> dict[str, object]:
     """Task 120: fold `shared_reports_check.py`'s own scan into the one
     block. Unconditional, local-filesystem-only, the same cheap
     informational class `check_report_cadence`/`check_metrics_cadence`
@@ -1103,7 +1105,7 @@ def check_ritual_completeness(
     source_path: str | None = None,
     tools_dir: str | None = None,
     seam_engine_dir: str | None = None,
-) -> dict:
+) -> dict[str, object]:
     """Task 121: fold `ritual_completeness_check.py`'s own static, AST-only
     audit of THIS FILE into the one block it audits. Unconditional, like
     every other doctrine check -- but unlike `report_cadence`/
@@ -1130,7 +1132,7 @@ def check_ritual_completeness(
     return mod.compute_ritual_completeness(**kwargs)
 
 
-def check_wip_reclaim(now: datetime, roadmap_path: str | None = None) -> dict:
+def check_wip_reclaim(now: datetime, roadmap_path: str | None = None) -> dict[str, object]:
     """Task 123: fold `wip_reclaim_check.py`'s own scan of `ROADMAP.md`'s
     task table into the one block. Unconditional, local-filesystem-only,
     the same cheap class `check_journal_numbering`/`check_petition_cadence`
@@ -1148,7 +1150,7 @@ def check_wip_reclaim(now: datetime, roadmap_path: str | None = None) -> dict:
     return mod.find_stale(**kwargs)
 
 
-def check_scopes_completeness(scopes_path: str | None = None, app_log_path: str | None = None) -> dict:
+def check_scopes_completeness(scopes_path: str | None = None, app_log_path: str | None = None) -> dict[str, object]:
     """Task 135: fold `scopes_completeness_check.py`'s own cross-check of
     `fencepost/SCOPES.md`'s `## Every connected app, accounted for`
     section against `arcade_app_watch.py`'s durable log into the one
@@ -1168,7 +1170,7 @@ def check_scopes_completeness(scopes_path: str | None = None, app_log_path: str 
     return mod.check_scopes_completeness(**kwargs)
 
 
-def check_toolkits_in_use(metrics_path: str | None = None, consent_log_path: str | None = None) -> dict:
+def check_toolkits_in_use(metrics_path: str | None = None, consent_log_path: str | None = None) -> dict[str, object]:
     """Task 145: fold `toolkits_in_use_check.py`'s own cross-check of
     `records/metrics.jsonl`'s last `distinct_toolkits_in_use` reading
     against `consent_grant_log.py`'s real, gate-verified ground truth
@@ -1188,7 +1190,7 @@ def check_toolkits_in_use(metrics_path: str | None = None, consent_log_path: str
     return mod.check_toolkits_in_use(**kwargs)
 
 
-def check_connected_users(metrics_path: str | None = None, consent_log_path: str | None = None) -> dict:
+def check_connected_users(metrics_path: str | None = None, consent_log_path: str | None = None) -> dict[str, object]:
     """Task 412: fold `connected_users_check.py`'s own cross-check of
     `records/metrics.jsonl`'s last `connected_users_oauth` reading
     against `consent_grant_log.py`'s real, gate-verified ground truth
@@ -1213,7 +1215,7 @@ def check_connected_users(metrics_path: str | None = None, consent_log_path: str
     return mod.check_connected_users(**kwargs)
 
 
-def check_cluster_day_cadence(chronicle_dir: str | None = None, today=None) -> dict:
+def check_cluster_day_cadence(chronicle_dir: str | None = None, today=None) -> dict[str, object]:
     """Task 387: fold `cluster_day_check.py`'s own weekly Cluster Day scan
     into the one block. Unconditional, local-filesystem-only, the same
     cheap informational class `check_report_cadence`/`check_metrics_cadence`
@@ -1236,7 +1238,7 @@ def check_cluster_day_cadence(chronicle_dir: str | None = None, today=None) -> d
     return mod.compute_cadence(**kwargs)
 
 
-def check_what_moved_cadence(what_moved_path: str | None = None, what_moved_today=None) -> dict:
+def check_what_moved_cadence(what_moved_path: str | None = None, what_moved_today=None) -> dict[str, object]:
     """Task 449: fold `what_moved_check.py`'s own weekly `docs/what-moved.html`
     scan into the one block, alongside `check_cluster_day_cadence`'s own
     fold-in of Ananse's chronicle half. Unconditional, local-filesystem-
@@ -1264,7 +1266,7 @@ def check_thegap_cadence(
     thegap_readme_path: str | None = None,
     thegap_vault_dir: str | None = None,
     thegap_today=None,
-) -> dict:
+) -> dict[str, object]:
     """Task 463: fold `thegap_check.py`'s own weekly Gap-bug hide/confess
     scan into the one block, closing the third and last leg of
     TOWN-OPERATIONS.md's "Weekly, Cluster Day (Monday)" ritual --
@@ -1300,7 +1302,7 @@ def check_thegap_cadence(
 def check_nyx_traffic_cadence(
     nyx_traffic_vault_dir: str | None = None,
     nyx_traffic_today=None,
-) -> dict:
+) -> dict[str, object]:
     """Task 465: fold `nyx_traffic_check.py`'s own weekly traffic-report
     scan into the one block, closing the fourth leg of TOWN-OPERATIONS.md's
     "Weekly, Cluster Day (Monday)" ritual -- `check_cluster_day_cadence`
@@ -1325,7 +1327,7 @@ def check_nyx_traffic_cadence(
     return mod.compute_cadence(**kwargs)
 
 
-def check_strategy_targets(strategy_path: str | None = None) -> dict:
+def check_strategy_targets(strategy_path: str | None = None) -> dict[str, object]:
     """Task 407: fold strategy_targets_check.py's own STRATEGY.md-vs-code
     target cross-check (task 159) into the one block. Unconditional,
     local-filesystem-only (reads STRATEGY.md and the real modules it
@@ -1359,7 +1361,7 @@ def check_strategy_targets(strategy_path: str | None = None) -> dict:
 
 def check_strategy_true_positive(
     strategy_path: str | None = None, ledger_base: str | None = None
-) -> dict:
+) -> dict[str, object]:
     """Task 410: fold `fencepost/seam_engine/src/seam_engine/
     strategy_audit_target.py`'s own STRATEGY.md-vs-live-Ledger true-positive
     rate cross-check (task 161) into the one block. Unconditional,
@@ -1399,7 +1401,7 @@ def check_strategy_true_positive(
 
 def check_gap_true_positive_rate(
     metrics_path: str | None = None, ledger_base: str | None = None
-) -> dict:
+) -> dict[str, object]:
     """Task 413: fold `gap_true_positive_check.py`'s own cross-check of
     `records/metrics.jsonl`'s last `gap_true_positive_rate` reading
     against the real, live `seam_engine.audit.audit_ledger()` tally into
@@ -1430,7 +1432,7 @@ def check_gap_true_positive_rate(
     return mod.check_gap_true_positive_rate(**kwargs)
 
 
-def check_report_shipped(metrics_path: str | None = None, reports_dir: str | None = None) -> dict:
+def check_report_shipped(metrics_path: str | None = None, reports_dir: str | None = None) -> dict[str, object]:
     """Task 415: fold `report_shipped_check.py`'s own cross-check of
     `records/metrics.jsonl`'s last `reports_shipped_today` reading
     against real, live filesystem ground truth into the one block -- the
@@ -1462,7 +1464,7 @@ def check_report_shipped(metrics_path: str | None = None, reports_dir: str | Non
     return mod.check_report_shipped(**kwargs)
 
 
-def check_tasks_shipped(metrics_path: str | None = None, buildlog_path: str | None = None) -> dict:
+def check_tasks_shipped(metrics_path: str | None = None, buildlog_path: str | None = None) -> dict[str, object]:
     """Task 416: fold `tasks_shipped_check.py`'s own cross-check of
     `records/metrics.jsonl`'s last `tasks_shipped_today` reading against
     real, live `BUILDLOG.md` ground truth into the one block -- the last
@@ -1500,7 +1502,7 @@ def check_github_stars(
     metrics_path: str | None = None,
     log_path: str | None = None,
     record: bool = False,
-) -> dict:
+) -> dict[str, object]:
     """Task 420: fold `github_stars_check.py`'s own cross-check of
     `records/metrics.jsonl`'s last `github_stars` reading against the
     real, live GitHub stargazer count into the one block -- STRATEGY.md's
@@ -1546,7 +1548,7 @@ def check_github_stars(
     return mod.check_github_stars(**kwargs)
 
 
-def check_network_boundary(dirs: tuple | None = None) -> dict:
+def check_network_boundary(dirs: tuple[str, ...] | None = None) -> dict[str, object]:
     """Task 408: fold network_boundary_check.py's own AST-based "no
     network" trust-boundary sweep (tasks 163/164) into the one block.
     Unconditional, local-filesystem-only (reads `tools/*.py` and
@@ -1575,7 +1577,7 @@ def check_network_boundary(dirs: tuple | None = None) -> dict:
     return {"clean": not broken, "count": len(raw), "broken": broken}
 
 
-def check_site_links(docs_dir: str | None = None) -> dict:
+def check_site_links(docs_dir: str | None = None) -> dict[str, object]:
     """Task 423: fold site_link_check.py's own internal-link scan into the
     one block -- CHARTER.md Appendix B names Ogun's charter duty plainly
     ("links unbroken"), and it never had a running check the way its own
@@ -1593,7 +1595,7 @@ def check_site_links(docs_dir: str | None = None) -> dict:
     return {"clean": not violations, "count": len(violations), "violations": violations}
 
 
-def check_house_links(houses_dir: str | None = None) -> dict:
+def check_house_links(houses_dir: str | None = None) -> dict[str, object]:
     """Task 473: the `houses/`-aware sibling `check_site_links` task 472
     named as real, left-open future work rather than shipping half-built.
     `site_link_check.py` (task 423) only ever scanned `docs/`, the Pages-
@@ -1621,7 +1623,7 @@ def check_house_links(houses_dir: str | None = None) -> dict:
     return {"clean": not violations, "count": len(violations), "violations": violations}
 
 
-def check_fencepost_links(fencepost_dir: str | None = None) -> dict:
+def check_fencepost_links(fencepost_dir: str | None = None) -> dict[str, object]:
     """Task 483: the third sibling of `check_site_links`/`check_house_links`
     -- `fencepost/README.md` and its neighbors (`ONBOARDING.md`,
     `SCOPES.md`, `CONNECT.md`, ...) are GitHub-browsed, not Pages-served,
@@ -1661,7 +1663,7 @@ EXPECTED_ISSUE_TEMPLATES = frozenset(
 )
 
 
-def check_issue_template_links(issue_template_dir: str | None = None) -> dict:
+def check_issue_template_links(issue_template_dir: str | None = None) -> dict[str, object]:
     """Task 506 (Esu-Elegba): the fourth sibling of `check_site_links`/
     `check_house_links`/`check_fencepost_links` -- `.github/ISSUE_TEMPLATE/`
     is Esu's own claimed edge of the repo (her `github_behavior` names
@@ -1726,7 +1728,7 @@ def check_issue_template_links(issue_template_dir: str | None = None) -> dict:
     }
 
 
-def check_hand_links(hand_dir: str | None = None) -> dict:
+def check_hand_links(hand_dir: str | None = None) -> dict[str, object]:
     """Task 521 (Kothar-wa-Khasis): the fifth sibling of `check_site_links`/
     `check_house_links`/`check_fencepost_links`/`check_issue_template_links`
     -- `HAND/`, the Hand's own public record (verdicts, the petition queue,
@@ -1758,7 +1760,7 @@ def check_hand_links(hand_dir: str | None = None) -> dict:
     return {"clean": not violations, "count": len(violations), "violations": violations}
 
 
-def check_chronicle_links(chronicle_dir: str | None = None) -> dict:
+def check_chronicle_links(chronicle_dir: str | None = None) -> dict[str, object]:
     """Task 524 (Kwaku-Ananse): the sixth sibling of `check_site_links`/
     `check_house_links`/`check_fencepost_links`/`check_issue_template_links`/
     `check_hand_links` -- `chronicle/`, my own episode ledger
@@ -1789,7 +1791,7 @@ def check_chronicle_links(chronicle_dir: str | None = None) -> dict:
     return {"clean": not violations, "count": len(violations), "violations": violations}
 
 
-def check_chronicle_readme(readme_path: str | None = None, chronicle_readme_dir: str | None = None) -> dict:
+def check_chronicle_readme(readme_path: str | None = None, chronicle_readme_dir: str | None = None) -> dict[str, object]:
     """Task 545 (Nyx): the reverse half `check_chronicle_links` (task 524)
     never asked. That check proves every link IN `chronicle/README.md`
     resolves; it never asks whether every real numbered episode ON DISK
@@ -1810,7 +1812,7 @@ def check_chronicle_readme(readme_path: str | None = None, chronicle_readme_dir:
     return mod.check_chronicle_readme(**kwargs)
 
 
-def check_proclamation_count(readme_path: str | None = None, proclamations_dir: str | None = None) -> dict:
+def check_proclamation_count(readme_path: str | None = None, proclamations_dir: str | None = None) -> dict[str, object]:
     """Task 547 (Kothar-wa-Khasis): `HAND/README.md`'s own "There has/have
     been <word>." sentence naming how many unpetitioned proclamations
     exist, read live against `HAND/proclamations/*.md` -- confirmed live
@@ -1831,7 +1833,7 @@ def check_proclamation_count(readme_path: str | None = None, proclamations_dir: 
     return mod.check_proclamation_count(**kwargs)
 
 
-def check_badge_freshness(badge_path: str | None = None) -> dict:
+def check_badge_freshness(badge_path: str | None = None) -> dict[str, object]:
     """Task 425: fold badge_freshness_check.py's own live-recompute-vs-
     committed-file cross-check into the one block. `seam-scan.yml`'s daily
     "repaint the read-only badge" step runs `seam_engine.badge --write`
@@ -1854,7 +1856,7 @@ def check_badge_freshness(badge_path: str | None = None) -> dict:
     return mod.check_badge_freshness(**kwargs)
 
 
-def check_recipe_readme(readme_path: str | None = None, recipe_fencepost_root: str | None = None) -> dict:
+def check_recipe_readme(readme_path: str | None = None, recipe_fencepost_root: str | None = None) -> dict[str, object]:
     """Task 426: fold `recipe_readme_check.py`'s own two-way cross-check of
     `fencepost/README.md`'s Community recipes section against the live
     `seam_engine.recipes.discover_recipes()` tree into the one block.
@@ -1883,7 +1885,7 @@ def check_recipe_readme(readme_path: str | None = None, recipe_fencepost_root: s
     return mod.check_recipe_readme(**kwargs)
 
 
-def check_site_recipe_readme(site_path: str | None = None, site_recipe_fencepost_root: str | None = None) -> dict:
+def check_site_recipe_readme(site_path: str | None = None, site_recipe_fencepost_root: str | None = None) -> dict[str, object]:
     """Task 554 (Kothar-wa-Khasis): fold `site_recipe_check.py`'s own
     two-way cross-check of `docs/fencepost/index.html`'s Community recipes
     section against the live `seam_engine.recipes.discover_recipes()` tree
@@ -1921,7 +1923,7 @@ def check_site_recipe_readme(site_path: str | None = None, site_recipe_fencepost
 def check_recipe_commands(
     recipe_command_fencepost_root: str | None = None,
     recipe_command_seam_engine_dir: str | None = None,
-) -> dict:
+) -> dict[str, object]:
     """Task 571 (Ogun): fold `recipe_command_check.py`'s own live
     execution of every recipe README's "Run it yourself" block into the
     one hourly pass. `check_recipe_readme`/`check_site_recipe_readme`
@@ -1951,7 +1953,7 @@ def check_recipe_commands(
     return mod.check_recipe_commands(**kwargs)
 
 
-def check_escape_sequences(orita_dir: str | None = None) -> dict:
+def check_escape_sequences(orita_dir: str | None = None) -> dict[str, object]:
     """Task 434: fold escape_sequence_check.py's own repo-wide compile-
     time scan into the one block. Found by accident this hour running
     both full suites clean against a freshly-installed sandbox: pytest's
@@ -1976,7 +1978,7 @@ def check_escape_sequences(orita_dir: str | None = None) -> dict:
 
 def check_metrics_field_completeness(
     metrics_path: str | None = None, tools_dir: str | None = None
-) -> dict:
+) -> dict[str, object]:
     """Task 459: fold `metrics_field_completeness_check.py`'s own
     structural sweep into the one block -- the third of its family
     alongside `check_ritual_completeness` (every `check_*` function
@@ -1996,7 +1998,7 @@ def check_metrics_field_completeness(
     return mod.check_metrics_field_completeness(**kwargs)
 
 
-def check_change_gate(report_info: dict) -> dict | None:
+def check_change_gate(report_info: dict[str, str | None]) -> dict[str, object] | None:
     """Fold `change_gate.should_post_gap()` -- task 69's own change-gate
     rule -- using whichever report text `check_report_freshness` already
     resolved (its `path` if `current`, its `fallback_path` if `pending`).
@@ -2018,12 +2020,12 @@ def check_change_gate(report_info: dict) -> dict | None:
 def run_ritual_check(
     now: datetime | None = None,
     fencepost_base: str = DEFAULT_FENCEPOST_BASE,
-    square_state: dict | None = None,
+    square_state: dict[str, object] | None = None,
     scribe_root: str | None = None,
-    ci_checks: list | None = None,
-    cron_checks: list | None = None,
-    checkout_dirs: tuple | None = None,
-    vault_leak_dirs: tuple | None = None,
+    ci_checks: list[dict[str, object]] | None = None,
+    cron_checks: list[dict[str, object]] | None = None,
+    checkout_dirs: tuple[str, ...] | None = None,
+    vault_leak_dirs: tuple[str, ...] | None = None,
     star_covenant_dir: str | None = None,
     duplicate_regex_dir: str | None = None,
     rider_dir: str | None = None,
@@ -2031,15 +2033,15 @@ def run_ritual_check(
     no_grading_dir: str | None = None,
     arcade_hero_dir: str | None = None,
     petition_limits_dir: str | None = None,
-    child_files: list | None = None,
+    child_files: list[dict[str, object]] | None = None,
     child_work_log: str | None = None,
     child_work_repo: str | None = None,
     verdict_provenance_dir: str | None = None,
-    voice_window_commits: list | None = None,
+    voice_window_commits: list[dict[str, object]] | None = None,
     voice_window_log: str | None = None,
     petition_cadence_dir: str | None = None,
     journal_numbering_dir: str | None = None,
-    journal_numbering_dirs: tuple | None = None,
+    journal_numbering_dirs: tuple[str, ...] | None = None,
     report_cadence_dir: str | None = None,
     metrics_cadence_path: str | None = None,
     shared_reports_path: str | None = None,
@@ -2047,9 +2049,9 @@ def run_ritual_check(
     ritual_completeness_tools_dir: str | None = None,
     ritual_completeness_seam_engine_dir: str | None = None,
     wip_reclaim_path: str | None = None,
-    arcade_apps_state: dict | None = None,
-    gateway_toolset_state: dict | None = None,
-    good_first_issues_state: list | None = None,
+    arcade_apps_state: dict[str, object] | None = None,
+    gateway_toolset_state: dict[str, object] | None = None,
+    good_first_issues_state: list[dict[str, object]] | None = None,
     scopes_path: str | None = None,
     app_log_path: str | None = None,
     toolkits_metrics_path: str | None = None,
@@ -2066,7 +2068,7 @@ def run_ritual_check(
     nyx_traffic_vault_dir: str | None = None,
     nyx_traffic_today=None,
     strategy_targets_path: str | None = None,
-    network_boundary_dirs: tuple | None = None,
+    network_boundary_dirs: tuple[str, ...] | None = None,
     site_link_docs_dir: str | None = None,
     house_links_houses_dir: str | None = None,
     fencepost_links_dir: str | None = None,
@@ -2101,7 +2103,7 @@ def run_ritual_check(
     record_scribe_growth: bool = False,
     record_words: bool = False,
     record_github_stars: bool = False,
-) -> dict:
+) -> dict[str, Any]:
     """Task 374: `record_scribe_growth` defaults `False` -- a bare or
     library call to this function (a dev-verification run, a test, a
     notebook exploration) must never silently write a real entry to the
@@ -2349,7 +2351,7 @@ def run_ritual_check(
     }
 
 
-def format_ritual_check(result: dict) -> str:
+def format_ritual_check(result: dict[str, Any]) -> str:
     lines = [f"ritual check @ {result['now']}"]
     for c in result["checkout"]:
         if c["detached"]:
