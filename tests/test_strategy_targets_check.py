@@ -288,5 +288,29 @@ class MutationCase(unittest.TestCase):
         self.assertNotEqual(real_strategy_target, tiu.TARGET_TOOLKITS)
 
 
+class LoadHelperCase(unittest.TestCase):
+    """Task 624. strategy_targets_check.py's own `_load()` -- the loader
+    `check_strategy_targets()` uses to live-load the two real modules it
+    cross-checks STRATEGY.md against -- called
+    `importlib.util.module_from_spec(spec)` / `spec.loader.exec_module(...)`
+    unconditionally, the same shape task 621 already fixed in
+    ritual_check.py's own `_load()`. `spec_from_file_location` returns
+    `None` (not a `ModuleSpec`) whenever the target path's extension has no
+    registered loader, and every current call site here hands `_load()` a
+    real `.py` relpath so the gap never fires today -- but it is a real,
+    reachable path for a future caller passing a typo'd or non-`.py`
+    relpath, not a hypothetical."""
+
+    def test_load_raises_named_error_for_unloadable_path(self):
+        with self.assertRaises(ImportError) as ctx:
+            stc._load("_test_load_helper_bogus", "README.md")
+        self.assertIn("_test_load_helper_bogus", str(ctx.exception))
+        self.assertIn("README.md", str(ctx.exception))
+
+    def test_load_still_loads_a_real_module(self):
+        mod = stc._load("_test_load_helper_real", "tools/word_watch.py")
+        self.assertTrue(hasattr(mod, "LOG"))
+
+
 if __name__ == "__main__":
     unittest.main()
