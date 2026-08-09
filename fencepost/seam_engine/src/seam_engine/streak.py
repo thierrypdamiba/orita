@@ -41,6 +41,7 @@ Recorded, then told. — Kwaku Ananse
 from __future__ import annotations
 
 from datetime import date, timedelta
+from itertools import pairwise
 from pathlib import Path
 from typing import Any
 
@@ -126,7 +127,7 @@ def longest_streak(base: Path | None = None) -> int:
         return 0
     longest = 1
     current = 1
-    for prev, cur in zip(dates, dates[1:]):
+    for prev, cur in pairwise(dates):
         if cur - prev == timedelta(days=1):
             current += 1
             longest = max(longest, current)

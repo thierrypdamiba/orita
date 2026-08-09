@@ -237,7 +237,12 @@ def _find_match(invite: GmailInvite, events: list[CalendarEvent]) -> CalendarEve
     TIME_TOLERANCE AND their titles share a real keyword — either signal
     alone is too weak (two meetings an hour apart, or two same-named
     meetings on different days, are not necessarily the same thing)."""
-    assert invite.event_start is not None and invite.event_title is not None
+    if invite.event_start is None or invite.event_title is None:
+        raise ValueError(
+            f"_find_match(): invite {invite.id} reached the matcher without "
+            "event_start/event_title set -- _is_invite() should have filtered "
+            "it out before this call; ruff S101 (task 618)."
+        )
     invite_kw = _keywords(invite.event_title)
     for ev in events:
         if abs((ev.start - invite.event_start).total_seconds()) > TIME_TOLERANCE.total_seconds():
@@ -299,7 +304,17 @@ def compute_gaps(
             ))
             continue
 
-        assert m.event_start is not None
+        if m.event_start is None:
+            # Unreachable at runtime -- the `_find_match` call just above
+            # already raises on this exact condition (task 618) -- but kept
+            # (rather than removed as dead code) because mypy cannot infer
+            # that a call on `m` narrows `m.event_start`'s own type; this is
+            # the narrowing, not a second independent runtime guard.
+            raise ValueError(
+                f"compute_gaps(): invite {m.id} reached the surfaced-gap branch "
+                "without event_start set -- unreachable given _find_match()'s "
+                "own guard just above; narrows the type for mypy (task 618)."
+            )
         confidence = 0.6
         confidence += 0.2 if m.event_start >= now else 0.05
         if m.subject.lower().startswith("invitation:"):

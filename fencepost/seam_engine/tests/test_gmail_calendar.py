@@ -431,3 +431,40 @@ def test_parse_ts_is_the_same_object_as_scans():
     structurally an edit to both."""
     from seam_engine import gmail_calendar, scan
     assert gmail_calendar._parse_ts is scan._parse_ts
+
+
+# --- internal invariant guards (task 618: assert -> raise, ruff S101) ----------
+
+
+def test_find_match_raises_named_error_when_invariant_is_violated():
+    """`_find_match` is only ever reached (via `compute_gaps`) after
+    `_is_invite` has already confirmed event_start/event_title are set --
+    the caller invariant used to be spelled `assert`, which `python -O`
+    strips from the running program, silently deleting the guard rather
+    than the caller of a broken invariant hitting the same clear error a
+    test does now. Called directly (module-private, same access pattern
+    `test_parse_ts_is_the_same_object_as_scans` already uses) to exercise
+    the violated-invariant path `compute_gaps`'s own control flow can never
+    reach for real."""
+    from seam_engine import gmail_calendar as mod
+    invite = _invite(event_title=None, event_start=None)
+    with pytest.raises(ValueError, match="_find_match"):
+        mod._find_match(invite, [_event()])
+
+
+def test_compute_gaps_raises_named_error_when_invariant_is_violated(monkeypatch):
+    """Same invariant, the second call site (`compute_gaps`'s own surfaced-
+    gap branch) -- unreachable at runtime given `_find_match`'s own guard
+    fires first on the identical condition, kept only as a mypy narrowing
+    (see the comment at its call site). Monkeypatches BOTH `_is_invite`
+    (the entry guard) and `_find_match` (the guard that would otherwise
+    raise first) to prove this second raise is correctly worded and really
+    is reachable code, not that it is reachable in real use -- it never is,
+    by construction, which is exactly why two independent patches are
+    needed to reach it at all."""
+    from seam_engine import gmail_calendar as mod
+    monkeypatch.setattr(mod, "_is_invite", lambda _msg: True)
+    monkeypatch.setattr(mod, "_find_match", lambda _msg, _events: None)
+    invite = _invite(event_title=None, event_start=None)
+    with pytest.raises(ValueError, match="compute_gaps"):
+        mod.compute_gaps([invite], [], now=FIXTURE_NOW)
