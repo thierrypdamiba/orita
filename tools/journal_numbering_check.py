@@ -100,7 +100,7 @@ def _scan_journal_dirs(dirs: list, realm: str) -> list:
     from. Filenames only -- never opens a file to read its content."""
     violations = []
     for house, journal_dir in dirs:
-        seen_numbers = {}
+        seen_numbers: dict[int, str] = {}
         for name in sorted(os.listdir(journal_dir)):
             full = os.path.join(journal_dir, name)
             if not os.path.isfile(full):

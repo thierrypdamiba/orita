@@ -79,7 +79,7 @@ def _metrics_fields(metrics_path: str) -> set:
     -- this check exists to name unguarded fields, not to duplicate a
     JSONL-integrity check some other module already owns. Missing file
     returns an empty set (nothing recorded yet is not a violation)."""
-    fields = set()
+    fields: set[str] = set()
     if not os.path.isfile(metrics_path):
         return fields
     with open(metrics_path, encoding="utf-8") as f:
@@ -107,7 +107,7 @@ def _guarded_fields(tools_dir: str, fields: set) -> set:
     own file is excluded so it can never satisfy its own check merely by
     naming a field in this docstring or its `STRUCTURAL_FIELDS`/test
     fixtures."""
-    guarded = set()
+    guarded: set[str] = set()
     remaining = set(fields)
     if not remaining:
         return guarded

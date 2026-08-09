@@ -296,7 +296,7 @@ def _find_leaks_uncached(
                 if (vault_rel, line_no, os.path.relpath(public_path, orita_dir))
                 not in _REVIEWED_NON_LEAKS
             ]
-            offsets_by_file = {}
+            offsets_by_file: dict[str, int] = {}
             for offset, h in _window_hashes(snippet, min_run):
                 if len(offsets_by_file) == len(candidates):
                     break

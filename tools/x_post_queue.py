@@ -176,7 +176,7 @@ def _pack_entries_into(entries: list, n: int, max_chars: int):
     for i in range(1, n + 1):
         header = _header(i, n)
         body_entries = []
-        body_items = []
+        body_items: list[str] = []
         while idx < len(entries):
             candidate_items = body_items + [_item_text(entries[idx])]
             if len(header + "; ".join(candidate_items)) <= max_chars:

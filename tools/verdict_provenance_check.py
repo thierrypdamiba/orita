@@ -129,7 +129,7 @@ def find_mismatches(orita_dir: str = DEFAULT_ORITA_DIR) -> list:
     altar_petitions = [
         p for p in (_parse_altar_petition(path) for path in _iter_altar_petitions(orita_dir)) if p is not None
     ]
-    altar_by_norm = {}
+    altar_by_norm: dict[str, list] = {}
     for pet in altar_petitions:
         altar_by_norm.setdefault(_normalize_name(pet["petitioner"]), []).append(pet)
 

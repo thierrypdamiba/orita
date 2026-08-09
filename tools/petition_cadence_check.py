@@ -71,7 +71,7 @@ def find_violations(orita_dir: str | None = None) -> list:
     orita_dir = orita_dir or DEFAULT_ORITA_DIR
     violations = []
     for house, petitions_dir in _petition_dirs(orita_dir):
-        seen_dates = {}
+        seen_dates: dict[str, str] = {}
         for name in sorted(os.listdir(petitions_dir)):
             full = os.path.join(petitions_dir, name)
             if not os.path.isfile(full):

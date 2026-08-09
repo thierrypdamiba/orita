@@ -147,7 +147,9 @@ def find_stale(
     rows = parse_table_rows(text)
     opens = parse_wip_open_times(text)
     open_wip = [r for r in rows if r["status"] == "WIP"]
-    stale, fresh, unknown = [], [], []
+    stale: list[dict] = []
+    fresh: list[dict] = []
+    unknown: list[dict] = []
     for row in open_wip:
         n = row["number"]
         if n not in opens:
