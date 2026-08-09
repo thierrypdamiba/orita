@@ -59,7 +59,7 @@ import json
 import re
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any, Callable, cast
 
 from seam_engine.consent import REQUIRED_SCOPES
 
@@ -598,7 +598,7 @@ def load_detector(manifest: RecipeManifest) -> Callable[..., Any]:
         raise RecipeValidationError(
             f"{detector_path}: no callable named {manifest.entrypoint!r} found"
         )
-    return fn
+    return cast(Callable[..., Any], fn)
 
 
 # --- CLI: a contributor's own pre-flight check, before opening a PR --------

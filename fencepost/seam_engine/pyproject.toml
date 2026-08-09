@@ -37,6 +37,16 @@ python_version = "3.12"
 warn_unused_configs = true
 disallow_untyped_defs = false
 
+# httpx and arcade_mcp_server both ship a `py.typed` marker and ARE typed --
+# mypy just can't resolve them here because `uv run mypy` (no
+# --python-executable) doesn't search this project's own .venv/site-packages
+# by default. Silencing the import-not-found noise (not vendoring stubs, not
+# touching either library) so a real `--strict` run's signal isn't buried
+# under two false "missing" imports.
+[[tool.mypy.overrides]]
+module = ["httpx", "arcade_mcp_server", "arcade_mcp_server.*"]
+ignore_missing_imports = true
+
 [tool.pytest.ini_options]
 pythonpath = ["src"]
 testpaths = ["tests"]

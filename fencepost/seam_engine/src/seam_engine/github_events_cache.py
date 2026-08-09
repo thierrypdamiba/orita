@@ -92,7 +92,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 from seam_engine.scan import commit_event_fields, release_event_fields
 
@@ -175,7 +175,7 @@ def cache_max_ts(cache: list[dict[str, Any]]) -> str | None:
     session only asks GitHub for what this one doesn't already have."""
     if not cache:
         return None
-    return max(e["ts"] for e in cache)
+    return cast(str, max(e["ts"] for e in cache))
 
 
 def normalize_raw_commits(raw_commits: list[dict[str, Any]]) -> list[dict[str, Any]]:

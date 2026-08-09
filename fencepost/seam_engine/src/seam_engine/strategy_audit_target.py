@@ -23,6 +23,7 @@ from __future__ import annotations
 
 import re
 from pathlib import Path
+from typing import Any
 
 from seam_engine import audit
 
@@ -56,7 +57,7 @@ def strategy_true_positive_rate_target(strategy_text: str) -> int:
 
 def check_strategy_true_positive_target(
     strategy_path: Path | None = None, ledger_base: Path | None = None
-) -> dict:
+) -> dict[str, Any]:
     """Cross-checks STRATEGY.md's live target against the real, live
     true-positive rate `audit.audit_ledger()` computes from the real
     Ledger -- never a hand-typed copy of either number."""

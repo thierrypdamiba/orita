@@ -9,7 +9,7 @@ world, it does not belong in this server (Ogun's oath, sworn on iron).
 import sys
 from dataclasses import asdict
 from datetime import datetime, timedelta, timezone
-from typing import Annotated
+from typing import Annotated, Any
 
 from arcade_mcp_server import Context, MCPApp
 from arcade_mcp_server.metadata import (
@@ -56,7 +56,7 @@ def list_repo_commits(
     owner: Annotated[str, "GitHub owner (user or org), e.g. 'thierrypdamiba'"],
     repo: Annotated[str, "GitHub repository name, e.g. 'orita'"],
     since_hours: Annotated[int, "Only commits in the last N hours"] = 24,
-) -> Annotated[list[dict], "Commits since the window start, newest first"]:
+) -> Annotated[list[dict[str, Any]], "Commits since the window start, newest first"]:
     """Read-only: list recent commits on a public GitHub repo's default branch."""
     since = datetime.now(timezone.utc) - timedelta(hours=since_hours)
     events = fetch_github_activity(owner, repo, since)
@@ -67,7 +67,7 @@ def list_repo_commits(
 def get_latest_release(
     owner: Annotated[str, "GitHub owner (user or org)"],
     repo: Annotated[str, "GitHub repository name"],
-) -> Annotated[dict | None, "The latest release, or null if none exists"]:
+) -> Annotated[dict[str, Any] | None, "The latest release, or null if none exists"]:
     """Read-only: fetch the latest release of a public GitHub repo.
 
     ROADMAP.md #157: used to call `fetch_github_activity(owner, repo,
@@ -85,7 +85,7 @@ def get_latest_release(
 @app.tool(metadata=READ_ONLY)
 def get_recent_x_posts(
     context: Context,
-) -> Annotated[list[dict], "Posts the town has made to @oritatown, oldest first"]:
+) -> Annotated[list[dict[str, Any]], "Posts the town has made to @oritatown, oldest first"]:
     """Read-only: the town's own posted X history.
 
     v0 reads the public HAND/mortal-sky-log.md record. To hand `seam_scan`
@@ -126,7 +126,11 @@ def seam_scan(
         "An empty array is rejected — see load_github_events_from_live's "
         "docstring.",
     ] = None,
-) -> Annotated[dict, "The ranked seam scan: one labeled primary gap, a confidence-scored tail, and excluded false positives"]:
+) -> Annotated[
+    dict[str, Any],
+    "The ranked seam scan: one labeled primary gap, a confidence-scored tail, "
+    "and excluded false positives",
+]:
     """Read-only seam-scan v0: reconcile @oritatown's X posts against GitHub
     commits/releases and surface the single highest-confidence gap between
     them, labeled and cleared over the confidence bar, plus a confidence-scored
@@ -205,7 +209,7 @@ def seam_scan(
 
 @app.tool(metadata=READ_ONLY)
 def gmail_calendar_scan() -> Annotated[
-    dict,
+    dict[str, Any],
     "WIP (ROADMAP.md #16): the v0.2 invite-in-Gmail-vs-Calendar gap, computed "
     "against a fixture — the-hand gateway does not yet hold read-only Gmail/"
     "Calendar scopes and no demo Gmail/Calendar account is connected.",
@@ -241,7 +245,7 @@ def combined_scan_preview(
         "github_events_json.",
     ] = None,
 ) -> Annotated[
-    dict,
+    dict[str, Any],
     "WIP (ROADMAP.md #113): scan.py's own candidates pooled with every "
     "discovered RECIPES/ manifest's, ranked once. Every recipe today reads "
     "a fixture (MOCK ONLY) — this preview can surface a recipe's fixture "

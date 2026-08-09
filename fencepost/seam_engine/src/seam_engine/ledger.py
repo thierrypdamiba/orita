@@ -32,7 +32,7 @@ import json
 import re
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 from seam_engine.wall import wall_for
 
@@ -179,7 +179,7 @@ def last_seal(base: Path | None = None) -> str:
             "after it was sealed, so its seal can't be read. Run `python -m "
             "seam_engine.ledger verify` to see the full chain break."
         )
-    return tip["seal"]
+    return cast(str, tip["seal"])
 
 
 def tip_sealed(records: list[dict[str, Any]]) -> dict[str, Any]:
@@ -205,7 +205,7 @@ def tip_sealed(records: list[dict[str, Any]]) -> dict[str, Any]:
             "after it was sealed, so its sealed payload can't be read. Run "
             "`python -m seam_engine.ledger verify` to see the full chain break."
         )
-    return tip["sealed"]
+    return cast("dict[str, Any]", tip["sealed"])
 
 
 def _fenceposts_recorded(base: Path | None = None) -> int:
