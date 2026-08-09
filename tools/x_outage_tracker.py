@@ -90,6 +90,7 @@ Usage:
 import json
 import os
 import sys
+from typing import cast
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import iso_time  # noqa: E402
@@ -130,7 +131,7 @@ class XOutageTrackerTamperedError(RuntimeError):
     the next real check/record."""
 
 
-def _entries(path=LOG):
+def _entries(path: str = LOG) -> list[dict[str, object]]:
     """Delegates to jsonl_read.read_jsonl_entries (task 540) -- see
     that module's own docstring for the fourteen-copy history this
     replaced."""
@@ -143,13 +144,13 @@ def _entries(path=LOG):
 _append = jsonl_append.append_jsonl
 
 
-def last_check(entries: list, tool: str):
+def last_check(entries: list[dict[str, object]], tool: str) -> dict[str, object] | None:
     """The most recently recorded real check for `tool`, or None."""
     t_entries = _tool_entries(entries, tool)
     return t_entries[-1] if t_entries else None
 
 
-def record_check(tool: str, status: str, checked_at: str, path=LOG) -> bool:
+def record_check(tool: str, status: str, checked_at: str, path: str = LOG) -> bool:
     """Append one real API check. Never edits or removes a prior line.
 
     Task 503: the one `record_*` sibling task 501 named live and explicitly
@@ -190,7 +191,7 @@ def record_check(tool: str, status: str, checked_at: str, path=LOG) -> bool:
     return True
 
 
-def _tool_entries(entries: list, tool: str) -> list:
+def _tool_entries(entries: list[dict[str, object]], tool: str) -> list[dict[str, object]]:
     for e in entries:
         if e.get("_malformed"):
             raise XOutageTrackerTamperedError(
@@ -201,7 +202,7 @@ def _tool_entries(entries: list, tool: str) -> list:
     return [e for e in entries if e.get("type") == "check" and e.get("tool") == tool]
 
 
-def current_streak(entries: list, tool: str, status: str = "forbidden") -> int:
+def current_streak(entries: list[dict[str, object]], tool: str, status: str = "forbidden") -> int:
     """Count consecutive trailing checks for `tool` matching `status`.
 
     Walks backward from the most recent check for this tool and stops at
@@ -217,19 +218,19 @@ def current_streak(entries: list, tool: str, status: str = "forbidden") -> int:
     return count
 
 
-def streak_started_at(entries: list, tool: str, status: str = "forbidden"):
+def streak_started_at(entries: list[dict[str, object]], tool: str, status: str = "forbidden") -> str | None:
     """Timestamp of the oldest check in the current trailing streak, or None."""
     started = None
     for e in reversed(_tool_entries(entries, tool)):
         if e["status"] != status:
             break
         started = e["checked_at"]
-    return started
+    return cast(str, started) if started is not None else None
 
 
-def last_checked_at(entries: list, tool: str):
+def last_checked_at(entries: list[dict[str, object]], tool: str) -> str | None:
     t_entries = _tool_entries(entries, tool)
-    return t_entries[-1]["checked_at"] if t_entries else None
+    return cast(str, t_entries[-1]["checked_at"]) if t_entries else None
 
 
 # Task 509: consolidated into tools/iso_time.py -- three sibling checks
@@ -240,7 +241,7 @@ def last_checked_at(entries: list, tool: str):
 _parse = iso_time.parse_iso_utc
 
 
-def hours_since_last_check(entries: list, tool: str, now: str):
+def hours_since_last_check(entries: list[dict[str, object]], tool: str, now: str) -> float | None:
     """Hours between `tool`'s last recorded check and `now`, or None if never checked."""
     last = last_checked_at(entries, tool)
     if last is None:
@@ -248,7 +249,7 @@ def hours_since_last_check(entries: list, tool: str, now: str):
     return (_parse(now) - _parse(last)).total_seconds() / 3600.0
 
 
-def should_recheck(entries: list, tool: str, now: str, cooldown_hours: float = DEFAULT_COOLDOWN_HOURS) -> bool:
+def should_recheck(entries: list[dict[str, object]], tool: str, now: str, cooldown_hours: float = DEFAULT_COOLDOWN_HOURS) -> bool:
     """Whether `tool` is due for another real check as of `now`.
 
     Never checked: always due. Otherwise due once at least `cooldown_hours`
@@ -261,7 +262,7 @@ def should_recheck(entries: list, tool: str, now: str, cooldown_hours: float = D
     return elapsed >= cooldown_hours
 
 
-def _escalation_entries(path=ESCALATION_LOG) -> list:
+def _escalation_entries(path: str = ESCALATION_LOG) -> list[dict[str, object]]:
     """Every line in the escalation log, parsed.
 
     Same convention as _entries() above: an unparseable line, or one that
@@ -297,7 +298,7 @@ def record_escalation(
     escalated_at: str,
     hours: float,
     threshold_hours: float = DEFAULT_ESCALATION_THRESHOLD_HOURS,
-    path=ESCALATION_LOG,
+    path: str = ESCALATION_LOG,
 ) -> None:
     """Append one real escalation event. Never edits or removes a prior line.
 
@@ -319,7 +320,7 @@ def record_escalation(
 
 
 def already_escalated_for_streak(
-    escalation_entries: list,
+    escalation_entries: list[dict[str, object]],
     tool: str,
     streak_started_at: str,
     threshold_hours: float = DEFAULT_ESCALATION_THRESHOLD_HOURS,
@@ -353,12 +354,12 @@ def already_escalated_for_streak(
 
 
 def should_escalate(
-    entries: list,
+    entries: list[dict[str, object]],
     tool: str,
     now: str,
     threshold_hours: float = DEFAULT_ESCALATION_THRESHOLD_HOURS,
-    escalation_entries=None,
-):
+    escalation_entries: list[dict[str, object]] | None = None,
+) -> tuple[bool, str]:
     """Whether an ongoing `tool` outage has crossed the point the Hand should hear about it.
 
     Returns (due: bool, reason: str). Never due if the tool isn't currently
@@ -376,7 +377,11 @@ def should_escalate(
     streak = current_streak(entries, tool, "forbidden")
     if streak == 0:
         return False, "no active outage"
-    started = streak_started_at(entries, tool, "forbidden")
+    # streak > 0 (checked above) guarantees streak_started_at found a match,
+    # so it cannot be None here -- cast, not assert, since task 618's own
+    # "-O strips assert" lesson applies to a real invariant just as much as
+    # a test guard.
+    started = cast(str, streak_started_at(entries, tool, "forbidden"))
     elapsed = (_parse(now) - _parse(started)).total_seconds() / 3600.0
     if elapsed < threshold_hours:
         return False, f"outage {elapsed:.1f}h old, below {threshold_hours}h threshold"
@@ -387,9 +392,9 @@ def should_escalate(
 
 def _extended_tiers(
     elapsed_hours: float,
-    tiers=ESCALATION_TIERS,
+    tiers: tuple[float, ...] = ESCALATION_TIERS,
     recurring_interval: float = RECURRING_ESCALATION_INTERVAL_HOURS,
-) -> tuple:
+) -> tuple[float, ...]:
     """`tiers` extended with recurring tiers beyond its own highest value.
 
     `tiers` names finitely many severities; an outage does not stop
@@ -412,13 +417,13 @@ def _extended_tiers(
 
 
 def next_escalation_tier(
-    entries: list,
+    entries: list[dict[str, object]],
     tool: str,
     now: str,
-    escalation_entries=None,
-    tiers=ESCALATION_TIERS,
+    escalation_entries: list[dict[str, object]] | None = None,
+    tiers: tuple[float, ...] = ESCALATION_TIERS,
     recurring_interval: float = RECURRING_ESCALATION_INTERVAL_HOURS,
-):
+) -> tuple[float, str] | None:
     """The single worst crossed-and-unfired escalation tier for `tool`, or None.
 
     Walks `tiers` (extended past its own top by `_extended_tiers`, task
@@ -439,7 +444,7 @@ def next_escalation_tier(
     effective_tiers = tiers
     streak = current_streak(entries, tool, "forbidden")
     if streak:
-        started = streak_started_at(entries, tool, "forbidden")
+        started = cast(str, streak_started_at(entries, tool, "forbidden"))
         elapsed = (_parse(now) - _parse(started)).total_seconds() / 3600.0
         effective_tiers = _extended_tiers(elapsed, tiers, recurring_interval)
     for threshold_hours in sorted(effective_tiers, reverse=True):
@@ -449,7 +454,7 @@ def next_escalation_tier(
     return None
 
 
-def format_status_line(entries: list, tool: str, status: str = "forbidden") -> str:
+def format_status_line(entries: list[dict[str, object]], tool: str, status: str = "forbidden") -> str:
     last = last_checked_at(entries, tool)
     if last is None:
         return f"{tool}: no checks recorded"
