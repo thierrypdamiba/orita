@@ -71,6 +71,7 @@ import os
 import re
 import sys
 from datetime import date, datetime, timedelta, timezone
+from typing import cast
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import cluster_day_check  # noqa: E402
@@ -96,7 +97,7 @@ class MalformedGapConfessedMarkerError(ValueError):
     never silently skipped."""
 
 
-def _hidden_dates(path: str) -> list:
+def _hidden_dates(path: str) -> list[date]:
     """Every `gap-hidden` date found in `path`, ascending. An absent
     file returns an empty list, not an error; a malformed date inside a
     marker that IS present raises loudly instead (mirrors
@@ -105,7 +106,7 @@ def _hidden_dates(path: str) -> list:
         return []
     with open(path, encoding="utf-8") as f:
         text = f.read()
-    dates = []
+    dates: list[date] = []
     for m in _HIDDEN_MARKER.finditer(text):
         raw = m.group("date")
         try:
@@ -117,7 +118,7 @@ def _hidden_dates(path: str) -> list:
     return sorted(dates)
 
 
-def _confessed_dates(path: str) -> set:
+def _confessed_dates(path: str) -> set[date]:
     """Every HIDDEN date whose confession has already been posted
     publicly, per a `<!-- gap-confessed: YYYY-MM-DD -->` marker in `path`
     -- the marker names the bug it resolves by its hidden date, not the
@@ -129,7 +130,7 @@ def _confessed_dates(path: str) -> set:
         return set()
     with open(path, encoding="utf-8") as f:
         text = f.read()
-    dates = set()
+    dates: set[date] = set()
     for m in _CONFESSED_MARKER.finditer(text):
         raw = m.group("date")
         try:
@@ -146,7 +147,7 @@ def _next_monday_on_or_after(d: date) -> date:
     return d + timedelta(days=(0 - d.weekday()) % 7)
 
 
-def _confession_dates_on_record(vault_dir: str) -> set:
+def _confession_dates_on_record(vault_dir: str) -> set[date]:
     """Every due-date named by a pre-drafted confession file's own
     filename in `orita-vault/hand/gap-confessions/`. An absent directory
     (a fresh checkout, a vault the caller didn't attach) returns an empty
@@ -156,7 +157,7 @@ def _confession_dates_on_record(vault_dir: str) -> set:
     confessions_dir = os.path.join(vault_dir, "hand", "gap-confessions")
     if not os.path.isdir(confessions_dir):
         return set()
-    dates = set()
+    dates: set[date] = set()
     for name in sorted(os.listdir(confessions_dir)):
         m = _CONFESSION_FILE.match(name)
         if m:
@@ -168,7 +169,7 @@ def compute_cadence(
     readme_path: str | None = None,
     vault_dir: str | None = None,
     today: date | None = None,
-) -> dict:
+) -> dict[str, object]:
     """The real numbers behind Off-By-One's own half of TOWN-OPERATIONS.md's
     weekly Cluster Day ritual -- named as missing mechanism by task 463's
     research pass, never computed anywhere before.
@@ -204,8 +205,8 @@ def compute_cadence(
 
     predrafted = _confession_dates_on_record(vault_dir)
 
-    missing_predraft = []
-    confession_due_now = []
+    missing_predraft: list[str] = []
+    confession_due_now: list[dict[str, str]] = []
     for d in hidden:
         due = _next_monday_on_or_after(d + timedelta(days=1))
         if due not in predrafted:
@@ -227,22 +228,26 @@ def compute_cadence(
     }
 
 
-def format_cadence(result: dict) -> str:
+def format_cadence(result: dict[str, object]) -> str:
     bits = []
     if result["missed_mondays"]:
-        joined = ", ".join(result["missed_mondays"])
-        plural = "" if len(result["missed_mondays"]) == 1 else "s"
-        bits.append(f"{len(result['missed_mondays'])} Cluster Day{plural} lapsed (owed for {joined})")
+        missed_mondays = cast("list[str]", result["missed_mondays"])
+        joined = ", ".join(missed_mondays)
+        plural = "" if len(missed_mondays) == 1 else "s"
+        bits.append(f"{len(missed_mondays)} Cluster Day{plural} lapsed (owed for {joined})")
     if result["missing_predraft"]:
-        joined = ", ".join(result["missing_predraft"])
+        joined = ", ".join(cast("list[str]", result["missing_predraft"]))
         bits.append(f"missing pre-drafted confession for {joined} -- Iron Rule violation")
     if result["confession_due_now"]:
-        due = ", ".join(f"{c['hidden']}->{c['due']}" for c in result["confession_due_now"])
+        due = ", ".join(
+            f"{c['hidden']}->{c['due']}" for c in cast("list[dict[str, str]]", result["confession_due_now"])
+        )
         bits.append(f"confession due now: {due}")
     if not bits:
         return (
             f"thegap cadence: current -- {result['total_hidden_on_record']} bug(s) hidden on record, "
-            f"{len(result['mondays_due'])} Monday(s) owed since founding, none missed, every draft pre-written"
+            f"{len(cast('list[str]', result['mondays_due']))} Monday(s) owed since founding, none missed, "
+            "every draft pre-written"
         )
     return (
         "thegap cadence: " + "; ".join(bits) +

@@ -45,12 +45,21 @@ list, not an error.
 import json
 import os
 import sys
+from typing import TypedDict, cast
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import jsonl_append  # noqa: E402
 import jsonl_read  # noqa: E402
 
 LOG = os.path.join(os.path.dirname(__file__), "..", "HAND", "arcade-app-check-log.jsonl")
+
+
+class AppState(TypedDict):
+    """`compute_app_state()`'s own return shape: every currently-connected
+    app_id, and the sorted scope list each one carries."""
+
+    connected_app_ids: list[str]
+    scopes_by_app: dict[str, list[str]]
 
 
 class ArcadeAppWatchTamperedError(RuntimeError):
@@ -66,7 +75,7 @@ class ArcadeAppWatchTamperedError(RuntimeError):
     break, then repair the log before the next real check/record."""
 
 
-def compute_app_state(apps: list[dict]) -> dict:
+def compute_app_state(apps: list[dict[str, object]]) -> AppState:
     """Fold a live `Arcade_ListApps` read into the durable comparison shape.
 
     Only apps with `connected: true` are kept -- an app that has never been
@@ -76,16 +85,16 @@ def compute_app_state(apps: list[dict]) -> dict:
     renames of the human-readable `name`); each value is the sorted list of
     granted `permissions` (empty list if the field is absent).
     """
-    connected = {}
+    connected: dict[str, list[str]] = {}
     for app in apps:
         if not app.get("connected"):
             continue
-        app_id = app["app_id"]
-        connected[app_id] = sorted(app.get("permissions") or [])
+        app_id = cast(str, app["app_id"])
+        connected[app_id] = sorted(cast("list[str]", app.get("permissions") or []))
     return {"connected_app_ids": sorted(connected), "scopes_by_app": connected}
 
 
-def _entries(path=LOG):
+def _entries(path: str = LOG) -> list[dict[str, object]]:
     """Delegates to jsonl_read.read_jsonl_entries (task 540) -- see
     that module's own docstring for the fourteen-copy history this
     replaced."""
@@ -98,7 +107,7 @@ def _entries(path=LOG):
 _append = jsonl_append.append_jsonl
 
 
-def last_app_state(path=LOG):
+def last_app_state(path: str = LOG) -> dict[str, object] | None:
     """The most recently recorded real app-connection check, or None.
 
     Raises ArcadeAppWatchTamperedError if the log's last line isn't valid
@@ -117,7 +126,7 @@ def last_app_state(path=LOG):
     return entries[-1]
 
 
-def record_app_check(state: dict, checked_at: str, path=LOG) -> bool:
+def record_app_check(state: AppState, checked_at: str, path: str = LOG) -> bool:
     """Append one real observed gateway app-connection state. Never edits or removes a prior line.
 
     Task 498: skips the append -- returns False, writes nothing -- when
@@ -141,13 +150,13 @@ def record_app_check(state: dict, checked_at: str, path=LOG) -> bool:
     ):
         return False
 
-    entry = dict(state)
+    entry: dict[str, object] = dict(state)
     entry["checked_at"] = checked_at
     _append(entry, path)
     return True
 
 
-def app_delta(state: dict, path=LOG):
+def app_delta(state: AppState, path: str = LOG) -> tuple[bool, str]:
     """Whether this hour's live app-connection read differs from the last recorded check.
 
     Returns (changed: bool, reason: str). No prior check recorded: due
@@ -164,7 +173,8 @@ def app_delta(state: dict, path=LOG):
         apps = ", ".join(state["connected_app_ids"]) or "(none)"
         return True, f"no prior app check recorded -- due, currently connected: {apps}"
 
-    prev_ids = set(last["scopes_by_app"])
+    last_scopes_by_app = cast("dict[str, list[str]]", last["scopes_by_app"])
+    prev_ids = set(last_scopes_by_app)
     curr_ids = set(state["scopes_by_app"])
 
     newly_connected = sorted(curr_ids - prev_ids)
@@ -179,7 +189,7 @@ def app_delta(state: dict, path=LOG):
 
     scope_changes = []
     for app_id in sorted(curr_ids):
-        prev_scopes = set(last["scopes_by_app"][app_id])
+        prev_scopes = set(last_scopes_by_app[app_id])
         curr_scopes = set(state["scopes_by_app"][app_id])
         if prev_scopes != curr_scopes:
             added = sorted(curr_scopes - prev_scopes)
@@ -205,7 +215,7 @@ class ArcadeAppWatchArgError(ValueError):
     bare AttributeError instead of naming the real problem)."""
 
 
-def _load_apps_json(path: str) -> dict:
+def _load_apps_json(path: str) -> dict[str, object]:
     with open(path) as f:
         raw = json.load(f)
     if not isinstance(raw, dict):
@@ -215,13 +225,13 @@ def _load_apps_json(path: str) -> dict:
     return raw
 
 
-def main(argv):
+def main(argv: list[str]) -> int:
     if len(argv) < 3:
         print(__doc__)
         return 1
     cmd, apps_path = argv[1], argv[2]
     raw = _load_apps_json(apps_path)
-    state = compute_app_state(raw.get("apps", []))
+    state = compute_app_state(cast("list[dict[str, object]]", raw.get("apps", [])))
     if cmd == "check":
         changed, reason = app_delta(state, path=LOG)
         print(f"{'changed' if changed else 'unchanged'} -- {reason}")

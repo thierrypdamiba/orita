@@ -70,6 +70,7 @@ import os
 import re
 import sys
 from pathlib import Path
+from typing import cast
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DEFAULT_README_PATH = os.path.join(ROOT, "fencepost", "README.md")
@@ -157,7 +158,7 @@ def _missing_roadmap_citations(section_text: str) -> list[str]:
 def check_recipe_readme(
     readme_path: str = DEFAULT_README_PATH,
     fencepost_root: str = DEFAULT_FENCEPOST_ROOT,
-) -> dict:
+) -> dict[str, object]:
     """Cross-check `fencepost/README.md`'s "Community recipes" section
     against the real, live `RECIPES/` tree (`discover_recipes()`, never a
     second hand-typed slug list). Returns `clean: True` only when every
@@ -205,7 +206,7 @@ def check_recipe_readme(
     }
 
 
-def format_result(result: dict) -> str:
+def format_result(result: dict[str, object]) -> str:
     if result["clean"]:
         return (
             f"recipe readme: clean ({result['real_count']} real recipe(s), "
@@ -214,17 +215,21 @@ def format_result(result: dict) -> str:
         )
     problems = []
     if result["missing_from_readme"]:
-        problems.append(f"unlinked real recipe(s): {', '.join(result['missing_from_readme'])}")
+        problems.append(f"unlinked real recipe(s): {', '.join(cast('list[str]', result['missing_from_readme']))}")
     if result["stale_in_readme"]:
-        problems.append(f"dead link(s) to a recipe that no longer exists: {', '.join(result['stale_in_readme'])}")
+        problems.append(
+            f"dead link(s) to a recipe that no longer exists: "
+            f"{', '.join(cast('list[str]', result['stale_in_readme']))}"
+        )
     if result["mismatched_links"]:
-        pairs = ", ".join(f"[{t}]->({h})" for t, h in result["mismatched_links"])
+        pairs = ", ".join(f"[{t}]->({h})" for t, h in cast("list[tuple[str, str]]", result["mismatched_links"]))
         problems.append(f"link text/href disagree: {pairs}")
     if result["missing_readme"]:
-        problems.append(f"recipe dir(s) with no own README.md: {', '.join(result['missing_readme'])}")
+        problems.append(f"recipe dir(s) with no own README.md: {', '.join(cast('list[str]', result['missing_readme']))}")
     if result.get("missing_roadmap_citation"):
         problems.append(
-            f"entry(ies) missing a (ROADMAP.md #NNN) citation: {', '.join(result['missing_roadmap_citation'])}"
+            f"entry(ies) missing a (ROADMAP.md #NNN) citation: "
+            f"{', '.join(cast('list[str]', result['missing_roadmap_citation']))}"
         )
     return "recipe readme: BROKEN -- " + "; ".join(problems)
 

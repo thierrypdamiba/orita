@@ -33,12 +33,22 @@ import json
 import os
 import re
 import sys
+from typing import TypedDict, cast
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import jsonl_append  # noqa: E402
 import jsonl_read  # noqa: E402
 
 LOG = os.path.join(os.path.dirname(__file__), "..", "HAND", "gateway-toolset-check-log.jsonl")
+
+
+class ToolsetState(TypedDict):
+    """`compute_toolset_state()`'s own return shape: whether any
+    Gmail/Calendar-capable tool is present on the-hand's live toolset, and
+    which tool names matched."""
+
+    has_gmail_calendar_tools: bool
+    matched_tools: list[str]
 
 # Mirrors fencepost/SCOPES.md's own v0.2 table: the read-only Gmail/Calendar
 # tool names Fencepost would call once the gateway exposes them
@@ -59,13 +69,13 @@ class GatewayToolsetCheckTamperedError(RuntimeError):
     rerun."""
 
 
-def compute_toolset_state(tool_names: list[str]) -> dict:
+def compute_toolset_state(tool_names: list[str]) -> ToolsetState:
     """Fold a live the-hand tool-name list into the durable comparison shape."""
     matched = sorted(t for t in tool_names if _GMAIL_CALENDAR_PATTERN.search(t))
     return {"has_gmail_calendar_tools": bool(matched), "matched_tools": matched}
 
 
-def _entries(path=LOG):
+def _entries(path: str = LOG) -> list[dict[str, object]]:
     """Delegates to jsonl_read.read_jsonl_entries (task 540) -- see
     that module's own docstring for the fourteen-copy history this
     replaced."""
@@ -78,7 +88,7 @@ def _entries(path=LOG):
 _append = jsonl_append.append_jsonl
 
 
-def last_toolset_state(path=LOG):
+def last_toolset_state(path: str = LOG) -> dict[str, object] | None:
     """The most recently recorded real gateway-toolset check, or None.
 
     Raises GatewayToolsetCheckTamperedError if the log's last line isn't
@@ -96,7 +106,7 @@ def last_toolset_state(path=LOG):
     return entries[-1]
 
 
-def record_toolset_check(state: dict, checked_at: str, path=LOG) -> bool:
+def record_toolset_check(state: ToolsetState, checked_at: str, path: str = LOG) -> bool:
     """Append one real observed gateway toolset state. Never edits or removes a prior line.
 
     Task 498: skips the append -- returns False, writes nothing -- when
@@ -120,13 +130,13 @@ def record_toolset_check(state: dict, checked_at: str, path=LOG) -> bool:
     ):
         return False
 
-    entry = dict(state)
+    entry: dict[str, object] = dict(state)
     entry["checked_at"] = checked_at
     _append(entry, path)
     return True
 
 
-def toolset_delta(state: dict, path=LOG):
+def toolset_delta(state: ToolsetState, path: str = LOG) -> tuple[bool, str]:
     """Whether this hour's live toolset read differs from the last
     recorded check. Returns (changed: bool, reason: str).
 
@@ -159,7 +169,7 @@ class GatewayToolsetCheckArgError(ValueError):
     arcade_app_watch.py's ArcadeAppWatchArgError."""
 
 
-def _load_tool_names_json(path: str) -> dict:
+def _load_tool_names_json(path: str) -> dict[str, object]:
     with open(path) as f:
         raw = json.load(f)
     if not isinstance(raw, dict):
@@ -169,13 +179,13 @@ def _load_tool_names_json(path: str) -> dict:
     return raw
 
 
-def main(argv):
+def main(argv: list[str]) -> int:
     if len(argv) < 3:
         print(__doc__)
         return 1
     cmd, tools_path = argv[1], argv[2]
     raw = _load_tool_names_json(tools_path)
-    state = compute_toolset_state(raw.get("tool_names", []))
+    state = compute_toolset_state(cast("list[str]", raw.get("tool_names", [])))
     if cmd == "check":
         changed, reason = toolset_delta(state, path=LOG)
         print(f"{'changed' if changed else 'unchanged'} -- {reason}")

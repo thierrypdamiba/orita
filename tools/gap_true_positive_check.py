@@ -72,7 +72,7 @@ _last_metrics_entry = metrics_reader.last_metrics_entry
 def check_gap_true_positive_rate(
     metrics_path: str = DEFAULT_METRICS_PATH,
     ledger_base: str | Path = DEFAULT_LEDGER_BASE,
-) -> dict:
+) -> dict[str, object]:
     """Cross-check the last recorded `gap_true_positive_rate` reading
     against the real, live `seam_engine.audit.audit_ledger()` tally.
     Returns `clean: True` when the two agree (rounded to 4 decimal
@@ -130,15 +130,20 @@ def check_gap_true_positive_rate(
     }
 
 
-def format_result(result: dict) -> str:
+def format_result(result: dict[str, object]) -> str:
     if result["claimed"] is None:
         if result["clean"]:
-            real = "none audited yet" if result["real"] is None else f"{round(result['real'] * 100, 4)}%"
+            real = (
+                "none audited yet"
+                if result["real"] is None
+                else f"{round(cast(float, result['real']) * 100, 4)}%"
+            )
             return f"gap true-positive rate: clean (no metrics.jsonl reading yet; real ground truth is {real})"
         return (
             f"gap true-positive rate: BROKEN -- metrics.jsonl's {result['claimed_date']} reading names "
             f"no rate (null/absent), but the real Ledger already has one to report "
-            f"({round(result['real'] * 100, 4)}%) -- a real rate exists and was not recorded, escalate now"
+            f"({round(cast(float, result['real']) * 100, 4)}%) -- a real rate exists and was not recorded, "
+            "escalate now"
         )
     if result["real"] is None:
         return (
@@ -148,14 +153,14 @@ def format_result(result: dict) -> str:
         )
     if result["clean"]:
         return (
-            f"gap true-positive rate: clean ({round(result['real'] * 100, 4)}% real, "
+            f"gap true-positive rate: clean ({round(cast(float, result['real']) * 100, 4)}% real, "
             f"metrics.jsonl's {result['claimed_date']} reading agrees)"
         )
     return (
         f"gap true-positive rate: BROKEN -- metrics.jsonl's {result['claimed_date']} reading claims "
-        f"{round(result['claimed'] * 100, 4)}%, real ground truth (seam_engine.audit.audit_ledger(), "
-        f"gate-verified) is {round(result['real'] * 100, 4)}% -- STRATEGY.md's own Ogun's-law metric is "
-        "misreporting live"
+        f"{round(cast(float, result['claimed']) * 100, 4)}%, real ground truth (seam_engine.audit.audit_ledger(), "
+        f"gate-verified) is {round(cast(float, result['real']) * 100, 4)}% -- STRATEGY.md's own Ogun's-law "
+        "metric is misreporting live"
     )
 
 
@@ -167,3 +172,4 @@ if __name__ == "__main__":
     result = check_gap_true_positive_rate()
     print(format_result(result))
     sys.exit(1 if not result["clean"] else 0)
+

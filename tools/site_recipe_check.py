@@ -72,6 +72,7 @@ import os
 import re
 import sys
 from pathlib import Path
+from typing import cast
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DEFAULT_SITE_PATH = os.path.join(ROOT, "docs", "fencepost", "index.html")
@@ -113,7 +114,7 @@ def _linked_recipes(section_text: str) -> list[tuple[str, str]]:
 def check_site_recipe_readme(
     site_path: str = DEFAULT_SITE_PATH,
     fencepost_root: str = DEFAULT_FENCEPOST_ROOT,
-) -> dict:
+) -> dict[str, object]:
     """Cross-check `docs/fencepost/index.html`'s "Community recipes" section
     against the real, live `RECIPES/` tree (`discover_recipes()`, never a
     second hand-typed slug list). Returns `clean: True` only when every real
@@ -145,7 +146,7 @@ def check_site_recipe_readme(
     }
 
 
-def format_result(result: dict) -> str:
+def format_result(result: dict[str, object]) -> str:
     if result["clean"]:
         return (
             f"site recipe readme: clean ({result['real_count']} real recipe(s), "
@@ -154,11 +155,14 @@ def format_result(result: dict) -> str:
         )
     problems = []
     if result["missing_from_site"]:
-        problems.append(f"unlinked real recipe(s): {', '.join(result['missing_from_site'])}")
+        problems.append(f"unlinked real recipe(s): {', '.join(cast('list[str]', result['missing_from_site']))}")
     if result["stale_in_site"]:
-        problems.append(f"dead link(s) to a recipe that no longer exists: {', '.join(result['stale_in_site'])}")
+        problems.append(
+            f"dead link(s) to a recipe that no longer exists: "
+            f"{', '.join(cast('list[str]', result['stale_in_site']))}"
+        )
     if result["mismatched_links"]:
-        pairs = ", ".join(f"[{h}]->text({t})" for h, t in result["mismatched_links"])
+        pairs = ", ".join(f"[{h}]->text({t})" for h, t in cast("list[tuple[str, str]]", result["mismatched_links"]))
         problems.append(f"link href/text disagree: {pairs}")
     return "site recipe readme: BROKEN -- " + "; ".join(problems)
 

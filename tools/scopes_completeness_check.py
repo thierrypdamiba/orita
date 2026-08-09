@@ -27,6 +27,7 @@ from __future__ import annotations
 import os
 import re
 import sys
+from typing import cast
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import arcade_app_watch  # noqa: E402
@@ -56,7 +57,7 @@ def _section(scopes_text: str) -> str:
     return text_patterns.bounded_section(scopes_text, _SECTION_HEADER)
 
 
-def _accounted_for_app_ids(scopes_text: str) -> set:
+def _accounted_for_app_ids(scopes_text: str) -> set[str]:
     """Every app_id named in a `| `app_id`... |` table row inside the
     `## Every connected app, accounted for` section, structurally --
     never a hardcoded list of expected ids. Returns an empty set if the
@@ -74,7 +75,7 @@ def _row_status(scopes_text: str, app_id: str) -> str | None:
     return None
 
 
-def _last_connected_app_ids(app_log_path: str) -> list:
+def _last_connected_app_ids(app_log_path: str) -> list[str]:
     """The most recently recorded `connected_app_ids` list, read through
     `arcade_app_watch.py`'s own guarded `last_app_state()` rather than a
     second, unguarded parse of the same file. A malformed last line
@@ -86,7 +87,7 @@ def _last_connected_app_ids(app_log_path: str) -> list:
     state = arcade_app_watch.last_app_state(path=app_log_path)
     if state is None:
         return []
-    return state.get("connected_app_ids", [])
+    return cast("list[str]", state.get("connected_app_ids", []))
 
 
 def _google_row_is_stale(scopes_text: str, toolset_log_path: str) -> bool:
@@ -111,7 +112,7 @@ def check_scopes_completeness(
     scopes_path: str = DEFAULT_SCOPES_PATH,
     app_log_path: str = DEFAULT_APP_LOG_PATH,
     toolset_log_path: str = DEFAULT_TOOLSET_LOG_PATH,
-) -> dict:
+) -> dict[str, object]:
     """Cross-check every currently-connected real app_id against
     `fencepost/SCOPES.md`'s own `## Every connected app, accounted for`
     section. Returns `clean: True` with the accounted-for set when every
@@ -136,7 +137,7 @@ def check_scopes_completeness(
     }
 
 
-def format_result(result: dict) -> str:
+def format_result(result: dict[str, object]) -> str:
     if result["stale_google_claim"]:
         return (
             "scopes completeness: BROKEN -- stale arcade-google claim: row says "
@@ -146,8 +147,14 @@ def format_result(result: dict) -> str:
     if not result["connected_app_ids"]:
         return "scopes completeness: clean (no apps recorded as connected)"
     if result["clean"]:
-        return f"scopes completeness: clean ({len(result['connected_app_ids'])} connected app(s), all accounted for)"
-    return f"scopes completeness: BROKEN -- undocumented connected app(s): {', '.join(result['missing'])}"
+        return (
+            f"scopes completeness: clean "
+            f"({len(cast('list[str]', result['connected_app_ids']))} connected app(s), all accounted for)"
+        )
+    return (
+        f"scopes completeness: BROKEN -- undocumented connected app(s): "
+        f"{', '.join(cast('list[str]', result['missing']))}"
+    )
 
 
 if __name__ == "__main__":

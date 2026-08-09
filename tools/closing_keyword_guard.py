@@ -46,6 +46,7 @@ from __future__ import annotations
 import json
 import re
 import sys
+from collections.abc import Iterable
 
 # GitHub's real closing-keyword grammar: exactly these 9 forms, each
 # optionally followed by a colon, then whitespace, then #<digits> --
@@ -62,11 +63,11 @@ CLOSING_KEYWORD_RE = re.compile(
 )
 
 
-def find_closing_refs(text: str) -> list:
+def find_closing_refs(text: str) -> list[int]:
     """Every issue/PR number a GitHub-recognized closing keyword names in
     `text`, in first-seen order, de-duplicated. No exemptions -- see the
     module docstring for why quotes/backticks are not treated as safe."""
-    seen = []
+    seen: list[int] = []
     for m in CLOSING_KEYWORD_RE.finditer(text):
         n = int(m.group(1))
         if n not in seen:
@@ -74,7 +75,7 @@ def find_closing_refs(text: str) -> list:
     return seen
 
 
-def dangerous_refs(text: str, open_issue_numbers) -> list:
+def dangerous_refs(text: str, open_issue_numbers: Iterable[int]) -> list[int]:
     """The subset of `find_closing_refs(text)` that names a number
     currently open in the repo -- the only refs GitHub can actually act
     on. A closing-keyword phrase naming an already-closed or nonexistent
@@ -83,14 +84,14 @@ def dangerous_refs(text: str, open_issue_numbers) -> list:
     return [n for n in find_closing_refs(text) if n in open_set]
 
 
-def check_message(message: str, open_issue_numbers) -> tuple:
+def check_message(message: str, open_issue_numbers: Iterable[int]) -> tuple[bool, list[int]]:
     """Returns (ok: bool, dangerous: list[int]). ok is False iff pushing
     `message` to the default branch would auto-close a live open issue."""
     refs = dangerous_refs(message, open_issue_numbers)
     return (not refs, refs)
 
 
-def format_result(ok: bool, dangerous: list, message_path: str) -> str:
+def format_result(ok: bool, dangerous: list[int], message_path: str) -> str:
     if ok:
         return f"closing keyword guard: clean -- {message_path} names no open issue via a real closing keyword"
     return (

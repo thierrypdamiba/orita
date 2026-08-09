@@ -61,6 +61,7 @@ import shutil
 import subprocess
 import sys
 from pathlib import Path
+from typing import cast
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DEFAULT_FENCEPOST_ROOT = os.path.join(ROOT, "fencepost")
@@ -99,7 +100,7 @@ def _run_it_yourself_block(readme_text: str) -> str | None:
     return m.group(1) if m else None
 
 
-_RESULTS_CACHE: dict[tuple[str, str, float], dict] = {}
+_RESULTS_CACHE: dict[tuple[str, str, float], dict[str, object]] = {}
 
 
 def clear_cache() -> None:
@@ -114,7 +115,7 @@ def check_recipe_commands(
     fencepost_root: str = DEFAULT_FENCEPOST_ROOT,
     seam_engine_dir: str = DEFAULT_SEAM_ENGINE_DIR,
     timeout: float = _DEFAULT_TIMEOUT_S,
-) -> dict:
+) -> dict[str, object]:
     """Task 588: memoized per (fencepost_root, seam_engine_dir, timeout)
     for the lifetime of the process, the same fix `vault_leak_check.py`'s
     `find_leaks()` got at task 367 and for the identical reason:
@@ -140,7 +141,7 @@ def _check_recipe_commands_uncached(
     fencepost_root: str = DEFAULT_FENCEPOST_ROOT,
     seam_engine_dir: str = DEFAULT_SEAM_ENGINE_DIR,
     timeout: float = _DEFAULT_TIMEOUT_S,
-) -> dict:
+) -> dict[str, object]:
     """Execute every real recipe's own README-documented command, live,
     and return `clean: True` only when every one exists, runs, and
     produces the shape it promises. Never a bare pass/fail -- every
@@ -177,8 +178,8 @@ def _check_recipe_commands_uncached(
 
     no_block: list[str] = []
     unexpected_shape: list[str] = []
-    command_failed: list[dict] = []
-    malformed_output: list[dict] = []
+    command_failed: list[dict[str, str]] = []
+    malformed_output: list[dict[str, str]] = []
     skipped_no_uv: list[str] = []
     checked = 0
     uv_present = shutil.which("uv") is not None
@@ -260,19 +261,20 @@ def _check_recipe_commands_uncached(
     }
 
 
-def format_result(result: dict) -> str:
+def format_result(result: dict[str, object]) -> str:
     status = result.get("status")
     if status == "unavailable":
         return (
             f"recipe commands: clean (uv unavailable in this environment, "
-            f"{len(result.get('skipped_no_uv', []))} real recipe(s) skipped, nothing to execute)"
+            f"{len(cast('list[str]', result.get('skipped_no_uv', [])))} real recipe(s) skipped, "
+            "nothing to execute)"
         )
     if result["clean"]:
         if status == "partially_unavailable":
             return (
                 f"recipe commands: clean ({result['checked_count']}/{result['real_count']} real "
                 f"recipe(s) executed live and returned the shape it promises, "
-                f"{len(result['skipped_no_uv'])} skipped -- uv unavailable in this environment)"
+                f"{len(cast('list[str]', result['skipped_no_uv']))} skipped -- uv unavailable in this environment)"
             )
         return (
             f"recipe commands: clean ({result['checked_count']}/{result['real_count']} real "
@@ -281,14 +283,21 @@ def format_result(result: dict) -> str:
         )
     problems = []
     if result["no_block"]:
-        problems.append(f"no 'Run it yourself' block: {', '.join(result['no_block'])}")
+        problems.append(f"no 'Run it yourself' block: {', '.join(cast('list[str]', result['no_block']))}")
     if result["unexpected_shape"]:
-        problems.append(f"block doesn't start with 'cd fencepost/seam_engine': {', '.join(result['unexpected_shape'])}")
+        problems.append(
+            f"block doesn't start with 'cd fencepost/seam_engine': "
+            f"{', '.join(cast('list[str]', result['unexpected_shape']))}"
+        )
     if result["command_failed"]:
-        names = ", ".join(f"{p['slug']} ({p['reason']})" for p in result["command_failed"])
+        names = ", ".join(
+            f"{p['slug']} ({p['reason']})" for p in cast("list[dict[str, str]]", result["command_failed"])
+        )
         problems.append(f"documented command fails to run: {names}")
     if result["malformed_output"]:
-        names = ", ".join(f"{p['slug']} ({p['reason']})" for p in result["malformed_output"])
+        names = ", ".join(
+            f"{p['slug']} ({p['reason']})" for p in cast("list[dict[str, str]]", result["malformed_output"])
+        )
         problems.append(f"documented command's own output doesn't match the promised shape: {names}")
     return "recipe commands: BROKEN -- " + "; ".join(problems)
 
