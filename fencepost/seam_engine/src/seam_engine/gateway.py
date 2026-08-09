@@ -86,8 +86,8 @@ _SCOPE_KEYWORDS: dict[str, dict[str, str]] = {
 
 
 def required_scopes_covered_by_capabilities(
-    text: str = None,
-    required_scopes: dict = None,
+    text: str | None = None,
+    required_scopes: dict[str, frozenset[str]] | None = None,
 ) -> dict[str, list[str]]:
     """Return, per toolkit, the ``REQUIRED_SCOPES`` tool names ``text`` does
     NOT name a covering keyword for — an empty list per toolkit means full
