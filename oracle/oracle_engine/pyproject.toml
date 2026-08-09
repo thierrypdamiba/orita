@@ -37,6 +37,17 @@ python_version = "3.12"
 warn_unused_configs = true
 disallow_untyped_defs = false
 
+# httpx and arcade_mcp_server both ship a `py.typed` marker and ARE typed --
+# mypy just can't resolve them here because a plain `mypy` run (no
+# --python-executable) doesn't search this project's own .venv/site-packages
+# by default. Silencing the import-not-found noise (not vendoring stubs, not
+# touching either library) so a real signal isn't buried under two false
+# "missing" imports. Mirrors fencepost/seam_engine/pyproject.toml's own
+# identical fix (task 616) -- oracle_engine never got the same override.
+[[tool.mypy.overrides]]
+module = ["httpx", "arcade_mcp_server", "arcade_mcp_server.*"]
+ignore_missing_imports = true
+
 [tool.pytest.ini_options]
 pythonpath = ["src"]
 testpaths = ["tests"]
