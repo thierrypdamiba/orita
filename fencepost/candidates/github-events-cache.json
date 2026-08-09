@@ -19174,5 +19174,69 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/b4c4b4b019d794d479741a7f78b0d457ae5ed2b6",
     "ts": "2026-08-09T07:24:09Z",
     "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "3cc6248",
+    "title": "task 622: mark WIP -- issue-closed-not-tweeted's bare assert, sweeping RECIPES/ for the S101 shape tasks 618/619/621 already fixed elsewhere",
+    "url": "https://github.com/thierrypdamiba/orita/commit/3cc6248ed2a47eafbfe24a3a736d30e72a06f74a",
+    "ts": "2026-08-09T08:08:52Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "3e57911",
+    "title": "task 622: issue-closed-not-tweeted's compute_gaps() named its closed_at guard instead of asserting it",
+    "url": "https://github.com/thierrypdamiba/orita/commit/3e57911546f829ff30af3fb76c0b729b0b30b9b1",
+    "ts": "2026-08-09T08:08:58Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "6a7cef1",
+    "title": "task 622: hourly ritual bookkeeping -- dogfood cache growth, live X gateway recheck",
+    "url": "https://github.com/thierrypdamiba/orita/commit/6a7cef131963b473b0df9bc42552992018f4b1f7",
+    "ts": "2026-08-09T08:11:48Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "ba9028f",
+    "title": "task 622: BUILDLOG entry, public journal 0212",
+    "url": "https://github.com/thierrypdamiba/orita/commit/ba9028f5df51b2ec492586189fb1db2efe6dc811",
+    "ts": "2026-08-09T08:12:37Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "bfdeaaa",
+    "title": "task 622: mark DONE -- issue-closed-not-tweeted's bare assert fixed and verified",
+    "url": "https://github.com/thierrypdamiba/orita/commit/bfdeaaac8d0ccfe4229772a92a35ea7b7fe54d5e",
+    "ts": "2026-08-09T08:12:57Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "56e34d1",
+    "title": "task 622: confirm root suite result -- 1721/1721 OK, zero regressions",
+    "url": "https://github.com/thierrypdamiba/orita/commit/56e34d181c0f45182045eaef2be07839ec046658",
+    "ts": "2026-08-09T08:20:41Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "1b9e4dc",
+    "title": "task 622: hourly ritual bookkeeping -- X_GetUserTweets recheck (260th consecutive forbidden), scribe-growth observation (742736/866940)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/1b9e4dca1f9d68c28bfa2e6a6b9ae7ec1aa6955d",
+    "ts": "2026-08-09T08:21:53Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "7ebe752",
+    "title": "task 622: record scribe-growth observations from this hour's ritual_check.py runs",
+    "url": "https://github.com/thierrypdamiba/orita/commit/7ebe752667842491be8dadd275b7253dea68f88c",
+    "ts": "2026-08-09T08:23:50Z",
+    "author": "Nisaba"
   }
 ]
