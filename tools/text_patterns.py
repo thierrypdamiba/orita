@@ -84,7 +84,9 @@ NEXT_MARKDOWN_HEADER = re.compile(r"^## ", re.MULTILINE)
 
 
 def bounded_section(
-    text: str, section_header: re.Pattern, next_header: re.Pattern = NEXT_MARKDOWN_HEADER
+    text: str,
+    section_header: re.Pattern[str],
+    next_header: re.Pattern[str] = NEXT_MARKDOWN_HEADER,
 ) -> str:
     """The text strictly between `section_header`'s own match and the next
     `next_header` match (or end of `text`) -- the same walk `scopes_

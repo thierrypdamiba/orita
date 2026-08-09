@@ -46,7 +46,7 @@ from __future__ import annotations
 
 def format_violations(
     label: str,
-    violations: list,
+    violations: list[dict[str, object]],
     key_field: str,
     clean_detail: str,
     broken_detail: str,

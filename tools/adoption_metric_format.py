@@ -41,7 +41,9 @@ Usage: imported only, never run directly.
 from __future__ import annotations
 
 
-def format_adoption_result(label: str, result: dict, field_name: str, real_unit: str) -> str:
+def format_adoption_result(
+    label: str, result: dict[str, object], field_name: str, real_unit: str
+) -> str:
     """Shared renderer behind connected_users_check.py's and
     toolkits_in_use_check.py's own `format_result` wrappers. `label` is
     the check's own name as it appears in every line ("connected users

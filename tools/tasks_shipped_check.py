@@ -57,6 +57,7 @@ from __future__ import annotations
 import os
 import re
 import sys
+from typing import cast
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import metrics_reader  # noqa: E402
@@ -149,7 +150,7 @@ def check_tasks_shipped(
     last = _last_metrics_entry(metrics_path)
     if last is None or "date" not in last:
         return {"clean": True, "real": None, "claimed": None, "claimed_date": None}
-    claimed_date = last["date"]
+    claimed_date = cast(str, last["date"])
     real = _tasks_shipped_ground_truth(buildlog_path, claimed_date)
     if "tasks_shipped_today" not in last:
         if real is None:

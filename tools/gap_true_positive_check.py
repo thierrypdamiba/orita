@@ -46,6 +46,7 @@ from __future__ import annotations
 import os
 import sys
 from pathlib import Path
+from typing import cast
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DEFAULT_METRICS_PATH = os.path.join(ROOT, "records", "metrics.jsonl")
@@ -120,7 +121,7 @@ def check_gap_true_positive_rate(
             "claimed": claimed,
             "claimed_date": last.get("date"),
         }
-    clean = round(real, 4) == round(claimed, 4)
+    clean = round(real, 4) == round(cast(float, claimed), 4)
     return {
         "clean": clean,
         "real": real,

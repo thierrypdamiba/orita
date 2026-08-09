@@ -32,7 +32,7 @@ import json
 import os
 
 
-def last_metrics_entry(metrics_path: str) -> dict | None:
+def last_metrics_entry(metrics_path: str) -> dict[str, object] | None:
     """The most recently recorded dated reading in `records/
     metrics.jsonl` -- one append-only file, not one file per day. Walks
     non-blank lines from the end and returns the first one that parses

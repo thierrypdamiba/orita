@@ -38,7 +38,9 @@ from __future__ import annotations
 DEFAULT_QUOTE_CHARS = set('"\'\u201c\u2018')
 
 
-def is_quoted_citation(text: str, match_start: int, quote_chars=DEFAULT_QUOTE_CHARS) -> bool:
+def is_quoted_citation(
+    text: str, match_start: int, quote_chars: set[str] = DEFAULT_QUOTE_CHARS
+) -> bool:
     """A phrase opening immediately on a quote mark is a cited example
     (a module's own docstring, a ROADMAP row, a test file), not a live
     violation -- the self-referential trap task 99 first hit and guarded,

@@ -33,11 +33,15 @@ from __future__ import annotations
 
 import json
 import os
+from typing import Mapping
 
 
-def append_jsonl(entry: dict, path: str) -> None:
+def append_jsonl(entry: Mapping[str, object], path: str) -> None:
     """Append one JSON-encoded line for `entry` to the log at `path`,
-    creating the parent directory if it does not yet exist."""
+    creating the parent directory if it does not yet exist. Takes a
+    `Mapping`, not a `dict`, so a caller's own more specifically-typed
+    dict literal (e.g. `dict[str, str]`) is accepted without a variance
+    error -- this function only ever reads `entry`, never mutates it."""
     os.makedirs(os.path.dirname(path), exist_ok=True)
     with open(path, "a") as f:
         f.write(json.dumps(entry, ensure_ascii=False) + "\n")

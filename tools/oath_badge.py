@@ -67,7 +67,7 @@ def _policy_value_matches(declared_value: Any, policy_value: Any) -> bool:
     """
     if isinstance(policy_value, bool):
         return declared_value is policy_value
-    return declared_value == policy_value
+    return bool(declared_value == policy_value)
 
 
 @dataclass(frozen=True)

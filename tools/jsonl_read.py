@@ -56,7 +56,7 @@ import json
 import os
 
 
-def read_jsonl_entries(path: str) -> list[dict]:
+def read_jsonl_entries(path: str) -> list[dict[str, object]]:
     """Read every line in a JSONL log at `path`, tolerant of a corrupted
     tail. A line that isn't valid JSON, or that parses to something other
     than a JSON object (a bare number, null, list, or string), comes back
