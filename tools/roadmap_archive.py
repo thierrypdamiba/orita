@@ -51,6 +51,29 @@ import datetime
 import os
 import re
 import sys
+from typing import TypedDict
+
+
+class Section(TypedDict):
+    start: int
+    end: int
+    text: str
+
+
+class ArchiveResult(TypedDict):
+    archived_text: str
+    remainder_text: str
+    task_range: tuple[int, int] | None
+    sections_archived: int
+
+
+class ArchiveFileResult(TypedDict):
+    archived_text: str
+    remainder_text: str
+    task_range: tuple[int, int]
+    sections_archived: int
+    out_path: str
+
 
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
 DEFAULT_ROADMAP = os.path.join(ROOT, "ROADMAP.md")
@@ -71,7 +94,7 @@ class RoadmapArchiveError(Exception):
     """Raised when the document can't be split safely -- named, not silent."""
 
 
-def split_sections(text):
+def split_sections(text: str) -> list[Section]:
     """Split `text` into a list of contiguous, gapless section dicts.
 
     Each dict is {"start": int, "end": int, "text": str}. If any text
@@ -85,7 +108,7 @@ def split_sections(text):
     section's "text" in order reproduces `text` exactly, always.
     """
     matches = list(SECTION_RE.finditer(text))
-    sections = []
+    sections: list[Section] = []
     first_start = matches[0].start() if matches else len(text)
     if first_start > 0:
         sections.append({"start": 0, "end": first_start, "text": text[:first_start]})
@@ -96,7 +119,7 @@ def split_sections(text):
     return sections
 
 
-def section_task_rows(section_text):
+def section_task_rows(section_text: str) -> list[tuple[int, str]]:
     """Return [(task_num:int, status_cell:str), ...] for every numbered
     row found in this section, in document order. `status_cell` is
     stripped but otherwise verbatim -- callers decide what "done" means.
@@ -104,7 +127,7 @@ def section_task_rows(section_text):
     return [(int(n), status.strip()) for n, status in ROW_RE.findall(section_text)]
 
 
-def is_done_status(status_cell):
+def is_done_status(status_cell: str) -> bool:
     """A row counts as done if its status cell STARTS WITH 'DONE'
     (case-insensitive) -- covers both the bare `DONE` token and
     real, longer cells like task 19's `DONE-MACHINERY \xb7 ...`
@@ -113,7 +136,7 @@ def is_done_status(status_cell):
     return status_cell.strip().upper().startswith("DONE")
 
 
-def section_is_fully_done(section_text):
+def section_is_fully_done(section_text: str) -> bool | None:
     """True if every row in this section is done; None if the section
     carries no numbered row at all (prose-only, or the preamble) --
     distinct from False, since "no rows" is never itself a reason to stop
@@ -125,7 +148,7 @@ def section_is_fully_done(section_text):
     return all(is_done_status(status) for _, status in rows)
 
 
-def select_archivable_prefix(text, up_to_task_num):
+def select_archivable_prefix(text: str, up_to_task_num: int) -> list[Section]:
     """Return the contiguous run of sections (a Python list, in document
     order) eligible to move into an archive, given a ceiling task number.
 
@@ -149,7 +172,7 @@ def select_archivable_prefix(text, up_to_task_num):
     and that whole span is the piece safe to lift out of the live file.
     """
     sections = split_sections(text)
-    selected = []
+    selected: list[Section] = []
     started = False
     for sec in sections:
         rows = section_task_rows(sec["text"])
@@ -166,7 +189,7 @@ def select_archivable_prefix(text, up_to_task_num):
     return selected
 
 
-def archive_text(text, up_to_task_num):
+def archive_text(text: str, up_to_task_num: int) -> ArchiveResult:
     """Compute the archive/remainder split. Returns a dict:
     {
       "archived_text": the exact, verbatim span being lifted out (may be
@@ -213,7 +236,12 @@ def archive_text(text, up_to_task_num):
     }
 
 
-def build_archive_file_content(archived_text, task_range, source_path, archived_at):
+def build_archive_file_content(
+    archived_text: str,
+    task_range: tuple[int, int],
+    source_path: str,
+    archived_at: str,
+) -> tuple[str, str]:
     """Wrap the verbatim archived span with a small, fixed-shape header.
     Returns (header, full_content) so a caller/test can slice
     `full_content[len(header):]` and get back `archived_text` exactly --
@@ -229,7 +257,9 @@ def build_archive_file_content(archived_text, task_range, source_path, archived_
     return header, header + archived_text
 
 
-def archive(path, up_to_task_num, out_path, now=None):
+def archive(
+    path: str, up_to_task_num: int, out_path: str, now: str | None = None
+) -> ArchiveFileResult:
     """Perform the real, on-disk archive: read `path`, split it, write
     the archived span to `out_path` (must not already exist -- refuses to
     silently overwrite or append into a prior archive's byte range), and
@@ -259,11 +289,16 @@ def archive(path, up_to_task_num, out_path, now=None):
         f.write(archive_content)
     with open(path, "w", encoding="utf-8") as f:
         f.write(result["remainder_text"])
-    result["out_path"] = out_path
-    return result
+    return ArchiveFileResult(
+        archived_text=result["archived_text"],
+        remainder_text=result["remainder_text"],
+        task_range=result["task_range"],
+        sections_archived=result["sections_archived"],
+        out_path=out_path,
+    )
 
 
-def format_plan(result, up_to_task_num):
+def format_plan(result: ArchiveResult, up_to_task_num: int) -> str:
     if result["task_range"] is None:
         return f"nothing archivable at or below task {up_to_task_num}"
     lo, hi = result["task_range"]
@@ -274,7 +309,7 @@ def format_plan(result, up_to_task_num):
     )
 
 
-def main(argv=None):
+def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     sub = parser.add_subparsers(dest="command", required=True)
 
@@ -298,15 +333,15 @@ def main(argv=None):
 
     if args.command == "archive":
         try:
-            result = archive(args.path, args.up_to, args.out)
+            archive_result = archive(args.path, args.up_to, args.out)
         except RoadmapArchiveError as e:
             print(f"refused: {e}", file=sys.stderr)
             return 1
-        lo, hi = result["task_range"]
+        lo, hi = archive_result["task_range"]
         print(
-            f"archived tasks {lo}-{hi} -> {result['out_path']} "
-            f"({len(result['archived_text'])} bytes); "
-            f"{args.path} now {len(result['remainder_text'])} bytes"
+            f"archived tasks {lo}-{hi} -> {archive_result['out_path']} "
+            f"({len(archive_result['archived_text'])} bytes); "
+            f"{args.path} now {len(archive_result['remainder_text'])} bytes"
         )
         return 0
 
