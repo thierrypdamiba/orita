@@ -153,7 +153,7 @@ def _is_automatic_consequence(text: str, match_end: int) -> bool:
     return bool(_AUTOMATIC_CONSEQUENCE_RE.match(text, match_end))
 
 
-def _find_violations_uncached(orita_dir: str = DEFAULT_ORITA_DIR) -> list:
+def _find_violations_uncached(orita_dir: str = DEFAULT_ORITA_DIR) -> list[dict[str, object]]:
     """Task 99: read-only scan of every public .md/.html file in the town
     checkout for an imperative star/follow/like/subscribe ask. Returns a
     list of violation records, empty when the Star Covenant has genuinely
@@ -193,7 +193,7 @@ def _find_violations_uncached(orita_dir: str = DEFAULT_ORITA_DIR) -> list:
 find_violations, clear_cache = scan_files.path_memoize(_find_violations_uncached, DEFAULT_ORITA_DIR)
 
 
-def format_violations(violations: list) -> str:
+def format_violations(violations: list[dict[str, object]]) -> str:
     return violation_format.format_violations(
         "star covenant check",
         violations,

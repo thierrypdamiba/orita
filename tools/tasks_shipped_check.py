@@ -119,7 +119,7 @@ def _tasks_shipped_ground_truth(buildlog_path: str, date: str) -> int | None:
 def check_tasks_shipped(
     metrics_path: str = DEFAULT_METRICS_PATH,
     buildlog_path: str = DEFAULT_BUILDLOG_PATH,
-) -> dict:
+) -> dict[str, object]:
     """Cross-check the last recorded `tasks_shipped_today` reading against
     real, live BUILDLOG.md ground truth. Returns `clean: True` when the two
     agree, when there is no reading yet, or when no aggregate row exists
@@ -172,7 +172,7 @@ def check_tasks_shipped(
     }
 
 
-def format_result(result: dict) -> str:
+def format_result(result: dict[str, object]) -> str:
     if result["claimed_date"] is None:
         return "tasks shipped today: clean (no metrics.jsonl reading yet; nothing to cross-check)"
     if result["claimed"] is None:

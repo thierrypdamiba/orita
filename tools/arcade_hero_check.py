@@ -164,7 +164,7 @@ def _is_negated_or_predictive(text: str, match_start: int) -> bool:
 _is_quoted_citation = quoted_citation.is_quoted_citation
 
 
-def _find_violations_uncached(orita_dir: str = DEFAULT_ORITA_DIR) -> list:
+def _find_violations_uncached(orita_dir: str = DEFAULT_ORITA_DIR) -> list[dict[str, object]]:
     """Task 106: read-only scan of every public .md/.html file in the town
     checkout for the direct-credential-handoff shape ROADMAP.md's constraint
     #4 forbids -- a live ask routing a human's credential around Arcade's
@@ -193,7 +193,7 @@ def _find_violations_uncached(orita_dir: str = DEFAULT_ORITA_DIR) -> list:
 find_violations, clear_cache = scan_files.path_memoize(_find_violations_uncached, DEFAULT_ORITA_DIR)
 
 
-def format_violations(violations: list) -> str:
+def format_violations(violations: list[dict[str, object]]) -> str:
     return violation_format.format_violations(
         "arcade hero check",
         violations,

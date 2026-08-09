@@ -87,6 +87,7 @@ import ast
 import glob
 import os
 import sys
+from collections.abc import Iterator
 from typing import TypedDict, TypeGuard
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -123,7 +124,7 @@ _ALLOWED_DUPLICATES: dict[str, frozenset[str]] = {
 }
 
 
-def _iter_scanned_files(orita_dir: str):
+def _iter_scanned_files(orita_dir: str) -> Iterator[str]:
     for rel_glob in (_RECIPES_GLOB, _SEAM_ENGINE_GLOB, _TOOLS_GLOB, _ORACLE_ENGINE_GLOB):
         for path in sorted(glob.glob(os.path.join(orita_dir, rel_glob))):
             if os.path.basename(path) in _SKIP_BASENAMES:
@@ -220,7 +221,7 @@ def _find_violations_uncached(orita_dir: str = DEFAULT_ORITA_DIR) -> list[Violat
 find_violations, clear_cache = scan_files.path_memoize(_find_violations_uncached, DEFAULT_ORITA_DIR)
 
 
-def format_violations(violations: list) -> str:
+def format_violations(violations: list[Violation]) -> str:
     if not violations:
         return "duplicate regex check: clean -- every re.compile pattern is either unique or a seeded exception"
     lines = [f"duplicate regex check: {len(violations)} DUPLICATE PATTERN(S) FOUND -- hand-typed copy, no import backing it"]

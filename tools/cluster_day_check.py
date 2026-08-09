@@ -85,6 +85,7 @@ import os
 import re
 import sys
 from datetime import date, datetime, timedelta, timezone
+from typing import cast
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DEFAULT_CHRONICLE_DIR = os.path.join(ROOT, "chronicle")
@@ -202,7 +203,7 @@ def _mondays_through(today: date) -> list[date]:
     return mondays
 
 
-def compute_cadence(chronicle_dir: str | None = None, today: date | None = None) -> dict:
+def compute_cadence(chronicle_dir: str | None = None, today: date | None = None) -> dict[str, object]:
     """The real numbers behind TOWN-OPERATIONS.md's weekly Cluster Day
     ritual -- named as missing mechanism, never computed anywhere, by
     `orita-vault/hand/skipped.md`'s 2026-07-27 note.
@@ -256,16 +257,18 @@ def compute_cadence(chronicle_dir: str | None = None, today: date | None = None)
     }
 
 
-def format_cadence(result: dict) -> str:
-    if not result["missed_mondays"]:
+def format_cadence(result: dict[str, object]) -> str:
+    mondays_due = cast("list[str]", result["mondays_due"])
+    missed_mondays = cast("list[str]", result["missed_mondays"])
+    if not missed_mondays:
         return (
             f"cluster day: current -- {result['cluster_day_episodes_shipped']} Cluster Day episode(s) shipped, "
-            f"{len(result['mondays_due'])} Monday(s) owed since founding, none missed"
+            f"{len(mondays_due)} Monday(s) owed since founding, none missed"
         )
-    joined = ", ".join(result["missed_mondays"])
-    plural = "" if len(result["missed_mondays"]) == 1 else "s"
+    joined = ", ".join(missed_mondays)
+    plural = "" if len(missed_mondays) == 1 else "s"
     return (
-        f"cluster day: {len(result['missed_mondays'])} Cluster Day{plural} lapsed -- "
+        f"cluster day: {len(missed_mondays)} Cluster Day{plural} lapsed -- "
         f"{result['cluster_day_episodes_shipped']} Cluster Day episode(s) shipped, owed for {joined} "
         f"(TOWN-OPERATIONS.md's weekly ritual; see orita-vault/hand/skipped.md 2026-07-27)"
     )

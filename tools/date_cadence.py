@@ -54,10 +54,10 @@ Usage: imported only, never run directly.
 """
 from __future__ import annotations
 
-from datetime import timedelta
+from datetime import date, timedelta
 
 
-def compute_date_streak_and_gaps(dates: list, target: int) -> dict:
+def compute_date_streak_and_gaps(dates: list[date], target: int) -> dict[str, object]:
     """`dates` is every real calendar date a cadence check has already
     found (already deduplicated and sorted ascending -- this function does
     no reading of its own, on purpose, so it stays agnostic to whether the

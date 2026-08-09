@@ -71,7 +71,7 @@ _last_metrics_entry = metrics_reader.last_metrics_entry
 def check_toolkits_in_use(
     metrics_path: str = DEFAULT_METRICS_PATH,
     consent_log_path: str = DEFAULT_CONSENT_LOG_PATH,
-) -> dict:
+) -> dict[str, object]:
     """Cross-check the last recorded `distinct_toolkits_in_use` reading
     against ground truth. Returns `clean: True` when the two agree, or
     when nothing has been recorded yet (a fresh log has nothing to
@@ -120,7 +120,7 @@ def check_toolkits_in_use(
     }
 
 
-def format_result(result: dict) -> str:
+def format_result(result: dict[str, object]) -> str:
     return adoption_metric_format.format_adoption_result(
         "toolkits in use", result, "distinct_toolkits_in_use", "real toolkit(s)"
     )

@@ -80,7 +80,7 @@ _last_metrics_entry = metrics_reader.last_metrics_entry
 def check_report_shipped(
     metrics_path: str = DEFAULT_METRICS_PATH,
     reports_dir: str = DEFAULT_REPORTS_DIR,
-) -> dict:
+) -> dict[str, object]:
     """Cross-check the last recorded `reports_shipped_today` reading
     against real, live ground truth: does `fencepost/REPORTS/<claimed
     date>.md` actually exist? Returns `clean: True` when the two agree,
@@ -126,7 +126,7 @@ def check_report_shipped(
     }
 
 
-def format_result(result: dict) -> str:
+def format_result(result: dict[str, object]) -> str:
     if result["claimed"] is None:
         if result["claimed_date"] is None:
             return "reports shipped today: clean (no metrics.jsonl reading yet; nothing to cross-check)"

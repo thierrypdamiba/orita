@@ -47,6 +47,7 @@ from __future__ import annotations
 import os
 import re
 import sys
+from typing import cast
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DEFAULT_README_PATH = os.path.join(ROOT, "chronicle", "README.md")
@@ -81,7 +82,7 @@ def _linked_episode_numbers(section_text: str) -> list[int]:
 def check_chronicle_readme(
     readme_path: str = DEFAULT_README_PATH,
     chronicle_dir: str = DEFAULT_CHRONICLE_DIR,
-) -> dict:
+) -> dict[str, object]:
     """Cross-check `chronicle/README.md`'s "## Episodes" section against
     the real, live `chronicle/` tree (`cluster_day_check._episode_numbers`,
     never a second hand-typed list). Returns `clean: True` only when every
@@ -108,7 +109,7 @@ def check_chronicle_readme(
     }
 
 
-def format_result(result: dict) -> str:
+def format_result(result: dict[str, object]) -> str:
     if result["clean"]:
         return (
             f"chronicle readme: clean ({result['real_count']} real episode(s), "
@@ -116,10 +117,10 @@ def format_result(result: dict) -> str:
         )
     problems = []
     if result["missing_from_readme"]:
-        nums = ", ".join(str(n) for n in result["missing_from_readme"])
+        nums = ", ".join(str(n) for n in cast("list[int]", result["missing_from_readme"]))
         problems.append(f"unlinked real episode(s): {nums}")
     if result["stale_in_readme"]:
-        nums = ", ".join(str(n) for n in result["stale_in_readme"])
+        nums = ", ".join(str(n) for n in cast("list[int]", result["stale_in_readme"]))
         problems.append(f"link(s) to an episode that no longer exists: {nums}")
     return "chronicle readme: BROKEN -- " + "; ".join(problems)
 
