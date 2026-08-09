@@ -68,6 +68,24 @@ class TestNamedBlockerOf:
         # dependency ("I am blocked by/on"), never the inverse.
         assert detector._named_blocker_of("This blocks #900, not the other way around") is None
 
+    def test_a_negated_blocker_marker_is_not_a_claim(self):
+        # A body that explicitly denies still being blocked must not be
+        # read as naming a live blocker anyway -- the same false-positive
+        # shape task 612 fixed for duplicate_markers.py's "duplicate of #N".
+        assert detector._named_blocker_of("This is not blocked by #10 anymore, we are good to go.") is None
+
+    def test_no_longer_blocked_is_not_a_claim(self):
+        assert detector._named_blocker_of("No longer blocked by #10.") is None
+
+    def test_isnt_blocked_is_not_a_claim(self):
+        assert detector._named_blocker_of("This isn't blocked on #12, go ahead.") is None
+
+    def test_negation_does_not_launder_a_later_genuine_marker(self):
+        # A denial of one thing must not swallow an unrelated, real marker
+        # sitting further along in the same body -- `finditer` keeps
+        # walking past a skipped (negated) candidate to the next one.
+        assert detector._named_blocker_of("Not a fan of this, blocked by #10 for real.") == 10
+
 
 class TestComputeGaps:
     def test_a_stale_closed_blocker_is_surfaced_at_high_confidence(self):
@@ -127,6 +145,19 @@ class TestComputeGaps:
 
         assert surfaced == []
         assert excluded[0].slug == "nonexistent-blocker-909-999"
+
+    def test_a_denied_blocker_marker_produces_no_candidate_at_all(self):
+        # Before the fix, this body's "not blocked by #920" was read as an
+        # unnegated marker naming #920 as a live blocker -- since #920 is
+        # closed, that misfired straight into `unblocked-issue-still-open`.
+        # The negation must not turn a denial into a false gap.
+        blocked = _issue(919, "This is not blocked by #920 anymore, we're clear.")
+        blocker = _issue(920, "Some bug", state="closed", closed_at=datetime(2026, 7, 18, 9, 0, 0, tzinfo=timezone.utc))
+
+        surfaced, excluded = detector.compute_gaps([blocker, blocked], now=_NOW)
+
+        assert surfaced == []
+        assert excluded[0].slug == "no-blocker-marker-919"
 
     def test_a_closed_blocker_with_no_timestamp_is_excluded_as_malformed_not_still_open(self):
         blocked = _issue(910, "Blocked by #911")

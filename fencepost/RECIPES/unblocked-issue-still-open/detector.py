@@ -58,6 +58,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from seam_engine.negation import is_negated
 from seam_engine.scan import GapCandidate
 
 _HERE = Path(__file__).resolve().parent
@@ -71,6 +72,21 @@ DEFAULT_ISSUES_FIXTURE = _HERE.parents[1] / "fixtures" / "unblocked_issue_still_
 # "un" and "blocked" for `\b` to catch, so this never fires on it.
 BLOCKER_MARKER_RE = re.compile(r"\bblocked\s*(?:by|on|:)?\s+#(\d+)\b", re.IGNORECASE)
 
+# A negation word sitting in front of "blocked" turns a genuine-looking
+# marker into an explicit denial -- "This is not blocked by #10 anymore",
+# "No longer blocked by #10" -- the exact false-positive shape task 612
+# fixed for `duplicate_markers.py`'s own "duplicate of #N" marker: an
+# unnegated claim must not survive across a nearby negation. Reproduced
+# live before this fix: `_named_blocker_of("This is not blocked by #10
+# anymore, we are good to go.")` returned `10` -- a body that explicitly
+# denies still being blocked was read as naming a live blocker anyway,
+# which would surface a false "unblocked-issue-still-open" gap the moment
+# #10 itself happened to be closed. `_NEGATION_PREFIX_WINDOW` mirrors
+# `duplicate_markers.py`'s own 16-char window -- enough slack for "isn't
+# ", "is not ", or "no longer " sitting directly in front of "blocked"
+# without reaching back far enough to catch an unrelated earlier negation.
+_NEGATION_PREFIX_WINDOW = 16
+
 # A blocker closed under this age may not have been noticed yet by whoever
 # is waiting on it -- not yet a gap. Matches duplicate-issue-still-open's
 # and overdue-milestone-still-open's own bar rather than inventing a new
@@ -80,9 +96,16 @@ _STALE_HOURS = 24.0
 
 def _named_blocker_of(body: str) -> int | None:
     """The number named as this body's own blocker, or None if it names no
-    blocker marker at all."""
-    match = BLOCKER_MARKER_RE.search(body)
-    return int(match.group(1)) if match else None
+    (unnegated) blocker marker at all. A blocker marker whose immediately
+    preceding words negate it ("not blocked by #10 anymore", "no longer
+    blocked by #10") is skipped, and the search continues to the next
+    candidate -- see this module's own comment above `_NEGATION_PREFIX_
+    WINDOW` for the live reproduction."""
+    for match in BLOCKER_MARKER_RE.finditer(body):
+        if is_negated(body, match.start(), _NEGATION_PREFIX_WINDOW):
+            continue
+        return int(match.group(1))
+    return None
 
 
 def _parse_ts(s: str) -> datetime:
