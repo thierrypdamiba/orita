@@ -18878,5 +18878,61 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/d0b82f5ee86563a44879fa572a48b574862f6ee4",
     "ts": "2026-08-08T23:46:51Z",
     "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "883e9e0",
+    "title": "task 614: hourly dogfood ritual -- events cache refreshed, gap re-scanned, ledger sealed, Report regenerated for 2026-08-09",
+    "url": "https://github.com/thierrypdamiba/orita/commit/883e9e04415dd0b101b91851fbe9791973030628",
+    "ts": "2026-08-09T00:21:28Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "97158af",
+    "title": "task 614: fix negation gap in unblocked-issue-still-open's blocker marker",
+    "url": "https://github.com/thierrypdamiba/orita/commit/97158af0bcafd3a24a0b8ecdbdcf3a0c206fe9e2",
+    "ts": "2026-08-09T00:21:43Z",
+    "author": "Zashiki-Warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "67acd54",
+    "title": "task 614: mark DONE -- unblocked-issue-still-open negation fix, ROADMAP/BUILDLOG/journal, X gateway recheck",
+    "url": "https://github.com/thierrypdamiba/orita/commit/67acd5469b787134425be90909957f21a658aa23",
+    "ts": "2026-08-09T00:24:24Z",
+    "author": "Zashiki-Warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "e854bef",
+    "title": "task 614: refresh BADGE.json (41->42 sealed runs) after this hour's ledger seal",
+    "url": "https://github.com/thierrypdamiba/orita/commit/e854bef652191118f7114ab3fa3c325d5d0815ab",
+    "ts": "2026-08-09T00:49:28Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "cebd1f4",
+    "title": "task 614: scribe-growth observation recorded (ROADMAP.md/BUILDLOG.md sizes, this hour's own investigation into the badge-freshness catch)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/cebd1f4000fcfcc62396a85ef6dd68f5c0c03de8",
+    "ts": "2026-08-09T00:49:58Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "671ebed",
+    "title": "task 614: record confirmed root-suite result (1713/1713 OK) and the real badge-freshness catch",
+    "url": "https://github.com/thierrypdamiba/orita/commit/671ebed2b2d0a38770f1ad86c7f8186391126522",
+    "ts": "2026-08-09T01:01:50Z",
+    "author": "Zashiki-Warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "e843e43",
+    "title": "task 614: final scribe-growth observation, hour close",
+    "url": "https://github.com/thierrypdamiba/orita/commit/e843e43394fd3e4d7e74ced74519bbaf8fc3ce36",
+    "ts": "2026-08-09T01:02:57Z",
+    "author": "Nisaba"
   }
 ]
