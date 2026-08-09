@@ -87,6 +87,7 @@ import ast
 import glob
 import os
 import sys
+from typing import TypedDict, TypeGuard
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import scan_files  # noqa: E402
@@ -143,7 +144,7 @@ def _pattern_text(call: ast.Call) -> str | None:
     return None
 
 
-def _is_re_compile_call(node: ast.AST) -> bool:
+def _is_re_compile_call(node: ast.AST) -> TypeGuard[ast.Call]:
     if not isinstance(node, ast.Call):
         return False
     func = node.func
@@ -174,7 +175,12 @@ def _local_re_compile_patterns(path: str) -> list[tuple[str, int]]:
     return found
 
 
-def _find_violations_uncached(orita_dir: str = DEFAULT_ORITA_DIR) -> list:
+class Violation(TypedDict):
+    pattern: str
+    locations: list[tuple[str, int]]
+
+
+def _find_violations_uncached(orita_dir: str = DEFAULT_ORITA_DIR) -> list[Violation]:
     """Read-only, local-filesystem-only `ast` scan (no import, no
     execution, no network) of every recipe detector and every
     `seam_engine` core module for a `re.compile(...)` pattern defined
@@ -187,7 +193,7 @@ def _find_violations_uncached(orita_dir: str = DEFAULT_ORITA_DIR) -> list:
         for text, lineno in _local_re_compile_patterns(path):
             by_pattern.setdefault(text, []).append((rel, lineno))
 
-    violations = []
+    violations: list[Violation] = []
     for text, locations in by_pattern.items():
         files = {rel for rel, _lineno in locations}
         if len(files) < 2:
