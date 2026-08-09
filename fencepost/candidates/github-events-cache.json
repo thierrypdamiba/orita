@@ -18934,5 +18934,93 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/e843e43394fd3e4d7e74ced74519bbaf8fc3ce36",
     "ts": "2026-08-09T01:02:57Z",
     "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "6b947e1",
+    "title": "task 615: hourly dogfood ritual -- events cache refreshed, CI/X gateway checks recorded",
+    "url": "https://github.com/thierrypdamiba/orita/commit/6b947e1329db286932543fc4b17ebec4b9fff677",
+    "ts": "2026-08-09T01:16:23Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "7dc3c53",
+    "title": "task 615: fix implicit-Optional type bug in gateway.py's required_scopes_covered_by_capabilities",
+    "url": "https://github.com/thierrypdamiba/orita/commit/7dc3c53abc7c984b0faf203f59fdc6eaff05aa52",
+    "ts": "2026-08-09T01:17:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "6a03f04",
+    "title": "task 615: record ritual_check scribe-growth observation (702426/852945)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/6a03f04370104edffa3ee8b85066bf24227a6b8f",
+    "ts": "2026-08-09T01:19:37Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "4bd39b4",
+    "title": "task 615: mark DONE -- gateway.py implicit-Optional fix confirmed, root suite 1713/1713 OK",
+    "url": "https://github.com/thierrypdamiba/orita/commit/4bd39b47fed21b68e4c82e6f24c2cf7f85cb189c",
+    "ts": "2026-08-09T01:31:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "dc83315",
+    "title": "task 615: record ritual_check scribe-growth observation (704212/854073), hour close",
+    "url": "https://github.com/thierrypdamiba/orita/commit/dc8331571863c62799d8f256c68da7525d409365",
+    "ts": "2026-08-09T01:37:23Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "593ea47",
+    "title": "task 616: record ritual_check X_GetUserTweets recheck (257th consecutive forbidden)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/593ea4759d850932406aeee0e9ff716d13239270",
+    "ts": "2026-08-09T02:15:04Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "f17d080",
+    "title": "task 616: record ritual_check scribe-growth observation (710143/854073)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/f17d08061c2aa83b53e54bed0d761431c454c629",
+    "ts": "2026-08-09T02:15:44Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "e9bd4b8",
+    "title": "task 616: mypy --strict sweep of seam_engine -- 21 errors down to 6, zero behavior change",
+    "url": "https://github.com/thierrypdamiba/orita/commit/e9bd4b82c19ac4775a31c6509d19b2c17a971836",
+    "ts": "2026-08-09T02:16:00Z",
+    "author": "Zashiki-Warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "dc489aa",
+    "title": "task 616: confirm root suite result -- 1713/1713 OK, zero regressions",
+    "url": "https://github.com/thierrypdamiba/orita/commit/dc489aa630c81dc3fcd0d5b181b2a604e89dd794",
+    "ts": "2026-08-09T02:20:16Z",
+    "author": "Zashiki-Warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "aba9b22",
+    "title": "task 617: record ritual_check CI/scribe-growth observation (dawn-run+pages green on dc489aa, sizes 710005/855627)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/aba9b22ddb891b14abc404dd5081898addb3c78a",
+    "ts": "2026-08-09T03:18:47Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "dc20586",
+    "title": "task 617: tools/ ruff B/S/ARG/SIM sweep -- oath_badge.py dead label param removed, ritual_completeness_check.py zip() made strict",
+    "url": "https://github.com/thierrypdamiba/orita/commit/dc2058667aab86df9c9b95fcf068f8803e3b555b",
+    "ts": "2026-08-09T03:18:54Z",
+    "author": "Nyx"
   }
 ]
