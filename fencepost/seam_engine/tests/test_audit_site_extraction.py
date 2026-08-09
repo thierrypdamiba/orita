@@ -281,7 +281,7 @@ def test_row_parser_reproduces_real_ledger_gaps_exactly(tmp_path: Path):
     parsed = _parse_rows_like_the_site(rendered, threshold, indices)
 
     assert len(parsed) == t.total == 2
-    for row, gap in zip(parsed, t.gaps):
+    for row, gap in zip(parsed, t.gaps, strict=True):
         expected_verdict = "CONFIRMED" if gap.verdict == audit.Verdict.CONFIRMED.value else "FALSE"
         assert row["date"] == gap.date
         assert row["gap"] == _esc(gap.headline)
@@ -298,7 +298,7 @@ def test_row_parser_reproduces_the_towns_real_live_audit_ledger():
     parsed = _parse_rows_like_the_site(rendered, threshold, indices)
 
     assert len(parsed) == t.total
-    for row, gap in zip(parsed, t.gaps):
+    for row, gap in zip(parsed, t.gaps, strict=True):
         expected_verdict = "CONFIRMED" if gap.verdict == audit.Verdict.CONFIRMED.value else "FALSE"
         assert row["date"] == gap.date
         assert row["gap"] == _esc(gap.headline)

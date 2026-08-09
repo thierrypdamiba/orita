@@ -326,7 +326,7 @@ def test_main_with_no_sealed_arg_raises_named_error_not_keyerror_when_tip_is_mal
 
     try:
         draftback.main(["email", "--base", str(tmp_path)])
-        assert False, "expected LedgerTamperedError, not a bare KeyError"
+        raise AssertionError("expected LedgerTamperedError, not a bare KeyError")
     except ledger.LedgerTamperedError as e:
         assert "malformed" in str(e)
 
@@ -348,9 +348,9 @@ def test_main_with_file_arg_raises_named_error_not_attributeerror_when_json_is_n
 
     try:
         draftback.main(["email", str(bad), "--base", str(tmp_path)])
-        assert False, "expected a named ValueError, not a bare AttributeError"
+        raise AssertionError("expected a named ValueError, not a bare AttributeError")
     except AttributeError:
-        assert False, "expected a named ValueError, not a bare AttributeError"
+        raise AssertionError("expected a named ValueError, not a bare AttributeError") from None
     except ValueError as e:
         assert "object" in str(e)
 
@@ -364,8 +364,8 @@ def test_main_with_stdin_raises_named_error_not_attributeerror_when_json_is_not_
 
     try:
         draftback.main(["email", "-", "--base", str(tmp_path)])
-        assert False, "expected a named ValueError, not a bare AttributeError"
+        raise AssertionError("expected a named ValueError, not a bare AttributeError")
     except AttributeError:
-        assert False, "expected a named ValueError, not a bare AttributeError"
+        raise AssertionError("expected a named ValueError, not a bare AttributeError") from None
     except ValueError as e:
         assert "object" in str(e)

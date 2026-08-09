@@ -237,7 +237,7 @@ def test_last_seal_raises_named_error_not_keyerror_when_tip_is_malformed(tmp_pat
 
     try:
         ledger.last_seal(tmp_path)
-        assert False, "last_seal() must not silently return a seal for a malformed tip"
+        raise AssertionError("last_seal() must not silently return a seal for a malformed tip")
     except ledger.LedgerTamperedError as e:
         assert "malformed" in str(e)
 
@@ -255,7 +255,7 @@ def test_append_scan_raises_named_error_not_keyerror_when_tip_is_malformed(tmp_p
 
     try:
         ledger.append_scan(_scan(primary=True, generated_at="next"), now=_at(2026, 7, 13), base=tmp_path)
-        assert False, "append_scan() must not silently append on top of a malformed tip"
+        raise AssertionError("append_scan() must not silently append on top of a malformed tip")
     except ledger.LedgerTamperedError as e:
         assert "malformed" in str(e)
 
@@ -278,7 +278,7 @@ def test_tip_sealed_raises_named_error_not_keyerror_when_tip_is_malformed(tmp_pa
     records = ledger.read_records(tmp_path)
     try:
         ledger.tip_sealed(records)
-        assert False, "tip_sealed() must not silently return a sealed payload for a malformed tip"
+        raise AssertionError("tip_sealed() must not silently return a sealed payload for a malformed tip")
     except ledger.LedgerTamperedError as e:
         assert "malformed" in str(e)
 
@@ -389,9 +389,9 @@ def test_main_append_with_file_arg_raises_named_error_not_attributeerror_when_js
 
     try:
         ledger.main(["append", str(bad), "--base", str(tmp_path)])
-        assert False, "expected a named ValueError, not a bare AttributeError"
+        raise AssertionError("expected a named ValueError, not a bare AttributeError")
     except AttributeError:
-        assert False, "expected a named ValueError, not a bare AttributeError"
+        raise AssertionError("expected a named ValueError, not a bare AttributeError") from None
     except ValueError as e:
         assert "object" in str(e)
 
@@ -405,9 +405,9 @@ def test_main_append_with_stdin_raises_named_error_not_attributeerror_when_json_
 
     try:
         ledger.main(["append", "-", "--base", str(tmp_path)])
-        assert False, "expected a named ValueError, not a bare AttributeError"
+        raise AssertionError("expected a named ValueError, not a bare AttributeError")
     except AttributeError:
-        assert False, "expected a named ValueError, not a bare AttributeError"
+        raise AssertionError("expected a named ValueError, not a bare AttributeError") from None
     except ValueError as e:
         assert "object" in str(e)
 
@@ -444,7 +444,7 @@ def test_load_json_dict_names_the_given_noun_in_a_non_object_error(tmp_path: Pat
     p.write_text("[1, 2, 3]")
     try:
         ledger._load_json_dict(str(p), "widget record")
-        assert False, "expected a named ValueError"
+        raise AssertionError("expected a named ValueError")
     except ValueError as e:
         assert "widget record" in str(e)
         assert "list" in str(e)
@@ -455,7 +455,7 @@ def test_load_scan_delegates_to_load_json_dict_with_the_scan_record_noun(tmp_pat
     p.write_text("[1, 2, 3]")
     try:
         ledger._load_scan(str(p))
-        assert False, "expected a named ValueError"
+        raise AssertionError("expected a named ValueError")
     except ValueError as e:
         assert "scan record" in str(e)
 

@@ -190,7 +190,7 @@ def test_render_latest_reads_the_real_ledger(tmp_path: Path):
 def test_render_latest_on_empty_ledger_raises(tmp_path: Path):
     try:
         report.render_latest(tmp_path)
-        assert False, "expected ValueError on an empty ledger"
+        raise AssertionError("expected ValueError on an empty ledger")
     except ValueError:
         pass
 
@@ -226,7 +226,7 @@ def test_render_latest_raises_named_error_not_keyerror_when_tip_is_malformed(tmp
 
     try:
         report.render_latest(tmp_path)
-        assert False, "expected LedgerTamperedError, not a bare KeyError"
+        raise AssertionError("expected LedgerTamperedError, not a bare KeyError")
     except ledger.LedgerTamperedError as e:
         assert "malformed" in str(e)
 
@@ -259,7 +259,7 @@ def test_main_with_no_args_raises_named_error_not_keyerror_when_tip_is_malformed
 
     try:
         report.main(["--ledger-base", str(tmp_path)])
-        assert False, "expected LedgerTamperedError, not a bare KeyError"
+        raise AssertionError("expected LedgerTamperedError, not a bare KeyError")
     except ledger.LedgerTamperedError as e:
         assert "malformed" in str(e)
 
@@ -279,9 +279,9 @@ def test_main_with_file_arg_raises_named_error_not_attributeerror_when_json_is_n
 
     try:
         report.main([str(bad)])
-        assert False, "expected a named ValueError, not a bare AttributeError"
+        raise AssertionError("expected a named ValueError, not a bare AttributeError")
     except AttributeError:
-        assert False, "expected a named ValueError, not a bare AttributeError"
+        raise AssertionError("expected a named ValueError, not a bare AttributeError") from None
     except ValueError as e:
         assert "object" in str(e)
 
@@ -295,9 +295,9 @@ def test_main_with_stdin_raises_named_error_not_attributeerror_when_json_is_not_
 
     try:
         report.main(["-"])
-        assert False, "expected a named ValueError, not a bare AttributeError"
+        raise AssertionError("expected a named ValueError, not a bare AttributeError")
     except AttributeError:
-        assert False, "expected a named ValueError, not a bare AttributeError"
+        raise AssertionError("expected a named ValueError, not a bare AttributeError") from None
     except ValueError as e:
         assert "object" in str(e)
 

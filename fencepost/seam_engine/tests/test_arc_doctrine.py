@@ -18,6 +18,7 @@ promises to the same law:
 from __future__ import annotations
 
 from datetime import datetime, timedelta, timezone
+from itertools import pairwise
 from pathlib import Path
 
 import pytest
@@ -119,7 +120,7 @@ def test_wall_is_monotonic_non_decreasing_as_recorded_grows():
     # mean the wall "caught up") and never by less than 0 (which would mean
     # the wall went backwards on its own).
     walls = [max(n - 1, 0) for n in range(0, 20)]
-    diffs = [b - a for a, b in zip(walls, walls[1:])]
+    diffs = [b - a for a, b in pairwise(walls)]
     assert all(d in (0, 1) for d in diffs)
     # and the gap (recorded - wall) never shrinks below 1 once recorded > 0
     for n in range(1, 20):
