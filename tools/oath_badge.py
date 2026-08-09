@@ -186,7 +186,6 @@ def compute_badge_state(
     catalog: Iterable[Any],
     policy: dict[str, Any] | None = None,
     integrity_checks: Iterable[Callable[[], list[str]]] = (),
-    label: str = "read-only",
     now: datetime | None = None,
 ) -> BadgeState:
     """Audit a catalog against a policy, plus any number of extra integrity
@@ -194,6 +193,14 @@ def compute_badge_state(
     fork wants proven alongside the tool-scope oath). Each integrity check
     is a zero-arg callable returning a list of problem strings (empty =
     clean). Green requires the tool audit AND every integrity check clean.
+
+    No `label` parameter here on purpose: `BadgeState` carries no label
+    field and the badge's displayed label is `render_badge_json`'s alone
+    to set. A `label` kwarg on this function would be a second, competing
+    place callers could try to set it that quietly did nothing — the
+    identical dead-parameter shape task 617 found and removed here, not a
+    hypothetical (`--label` reached this function, unused, since the file
+    was first written).
     """
     now = now or datetime.now(timezone.utc)
     policy = dict(DEFAULT_POLICY) if policy is None else policy
@@ -288,7 +295,7 @@ def main(argv: list[str] | None = None) -> int:
             policy["operations"] = tuple(policy["operations"])
 
     catalog = load_catalog(catalog_spec)
-    state = compute_badge_state(catalog, policy, label=label)
+    state = compute_badge_state(catalog, policy)
     rendered = render_badge_json(state, label=label)
     print(rendered)
 

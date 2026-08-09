@@ -464,7 +464,7 @@ def _return_dict(func: ast.FunctionDef) -> dict:
     result = {}
     for stmt in func.body:
         if isinstance(stmt, ast.Return) and isinstance(stmt.value, ast.Dict):
-            for key_node, val_node in zip(stmt.value.keys, stmt.value.values):
+            for key_node, val_node in zip(stmt.value.keys, stmt.value.values, strict=True):
                 if isinstance(key_node, ast.Constant) and isinstance(key_node.value, str):
                     var_name = val_node.id if isinstance(val_node, ast.Name) else None
                     result[key_node.value] = var_name

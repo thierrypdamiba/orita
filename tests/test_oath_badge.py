@@ -291,5 +291,49 @@ class TestUsageStringMatchesRealFlags(unittest.TestCase):
                 os.remove(path)
 
 
+class TestComputeBadgeStateHasNoDeadLabelParameter(unittest.TestCase):
+    """Task 617. `compute_badge_state` used to accept a `label` keyword
+    that did nothing at all -- `BadgeState` carries no label field and the
+    badge's message text never referenced it, so `--label custom` reached
+    `compute_badge_state(catalog, policy, label=label)` and was silently
+    dropped; only the separate `render_badge_json(state, label=label)`
+    call actually controlled the rendered label. `ruff --select ARG001`
+    caught it as an unused function argument on ground `tools/` had never
+    been linted against before. The parameter is now gone entirely rather
+    than left unused, so a caller (this template is meant to be copied by
+    forks, per its own module docstring) gets a real `TypeError` instead
+    of a second, competing, no-op place to try to set the label -- the
+    same "unrecognized flag is silently accepted" shape task 437's
+    `--write` fix above already named in this same file, one layer
+    deeper (a real parameter this time, not an unparsed CLI flag)."""
+
+    def test_label_kwarg_no_longer_accepted(self):
+        with self.assertRaises(TypeError):
+            oath_badge.compute_badge_state(_clean_catalog(), label="custom")
+
+    def test_cli_label_flag_still_controls_the_rendered_label_end_to_end(self):
+        import io
+        import contextlib
+
+        class _FakeApp:
+            _catalog = [_MaterializedTool("ListIssues", True, False, ["read"])]
+
+        class _FakeModule:
+            app = _FakeApp()
+
+        sys.modules["_oath_badge_label_fixture_module"] = _FakeModule
+        try:
+            stdout = io.StringIO()
+            with contextlib.redirect_stdout(stdout):
+                rc = oath_badge.main([
+                    "--catalog", "_oath_badge_label_fixture_module:app",
+                    "--label", "my-fork-oath",
+                ])
+            self.assertEqual(rc, 0)
+            self.assertIn('"label": "my-fork-oath"', stdout.getvalue())
+        finally:
+            del sys.modules["_oath_badge_label_fixture_module"]
+
+
 if __name__ == "__main__":
     unittest.main()
