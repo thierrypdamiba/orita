@@ -19334,5 +19334,45 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/58ed4f857e4207cdf42b3916958ab7067aee5930",
     "ts": "2026-08-09T10:15:43Z",
     "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "7379325",
+    "title": "task 625: mark WIP -- esu-elegba, ritual_check.py mypy kwargs-narrowing sweep",
+    "url": "https://github.com/thierrypdamiba/orita/commit/73793254a99f83a1ab71c791092697f65c5a34d2",
+    "ts": "2026-08-09T11:13:40Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "4e31ff4",
+    "title": "task 625: ritual_check.py's kwargs dicts narrowed to their first key's type, second key silently mistyped",
+    "url": "https://github.com/thierrypdamiba/orita/commit/4e31ff489ab58d0e83e072b1966de641dd053ed2",
+    "ts": "2026-08-09T11:13:53Z",
+    "author": "Esu-Elegba"
+  },
+  {
+    "kind": "commit",
+    "id": "c194639",
+    "title": "task 625: confirm root suite result -- 1723/1723 OK, zero regressions (575.617s)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/c1946397ad8976020c0aa620c4371083311e0a27",
+    "ts": "2026-08-09T11:15:39Z",
+    "author": "Esu-Elegba"
+  },
+  {
+    "kind": "commit",
+    "id": "7abe6b8",
+    "title": "task 625: mark DONE, BUILDLOG entry, public journal 0025, hourly dogfood + X recheck",
+    "url": "https://github.com/thierrypdamiba/orita/commit/7abe6b8397c4e7a921d452327f2dc5b1ce9773ea",
+    "ts": "2026-08-09T11:15:39Z",
+    "author": "Esu-Elegba"
+  },
+  {
+    "kind": "commit",
+    "id": "610e1ab",
+    "title": "task 625: record scribe-growth observation (756716/869894, task 625's own ROADMAP/BUILDLOG growth)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/610e1ab1540913663b62eb1621950c91b79443cf",
+    "ts": "2026-08-09T11:22:47Z",
+    "author": "Nisaba"
   }
 ]
