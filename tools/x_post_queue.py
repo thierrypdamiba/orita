@@ -61,9 +61,13 @@ Usage:
     python3 tools/x_post_queue.py compose-batches  -- every batch at once, by hand; raises on any permanently-unpostable entry (by design -- use next-post operationally)
     python3 tools/x_post_queue.py mark-posted <tweet_id> <posted_at> <task> [task...]
 """
+from __future__ import annotations
+
 import json
 import os
 import sys
+
+from typing import TypedDict, cast
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import jsonl_append  # noqa: E402
@@ -72,8 +76,17 @@ import jsonl_read  # noqa: E402
 QUEUE = os.path.join(os.path.dirname(__file__), "..", "HAND", "x-post-queue.jsonl")
 MAX_TWEET_CHARS = 280
 
+Entry = dict[str, object]
 
-def _entries(path=QUEUE):
+
+class PostPlan(TypedDict):
+    text: str
+    tasks: list[str]
+    remaining_batches: int
+    blocked_tasks: list[str]
+
+
+def _entries(path: str = QUEUE) -> list[Entry]:
     """Delegates to jsonl_read.read_jsonl_entries (task 540) -- see
     that module's own docstring for the fourteen-copy history this
     replaced."""
@@ -96,7 +109,7 @@ class QueueTamperedError(RuntimeError):
 _append = jsonl_append.append_jsonl
 
 
-def queue_owed_post(task: str, topic: str, queued_at: str, path=QUEUE) -> bool:
+def queue_owed_post(task: str, topic: str, queued_at: str, path: str = QUEUE) -> bool:
     """Record a shipped task's un-postable change-gated post.
 
     Deduped by task id: calling this twice for the same task writes
@@ -110,15 +123,15 @@ def queue_owed_post(task: str, topic: str, queued_at: str, path=QUEUE) -> bool:
     return True
 
 
-def _posted_tasks(entries) -> set:
-    posted = set()
+def _posted_tasks(entries: list[Entry]) -> set[str]:
+    posted: set[str] = set()
     for e in entries:
         if e.get("type") == "posted":
-            posted.update(e.get("tasks", []))
+            posted.update(cast("list[str]", e.get("tasks", [])))
     return posted
 
 
-def pending_entries(path=QUEUE) -> list:
+def pending_entries(path: str = QUEUE) -> list[Entry]:
     """Every queued task not yet named by a posted marker, oldest first.
 
     Refuses via QueueTamperedError if any line in the queue is malformed --
@@ -133,14 +146,16 @@ def pending_entries(path=QUEUE) -> list:
             f"First error: {malformed[0]['_error']}"
         )
     posted = _posted_tasks(entries)
-    by_task = {}
+    by_task: dict[str, Entry] = {}
     for e in entries:
-        if e.get("type") == "queued" and e["task"] not in posted:
-            by_task[e["task"]] = e
-    return sorted(by_task.values(), key=lambda e: e["queued_at"])
+        if e.get("type") == "queued":
+            task_id = cast(str, e["task"])
+            if task_id not in posted:
+                by_task[task_id] = e
+    return sorted(by_task.values(), key=lambda e: cast(str, e["queued_at"]))
 
 
-def compose_combined_tweet(entries: list, max_chars: int = MAX_TWEET_CHARS) -> str:
+def compose_combined_tweet(entries: list[Entry], max_chars: int = MAX_TWEET_CHARS) -> str:
     """One tweet naming every pending task.
 
     Never silently drops an entry to make the text fit -- if the full
@@ -161,7 +176,7 @@ def compose_combined_tweet(entries: list, max_chars: int = MAX_TWEET_CHARS) -> s
     return text
 
 
-def _item_text(entry: dict) -> str:
+def _item_text(entry: Entry) -> str:
     return f"#{entry['task']} {entry['topic']}"
 
 
@@ -169,13 +184,13 @@ def _header(i: int, n: int) -> str:
     return "Owed reports, now caught up: " if n == 1 else f"Owed reports ({i}/{n}): "
 
 
-def _pack_entries_into(entries: list, n: int, max_chars: int):
+def _pack_entries_into(entries: list[Entry], n: int, max_chars: int) -> list[list[Entry]] | None:
     """Greedily fill exactly n ordered groups of entry dicts; None if it can't be done."""
-    batches = []
+    batches: list[list[Entry]] = []
     idx = 0
     for i in range(1, n + 1):
         header = _header(i, n)
-        body_entries = []
+        body_entries: list[Entry] = []
         body_items: list[str] = []
         while idx < len(entries):
             candidate_items = body_items + [_item_text(entries[idx])]
@@ -191,7 +206,7 @@ def _pack_entries_into(entries: list, n: int, max_chars: int):
     return batches if idx == len(entries) else None
 
 
-def batch_entries(entries: list, max_chars: int = MAX_TWEET_CHARS) -> list:
+def batch_entries(entries: list[Entry], max_chars: int = MAX_TWEET_CHARS) -> list[list[Entry]]:
     """Split pending entries into as few ordered groups of entry dicts as needed.
 
     Every entry appears exactly once, in queued order, across the
@@ -215,7 +230,7 @@ def batch_entries(entries: list, max_chars: int = MAX_TWEET_CHARS) -> list:
     )
 
 
-def compose_batched_tweets(entries: list, max_chars: int = MAX_TWEET_CHARS) -> list:
+def compose_batched_tweets(entries: list[Entry], max_chars: int = MAX_TWEET_CHARS) -> list[str]:
     """Split pending entries into as few ordered tweets as needed.
 
     Every entry appears exactly once, in queued order, across the
@@ -226,7 +241,7 @@ def compose_batched_tweets(entries: list, max_chars: int = MAX_TWEET_CHARS) -> l
     return [_header(i, n) + "; ".join(_item_text(e) for e in g) for i, g in enumerate(groups, start=1)]
 
 
-def _fits_in_any_batch(entry: dict, max_chars: int = MAX_TWEET_CHARS) -> bool:
+def _fits_in_any_batch(entry: Entry, max_chars: int = MAX_TWEET_CHARS) -> bool:
     """Whether `entry` would survive `batch_entries` if it ended up alone
     in a single-batch (n == 1) plan -- the header a lone postable entry,
     or the last entry left after every sibling is blocked, actually gets.
@@ -252,7 +267,7 @@ def _fits_in_any_batch(entry: dict, max_chars: int = MAX_TWEET_CHARS) -> bool:
     return len(_item_text(entry)) <= max_chars - longest_possible_header
 
 
-def next_post_plan(entries: list, max_chars: int = MAX_TWEET_CHARS) -> dict:
+def next_post_plan(entries: list[Entry], max_chars: int = MAX_TWEET_CHARS) -> PostPlan:
     """The single next tweet to post this hour -- never the whole backlog at once.
 
     Recovery from an outage must not turn into a burst: this returns
@@ -289,13 +304,13 @@ def next_post_plan(entries: list, max_chars: int = MAX_TWEET_CHARS) -> dict:
     text = _header(1, n) + "; ".join(_item_text(e) for e in first)
     return {
         "text": text,
-        "tasks": [e["task"] for e in first],
+        "tasks": [cast(str, e["task"]) for e in first],
         "remaining_batches": n - 1,
-        "blocked_tasks": [e["task"] for e in blocked],
+        "blocked_tasks": [cast(str, e["task"]) for e in blocked],
     }
 
 
-def mark_posted(tasks: list, tweet_id: str, posted_at: str, path=QUEUE) -> None:
+def mark_posted(tasks: list[str], tweet_id: str, posted_at: str, path: str = QUEUE) -> None:
     """Append a posted-marker event. Never edits or removes a queued line."""
     _append(
         {"type": "posted", "tasks": list(tasks), "tweet_id": tweet_id, "posted_at": posted_at},
