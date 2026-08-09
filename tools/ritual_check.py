@@ -1142,7 +1142,7 @@ def check_wip_reclaim(now: datetime, roadmap_path: str | None = None) -> dict:
     same class of live regression `ritual_completeness`/`journal_numbering`
     already escalate on, not an honest zero-state waiting on the calendar."""
     mod = _wip_reclaim_check()
-    kwargs = {"now": now}
+    kwargs: dict[str, object] = {"now": now}
     if roadmap_path is not None:
         kwargs["roadmap_path"] = roadmap_path
     return mod.find_stale(**kwargs)
@@ -1612,7 +1612,7 @@ def check_house_links(houses_dir: str | None = None) -> dict:
     anything; a real broken link is a god-on-duty escalation, not something
     this check silently repairs."""
     mod = _site_link_check()
-    kwargs = {"require_index": False}
+    kwargs: dict[str, object] = {"require_index": False}
     if houses_dir is not None:
         kwargs["docs_dir"] = houses_dir
     else:
@@ -1641,7 +1641,7 @@ def check_fencepost_links(fencepost_dir: str | None = None) -> dict:
     real broken link is a god-on-duty escalation, not something this
     check silently repairs."""
     mod = _site_link_check()
-    kwargs = {"require_index": False}
+    kwargs: dict[str, object] = {"require_index": False}
     if fencepost_dir is not None:
         kwargs["docs_dir"] = fencepost_dir
     else:
@@ -1708,7 +1708,7 @@ def check_issue_template_links(issue_template_dir: str | None = None) -> dict:
     from the directory itself -- a live discovery could never notice its
     own subject going missing."""
     mod = _site_link_check()
-    kwargs = {"require_index": False}
+    kwargs: dict[str, object] = {"require_index": False}
     if issue_template_dir is not None:
         template_dir = issue_template_dir
     else:
@@ -1749,7 +1749,7 @@ def check_hand_links(hand_dir: str | None = None) -> dict:
     link, if one is ever found, is a god-on-duty escalation, not something
     this check silently repairs."""
     mod = _site_link_check()
-    kwargs = {"require_index": False}
+    kwargs: dict[str, object] = {"require_index": False}
     if hand_dir is not None:
         kwargs["docs_dir"] = hand_dir
     else:
@@ -1780,7 +1780,7 @@ def check_chronicle_links(chronicle_dir: str | None = None) -> dict:
     anything; a real broken link, if one is ever found, is a
     god-on-duty escalation, not something this check silently repairs."""
     mod = _site_link_check()
-    kwargs = {"require_index": False}
+    kwargs: dict[str, object] = {"require_index": False}
     if chronicle_dir is not None:
         kwargs["docs_dir"] = chronicle_dir
     else:
