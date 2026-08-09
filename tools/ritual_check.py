@@ -186,6 +186,8 @@ DEFAULT_CHECKOUT_DIRS = (ROOT, os.path.join(os.path.dirname(ROOT), "orita-vault"
 
 def _load(name: str, path: str):
     spec = importlib.util.spec_from_file_location(name, path)
+    if spec is None or spec.loader is None:
+        raise ImportError(f"could not load module {name!r} from {path!r}: no loader for this file type")
     mod = importlib.util.module_from_spec(spec)
     sys.modules[spec.name] = mod
     spec.loader.exec_module(mod)

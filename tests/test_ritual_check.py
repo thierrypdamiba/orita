@@ -54,6 +54,28 @@ def setUpModule():
     rc._word_watch = lambda: _safe_word_watch
 
 
+class LoadHelperCase(unittest.TestCase):
+    """Task 621. ritual_check.py's own `_load()` called
+    `importlib.util.module_from_spec(spec)` / `spec.loader.exec_module(...)`
+    unconditionally, but `spec_from_file_location` returns `None` (not a
+    `ModuleSpec`) whenever the target path's extension has no registered
+    loader -- e.g. a non-`.py` file. That path is real and reachable (any
+    future `_load()` call site passing the wrong path, a typo'd extension,
+    or a data file by mistake), and previously crashed with a bare
+    `AttributeError: 'NoneType' object has no attribute 'loader'` instead
+    of a named error identifying the module and the bad path."""
+
+    def test_load_raises_named_error_for_unloadable_path(self):
+        with self.assertRaises(ImportError) as ctx:
+            rc._load("_test_load_helper_bogus", os.path.join(ROOT, "README.md"))
+        self.assertIn("_test_load_helper_bogus", str(ctx.exception))
+        self.assertIn("README.md", str(ctx.exception))
+
+    def test_load_still_loads_a_real_module(self):
+        mod = rc._load("_test_load_helper_real", os.path.join(ROOT, "tools", "word_watch.py"))
+        self.assertTrue(hasattr(mod, "LOG"))
+
+
 def tearDownModule():
     shutil.rmtree(_safe_word_watch_dir, ignore_errors=True)
 
