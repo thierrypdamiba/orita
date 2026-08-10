@@ -9,7 +9,7 @@ world, it does not belong in this server (Ogun's oath, sworn on iron).
 import sys
 from dataclasses import asdict
 from datetime import datetime, timedelta, timezone
-from typing import Annotated, Any
+from typing import Annotated, Any, Literal
 
 from arcade_mcp_server import Context, MCPApp
 from arcade_mcp_server.metadata import (
@@ -36,6 +36,9 @@ from seam_engine.scan import (
     load_x_posts_from_ledger,
     load_x_posts_from_live,
 )
+
+TransportArg = Literal["http", "stdio"]
+_VALID_TRANSPORTS: tuple[TransportArg, ...] = ("http", "stdio")
 
 app = MCPApp(name="seam_engine", version="0.1.0", log_level="DEBUG")
 
@@ -288,10 +291,30 @@ def combined_scan_preview(
     )
 
 
+def _resolve_transport(argv: list[str]) -> TransportArg:
+    """Validate the CLI transport argument before app.run() ever starts.
+
+    Without this, an unrecognized value reaches arcade_mcp_server.MCPApp.run()
+    only after it has already registered every tool and started logging --
+    the ServerError it raises then is real but buried under startup noise
+    (reproduced live: `seam_engine.server bogus` prints six "Added tool"
+    lines and a full traceback before the actual message). Failing here
+    keeps the CLI usage error the first and only thing printed, and narrows
+    the return type to what app.run()'s own `transport` parameter expects
+    instead of a bare `str` (mypy --strict caught the untyped mismatch).
+    """
+    transport = argv[1] if len(argv) > 1 else "stdio"
+    if transport not in _VALID_TRANSPORTS:
+        sys.exit(
+            f"seam_engine.server: invalid transport {transport!r} "
+            f"(expected one of {', '.join(_VALID_TRANSPORTS)})"
+        )
+    return transport
+
+
 # Run with specific transport
 if __name__ == "__main__":
     # "stdio" (default): Claude Desktop, CLI tools, etc.
     # "http": Cursor, VS Code, etc. (does not support requires_auth/requires_secrets
     #   tools unless deployed via 'arcade deploy')
-    transport = sys.argv[1] if len(sys.argv) > 1 else "stdio"
-    app.run(transport=transport, host="127.0.0.1", port=8000)
+    app.run(transport=_resolve_transport(sys.argv), host="127.0.0.1", port=8000)
