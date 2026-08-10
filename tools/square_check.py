@@ -50,6 +50,7 @@ Usage:
 import json
 import os
 import sys
+from typing import cast
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import jsonl_append  # noqa: E402
@@ -58,16 +59,20 @@ import jsonl_read  # noqa: E402
 LOG = os.path.join(os.path.dirname(__file__), "..", "HAND", "square-check-log.jsonl")
 
 
-def compute_square_state(issues, prs):
+def compute_square_state(
+    issues: list[dict[str, object]], prs: list[dict[str, object]]
+) -> dict[str, object]:
     """Fold a live issues/PRs read into the durable comparison shape.
 
     `issues`/`prs` are lists of dicts, each carrying at least `number` and
     `updated_at` (ISO-8601 string) -- the same fields every GitHub list-issue
     /list-PR read already returns. Never makes a network call itself.
     """
-    issue_numbers = sorted(i["number"] for i in issues)
-    pr_numbers = sorted(p["number"] for p in prs)
-    updated_ats = [i["updated_at"] for i in issues] + [p["updated_at"] for p in prs]
+    issue_numbers = sorted(cast(int, i["number"]) for i in issues)
+    pr_numbers = sorted(cast(int, p["number"]) for p in prs)
+    updated_ats = [cast(str, i["updated_at"]) for i in issues] + [
+        cast(str, p["updated_at"]) for p in prs
+    ]
     max_updated_at = max(updated_ats) if updated_ats else None
     return {
         "issue_numbers": issue_numbers,
@@ -89,7 +94,7 @@ class SquareCheckTamperedError(RuntimeError):
     log before the next real check/record."""
 
 
-def _entries(path=LOG):
+def _entries(path: str = LOG) -> list[dict[str, object]]:
     """Delegates to jsonl_read.read_jsonl_entries (task 540) -- see
     that module's own docstring for the fourteen-copy history this
     replaced."""
@@ -102,7 +107,7 @@ def _entries(path=LOG):
 _append = jsonl_append.append_jsonl
 
 
-def last_square_state(path=LOG):
+def last_square_state(path: str = LOG) -> dict[str, object] | None:
     """The most recently recorded real square check, or None.
 
     Raises SquareCheckTamperedError if the log's last line isn't valid
@@ -130,7 +135,9 @@ class DegenerateSquareStateError(ValueError):
     real close events in between is the rare case, not the common one."""
 
 
-def record_square_check(state: dict, checked_at: str, path=LOG, *, force: bool = False) -> bool:
+def record_square_check(
+    state: dict[str, object], checked_at: str, path: str = LOG, *, force: bool = False
+) -> bool:
     """Append one real observed square state. Never edits or removes a prior line.
 
     Refuses to record an all-empty state when the last recorded real check
@@ -177,7 +184,7 @@ def record_square_check(state: dict, checked_at: str, path=LOG, *, force: bool =
     return True
 
 
-def square_delta(state: dict, path=LOG):
+def square_delta(state: dict[str, object], path: str = LOG) -> tuple[bool, str]:
     """Whether this hour's live square read differs from the last recorded check.
 
     Returns (changed: bool, reason: str). No prior check recorded: due (first
@@ -215,23 +222,26 @@ class SquareCheckArgError(ValueError):
     AttributeError instead of naming the real problem)."""
 
 
-def _load_state_json(path: str) -> dict:
+def _load_state_json(path: str) -> dict[str, object]:
     with open(path) as f:
         raw = json.load(f)
     if not isinstance(raw, dict):
         raise SquareCheckArgError(
             f"{path}: expected a JSON dict, got {type(raw).__name__}"
         )
-    return raw
+    return cast("dict[str, object]", raw)
 
 
-def main(argv):
+def main(argv: list[str]) -> int:
     if len(argv) < 3:
         print(__doc__)
         return 1
     cmd, state_path = argv[1], argv[2]
     raw = _load_state_json(state_path)
-    state = compute_square_state(raw.get("issues", []), raw.get("prs", []))
+    state = compute_square_state(
+        cast("list[dict[str, object]]", raw.get("issues", [])),
+        cast("list[dict[str, object]]", raw.get("prs", [])),
+    )
     if cmd == "check":
         changed, reason = square_delta(state, path=LOG)
         print(f"{'changed' if changed else 'unchanged'} -- {reason}")

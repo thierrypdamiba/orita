@@ -40,6 +40,7 @@ Usage:
 """
 import os
 import sys
+from typing import cast
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import jsonl_append  # noqa: E402
@@ -60,7 +61,9 @@ TRACKED_FILES = {
 }
 
 
-def compute_scribe_sizes(root: str = ROOT, tracked: dict | None = None) -> dict:
+def compute_scribe_sizes(
+    root: str = ROOT, tracked: dict[str, str] | None = None
+) -> dict[str, int]:
     """Real, live byte size of each tracked scribal file via os.path.getsize
     -- never a cached or remembered number. Raises FileNotFoundError if a
     tracked file is missing: a scribal file the town depends on existing
@@ -85,7 +88,7 @@ class ScribeGrowthLogTamperedError(RuntimeError):
     the next real check/record."""
 
 
-def _entries(path=LOG):
+def _entries(path: str = LOG) -> list[dict[str, object]]:
     """Delegates to jsonl_read.read_jsonl_entries (task 540) -- see
     that module's own docstring for the fourteen-copy history this
     replaced."""
@@ -98,7 +101,7 @@ def _entries(path=LOG):
 _append = jsonl_append.append_jsonl
 
 
-def last_scribe_state(path=LOG):
+def last_scribe_state(path: str = LOG) -> dict[str, object] | None:
     """The most recently recorded real scribe-size snapshot, or None.
 
     Raises ScribeGrowthLogTamperedError if the log's last line isn't valid
@@ -117,7 +120,7 @@ def last_scribe_state(path=LOG):
     return entries[-1]
 
 
-def record_scribe_check(sizes: dict, checked_at: str, path=LOG) -> bool:
+def record_scribe_check(sizes: dict[str, int], checked_at: str, path: str = LOG) -> bool:
     """Append one real observed scribe-size snapshot. Never edits or removes
     a prior line.
 
@@ -153,7 +156,9 @@ def record_scribe_check(sizes: dict, checked_at: str, path=LOG) -> bool:
     return True
 
 
-def check_scribe_growth(sizes: dict, threshold_bytes: int = WARN_BYTES, path=LOG) -> dict:
+def check_scribe_growth(
+    sizes: dict[str, int], threshold_bytes: int = WARN_BYTES, path: str = LOG
+) -> dict[str, object]:
     """Pure judgement over an already-computed sizes dict: which tracked
     files (if any) have crossed threshold_bytes, and -- if a prior
     recorded check exists -- how many bytes each grew since then. Never
@@ -161,9 +166,9 @@ def check_scribe_growth(sizes: dict, threshold_bytes: int = WARN_BYTES, path=LOG
     `compute_scribe_sizes()` result."""
     over_threshold = sorted(name for name, size in sizes.items() if size >= threshold_bytes)
     last = last_scribe_state(path)
-    growth_since_last_check = None
+    growth_since_last_check: dict[str, int] | None = None
     if last is not None:
-        prev_sizes = last["sizes"]
+        prev_sizes = cast("dict[str, int]", last["sizes"])
         growth_since_last_check = {
             name: size - prev_sizes[name] for name, size in sizes.items() if name in prev_sizes
         }
@@ -175,7 +180,7 @@ def check_scribe_growth(sizes: dict, threshold_bytes: int = WARN_BYTES, path=LOG
     }
 
 
-def main(argv):
+def main(argv: list[str]) -> int:
     if len(argv) < 2:
         print(__doc__)
         return 1

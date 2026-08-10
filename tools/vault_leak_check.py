@@ -38,6 +38,7 @@ from __future__ import annotations
 
 import os
 import sys
+from collections.abc import Iterator
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DEFAULT_ORITA_DIR = ROOT
@@ -83,7 +84,9 @@ def _is_founding_record(orita_dir: str, public_path: str) -> bool:
     )
 
 
-def _founding_canon_corpus(orita_dir: str, public_corpus: list) -> list:
+def _founding_canon_corpus(
+    orita_dir: str, public_corpus: list[tuple[str, str]]
+) -> list[tuple[str, str]]:
     return [(path, text) for path, text in public_corpus if _is_founding_record(orita_dir, path)]
 
 
@@ -102,7 +105,7 @@ _HASH_MOD = (1 << 61) - 1
 _HASH_BASE = 1_000_003
 
 
-def _window_hashes(s: str, k: int):
+def _window_hashes(s: str, k: int) -> Iterator[tuple[int, int]]:
     """Yield (offset, hash) for every length-k window of s, in order,
     via one O(len(s)) rolling-hash pass. Empty when len(s) < k."""
     n = len(s)
@@ -118,12 +121,12 @@ def _window_hashes(s: str, k: int):
         yield i - k + 1, h
 
 
-def _haystack_hash_set(haystack: str, k: int) -> frozenset:
+def _haystack_hash_set(haystack: str, k: int) -> frozenset[int]:
     return frozenset(h for _offset, h in _window_hashes(haystack, k))
 
 
 def _has_independent_public_provenance(
-    snippet: str, min_run: int, canon_haystack: str, canon_hash_set: frozenset
+    snippet: str, min_run: int, canon_haystack: str, canon_hash_set: frozenset[int]
 ) -> bool:
     return any(
         h in canon_hash_set and snippet[offset : offset + min_run] in canon_haystack
@@ -151,7 +154,7 @@ _REVIEWED_NON_LEAKS = frozenset({
 })
 
 
-def _iter_md_files(base_dir: str):
+def _iter_md_files(base_dir: str) -> Iterator[str]:
     if not os.path.isdir(base_dir):
         return
     for dirpath, dirnames, filenames in os.walk(base_dir):
@@ -161,7 +164,7 @@ def _iter_md_files(base_dir: str):
                 yield os.path.join(dirpath, name)
 
 
-def _private_journal_files(vault_dir: str):
+def _private_journal_files(vault_dir: str) -> Iterator[str]:
     vault_root = os.path.join(vault_dir, "vault")
     if not os.path.isdir(vault_root):
         return
@@ -174,7 +177,7 @@ def _private_journal_files(vault_dir: str):
                 yield os.path.join(journal_dir, name)
 
 
-def _significant_lines(path: str, min_run: int):
+def _significant_lines(path: str, min_run: int) -> Iterator[tuple[int, str]]:
     with open(path, encoding="utf-8") as f:
         for line_no, raw in enumerate(f, start=1):
             text = raw.strip()
@@ -182,7 +185,7 @@ def _significant_lines(path: str, min_run: int):
                 yield line_no, text
 
 
-def _build_combined_haystack(public_corpus: list, min_run: int) -> str:
+def _build_combined_haystack(public_corpus: list[tuple[str, str]], min_run: int) -> str:
     """Task 236: one boundary-safe concatenation of every public file's
     text, used as a cheap global pre-filter before ever touching an
     individual file. The separator is NUL repeated min_run times -- NUL
@@ -193,7 +196,7 @@ def _build_combined_haystack(public_corpus: list, min_run: int) -> str:
     return sep.join(text for _, text in public_corpus)
 
 
-_LEAKS_CACHE: dict[tuple[str, str, int], list] = {}
+_LEAKS_CACHE: dict[tuple[str, str, int], list[dict[str, object]]] = {}
 
 
 def clear_cache() -> None:
@@ -208,7 +211,7 @@ def find_leaks(
     orita_dir: str = DEFAULT_ORITA_DIR,
     vault_dir: str = DEFAULT_VAULT_DIR,
     min_run: int = MIN_RUN,
-) -> list:
+) -> list[dict[str, object]]:
     """Task 367: memoized per (orita_dir, vault_dir, min_run) for the
     lifetime of the process. `run_ritual_check()`'s `check_vault_leak()`
     call has no way to skip this check (Iron Rule #1 is unconditional,
@@ -235,7 +238,7 @@ def _find_leaks_uncached(
     orita_dir: str = DEFAULT_ORITA_DIR,
     vault_dir: str = DEFAULT_VAULT_DIR,
     min_run: int = MIN_RUN,
-) -> list:
+) -> list[dict[str, object]]:
     """Task 98: read-only compare of every private vault/<slug>/journal/
     line (>= min_run chars) against every public .md file's raw text.
     Returns a list of leak records, empty when the town's own blind-write
@@ -266,7 +269,7 @@ def _find_leaks_uncached(
     offset-order, first-match-per-file result as the original nested
     loop."""
     public_files = list(_iter_md_files(orita_dir))
-    public_corpus = []
+    public_corpus: list[tuple[str, str]] = []
     for path in public_files:
         try:
             with open(path, encoding="utf-8") as f:
@@ -281,7 +284,7 @@ def _find_leaks_uncached(
     combined_haystack = _build_combined_haystack(public_corpus, min_run)
     public_hash_set = _haystack_hash_set(combined_haystack, min_run)
 
-    leaks = []
+    leaks: list[dict[str, object]] = []
     for vault_path in _private_journal_files(vault_dir):
         vault_rel = os.path.relpath(vault_path, os.path.join(vault_dir, "vault"))
         for line_no, snippet in _significant_lines(vault_path, min_run):
@@ -324,7 +327,7 @@ def _find_leaks_uncached(
     return leaks
 
 
-def format_leaks(leaks: list) -> str:
+def format_leaks(leaks: list[dict[str, object]]) -> str:
     if not leaks:
         return "vault leak check: clean -- no private journal line found in any public file"
     lines = [f"vault leak check: {len(leaks)} LEAK(S) FOUND -- Proclamation 0001 violated"]
