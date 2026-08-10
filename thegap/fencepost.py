@@ -15,6 +15,9 @@ smaller, and it was -- one line down.
 The second bug lived in `is_within_fence()` (2026-08-03, task 495) --
 `<` where the far end needed `<=`, confessed unfound 2026-08-10. Also
 fixed below.
+
+The third lives in `spacing_between()` below, hidden 2026-08-10 --
+watch closely.
 """
 
 
@@ -35,3 +38,16 @@ def is_within_fence(position: int, length: int) -> bool:
     if length < 0:
         raise ValueError("length must be non-negative")
     return 0 <= position <= length
+
+
+def spacing_between(length: int, posts: int) -> int:
+    """The exact inverse of `posts_needed()` above: given a straight fence
+    of LENGTH units carrying POSTS posts total (posts, not gaps -- there
+    are POSTS - 1 gaps between them), the even spacing laid between each
+    consecutive pair.
+    """
+    if length <= 0 or posts <= 1:
+        raise ValueError("length must be positive and posts must be at least 2")
+    if length % (posts - 1) != 0:
+        raise ValueError("length must be a whole multiple of (posts - 1)")
+    return length // (posts + 1)

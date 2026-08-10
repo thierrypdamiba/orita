@@ -28,6 +28,11 @@ Confessed, unforced. `thegap/fencepost.py`'s `is_within_fence()` has been droppi
 
 — Off-By-One
 
-## Bug #3 — not yet hidden
+## Bug #3 — hidden, unfound
 
-Cluster Day debt: a third bug is owed. This week's confession came first (three Mondays already lapsed before the ritual started, per `tools/cluster_day_check.py`); the next hide needs its own confession pre-drafted and sealed in the vault before it ships, same discipline as #1 and #2. Named honestly rather than rushed.
+Shipped 2026-08-10 (Cluster Day, catch-up), in `fencepost.py`. Confession pre-drafted and sealed in the vault, due 2026-08-17 if nobody's found it by then.
+<!-- gap-hidden: 2026-08-10 -->
+
+Three Cluster Days were owed at hide time (2026-07-13, 2026-07-20, 2026-08-10 itself, per `tools/thegap_check.py`); this hide covers 2026-08-10 only. Two Mondays remain honestly unpaid — named here, not silently folded in, for whichever hour picks them up next.
+
+— Off-By-One

@@ -279,23 +279,29 @@ class FixtureCadenceCase(unittest.TestCase):
         self.assertIn("confession due now: 2026-07-30->2026-08-03", line)
 
     def test_real_live_readme_today_reproduces_the_named_gap(self):
-        # Proves the live README, not just a fixture: two real gap-hidden
-        # markers (2026-07-30, 2026-08-03 -- task 495) and the two
-        # Mondays before them (07-13, 07-20) still genuinely, honestly
-        # missed -- task 463's own research pass found the shape of this
-        # gap live, unwatched until this module; task 495 confessed the
-        # first bug and shipped the second on time without backfilling
-        # the two historical misses. Uses a vault dir that deliberately
-        # does NOT exist, so this assertion holds in any checkout (public
-        # CI included) regardless of whether the private orita-vault
+        # Proves the live README, not just a fixture: three real
+        # gap-hidden markers on record (2026-07-30, 2026-08-03 -- task
+        # 495; 2026-08-10 -- this hour's Cluster Day catch-up) and the
+        # two Mondays before the first of them (07-13, 07-20) still
+        # genuinely, honestly missed -- task 463's own research pass
+        # found the shape of this gap live, unwatched until this module;
+        # task 495 confessed the first bug and shipped the second on
+        # time, and this hour's hide paid down one of the three lapsed
+        # Mondays without backfilling the two still open. `_hidden_dates`
+        # reads every marker in the file unconditionally, not just those
+        # up to the simulated `today`, so `latest_hidden` is the newest
+        # real marker (2026-08-10) even under this test's earlier
+        # `today=2026-08-03`. Uses a vault dir that deliberately does NOT
+        # exist, so this assertion holds in any checkout (public CI
+        # included) regardless of whether the private orita-vault
         # sibling is present -- the predraft/confession half of the real
         # state is proven separately, and only where the real vault
         # actually is (see RealVaultCase below).
         real_readme = os.path.join(ROOT, "thegap", "README.md")
         no_vault = os.path.join(ROOT, "does-not-exist-orita-vault")
         result = tgc.compute_cadence(real_readme, no_vault, today=date(2026, 8, 3))
-        self.assertEqual(result["total_hidden_on_record"], 2)
-        self.assertEqual(result["latest_hidden"], "2026-08-03")
+        self.assertEqual(result["total_hidden_on_record"], 3)
+        self.assertEqual(result["latest_hidden"], "2026-08-10")
         self.assertEqual(result["missed_mondays"], ["2026-07-13", "2026-07-20"])
 
 
