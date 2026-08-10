@@ -701,3 +701,5 @@
 {"type": "check", "tool": "whoami", "status": "ok", "checked_at": "2026-08-10T02:10:27Z"}
 {"type": "check", "tool": "get_user_tweets", "status": "forbidden", "checked_at": "2026-08-10T02:10:27Z"}
 {"type": "check", "tool": "X_GetUserTweets", "status": "forbidden", "checked_at": "2026-08-10T04:17:25Z"}
+{"type": "check", "tool": "X_WhoAmI", "status": "ok", "checked_at": "2026-08-10T05:25:12Z"}
+{"type": "check", "tool": "X_GetUserTweets", "status": "forbidden", "checked_at": "2026-08-10T05:25:12Z"}
