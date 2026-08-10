@@ -46,13 +46,15 @@ here.
 """
 from __future__ import annotations
 
+import datetime
 import importlib.util
 import json
 import math
 import os
 import sys
+from collections.abc import Callable
 from types import ModuleType
-from typing import Any
+from typing import Any, cast
 
 from oracle_engine import copylint
 
@@ -111,7 +113,7 @@ def validate_actor(actor: str) -> None:
         raise PredictionError("actor must be a non-empty string")
 
 
-def prediction_payload(claim: str, confidence: float) -> dict:
+def prediction_payload(claim: str, confidence: float) -> dict[str, object]:
     """The sealed detail shape. Exactly two keys, sorted, no room to grow
     an edit-shaped field in by accident."""
     return {"claim": claim, "confidence": float(confidence)}
@@ -123,7 +125,7 @@ def seal_prediction(
     confidence: float,
     ts: str | None = None,
     ledger_module: ModuleType | None = None,
-) -> dict:
+) -> dict[str, object]:
     """Validate and seal a prediction as the next entry on the town's chain.
 
     Raises `PredictionError` before anything is written if the schema is
@@ -140,21 +142,21 @@ def seal_prediction(
 
     mod = ledger_module or load_ledger_module()
     detail = json.dumps(prediction_payload(claim, confidence), sort_keys=True, ensure_ascii=False)
-    return mod.append(actor, PREDICTION_ACT, detail, ts)
+    return cast(dict[str, object], mod.append(actor, PREDICTION_ACT, detail, ts))
 
 
 def seal_generic_prediction(
-    build_prediction_fn,
-    load_snapshots_fn,
+    build_prediction_fn: Callable[..., dict[str, object]],
+    load_snapshots_fn: Callable[[], list[dict[str, object]]],
     *,
-    now,
+    now: datetime.datetime,
     ts: str,
     current_count: int,
     actor: str,
-    snapshots: list[dict] | None = None,
+    snapshots: list[dict[str, object]] | None = None,
     ledger_module: ModuleType | None = None,
-    **build_kwargs,
-) -> dict:
+    **build_kwargs: object,
+) -> dict[str, object]:
     """Build one cadence-source prediction and seal it — the shared glue
     task 573's AST-hash sweep found byte-identical across all 25
     `*_cadence.py` siblings' own `seal_<topic>_prediction`. `build_prediction_fn`
@@ -171,17 +173,19 @@ def seal_generic_prediction(
     if snapshots is None:
         snapshots = load_snapshots_fn()
     payload = build_prediction_fn(now=now, snapshots=snapshots, current_count=current_count, **build_kwargs)
-    copylint.enforce_copy(payload["claim"], payload["confidence"])
+    claim = cast(str, payload["claim"])
+    confidence = cast(float, payload["confidence"])
+    copylint.enforce_copy(claim, confidence)
     return seal_prediction(
         actor=actor,
-        claim=payload["claim"],
-        confidence=payload["confidence"],
+        claim=claim,
+        confidence=confidence,
         ts=ts,
         ledger_module=ledger_module,
     )
 
 
-def parse_prediction_detail(detail: str) -> dict:
+def parse_prediction_detail(detail: str) -> dict[str, object]:
     """Read a sealed prediction's detail back out. Read-only — this
     function returns a fresh dict; mutating it does not touch the chain."""
     payload = json.loads(detail)

@@ -75,7 +75,7 @@ class LintResult:
         return "; ".join(f"{'OK' if p else 'FAIL'} {label}" for label, p in self.checks)
 
 
-def _hits(patterns: list[re.Pattern], text: str) -> list[str]:
+def _hits(patterns: list[re.Pattern[str]], text: str) -> list[str]:
     return [p.pattern for p in patterns if p.search(text)]
 
 

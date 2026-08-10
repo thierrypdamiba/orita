@@ -108,6 +108,7 @@ from __future__ import annotations
 import datetime
 import json
 import os
+from typing import cast
 
 
 def parse_ts(ts: str) -> datetime.datetime:
@@ -121,7 +122,7 @@ def parse_ts(ts: str) -> datetime.datetime:
     return dt
 
 
-def load_snapshots(path: str) -> list[dict]:
+def load_snapshots(path: str) -> list[dict[str, object]]:
     """Every snapshot line, in file order. Read-only: never touches the
     file, takes its path and hands back plain dicts. A line that is not
     even valid JSON any more (a bad hand-edit, a stray merge-conflict
@@ -136,7 +137,7 @@ def load_snapshots(path: str) -> list[dict]:
     task 328 closed for tools/toolkits_in_use_check.py."""
     if not os.path.exists(path):
         return []
-    out = []
+    out: list[dict[str, object]] = []
     with open(path, encoding="utf-8") as f:
         for line in f:
             line = line.strip()
@@ -156,7 +157,7 @@ def load_snapshots(path: str) -> list[dict]:
 
 def record_snapshot(
     count: int, ts: str, path: str, error_cls: type[Exception] = ValueError
-) -> dict:
+) -> dict[str, object]:
     """Append one `{"ts", "count"}` snapshot. Append-only — no caller
     rewrites a prior line. `count` must be a non-negative, non-bool int;
     on a bad value this raises `error_cls` (each cadence sibling passes
@@ -175,7 +176,7 @@ def record_snapshot(
 
 
 def reject_malformed(
-    snapshots: list[dict], caller: str, error_cls: type[Exception] = ValueError
+    snapshots: list[dict[str, object]], caller: str, error_cls: type[Exception] = ValueError
 ) -> None:
     """Raise `error_cls` if any snapshot line came back marked
     `_malformed` by `load_snapshots()` -- every caller across the 25
@@ -191,7 +192,7 @@ def reject_malformed(
             )
 
 
-def count_at_or_before(snapshots: list[dict], when: datetime.datetime) -> int | None:
+def count_at_or_before(snapshots: list[dict[str, object]], when: datetime.datetime) -> int | None:
     """The most recently recorded count at or before `when`; `None` if no
     snapshot that early exists yet -- never guessed at, never
     interpolated. Assumes the caller has already rejected malformed lines
@@ -200,15 +201,15 @@ def count_at_or_before(snapshots: list[dict], when: datetime.datetime) -> int | 
     skips that step could silently read `s["ts"]`/`s["count"]` off a
     marker dict and raise a confusing `KeyError` instead of its own
     `*CadenceTamperedError`."""
-    best = None
+    best: dict[str, object] | None = None
     for s in snapshots:
-        ts = parse_ts(s["ts"])
-        if ts <= when and (best is None or ts > parse_ts(best["ts"])):
+        ts = parse_ts(cast(str, s["ts"]))
+        if ts <= when and (best is None or ts > parse_ts(cast(str, best["ts"]))):
             best = s
-    return best["count"] if best else None
+    return cast(int, best["count"]) if best else None
 
 
-def count_at_or_after(snapshots: list[dict], when: datetime.datetime) -> int | None:
+def count_at_or_after(snapshots: list[dict[str, object]], when: datetime.datetime) -> int | None:
     """The EARLIEST recorded count at or after `when`; `None` if no
     snapshot that late has landed yet. The grading-side counterpart to
     `count_at_or_before`: once a call's window closes, the honest outcome
@@ -216,9 +217,9 @@ def count_at_or_after(snapshots: list[dict], when: datetime.datetime) -> int | N
     later one that could quietly wait for a friendlier number. Same
     caller contract as `count_at_or_before` above -- malformed lines must
     already be rejected."""
-    best = None
+    best: dict[str, object] | None = None
     for s in snapshots:
-        ts = parse_ts(s["ts"])
-        if ts >= when and (best is None or ts < parse_ts(best["ts"])):
+        ts = parse_ts(cast(str, s["ts"]))
+        if ts >= when and (best is None or ts < parse_ts(cast(str, best["ts"]))):
             best = s
-    return best["count"] if best else None
+    return cast(int, best["count"]) if best else None
