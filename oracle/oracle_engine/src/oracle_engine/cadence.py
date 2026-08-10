@@ -36,6 +36,7 @@ import datetime
 import os
 import re
 from types import ModuleType
+from typing import Any, cast
 
 from oracle_engine import copylint, prediction
 
@@ -57,10 +58,10 @@ class CadenceError(ValueError):
     """The cadence read or the prediction it produced is not well-formed."""
 
 
-def parse_buildlog(text: str) -> list[dict]:
+def parse_buildlog(text: str) -> list[dict[str, str]]:
     """Every well-formed `BUILDLOG.md` line, parsed. Read-only: never
     touches the file, takes its text and hands back plain dicts."""
-    entries = []
+    entries: list[dict[str, str]] = []
     for line in text.splitlines():
         m = _LOG_LINE_RE.match(line)
         if m:
@@ -85,13 +86,13 @@ def _minute_floor(time_str: str) -> str:
     return time_str.replace("x", "0")
 
 
-def load_buildlog_entries(path: str = DEFAULT_BUILDLOG_PATH) -> list[dict]:
+def load_buildlog_entries(path: str = DEFAULT_BUILDLOG_PATH) -> list[dict[str, str]]:
     with open(path, encoding="utf-8") as f:
         return parse_buildlog(f.read())
 
 
 def recent_task_velocity(
-    entries: list[dict],
+    entries: list[dict[str, str]],
     now: datetime.datetime,
     window_hours: int | float = DEFAULT_HORIZON_HOURS,
 ) -> int:
@@ -125,11 +126,11 @@ def recent_task_velocity(
 
 def build_prediction(
     now: datetime.datetime,
-    entries: list[dict],
+    entries: list[dict[str, str]],
     threshold: int = DEFAULT_THRESHOLD,
     horizon_hours: int = DEFAULT_HORIZON_HOURS,
     confidence: float = DEFAULT_CONFIDENCE,
-) -> dict:
+) -> dict[str, object]:
     """One self-referential, checkable claim about the town's own next
     window, plus the confidence sealed alongside it. Pure: reads `entries`
     and `now`, writes nothing, decides nothing about whether to seal it."""
@@ -163,10 +164,10 @@ def seal_cadence_prediction(
     now: datetime.datetime,
     ts: str,
     actor: str = "off-by-one",
-    entries: list[dict] | None = None,
+    entries: list[dict[str, str]] | None = None,
     ledger_module: ModuleType | None = None,
-    **build_kwargs,
-) -> dict:
+    **build_kwargs: Any,
+) -> dict[str, object]:
     """Build one cadence prediction and seal it. `now` and `ts` are always
     passed in by the caller — a cadence read, like every other sealed act
     in this town, is timestamped at the moment it's taken, never defaulted
@@ -175,11 +176,13 @@ def seal_cadence_prediction(
     if entries is None:
         entries = load_buildlog_entries()
     payload = build_prediction(now=now, entries=entries, **build_kwargs)
-    copylint.enforce_copy(payload["claim"], payload["confidence"])
+    claim = cast(str, payload["claim"])
+    confidence = cast(float, payload["confidence"])
+    copylint.enforce_copy(claim, confidence)
     return prediction.seal_prediction(
         actor=actor,
-        claim=payload["claim"],
-        confidence=payload["confidence"],
+        claim=claim,
+        confidence=confidence,
         ts=ts,
         ledger_module=ledger_module,
     )

@@ -50,7 +50,7 @@ import os
 from typing import Any
 
 
-def github_headers(accept: str = "application/vnd.github+json") -> dict:
+def github_headers(accept: str = "application/vnd.github+json") -> dict[str, str]:
     """Accept header always; bearer Authorization added only if a GitHub
     token is present in the environment (`GITHUB_TOKEN`, GitHub Actions'
     own name for it, checked first; `GH_TOKEN`, the `gh` CLI's name for the

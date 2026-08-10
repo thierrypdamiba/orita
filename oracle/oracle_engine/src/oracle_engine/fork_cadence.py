@@ -22,6 +22,7 @@ from __future__ import annotations
 import datetime
 import os
 from types import ModuleType
+from typing import Any, Callable
 
 from oracle_engine import github_auth, prediction, time_utils
 
@@ -61,7 +62,7 @@ class ForkCadenceTamperedError(RuntimeError):
 _default_http_get = github_auth.default_http_get
 
 
-def fetch_fork_count(repo: str = DEFAULT_REPO, http_get=None) -> int:
+def fetch_fork_count(repo: str = DEFAULT_REPO, http_get: Callable[[str], Any] | None = None) -> int:
     """The repo's PUBLIC, unauthenticated fork count off the GitHub REST
     API — read-only by nature, no account, no OAuth, no toolkit. Same
     pluggable `http_get` shape `star_cadence.fetch_star_count` uses, kept
@@ -73,7 +74,7 @@ def fetch_fork_count(repo: str = DEFAULT_REPO, http_get=None) -> int:
     return int(payload["forks_count"])
 
 
-def load_snapshots(path: str = DEFAULT_SNAPSHOT_PATH) -> list[dict]:
+def load_snapshots(path: str = DEFAULT_SNAPSHOT_PATH) -> list[dict[str, object]]:
     """This module's own default-path wrapper around the shared
     time_utils.load_snapshots (task 523). Kept here rather than a bare name
     rebinding (unlike _parse_ts = time_utils.parse_ts) because every
@@ -84,7 +85,7 @@ def load_snapshots(path: str = DEFAULT_SNAPSHOT_PATH) -> list[dict]:
     return time_utils.load_snapshots(path)
 
 
-def record_snapshot(count: int, ts: str, path: str = DEFAULT_SNAPSHOT_PATH) -> dict:
+def record_snapshot(count: int, ts: str, path: str = DEFAULT_SNAPSHOT_PATH) -> dict[str, object]:
     """Append one `{"ts", "count"}` snapshot. Thin wrapper around
     `time_utils.record_snapshot` (task 559) — keeps this module's own
     default path and `ForkCadenceError`, delegates the actual
@@ -95,7 +96,7 @@ def record_snapshot(count: int, ts: str, path: str = DEFAULT_SNAPSHOT_PATH) -> d
 _parse_ts = time_utils.parse_ts
 
 
-def _reject_malformed(snapshots: list[dict], caller: str) -> None:
+def _reject_malformed(snapshots: list[dict[str, object]], caller: str) -> None:
     """Raise ForkCadenceTamperedError if any snapshot line came back marked
     _malformed by load_snapshots(). Thin wrapper around
     time_utils.reject_malformed (task 563) -- keeps this module's own
@@ -104,7 +105,7 @@ def _reject_malformed(snapshots: list[dict], caller: str) -> None:
     time_utils.reject_malformed(snapshots, caller, error_cls=ForkCadenceTamperedError)
 
 
-def fork_count_at_or_before(snapshots: list[dict], when: datetime.datetime) -> int | None:
+def fork_count_at_or_before(snapshots: list[dict[str, object]], when: datetime.datetime) -> int | None:
     """The most recently recorded count at or before `when`; `None` if no
     snapshot that early exists yet -- never guessed at, never
     interpolated. Thin wrapper: this module's own `_reject_malformed`
@@ -116,7 +117,7 @@ def fork_count_at_or_before(snapshots: list[dict], when: datetime.datetime) -> i
     return time_utils.count_at_or_before(snapshots, when)
 
 
-def fork_count_at_or_after(snapshots: list[dict], when: datetime.datetime) -> int | None:
+def fork_count_at_or_after(snapshots: list[dict[str, object]], when: datetime.datetime) -> int | None:
     """The EARLIEST recorded count at or after `when`; `None` if no
     snapshot that late has landed yet. The grading-side counterpart to
     `fork_count_at_or_before`: once a call's window closes, the honest
@@ -130,11 +131,11 @@ def fork_count_at_or_after(snapshots: list[dict], when: datetime.datetime) -> in
 
 def build_prediction(
     now: datetime.datetime,
-    snapshots: list[dict],
+    snapshots: list[dict[str, object]],
     current_count: int,
     horizon_hours: int = DEFAULT_HORIZON_HOURS,
     confidence: float = DEFAULT_CONFIDENCE,
-) -> dict:
+) -> dict[str, object]:
     """One checkable claim about the town's own next window of public
     forks, plus the confidence sealed alongside it. Pure: reads
     `snapshots`/`now`/`current_count`, writes nothing, decides nothing
@@ -172,10 +173,10 @@ def seal_fork_prediction(
     ts: str,
     current_count: int,
     actor: str = DEFAULT_ACTOR,
-    snapshots: list[dict] | None = None,
+    snapshots: list[dict[str, object]] | None = None,
     ledger_module: ModuleType | None = None,
-    **build_kwargs,
-) -> dict:
+    **build_kwargs: object,
+) -> dict[str, object]:
     """Build one fork-cadence prediction and seal it. Thin wrapper around
     `prediction.seal_generic_prediction` (task 573) -- keeps this module's
     own `build_prediction`/`load_snapshots`/`DEFAULT_ACTOR`, delegates the

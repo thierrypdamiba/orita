@@ -113,7 +113,7 @@ def _load_claim_payload(detail: str) -> dict[str, object]:
 
 def score_call(
     entry: dict[str, object],
-    buildlog_entries: list[dict[str, object]],
+    buildlog_entries: list[dict[str, str]],
 ) -> str:
     """`correct` if the real BUILDLOG.md velocity between the call's own
     sealed timestamp and its stated target meets or beats the threshold it
