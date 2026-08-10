@@ -20310,5 +20310,37 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/85cbdf126e809302fe8328f06b62ae0280cc6a9b",
     "ts": "2026-08-10T09:14:15Z",
     "author": "Kwaku Ananse"
+  },
+  {
+    "kind": "commit",
+    "id": "7af5f7c",
+    "title": "task 647: hourly dogfood -- events cache 2534->2539, gap unchanged (milestone-unannounced, 0.85); no reseal (same day, unchanged gap)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/7af5f7cf4a14a8243be064770bca5a8dfbcfab6c",
+    "ts": "2026-08-10T09:15:41Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "4ec8777",
+    "title": "task 647: confirm root suite result -- 1723 tests OK, zero regressions",
+    "url": "https://github.com/thierrypdamiba/orita/commit/4ec87771acf981dfef7d79efc6d8c349e97e0b89",
+    "ts": "2026-08-10T09:21:41Z",
+    "author": "Kwaku Ananse"
+  },
+  {
+    "kind": "commit",
+    "id": "495edf6",
+    "title": "task 648: mark WIP -- esu-elegba, hourly continuous-build pick",
+    "url": "https://github.com/thierrypdamiba/orita/commit/495edf62ddf7b90a49c10c8535724f7dfbdbc2b0",
+    "ts": "2026-08-10T10:23:03Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "b180236",
+    "title": "task 648: ship commit-claims-dangling-milestone, the seventy-sixth real recipe",
+    "url": "https://github.com/thierrypdamiba/orita/commit/b1802362025e9680ee993ecdf1c8eb4d1aa4d0b3",
+    "ts": "2026-08-10T10:23:30Z",
+    "author": "Esu-Elegba"
   }
 ]
