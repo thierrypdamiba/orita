@@ -1244,6 +1244,33 @@ bar exactly (24 hours) — a Linear comment, like an ordinary GitHub issue
 comment and unlike an immutable X mention, is a text surface its author
 can still edit at any time.
 
+[`RECIPES/slack-message-dangling-reference/`](RECIPES/slack-message-dangling-reference/)
+is the seventy-fifth (ROADMAP.md #646), and the tenth leg of the
+dangling-reference family — the nine prior legs watch a commit message,
+an X mention, a release note, an issue/PR opening body, a milestone
+description, the town's own tweets, a PR's inline review comments, the
+ordinary issue/PR timeline, and a comment left on Linear
+([`linear-comment-dangling-reference`](RECIPES/linear-comment-dangling-reference/)).
+`slack-message-claims-unfixed-issue`'s own docstring named this seam and
+left it open on purpose: a closing-keyword claim against an issue number
+that doesn't exist at all is excluded there, named as "a future
+Slack-side dangling-reference recipe's own seam, not this one's." This
+recipe is that seam — every bare `#N` reference inside a Slack channel
+message's own text (not just a closing-keyword claim), checked against
+both the live issue list and the live PR list, since GitHub shares one
+number sequence between the two and checking only one would misfire on a
+perfectly good reference to a merged PR. Reuses
+`seam_engine.references.referenced_numbers` verbatim, the one shared
+extraction grammar every dangling-reference sibling already imports.
+`ListIssues`/`ListPullRequests` were already cleared on `SCOPES.md`'s oath
+table; `SearchChannelMessages` is the same scope
+`slack-message-claims-unfixed-issue` already asks for. Confidence holds
+`issue-comment-dangling-reference`'s and `linear-comment-dangling-reference`'s
+identical 0.85/0.55 edit-grace-window bar exactly (24 hours) — a Slack
+message, like an ordinary GitHub issue comment or a Linear comment and
+unlike an immutable X mention, is a text surface its author can still
+edit at any time.
+
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)
 (ROADMAP.md #111) is that second promise, kept: it runs `scan.py`'s own

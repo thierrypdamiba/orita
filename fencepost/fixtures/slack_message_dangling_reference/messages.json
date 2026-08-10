@@ -1,0 +1,42 @@
+[
+  {
+    "id": "SLK-D-9001",
+    "channel": "#dev-updates",
+    "author": "town-crier",
+    "text": "circling back on this -- smells like the same root cause as #6301, worth a look",
+    "ts": "2026-08-05T10:00:00Z",
+    "url": "https://orita-town.slack.com/archives/C05DEVUPD/p1722852000000101"
+  },
+  {
+    "id": "SLK-D-9002",
+    "channel": "#eng-notes",
+    "author": "quiet-shipper",
+    "text": "blocked on #6302 landing first, will retest after",
+    "ts": "2026-08-10T09:00:00Z",
+    "url": "https://orita-town.slack.com/archives/C08ENGNTS/p1723276800000102"
+  },
+  {
+    "id": "SLK-D-9003",
+    "channel": "#bugs",
+    "author": "helpful-mod",
+    "text": "same slowness already tracked in #6210, no need for a second thread",
+    "ts": "2026-08-05T11:00:00Z",
+    "url": "https://orita-town.slack.com/archives/C06BUGS00/p1722855600000103"
+  },
+  {
+    "id": "SLK-D-9004",
+    "channel": "#bugs",
+    "author": "quiet-watcher",
+    "text": "the fix for this actually landed in #6220 last week",
+    "ts": "2026-08-05T12:00:00Z",
+    "url": "https://orita-town.slack.com/archives/C06BUGS00/p1722859200000104"
+  },
+  {
+    "id": "SLK-D-9005",
+    "channel": "#random",
+    "author": "confused-newcomer",
+    "text": "thanks for the context, makes sense now",
+    "ts": "2026-08-05T13:00:00Z",
+    "url": "https://orita-town.slack.com/archives/C07RANDOM0/p1722862800000105"
+  }
+]
