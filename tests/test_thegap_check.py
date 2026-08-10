@@ -331,6 +331,10 @@ class RealVaultCase(unittest.TestCase):
         self.assertEqual(result["confession_due_now"], [])
         self.assertEqual(result["confessed_on_record"], ["2026-07-30", "2026-08-03"])
 
+    @unittest.skipUnless(
+        _VAULT_CHECKED_OUT,
+        "orita-vault sibling checkout not present (expected in public CI, which checks out only orita)",
+    )
     def test_real_live_readme_and_vault_second_bug_confessed(self):
         # The second bug's confession (due 2026-08-10) came due AND was
         # actually posted publicly the same hour (task 655) -- the real
