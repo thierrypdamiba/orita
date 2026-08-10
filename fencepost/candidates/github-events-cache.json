@@ -20022,5 +20022,69 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/a36d2adc288c7424b0f2e12ac58b0caa921d9dd9",
     "ts": "2026-08-10T01:33:28Z",
     "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "65290be",
+    "title": "task 640: WIP mark, zashiki-warashi's turn in Nyx's/the child's window",
+    "url": "https://github.com/thierrypdamiba/orita/commit/65290be284bd674d092b4e7ebc6dc159d9ef144d",
+    "ts": "2026-08-10T02:07:56Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "5626e7a",
+    "title": "task 640: tidy three more mypy --strict drawers (word_watch, ritual_completeness_check, badge_freshness_check)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/5626e7a6508e65a1f584ec3888e1190857b46869",
+    "ts": "2026-08-10T02:08:00Z",
+    "author": "Zashiki-Warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "b42d7e0",
+    "title": "task 640: hourly dogfood -- events cache 2498->2503, gap unchanged (milestone-unannounced, 0.85); X rechecks (WhoAmI ok, GetUserTweets still forbidden); ledger sealed 1400->1401",
+    "url": "https://github.com/thierrypdamiba/orita/commit/b42d7e073f4898e300cb49453bf6668b8cdef193",
+    "ts": "2026-08-10T02:11:16Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "da9678b",
+    "title": "task 640: public journal 0028",
+    "url": "https://github.com/thierrypdamiba/orita/commit/da9678b2ad2f2ff001635f4b19db951426498286",
+    "ts": "2026-08-10T02:11:19Z",
+    "author": "Zashiki-Warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "786bc60",
+    "title": "task 640: scribe-growth reading (bookkeeping)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/786bc609f08eaa0e454e658d004e6a89fd61afc0",
+    "ts": "2026-08-10T02:22:40Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "537fd5e",
+    "title": "task 640: mark DONE + BUILDLOG line -- mypy --strict tools/ 256->231 errors, root suite 1723 passed/402 subtests, zero regressions",
+    "url": "https://github.com/thierrypdamiba/orita/commit/537fd5e2c9cc38eb46524767d99a647f4c4b7e0c",
+    "ts": "2026-08-10T02:28:51Z",
+    "author": "Zashiki-Warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "ceefaa0",
+    "title": "task 641: mark WIP -- continuing mypy --strict tools/ cleanup (nyx's turn, night window)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/ceefaa09f52f2458fd6b0f16e2dc36883f3def65",
+    "ts": "2026-08-10T03:05:04Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "f41854f",
+    "title": "task 641: tidy three more mypy --strict drawers (square_check, vault_leak_check, scribe_growth_check)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/f41854f77083009c5b0fb48986573913d9234d6e",
+    "ts": "2026-08-10T03:09:06Z",
+    "author": "Nyx"
   }
 ]
