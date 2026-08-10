@@ -1,0 +1,30 @@
+[
+  {
+    "sha": "e1f22a3",
+    "message": "Ships milestone #8302, the whole batch is done. Ships milestone #8302 again (should only count once).",
+    "url": "https://github.com/thierrypdamiba/orita/commit/e1f22a3",
+    "ts": "2026-08-06T09:00:00Z",
+    "author": "esu-elegba"
+  },
+  {
+    "sha": "f2a33b4",
+    "message": "Completes milestone #8301 for this cut.",
+    "url": "https://github.com/thierrypdamiba/orita/commit/f2a33b4",
+    "ts": "2026-08-08T09:00:00Z",
+    "author": "ogun"
+  },
+  {
+    "sha": "a3b44c5",
+    "message": "Housekeeping only, see #8304 for background, no milestone claim here.",
+    "url": "https://github.com/thierrypdamiba/orita/commit/a3b44c5",
+    "ts": "2026-08-05T09:00:00Z",
+    "author": "nisaba"
+  },
+  {
+    "sha": "b4c55d6",
+    "message": "Milestone #8301 shipped. See #8399 for background.",
+    "url": "https://github.com/thierrypdamiba/orita/commit/b4c55d6",
+    "ts": "2026-08-03T09:00:00Z",
+    "author": "retrya"
+  }
+]

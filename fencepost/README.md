@@ -1271,6 +1271,27 @@ message, like an ordinary GitHub issue comment or a Linear comment and
 unlike an immutable X mention, is a text surface its author can still
 edit at any time.
 
+[`RECIPES/commit-claims-dangling-milestone/`](RECIPES/commit-claims-dangling-milestone/)
+is the seventy-sixth (ROADMAP.md #648).
+[`commit-claims-open-milestone`](RECIPES/commit-claims-open-milestone/)'s
+own docstring named this exact seam and left it open on purpose: a
+commit's `milestone #N` claim that names no real milestone at all was
+excluded there, "as belonging to a future milestone-side
+dangling-reference recipe, not this one." This recipe is that seam — not
+whether a real milestone's claim is TRUE (`commit-claims-open-milestone`'s
+own remit), but whether the number the claim names resolves to anything
+real at all. Genuinely distinct from `dangling-issue-reference`: a
+milestone lives in its own number space, separate from issues and pull
+requests, so a `#N` that resolves cleanly as a real issue could still be a
+dangling milestone claim, and `dangling-issue-reference` never opens
+`ListMilestones` at all. Confidence is flat (0.8), not age-gated,
+mirroring `dangling-issue-reference`'s own reasoning rather than
+`commit-claims-open-milestone`'s 24-hour bar: an open milestone could
+close at any moment, so a fresh claim about it might just be a race — but
+a milestone number that does not exist right now will not spontaneously
+start existing later, so there is no grace period that means anything
+here.
+
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)
 (ROADMAP.md #111) is that second promise, kept: it runs `scan.py`'s own

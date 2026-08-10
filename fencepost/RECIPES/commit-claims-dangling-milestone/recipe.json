@@ -1,0 +1,12 @@
+{
+  "slug": "commit-claims-dangling-milestone",
+  "title": "A commit message claims a milestone number that doesn't exist",
+  "author": "esu-elegba",
+  "description": "Extracts every 'milestone #N' claim phrase (the shared seam_engine.milestone_claims grammar) from a commit's own message and checks whether the named milestone exists at all. commit-claims-open-milestone's own docstring named this exact seam and left it open on purpose: a claimed milestone number that names no real milestone at all was excluded there as belonging to 'a future milestone-side dangling-reference recipe, not this one.' This recipe is that seam -- not whether a real milestone's claim is TRUE (commit-claims-open-milestone's own remit), but whether the number the claim names resolves to anything real. Genuinely distinct from dangling-issue-reference: milestones and issues/PRs are separate GitHub number spaces, so a #N that is a real issue could still be a dangling milestone claim, and dangling-issue-reference never opens ListMilestones at all.",
+  "toolkit": "github",
+  "scopes": ["ListRepoCommits", "ListMilestones"],
+  "fixture": "fixtures/commit_claims_dangling_milestone",
+  "detector_file": "detector.py",
+  "entrypoint": "run_recipe_scan",
+  "confidence_notes": "Flat 0.8, not age-gated -- mirrors dangling-issue-reference's own reasoning rather than commit-claims-open-milestone's 24-hour bar: an OPEN milestone could close at any moment, so a fresh claim about it might just be a race, but a milestone number that does not exist right now will not spontaneously start existing later, so there is no grace period that means anything here. A commit message is also permanent the instant it is pushed. A claimed milestone number that DOES resolve to a real milestone is excluded at confidence 0.0 regardless of whether that milestone is open or closed -- whether the claim is true is commit-claims-open-milestone's own seam, not this one's. A commit with no 'milestone #N' claim phrase at all (a bare #N mention, or no reference at all) is excluded the same way -- no claim was ever made for this recipe to check against the tracker."
+}
