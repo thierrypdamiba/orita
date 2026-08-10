@@ -175,8 +175,9 @@ import json
 import os
 import subprocess
 import sys
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
+from types import ModuleType
 from typing import Any, cast
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -185,7 +186,7 @@ DEFAULT_REPORTS_DIR = os.path.join(ROOT, "fencepost", "REPORTS")
 DEFAULT_CHECKOUT_DIRS = (ROOT, os.path.join(os.path.dirname(ROOT), "orita-vault"))
 
 
-def _load(name: str, path: str):
+def _load(name: str, path: str) -> ModuleType:
     spec = importlib.util.spec_from_file_location(name, path)
     if spec is None or spec.loader is None:
         raise ImportError(f"could not load module {name!r} from {path!r}: no loader for this file type")
@@ -195,10 +196,10 @@ def _load(name: str, path: str):
     return mod
 
 
-_LOADED_MODULES_CACHE: dict[str, object] = {}
+_LOADED_MODULES_CACHE: dict[str, ModuleType] = {}
 
 
-def _load_once(name: str, path: str):
+def _load_once(name: str, path: str) -> ModuleType:
     """Task 367: like `_load()`, but reuses the same module object across
     repeated calls for the same `name` within one process, instead of
     re-`exec_module()`-ing (and so fully re-running) the target file
@@ -222,237 +223,237 @@ def _load_once(name: str, path: str):
     return _LOADED_MODULES_CACHE[name]
 
 
-def _town_ledger():
+def _town_ledger() -> ModuleType:
     return _load("_ritual_town_ledger", os.path.join(ROOT, "tools", "ledger.py"))
 
 
-def _outage_tracker():
+def _outage_tracker() -> ModuleType:
     return _load("_ritual_outage_tracker", os.path.join(ROOT, "tools", "x_outage_tracker.py"))
 
 
-def _square_check():
+def _square_check() -> ModuleType:
     return _load("_ritual_square_check", os.path.join(ROOT, "tools", "square_check.py"))
 
 
-def _ci_watch():
+def _ci_watch() -> ModuleType:
     return _load("_ritual_ci_watch", os.path.join(ROOT, "tools", "ci_watch.py"))
 
 
-def _github_stars_check():
+def _github_stars_check() -> ModuleType:
     return _load("_ritual_github_stars_check", os.path.join(ROOT, "tools", "github_stars_check.py"))
 
 
-def _word_watch():
+def _word_watch() -> ModuleType:
     return _load("_ritual_word_watch", os.path.join(ROOT, "tools", "word_watch.py"))
 
 
-def _x_post_queue():
+def _x_post_queue() -> ModuleType:
     return _load("_ritual_x_post_queue", os.path.join(ROOT, "tools", "x_post_queue.py"))
 
 
-def _cron_health():
+def _cron_health() -> ModuleType:
     return _load("_ritual_cron_health", os.path.join(ROOT, "tools", "cron_health.py"))
 
 
-def _change_gate():
+def _change_gate() -> ModuleType:
     return _load("_ritual_change_gate", os.path.join(ROOT, "tools", "change_gate.py"))
 
 
-def _arcade_app_watch():
+def _arcade_app_watch() -> ModuleType:
     return _load("_ritual_arcade_app_watch", os.path.join(ROOT, "tools", "arcade_app_watch.py"))
 
 
-def _gateway_toolset_check():
+def _gateway_toolset_check() -> ModuleType:
     return _load("_ritual_gateway_toolset_check", os.path.join(ROOT, "tools", "gateway_toolset_check.py"))
 
 
-def _good_first_issue_check():
+def _good_first_issue_check() -> ModuleType:
     return _load("_ritual_good_first_issue_check", os.path.join(ROOT, "tools", "good_first_issue_check.py"))
 
 
-def _scribe_growth_check():
+def _scribe_growth_check() -> ModuleType:
     return _load("_ritual_scribe_growth_check", os.path.join(ROOT, "tools", "scribe_growth_check.py"))
 
 
-def _vault_leak_check():
+def _vault_leak_check() -> ModuleType:
     return _load_once("_ritual_vault_leak_check", os.path.join(ROOT, "tools", "vault_leak_check.py"))
 
 
-def _star_covenant_check():
+def _star_covenant_check() -> ModuleType:
     return _load_once("_ritual_star_covenant_check", os.path.join(ROOT, "tools", "star_covenant_check.py"))
 
 
-def _duplicate_regex_check():
+def _duplicate_regex_check() -> ModuleType:
     return _load_once("_ritual_duplicate_regex_check", os.path.join(ROOT, "tools", "duplicate_regex_check.py"))
 
 
-def _rider_check():
+def _rider_check() -> ModuleType:
     return _load_once("_ritual_rider_check", os.path.join(ROOT, "tools", "rider_check.py"))
 
 
-def _hand_lore_check():
+def _hand_lore_check() -> ModuleType:
     return _load_once("_ritual_hand_lore_check", os.path.join(ROOT, "tools", "hand_lore_check.py"))
 
 
-def _no_grading_check():
+def _no_grading_check() -> ModuleType:
     return _load_once("_ritual_no_grading_check", os.path.join(ROOT, "tools", "no_grading_check.py"))
 
 
-def _arcade_hero_check():
+def _arcade_hero_check() -> ModuleType:
     return _load_once("_ritual_arcade_hero_check", os.path.join(ROOT, "tools", "arcade_hero_check.py"))
 
 
-def _petition_limits_check():
+def _petition_limits_check() -> ModuleType:
     return _load("_ritual_petition_limits_check", os.path.join(ROOT, "tools", "petition_limits_check.py"))
 
 
-def _child_work_check():
+def _child_work_check() -> ModuleType:
     return _load("_ritual_child_work_check", os.path.join(ROOT, "tools", "child_work_check.py"))
 
 
-def _verdict_provenance_check():
+def _verdict_provenance_check() -> ModuleType:
     return _load("_ritual_verdict_provenance_check", os.path.join(ROOT, "tools", "verdict_provenance_check.py"))
 
 
-def _voice_window_check():
+def _voice_window_check() -> ModuleType:
     return _load("_ritual_voice_window_check", os.path.join(ROOT, "tools", "voice_window_check.py"))
 
 
-def _petition_cadence_check():
+def _petition_cadence_check() -> ModuleType:
     return _load("_ritual_petition_cadence_check", os.path.join(ROOT, "tools", "petition_cadence_check.py"))
 
 
-def _journal_numbering_check():
+def _journal_numbering_check() -> ModuleType:
     return _load("_ritual_journal_numbering_check", os.path.join(ROOT, "tools", "journal_numbering_check.py"))
 
 
-def _report_cadence_check():
+def _report_cadence_check() -> ModuleType:
     return _load("_ritual_report_cadence_check", os.path.join(ROOT, "tools", "report_cadence_check.py"))
 
 
-def _metrics_cadence_check():
+def _metrics_cadence_check() -> ModuleType:
     return _load("_ritual_metrics_cadence_check", os.path.join(ROOT, "tools", "metrics_cadence_check.py"))
 
 
-def _shared_reports_check():
+def _shared_reports_check() -> ModuleType:
     return _load("_ritual_shared_reports_check", os.path.join(ROOT, "tools", "shared_reports_check.py"))
 
 
-def _ritual_completeness_check():
+def _ritual_completeness_check() -> ModuleType:
     return _load("_ritual_completeness_check", os.path.join(ROOT, "tools", "ritual_completeness_check.py"))
 
 
-def _wip_reclaim_check():
+def _wip_reclaim_check() -> ModuleType:
     return _load("_ritual_wip_reclaim_check", os.path.join(ROOT, "tools", "wip_reclaim_check.py"))
 
 
-def _scopes_completeness_check():
+def _scopes_completeness_check() -> ModuleType:
     return _load("_ritual_scopes_completeness_check", os.path.join(ROOT, "tools", "scopes_completeness_check.py"))
 
 
-def _toolkits_in_use_check():
+def _toolkits_in_use_check() -> ModuleType:
     return _load("_ritual_toolkits_in_use_check", os.path.join(ROOT, "tools", "toolkits_in_use_check.py"))
 
 
-def _connected_users_check():
+def _connected_users_check() -> ModuleType:
     return _load("_ritual_connected_users_check", os.path.join(ROOT, "tools", "connected_users_check.py"))
 
 
-def _gap_true_positive_check():
+def _gap_true_positive_check() -> ModuleType:
     return _load(
         "_ritual_gap_true_positive_check", os.path.join(ROOT, "tools", "gap_true_positive_check.py")
     )
 
 
-def _report_shipped_check():
+def _report_shipped_check() -> ModuleType:
     return _load(
         "_ritual_report_shipped_check", os.path.join(ROOT, "tools", "report_shipped_check.py")
     )
 
 
-def _tasks_shipped_check():
+def _tasks_shipped_check() -> ModuleType:
     return _load(
         "_ritual_tasks_shipped_check", os.path.join(ROOT, "tools", "tasks_shipped_check.py")
     )
 
 
-def _cluster_day_check():
+def _cluster_day_check() -> ModuleType:
     return _load("_ritual_cluster_day_check", os.path.join(ROOT, "tools", "cluster_day_check.py"))
 
 
-def _what_moved_check():
+def _what_moved_check() -> ModuleType:
     return _load("_ritual_what_moved_check", os.path.join(ROOT, "tools", "what_moved_check.py"))
 
 
-def _thegap_check():
+def _thegap_check() -> ModuleType:
     return _load("_ritual_thegap_check", os.path.join(ROOT, "tools", "thegap_check.py"))
 
 
-def _nyx_traffic_check():
+def _nyx_traffic_check() -> ModuleType:
     return _load("_ritual_nyx_traffic_check", os.path.join(ROOT, "tools", "nyx_traffic_check.py"))
 
 
-def _strategy_targets_check():
+def _strategy_targets_check() -> ModuleType:
     return _load_once("_ritual_strategy_targets_check", os.path.join(ROOT, "tools", "strategy_targets_check.py"))
 
 
-def _network_boundary_check():
+def _network_boundary_check() -> ModuleType:
     return _load_once("_ritual_network_boundary_check", os.path.join(ROOT, "tools", "network_boundary_check.py"))
 
 
-def _site_link_check():
+def _site_link_check() -> ModuleType:
     return _load_once("_ritual_site_link_check", os.path.join(ROOT, "tools", "site_link_check.py"))
 
 
-def _badge_freshness_check():
+def _badge_freshness_check() -> ModuleType:
     return _load_once("_ritual_badge_freshness_check", os.path.join(ROOT, "tools", "badge_freshness_check.py"))
 
 
-def _recipe_readme_check():
+def _recipe_readme_check() -> ModuleType:
     return _load_once("_ritual_recipe_readme_check", os.path.join(ROOT, "tools", "recipe_readme_check.py"))
 
 
-def _site_recipe_check():
+def _site_recipe_check() -> ModuleType:
     return _load_once("_ritual_site_recipe_check", os.path.join(ROOT, "tools", "site_recipe_check.py"))
 
 
-def _recipe_command_check():
+def _recipe_command_check() -> ModuleType:
     return _load_once("_ritual_recipe_command_check", os.path.join(ROOT, "tools", "recipe_command_check.py"))
 
 
-def _chronicle_readme_check():
+def _chronicle_readme_check() -> ModuleType:
     return _load_once("_ritual_chronicle_readme_check", os.path.join(ROOT, "tools", "chronicle_readme_check.py"))
 
 
-def _proclamation_count_check():
+def _proclamation_count_check() -> ModuleType:
     return _load_once("_ritual_proclamation_count_check", os.path.join(ROOT, "tools", "proclamation_count_check.py"))
 
 
-def _escape_sequence_check():
+def _escape_sequence_check() -> ModuleType:
     return _load_once("_ritual_escape_sequence_check", os.path.join(ROOT, "tools", "escape_sequence_check.py"))
 
 
-def _metrics_field_completeness_check():
+def _metrics_field_completeness_check() -> ModuleType:
     return _load_once(
         "_ritual_metrics_field_completeness_check",
         os.path.join(ROOT, "tools", "metrics_field_completeness_check.py"),
     )
 
 
-def _strategy_audit_target():
+def _strategy_audit_target() -> ModuleType:
     src = os.path.join(ROOT, "fencepost", "seam_engine", "src")
     if src not in sys.path:
         sys.path.insert(0, src)
     import seam_engine.strategy_audit_target as sat  # noqa: PLC0415
-    return sat
+    return cast(ModuleType, sat)
 
 
-def _seam_ledger():
+def _seam_ledger() -> ModuleType:
     src = os.path.join(ROOT, "fencepost", "seam_engine", "src")
     if src not in sys.path:
         sys.path.insert(0, src)
     import seam_engine.ledger as seam_ledger  # noqa: PLC0415
-    return seam_ledger
+    return cast(ModuleType, seam_ledger)
 
 
 def check_town_ledger() -> dict[str, object]:
@@ -640,7 +641,7 @@ def check_good_first_issues(open_issues: list[dict[str, object]] | None) -> dict
     `report_cadence`/`cluster_day`/`thegap` already hold for their own
     named-but-not-doctrine-breaking gaps -- never flips `broken`."""
     mod = _good_first_issue_check()
-    return mod.check_good_first_issues(open_issues)
+    return cast(dict[str, object] | None, mod.check_good_first_issues(open_issues))
 
 
 def check_scribe_growth(now_iso: str, scribe_root: str | None = None, record: bool = True) -> dict[str, object]:
@@ -665,7 +666,7 @@ def check_scribe_growth(now_iso: str, scribe_root: str | None = None, record: bo
     result = mod.check_scribe_growth(sizes, threshold_bytes=mod.WARN_BYTES, path=mod.LOG)
     if record:
         mod.record_scribe_check(sizes, now_iso, path=mod.LOG)
-    return result
+    return cast(dict[str, object], result)
 
 
 def check_ci(ci_checks: list[dict[str, object]] | None) -> dict[str, object] | None:
@@ -945,7 +946,7 @@ def check_child_work(
     silently skipped for want of a fresh fetch."""
     mod = _child_work_check()
     kwargs = {"path": path or mod.LOG, "repo_root": repo_root or mod.ROOT}
-    return mod.check(child_files=child_files, now_iso=now_iso, **kwargs)
+    return cast(dict[str, object], mod.check(child_files=child_files, now_iso=now_iso, **kwargs))
 
 
 def check_verdict_provenance(orita_dir: str | None = None) -> dict[str, object]:
@@ -979,7 +980,7 @@ def check_voice_window(
     skipped for want of one."""
     mod = _voice_window_check()
     kwargs = {"path": path or mod.LOG}
-    return mod.check(commits=commits, now_iso=now_iso, **kwargs)
+    return cast(dict[str, object], mod.check(commits=commits, now_iso=now_iso, **kwargs))
 
 
 def check_petition_cadence(orita_dir: str | None = None) -> dict[str, object]:
@@ -1039,7 +1040,7 @@ def check_report_cadence(reports_dir: str | None = None) -> dict[str, object]:
     kwargs = {}
     if reports_dir is not None:
         kwargs["reports_dir"] = reports_dir
-    return mod.compute_cadence(**kwargs)
+    return cast(dict[str, object], mod.compute_cadence(**kwargs))
 
 
 def check_metrics_cadence(metrics_path: str | None = None) -> dict[str, object]:
@@ -1058,7 +1059,7 @@ def check_metrics_cadence(metrics_path: str | None = None) -> dict[str, object]:
     kwargs = {}
     if metrics_path is not None:
         kwargs["metrics_path"] = metrics_path
-    return mod.compute_cadence(**kwargs)
+    return cast(dict[str, object], mod.compute_cadence(**kwargs))
 
 
 def check_metrics_freshness(now: datetime, metrics_path: str | None = None) -> dict[str, object]:
@@ -1080,7 +1081,7 @@ def check_metrics_freshness(now: datetime, metrics_path: str | None = None) -> d
     kwargs = {}
     if metrics_path is not None:
         kwargs["metrics_path"] = metrics_path
-    return mod.compute_metrics_freshness(now, **kwargs)
+    return cast(dict[str, object], mod.compute_metrics_freshness(now, **kwargs))
 
 
 def check_shared_reports(shared_path: str | None = None) -> dict[str, object]:
@@ -1098,7 +1099,7 @@ def check_shared_reports(shared_path: str | None = None) -> dict[str, object]:
     kwargs = {}
     if shared_path is not None:
         kwargs["shared_path"] = shared_path
-    return mod.compute_shared_reports(**kwargs)
+    return cast(dict[str, object], mod.compute_shared_reports(**kwargs))
 
 
 def check_ritual_completeness(
@@ -1129,7 +1130,7 @@ def check_ritual_completeness(
         kwargs["tools_dir"] = tools_dir
     if seam_engine_dir is not None:
         kwargs["seam_engine_dir"] = seam_engine_dir
-    return mod.compute_ritual_completeness(**kwargs)
+    return cast(dict[str, object], mod.compute_ritual_completeness(**kwargs))
 
 
 def check_wip_reclaim(now: datetime, roadmap_path: str | None = None) -> dict[str, object]:
@@ -1147,7 +1148,7 @@ def check_wip_reclaim(now: datetime, roadmap_path: str | None = None) -> dict[st
     kwargs: dict[str, object] = {"now": now}
     if roadmap_path is not None:
         kwargs["roadmap_path"] = roadmap_path
-    return mod.find_stale(**kwargs)
+    return cast(dict[str, object], mod.find_stale(**kwargs))
 
 
 def check_scopes_completeness(scopes_path: str | None = None, app_log_path: str | None = None) -> dict[str, object]:
@@ -1167,7 +1168,7 @@ def check_scopes_completeness(scopes_path: str | None = None, app_log_path: str 
         kwargs["scopes_path"] = scopes_path
     if app_log_path is not None:
         kwargs["app_log_path"] = app_log_path
-    return mod.check_scopes_completeness(**kwargs)
+    return cast(dict[str, object], mod.check_scopes_completeness(**kwargs))
 
 
 def check_toolkits_in_use(metrics_path: str | None = None, consent_log_path: str | None = None) -> dict[str, object]:
@@ -1187,7 +1188,7 @@ def check_toolkits_in_use(metrics_path: str | None = None, consent_log_path: str
         kwargs["metrics_path"] = metrics_path
     if consent_log_path is not None:
         kwargs["consent_log_path"] = consent_log_path
-    return mod.check_toolkits_in_use(**kwargs)
+    return cast(dict[str, object], mod.check_toolkits_in_use(**kwargs))
 
 
 def check_connected_users(metrics_path: str | None = None, consent_log_path: str | None = None) -> dict[str, object]:
@@ -1212,10 +1213,10 @@ def check_connected_users(metrics_path: str | None = None, consent_log_path: str
         kwargs["metrics_path"] = metrics_path
     if consent_log_path is not None:
         kwargs["consent_log_path"] = consent_log_path
-    return mod.check_connected_users(**kwargs)
+    return cast(dict[str, object], mod.check_connected_users(**kwargs))
 
 
-def check_cluster_day_cadence(chronicle_dir: str | None = None, today=None) -> dict[str, object]:
+def check_cluster_day_cadence(chronicle_dir: str | None = None, today: date | None = None) -> dict[str, object]:
     """Task 387: fold `cluster_day_check.py`'s own weekly Cluster Day scan
     into the one block. Unconditional, local-filesystem-only, the same
     cheap informational class `check_report_cadence`/`check_metrics_cadence`
@@ -1230,15 +1231,15 @@ def check_cluster_day_cadence(chronicle_dir: str | None = None, today=None) -> d
     currently-live law violation -- the same distinction
     `report_cadence`/`metrics_cadence` already hold for their own gaps."""
     mod = _cluster_day_check()
-    kwargs = {}
+    kwargs: dict[str, object] = {}
     if chronicle_dir is not None:
         kwargs["chronicle_dir"] = chronicle_dir
     if today is not None:
         kwargs["today"] = today
-    return mod.compute_cadence(**kwargs)
+    return cast(dict[str, object], mod.compute_cadence(**kwargs))
 
 
-def check_what_moved_cadence(what_moved_path: str | None = None, what_moved_today=None) -> dict[str, object]:
+def check_what_moved_cadence(what_moved_path: str | None = None, what_moved_today: date | None = None) -> dict[str, object]:
     """Task 449: fold `what_moved_check.py`'s own weekly `docs/what-moved.html`
     scan into the one block, alongside `check_cluster_day_cadence`'s own
     fold-in of Ananse's chronicle half. Unconditional, local-filesystem-
@@ -1254,18 +1255,18 @@ def check_what_moved_cadence(what_moved_path: str | None = None, what_moved_toda
     `cluster_day`/`report_cadence`/`metrics_cadence` already hold for
     their own gaps."""
     mod = _what_moved_check()
-    kwargs = {}
+    kwargs: dict[str, object] = {}
     if what_moved_path is not None:
         kwargs["path"] = what_moved_path
     if what_moved_today is not None:
         kwargs["today"] = what_moved_today
-    return mod.compute_cadence(**kwargs)
+    return cast(dict[str, object], mod.compute_cadence(**kwargs))
 
 
 def check_thegap_cadence(
     thegap_readme_path: str | None = None,
     thegap_vault_dir: str | None = None,
-    thegap_today=None,
+    thegap_today: date | None = None,
 ) -> dict[str, object]:
     """Task 463: fold `thegap_check.py`'s own weekly Gap-bug hide/confess
     scan into the one block, closing the third and last leg of
@@ -1289,19 +1290,19 @@ def check_thegap_cadence(
     check in this weekly-cadence family being informational rather than
     a hard gate."""
     mod = _thegap_check()
-    kwargs = {}
+    kwargs: dict[str, object] = {}
     if thegap_readme_path is not None:
         kwargs["readme_path"] = thegap_readme_path
     if thegap_vault_dir is not None:
         kwargs["vault_dir"] = thegap_vault_dir
     if thegap_today is not None:
         kwargs["today"] = thegap_today
-    return mod.compute_cadence(**kwargs)
+    return cast(dict[str, object], mod.compute_cadence(**kwargs))
 
 
 def check_nyx_traffic_cadence(
     nyx_traffic_vault_dir: str | None = None,
-    nyx_traffic_today=None,
+    nyx_traffic_today: date | None = None,
 ) -> dict[str, object]:
     """Task 465: fold `nyx_traffic_check.py`'s own weekly traffic-report
     scan into the one block, closing the fourth leg of TOWN-OPERATIONS.md's
@@ -1319,12 +1320,12 @@ def check_nyx_traffic_cadence(
     next hour's run, not a currently-live violation -- the same
     distinction `cluster_day`/`what_moved`/`thegap` already draw."""
     mod = _nyx_traffic_check()
-    kwargs = {}
+    kwargs: dict[str, object] = {}
     if nyx_traffic_vault_dir is not None:
         kwargs["vault_dir"] = nyx_traffic_vault_dir
     if nyx_traffic_today is not None:
         kwargs["today"] = nyx_traffic_today
-    return mod.compute_cadence(**kwargs)
+    return cast(dict[str, object], mod.compute_cadence(**kwargs))
 
 
 def check_strategy_targets(strategy_path: str | None = None) -> dict[str, object]:
@@ -1429,7 +1430,7 @@ def check_gap_true_positive_rate(
         kwargs["metrics_path"] = metrics_path
     if ledger_base is not None:
         kwargs["ledger_base"] = ledger_base
-    return mod.check_gap_true_positive_rate(**kwargs)
+    return cast(dict[str, object], mod.check_gap_true_positive_rate(**kwargs))
 
 
 def check_report_shipped(metrics_path: str | None = None, reports_dir: str | None = None) -> dict[str, object]:
@@ -1461,7 +1462,7 @@ def check_report_shipped(metrics_path: str | None = None, reports_dir: str | Non
         kwargs["metrics_path"] = metrics_path
     if reports_dir is not None:
         kwargs["reports_dir"] = reports_dir
-    return mod.check_report_shipped(**kwargs)
+    return cast(dict[str, object], mod.check_report_shipped(**kwargs))
 
 
 def check_tasks_shipped(metrics_path: str | None = None, buildlog_path: str | None = None) -> dict[str, object]:
@@ -1493,7 +1494,7 @@ def check_tasks_shipped(metrics_path: str | None = None, buildlog_path: str | No
         kwargs["metrics_path"] = metrics_path
     if buildlog_path is not None:
         kwargs["buildlog_path"] = buildlog_path
-    return mod.check_tasks_shipped(**kwargs)
+    return cast(dict[str, object], mod.check_tasks_shipped(**kwargs))
 
 
 def check_github_stars(
@@ -1545,7 +1546,7 @@ def check_github_stars(
     kwargs = {"log_path": resolved_log_path}
     if metrics_path is not None:
         kwargs["metrics_path"] = metrics_path
-    return mod.check_github_stars(**kwargs)
+    return cast(dict[str, object], mod.check_github_stars(**kwargs))
 
 
 def check_network_boundary(dirs: tuple[str, ...] | None = None) -> dict[str, object]:
@@ -1809,7 +1810,7 @@ def check_chronicle_readme(readme_path: str | None = None, chronicle_readme_dir:
         kwargs["readme_path"] = readme_path
     if chronicle_readme_dir is not None:
         kwargs["chronicle_dir"] = chronicle_readme_dir
-    return mod.check_chronicle_readme(**kwargs)
+    return cast(dict[str, object], mod.check_chronicle_readme(**kwargs))
 
 
 def check_proclamation_count(readme_path: str | None = None, proclamations_dir: str | None = None) -> dict[str, object]:
@@ -1830,7 +1831,7 @@ def check_proclamation_count(readme_path: str | None = None, proclamations_dir: 
         kwargs["readme_path"] = readme_path
     if proclamations_dir is not None:
         kwargs["proclamations_dir"] = proclamations_dir
-    return mod.check_proclamation_count(**kwargs)
+    return cast(dict[str, object], mod.check_proclamation_count(**kwargs))
 
 
 def check_badge_freshness(badge_path: str | None = None) -> dict[str, object]:
@@ -1853,7 +1854,7 @@ def check_badge_freshness(badge_path: str | None = None) -> dict[str, object]:
     kwargs = {}
     if badge_path is not None:
         kwargs["badge_path"] = badge_path
-    return mod.check_badge_freshness(**kwargs)
+    return cast(dict[str, object], mod.check_badge_freshness(**kwargs))
 
 
 def check_recipe_readme(readme_path: str | None = None, recipe_fencepost_root: str | None = None) -> dict[str, object]:
@@ -1882,7 +1883,7 @@ def check_recipe_readme(readme_path: str | None = None, recipe_fencepost_root: s
         kwargs["readme_path"] = readme_path
     if recipe_fencepost_root is not None:
         kwargs["fencepost_root"] = recipe_fencepost_root
-    return mod.check_recipe_readme(**kwargs)
+    return cast(dict[str, object], mod.check_recipe_readme(**kwargs))
 
 
 def check_site_recipe_readme(site_path: str | None = None, site_recipe_fencepost_root: str | None = None) -> dict[str, object]:
@@ -1917,7 +1918,7 @@ def check_site_recipe_readme(site_path: str | None = None, site_recipe_fencepost
         kwargs["site_path"] = site_path
     if site_recipe_fencepost_root is not None:
         kwargs["fencepost_root"] = site_recipe_fencepost_root
-    return mod.check_site_recipe_readme(**kwargs)
+    return cast(dict[str, object], mod.check_site_recipe_readme(**kwargs))
 
 
 def check_recipe_commands(
@@ -1950,7 +1951,7 @@ def check_recipe_commands(
         kwargs["fencepost_root"] = recipe_command_fencepost_root
     if recipe_command_seam_engine_dir is not None:
         kwargs["seam_engine_dir"] = recipe_command_seam_engine_dir
-    return mod.check_recipe_commands(**kwargs)
+    return cast(dict[str, object], mod.check_recipe_commands(**kwargs))
 
 
 def check_escape_sequences(orita_dir: str | None = None) -> dict[str, object]:
@@ -1973,7 +1974,7 @@ def check_escape_sequences(orita_dir: str | None = None) -> dict[str, object]:
     kwargs = {}
     if orita_dir is not None:
         kwargs["orita_dir"] = orita_dir
-    return mod.check_escape_sequences(**kwargs)
+    return cast(dict[str, object], mod.check_escape_sequences(**kwargs))
 
 
 def check_metrics_field_completeness(
@@ -1995,7 +1996,7 @@ def check_metrics_field_completeness(
         kwargs["metrics_path"] = metrics_path
     if tools_dir is not None:
         kwargs["tools_dir"] = tools_dir
-    return mod.check_metrics_field_completeness(**kwargs)
+    return cast(dict[str, object], mod.check_metrics_field_completeness(**kwargs))
 
 
 def check_change_gate(report_info: dict[str, str | None]) -> dict[str, object] | None:
@@ -2059,14 +2060,14 @@ def run_ritual_check(
     connected_users_metrics_path: str | None = None,
     connected_users_consent_log_path: str | None = None,
     cluster_day_dir: str | None = None,
-    cluster_day_today=None,
+    cluster_day_today: date | None = None,
     what_moved_path: str | None = None,
-    what_moved_today=None,
+    what_moved_today: date | None = None,
     thegap_readme_path: str | None = None,
     thegap_vault_dir: str | None = None,
-    thegap_today=None,
+    thegap_today: date | None = None,
     nyx_traffic_vault_dir: str | None = None,
-    nyx_traffic_today=None,
+    nyx_traffic_today: date | None = None,
     strategy_targets_path: str | None = None,
     network_boundary_dirs: tuple[str, ...] | None = None,
     site_link_docs_dir: str | None = None,
@@ -2747,7 +2748,7 @@ class RitualCheckArgError(ValueError):
     bare `AttributeError`/`TypeError` two or three frames deeper."""
 
 
-def _load_json_arg(path: str, flag: str, expected: str):
+def _load_json_arg(path: str, flag: str, expected: str) -> dict[str, object] | list[object]:
     """Load `path` as JSON and confirm its top-level shape matches
     `expected` ("dict" or "list"), raising `RitualCheckArgError` naming the
     flag and the actual type otherwise. A bare scalar (int/bool/null/
@@ -2763,7 +2764,7 @@ def _load_json_arg(path: str, flag: str, expected: str):
         raise RitualCheckArgError(
             f"--{flag}: expected a JSON {expected}, got {type(raw).__name__}"
         )
-    return raw
+    return cast(dict[str, object] | list[object], raw)
 
 
 def main(argv: list[str]) -> int:
@@ -2787,34 +2788,34 @@ def main(argv: list[str]) -> int:
             base = argv[i + 1]
             i += 2
         elif argv[i] == "--square-state" and i + 1 < len(argv):
-            raw = _load_json_arg(argv[i + 1], "square-state", "dict")
+            raw = cast(dict[str, object], _load_json_arg(argv[i + 1], "square-state", "dict"))
             sq = _square_check()
             square_state = sq.compute_square_state(raw.get("issues", []), raw.get("prs", []))
             i += 2
         elif argv[i] == "--arcade-apps-state" and i + 1 < len(argv):
-            raw = _load_json_arg(argv[i + 1], "arcade-apps-state", "dict")
+            raw = cast(dict[str, object], _load_json_arg(argv[i + 1], "arcade-apps-state", "dict"))
             aw = _arcade_app_watch()
             arcade_apps_state = aw.compute_app_state(raw.get("apps", []))
             i += 2
         elif argv[i] == "--gateway-toolset" and i + 1 < len(argv):
-            raw = _load_json_arg(argv[i + 1], "gateway-toolset", "dict")
+            raw = cast(dict[str, object], _load_json_arg(argv[i + 1], "gateway-toolset", "dict"))
             gt = _gateway_toolset_check()
             gateway_toolset_state = gt.compute_toolset_state(raw.get("tool_names", []))
             i += 2
         elif argv[i] == "--good-first-issues" and i + 1 < len(argv):
-            good_first_issues_state = _load_json_arg(argv[i + 1], "good-first-issues", "list")
+            good_first_issues_state = cast(list[dict[str, object]], _load_json_arg(argv[i + 1], "good-first-issues", "list"))
             i += 2
         elif argv[i] == "--ci-checks" and i + 1 < len(argv):
-            ci_checks = _load_json_arg(argv[i + 1], "ci-checks", "list")
+            ci_checks = cast(list[dict[str, object]], _load_json_arg(argv[i + 1], "ci-checks", "list"))
             i += 2
         elif argv[i] == "--cron-checks" and i + 1 < len(argv):
-            cron_checks = _load_json_arg(argv[i + 1], "cron-checks", "list")
+            cron_checks = cast(list[dict[str, object]], _load_json_arg(argv[i + 1], "cron-checks", "list"))
             i += 2
         elif argv[i] == "--child-files" and i + 1 < len(argv):
-            child_files = _load_json_arg(argv[i + 1], "child-files", "list")
+            child_files = cast(list[dict[str, object]], _load_json_arg(argv[i + 1], "child-files", "list"))
             i += 2
         elif argv[i] == "--voice-window-commits" and i + 1 < len(argv):
-            voice_window_commits = _load_json_arg(argv[i + 1], "voice-window-commits", "list")
+            voice_window_commits = cast(list[dict[str, object]], _load_json_arg(argv[i + 1], "voice-window-commits", "list"))
             i += 2
         elif argv[i] == "--github-stars" and i + 1 < len(argv):
             github_stars_count = int(argv[i + 1])
