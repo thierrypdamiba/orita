@@ -445,7 +445,7 @@ def _strategy_audit_target() -> ModuleType:
     if src not in sys.path:
         sys.path.insert(0, src)
     import seam_engine.strategy_audit_target as sat  # noqa: PLC0415
-    return cast(ModuleType, sat)
+    return sat
 
 
 def _seam_ledger() -> ModuleType:
@@ -453,7 +453,7 @@ def _seam_ledger() -> ModuleType:
     if src not in sys.path:
         sys.path.insert(0, src)
     import seam_engine.ledger as seam_ledger  # noqa: PLC0415
-    return cast(ModuleType, seam_ledger)
+    return seam_ledger
 
 
 def check_town_ledger() -> dict[str, object]:
