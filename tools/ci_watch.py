@@ -30,6 +30,7 @@ Usage:
 """
 import os
 import sys
+from typing import cast
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import jsonl_append  # noqa: E402
@@ -83,7 +84,7 @@ CONCLUSIONS = (
 TRACKED_WORKFLOWS = ("dawn-run", "pages", "seam-scan", "oracle-cadence")
 
 
-def _entries(path=LOG):
+def _entries(path: str = LOG) -> list[dict[str, object]]:
     """Delegates to jsonl_read.read_jsonl_entries (task 540) -- see
     that module's own docstring for the fourteen-copy history this
     replaced."""
@@ -96,7 +97,7 @@ def _entries(path=LOG):
 _append = jsonl_append.append_jsonl
 
 
-def record_check(workflow: str, conclusion: str, run_id, checked_at: str, path=LOG) -> bool:
+def record_check(workflow: str, conclusion: str, run_id: int | str, checked_at: str, path: str = LOG) -> bool:
     """Append one real observed CI conclusion. Never edits or removes a prior line.
 
     Task 501: the one genuine gap task 495 found live and named but deferred
@@ -126,7 +127,7 @@ def record_check(workflow: str, conclusion: str, run_id, checked_at: str, path=L
     """
     if conclusion not in CONCLUSIONS:
         raise ValueError(f"unknown conclusion {conclusion!r} -- must be one of {CONCLUSIONS}")
-    entry = {
+    entry: dict[str, object] = {
         "type": "check",
         "workflow": workflow,
         "conclusion": conclusion,
@@ -149,7 +150,7 @@ def record_check(workflow: str, conclusion: str, run_id, checked_at: str, path=L
     return True
 
 
-def _same_observation(a: dict, b: dict) -> bool:
+def _same_observation(a: dict[str, object], b: dict[str, object]) -> bool:
     """True if two recorded check entries name the identical real moment.
 
     Task 541: `record_check`'s dedup used to compare entry dicts with a bare
@@ -177,7 +178,7 @@ def _same_observation(a: dict, b: dict) -> bool:
     return True
 
 
-def _workflow_entries(entries: list, workflow: str) -> list:
+def _workflow_entries(entries: list[dict[str, object]], workflow: str) -> list[dict[str, object]]:
     for e in entries:
         if e.get("_malformed"):
             raise CIWatchTamperedError(
@@ -189,7 +190,7 @@ def _workflow_entries(entries: list, workflow: str) -> list:
     return [e for e in entries if e.get("type") == "check" and e.get("workflow") == workflow]
 
 
-def current_streak(entries: list, workflow: str, conclusion: str = "failure") -> int:
+def current_streak(entries: list[dict[str, object]], workflow: str, conclusion: str = "failure") -> int:
     """Count consecutive trailing checks for `workflow` matching `conclusion`.
 
     Walks backward from the most recent check for this workflow and stops at
@@ -205,23 +206,23 @@ def current_streak(entries: list, workflow: str, conclusion: str = "failure") ->
     return count
 
 
-def streak_started_at(entries: list, workflow: str, conclusion: str = "failure"):
+def streak_started_at(entries: list[dict[str, object]], workflow: str, conclusion: str = "failure") -> str | None:
     """Timestamp of the oldest check in the current trailing streak, or None."""
     started = None
     for e in reversed(_workflow_entries(entries, workflow)):
         if e["conclusion"] != conclusion:
             break
         started = e["checked_at"]
-    return started
+    return cast("str | None", started)
 
 
-def last_check(entries: list, workflow: str):
+def last_check(entries: list[dict[str, object]], workflow: str) -> dict[str, object] | None:
     """The most recently recorded real check for `workflow`, or None."""
     w_entries = _workflow_entries(entries, workflow)
     return w_entries[-1] if w_entries else None
 
 
-def format_status_line(entries: list, workflow: str, conclusion: str = "failure") -> str:
+def format_status_line(entries: list[dict[str, object]], workflow: str, conclusion: str = "failure") -> str:
     last = last_check(entries, workflow)
     if last is None:
         return f"{workflow}: no checks recorded"

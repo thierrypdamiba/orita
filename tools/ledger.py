@@ -77,7 +77,7 @@ def verify() -> bool:
         if e.get("_malformed"):
             print(f"CHAIN BROKEN at seq {i}. The record has been touched.")
             return False
-        h = e.pop("hash")
+        h = cast(str, e.pop("hash"))
         if e["prev"] != prev or _hash(e, prev) != h:
             print(f"CHAIN BROKEN at seq {i}. The record has been touched.")
             return False
