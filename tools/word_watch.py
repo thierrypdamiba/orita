@@ -29,6 +29,7 @@ from __future__ import annotations
 import hashlib
 import os
 import sys
+from typing import cast
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import jsonl_append  # noqa: E402
@@ -50,14 +51,14 @@ def _file_digest(path: str) -> str:
         return hashlib.sha256(f.read()).hexdigest()
 
 
-def compute_word_state(root: str = ROOT) -> dict:
+def compute_word_state(root: str = ROOT) -> dict[str, object]:
     """Walk the four places Thierry's words land and fold them into a
     sorted {relpath: sha256} shape. Pure local filesystem read -- no
     network call, mirroring sync_checkout.sh's local-only boundary.
     A tracked path that doesn't exist yet contributes nothing (not an
     error) so a fresh fork with no DECREES/ yet still gets a valid,
     empty-honest state."""
-    files = {}
+    files: dict[str, str] = {}
     for tracked in TRACKED_PATHS:
         full = os.path.join(root, tracked)
         if os.path.isfile(full):
@@ -83,7 +84,7 @@ class WordWatchTamperedError(RuntimeError):
     the log before the next real check/record."""
 
 
-def _entries(path=LOG):
+def _entries(path: str = LOG) -> list[dict[str, object]]:
     """Delegates to jsonl_read.read_jsonl_entries (task 540) -- see
     that module's own docstring for the fourteen-copy history this
     replaced."""
@@ -96,7 +97,7 @@ def _entries(path=LOG):
 _append = jsonl_append.append_jsonl
 
 
-def last_word_state(path: str = LOG):
+def last_word_state(path: str = LOG) -> dict[str, object] | None:
     """The most recently recorded real word check, or None.
 
     Raises WordWatchTamperedError if the log's last line isn't valid
@@ -115,7 +116,7 @@ def last_word_state(path: str = LOG):
     return entries[-1]
 
 
-def record_word_check(state: dict, checked_at: str, path: str = LOG) -> bool:
+def record_word_check(state: dict[str, object], checked_at: str, path: str = LOG) -> bool:
     """Append one real observed word state. Never edits or removes a prior
     line.
 
@@ -144,7 +145,7 @@ def record_word_check(state: dict, checked_at: str, path: str = LOG) -> bool:
     return True
 
 
-def word_delta(state: dict, path: str = LOG):
+def word_delta(state: dict[str, object], path: str = LOG) -> tuple[bool, str]:
     """Whether this hour's real filesystem read differs from the last
     recorded check. Returns (changed: bool, reason: str). No prior check
     recorded: due (first check). A tracked file added, removed, or its
@@ -154,8 +155,8 @@ def word_delta(state: dict, path: str = LOG):
     last = last_word_state(path)
     if last is None:
         return True, "no prior word check recorded -- due"
-    prev_files = last["files"]
-    cur_files = state["files"]
+    prev_files = cast("dict[str, str]", last["files"])
+    cur_files = cast("dict[str, str]", state["files"])
     added = sorted(set(cur_files) - set(prev_files))
     removed = sorted(set(prev_files) - set(cur_files))
     changed_content = sorted(
@@ -170,7 +171,7 @@ def word_delta(state: dict, path: str = LOG):
     return False, f"unchanged since {last['checked_at']}"
 
 
-def main(argv):
+def main(argv: list[str]) -> int:
     if len(argv) < 2:
         print(__doc__)
         return 1
@@ -185,10 +186,11 @@ def main(argv):
             print("usage: record <checked_at>")
             return 1
         wrote = record_word_check(state, argv[2])
+        n_files = len(cast("dict[str, str]", state["files"]))
         if wrote:
-            print(f"recorded: {len(state['files'])} tracked file(s)")
+            print(f"recorded: {n_files} tracked file(s)")
         else:
-            print(f"no-op (unchanged since last recorded check): {len(state['files'])} tracked file(s)")
+            print(f"no-op (unchanged since last recorded check): {n_files} tracked file(s)")
         return 0
     print(f"unknown command: {cmd!r}")
     return 1

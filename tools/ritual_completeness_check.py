@@ -311,6 +311,7 @@ import ast
 import os
 import re
 import sys
+from typing import cast
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DEFAULT_RITUAL_CHECK_PATH = os.path.join(ROOT, "tools", "ritual_check.py")
@@ -427,7 +428,7 @@ def _find_function(tree: ast.Module, name: str) -> ast.FunctionDef | None:
     return None
 
 
-def _check_function_names(tree: ast.Module) -> set:
+def _check_function_names(tree: ast.Module) -> set[str]:
     return {
         node.name
         for node in tree.body
@@ -435,13 +436,13 @@ def _check_function_names(tree: ast.Module) -> set:
     }
 
 
-def _called_functions(func: ast.FunctionDef, wanted: set) -> dict:
+def _called_functions(func: ast.FunctionDef, wanted: set[str]) -> dict[str, str]:
     """{function_name: assigned_variable_name} for every `var =
     check_x(...)` assignment anywhere inside `func`'s own body -- walked,
     not just top-level statements, since `run_ritual_check` calls some
     checks (e.g. `check_vault_leak`) conditionally inside an `if`/`else`
     branch rather than unconditionally at the top level."""
-    called = {}
+    called: dict[str, str] = {}
     for stmt in ast.walk(func):
         if not isinstance(stmt, ast.Assign):
             continue
@@ -456,12 +457,12 @@ def _called_functions(func: ast.FunctionDef, wanted: set) -> dict:
     return called
 
 
-def _return_dict(func: ast.FunctionDef) -> dict:
+def _return_dict(func: ast.FunctionDef) -> dict[str, str | None]:
     """{dict_key: variable_name_or_None} for the dict literal in the last
     top-level `return {...}` inside `func`'s own body. Non-Name values
     (e.g. a literal or expression) map to None -- nothing to cross-check
     a variable against, but still a real key."""
-    result = {}
+    result: dict[str, str | None] = {}
     for stmt in func.body:
         if isinstance(stmt, ast.Return) and isinstance(stmt.value, ast.Dict):
             for key_node, val_node in zip(stmt.value.keys, stmt.value.values, strict=True):
@@ -471,12 +472,12 @@ def _return_dict(func: ast.FunctionDef) -> dict:
     return result
 
 
-def _printed_keys(func: ast.FunctionDef) -> set:
+def _printed_keys(func: ast.FunctionDef) -> set[str]:
     """Every string key subscripted off a variable literally named
     `result` anywhere inside `func` (loops, branches, comprehensions --
     walked, not just top-level statements, since format_ritual_check
     reads `result[...]` inside for-loops and if/else branches)."""
-    keys = set()
+    keys: set[str] = set()
     for node in ast.walk(func):
         if (
             isinstance(node, ast.Subscript)
@@ -491,7 +492,7 @@ def _printed_keys(func: ast.FunctionDef) -> set:
 
 def find_unwired_tool_files(
     tools_dir: str | None = None, ritual_check_path: str | None = None
-) -> list:
+) -> list[str]:
     """Every tools/*.py file whose basename never appears as a quoted
     string literal in ritual_check.py's own source (the same shape every
     real `_load(..., os.path.join(ROOT, "tools", "<name>.py"))` call site
@@ -544,7 +545,7 @@ def _defines_strategy_md_constant(path: str) -> bool:
 
 def find_unwired_strategy_audit_modules(
     seam_engine_dir: str | None = None, ritual_check_path: str | None = None
-) -> list:
+) -> list[str]:
     """Every fencepost/seam_engine/src/seam_engine/*.py file that defines a
     live STRATEGY_MD constant (`_defines_strategy_md_constant`) and whose
     bare module stem (e.g. "strategy_audit_target", the name it is
@@ -587,7 +588,7 @@ def compute_ritual_completeness(
     source_path: str | None = None,
     tools_dir: str | None = None,
     seam_engine_dir: str | None = None,
-) -> dict:
+) -> dict[str, object]:
     source_path = source_path or DEFAULT_RITUAL_CHECK_PATH
     with open(source_path, encoding="utf-8") as f:
         tree = ast.parse(f.read(), filename=source_path)
@@ -644,22 +645,22 @@ def compute_ritual_completeness(
     }
 
 
-def format_ritual_completeness(result: dict) -> str:
+def format_ritual_completeness(result: dict[str, object]) -> str:
     if result["clean"]:
         return "ritual completeness: clean (every check_* function is called, returned, and printed; every tools/*.py file is wired or exempt)"
     parts = []
     if result["missing_from_run"]:
-        parts.append(f"never called in {RUN_FUNC_NAME}: {', '.join(result['missing_from_run'])}")
+        parts.append(f"never called in {RUN_FUNC_NAME}: {', '.join(cast('list[str]', result['missing_from_run']))}")
     if result["missing_from_dict"]:
-        parts.append(f"called but dropped from the return dict: {', '.join(result['missing_from_dict'])}")
+        parts.append(f"called but dropped from the return dict: {', '.join(cast('list[str]', result['missing_from_dict']))}")
     if result["missing_from_format"]:
-        parts.append(f"returned but never printed in {FORMAT_FUNC_NAME}: {', '.join(result['missing_from_format'])}")
+        parts.append(f"returned but never printed in {FORMAT_FUNC_NAME}: {', '.join(cast('list[str]', result['missing_from_format']))}")
     if result.get("unwired_tool_files"):
-        parts.append(f"tools/*.py never loaded from {RUN_FUNC_NAME} and not exempt: {', '.join(result['unwired_tool_files'])}")
+        parts.append(f"tools/*.py never loaded from {RUN_FUNC_NAME} and not exempt: {', '.join(cast('list[str]', result['unwired_tool_files']))}")
     if result.get("unwired_strategy_audit_modules"):
         parts.append(
             "seam_engine/*.py STRATEGY.md cross-check module(s) never referenced in "
-            f"{RUN_FUNC_NAME} and not exempt: {', '.join(result['unwired_strategy_audit_modules'])}"
+            f"{RUN_FUNC_NAME} and not exempt: {', '.join(cast('list[str]', result['unwired_strategy_audit_modules']))}"
         )
     return "ritual completeness: BROKEN -- " + "; ".join(parts)
 

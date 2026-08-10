@@ -59,6 +59,7 @@ import os
 import shutil
 import subprocess
 import sys
+from typing import Any, cast
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DEFAULT_BADGE_PATH = os.path.join(ROOT, "fencepost", "BADGE.json")
@@ -83,7 +84,7 @@ _LIVE_BADGE_SCRIPT = (
 _COMPUTE_FRESH = object()
 
 
-def _seam_badge():
+def _seam_badge() -> Any:
     """Import the real `seam_engine.badge` module, the same `sys.path`
     convention `tools/ritual_check.py`'s own `_seam_ledger()` already uses
     to reach into the engine's `src/` layout from outside it."""
@@ -97,7 +98,7 @@ def _seam_badge():
 
 def _live_badge_state_via_uv(
     seam_engine_dir: str = SEAM_ENGINE_DIR, timeout: float = DEFAULT_UV_TIMEOUT
-) -> dict | None:
+) -> dict[str, str] | None:
     """Fall back to the `fencepost/seam_engine` `uv` venv itself, the one
     place `arcade-mcp-server` is actually installed, when a bare in-process
     import can't reach it. Returns `None` on any of: no `uv` on PATH, the
@@ -131,7 +132,7 @@ def _live_badge_state_via_uv(
     return {"color": payload["color"], "message": payload["message"]}
 
 
-def live_badge_state() -> dict | None:
+def live_badge_state() -> dict[str, str] | None:
     """Recompute the badge fresh -- the identical live introspection
     `seam_engine.badge.compute_badge_state()` performs -- reduced to the
     same `{color, message}` shape `fencepost/BADGE.json` holds on disk.
@@ -150,37 +151,43 @@ def live_badge_state() -> dict | None:
     return {"color": state.color, "message": state.message}
 
 
-def check_badge_freshness(badge_path: str = DEFAULT_BADGE_PATH, live=_COMPUTE_FRESH) -> dict:
+def check_badge_freshness(
+    badge_path: str = DEFAULT_BADGE_PATH, live: object = _COMPUTE_FRESH
+) -> dict[str, object]:
     """Compares the committed `fencepost/BADGE.json` against a fresh live
     recomputation. `live` defaults to computing it now via
     `live_badge_state()`; pass an explicit dict (or `None`, meaning
     "treat as unavailable") to control the comparison directly -- the same
     dependency-injection seam every other doctrine check in this repo
     holds for its own live-vs-committed comparison."""
+    live_state: dict[str, str] | None
     if live is _COMPUTE_FRESH:
-        live = live_badge_state()
+        live_state = live_badge_state()
+    else:
+        live_state = cast("dict[str, str] | None", live)
 
     with open(badge_path, encoding="utf-8") as f:
         committed = json.load(f)
     committed_view = {"color": committed.get("color"), "message": committed.get("message")}
 
-    if live is None:
+    if live_state is None:
         return {"clean": True, "status": "unavailable", "committed": committed_view, "live": None}
 
-    agree = committed_view == live
+    agree = committed_view == live_state
     return {
         "clean": agree,
         "status": "current" if agree else "STALE",
         "committed": committed_view,
-        "live": live,
+        "live": live_state,
     }
 
 
-def format_badge_freshness(result: dict) -> str:
+def format_badge_freshness(result: dict[str, object]) -> str:
     if result["status"] == "unavailable":
         return "badge freshness: clean (live recompute unavailable in this environment, nothing to cross-check)"
     if result["clean"]:
-        return f"badge freshness: clean (fencepost/BADGE.json matches a fresh live recompute: {result['committed']['message']!r})"
+        committed = cast("dict[str, str]", result["committed"])
+        return f"badge freshness: clean (fencepost/BADGE.json matches a fresh live recompute: {committed['message']!r})"
     return (
         f"badge freshness: STALE -- fencepost/BADGE.json says {result['committed']!r}, "
         f"a fresh live recompute says {result['live']!r} -- Ogun's oath badge is misreporting live, escalate now"
