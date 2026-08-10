@@ -1292,6 +1292,30 @@ a milestone number that does not exist right now will not spontaneously
 start existing later, so there is no grace period that means anything
 here.
 
+[`RECIPES/issue-assignee-never-opened-pr/`](RECIPES/issue-assignee-never-opened-pr/)
+is the seventy-seventh (ROADMAP.md #652): the first recipe to read
+`assignees`, GitHub's own structured, private "you specifically are on
+the hook" field, confirmed by grep to be untouched by any of the
+seventy-six recipes before it. The seam: an open issue names at least one
+assignee, but none of them has ever opened a pull request that closes the
+issue via a real GitHub closing keyword — someone else's PR closing it,
+or the assignee's own PR closing a different issue, both leave this open.
+Genuinely distinct from `good-first-issue-never-referenced`, the closest
+sibling: that recipe asks whether ANY PR from ANYONE ever referenced the
+issue, pure existence with no identity check; this one requires the
+closing PR's own author to be one of the issue's own named assignees.
+Also distinct from `merged-pr-requested-reviewer-never-reviewed`, the
+only other recipe matching identity between two people-fields — that one
+stays entirely inside one pull request's own record
+(`requested_reviewers` against that PR's own review comments); this one
+crosses object types, an issue's own assignee field against a different
+object's (a pull request) authorship. Confidence is age-gated on the
+issue's own `created_at` (24-hour bar, shorter than the label family's
+168-hour one — a direct ask of one named person is a faster human cadence
+than a public invitation waiting for a stranger). Both scopes
+(`ListIssues`, `ListPullRequests`) already sat on `SCOPES.md`'s cleared
+oath table — no new door opened.
+
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)
 (ROADMAP.md #111) is that second promise, kept: it runs `scan.py`'s own

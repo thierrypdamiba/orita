@@ -562,7 +562,7 @@ _CARDINAL_WORDS = {
     "sixty-five": 65, "sixty-six": 66, "sixty-seven": 67, "sixty-eight": 68,
     "sixty-nine": 69, "seventy": 70, "seventy-one": 71, "seventy-two": 72,
     "seventy-three": 73, "seventy-four": 74, "seventy-five": 75,
-    "seventy-six": 76,
+    "seventy-six": 76, "seventy-seven": 77,
 }
 
 _PLUS_JOINED_CLAIM_RE = re.compile(
@@ -614,9 +614,9 @@ def test_plus_joined_claim_missing_sentence_raises():
         claimed_plus_joined_counts("Nothing here about plus-joined toolkits.")
 
 
-def test_real_plus_joined_counts_are_currently_twenty_three_of_seventy_six():
-    # Regression pin: today's real, live counts under RECIPES/. Was (23, 75)
-    # until commit-claims-dangling-milestone merged (the seventy-sixth real
+def test_real_plus_joined_counts_are_currently_twenty_three_of_seventy_seven():
+    # Regression pin: today's real, live counts under RECIPES/. Was (23, 76)
+    # until issue-assignee-never-opened-pr merged (the seventy-seventh real
     # recipe, toolkit "github" -- not plus-joined, so only the total climbs
     # this time, unlike slack-message-dangling-reference's own merge, which
     # moved both halves together). `real_plus_joined_counts` counts every
@@ -625,7 +625,7 @@ def test_real_plus_joined_counts_are_currently_twenty_three_of_seventy_six():
     # plus-joined half untouched. Verified against the live tree, not
     # assumed from a prior task's own note: every one of today's
     # plus-joined recipes was grepped by hand before pinning this number.
-    assert real_plus_joined_counts(FENCEPOST_ROOT) == (23, 76)
+    assert real_plus_joined_counts(FENCEPOST_ROOT) == (23, 77)
 
 
 def test_oath_scopes_for_toolkit_docstring_matches_the_real_live_counts():

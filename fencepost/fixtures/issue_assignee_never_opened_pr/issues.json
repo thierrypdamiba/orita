@@ -1,0 +1,50 @@
+[
+  {
+    "number": 801,
+    "title": "Fix the flaky ledger hash-chain verifier under load",
+    "state": "open",
+    "assignees": ["mortal-contributor-a"],
+    "created_at": "2026-08-05T09:00:00Z",
+    "url": "https://github.com/example/example-repo/issues/801"
+  },
+  {
+    "number": 802,
+    "title": "Document the ranking module's separation margin",
+    "state": "open",
+    "assignees": ["mortal-contributor-b"],
+    "created_at": "2026-08-10T10:00:00Z",
+    "url": "https://github.com/example/example-repo/issues/802"
+  },
+  {
+    "number": 803,
+    "title": "Add a dark-mode toggle to the site header",
+    "state": "open",
+    "assignees": ["mortal-contributor-c"],
+    "created_at": "2026-07-20T08:00:00Z",
+    "url": "https://github.com/example/example-repo/issues/803"
+  },
+  {
+    "number": 804,
+    "title": "Refactor the internal ledger hash chain",
+    "state": "closed",
+    "assignees": ["mortal-contributor-d"],
+    "created_at": "2026-07-01T08:00:00Z",
+    "url": "https://github.com/example/example-repo/issues/804"
+  },
+  {
+    "number": 805,
+    "title": "Write a seam recipe for the milestone-description family",
+    "state": "open",
+    "assignees": [],
+    "created_at": "2026-07-15T08:00:00Z",
+    "url": "https://github.com/example/example-repo/issues/805"
+  },
+  {
+    "number": 806,
+    "title": "Two hands on one gap: assignee split across a real attempt and a bystander PR",
+    "state": "open",
+    "assignees": ["mortal-contributor-e", "mortal-contributor-f"],
+    "created_at": "2026-08-10T09:00:00Z",
+    "url": "https://github.com/example/example-repo/issues/806"
+  }
+]
