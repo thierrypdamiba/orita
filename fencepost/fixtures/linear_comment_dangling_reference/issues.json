@@ -1,0 +1,14 @@
+[
+  {
+    "number": 4210,
+    "title": "Nightly ledger verify job intermittently slow",
+    "state": "open",
+    "url": "https://github.com/thierrypdamiba/orita/issues/4210"
+  },
+  {
+    "number": 4211,
+    "title": "Journal numbering off by one after archive split",
+    "state": "closed",
+    "url": "https://github.com/thierrypdamiba/orita/issues/4211"
+  }
+]

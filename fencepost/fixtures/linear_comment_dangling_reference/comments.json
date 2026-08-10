@@ -1,0 +1,42 @@
+[
+  {
+    "id": "LIN-C-9001",
+    "issue_identifier": "ENG-190",
+    "author": "town-crier",
+    "text": "picking this back up -- root cause is the same shape as #4299, worth reading first",
+    "ts": "2026-08-05T10:00:00Z",
+    "url": "https://linear.app/orita-town/issue/ENG-190#comment-9001a"
+  },
+  {
+    "id": "LIN-C-9002",
+    "issue_identifier": "ENG-204",
+    "author": "quiet-shipper",
+    "text": "blocked on #4298 landing first, will retest after",
+    "ts": "2026-08-10T09:00:00Z",
+    "url": "https://linear.app/orita-town/issue/ENG-204#comment-9002a"
+  },
+  {
+    "id": "LIN-C-9003",
+    "issue_identifier": "ENG-77",
+    "author": "helpful-mod",
+    "text": "same slowness already tracked in #4210, no need for a second thread",
+    "ts": "2026-08-05T11:00:00Z",
+    "url": "https://linear.app/orita-town/issue/ENG-77#comment-9003a"
+  },
+  {
+    "id": "LIN-C-9004",
+    "issue_identifier": "ENG-101",
+    "author": "quiet-watcher",
+    "text": "the fix for this actually landed in #4220 last week",
+    "ts": "2026-08-05T12:00:00Z",
+    "url": "https://linear.app/orita-town/issue/ENG-101#comment-9004a"
+  },
+  {
+    "id": "LIN-C-9005",
+    "issue_identifier": "ENG-142",
+    "author": "confused-newcomer",
+    "text": "thanks for the context, makes sense now",
+    "ts": "2026-08-05T13:00:00Z",
+    "url": "https://linear.app/orita-town/issue/ENG-142#comment-9005a"
+  }
+]

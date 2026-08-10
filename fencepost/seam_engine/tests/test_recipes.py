@@ -561,7 +561,7 @@ _CARDINAL_WORDS = {
     "sixty-one": 61, "sixty-two": 62, "sixty-three": 63, "sixty-four": 64,
     "sixty-five": 65, "sixty-six": 66, "sixty-seven": 67, "sixty-eight": 68,
     "sixty-nine": 69, "seventy": 70, "seventy-one": 71, "seventy-two": 72,
-    "seventy-three": 73,
+    "seventy-three": 73, "seventy-four": 74,
 }
 
 _PLUS_JOINED_CLAIM_RE = re.compile(
@@ -613,20 +613,21 @@ def test_plus_joined_claim_missing_sentence_raises():
         claimed_plus_joined_counts("Nothing here about plus-joined toolkits.")
 
 
-def test_real_plus_joined_counts_are_currently_twenty_one_of_seventy_three():
-    # Regression pin: today's real, live counts under RECIPES/. Was (21, 72)
-    # until commit-claims-unmerged-pr merged (the seventy-third real
-    # recipe, toolkit "github" -- not plus-joined, so the plus count holds
-    # at 21 while the total climbs to 73). `real_plus_joined_counts`
-    # counts every recipe whose OWN toolkit string contains "+" -- not
-    # distinct toolkit-pair strings -- so a second (or third) recipe
+def test_real_plus_joined_counts_are_currently_twenty_two_of_seventy_four():
+    # Regression pin: today's real, live counts under RECIPES/. Was (21, 73)
+    # until linear-comment-dangling-reference merged (the seventy-fourth
+    # real recipe, toolkit "linear+github" -- plus-joined, so both halves
+    # climb together this time, unlike commit-claims-unmerged-pr's own
+    # merge which only grew the total). `real_plus_joined_counts` counts
+    # every recipe whose OWN toolkit string contains "+" -- not distinct
+    # toolkit-pair strings -- so a second (or third, or fourth) recipe
     # reusing an already-named pair still increments this count, the same
-    # way linear-comment-claims-unmerged-pr's own merge (task 603, reusing
-    # "linear+github") grew both halves together. Verified against the
+    # way linear-comment-dangling-reference's own merge reuses
+    # "linear+github" rather than naming a new pair. Verified against the
     # live tree, not assumed from a prior task's own note: every one of
     # today's plus-joined recipes was grepped by hand before pinning this
     # number.
-    assert real_plus_joined_counts(FENCEPOST_ROOT) == (21, 73)
+    assert real_plus_joined_counts(FENCEPOST_ROOT) == (22, 74)
 
 
 def test_oath_scopes_for_toolkit_docstring_matches_the_real_live_counts():

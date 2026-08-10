@@ -73,7 +73,7 @@ _ORDINAL_WORDS = {
     "sixty-first": 61, "sixty-second": 62, "sixty-third": 63, "sixty-fourth": 64,
     "sixty-fifth": 65, "sixty-sixth": 66, "sixty-seventh": 67,
     "sixty-eighth": 68, "sixty-ninth": 69, "seventieth": 70, "seventy-first": 71,
-    "seventy-second": 72, "seventy-third": 73,
+    "seventy-second": 72, "seventy-third": 73, "seventy-fourth": 74,
 }
 
 # Matches right at the top of the docstring only (``re.match``, not
@@ -173,14 +173,15 @@ def test_all_claimed_ordinals_are_pairwise_distinct():
 
 
 def test_the_real_ordinal_claims_are_currently_clean():
-    """Regression pin against today's real, live tree: 73 real recipes,
-    the reference recipe unnumbered, the other 72 forming the unbroken
-    sequence 2..73 -- no duplicate, no gap. Was 72/71/2..72 until
-    commit-claims-unmerged-pr merged (the seventy-third real recipe)."""
+    """Regression pin against today's real, live tree: 74 real recipes,
+    the reference recipe unnumbered, the other 73 forming the unbroken
+    sequence 2..74 -- no duplicate, no gap. Was 73/72/2..73 until
+    linear-comment-dangling-reference merged (the seventy-fourth real
+    recipe)."""
     claims = live_ordinal_claims(FENCEPOST_ROOT)
     numbered = sorted(n for n in claims.values() if n is not None)
-    assert len(claims) == 73
-    assert numbered == list(range(2, 74))
+    assert len(claims) == 74
+    assert numbered == list(range(2, 75))
 
 
 def test_a_duplicate_ordinal_would_flip_this_check_red(tmp_path):
