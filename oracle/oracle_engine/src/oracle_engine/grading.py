@@ -26,7 +26,7 @@ from __future__ import annotations
 
 import json
 from types import ModuleType
-from typing import Any
+from typing import Any, cast
 
 from oracle_engine.prediction import PREDICTION_ACT, load_ledger_module
 
@@ -54,11 +54,11 @@ def validate_outcome(outcome: str) -> None:
         )
 
 
-def _chain_entries(ledger_module: ModuleType) -> list[dict]:
-    return ledger_module._entries()
+def _chain_entries(ledger_module: ModuleType) -> list[dict[str, object]]:
+    return cast(list[dict[str, object]], ledger_module._entries())
 
 
-def find_call(call_seq: Any, entries: list[dict]) -> dict:
+def find_call(call_seq: Any, entries: list[dict[str, object]]) -> dict[str, object]:
     """Locate the original prediction a grade would reference. Raises
     `GradingError` if `call_seq` does not point at a real, existing
     `predict` entry on the chain — a grade of nothing is not a grade."""
@@ -75,7 +75,7 @@ def find_call(call_seq: Any, entries: list[dict]) -> dict:
     raise GradingError(f"call_seq {call_seq} does not exist on the chain — cannot grade a non-existent call")
 
 
-def existing_grades(call_seq: int, entries: list[dict]) -> list[dict]:
+def existing_grades(call_seq: int, entries: list[dict[str, object]]) -> list[dict[str, object]]:
     """Every grade entry already sealed for this call_seq, oldest first.
 
     A `grade`-act entry whose `detail` is syntactically valid JSON but not a
@@ -88,12 +88,12 @@ def existing_grades(call_seq: int, entries: list[dict]) -> list[dict]:
     directly, unguarded, so a crash here crashes all of them -- this is the
     one root check that protects every leaf at once.
     """
-    out = []
+    out: list[dict[str, object]] = []
     for entry in entries:
         if entry.get("act") != GRADE_ACT:
             continue
         try:
-            payload = json.loads(entry["detail"])
+            payload = json.loads(cast(str, entry["detail"]))
         except (KeyError, json.JSONDecodeError):
             continue
         if not isinstance(payload, dict):
@@ -103,12 +103,12 @@ def existing_grades(call_seq: int, entries: list[dict]) -> list[dict]:
     return out
 
 
-def assert_not_already_terminal(call_seq: int, entries: list[dict]) -> None:
+def assert_not_already_terminal(call_seq: int, entries: list[dict[str, object]]) -> None:
     """Refuse to grade a call that already carries a terminal grade. This is
     the enforcement of Ogun's law: once a loss is sealed `incorrect`, no
     later grade for the same call_seq is permitted, terminal or not."""
     for prior in existing_grades(call_seq, entries):
-        prior_outcome = json.loads(prior["detail"]).get("outcome")
+        prior_outcome = json.loads(cast(str, prior["detail"])).get("outcome")
         if prior_outcome in TERMINAL_OUTCOMES:
             raise GradingError(
                 f"call_seq {call_seq} already has a terminal grade ({prior_outcome!r} "
@@ -116,7 +116,7 @@ def assert_not_already_terminal(call_seq: int, entries: list[dict]) -> None:
             )
 
 
-def grade_payload(call_seq: int, outcome: str) -> dict:
+def grade_payload(call_seq: int, outcome: str) -> dict[str, object]:
     """The sealed detail shape. Exactly two keys, sorted, no room to grow
     an edit-shaped field in by accident."""
     return {"call_seq": call_seq, "outcome": outcome}
@@ -128,7 +128,7 @@ def seal_grade(
     outcome: str,
     ts: str | None = None,
     ledger_module: ModuleType | None = None,
-) -> dict:
+) -> dict[str, object]:
     """Validate and seal a grade as the next entry on the town's chain.
 
     Raises `GradingError` before anything is written if: the actor is
@@ -151,10 +151,10 @@ def seal_grade(
     assert_not_already_terminal(call_seq, entries)
 
     detail = json.dumps(grade_payload(call_seq, outcome), sort_keys=True, ensure_ascii=False)
-    return mod.append(actor, GRADE_ACT, detail, ts)
+    return cast(dict[str, object], mod.append(actor, GRADE_ACT, detail, ts))
 
 
-def parse_grade_detail(detail: str) -> dict:
+def parse_grade_detail(detail: str) -> dict[str, object]:
     """Read a sealed grade's detail back out. Read-only — this function
     returns a fresh dict; mutating it does not touch the chain."""
     payload = json.loads(detail)
@@ -165,7 +165,7 @@ def parse_grade_detail(detail: str) -> dict:
     return dict(payload)
 
 
-def load_claim_payload(detail: str, error_cls: type[Exception]) -> dict:
+def load_claim_payload(detail: str, error_cls: type[Exception]) -> dict[str, object]:
     """Parse a `predict` entry's own `detail` (the claim payload a cadence
     module built, not a grade's) back into a dict, raising `error_cls` if it
     parses to anything other than a JSON object.

@@ -33,6 +33,7 @@ import datetime
 import json
 import re
 from types import ModuleType
+from typing import cast
 
 from oracle_engine import grading, time_utils
 from oracle_engine.cadence import (
@@ -73,26 +74,28 @@ def parse_cadence_claim(claim: str) -> tuple[datetime.datetime, int]:
 _parse_ts = time_utils.parse_ts
 
 
-def find_due_calls(entries: list[dict], now: datetime.datetime) -> list[dict]:
+def find_due_calls(
+    entries: list[dict[str, object]], now: datetime.datetime
+) -> list[dict[str, object]]:
     """Every `predict` entry, cadence-shaped, whose target has already
     passed and that carries no terminal grade yet. Skips (never raises on)
     entries that aren't cadence-shaped — this reader only ever touches the
     calls it knows how to score."""
-    due = []
+    due: list[dict[str, object]] = []
     for entry in entries:
         if entry.get("act") != PREDICTION_ACT:
             continue
         try:
-            payload = _load_claim_payload(entry["detail"])
-            target, _ = parse_cadence_claim(payload["claim"])
+            payload = _load_claim_payload(cast(str, entry["detail"]))
+            target, _ = parse_cadence_claim(cast(str, payload["claim"]))
         except (AutogradeError, KeyError, ValueError):
             continue
         if target > now:
             continue
-        prior_outcomes = []
-        for g in grading.existing_grades(entry["seq"], entries):
+        prior_outcomes: list[object] = []
+        for g in grading.existing_grades(cast(int, entry["seq"]), entries):
             try:
-                prior_outcomes.append(grading.parse_grade_detail(g["detail"])["outcome"])
+                prior_outcomes.append(grading.parse_grade_detail(cast(str, g["detail"]))["outcome"])
             except (grading.GradingError, KeyError, json.JSONDecodeError):
                 continue
         if any(o in grading.TERMINAL_OUTCOMES for o in prior_outcomes):
@@ -101,7 +104,7 @@ def find_due_calls(entries: list[dict], now: datetime.datetime) -> list[dict]:
     return due
 
 
-def _load_claim_payload(detail: str) -> dict:
+def _load_claim_payload(detail: str) -> dict[str, object]:
     """Thin wrapper around `grading.load_claim_payload` (this module's own
     default `error_cls`) — see that function's own docstring for the
     25-sibling consolidation this closes."""
@@ -109,17 +112,17 @@ def _load_claim_payload(detail: str) -> dict:
 
 
 def score_call(
-    entry: dict,
-    buildlog_entries: list[dict],
+    entry: dict[str, object],
+    buildlog_entries: list[dict[str, object]],
 ) -> str:
     """`correct` if the real BUILDLOG.md velocity between the call's own
     sealed timestamp and its stated target meets or beats the threshold it
     named, `incorrect` otherwise. Windowed on the call's OWN span, never on
     "now" — a call is scored against exactly the window it claimed, nothing
     wider or narrower."""
-    payload = _load_claim_payload(entry["detail"])
-    target, threshold = parse_cadence_claim(payload["claim"])
-    sealed_at = _parse_ts(entry["ts"])
+    payload = _load_claim_payload(cast(str, entry["detail"]))
+    target, threshold = parse_cadence_claim(cast(str, payload["claim"]))
+    sealed_at = _parse_ts(cast(str, entry["ts"]))
     window_hours = (target - sealed_at).total_seconds() / 3600.0
     actual = recent_task_velocity(buildlog_entries, now=target, window_hours=window_hours)
     return "correct" if actual >= threshold else "incorrect"
@@ -131,7 +134,7 @@ def autograde_due_predictions(
     actor: str = AUTOGRADE_ACTOR,
     buildlog_path: str = DEFAULT_BUILDLOG_PATH,
     ledger_module: ModuleType | None = None,
-) -> list[dict]:
+) -> list[dict[str, object]]:
     """Grade every due, ungraded cadence prediction on the live chain and
     seal each grade. Returns the sealed grade entries (empty if nothing was
     due — a quiet run is not an error). `now` and `ts` are always passed in
@@ -140,19 +143,19 @@ def autograde_due_predictions(
         raise AutogradeError("now must be timezone-aware")
 
     mod = ledger_module or load_ledger_module()
-    entries = mod._entries()
+    entries: list[dict[str, object]] = cast(list[dict[str, object]], mod._entries())
     due = find_due_calls(entries, now)
     if not due:
         return []
 
     buildlog_entries = load_buildlog_entries(buildlog_path)
-    sealed = []
+    sealed: list[dict[str, object]] = []
     for entry in due:
         outcome = score_call(entry, buildlog_entries)
         sealed.append(
             grading.seal_grade(
                 actor=actor,
-                call_seq=entry["seq"],
+                call_seq=cast(int, entry["seq"]),
                 outcome=outcome,
                 ts=ts,
                 ledger_module=mod,
@@ -160,7 +163,7 @@ def autograde_due_predictions(
         )
         # keep `entries` current so a second due call this run can't be
         # mis-scored against a chain that hasn't seen the prior seal yet
-        entries = mod._entries()
+        entries = cast(list[dict[str, object]], mod._entries())
     return sealed
 
 
