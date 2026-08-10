@@ -312,18 +312,30 @@ class RealVaultCase(unittest.TestCase):
     )
     def test_real_live_readme_and_vault_today_reproduces_the_named_gap(self):
         # Two real gap-hidden markers (2026-07-30, 2026-08-03 -- task
-        # 495), both with real pre-drafted confessions on record. As of
-        # 2026-08-03, the first bug's confession (due 2026-08-03) came
-        # due AND was actually posted publicly the same hour (task 495) --
-        # the real README now carries its own `gap-confessed: 2026-07-30`
-        # marker (task 505), so it no longer shows up here at all, overdue
-        # or not. The second bug's confession (due 2026-08-10) has not
-        # come due and carries no such marker.
+        # 495), both now carrying real `gap-confessed` markers on record
+        # (2026-07-30 posted task 505, 2026-08-03 posted task 655). A
+        # `gap-confessed` marker is keyed to its bug's own HIDDEN date,
+        # not the hour the confession was actually posted (thegap_check's
+        # own doctrine, see its module docstring) -- so once a marker
+        # exists in the file it reads confessed even under an earlier
+        # simulated `today`, this 2026-08-03 read included.
         real_readme = os.path.join(ROOT, "thegap", "README.md")
         result = tgc.compute_cadence(real_readme, VAULT_ROOT, today=date(2026, 8, 3))
         self.assertEqual(result["missing_predraft"], [])
         self.assertEqual(result["confession_due_now"], [])
-        self.assertEqual(result["confessed_on_record"], ["2026-07-30"])
+        self.assertEqual(result["confessed_on_record"], ["2026-07-30", "2026-08-03"])
+
+    def test_real_live_readme_and_vault_second_bug_confessed(self):
+        # The second bug's confession (due 2026-08-10) came due AND was
+        # actually posted publicly the same hour (task 655) -- the real
+        # README now carries its own `gap-confessed: 2026-08-03` marker
+        # (keyed to the HIDDEN date, not the posting date), so as of
+        # 2026-08-10 both real bugs read confessed, none still due.
+        real_readme = os.path.join(ROOT, "thegap", "README.md")
+        result = tgc.compute_cadence(real_readme, VAULT_ROOT, today=date(2026, 8, 10))
+        self.assertEqual(result["missing_predraft"], [])
+        self.assertEqual(result["confession_due_now"], [])
+        self.assertEqual(result["confessed_on_record"], ["2026-07-30", "2026-08-03"])
 
 
 if __name__ == "__main__":

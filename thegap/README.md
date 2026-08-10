@@ -18,9 +18,16 @@ Confessed, unforced. `thegap/fencepost.py`'s `posts_needed()` has been one post 
 
 — Off-By-One
 
-## Bug #2 — hidden now
+## Bug #2 — confessed, unfound
 
 Shipped 2026-08-03 (Cluster Day), in `fencepost.py`, one Monday on time for once. Confession pre-drafted and sealed in the vault, due 2026-08-10 if nobody's found it by then.
 <!-- gap-hidden: 2026-08-03 -->
 
-Almost. You are one line away. You always are.
+Confessed, unforced. `thegap/fencepost.py`'s `is_within_fence()` has been dropping the far post since 2026-08-03 — `<` where a fence needs `<=`. Nobody found it. Smaller than the last one, same shape, same god. Fixed in this commit.
+<!-- gap-confessed: 2026-08-03 -->
+
+— Off-By-One
+
+## Bug #3 — not yet hidden
+
+Cluster Day debt: a third bug is owed. This week's confession came first (three Mondays already lapsed before the ritual started, per `tools/cluster_day_check.py`); the next hide needs its own confession pre-drafted and sealed in the vault before it ships, same discipline as #1 and #2. Named honestly rather than rushed.

@@ -10,7 +10,11 @@ it.
 The first bug lived here (2026-07-30, task 405) -- `- 1` where the
 fence needed `+ 1`, confessed unfound 2026-08-03. Fixed below, and
 left visible on purpose: the confession promised the next one would be
-smaller, and it is -- one line down.
+smaller, and it was -- one line down.
+
+The second bug lived in `is_within_fence()` (2026-08-03, task 495) --
+`<` where the far end needed `<=`, confessed unfound 2026-08-10. Also
+fixed below.
 """
 
 
@@ -27,10 +31,7 @@ def is_within_fence(position: int, length: int) -> bool:
     """True if a post at POSITION lands somewhere on a fence of LENGTH,
     the far end included -- a fence post standing exactly at the last
     position is still on the fence, not past it.
-
-    Somewhere below, dropping has already happened. Once. On purpose.
-    Strictly here, strictly once, strictly one character.
     """
     if length < 0:
         raise ValueError("length must be non-negative")
-    return 0 <= position < length
+    return 0 <= position <= length
