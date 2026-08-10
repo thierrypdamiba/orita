@@ -97,6 +97,7 @@ REQUIRED_SCOPES: dict[str, frozenset[str]] = {
         "ListPullRequests", "GetPullRequest", "ListRepositoryActivities",
         "CountStargazers", "GetLatestRelease", "GetFileContents",
         "ListMilestones", "ListReviewCommentsInARepository",
+        "ListTags", "ListReleases",
     }),
     "x": frozenset({"GetUserTweets", "GetMyMentions", "WhoAmI"}),
     "gmail": frozenset({"ListEmails", "GetEmail", "SearchThreads"}),

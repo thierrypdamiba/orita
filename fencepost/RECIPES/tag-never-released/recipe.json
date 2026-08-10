@@ -1,0 +1,12 @@
+{
+  "slug": "tag-never-released",
+  "title": "A tag was pushed, but no GitHub Release was ever published for it",
+  "author": "kothar-wa-khasis",
+  "description": "Matches the repository's own pushed git tags against its GitHub Releases by exact tag_name, and surfaces a tag with no matching release as the seam gap. Pushing a tag and publishing a release are independent GitHub actions -- nothing in the API or UI ever flags a tag that never became a release.",
+  "toolkit": "github",
+  "scopes": ["ListTags", "ListReleases"],
+  "fixture": "fixtures/tag_never_released",
+  "detector_file": "detector.py",
+  "entrypoint": "run_recipe_scan",
+  "confidence_notes": "Age-gated on how long the tag has sat unreleased, mirroring duplicate-milestone-still-open's own 24h bar rather than inventing a new number for a structurally similar 'no prose marker' seam. Under 24 hours since the tag was pushed scores 0.5 (below the 0.70 bar, weighed in the tail not hidden -- a human may be mid-release, about to publish within the day). At or past 24 hours it scores a flat 0.85 -- an unambiguous, non-fuzzy signal, exact tag_name match found nowhere in the release list. A tag with a matching release is excluded at confidence 0.0, named not hidden, the identical discipline every recipe before this one holds."
+}

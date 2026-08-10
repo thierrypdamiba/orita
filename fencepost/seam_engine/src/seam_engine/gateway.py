@@ -46,7 +46,7 @@ from seam_engine.consent import REQUIRED_SCOPES
 # selects tools automatically — see docs.arcade.dev/en/guides/mcp-gateways.
 READ_ONLY_CAPABILITIES = (
     "Read-only seam reconciliation: list and read GitHub repository "
-    "metadata, commit history, releases, issues, pull requests, "
+    "metadata, commit history, releases, tags, issues, pull requests, "
     "repository activity, individual file contents, milestones, pull "
     "request review comments, and stargazer counts, and read a connected "
     "user's own X (Twitter) tweet history, mentions, and account identity "
@@ -76,6 +76,8 @@ _SCOPE_KEYWORDS: dict[str, dict[str, str]] = {
         "GetFileContents": "file contents",
         "ListMilestones": "milestone",
         "ListReviewCommentsInARepository": "review comments",
+        "ListTags": "tag",
+        "ListReleases": "release",
     },
     "x": {
         "GetUserTweets": "tweet history",

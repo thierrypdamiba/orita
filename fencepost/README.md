@@ -1316,6 +1316,32 @@ than a public invitation waiting for a stranger). Both scopes
 (`ListIssues`, `ListPullRequests`) already sat on `SCOPES.md`'s cleared
 oath table — no new door opened.
 
+[`RECIPES/tag-never-released/`](RECIPES/tag-never-released/) is the
+seventy-eighth (ROADMAP.md #653): the first recipe to read a git tag as
+its own object at all, confirmed by grep to be untouched by any of the
+seventy-seven recipes before it. The seam: a tag was pushed to the
+repository, but no GitHub Release was ever published for it — pushing a
+tag and publishing a release are independent GitHub actions, and nothing
+in the API or UI ever flags the gap between them. Genuinely distinct from
+`example-release-vs-changelog`, the reference recipe: that one starts
+from a Release that already exists and asks whether CHANGELOG.md caught
+up to it — one level downstream of this one, which starts at the raw tag
+and asks whether a Release was ever created for it at all. Also distinct
+from the `*-never-released` family (`merged-pr-never-released`,
+`milestone-closed-never-released`, `issue-closed-never-released`): those
+three read a Release's own body text for a later claim phrase about a
+different object; this one is a structural, no-prose-marker existence
+check — an exact `name`-to-`tag_name` match, the same "no keyword
+fuzziness to misfire on" shape `example-release-vs-changelog` already
+established. Confidence is age-gated on how long the tag has sat
+unreleased (24-hour bar, mirroring `duplicate-milestone-still-open`'s
+own). Neither scope (`ListTags`, `ListReleases`) sat on `SCOPES.md`'s
+cleared oath table before this recipe — both are added in the same
+commit, cleared on the oath's own naming check (matches the allowed
+`List*` prefix, names no forbidden write word), not yet exposed live on
+the-hand gateway (confirmed live against its real tool set the same hour
+this recipe shipped).
+
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)
 (ROADMAP.md #111) is that second promise, kept: it runs `scan.py`'s own

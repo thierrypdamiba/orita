@@ -12,12 +12,36 @@ Concretely, on the toolkits in use:
 
 | toolkit | Fencepost uses | Fencepost may NEVER use |
 |--|--|--|
-| GitHub | GetRepository, ListRepoCommits, ListIssues, GetIssue, ListPullRequests, GetPullRequest, ListRepositoryActivities, CountStargazers, GetLatestRelease, GetFileContents, ListMilestones, ListReviewCommentsInARepository | CreateFile, UpdateFileLines, CreateIssue, MergePullRequest, CreateRelease, ManageLabels |
+| GitHub | GetRepository, ListRepoCommits, ListIssues, GetIssue, ListPullRequests, GetPullRequest, ListRepositoryActivities, CountStargazers, GetLatestRelease, GetFileContents, ListMilestones, ListReviewCommentsInARepository, ListTags, ListReleases | CreateFile, UpdateFileLines, CreateIssue, MergePullRequest, CreateRelease, ManageLabels |
 | X | GetUserTweets, GetMyMentions, WhoAmI | PostTweet, ReplyToTweet |
 | Gmail (v0.2) | ListEmails, GetEmail, SearchThreads | SendEmail, CreateDraft*, Trash*, Modify* |
 | Google Calendar (v0.2) | ListEvents, GetEvent | CreateEvent, UpdateEvent, DeleteEvent |
 | Slack (proposed) | SearchChannelMessages | PostMessage, chat:write, UpdateMessage, DeleteMessage |
 | Linear (proposed) | SearchIssueComments | CreateComment, CreateIssue, UpdateIssue, DeleteIssue |
+
+**WIP note (ROADMAP.md #653), `RECIPES/tag-never-released/`:**
+the first recipe under `RECIPES/` to name `ListTags` or `ListReleases` at
+all -- neither scope sat on this table before this recipe. Both clear
+`seam_engine.recipes.validate_recipe`'s own two-part check the identical
+way every scope in this engine does: the allow-list (matches `List*`) and
+the deny-list (names no forbidden write word) -- `Create`, `Update`,
+`Delete`, and every other verb `SCOPES.md`'s oath forbids appear nowhere
+in either name. Checked live this hour by the orchestrating session
+against the-hand gateway's own real, currently-exposed GitHub tool set
+(`Github_GetRepository`, `Github_GetIssue`, `Github_ListIssues`,
+`Github_GetPullRequest`, `Github_ListPullRequests`,
+`Github_ListRepositoryActivities`, `Github_ListRepositoryLabels`,
+`Github_ListReviewCommentsInARepository`, `Github_ListStargazers`,
+`Github_CountStargazers`, `Github_GetFileContents`,
+`Github_ListOrgRepositories`, plus the write-shaped tools the oath
+already forbids): **no `Github_ListTags`, `Github_GetTag`,
+`Github_ListReleases`, or `Github_GetReleaseByTag`-shaped tool is exposed
+anywhere in the-hand's live MCP toolset today.** This is the identical
+"connected toolkit, scope cleared on the oath's own naming check, not yet
+wired into the gateway" shape the Slack and Linear notes below already
+carry for two other toolkits -- the day a live `ListTags`/`ListReleases`
+tool appears on the gateway, only the recipe's own two fixture loaders
+swap for real reads; the detector's own logic does not change one line.
 
 **WIP note (ROADMAP.md #599), `RECIPES/slack-message-claims-unfixed-issue/`:**
 the first recipe under `RECIPES/` to name a toolkit besides GitHub or X at

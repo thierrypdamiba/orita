@@ -1,0 +1,16 @@
+[
+  {
+    "tag_name": "v0.9.0",
+    "name": "v0.9.0 -- early preview",
+    "id": "rel_9001",
+    "published_at": "2026-05-01T11:30:00Z",
+    "url": "https://github.com/example/example-repo/releases/tag/v0.9.0"
+  },
+  {
+    "tag_name": "v1.0.0",
+    "name": "v1.0.0 -- first stable",
+    "id": "rel_9002",
+    "published_at": "2026-06-01T12:15:00Z",
+    "url": "https://github.com/example/example-repo/releases/tag/v1.0.0"
+  }
+]

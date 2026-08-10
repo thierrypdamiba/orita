@@ -196,12 +196,18 @@ def test_real_pre_task_152_string_would_have_failed_the_coverage_check():
     # the real historical gap, not a synthetic one. Checked against the
     # live REQUIRED_SCOPES (default), so GetFileContents -- added by task
     # 371, after this pre-152 string was written -- correctly shows up
-    # missing too: this string never named it either.
+    # missing too: this string never named it either. ListTags -- added by
+    # task 653, for tag-never-released -- shows up missing the same way:
+    # this pre-152 string predates it by months and never says "tag"
+    # anywhere. ListReleases (added the same task) does NOT show up missing
+    # here -- this string already says "releases" for GetLatestRelease's
+    # own sake, and "release" is ListReleases's keyword too; one shared
+    # word genuinely covers both tools, correctly, not a checker gap.
     missing = required_scopes_covered_by_capabilities(_PRE_TASK_152_CAPABILITIES)
     assert missing == {
         "github": [
             "CountStargazers", "GetFileContents", "GetRepository", "ListMilestones",
-            "ListRepositoryActivities", "ListReviewCommentsInARepository",
+            "ListRepositoryActivities", "ListReviewCommentsInARepository", "ListTags",
         ],
         "x": ["WhoAmI"],
     }

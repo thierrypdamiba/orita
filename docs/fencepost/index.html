@@ -70,7 +70,7 @@
     reviewed and merged like any PR. The read-only oath does not loosen for outside code:
     <a href="https://github.com/thierrypdamiba/orita/blob/main/fencepost/CONTRIBUTING.md">CONTRIBUTING.md</a>
     is the schema in prose, enforced in code before a human reviewer ever reads a stranger's
-    detector. Seventy-seven real recipes stand today:</p>
+    detector. Seventy-eight real recipes stand today:</p>
     <p><b><a href="https://github.com/thierrypdamiba/orita/tree/main/fencepost/RECIPES/example-release-vs-changelog">example-release-vs-changelog</a></b>
     — the reference: proof a first external recipe PR is mergeable at all.<br>
     <b><a href="https://github.com/thierrypdamiba/orita/tree/main/fencepost/RECIPES/merged-pr-issue-still-open">merged-pr-issue-still-open</a></b>
@@ -658,6 +658,23 @@
     Confidence is age-gated on the issue's own <code>created_at</code> (24-hour bar, shorter than the
     label family's 168-hour one). Both scopes already sat on <code>SCOPES.md</code>'s cleared oath
     table — no new door opened.</p>
+    <p><b><a href="https://github.com/thierrypdamiba/orita/tree/main/fencepost/RECIPES/tag-never-released">tag-never-released</a></b>
+    — the seventy-eighth, and the first recipe to read a git tag as its own object at all —
+    confirmed by grep to be untouched by any of the seventy-seven recipes before it. The seam: a tag
+    was pushed to the repository, but no GitHub Release was ever published for it — pushing a tag and
+    publishing a release are independent GitHub actions, and nothing in the API or UI ever flags the
+    gap between them. Distinct from <code>example-release-vs-changelog</code>, the reference recipe:
+    that one starts from a Release that already exists and asks whether CHANGELOG.md caught up to it —
+    one level downstream of this one, which starts at the raw tag and asks whether a Release was ever
+    created for it at all. Distinct too from the <code>*-never-released</code> family
+    (<code>merged-pr-never-released</code>, <code>milestone-closed-never-released</code>,
+    <code>issue-closed-never-released</code>): those read a Release's own body text for a later claim
+    phrase about a different object; this one is a structural, no-prose-marker existence check, an
+    exact <code>name</code>-to-<code>tag_name</code> match. Confidence is age-gated on how long the tag
+    has sat unreleased (24-hour bar, mirroring <code>duplicate-milestone-still-open</code>'s own).
+    Neither scope (<code>ListTags</code>, <code>ListReleases</code>) sat on <code>SCOPES.md</code>'s
+    cleared oath table before this recipe — both are added in the same commit, cleared on the oath's
+    own naming check, not yet exposed live on the-hand gateway.</p>
     <p>Merging a recipe is one promise; letting it actually compete for the daily primary gap
     is another. <a href="https://github.com/thierrypdamiba/orita/blob/main/fencepost/seam_engine/src/seam_engine/combined_scan.py"><code>combined_scan.py</code></a>
     keeps the second: it pools a recipe's own candidates with <code>scan.py</code>'s, and ranks
