@@ -45,6 +45,7 @@ from __future__ import annotations
 import json
 import os
 import sys
+from typing import cast
 
 sys.path.insert(
     0,
@@ -62,7 +63,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 LOG = os.path.join(ROOT, "HAND", "consent-grants-log.jsonl")
 
 
-def _entries(path: str = LOG) -> list:
+def _entries(path: str = LOG) -> list[dict[str, object]]:
     """Every real recorded grant, oldest first. Delegates to
     jsonl_read.read_jsonl_entries (task 540) -- see that module's own
     docstring for the fourteen-copy history this replaced.
@@ -75,10 +76,10 @@ def record_grant(
     human: str,
     toolkit: str,
     issue_url: str,
-    confirmed_scopes: frozenset,
+    confirmed_scopes: "frozenset[str]",
     recorded_at: str,
     path: str = LOG,
-) -> dict:
+) -> dict[str, object]:
     """Durably record ONE real, already-gated consent grant.
 
     Re-runs `enforce_consent_gate` itself before writing a single byte --
@@ -95,7 +96,7 @@ def record_grant(
         confirmed_scopes=confirmed_scopes,
     )
     enforce_consent_gate(record, toolkit=toolkit)  # raises if either lock fails; writes nothing
-    entry = {
+    entry: dict[str, object] = {
         "human": human,
         "toolkit": toolkit,
         "issue_url": issue_url,
@@ -121,7 +122,7 @@ class ConsentLogTamperedError(RuntimeError):
     fixes already refuse to take."""
 
 
-def distinct_toolkits(entries: list) -> set:
+def distinct_toolkits(entries: list[dict[str, object]]) -> set[str]:
     """The set of distinct toolkit names across every real recorded
     grant -- never a count of grants themselves (one human confirming
     both Gmail and Calendar is two toolkits, not two "users").
@@ -136,7 +137,7 @@ def distinct_toolkits(entries: list) -> set:
             "silently undercounting STRATEGY.md's toolkit metric. Repair the log "
             f"by hand, then re-run. First error: {malformed[0]['_error']}"
         )
-    return {e["toolkit"] for e in entries}
+    return {cast(str, e["toolkit"]) for e in entries}
 
 
 def real_distinct_toolkit_count(path: str = LOG) -> int:
@@ -147,7 +148,7 @@ def real_distinct_toolkit_count(path: str = LOG) -> int:
     return len(distinct_toolkits(_entries(path)))
 
 
-def distinct_humans(entries: list) -> set:
+def distinct_humans(entries: list[dict[str, object]]) -> set[str]:
     """The set of distinct human identities across every real recorded
     grant -- never a count of grants themselves (one human confirming
     both Gmail and Calendar is still ONE connected user, not two).
@@ -168,7 +169,7 @@ def distinct_humans(entries: list) -> set:
             "silently undercounting STRATEGY.md's connected-users metric. Repair "
             f"the log by hand, then re-run. First error: {malformed[0]['_error']}"
         )
-    return {e["human"] for e in entries}
+    return {cast(str, e["human"]) for e in entries}
 
 
 def real_distinct_human_count(path: str = LOG) -> int:

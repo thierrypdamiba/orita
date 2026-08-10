@@ -87,7 +87,7 @@ class GitHubStarsTamperedError(RuntimeError):
     then repair the log before the next real check/record."""
 
 
-def _entries(path=LOG):
+def _entries(path: str = LOG) -> list[dict[str, object]]:
     """Delegates to jsonl_read.read_jsonl_entries (task 540) -- see
     that module's own docstring for the fourteen-copy history this
     replaced."""
@@ -100,7 +100,7 @@ def _entries(path=LOG):
 _append = jsonl_append.append_jsonl
 
 
-def record_check(count: int, checked_at: str, path=LOG) -> bool:
+def record_check(count: int, checked_at: str, path: str = LOG) -> bool:
     """Append one real observed live star count. Never edits or removes a
     prior line.
 
@@ -136,7 +136,7 @@ def record_check(count: int, checked_at: str, path=LOG) -> bool:
     return True
 
 
-def last_check(path=LOG):
+def last_check(path: str = LOG) -> dict[str, object] | None:
     """The most recently recorded real live star count, or None.
 
     Raises GitHubStarsTamperedError if the log's last line isn't valid
@@ -162,7 +162,9 @@ def last_check(path=LOG):
 _last_metrics_entry = metrics_reader.last_metrics_entry
 
 
-def check_github_stars(metrics_path: str = DEFAULT_METRICS_PATH, log_path: str = LOG) -> dict:
+def check_github_stars(
+    metrics_path: str = DEFAULT_METRICS_PATH, log_path: str = LOG
+) -> dict[str, object]:
     """Cross-check the last recorded `github_stars` reading in
     `records/metrics.jsonl` against the last recorded LIVE star count in
     `HAND/github-stars-log.jsonl`. Returns `clean: True` when the two
@@ -196,7 +198,7 @@ def check_github_stars(metrics_path: str = DEFAULT_METRICS_PATH, log_path: str =
     return {"clean": claimed == real, "real": real, "claimed": claimed, "claimed_date": claimed_date}
 
 
-def format_result(result: dict) -> str:
+def format_result(result: dict[str, object]) -> str:
     if result["claimed"] is None:
         if result["claimed_date"] is None:
             if result["real"] is None:

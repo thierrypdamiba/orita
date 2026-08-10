@@ -34,11 +34,12 @@ from __future__ import annotations
 
 import json
 import sys
+from typing import cast
 
 GOOD_FIRST_ISSUE_LABEL = "good first issue"
 
 
-def compute_good_first_issue_state(open_issues: list) -> dict:
+def compute_good_first_issue_state(open_issues: list[dict[str, object]]) -> dict[str, object]:
     """Pure function: which open issues carry the `good first issue` label.
 
     `open_issues` is a list of dicts, each carrying at least `number` and
@@ -51,17 +52,17 @@ def compute_good_first_issue_state(open_issues: list) -> dict:
     own cue words.
     """
     stocked = sorted(
-        issue["number"]
+        cast(int, issue["number"])
         for issue in open_issues
         if any(
-            label.strip().lower() == GOOD_FIRST_ISSUE_LABEL
-            for label in issue.get("labels", [])
+            cast(str, label).strip().lower() == GOOD_FIRST_ISSUE_LABEL
+            for label in cast(list[object], issue.get("labels", []))
         )
     )
     return {"count": len(stocked), "issue_numbers": stocked}
 
 
-def check_good_first_issues(open_issues) -> dict | None:
+def check_good_first_issues(open_issues: list[dict[str, object]] | None) -> dict[str, object] | None:
     """Returns None if the caller didn't hold a live `list_issues` read this
     hour -- informational-only, never blocks the rest of the ritual on a
     missing live read, the same optional-input shape `check_square`/
@@ -74,10 +75,10 @@ def check_good_first_issues(open_issues) -> dict | None:
     if open_issues is None:
         return None
     state = compute_good_first_issue_state(open_issues)
-    return {"clean": state["count"] >= 1, **state}
+    return {"clean": cast(int, state["count"]) >= 1, **state}
 
 
-def format_good_first_issues(result) -> str:
+def format_good_first_issues(result: dict[str, object] | None) -> str:
     if result is None:
         return "good first issues: not read this hour (no live list_issues held)"
     if result["clean"]:
@@ -94,7 +95,7 @@ class GoodFirstIssueArgError(ValueError):
     `SquareCheckArgError` holds for its dict-shaped argument."""
 
 
-def _load_state_json(path: str) -> list:
+def _load_state_json(path: str) -> list[dict[str, object]]:
     with open(path) as f:
         raw = json.load(f)
     if not isinstance(raw, list):
@@ -102,7 +103,7 @@ def _load_state_json(path: str) -> list:
     return raw
 
 
-def main(argv):
+def main(argv: list[str]) -> int:
     if len(argv) < 3 or argv[1] != "check":
         print(__doc__)
         return 1
