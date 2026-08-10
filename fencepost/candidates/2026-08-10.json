@@ -1,0 +1,125 @@
+{
+  "generated_at": "2026-08-10T13:03:17.214454+00:00",
+  "repo": "thierrypdamiba/orita",
+  "window_hours": 24,
+  "account_live_since": "2026-07-12T00:00:00+00:00",
+  "x_posts_source": "ledger",
+  "github_events_source": "direct",
+  "confidence_bar": 0.7,
+  "separation_margin": 0.15,
+  "primary_gap": {
+    "slug": "milestone-unannounced",
+    "headline": "Milestone-level work shipped but never reached @oritatown",
+    "detail": "112 milestone commit(s) since 2026-07-12 (matching ['fencepost', 'flagship', 'strategy']), none echoed in a post.",
+    "confidence": 0.85,
+    "evidence": [
+      "https://github.com/thierrypdamiba/orita/commit/bb325b78b943ee84978cf6042c320283dd79bc5b",
+      "https://github.com/thierrypdamiba/orita/commit/4ca724c26b2329673be88ac2f97c6894ada5e62c",
+      "https://github.com/thierrypdamiba/orita/commit/3b350da6a1933a8dea8060416fc1068b42ba98ed",
+      "https://github.com/thierrypdamiba/orita/commit/1658502c7bab3d8e915ccc8a0e93425bebbe13b8",
+      "https://github.com/thierrypdamiba/orita/commit/e29b0e90c522b36dcfbc62b3593be9eff77d7734"
+    ],
+    "label": "primary",
+    "rank": 1,
+    "lead": 0.3
+  },
+  "tail": [
+    {
+      "slug": "coincidence-automatic",
+      "headline": "'automatic' recurs in commits but stays off @oritatown",
+      "detail": "568 commit(s) since 2026-07-12 touch 'automatic', none echoed in a post. Routine work is not a gap \u2014 coincidence, not seam.",
+      "confidence": 0.55,
+      "evidence": [
+        "https://github.com/thierrypdamiba/orita/commit/87d3dbae146b19d456d6aee8b6f1113141b4cf3f",
+        "https://github.com/thierrypdamiba/orita/commit/1bb480d11342584ff65f7990100bdc59135a2f19",
+        "https://github.com/thierrypdamiba/orita/commit/feb05236c302adae4873918da9e24b79dbe8fa88",
+        "https://github.com/thierrypdamiba/orita/commit/83a1d3d3861c1579dc78660666e2cbef2b94a9e5",
+        "https://github.com/thierrypdamiba/orita/commit/ee6a08bcc4bbf33bbb2412e668f1093b025ddaea"
+      ],
+      "label": "coincidence",
+      "rank": 2,
+      "lead": 0.0
+    },
+    {
+      "slug": "coincidence-check",
+      "headline": "'check' recurs in commits but stays off @oritatown",
+      "detail": "287 commit(s) since 2026-07-12 touch 'check', none echoed in a post. Routine work is not a gap \u2014 coincidence, not seam.",
+      "confidence": 0.55,
+      "evidence": [
+        "https://github.com/thierrypdamiba/orita/commit/d2ee322c33806b4935a8d3f7205fc62ebed8ae15",
+        "https://github.com/thierrypdamiba/orita/commit/ada5946fba8faf7d9e0f8b827d33f73d7ce05c5f",
+        "https://github.com/thierrypdamiba/orita/commit/d33016ffa9911ddf7949236fc10d55121df14ab5",
+        "https://github.com/thierrypdamiba/orita/commit/8bd9e627dfbdd316aa8199035dedf51535c5e687",
+        "https://github.com/thierrypdamiba/orita/commit/ccd550c457ee80494725c56a53547513ba943fd0"
+      ],
+      "label": "coincidence",
+      "rank": 3,
+      "lead": 0.0
+    },
+    {
+      "slug": "coincidence-due",
+      "headline": "'due' recurs in commits but stays off @oritatown",
+      "detail": "294 commit(s) since 2026-07-12 touch 'due', none echoed in a post. Routine work is not a gap \u2014 coincidence, not seam.",
+      "confidence": 0.55,
+      "evidence": [
+        "https://github.com/thierrypdamiba/orita/commit/87d3dbae146b19d456d6aee8b6f1113141b4cf3f",
+        "https://github.com/thierrypdamiba/orita/commit/feb05236c302adae4873918da9e24b79dbe8fa88",
+        "https://github.com/thierrypdamiba/orita/commit/ee6a08bcc4bbf33bbb2412e668f1093b025ddaea",
+        "https://github.com/thierrypdamiba/orita/commit/040d1edc4ad916f23c306d6bc9315d317db5a9d1",
+        "https://github.com/thierrypdamiba/orita/commit/ad4c67fb0fe6672010318a266176dcfaa01ba6c8"
+      ],
+      "label": "coincidence",
+      "rank": 4,
+      "lead": 0.0
+    },
+    {
+      "slug": "coincidence-human",
+      "headline": "'human' recurs in commits but stays off @oritatown",
+      "detail": "568 commit(s) since 2026-07-12 touch 'human', none echoed in a post. Routine work is not a gap \u2014 coincidence, not seam.",
+      "confidence": 0.55,
+      "evidence": [
+        "https://github.com/thierrypdamiba/orita/commit/87d3dbae146b19d456d6aee8b6f1113141b4cf3f",
+        "https://github.com/thierrypdamiba/orita/commit/1bb480d11342584ff65f7990100bdc59135a2f19",
+        "https://github.com/thierrypdamiba/orita/commit/feb05236c302adae4873918da9e24b79dbe8fa88",
+        "https://github.com/thierrypdamiba/orita/commit/83a1d3d3861c1579dc78660666e2cbef2b94a9e5",
+        "https://github.com/thierrypdamiba/orita/commit/ee6a08bcc4bbf33bbb2412e668f1093b025ddaea"
+      ],
+      "label": "coincidence",
+      "rank": 5,
+      "lead": 0.0
+    },
+    {
+      "slug": "coincidence-ritual",
+      "headline": "'ritual' recurs in commits but stays off @oritatown",
+      "detail": "394 commit(s) since 2026-07-12 touch 'ritual', none echoed in a post. Routine work is not a gap \u2014 coincidence, not seam.",
+      "confidence": 0.55,
+      "evidence": [
+        "https://github.com/thierrypdamiba/orita/commit/d2ee322c33806b4935a8d3f7205fc62ebed8ae15",
+        "https://github.com/thierrypdamiba/orita/commit/ada5946fba8faf7d9e0f8b827d33f73d7ce05c5f",
+        "https://github.com/thierrypdamiba/orita/commit/8bd9e627dfbdd316aa8199035dedf51535c5e687",
+        "https://github.com/thierrypdamiba/orita/commit/7eae89decf478e01b6923d1f9011f28f1f7575d1",
+        "https://github.com/thierrypdamiba/orita/commit/6a2f8f1df1855d78d992afad3b0045a3a9b9c1c3"
+      ],
+      "label": "coincidence",
+      "rank": 6,
+      "lead": 0.0
+    },
+    {
+      "slug": "coincidence-trigger",
+      "headline": "'trigger' recurs in commits but stays off @oritatown",
+      "detail": "568 commit(s) since 2026-07-12 touch 'trigger', none echoed in a post. Routine work is not a gap \u2014 coincidence, not seam.",
+      "confidence": 0.55,
+      "evidence": [
+        "https://github.com/thierrypdamiba/orita/commit/87d3dbae146b19d456d6aee8b6f1113141b4cf3f",
+        "https://github.com/thierrypdamiba/orita/commit/1bb480d11342584ff65f7990100bdc59135a2f19",
+        "https://github.com/thierrypdamiba/orita/commit/feb05236c302adae4873918da9e24b79dbe8fa88",
+        "https://github.com/thierrypdamiba/orita/commit/83a1d3d3861c1579dc78660666e2cbef2b94a9e5",
+        "https://github.com/thierrypdamiba/orita/commit/ee6a08bcc4bbf33bbb2412e668f1093b025ddaea"
+      ],
+      "label": "coincidence",
+      "rank": 7,
+      "lead": 0.55
+    }
+  ],
+  "excluded": []
+}
