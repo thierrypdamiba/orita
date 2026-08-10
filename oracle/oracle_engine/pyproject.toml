@@ -16,6 +16,18 @@ dev = [
     "mypy>=1.0.0",
     "ruff>=0.1.0",
 ]
+# `mypy`/`pytest`/`ruff` live only in this group, never in the base
+# `dependencies` above. `uv run pytest` on a `.venv` that has never synced
+# `dev` fails loudly (`No module named pytest`, the same shape
+# `fencepost/seam_engine/CONTRIBUTING.md`'s own PR checklist names). `uv
+# run mypy` does NOT fail loudly in that same state -- it silently falls
+# back to any `mypy` already on `$PATH` and prints a plausible strict-check
+# result for a completely different, unpinned version, with no warning.
+# Confirmed live (task 660): a fresh container's global `mypy 1.19.1`
+# reported 2 false "errors" in `server.py` that this project's real,
+# locked `mypy` (`uv.lock` pins 2.2.0) does not produce. Always run `uv
+# run --extra dev mypy --strict src` (or `uv sync --extra dev` first) --
+# never a bare `uv run mypy`.
 
 # Tell Arcade.dev that this package has Arcade tools
 [project.entry-points.arcade_toolkits]
