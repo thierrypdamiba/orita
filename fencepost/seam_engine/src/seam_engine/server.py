@@ -9,7 +9,7 @@ world, it does not belong in this server (Ogun's oath, sworn on iron).
 import sys
 from dataclasses import asdict
 from datetime import datetime, timedelta, timezone
-from typing import Annotated, Any, Literal
+from typing import Annotated, Any, Literal, cast
 
 from arcade_mcp_server import Context, MCPApp
 from arcade_mcp_server.metadata import (
@@ -309,7 +309,10 @@ def _resolve_transport(argv: list[str]) -> TransportArg:
             f"seam_engine.server: invalid transport {transport!r} "
             f"(expected one of {', '.join(_VALID_TRANSPORTS)})"
         )
-    return transport
+    # mypy --strict can't narrow a bare str via membership in a
+    # tuple-typed variable (confirmed live -- only inline literal tuples
+    # narrow); the check above already proves this at runtime.
+    return cast(TransportArg, transport)
 
 
 # Run with specific transport
