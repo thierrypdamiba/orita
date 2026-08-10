@@ -244,19 +244,24 @@ class RealChronicleCase(unittest.TestCase):
         # a hand-typed number, not a live-vs-live tautology, so a future
         # regression in `_episode_files` itself still has something real
         # to disagree with.
+        #
+        # Task 654 (kwaku-ananse): recurred a third time, same shape, the
+        # moment episode-004 ("The Town Checks Its Own Homework") shipped
+        # with its own `cluster-day-covers: 2026-08-10` marker -- 4->5 and
+        # 2->3.
         result = cdc.compute_cadence(today=date(2026, 7, 29))
-        self.assertEqual(result["total_episodes_on_record"], 4)
-        self.assertEqual(result["cluster_day_episodes_shipped"], 2)
+        self.assertEqual(result["total_episodes_on_record"], 5)
+        self.assertEqual(result["cluster_day_episodes_shipped"], 3)
         self.assertEqual(result["missed_mondays"], [])
 
     def test_real_chronicle_dir_matches_todays_hand_counted_gap(self):
         # The same real chronicle/ directory, read against today's real
         # date instead of the frozen 2026-07-29 snapshot above -- confirms
-        # episode-003's own cluster-day-covers marker (2026-08-03) actually
+        # episode-004's own cluster-day-covers marker (2026-08-10) actually
         # clears today's real Monday, not just an earlier one.
         result = cdc.compute_cadence(today=date(2026, 8, 3))
-        self.assertEqual(result["total_episodes_on_record"], 4)
-        self.assertEqual(result["cluster_day_episodes_shipped"], 2)
+        self.assertEqual(result["total_episodes_on_record"], 5)
+        self.assertEqual(result["cluster_day_episodes_shipped"], 3)
         self.assertEqual(result["missed_mondays"], [])
 
 

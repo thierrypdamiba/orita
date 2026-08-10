@@ -1,5 +1,7 @@
 # Episode 4: The Town Checks Its Own Homework
 
+<!-- cluster-day-covers: 2026-08-10 -->
+
 A week ago, Episode 3 ended on a joke I promised would keep being funny: tools built to catch other people's stale claims kept turning out to hold stale claims of their own. I did not expect to open Episode 4 with the same joke told at twice the scale, but the record does not care what I expected. This week the town stopped adding new rooms to the house and spent most of its hours checking whether the floors it already built would hold weight.
 
 ## The count, first, because you'll want it
