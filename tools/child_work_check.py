@@ -40,6 +40,8 @@ import json
 import os
 import subprocess
 import sys
+from collections.abc import Iterable
+from typing import cast
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import jsonl_read  # noqa: E402
@@ -61,32 +63,34 @@ class ChildWorkLogTamperedError(RuntimeError):
     consults just the log's newest line)."""
 
 
-def _entries(path: str) -> list[dict]:
+def _entries(path: str) -> list[dict[str, object]]:
     """Delegates to jsonl_read.read_jsonl_entries (task 540) -- see that
     module's own docstring for the fourteen-copy history this replaced."""
     return jsonl_read.read_jsonl_entries(path)
 
 
-def load_known_files(path: str = LOG) -> dict:
-    known = {}
+def load_known_files(path: str = LOG) -> dict[str, dict[str, object]]:
+    known: dict[str, dict[str, object]] = {}
     for entry in _entries(path):
         if entry.get("_malformed"):
             raise ChildWorkLogTamperedError(
                 f"{path} contains an unparseable line: {entry['_error']}"
             )
-        known[entry["path"]] = entry
+        known[cast(str, entry["path"])] = entry
     return known
 
 
-def record_new_files(child_files: list, now_iso: str, path: str = LOG) -> list:
+def record_new_files(
+    child_files: list[dict[str, object]], now_iso: str, path: str = LOG
+) -> list[dict[str, object]]:
     """child_files: caller-fetched list of {"path", "sha", "author_date"}
     dicts (a GitHub commit's added/modified files, live this hour). Appends
     ONLY paths not already logged -- idempotent across repeated calls with
     an overlapping or identical list. Returns the entries actually appended."""
     known = load_known_files(path)
-    new_entries = []
+    new_entries: list[dict[str, object]] = []
     for cf in child_files:
-        p = cf["path"]
+        p = cast(str, cf["path"])
         if p in known:
             continue
         entry = {
@@ -114,18 +118,23 @@ def file_exists_at_head(rel_path: str, repo_root: str = ROOT) -> bool:
     return result.returncode == 0
 
 
-def find_reverted(known_paths, repo_root: str = ROOT) -> list:
+def find_reverted(known_paths: "Iterable[str]", repo_root: str = ROOT) -> list[str]:
     """Return the sorted list of known child-authored paths no longer
     present at HEAD -- checked locally, no network call."""
     return sorted(p for p in known_paths if not file_exists_at_head(p, repo_root=repo_root))
 
 
-def check(child_files: list | None = None, now_iso: str | None = None, path: str = LOG, repo_root: str = ROOT) -> dict:
+def check(
+    child_files: list[dict[str, object]] | None = None,
+    now_iso: str | None = None,
+    path: str = LOG,
+    repo_root: str = ROOT,
+) -> dict[str, object]:
     """child_files is optional (None unless the caller holds this hour's
     live GitHub commit read). Always re-checks EVERY already-logged path
     against the current tree regardless -- a violation logged three hours
     ago must surface this hour too, not just the hour a fresh fetch names it."""
-    newly_logged = []
+    newly_logged: list[dict[str, object]] = []
     if child_files:
         if now_iso is None:
             raise ValueError("now_iso is required when child_files is supplied")
@@ -140,12 +149,14 @@ def check(child_files: list | None = None, now_iso: str | None = None, path: str
     }
 
 
-def format_check(result: dict) -> str:
+def format_check(result: dict[str, object]) -> str:
+    newly_logged = cast("list[str]", result["newly_logged"])
+    reverted = cast("list[str]", result["reverted"])
     if result["clean"]:
-        suffix = f" ({len(result['newly_logged'])} newly logged)" if result["newly_logged"] else ""
+        suffix = f" ({len(newly_logged)} newly logged)" if newly_logged else ""
         return f"child work check: clean -- {result['known_count']} known file(s), none reverted{suffix}"
-    lines = [f"child work check: {len(result['reverted'])} REVERTED -- Iron Rule #6 violated, escalate now"]
-    for p in result["reverted"]:
+    lines = [f"child work check: {len(reverted)} REVERTED -- Iron Rule #6 violated, escalate now"]
+    for p in reverted:
         lines.append(f"  {p}")
     return "\n".join(lines)
 
@@ -159,14 +170,14 @@ class ChildWorkArgError(ValueError):
     problem)."""
 
 
-def _load_files_json(path: str) -> list:
+def _load_files_json(path: str) -> list[dict[str, object]]:
     with open(path, encoding="utf-8") as f:
         raw = json.load(f)
     if not isinstance(raw, list):
         raise ChildWorkArgError(
             f"--files-json: expected a JSON list, got {type(raw).__name__}"
         )
-    return raw
+    return cast("list[dict[str, object]]", raw)
 
 
 if __name__ == "__main__":

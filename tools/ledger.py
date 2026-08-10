@@ -13,6 +13,7 @@ import hashlib
 import json
 import os
 import sys
+from typing import cast
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import jsonl_read  # noqa: E402
@@ -21,7 +22,7 @@ LEDGER = os.path.join(os.path.dirname(__file__), "..", "records", "ledger.jsonl"
 GENESIS = "0" * 64
 
 
-def _entries():
+def _entries() -> list[dict[str, object]]:
     """Every line in the ledger, parsed. Delegates to
     jsonl_read.read_jsonl_entries (task 540) -- see that module's own
     docstring for the fourteen-copy history this replaced; this file's own
@@ -31,7 +32,7 @@ def _entries():
     return jsonl_read.read_jsonl_entries(LEDGER)
 
 
-def _hash(entry_without_hash: dict, prev_hash: str) -> str:
+def _hash(entry_without_hash: dict[str, object], prev_hash: str) -> str:
     payload = json.dumps(entry_without_hash, sort_keys=True, ensure_ascii=False)
     return hashlib.sha256((prev_hash + payload).encode("utf-8")).hexdigest()
 
@@ -45,7 +46,7 @@ class LedgerTamperedError(RuntimeError):
     that same refusal: run `python3 tools/ledger.py verify` to see the break."""
 
 
-def append(actor: str, act: str, detail: str, ts: str) -> dict:
+def append(actor: str, act: str, detail: str, ts: str) -> dict[str, object]:
     entries = _entries()
     if entries and entries[-1].get("_malformed"):
         raise LedgerTamperedError(
@@ -54,8 +55,8 @@ def append(actor: str, act: str, detail: str, ts: str) -> dict:
             "been touched. Run `python3 tools/ledger.py verify` and repair "
             "the ledger by hand before appending again."
         )
-    prev = entries[-1]["hash"] if entries else GENESIS
-    entry = {
+    prev = cast(str, entries[-1]["hash"]) if entries else GENESIS
+    entry: dict[str, object] = {
         "seq": len(entries),  # zero-indexed; Off-By-One insisted, Nisaba conceded the point once
         "ts": ts,
         "actor": actor,
@@ -93,7 +94,7 @@ class LedgerCLIError(ValueError):
     bare-positional shape -- never silently coerced, always refused."""
 
 
-def parse_append_args(argv: list) -> tuple:
+def parse_append_args(argv: list[str]) -> tuple[str, str, str]:
     """Parse the argv tail after `append` (i.e. sys.argv[2:]) into
     (actor, act, detail), rejecting flag-shaped and blank actor/act tokens.
 
@@ -148,7 +149,7 @@ def parse_append_args(argv: list) -> tuple:
     return actor, act, detail
 
 
-def main(argv=None) -> int:
+def main(argv: list[str] | None = None) -> int:
     """Entry point, factored out so tests can drive the real CLI dispatch
     (including the parse_append_args guard) against a patched LEDGER path
     without shelling out to a subprocess."""

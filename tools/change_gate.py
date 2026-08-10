@@ -33,6 +33,7 @@ Usage:
 import os
 import re
 import sys
+from typing import cast
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import jsonl_append  # noqa: E402
@@ -43,7 +44,7 @@ LOG = os.path.join(os.path.dirname(__file__), "..", "HAND", "posted-gap-log.json
 _GAP_RE = re.compile(r"^\*\*(.+?)\*\*\s*—\s*confidence\s+([\d.]+)\.", re.MULTILINE)
 
 
-def extract_primary_gap(report_text: str):
+def extract_primary_gap(report_text: str) -> str | None:
     """Pull the bolded primary-gap line out of a Fencepost Report.
 
     Returns the gap's description text, or None if the report carries no
@@ -66,7 +67,7 @@ def _gap_detail(report_text: str, headline_end: int) -> str:
     return ""
 
 
-def extract_gap_identity(report_text: str):
+def extract_gap_identity(report_text: str) -> str | None:
     """The fingerprint should_post_gap/record_posted_gap actually compare.
 
     The bare headline alone is not enough: several gap kinds (the
@@ -101,7 +102,7 @@ class PostedGapLogTamperedError(RuntimeError):
     the log before the next real check/record."""
 
 
-def _entries(path=LOG):
+def _entries(path: str = LOG) -> list[dict[str, object]]:
     """Delegates to jsonl_read.read_jsonl_entries (task 540) -- see
     that module's own docstring for the fourteen-copy history this
     replaced."""
@@ -114,7 +115,7 @@ def _entries(path=LOG):
 _append = jsonl_append.append_jsonl
 
 
-def last_posted_gap(path=LOG):
+def last_posted_gap(path: str = LOG) -> str | None:
     """The gap text of the most recently recorded real post, or None.
 
     Raises PostedGapLogTamperedError if the log's last line isn't valid
@@ -129,17 +130,17 @@ def last_posted_gap(path=LOG):
             f"valid JSON ({entries[-1]['_error']}) -- refusing to guess "
             "whether a post is due. Repair the log by hand, then rerun."
         )
-    return entries[-1]["gap"]
+    return cast(str, entries[-1]["gap"])
 
 
-def record_posted_gap(gap_text: str, posted_at: str, path=LOG) -> None:
+def record_posted_gap(gap_text: str, posted_at: str, path: str = LOG) -> None:
     """Append one real posted-gap event. Never edits or removes a prior line."""
     if not gap_text:
         raise ValueError("refusing to record an empty gap text")
     _append({"type": "posted", "gap": gap_text, "posted_at": posted_at}, path)
 
 
-def should_post_gap(report_text: str, path=LOG):
+def should_post_gap(report_text: str, path: str = LOG) -> tuple[bool, str]:
     """Whether this report's primary gap clears TOWN-OPERATIONS.md's change-gate.
 
     Returns (due: bool, reason: str). No parseable gap in the report: never
