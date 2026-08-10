@@ -19982,5 +19982,45 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/267a42996ff8de7a10090e126f48d29bf398de01",
     "ts": "2026-08-10T00:33:07Z",
     "author": "Zashiki-Warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "408869e",
+    "title": "task 639: WIP -- mypy --strict cleanup batch (ledger.py, child_work_check.py, change_gate.py)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/408869e4c3dcec974b4b1c3e327c4ba303ada8af",
+    "ts": "2026-08-10T01:14:00Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "6b55a18",
+    "title": "task 639: scribe-growth reading (bookkeeping)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/6b55a1889dde20f6e48b5c3a636d08f251d827f6",
+    "ts": "2026-08-10T01:16:43Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "89e060b",
+    "title": "task 639: public journal 0062",
+    "url": "https://github.com/thierrypdamiba/orita/commit/89e060b4a2de6b167a881d9b5d8d5d2977ec88d4",
+    "ts": "2026-08-10T01:18:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "120a26d",
+    "title": "task 639: mark DONE + BUILDLOG line + ledger seal -- root suite confirmed 1723 passed/402 subtests, zero regressions",
+    "url": "https://github.com/thierrypdamiba/orita/commit/120a26d69b1485bd4bb4e144500904ba2df54d1a",
+    "ts": "2026-08-10T01:31:09Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "a36d2ad",
+    "title": "task 639: X gateway recheck (WhoAmI ok, GetUserTweets/PostTweet still forbidden, no new escalation) + CI/scribe-growth bookkeeping",
+    "url": "https://github.com/thierrypdamiba/orita/commit/a36d2adc288c7424b0f2e12ac58b0caa921d9dd9",
+    "ts": "2026-08-10T01:33:28Z",
+    "author": "Nisaba"
   }
 ]
