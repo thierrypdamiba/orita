@@ -9,7 +9,7 @@ world, it does not belong in this server (Ogun's oath, sworn on iron).
 import sys
 from dataclasses import asdict
 from datetime import datetime, timedelta, timezone
-from typing import Annotated, Any, Literal, cast
+from typing import Annotated, Any, Literal
 
 from arcade_mcp_server import Context, MCPApp
 from arcade_mcp_server.metadata import (
@@ -53,8 +53,23 @@ READ_ONLY = ToolMetadata(
     ),
 )
 
+# Every `@app.tool(metadata=READ_ONLY)` below carries a targeted
+# `# type: ignore[untyped-decorator, arg-type]`. Confirmed live (task 658)
+# this is a real gap in the vendor, not seam_engine: `MCPApp.tool()`
+# (arcade_mcp_server/mcp_app.py) is a single, non-`@overload`ed method whose
+# return annotation is the union
+# `Callable[[Callable[P, T]], Callable[P, T]] | Callable[P, T]` — correct at
+# runtime (it branches on whether `func` was passed) but mypy --strict has no
+# way to know, from a kwargs-only call site like `@app.tool(metadata=...)`,
+# which arm of the union applies, so it falls back to treating the decorator
+# as untyped and the two derived arg-type mismatches that follow from that.
+# No PyPI `types-arcade-mcp-server` stub package exists to fix this without
+# touching the vendor (checked live). Ignoring these two specific codes only
+# — anything else `mypy --strict` finds on these lines still fails the
+# build.
 
-@app.tool(metadata=READ_ONLY)
+
+@app.tool(metadata=READ_ONLY)  # type: ignore[untyped-decorator, arg-type]
 def list_repo_commits(
     owner: Annotated[str, "GitHub owner (user or org), e.g. 'thierrypdamiba'"],
     repo: Annotated[str, "GitHub repository name, e.g. 'orita'"],
@@ -66,7 +81,7 @@ def list_repo_commits(
     return [asdict(e) for e in events if e.kind == "commit"]
 
 
-@app.tool(metadata=READ_ONLY)
+@app.tool(metadata=READ_ONLY)  # type: ignore[untyped-decorator, arg-type]
 def get_latest_release(
     owner: Annotated[str, "GitHub owner (user or org)"],
     repo: Annotated[str, "GitHub repository name"],
@@ -85,7 +100,7 @@ def get_latest_release(
     return asdict(event) if event is not None else None
 
 
-@app.tool(metadata=READ_ONLY)
+@app.tool(metadata=READ_ONLY)  # type: ignore[untyped-decorator, arg-type]
 def get_recent_x_posts(
     context: Context,
 ) -> Annotated[list[dict[str, Any]], "Posts the town has made to @oritatown, oldest first"]:
@@ -104,7 +119,7 @@ def get_recent_x_posts(
     return [asdict(p) for p in posts]
 
 
-@app.tool(metadata=READ_ONLY)
+@app.tool(metadata=READ_ONLY)  # type: ignore[untyped-decorator, arg-type]
 def seam_scan(
     owner: Annotated[str, "GitHub owner (user or org)"] = "thierrypdamiba",
     repo: Annotated[str, "GitHub repository name"] = "orita",
@@ -210,7 +225,7 @@ def seam_scan(
     }
 
 
-@app.tool(metadata=READ_ONLY)
+@app.tool(metadata=READ_ONLY)  # type: ignore[untyped-decorator, arg-type]
 def gmail_calendar_scan() -> Annotated[
     dict[str, Any],
     "WIP (ROADMAP.md #16): the v0.2 invite-in-Gmail-vs-Calendar gap, computed "
@@ -231,7 +246,7 @@ def gmail_calendar_scan() -> Annotated[
     return run_gmail_calendar_scan()
 
 
-@app.tool(metadata=READ_ONLY)
+@app.tool(metadata=READ_ONLY)  # type: ignore[untyped-decorator, arg-type]
 def combined_scan_preview(
     owner: Annotated[str, "GitHub owner (user or org)"] = "thierrypdamiba",
     repo: Annotated[str, "GitHub repository name"] = "orita",
@@ -309,10 +324,12 @@ def _resolve_transport(argv: list[str]) -> TransportArg:
             f"seam_engine.server: invalid transport {transport!r} "
             f"(expected one of {', '.join(_VALID_TRANSPORTS)})"
         )
-    # mypy --strict can't narrow a bare str via membership in a
-    # tuple-typed variable (confirmed live -- only inline literal tuples
-    # narrow); the check above already proves this at runtime.
-    return cast(TransportArg, transport)
+    # task 657 (mypy 1.x): the membership check above didn't narrow the bare
+    # `str` to `TransportArg`, so `cast()` was needed here. task 658 (mypy
+    # 2.2.0, confirmed live): the same tuple-membership guard now narrows on
+    # its own -- the cast had gone stale and mypy --strict flags it as
+    # `redundant-cast`. Removed; the guard alone now satisfies the return type.
+    return transport
 
 
 # Run with specific transport
