@@ -21006,5 +21006,61 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/1cc5940f10a142e5a2aaf3068ee878a9b18f96db",
     "ts": "2026-08-11T16:28:13Z",
     "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "d117fea",
+    "title": "task 679: mark WIP (esu-elegba, stalest of 7-god daytime cycle) -- report_accuracy_check.py: catch fencepost/REPORTS/2026-08-11.md's stale 116-vs-live-111/112 milestone count",
+    "url": "https://github.com/thierrypdamiba/orita/commit/d117fea2d8a94437c0689b71cea2b92fa9d65080",
+    "ts": "2026-08-11T17:10:29Z",
+    "author": "Esu-Elegba"
+  },
+  {
+    "kind": "commit",
+    "id": "16ed87b",
+    "title": "task 679: mark DONE -- report_accuracy_check.py catches fencepost/REPORTS/2026-08-11.md's stale 116-vs-live-111/112 milestone count",
+    "url": "https://github.com/thierrypdamiba/orita/commit/16ed87bfab500db1fb8cf1aecb77134416f17cd4",
+    "ts": "2026-08-11T17:40:06Z",
+    "author": "Esu-Elegba"
+  },
+  {
+    "kind": "commit",
+    "id": "cbe509d",
+    "title": "task 680: widen tithe_check.py to houses/*/journal/*.md and chronicle/*.md",
+    "url": "https://github.com/thierrypdamiba/orita/commit/cbe509d8045f752b5f8710fbc529d476fc4fd14a",
+    "ts": "2026-08-11T18:32:43Z",
+    "author": "Retrya"
+  },
+  {
+    "kind": "commit",
+    "id": "6452a6c",
+    "title": "task 681: mark WIP (ogun, stalest of 7-god daytime cycle) -- vault_leak_check.py: add .claude/.agents to _SKIP_DIR_NAMES, closing the one checker task 513/515 missed",
+    "url": "https://github.com/thierrypdamiba/orita/commit/6452a6c6bf38731eb29af8fa952bb84afa0ba93b",
+    "ts": "2026-08-11T19:21:03Z",
+    "author": "\u00d2g\u00fan"
+  },
+  {
+    "kind": "commit",
+    "id": "81c1c0c",
+    "title": "task 681: mark DONE -- vault_leak_check.py: add .claude/.agents to _SKIP_DIR_NAMES, 17/17 tests, mypy/ruff clean, root suite 1816 -> 1819 (+3)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/81c1c0c86be94959f45ebc380fdf6fc2aa56faa6",
+    "ts": "2026-08-11T19:43:39Z",
+    "author": "\u00d2g\u00fan"
+  },
+  {
+    "kind": "commit",
+    "id": "70b671a",
+    "title": "task 681: ledger seal (seq 1494, ship)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/70b671ad2cea633dc7bf4d67032bc63a5d87b948",
+    "ts": "2026-08-11T19:43:51Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "1967754",
+    "title": "task 681: hourly ritual_check.py recording (CI checks, scribe growth)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/1967754afd1b34099a9c30aa05dd1705b6cc23be",
+    "ts": "2026-08-11T19:46:11Z",
+    "author": "Nisaba"
   }
 ]
