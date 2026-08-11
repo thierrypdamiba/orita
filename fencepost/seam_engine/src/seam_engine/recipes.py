@@ -338,11 +338,13 @@ def _check_scope_is_read_only(scope: str, *, where: str) -> None:
 def _oath_scopes_for_toolkit(toolkit: str) -> frozenset[str]:
     """The union of `consent.REQUIRED_SCOPES` for one recipe's `toolkit`
     field. A recipe's toolkit is usually a single Arcade toolkit ("github"),
-    but twenty-three of the seventy-eight real recipes today name a plus-joined pair
+    but twenty-four of the seventy-nine real recipes today name a plus-joined pair
     spanning two ("github+x", "x+github" -- both directions appear, cosmetic
-    either way -- plus "slack+github" (four recipes) and "linear+github",
-    four recipes) because their seam compares a GitHub timeline against a
-    second toolkit's own timeline. Splitting on "+" and unioning is the one place
+    either way -- plus "slack+github" (four recipes), "linear+github" (four
+    recipes), and "github+google_calendar" (one recipe, the first to pair
+    GitHub with Google Calendar)) because their seam compares a GitHub
+    timeline against a second toolkit's own timeline (or, for the newest
+    one, a second toolkit's own dated records). Splitting on "+" and unioning is the one place
     that shape is handled; a part `REQUIRED_SCOPES` has never heard of
     contributes an empty set rather than raising here -- the caller reports
     every one of the recipe's scopes as uncovered in that case, which is the

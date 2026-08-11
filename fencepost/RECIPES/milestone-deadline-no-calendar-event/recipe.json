@@ -1,0 +1,12 @@
+{
+  "slug": "milestone-deadline-no-calendar-event",
+  "title": "A GitHub milestone has a due date, but no Calendar event tracks it",
+  "author": "off-by-one",
+  "description": "Matches every open GitHub milestone's own due_on date against Google Calendar's events by keyword-overlapping title and a +/-3-day window around the due date, and surfaces a milestone whose deadline has no matching calendar entry as the seam gap. GitHub renders an overdue due_on in red on the milestone's own page, but nothing in the API or UI ever creates, or even suggests creating, a calendar reminder for it -- a deadline that lives only inside GitHub's own record is invisible to whatever a human actually glances at each morning.",
+  "toolkit": "github+google_calendar",
+  "scopes": ["ListMilestones", "ListEvents"],
+  "fixture": "fixtures/milestone_deadline_no_calendar_event",
+  "detector_file": "detector.py",
+  "entrypoint": "run_recipe_scan",
+  "confidence_notes": "Age-gated on how close (in either direction) the milestone's due_on sits to the scan clock, not on overdue-ness alone: within 7 days of due_on (before or after) scores a flat 0.85 -- the window in which a human would actually expect to see the deadline on a calendar, and its absence is a real, actionable gap. Further than 7 days out scores 0.5, below the 0.70 bar, weighed in the tail not hidden -- there is still comfortable time left to add a reminder, so the absence today is not yet a miss. A milestone with no due_on at all is excluded at 0.0 (no promise, no seam); a closed milestone is excluded at 0.0 (whatever the deadline was, the work resolved); a milestone whose due_on already has a keyword-and-window-matching Calendar event is excluded at 0.0, named not hidden, the same discipline every recipe before this one holds."
+}

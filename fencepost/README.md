@@ -1342,6 +1342,42 @@ commit, cleared on the oath's own naming check (matches the allowed
 the-hand gateway (confirmed live against its real tool set the same hour
 this recipe shipped).
 
+[`RECIPES/milestone-deadline-no-calendar-event/`](RECIPES/milestone-deadline-no-calendar-event/)
+is the seventy-ninth (ROADMAP.md #665): the first recipe to declare a
+Google Calendar scope at all, confirmed by grep to be untouched by any of
+the seventy-eight recipes before it — every one of them stays inside
+`github`, or pairs `github` with `x`/`slack`/`linear`; none has ever named
+`google_calendar`, `ListEvents`, or `GetEvent`. The seam: a GitHub
+milestone carries its own `due_on` date, and GitHub renders it in red on
+the milestone's own page once it passes — but that is decoration. Nothing
+in the API or UI ever creates, or even suggests creating, a calendar entry
+for it, so a deadline that lives only inside GitHub's own record is
+invisible to whatever a human actually glances at each morning. Genuinely
+distinct from `overdue-milestone-still-open`, the only other recipe
+reading a milestone's own `due_on`: that recipe stays entirely inside
+GitHub's own record and asks a backward-looking question — is the
+milestone still open after its due date passed? This recipe crosses
+toolkits and asks an orthogonal, direction-agnostic question — does
+anything *outside* GitHub exist to remind a human the date is coming at
+all? A milestone not yet due can carry this gap; a badly overdue one can
+carry it too; the two recipes can both fire on the same milestone, for two
+different reasons. Also distinct from every `*-claims-open-milestone`
+recipe: those read a third record's own prose claim naming a milestone
+number and check it against the milestone's live state; this recipe never
+reads a prose claim at all. Matching is keyword-plus-window, mirroring
+`gmail_calendar.compute_gaps`'s own `_find_match`: a calendar event tracks
+a milestone's deadline only if its title shares a real keyword with the
+milestone's title *and* its start falls within 3 days of `due_on` — either
+signal alone is too weak to trust on its own. Confidence is age-gated on
+how close `due_on` sits to the scan clock, in either direction (7-day
+bar, below which there is still comfortable time to add a reminder). Both
+scopes (`ListMilestones`, `ListEvents`) already sat on `SCOPES.md`'s
+cleared oath table — no new door opened, though this is the first recipe
+to actually exercise the Calendar half of it; zero Google Calendar tools
+are exposed on the-hand gateway today, the same WIP boundary
+`gmail_calendar.py` and `tag-never-released` already hold for their own
+not-yet-live scopes.
+
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)
 (ROADMAP.md #111) is that second promise, kept: it runs `scan.py`'s own

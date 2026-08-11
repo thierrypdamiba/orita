@@ -1,0 +1,16 @@
+[
+  {
+    "id": "evt_1",
+    "title": "Security audit review",
+    "start": "2026-08-09T15:00:00Z",
+    "organizer": "compliance@example.com",
+    "source": "calendar"
+  },
+  {
+    "id": "evt_2",
+    "title": "Team offsite planning",
+    "start": "2026-08-12T10:00:00Z",
+    "organizer": "ops@example.com",
+    "source": "calendar"
+  }
+]
