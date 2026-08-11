@@ -155,6 +155,45 @@ class LedgerCoreCase(unittest.TestCase):
         with open(self.mod.LEDGER) as f:
             self.assertEqual(len(f.readlines()), 2)
 
+    def test_verify_reports_broken_chain_on_dict_line_missing_hash_not_a_crash(self):
+        # A line can be valid JSON *and* a dict -- passing _entries()'s only
+        # two checks -- and still be tampered: a hand-edit or bad merge that
+        # drops the "hash" field entirely. Pre-fix this line came back
+        # unmarked (not "_malformed") and later crashed verify() with an
+        # uncaught KeyError instead of being named tampering.
+        first = self.mod.append("nisaba", "test", "one", "2026-07-14T00:00:00+00:00")
+        with open(self.mod.LEDGER, "a") as f:
+            f.write(json.dumps({
+                "seq": 1, "ts": "x", "actor": "y", "act": "z",
+                "detail": "d", "prev": first["hash"],
+            }, ensure_ascii=False) + "\n")
+        self.assertFalse(self.mod.verify())
+
+    def test_append_refuses_on_a_dict_tip_missing_hash_instead_of_crashing(self):
+        first = self.mod.append("nisaba", "test", "one", "2026-07-14T00:00:00+00:00")
+        with open(self.mod.LEDGER, "a") as f:
+            f.write(json.dumps({
+                "seq": 1, "ts": "x", "actor": "y", "act": "z",
+                "detail": "d", "prev": first["hash"],
+            }, ensure_ascii=False) + "\n")
+        with self.assertRaises(self.mod.LedgerTamperedError):
+            self.mod.append("off-by-one", "test", "two", "2026-07-14T00:01:00+00:00")
+        # Refusing must not have written a third line on top of the break.
+        with open(self.mod.LEDGER) as f:
+            self.assertEqual(len(f.readlines()), 2)
+
+    def test_verify_reports_broken_chain_on_dict_line_missing_prev_not_a_crash(self):
+        # The sibling field: a dict line with "hash" present but "prev"
+        # dropped. verify() indexes e["prev"] directly after popping "hash";
+        # pre-fix this shape also crashed uncaught, with KeyError: 'prev'.
+        self.mod.append("nisaba", "test", "one", "2026-07-14T00:00:00+00:00")
+        with open(self.mod.LEDGER, "a") as f:
+            f.write(json.dumps({
+                "seq": 1, "ts": "x", "actor": "y", "act": "z",
+                "detail": "d", "hash": "f" * 64,
+            }, ensure_ascii=False) + "\n")
+        self.assertFalse(self.mod.verify())
+
 
 class ParseAppendArgsCase(unittest.TestCase):
     """The CLI guard: rejects flag-shaped actor/act, mirroring the real

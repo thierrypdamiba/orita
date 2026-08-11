@@ -55,6 +55,13 @@ def append(actor: str, act: str, detail: str, ts: str) -> dict[str, object]:
             "been touched. Run `python3 tools/ledger.py verify` and repair "
             "the ledger by hand before appending again."
         )
+    if entries and "hash" not in entries[-1]:
+        raise LedgerTamperedError(
+            f"append(): refusing to append -- the most recent line in {LEDGER} "
+            "is valid JSON but has no \"hash\" field -- the record has been "
+            "touched. Run `python3 tools/ledger.py verify` and repair the "
+            "ledger by hand before appending again."
+        )
     prev = cast(str, entries[-1]["hash"]) if entries else GENESIS
     entry: dict[str, object] = {
         "seq": len(entries),  # zero-indexed; Off-By-One insisted, Nisaba conceded the point once
@@ -74,7 +81,7 @@ def append(actor: str, act: str, detail: str, ts: str) -> dict[str, object]:
 def verify() -> bool:
     prev = GENESIS
     for i, e in enumerate(_entries()):
-        if e.get("_malformed"):
+        if e.get("_malformed") or "hash" not in e or "prev" not in e:
             print(f"CHAIN BROKEN at seq {i}. The record has been touched.")
             return False
         h = cast(str, e.pop("hash"))
