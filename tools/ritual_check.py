@@ -287,6 +287,10 @@ def _duplicate_regex_check() -> ModuleType:
     return _load_once("_ritual_duplicate_regex_check", os.path.join(ROOT, "tools", "duplicate_regex_check.py"))
 
 
+def _duplicate_function_check() -> ModuleType:
+    return _load_once("_ritual_duplicate_function_check", os.path.join(ROOT, "tools", "duplicate_function_check.py"))
+
+
 def _rider_check() -> ModuleType:
     return _load_once("_ritual_rider_check", os.path.join(ROOT, "tools", "rider_check.py"))
 
@@ -855,6 +859,29 @@ def check_duplicate_regex(orita_dir: str | None = None) -> dict[str, object]:
     is a god-on-duty escalation, not something this check silently
     repairs."""
     mod = _duplicate_regex_check()
+    kwargs = {}
+    if orita_dir is not None:
+        kwargs["orita_dir"] = orita_dir
+    violations = mod.find_violations(**kwargs)
+    return {"clean": not violations, "count": len(violations), "violations": violations}
+
+
+def check_duplicate_function(orita_dir: str | None = None) -> dict[str, object]:
+    """Task 671: fold duplicate_function_check.py's own ast-based function-
+    body duplication scan into the one block -- the running-check graduation
+    tasks 508/509/513/515/569 kept promising by hand (four separate manual
+    AST-hash sweeps for the same "byte-identical function body, no shared
+    import backing it" bug, each found by re-running the sweep on purpose
+    that hour, never a standing check between them) and never actually
+    built, the same shape `check_duplicate_regex` (task 397) already closed
+    for its own narrower sibling bug (a hand-typed `re.compile(...)`
+    literal). Unconditional, local-filesystem-only (reads the checkout
+    already on disk, no network, no import of the files it audits) -- the
+    same cheap class `check_checkout`/`check_vault_leak`/
+    `check_duplicate_regex` already hold. Never edits anything; a real
+    violation, if one is ever found, is a god-on-duty escalation, not
+    something this check silently repairs."""
+    mod = _duplicate_function_check()
     kwargs = {}
     if orita_dir is not None:
         kwargs["orita_dir"] = orita_dir
@@ -2047,6 +2074,7 @@ def run_ritual_check(
     vault_leak_dirs: tuple[str, ...] | None = None,
     star_covenant_dir: str | None = None,
     duplicate_regex_dir: str | None = None,
+    duplicate_function_dir: str | None = None,
     rider_dir: str | None = None,
     hand_lore_dir: str | None = None,
     no_grading_dir: str | None = None,
@@ -2166,6 +2194,7 @@ def run_ritual_check(
         vault_leak = check_vault_leak(orita_dir=vault_leak_dirs[0], vault_dir=vault_leak_dirs[1])
     star_covenant = check_star_covenant(orita_dir=star_covenant_dir)
     duplicate_regex = check_duplicate_regex(orita_dir=duplicate_regex_dir)
+    duplicate_function = check_duplicate_function(orita_dir=duplicate_function_dir)
     riders = check_riders(orita_dir=rider_dir)
     hand_lore = check_hand_lore(orita_dir=hand_lore_dir)
     no_grading = check_no_grading(orita_dir=no_grading_dir)
@@ -2265,6 +2294,7 @@ def run_ritual_check(
         or (not vault_leak["clean"])
         or (not star_covenant["clean"])
         or (not duplicate_regex["clean"])
+        or (not duplicate_function["clean"])
         or (not riders["clean"])
         or (not hand_lore["clean"])
         or (not no_grading["clean"])
@@ -2324,6 +2354,7 @@ def run_ritual_check(
         "vault_leak": vault_leak,
         "star_covenant": star_covenant,
         "duplicate_regex": duplicate_regex,
+        "duplicate_function": duplicate_function,
         "riders": riders,
         "hand_lore": hand_lore,
         "no_grading": no_grading,
@@ -2452,6 +2483,11 @@ def format_ritual_check(result: dict[str, Any]) -> str:
         lines.append("  duplicate regex: clean (every re.compile pattern unique or a seeded exception)")
     else:
         lines.append(f"  duplicate regex: {dr['count']} DUPLICATE(S) -- hand-typed copy with no import backing it, fix now")
+    df = result["duplicate_function"]
+    if df["clean"]:
+        lines.append("  duplicate function: clean (every tools/*.py function body unique or a seeded exception)")
+    else:
+        lines.append(f"  duplicate function: {df['count']} DUPLICATE(S) -- identical function body, no shared import backing it, fix now")
     rd = result["riders"]
     if rd["clean"]:
         lines.append("  riders: clean (all five character riders hold)")
