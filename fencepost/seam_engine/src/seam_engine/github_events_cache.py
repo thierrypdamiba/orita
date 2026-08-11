@@ -236,10 +236,16 @@ def main(argv: list[str] | None = None) -> int:
         cache_path = DEFAULT_CACHE_PATH
         if "--cache" in rest:
             i = rest.index("--cache")
+            if i + 1 >= len(rest):
+                print("--cache needs a path to a cache JSON file.")
+                return 2
             cache_path = Path(rest[i + 1])
         out_path = cache_path
         if "--out" in rest:
             i = rest.index("--out")
+            if i + 1 >= len(rest):
+                print("--out needs a path to write the merged cache to.")
+                return 2
             out_path = Path(rest[i + 1])
         new_events = json.loads(new_events_path.read_text())
         if not isinstance(new_events, list):
@@ -271,14 +277,23 @@ def main(argv: list[str] | None = None) -> int:
         cache_path = DEFAULT_CACHE_PATH
         if "--cache" in rest:
             i = rest.index("--cache")
+            if i + 1 >= len(rest):
+                print("--cache needs a path to a cache JSON file.")
+                return 2
             cache_path = Path(rest[i + 1])
         out_path = cache_path
         if "--out" in rest:
             i = rest.index("--out")
+            if i + 1 >= len(rest):
+                print("--out needs a path to write the merged cache to.")
+                return 2
             out_path = Path(rest[i + 1])
         release_path: Path | None = None
         if "--release" in rest:
             i = rest.index("--release")
+            if i + 1 >= len(rest):
+                print("--release needs a path to a raw release JSON file.")
+                return 2
             release_path = Path(rest[i + 1])
 
         raw_commits = json.loads(raw_commits_path.read_text())
@@ -311,6 +326,9 @@ def main(argv: list[str] | None = None) -> int:
         cache_path = DEFAULT_CACHE_PATH
         if "--cache" in rest:
             i = rest.index("--cache")
+            if i + 1 >= len(rest):
+                print("--cache needs a path to a cache JSON file.")
+                return 2
             cache_path = Path(rest[i + 1])
         ts = cache_max_ts(load_cache(cache_path))
         print(ts if ts is not None else "")

@@ -151,6 +151,26 @@ def test_cli_merge_new_events_not_a_list_fails_named(tmp_path: Path, capsys) -> 
     assert "expected a JSON list" in capsys.readouterr().err
 
 
+def test_cli_merge_trailing_cache_flag_prints_usage_and_fails(tmp_path: Path, capsys) -> None:
+    new_events_path = tmp_path / "delta.json"
+    new_events_path.write_text(json.dumps([COMMIT_A]))
+
+    rc = gec.main(["merge", str(new_events_path), "--cache"])
+
+    assert rc == 2
+    assert "--cache needs a path" in capsys.readouterr().out
+
+
+def test_cli_merge_trailing_out_flag_prints_usage_and_fails(tmp_path: Path, capsys) -> None:
+    new_events_path = tmp_path / "delta.json"
+    new_events_path.write_text(json.dumps([COMMIT_A]))
+
+    rc = gec.main(["merge", str(new_events_path), "--out"])
+
+    assert rc == 2
+    assert "--out needs a path" in capsys.readouterr().out
+
+
 def test_cli_since_prints_newest_ts(tmp_path: Path, capsys) -> None:
     cache_path = tmp_path / "cache.json"
     gec.save_cache([COMMIT_A, COMMIT_B], cache_path)
@@ -165,6 +185,12 @@ def test_cli_since_empty_cache_prints_nothing(tmp_path: Path, capsys) -> None:
     rc = gec.main(["since", "--cache", str(tmp_path / "missing.json")])
     assert rc == 0
     assert capsys.readouterr().out.strip() == ""
+
+
+def test_cli_since_trailing_cache_flag_prints_usage_and_fails(capsys) -> None:
+    rc = gec.main(["since", "--cache"])
+    assert rc == 2
+    assert "--cache needs a path" in capsys.readouterr().out
 
 
 def test_cli_no_command_prints_usage_and_fails(capsys) -> None:
@@ -293,6 +319,42 @@ def test_cli_ingest_raw_no_path_prints_usage(capsys) -> None:
     rc = gec.main(["ingest-raw"])
     assert rc == 2
     assert "usage:" in capsys.readouterr().out
+
+
+def test_cli_ingest_raw_trailing_cache_flag_prints_usage_and_fails(
+    tmp_path: Path, capsys
+) -> None:
+    raw_commits_path = tmp_path / "raw-commits.json"
+    raw_commits_path.write_text(json.dumps([RAW_COMMIT]))
+
+    rc = gec.main(["ingest-raw", str(raw_commits_path), "--cache"])
+
+    assert rc == 2
+    assert "--cache needs a path" in capsys.readouterr().out
+
+
+def test_cli_ingest_raw_trailing_out_flag_prints_usage_and_fails(
+    tmp_path: Path, capsys
+) -> None:
+    raw_commits_path = tmp_path / "raw-commits.json"
+    raw_commits_path.write_text(json.dumps([RAW_COMMIT]))
+
+    rc = gec.main(["ingest-raw", str(raw_commits_path), "--out"])
+
+    assert rc == 2
+    assert "--out needs a path" in capsys.readouterr().out
+
+
+def test_cli_ingest_raw_trailing_release_flag_prints_usage_and_fails(
+    tmp_path: Path, capsys
+) -> None:
+    raw_commits_path = tmp_path / "raw-commits.json"
+    raw_commits_path.write_text(json.dumps([RAW_COMMIT]))
+
+    rc = gec.main(["ingest-raw", str(raw_commits_path), "--release"])
+
+    assert rc == 2
+    assert "--release needs a path" in capsys.readouterr().out
 
 
 def test_seeded_cache_is_real_and_scan_compatible_shape() -> None:
