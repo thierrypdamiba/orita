@@ -172,6 +172,34 @@ class TestMainCLI(unittest.TestCase):
                 with open(written, encoding="utf-8") as f:
                     self.assertIn("Real alt text.", f.read())
 
+    def test_main_with_too_few_args_names_the_problem_not_indexerror(self):
+        with tempfile.TemporaryDirectory() as tmp, mock.patch.object(card, "ROOT", tmp):
+            argv = ["card.py", "onlyslug"]
+            err = io.StringIO()
+            with (
+                mock.patch.object(sys, "argv", argv),
+                contextlib.redirect_stdout(err),
+                self.assertRaises(SystemExit) as ctx,
+            ):
+                card.main()
+            self.assertEqual(ctx.exception.code, 2)
+            self.assertIn("Usage:", err.getvalue())
+            self.assertFalse(os.path.exists(os.path.join(tmp, "docs", "cards")))
+
+    def test_main_with_no_args_names_the_problem_not_indexerror(self):
+        with tempfile.TemporaryDirectory() as tmp, mock.patch.object(card, "ROOT", tmp):
+            argv = ["card.py"]
+            err = io.StringIO()
+            with (
+                mock.patch.object(sys, "argv", argv),
+                contextlib.redirect_stdout(err),
+                self.assertRaises(SystemExit) as ctx,
+            ):
+                card.main()
+            self.assertEqual(ctx.exception.code, 2)
+            self.assertIn("Usage:", err.getvalue())
+            self.assertFalse(os.path.exists(os.path.join(tmp, "docs", "cards")))
+
     def test_main_refuses_blank_alt_before_writing_anything(self):
         with tempfile.TemporaryDirectory() as tmp:
             with mock.patch.object(card, "ROOT", tmp):

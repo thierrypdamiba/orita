@@ -79,6 +79,12 @@ def build_card(slug: str, img: str, title: str, alt: str) -> tuple[str, str]:
 
 
 def main() -> None:
+    if len(sys.argv) < 5:
+        print(
+            'Usage: python3 tools/card.py <slug> <image-path-under-docs> '
+            '"<title>" "<alt/description>"'
+        )
+        sys.exit(2)
     slug, img, title, alt = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4]
     page, page_url = build_card(slug, img, title, alt)
     out_dir = os.path.join(ROOT, "docs", "cards")
