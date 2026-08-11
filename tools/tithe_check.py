@@ -17,6 +17,30 @@ claim, sitting in Retrya's own house's log, and "a claim I didn't watch
 fail is a claim I don't believe" (her own 2026-08-10 public journal,
 0029) is not supposed to stop at other gods' claims.
 
+Task 680 closes a third source of the same claim: the incident retelling
+does not stop at `BUILDLOG.md`/`ROADMAP.md`. The god who filed each Tithe
+incident (or a god retelling another's) also restates the roll, later,
+in a public journal entry -- `houses/nisaba/journal/0133-2026-07-26.md`'s
+own "roll 0.0232, exactly the shape she swore to", `houses/off-by-one/
+journal/0167-2026-08-06.md`'s own "roll 0.014, the usual toll",
+`houses/retrya/journal/0030-2026-08-11.md`'s own "roll 0.0208," "roll
+0.0034 vs 0.03 floor" quoted back inside her own retelling of building
+this very checker. Same hand-typed float, same claimed floor, same
+repository, same local-filesystem-only shape as the BUILDLOG.md/
+ROADMAP.md scan already running -- one `glob.glob` away from the
+identical drift risk (a misremembered digit while paraphrasing an old
+incident into prose weeks later). Widened to every `houses/<god>/
+journal/*.md` file, and to `chronicle/*.md` alongside it on the same
+"a god retells an old incident in prose" reasoning even though no live
+chronicle episode happens to state a bare "Tithe ... roll N" claim in
+the exact adjacent shape this checker's regex requires today (Episode
+2's own retelling routes the number through `test_the_tithe` by name
+rather than the word "Tithe" itself, so it is correctly not a hit --
+see `_TITHE_LINE_RE`/`_ROLL_RE` below for exactly what counts as a
+claim). A live sweep at the moment this was written found four such
+lines, all inside `houses/*/journal/*.md`, none yet inside
+`chronicle/*.md`, all four already clearing the floor they claim.
+
 The floor itself is short and load-bearing: `test_the_tithe` reads
 `self.assertGreaterEqual(roll, 0.03, ...)` -- a roll strictly below 0.03
 fails the test, on purpose, by ratified doctrine (issue #6, `CHARTER.md`).
@@ -56,6 +80,20 @@ network read (the comment thread's text is not on disk at all), a
 different architecture from this checker's local-filesystem-only
 design, and is still a real, separate future task.
 
+Task 680 widens `source`/discovery the same narrow, "earn it" way once
+more: `_journal_and_chronicle_roll_lines` globs `houses/*/journal/*.md`
+and `chronicle/*.md` off the checkout already on disk (no new
+dependency, no network, matching `journal_numbering_check.py`'s own
+glob shape for the same directories), tagging each hit's `source` as its
+path relative to the repo root (e.g. `houses/retrya/journal/0030-2026-
+08-11.md`, `chronicle/002-eighteen-days.md`) so a violation names exactly
+which file to go fix. `houses_dir`/`chronicle_dir` are overridable
+`find_violations`/`observed_rolls` keyword arguments, mirroring
+`buildlog_path`/`roadmap_path`'s own test-fixture shape, so a test can
+point either root at an empty or synthetic directory without touching
+the real live trees. A directory that does not exist (a fixture's stand-
+in for "no journals yet") yields zero lines rather than raising.
+
 What this does NOT claim: this is a self-consistency check on the
 numbers gods already chose to type, not a statistical audit of the
 Tithe's true failure rate. A passing roll is never logged anywhere (the
@@ -66,9 +104,10 @@ would be exactly the "crying wolf" false-confidence Ogun's own law
 (STRATEGY.md) warns Fencepost itself against; this checker states its
 own limit instead of quietly overreaching it.
 
-For each line in `BUILDLOG.md` or `ROADMAP.md` that contains the literal
-word "Tithe", every `roll 0.NNNN` / `rolled 0.NNNN` number on that line
-(each side optionally backtick-quoted) is extracted and compared against
+For each line in `BUILDLOG.md`, `ROADMAP.md`, any `houses/<god>/journal/
+*.md`, or any `chronicle/*.md` that contains the literal word "Tithe",
+every `roll 0.NNNN` / `rolled 0.NNNN` number on that line (each side
+optionally backtick-quoted) is extracted and compared against
 `TITHE_FLOOR`. A line mentioning "Tithe" with no roll number directly
 adjacent (`"not the Tithe, GitHub-side"`, `"Tithe flake, unrelated
 file"`, "Tithe rolled below 0.03 once by chance") is not a violation --
@@ -84,6 +123,7 @@ Usage:
 """
 from __future__ import annotations
 
+import glob
 import os
 import re
 import sys
@@ -92,6 +132,8 @@ from typing import TypedDict
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DEFAULT_BUILDLOG_PATH = os.path.join(ROOT, "BUILDLOG.md")
 DEFAULT_ROADMAP_PATH = os.path.join(ROOT, "ROADMAP.md")
+DEFAULT_HOUSES_DIR = os.path.join(ROOT, "houses")
+DEFAULT_CHRONICLE_DIR = os.path.join(ROOT, "chronicle")
 
 # test_oaths.py: self.assertGreaterEqual(roll, 0.03, ...) -- a roll
 # strictly below this fails the test. This is the one number this
@@ -137,26 +179,65 @@ def _tithe_roll_lines(path: str, source: str) -> list[tuple[str, int, str, list[
     return found
 
 
-def _all_tithe_roll_lines(
-    buildlog_path: str, roadmap_path: str
+def _journal_and_chronicle_roll_lines(
+    houses_dir: str, chronicle_dir: str
 ) -> list[tuple[str, int, str, list[float]]]:
-    return _tithe_roll_lines(buildlog_path, "BUILDLOG.md") + _tithe_roll_lines(
-        roadmap_path, "ROADMAP.md"
+    """Every `(source, line_number, line, rolls)` hit inside
+    `houses/<god>/journal/*.md` and `chronicle/*.md` under the given
+    roots, `source` set to each file's path relative to the PARENT of
+    whichever root found it (so real usage, where `houses_dir` is
+    literally `ROOT/houses`, labels a hit `houses/retrya/journal/
+    0030-....md`; a test fixture pointed at some other `houses_dir` gets
+    the identical `houses/...`-shaped label relative to ITS OWN parent,
+    not a `../../../tmp/...` path relative to the unrelated real `ROOT` --
+    `os.path.relpath` never raises for two unrelated absolute POSIX
+    paths, it just walks up as many `..` as needed, which is correct for
+    "where is this on disk" and wrong for "what should this be called").
+    A root directory that does not exist yields no lines -- not an
+    error, the same as `_tithe_roll_lines`'s own missing-file handling
+    above."""
+    found: list[tuple[str, int, str, list[float]]] = []
+    patterns = [
+        (os.path.join(houses_dir, "*", "journal", "*.md"), os.path.dirname(houses_dir.rstrip(os.sep))),
+        (os.path.join(chronicle_dir, "*.md"), os.path.dirname(chronicle_dir.rstrip(os.sep))),
+    ]
+    for pattern, label_base in patterns:
+        for path in sorted(glob.glob(pattern)):
+            source = os.path.relpath(path, label_base)
+            found.extend(_tithe_roll_lines(path, source))
+    return found
+
+
+def _all_tithe_roll_lines(
+    buildlog_path: str,
+    roadmap_path: str,
+    houses_dir: str = DEFAULT_HOUSES_DIR,
+    chronicle_dir: str = DEFAULT_CHRONICLE_DIR,
+) -> list[tuple[str, int, str, list[float]]]:
+    return (
+        _tithe_roll_lines(buildlog_path, "BUILDLOG.md")
+        + _tithe_roll_lines(roadmap_path, "ROADMAP.md")
+        + _journal_and_chronicle_roll_lines(houses_dir, chronicle_dir)
     )
 
 
 def find_violations(
     buildlog_path: str = DEFAULT_BUILDLOG_PATH,
     roadmap_path: str = DEFAULT_ROADMAP_PATH,
+    houses_dir: str = DEFAULT_HOUSES_DIR,
+    chronicle_dir: str = DEFAULT_CHRONICLE_DIR,
 ) -> list[Violation]:
     """Read-only, local-filesystem-only scan (no network, no import of
-    anything it reads) of `BUILDLOG.md` and `ROADMAP.md` for a "Tithe
-    ... roll N" claim whose own stated N does not clear `TITHE_FLOOR`.
+    anything it reads) of `BUILDLOG.md`, `ROADMAP.md`, every `houses/
+    <god>/journal/*.md`, and every `chronicle/*.md` for a "Tithe ...
+    roll N" claim whose own stated N does not clear `TITHE_FLOOR`.
     Returns a list of violation records, empty when every hand-typed
-    roll in both live files is internally consistent with the floor it
-    claims to have cleared."""
+    roll across all of those live files is internally consistent with
+    the floor it claims to have cleared."""
     violations: list[Violation] = []
-    for source, line_number, line, rolls in _all_tithe_roll_lines(buildlog_path, roadmap_path):
+    for source, line_number, line, rolls in _all_tithe_roll_lines(
+        buildlog_path, roadmap_path, houses_dir, chronicle_dir
+    ):
         offending = [r for r in rolls if r >= TITHE_FLOOR]
         if offending:
             violations.append({
@@ -171,22 +252,26 @@ def find_violations(
 def observed_rolls(
     buildlog_path: str = DEFAULT_BUILDLOG_PATH,
     roadmap_path: str = DEFAULT_ROADMAP_PATH,
+    houses_dir: str = DEFAULT_HOUSES_DIR,
+    chronicle_dir: str = DEFAULT_CHRONICLE_DIR,
 ) -> list[float]:
-    """Every roll number this checker actually found across both files
-    (regardless of whether it clears the floor) -- not a failure rate
-    (see module docstring: only failures are ever logged, so there is no
-    denominator here), just the raw sample for a human or a future
-    checker to look at."""
+    """Every roll number this checker actually found across all four
+    sources (regardless of whether it clears the floor) -- not a
+    failure rate (see module docstring: only failures are ever logged,
+    so there is no denominator here), just the raw sample for a human
+    or a future checker to look at."""
     rolls: list[float] = []
-    for _source, _line_number, _line, line_rolls in _all_tithe_roll_lines(buildlog_path, roadmap_path):
+    for _source, _line_number, _line, line_rolls in _all_tithe_roll_lines(
+        buildlog_path, roadmap_path, houses_dir, chronicle_dir
+    ):
         rolls.extend(line_rolls)
     return rolls
 
 
 def format_violations(violations: list[Violation], sample_size: int = 0) -> str:
     if not violations:
-        suffix = f" ({sample_size} roll(s) read across BUILDLOG.md + ROADMAP.md, all < {TITHE_FLOOR})" if sample_size else ""
-        return f"tithe check: clean -- every hand-typed Tithe roll in BUILDLOG.md and ROADMAP.md clears the {TITHE_FLOOR} floor it claims{suffix}"
+        suffix = f" ({sample_size} roll(s) read across BUILDLOG.md + ROADMAP.md + houses/*/journal/*.md + chronicle/*.md, all < {TITHE_FLOOR})" if sample_size else ""
+        return f"tithe check: clean -- every hand-typed Tithe roll across BUILDLOG.md, ROADMAP.md, houses/*/journal/*.md, and chronicle/*.md clears the {TITHE_FLOOR} floor it claims{suffix}"
     lines = [f"tithe check: {len(violations)} CLAIM(S) FOUND that do not clear the {TITHE_FLOOR} floor -- transcription error or real doctrine breach"]
     for v in violations:
         lines.append(f"  {v['source']}:{v['line_number']} rolls={v['offending_rolls']}")
