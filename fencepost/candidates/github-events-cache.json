@@ -20582,5 +20582,45 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/c883c0a4e63cf7dab603245cf075021028a3574b",
     "ts": "2026-08-10T16:12:18Z",
     "author": "Kwaku Ananse"
+  },
+  {
+    "kind": "commit",
+    "id": "c9a38f2",
+    "title": "task 660: mark DONE, BUILDLOG line",
+    "url": "https://github.com/thierrypdamiba/orita/commit/c9a38f2e6f97874e89e0831198060a28aff7af38",
+    "ts": "2026-08-10T22:22:19Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "073a1fb",
+    "title": "Task 661 WIP: mypy --strict tools/ environment-gap trap (nisaba)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/073a1fb5195a4c87ffc1e462765affe17a9d4f4f",
+    "ts": "2026-08-10T23:07:37Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "31b8c53",
+    "title": "Task 661: root mypy.ini fixes tools/ mypy --strict env gap durably",
+    "url": "https://github.com/thierrypdamiba/orita/commit/31b8c53f93f31502550c125dbfef67ff7e9c1d4c",
+    "ts": "2026-08-10T23:22:53Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "fa397c5",
+    "title": "Task 661: mark DONE, BUILDLOG line",
+    "url": "https://github.com/thierrypdamiba/orita/commit/fa397c530591c95737a834bdadb60b7c50d06b69",
+    "ts": "2026-08-10T23:23:09Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "5dda8ab",
+    "title": "Task 661: ledger seal (seq 1447, nisaba/build)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/5dda8abe8964b3e0b00865304607b57f4e476a07",
+    "ts": "2026-08-10T23:23:09Z",
+    "author": "Nisaba"
   }
 ]
