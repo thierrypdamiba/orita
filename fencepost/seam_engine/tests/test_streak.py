@@ -16,6 +16,7 @@ Two invariants, both load-bearing:
 """
 from __future__ import annotations
 
+import json
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
@@ -325,3 +326,71 @@ def test_roadmap_row_19_names_seven_consecutive_reports():
 def test_seam_scan_workflow_runs_the_streak_status_step():
     text = SEAM_SCAN_YML.read_text(encoding="utf-8")
     assert "seam_engine.streak status" in text
+
+
+# --- longest_streak: the empty-ledger floor ---------------------------------
+
+
+def test_longest_streak_zero_on_an_empty_ledger(tmp_path: Path):
+    assert streak.longest_streak(tmp_path) == 0
+
+
+# --- CLI: main() ------------------------------------------------------------
+#
+# Never directly exercised before this task -- `uv run --with pytest-cov
+# python -m pytest --cov` measured streak.py at 71%, missing exactly this
+# function's four branches (default `status` command, the seven-day-held
+# message, the days-remaining message, and the unknown-command exit code).
+# Same untested-CLI-entrypoint shape tasks 647/657/658/659/661 already found
+# and closed in sibling `main()`/argv-parsing blocks elsewhere in this repo,
+# just never swept for this file.
+
+
+def test_cli_status_defaults_to_status_command(tmp_path: Path, capsys):
+    _append_day(tmp_path, date(2026, 7, 1))
+    rc = streak.main(["--base", str(tmp_path)])
+    assert rc == 0
+    out = json.loads(capsys.readouterr().out)
+    assert out["episode"] == 1
+    assert out["streak_days"] == 1
+
+
+def test_cli_status_reports_days_remaining_below_seven(tmp_path: Path, capsys):
+    for day in (date(2026, 7, 1), date(2026, 7, 2), date(2026, 7, 3)):
+        _append_day(tmp_path, day)
+    rc = streak.main(["status", "--base", str(tmp_path)])
+    assert rc == 0
+    captured = capsys.readouterr()
+    out = json.loads(captured.out)
+    assert out["seven_day_streak"] is False
+    assert out["days_remaining"] == 4
+    assert "Day 3 of 7" in captured.err
+    assert "4 to go" in captured.err
+
+
+def test_cli_status_reports_seven_day_streak_held(tmp_path: Path, capsys):
+    for i in range(7):
+        _append_day(tmp_path, date(2026, 7, 1) + timedelta(days=i))
+    rc = streak.main(["status", "--base", str(tmp_path)])
+    assert rc == 0
+    captured = capsys.readouterr()
+    out = json.loads(captured.out)
+    assert out["seven_day_streak"] is True
+    assert "Seven days, unbroken" in captured.err
+    assert f"Episode {out['episode']}" in captured.err
+
+
+def test_cli_rejects_an_unknown_command(tmp_path: Path, capsys):
+    rc = streak.main(["bogus", "--base", str(tmp_path)])
+    assert rc == 2
+    assert "unknown command: bogus" in capsys.readouterr().err
+
+
+def test_cli_status_on_an_empty_ledger_shows_day_zero(tmp_path: Path, capsys):
+    rc = streak.main(["status", "--base", str(tmp_path)])
+    assert rc == 0
+    captured = capsys.readouterr()
+    out = json.loads(captured.out)
+    assert out["episode"] == 0
+    assert out["streak_days"] == 0
+    assert "Day 0 of 7" in captured.err
