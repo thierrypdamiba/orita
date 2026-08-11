@@ -10,6 +10,7 @@ json.JSONDecodeError.
 import importlib.util
 import json
 import os
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -748,6 +749,59 @@ class TestTamperedEscalationLog(_TempLogCase):
                 threshold_hours=48.0,
                 escalation_entries=escalation_entries,
             )
+
+
+class CliArgvBoundsCase(unittest.TestCase):
+    """Task 683. `record`/`should-recheck`/`should-escalate`/`next-tier` each
+    unpacked `sys.argv[2:]` positionally with zero bounds checking -- the
+    same unguarded-argv shape tasks 663/672/675/682 already swept from
+    other tools/ CLIs but never reached `x_outage_tracker.py`. Runs the
+    real script as a subprocess so it exercises the actual `__main__`
+    block."""
+
+    SCRIPT = os.path.join(ROOT, "tools", "x_outage_tracker.py")
+
+    def _run(self, *args):
+        return subprocess.run(
+            [sys.executable, self.SCRIPT, *args],
+            capture_output=True,
+            text=True,
+        )
+
+    def test_record_with_too_few_args_names_the_problem_not_indexerror(self):
+        result = self._run("record", "X_PostTweet", "forbidden")
+        self.assertEqual(result.returncode, 2, result)
+        self.assertIn("usage: x_outage_tracker.py record", result.stdout, result)
+        self.assertNotIn("IndexError", result.stderr, result)
+        self.assertNotIn("Traceback", result.stderr, result)
+
+    def test_should_recheck_with_too_few_args_names_the_problem_not_indexerror(self):
+        result = self._run("should-recheck", "X_PostTweet")
+        self.assertEqual(result.returncode, 2, result)
+        self.assertIn("usage: x_outage_tracker.py should-recheck", result.stdout, result)
+        self.assertNotIn("IndexError", result.stderr, result)
+        self.assertNotIn("Traceback", result.stderr, result)
+
+    def test_should_escalate_with_too_few_args_names_the_problem_not_indexerror(self):
+        result = self._run("should-escalate", "X_PostTweet")
+        self.assertEqual(result.returncode, 2, result)
+        self.assertIn("usage: x_outage_tracker.py should-escalate", result.stdout, result)
+        self.assertNotIn("IndexError", result.stderr, result)
+        self.assertNotIn("Traceback", result.stderr, result)
+
+    def test_next_tier_with_too_few_args_names_the_problem_not_indexerror(self):
+        result = self._run("next-tier", "X_PostTweet")
+        self.assertEqual(result.returncode, 2, result)
+        self.assertIn("usage: x_outage_tracker.py next-tier", result.stdout, result)
+        self.assertNotIn("IndexError", result.stderr, result)
+        self.assertNotIn("Traceback", result.stderr, result)
+
+    def test_next_tier_with_no_args_names_the_problem_not_indexerror(self):
+        result = self._run("next-tier")
+        self.assertEqual(result.returncode, 2, result)
+        self.assertIn("usage: x_outage_tracker.py next-tier", result.stdout, result)
+        self.assertNotIn("IndexError", result.stderr, result)
+        self.assertNotIn("Traceback", result.stderr, result)
 
 
 if __name__ == "__main__":

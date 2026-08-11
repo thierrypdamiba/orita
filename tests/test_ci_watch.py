@@ -6,6 +6,7 @@ both green off task N's push."
 """
 import importlib.util
 import os
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -331,6 +332,38 @@ class TestTrackedWorkflows(unittest.TestCase):
         finally:
             if os.path.exists(path):
                 os.remove(path)
+
+
+class CliArgvBoundsCase(unittest.TestCase):
+    """Task 683. `record` with fewer than 4 positional args raised a bare
+    `IndexError` instead of a named usage error -- the same unguarded-argv
+    shape tasks 663/672/675/682 already swept from other tools/ CLIs but
+    never reached `ci_watch.py`. Runs the real script as a subprocess so it
+    exercises the actual `__main__` block."""
+
+    SCRIPT = os.path.join(ROOT, "tools", "ci_watch.py")
+
+    def test_record_with_too_few_args_names_the_problem_not_indexerror(self):
+        result = subprocess.run(
+            [sys.executable, self.SCRIPT, "record", "dawn-run", "success"],
+            capture_output=True,
+            text=True,
+        )
+        self.assertEqual(result.returncode, 2, result)
+        self.assertIn("usage: ci_watch.py record", result.stdout, result)
+        self.assertNotIn("IndexError", result.stderr, result)
+        self.assertNotIn("Traceback", result.stderr, result)
+
+    def test_record_with_no_args_names_the_problem_not_indexerror(self):
+        result = subprocess.run(
+            [sys.executable, self.SCRIPT, "record"],
+            capture_output=True,
+            text=True,
+        )
+        self.assertEqual(result.returncode, 2, result)
+        self.assertIn("usage: ci_watch.py record", result.stdout, result)
+        self.assertNotIn("IndexError", result.stderr, result)
+        self.assertNotIn("Traceback", result.stderr, result)
 
 
 if __name__ == "__main__":

@@ -3,6 +3,7 @@ written skipped.md prose for change-gated posts an X-side outage delayed.
 """
 import importlib.util
 import os
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -381,6 +382,44 @@ class TestMarkPosted(_TempQueueCase):
             after = f.readlines()
         self.assertEqual(after[0], before[0])
         self.assertEqual(len(after), len(before) + 1)
+
+
+class CliArgvBoundsCase(unittest.TestCase):
+    """Task 683. `queue`/`mark-posted` each unpacked `sys.argv[2:]`
+    positionally with zero bounds checking -- the same unguarded-argv shape
+    tasks 663/672/675/682 already swept from other tools/ CLIs but never
+    reached `x_post_queue.py`. Runs the real script as a subprocess so it
+    exercises the actual `__main__` block."""
+
+    SCRIPT = os.path.join(ROOT, "tools", "x_post_queue.py")
+
+    def _run(self, *args):
+        return subprocess.run(
+            [sys.executable, self.SCRIPT, *args],
+            capture_output=True,
+            text=True,
+        )
+
+    def test_queue_with_too_few_args_names_the_problem_not_indexerror(self):
+        result = self._run("queue", "683", "topic")
+        self.assertEqual(result.returncode, 2, result)
+        self.assertIn("usage: x_post_queue.py queue", result.stdout, result)
+        self.assertNotIn("IndexError", result.stderr, result)
+        self.assertNotIn("Traceback", result.stderr, result)
+
+    def test_mark_posted_with_too_few_args_names_the_problem_not_indexerror(self):
+        result = self._run("mark-posted", "tweetid123")
+        self.assertEqual(result.returncode, 2, result)
+        self.assertIn("usage: x_post_queue.py mark-posted", result.stdout, result)
+        self.assertNotIn("IndexError", result.stderr, result)
+        self.assertNotIn("Traceback", result.stderr, result)
+
+    def test_mark_posted_with_no_args_names_the_problem_not_indexerror(self):
+        result = self._run("mark-posted")
+        self.assertEqual(result.returncode, 2, result)
+        self.assertIn("usage: x_post_queue.py mark-posted", result.stdout, result)
+        self.assertNotIn("IndexError", result.stderr, result)
+        self.assertNotIn("Traceback", result.stderr, result)
 
 
 if __name__ == "__main__":

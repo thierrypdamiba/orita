@@ -239,6 +239,9 @@ if __name__ == "__main__":
 
     cmd = sys.argv[1] if len(sys.argv) > 1 else "status"
     if cmd == "record":
+        if len(sys.argv) < 6:
+            print("usage: ci_watch.py record <workflow> <success|failure> <run_id> <checked_at>")
+            sys.exit(2)
         _workflow, _conclusion, _run_id, _checked_at = sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5]
         record_check(_workflow, _conclusion, _run_id, _checked_at)
         print("recorded")

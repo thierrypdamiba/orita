@@ -469,6 +469,9 @@ def format_status_line(entries: list[dict[str, object]], tool: str, status: str 
 if __name__ == "__main__":
     cmd = sys.argv[1] if len(sys.argv) > 1 else "status"
     if cmd == "record":
+        if len(sys.argv) < 5:
+            print("usage: x_outage_tracker.py record <tool> <status> <checked_at>")
+            sys.exit(2)
         _tool, _status, _checked_at = sys.argv[2], sys.argv[3], sys.argv[4]
         record_check(_tool, _status, _checked_at)
         print("recorded")
@@ -477,6 +480,9 @@ if __name__ == "__main__":
         for _tool in TRACKED_TOOLS:
             print(format_status_line(_entries_now, _tool))
     elif cmd == "should-recheck":
+        if len(sys.argv) < 4:
+            print("usage: x_outage_tracker.py should-recheck <tool> <now_iso> [cooldown_hours]")
+            sys.exit(2)
         _tool = sys.argv[2]
         _now = sys.argv[3]
         _cooldown = float(sys.argv[4]) if len(sys.argv) > 4 else DEFAULT_COOLDOWN_HOURS
@@ -484,6 +490,9 @@ if __name__ == "__main__":
         print("due" if _due else "not due")
         sys.exit(0 if _due else 1)
     elif cmd == "should-escalate":
+        if len(sys.argv) < 4:
+            print("usage: x_outage_tracker.py should-escalate <tool> <now_iso> [threshold_hours]")
+            sys.exit(2)
         _tool = sys.argv[2]
         _now = sys.argv[3]
         _threshold = float(sys.argv[4]) if len(sys.argv) > 4 else DEFAULT_ESCALATION_THRESHOLD_HOURS
@@ -491,6 +500,9 @@ if __name__ == "__main__":
         print(("due" if _due else "not due") + f" -- {_reason}")
         sys.exit(0 if _due else 1)
     elif cmd == "next-tier":
+        if len(sys.argv) < 4:
+            print("usage: x_outage_tracker.py next-tier <tool> <now_iso>")
+            sys.exit(2)
         _tool = sys.argv[2]
         _now = sys.argv[3]
         _tier = next_escalation_tier(_entries(), _tool, _now)

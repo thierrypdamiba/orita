@@ -323,6 +323,9 @@ if __name__ == "__main__":
 
     cmd = sys.argv[1] if len(sys.argv) > 1 else "pending"
     if cmd == "queue":
+        if len(sys.argv) < 5:
+            print("usage: x_post_queue.py queue <task> <topic> <queued_at>")
+            sys.exit(2)
         _task, _topic, _queued_at = sys.argv[2], sys.argv[3], sys.argv[4]
         print("queued" if queue_owed_post(_task, _topic, _queued_at) else "already queued")
     elif cmd == "pending":
@@ -341,6 +344,9 @@ if __name__ == "__main__":
         if _plan["blocked_tasks"]:
             print(f"blocked_tasks (topic too long to ever post, shorten and re-queue): {','.join(_plan['blocked_tasks'])}")
     elif cmd == "mark-posted":
+        if len(sys.argv) < 4:
+            print("usage: x_post_queue.py mark-posted <tweet_id> <posted_at> [task ...]")
+            sys.exit(2)
         _tweet_id, _posted_at = sys.argv[2], sys.argv[3]
         _tasks = sys.argv[4:]
         mark_posted(_tasks, _tweet_id, _posted_at)

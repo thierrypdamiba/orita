@@ -5,6 +5,7 @@ way every time, for every god, instead of by re-reading prose.
 """
 import importlib.util
 import os
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -273,6 +274,44 @@ class TestShouldPostGap(_TempLogCase):
         due, reason = cg.should_post_gap(REPORT_EMPTY, path=self.path)
         self.assertFalse(due)
         self.assertIn("no parseable", reason)
+
+
+class CliArgvBoundsCase(unittest.TestCase):
+    """Task 683. `check`/`record` each unpacked `sys.argv[2:]` positionally
+    with zero bounds checking -- the same unguarded-argv shape tasks
+    663/672/675/682 already swept from other tools/ CLIs but never reached
+    `change_gate.py`. Runs the real script as a subprocess so it exercises
+    the actual `__main__` block."""
+
+    SCRIPT = os.path.join(ROOT, "tools", "change_gate.py")
+
+    def _run(self, *args):
+        return subprocess.run(
+            [sys.executable, self.SCRIPT, *args],
+            capture_output=True,
+            text=True,
+        )
+
+    def test_check_with_no_args_names_the_problem_not_indexerror(self):
+        result = self._run("check")
+        self.assertEqual(result.returncode, 2, result)
+        self.assertIn("usage: change_gate.py check", result.stdout, result)
+        self.assertNotIn("IndexError", result.stderr, result)
+        self.assertNotIn("Traceback", result.stderr, result)
+
+    def test_record_with_too_few_args_names_the_problem_not_indexerror(self):
+        result = self._run("record", "fencepost/REPORTS/2026-08-11.md")
+        self.assertEqual(result.returncode, 2, result)
+        self.assertIn("usage: change_gate.py record", result.stdout, result)
+        self.assertNotIn("IndexError", result.stderr, result)
+        self.assertNotIn("Traceback", result.stderr, result)
+
+    def test_record_with_no_args_names_the_problem_not_indexerror(self):
+        result = self._run("record")
+        self.assertEqual(result.returncode, 2, result)
+        self.assertIn("usage: change_gate.py record", result.stdout, result)
+        self.assertNotIn("IndexError", result.stderr, result)
+        self.assertNotIn("Traceback", result.stderr, result)
 
 
 if __name__ == "__main__":

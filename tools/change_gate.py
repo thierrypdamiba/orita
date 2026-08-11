@@ -164,6 +164,9 @@ if __name__ == "__main__":
 
     cmd = sys.argv[1] if len(sys.argv) > 1 else "check"
     if cmd == "check":
+        if len(sys.argv) < 3:
+            print("usage: change_gate.py check <report_path>")
+            sys.exit(2)
         report_path = sys.argv[2]
         with open(report_path) as f:
             text = f.read()
@@ -171,6 +174,9 @@ if __name__ == "__main__":
         print(f"{'due' if due else 'not due'} -- {reason}")
         sys.exit(0 if due else 1)
     elif cmd == "record":
+        if len(sys.argv) < 4:
+            print("usage: change_gate.py record <report_path> <posted_at>")
+            sys.exit(2)
         report_path, posted_at = sys.argv[2], sys.argv[3]
         with open(report_path) as f:
             text = f.read()
