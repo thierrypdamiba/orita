@@ -13,6 +13,7 @@ mid-flight (dawn-run #618, 2026-07-28T09:07:31Z, caught task 360).
 """
 import importlib.util
 import os
+import subprocess
 import sys
 import unittest
 from datetime import datetime, timezone
@@ -264,6 +265,47 @@ class RealCheckoutCase(unittest.TestCase):
                     rows.extend(wrc.parse_table_rows(f.read()))
         nums = sorted(r["number"] for r in rows)
         self.assertEqual(nums, list(range(1, nums[-1] + 1)), nums)
+
+
+class CliArgvBoundsCase(unittest.TestCase):
+    """Task 675. `--now` as the trailing, valueless CLI token used to raise
+    a bare `IndexError` instead of a named usage error -- the same
+    unguarded-trailing-flag shape task 663's sweep found and task 672
+    fixed six of in `github_events_cache.py`. Runs the real script as a
+    subprocess so it exercises the actual `__main__` block, not `find_stale`
+    called directly (every prior test in this file did the latter, which
+    is exactly why the CLI parsing itself went unswept)."""
+
+    SCRIPT = os.path.join(ROOT, "tools", "wip_reclaim_check.py")
+
+    def test_trailing_now_flag_with_no_value_exits_named_not_indexerror(self):
+        result = subprocess.run(
+            [sys.executable, self.SCRIPT, "check", "--now"],
+            capture_output=True,
+            text=True,
+        )
+        self.assertEqual(result.returncode, 2, result)
+        self.assertIn("--now needs an ISO timestamp value.", result.stdout, result)
+        self.assertNotIn("IndexError", result.stderr, result)
+        self.assertNotIn("Traceback", result.stderr, result)
+
+    def test_now_flag_with_a_real_value_still_runs_clean(self):
+        result = subprocess.run(
+            [sys.executable, self.SCRIPT, "check", "--now", "2026-07-28T10:00:00Z"],
+            capture_output=True,
+            text=True,
+        )
+        self.assertEqual(result.returncode, 0, result)
+        self.assertIn("wip reclaim check:", result.stdout, result)
+
+    def test_no_now_flag_at_all_still_runs(self):
+        result = subprocess.run(
+            [sys.executable, self.SCRIPT, "check"],
+            capture_output=True,
+            text=True,
+        )
+        self.assertIn(result.returncode, (0, 1), result)
+        self.assertIn("wip reclaim check:", result.stdout, result)
 
 
 if __name__ == "__main__":

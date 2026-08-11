@@ -77,6 +77,23 @@ gap.
 
 Usage:
     python3 tools/wip_reclaim_check.py check [--now <iso>]
+
+Task 675: the `--now` CLI flag itself carried the exact unguarded-
+trailing-flag shape task 663's own argv-bounds sweep found and fixed six
+of in `github_events_cache.py` (task 672) -- `argv.index("--now") + 1`
+indexed straight into `argv` with no bounds check, so `--now` as the
+LAST token on the command line raised a bare `IndexError: list index out
+of range` instead of a named usage error. Reproduced live before fixing:
+`python3 tools/wip_reclaim_check.py check --now` crashed exactly that
+way. The `--catalog`/`--policy`/`--label`/`--out` flags in this same
+tools/ directory's `oath_badge.py` already guard the identical shape
+(`_take`'s own `if i + 1 >= len(argv): raise ...`); this file's own single
+`--now` site had never been swept the same way because the whole CLI
+`__main__` block carried zero tests of its own before this task -- every
+existing test called `find_stale`/`parse_table_rows` etc. directly,
+never `python3 tools/wip_reclaim_check.py` as a subprocess. Fixed with
+the same named-error-then-`sys.exit(2)` shape `github_events_cache.py`'s
+six sites already established, not a bare `raise`.
 """
 from __future__ import annotations
 
@@ -201,7 +218,11 @@ if __name__ == "__main__":
         sys.exit(1)
     now = None
     if "--now" in argv:
-        now = datetime.fromisoformat(argv[argv.index("--now") + 1].replace("Z", "+00:00")).astimezone(timezone.utc)
+        i = argv.index("--now")
+        if i + 1 >= len(argv):
+            print("--now needs an ISO timestamp value.")
+            sys.exit(2)
+        now = datetime.fromisoformat(argv[i + 1].replace("Z", "+00:00")).astimezone(timezone.utc)
     result = find_stale(now=now)
     print(format_result(result))
     sys.exit(1 if not result["clean"] else 0)
