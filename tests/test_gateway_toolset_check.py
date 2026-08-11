@@ -43,6 +43,12 @@ class _TempLogCase(unittest.TestCase):
     def tearDown(self):
         if os.path.exists(self.path):
             os.remove(self.path)
+        # Task 669: record_toolset_check's own auto-derived freshness
+        # companion (self.path + ".freshness") when a test doesn't pass
+        # freshness_path explicitly -- clean it up too.
+        derived = f"{self.path}.freshness"
+        if os.path.exists(derived):
+            os.remove(derived)
 
 
 class TestComputeToolsetState(unittest.TestCase):
@@ -246,6 +252,102 @@ class TestToolsetDelta(_TempLogCase):
         self.assertIn("True -> False", reason)
 
 
+class TestRecordToolsetCheckPingsFreshnessEvenWhenUnchanged(_TempLogCase):
+    """Task 669's own load-bearing regression test. Discovered live, after
+    the freshness feature's first commit: `record_toolset_check`'s state
+    dedup (task 498) means a caller that dutifully re-checks every single
+    hour and always finds the same "still zero gmail/calendar tools"
+    answer would NEVER write a new line to `path` -- so if
+    `compute_toolset_freshness` read `path`/`LOG` directly (as this
+    feature's first draft did), it would read STALE forever, no matter
+    how often someone genuinely re-verified, which defeats the entire
+    point. This proves the fix: the separate freshness companion log
+    (auto-derived from `path` here) gets a fresh entry on EVERY real call,
+    identical-state or not."""
+
+    def test_freshness_advances_on_repeated_identical_checks(self):
+        state = gt.compute_toolset_state(TOOLS_GITHUB_X_ONLY)
+        freshness_path = f"{self.path}.freshness"
+        self.addCleanup(lambda: os.path.exists(freshness_path) and os.remove(freshness_path))
+
+        wrote1 = gt.record_toolset_check(state, "2026-08-04T00:00:00Z", path=self.path)
+        wrote2 = gt.record_toolset_check(state, "2026-08-05T00:00:00Z", path=self.path)  # identical state
+        wrote3 = gt.record_toolset_check(state, "2026-08-06T00:00:00Z", path=self.path)  # identical state
+
+        # The STATE log's own dedup contract is completely unchanged:
+        self.assertTrue(wrote1)
+        self.assertFalse(wrote2)
+        self.assertFalse(wrote3)
+        with open(self.path) as f:
+            self.assertEqual(len([ln for ln in f if ln.strip()]), 1)
+
+        # But the freshness companion advanced on every real call:
+        with open(freshness_path) as f:
+            freshness_lines = [ln for ln in f if ln.strip()]
+        self.assertEqual(len(freshness_lines), 3)
+
+        # And compute_toolset_freshness reads the LATEST real check, not
+        # the last STATE CHANGE -- proving the bug this test exists to
+        # catch is actually fixed, not just that the log grew.
+        now = datetime(2026, 8, 6, 1, 0, 0, tzinfo=timezone.utc)  # 1h after the 3rd check
+        result = gt.compute_toolset_freshness(now, path=freshness_path)
+        self.assertEqual(result["status"], "fresh")
+        self.assertEqual(result["checked_at"], "2026-08-06T00:00:00Z")
+
+    def test_freshness_path_defaults_to_the_real_constant_only_when_path_is_the_real_log(self):
+        # Production callers pass path=LOG (or omit path); the derived
+        # freshness_path must be the real FRESHNESS_LOG in that case, not
+        # a suffixed variant of LOG's own path.
+        state = gt.compute_toolset_state(TOOLS_GITHUB_X_ONLY)
+        real_log, real_freshness_log = gt.LOG, gt.FRESHNESS_LOG
+        gt.LOG = self.path
+        gt.FRESHNESS_LOG = f"{self.path}.real-freshness"
+        try:
+            gt.record_toolset_check(state, "2026-08-04T00:00:00Z", path=gt.LOG)
+            self.assertTrue(os.path.exists(gt.FRESHNESS_LOG))
+            self.assertFalse(os.path.exists(f"{self.path}.freshness"))  # not the suffixed fallback
+        finally:
+            if os.path.exists(gt.FRESHNESS_LOG):
+                os.remove(gt.FRESHNESS_LOG)
+            gt.LOG, gt.FRESHNESS_LOG = real_log, real_freshness_log
+
+    def test_explicit_freshness_path_overrides_both_defaults(self):
+        state = gt.compute_toolset_state(TOOLS_GITHUB_X_ONLY)
+        explicit_path = f"{self.path}.explicit"
+        self.addCleanup(lambda: os.path.exists(explicit_path) and os.remove(explicit_path))
+        gt.record_toolset_check(state, "2026-08-04T00:00:00Z", path=self.path, freshness_path=explicit_path)
+        self.assertTrue(os.path.exists(explicit_path))
+        self.assertFalse(os.path.exists(f"{self.path}.freshness"))
+
+
+class TestRecordToolsetFreshnessCheck(_TempLogCase):
+    def test_first_check_always_writes(self):
+        wrote = gt.record_toolset_freshness_check("2026-08-11T07:00:00Z", path=self.path)
+        self.assertTrue(wrote)
+
+    def test_exact_same_moment_resubmitted_is_skipped(self):
+        gt.record_toolset_freshness_check("2026-08-11T07:00:00Z", path=self.path)
+        wrote = gt.record_toolset_freshness_check("2026-08-11T07:00:00Z", path=self.path)
+        self.assertFalse(wrote)
+        with open(self.path) as f:
+            self.assertEqual(len([ln for ln in f if ln.strip()]), 1)
+
+    def test_a_different_moment_always_writes_even_with_no_state_change(self):
+        gt.record_toolset_freshness_check("2026-08-11T07:00:00Z", path=self.path)
+        wrote = gt.record_toolset_freshness_check("2026-08-11T08:00:00Z", path=self.path)
+        self.assertTrue(wrote)
+        with open(self.path) as f:
+            self.assertEqual(len([ln for ln in f if ln.strip()]), 2)
+
+    def test_malformed_tip_does_not_block_a_write(self):
+        with open(self.path, "w") as f:
+            f.write("{not valid json\n")
+        wrote = gt.record_toolset_freshness_check("2026-08-11T07:00:00Z", path=self.path)
+        self.assertTrue(wrote)
+        with open(self.path) as f:
+            self.assertEqual(len([ln for ln in f if ln.strip()]), 2)
+
+
 class TestComputeToolsetFreshness(_TempLogCase):
     """Task 669: the freshness half `toolset_delta`/`check` don't cover --
     how long since this log's own last entry, elapsed-time-keyed since (
@@ -355,15 +457,18 @@ class TestMainCLI(_TempLogCase):
 
     def test_record_then_check_round_trips(self):
         tools_path = self._write_tools_json(TOOLS_GITHUB_X_ONLY)
-        real_log = gt.LOG
+        real_log, real_freshness_log = gt.LOG, gt.FRESHNESS_LOG
         gt.LOG = self.path  # never touch the real durable log from a test
+        gt.FRESHNESS_LOG = f"{self.path}.freshness"  # nor its freshness companion (task 669)
         try:
             rc = gt.main(["gateway_toolset_check.py", "record", tools_path, "2026-08-01T18:00:00Z"])
             self.assertEqual(rc, 0)
             self.assertIsNotNone(gt.last_toolset_state(path=gt.LOG))
         finally:
-            gt.LOG = real_log
+            gt.LOG, gt.FRESHNESS_LOG = real_log, real_freshness_log
             os.remove(tools_path)
+            if os.path.exists(f"{self.path}.freshness"):
+                os.remove(f"{self.path}.freshness")
 
     def test_freshness_command_needs_no_tools_json(self):
         real_log = gt.LOG

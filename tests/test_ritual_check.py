@@ -642,6 +642,12 @@ class GatewayToolsetFoldCase(unittest.TestCase):
             os.path.join(ROOT, "tools", "gateway_toolset_check.py"),
         )
         self.gt.LOG = os.path.join(self.tmpdir, "gateway-toolset-check-log.jsonl")
+        # Task 669: record_toolset_check now also pings a freshness
+        # companion log on every call (see gateway_toolset_check.py's own
+        # FRESHNESS_LOG comment) -- isolate it here too, or these tests
+        # would silently write to the real production
+        # HAND/gateway-toolset-freshness-log.jsonl on every run.
+        self.gt.FRESHNESS_LOG = os.path.join(self.tmpdir, "gateway-toolset-freshness-log.jsonl")
         original_loader = rc._gateway_toolset_check
         rc._gateway_toolset_check = lambda: self.gt
         self.addCleanup(setattr, rc, "_gateway_toolset_check", original_loader)
@@ -752,6 +758,13 @@ class GatewayToolsetFreshnessFoldCase(unittest.TestCase):
             os.path.join(ROOT, "tools", "gateway_toolset_check.py"),
         )
         self.gt.LOG = os.path.join(self.tmpdir, "gateway-toolset-check-log.jsonl")
+        # Task 669: FRESHNESS_LOG must be isolated too, same as LOG --
+        # otherwise record_toolset_check's own path==LOG check (comparing
+        # against the module's live LOG global) still matches after the
+        # override above, and compute_toolset_freshness would read the
+        # REAL production HAND/gateway-toolset-freshness-log.jsonl instead
+        # of this test's isolated temp file.
+        self.gt.FRESHNESS_LOG = os.path.join(self.tmpdir, "gateway-toolset-freshness-log.jsonl")
         original_loader = rc._gateway_toolset_check
         rc._gateway_toolset_check = lambda: self.gt
         self.addCleanup(setattr, rc, "_gateway_toolset_check", original_loader)

@@ -646,7 +646,7 @@ def check_gateway_toolset_freshness(now: datetime) -> dict[str, object]:
     the next hour's run, not a currently-live rule violation, the same
     distinction the report/metrics freshness checks already hold."""
     mod = _gateway_toolset_check()
-    return cast(dict[str, object], mod.compute_toolset_freshness(now, path=mod.LOG))
+    return cast(dict[str, object], mod.compute_toolset_freshness(now, path=mod.FRESHNESS_LOG))
 
 
 def check_good_first_issues(open_issues: list[dict[str, object]] | None) -> dict[str, object] | None:

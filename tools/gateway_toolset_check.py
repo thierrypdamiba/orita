@@ -50,6 +50,26 @@ import jsonl_read  # noqa: E402
 
 LOG = os.path.join(os.path.dirname(__file__), "..", "HAND", "gateway-toolset-check-log.jsonl")
 
+# Task 669: a SEPARATE log from LOG above, on purpose. `record_toolset_check`
+# below deliberately skips writing to LOG when the observed state is
+# identical to the last recorded one (task 498's fix, mirrored across three
+# sibling logs: square_check.py, arcade_app_watch.py, word_watch.py) --
+# correct for LOG's own job (a real state CHANGE is the only thing worth a
+# new delta-log line) but exactly wrong for a freshness clock, which needs
+# "was this genuinely re-verified recently" and could otherwise sit dedup'd
+# at one stale entry forever even if someone dutifully re-checks every
+# single hour and it keeps coming back "still zero." `ci_watch.py` hit this
+# identical tension (task 501, its own docstring: a streak's design
+# "REQUIRES that two genuinely separate real checks landing on the same
+# conclusion at two different real moments both count") and solved it with
+# a narrower, moment-scoped dedup on ITS log rather than touching the
+# state-scoped dedup family's contract. This mirrors that choice instead of
+# repeating task 501's own mistake of first trying to bolt the fix onto the
+# wrong log: a freshness clock and a change-delta log are two different
+# questions, so they get two different logs, and LOG's own dedup contract
+# (and its existing tests) are untouched by this file.
+FRESHNESS_LOG = os.path.join(os.path.dirname(__file__), "..", "HAND", "gateway-toolset-freshness-log.jsonl")
+
 
 class ToolsetState(TypedDict):
     """`compute_toolset_state()`'s own return shape: whether any
@@ -115,7 +135,9 @@ def last_toolset_state(path: str = LOG) -> dict[str, object] | None:
     return entries[-1]
 
 
-def record_toolset_check(state: ToolsetState, checked_at: str, path: str = LOG) -> bool:
+def record_toolset_check(
+    state: ToolsetState, checked_at: str, path: str = LOG, freshness_path: str | None = None
+) -> bool:
     """Append one real observed gateway toolset state. Never edits or removes a prior line.
 
     Task 498: skips the append -- returns False, writes nothing -- when
@@ -127,21 +149,59 @@ def record_toolset_check(state: ToolsetState, checked_at: str, path: str = LOG) 
     "cannot confirm a duplicate" rather than propagated -- recording must
     still be able to repair a corrupted log by appending a fresh valid
     line.
+
+    Task 669: ALSO pings the separate freshness log (`FRESHNESS_LOG`'s own
+    comment above explains why it must be separate from `path`) on every
+    call, regardless of whether this state log write happened -- a real
+    check happened either way, so the freshness clock always advances,
+    even on the routine "checked, still the expected zero state" case this
+    function's own state dedup exists to keep OUT of `path`. `freshness_path`
+    defaults to `FRESHNESS_LOG` when `path` is the real default `LOG`
+    (production), or to `path + ".freshness"` otherwise (test callers that
+    already isolate `path` to a temp file get an isolated freshness
+    companion for free, with no call-site changes needed across this
+    function's ~30 existing callers) -- pass it explicitly to override
+    either default.
     """
     try:
         last = last_toolset_state(path)
     except GatewayToolsetCheckTamperedError:
         last = None
 
-    if last is not None and (
+    wrote = False
+    if last is None or not (
         bool(last.get("has_gmail_calendar_tools")) == state["has_gmail_calendar_tools"]
         and last.get("matched_tools") == state["matched_tools"]
     ):
-        return False
+        entry: dict[str, object] = dict(state)
+        entry["checked_at"] = checked_at
+        _append(entry, path)
+        wrote = True
 
-    entry: dict[str, object] = dict(state)
-    entry["checked_at"] = checked_at
-    _append(entry, path)
+    fp = freshness_path if freshness_path is not None else (FRESHNESS_LOG if path == LOG else f"{path}.freshness")
+    record_toolset_freshness_check(checked_at, path=fp)
+    return wrote
+
+
+def record_toolset_freshness_check(checked_at: str, path: str = FRESHNESS_LOG) -> bool:
+    """Append one real "a live gateway-toolset check happened" ping.
+
+    Deliberately dedups on a NARROWER criterion than `record_toolset_check`
+    above: only the exact same `checked_at` already being the last entry is
+    skipped (mirrors `ci_watch.py`'s `_same_observation`, narrowed to the
+    one field this log carries) -- refusing only the literal resubmission
+    of an already-recorded moment, never a second real check that happens
+    to land on the same (expected, steady-state) toolset. This is the
+    entire reason this log is separate from `LOG`: a state-scoped dedup
+    would make freshness un-refreshable exactly when the state is stable,
+    which defeats the point of a freshness check. Returns True if a line
+    was written, False if this exact `checked_at` was already the tip. A
+    malformed tip is treated as "cannot confirm a duplicate" rather than
+    propagated, the same discipline `record_toolset_check` already holds."""
+    entries = _entries(path)
+    if entries and not entries[-1].get("_malformed") and entries[-1].get("checked_at") == checked_at:
+        return False
+    _append({"checked_at": checked_at}, path)
     return True
 
 
@@ -200,34 +260,36 @@ class ToolsetFreshness(TypedDict):
     reason: str | None
 
 
-def compute_toolset_freshness(now: datetime, path: str = LOG) -> ToolsetFreshness:
-    """How long since this log last carried a REAL recorded check, keyed on
-    elapsed time rather than a calendar date -- unlike a daily report or a
-    daily metrics aggregate, this log has no fixed "expected reading for
-    today," so `check_report_freshness`/`compute_metrics_freshness`'s own
-    current/pending/stale-by-date shape does not fit. Three states instead:
-    "never" (the log is empty -- no check has ever been recorded), "fresh"
-    (the last entry is within `STALE_AFTER_DAYS`), "stale" (older than
-    that, or the log's own tip is malformed and its true freshness cannot
-    be trusted). Read-only: makes no network call and writes nothing,
-    mirroring `check_badge_freshness`'s own live-recompute-vs-committed-
-    state split -- freshness is a fact ABOUT the log, not a new entry in
-    it."""
-    try:
-        last = last_toolset_state(path)
-    except GatewayToolsetCheckTamperedError:
-        return {
-            "status": "stale",
-            "days_since": None,
-            "checked_at": None,
-            "reason": "the log's own tip is malformed -- last real freshness cannot be trusted",
-        }
-    if last is None:
+def compute_toolset_freshness(now: datetime, path: str = FRESHNESS_LOG) -> ToolsetFreshness:
+    """How long since `FRESHNESS_LOG` last carried a REAL recorded check,
+    keyed on elapsed time rather than a calendar date -- unlike a daily
+    report or a daily metrics aggregate, this log has no fixed "expected
+    reading for today," so `check_report_freshness`/`compute_metrics_
+    freshness`'s own current/pending/stale-by-date shape does not fit.
+    Three states instead: "never" (the log is empty -- no check has ever
+    been recorded), "fresh" (the last entry is within `STALE_AFTER_DAYS`),
+    "stale" (older than that, or the log's own tip is malformed and its
+    true freshness cannot be trusted). Reads `FRESHNESS_LOG`, never `LOG`
+    -- see `FRESHNESS_LOG`'s own comment for why `LOG`'s state dedup makes
+    it unusable for this purpose. Read-only: makes no network call and
+    writes nothing, mirroring `check_badge_freshness`'s own live-recompute-
+    vs-committed-state split -- freshness is a fact ABOUT the log, not a
+    new entry in it."""
+    entries = _entries(path)
+    if not entries:
         return {
             "status": "never",
             "days_since": None,
             "checked_at": None,
             "reason": "no gateway-toolset check has ever been recorded",
+        }
+    last = entries[-1]
+    if last.get("_malformed"):
+        return {
+            "status": "stale",
+            "days_since": None,
+            "checked_at": None,
+            "reason": "the log's own tip is malformed -- last real freshness cannot be trusted",
         }
     checked_at_raw = cast(str, last["checked_at"])
     checked_at = datetime.fromisoformat(checked_at_raw.replace("Z", "+00:00"))
@@ -270,8 +332,8 @@ def _load_tool_names_json(path: str) -> dict[str, object]:
 def main(argv: list[str]) -> int:
     if len(argv) >= 2 and argv[1] == "freshness":
         # Unlike check/record, freshness reads no live tool-name list --
-        # it is a fact about the LOG's own last entry, so it needs no
-        # <tool_names.json> argument at all.
+        # it is a fact about FRESHNESS_LOG's own last entry, so it needs
+        # no <tool_names.json> argument at all.
         result = compute_toolset_freshness(datetime.now(timezone.utc))
         print(format_toolset_freshness(result))
         return 0

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Task 121. Off-By-One counts the tool that counts everything else.
 
-`tools/ritual_check.py` hand-wires 63 `check_*` functions into one hourly
+`tools/ritual_check.py` hand-wires 64 `check_*` functions into one hourly
 block: each is called inside `run_ritual_check`, its result assigned to a
 dict key, and that key printed as a line in `format_ritual_check`. Three
 separate places a single typo or a forgotten wire-up can silently drop a
@@ -301,6 +301,17 @@ recipe README's literal "Run it yourself" block live and checks it exits
 0 and returns the shape its own `run_recipe_scan` promises -- the
 "documented, not verified" gap closed for the text of a link, now closed
 for the executable copy-paste instruction sitting right below it.
+
+**Updated to 64** the same hour task 669's `check_gateway_toolset_freshness`
+was wired in -- the sibling `check_gateway_toolset` (task 464) only ever
+runs, and only ever prints, when a caller passes a live
+`gateway_toolset_state`; a session that skipped the flag left no trace at
+all, so `fencepost/SCOPES.md`'s v0.2-gate claim sat unverified for nine
+real days with nothing surfacing it. `check_gateway_toolset_freshness` is
+unconditional (no live state required, runs on a bare `run_ritual_check()`
+too) and reports elapsed time since the log's own last real check, closing
+the exact "true when written, never rechecked" gap this module's own
+docstring already names as its reason for existing.
 
 Usage:
     python3 tools/ritual_completeness_check.py check
