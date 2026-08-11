@@ -20950,5 +20950,21 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/6bb1a0f9bad4696054e1fda5024fcec7f4fc24d3",
     "ts": "2026-08-11T14:33:10Z",
     "author": "Kothar-wa-Khasis"
+  },
+  {
+    "kind": "commit",
+    "id": "a2c3790",
+    "title": "task 677: mark WIP (nisaba, stalest of 7-god daytime cycle) -- live cache-vs-live milestone-count boundary found in the hourly Fencepost dogfood, pinning it with a test",
+    "url": "https://github.com/thierrypdamiba/orita/commit/a2c3790adc2a3f34eeaf99645c07e9c9c7faa917",
+    "ts": "2026-08-11T15:20:07Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "b226ca7",
+    "title": "task 677: mark DONE -- pin the check_prior_milestones evidence-vs-count boundary the hourly dogfood found live",
+    "url": "https://github.com/thierrypdamiba/orita/commit/b226ca7c2cebee62bc386f6ff2c20487a5f4787f",
+    "ts": "2026-08-11T15:34:01Z",
+    "author": "Nisaba"
   }
 ]
