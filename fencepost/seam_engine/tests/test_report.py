@@ -231,6 +231,20 @@ def test_render_latest_raises_named_error_not_keyerror_when_tip_is_malformed(tmp
         assert "malformed" in str(e)
 
 
+def test_main_rejects_trailing_ledger_base_flag_with_no_value(capsys):
+    rc = report.main(["--ledger-base"])
+    assert rc == 2
+    assert "--ledger-base needs a path" in capsys.readouterr().out
+
+
+def test_main_rejects_trailing_out_base_flag_with_no_value(tmp_path: Path, capsys):
+    sealed_path = tmp_path / "sealed.json"
+    sealed_path.write_text('{"date": "2026-07-12", "repo": "x", "primary_gap": null, "fenceposts_recorded_total": 0}')
+    rc = report.main([str(sealed_path), "--out-base"])
+    assert rc == 2
+    assert "--out-base needs a path" in capsys.readouterr().out
+
+
 def test_main_with_no_args_raises_named_error_not_keyerror_when_tip_is_malformed(tmp_path: Path):
     # Same bug, reached through the CLI's no-arg branch (`main()`'s
     # `sealed = records[-1]["sealed"]`), the exact path the daily Action

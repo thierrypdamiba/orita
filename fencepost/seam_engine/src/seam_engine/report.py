@@ -502,6 +502,9 @@ def main(argv: list[str] | None = None) -> int:
     ledger_base: Path | None = None
     if "--ledger-base" in argv:
         i = argv.index("--ledger-base")
+        if i + 1 >= len(argv):
+            print("--ledger-base needs a path to a Ledger directory.")
+            return 2
         ledger_base = Path(argv[i + 1])
         del argv[i : i + 2]
 
@@ -512,6 +515,9 @@ def main(argv: list[str] | None = None) -> int:
     out_base: Path | None = None
     if "--out-base" in argv:
         i = argv.index("--out-base")
+        if i + 1 >= len(argv):
+            print("--out-base needs a path to write the report under.")
+            return 2
         out_base = Path(argv[i + 1])
         del argv[i : i + 2]
 

@@ -368,6 +368,12 @@ def test_cli_status_reports_days_remaining_below_seven(tmp_path: Path, capsys):
     assert "4 to go" in captured.err
 
 
+def test_cli_rejects_trailing_base_flag_with_no_value(capsys):
+    rc = streak.main(["--base"])
+    assert rc == 2
+    assert "--base needs a path" in capsys.readouterr().out
+
+
 def test_cli_status_reports_seven_day_streak_held(tmp_path: Path, capsys):
     for i in range(7):
         _append_day(tmp_path, date(2026, 7, 1) + timedelta(days=i))

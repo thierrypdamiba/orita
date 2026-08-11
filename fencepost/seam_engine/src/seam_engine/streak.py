@@ -176,6 +176,9 @@ def main(argv: list[str] | None = None) -> int:
     base: Path | None = None
     if "--base" in argv:
         i = argv.index("--base")
+        if i + 1 >= len(argv):
+            print("--base needs a path to a Ledger directory.")
+            return 2
         base = Path(argv[i + 1])
         del argv[i : i + 2]
 

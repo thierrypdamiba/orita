@@ -370,6 +370,25 @@ def test_last_seal_is_genesis_on_empty_ledger(tmp_path: Path):
     assert ledger.last_seal(tmp_path) == ledger.GENESIS
 
 
+# --- the CLI's --base flag names a missing value, never crashes opaquely ------
+
+
+def test_main_rejects_trailing_base_flag_with_no_value(capsys):
+    rc = ledger.main(["status", "--base"])
+    assert rc == 2
+    assert "--base needs a path" in capsys.readouterr().out
+
+
+def test_main_with_only_base_flag_and_no_command_prints_usage(capsys):
+    # `--base x` alone used to consume both tokens and leave `argv` empty,
+    # then `cmd = argv[0]` crashed with a bare
+    # `IndexError: list index out of range` instead of the same usage
+    # message the truly-empty-argv branch above it already prints.
+    rc = ledger.main(["--base", "x"])
+    assert rc == 2
+    assert "usage:" in capsys.readouterr().out
+
+
 # --- the CLI's append command names a bad shape, never crashes opaquely -------
 
 

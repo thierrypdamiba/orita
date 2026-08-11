@@ -190,6 +190,18 @@ def test_main_exits_nonzero_when_the_ledger_chain_is_broken(tmp_path: Path):
     assert rc == 1
 
 
+def test_main_rejects_trailing_base_flag_with_no_value(capsys):
+    rc = badge.main(["--base"])
+    assert rc == 2
+    assert "--base needs a path" in capsys.readouterr().out
+
+
+def test_main_rejects_trailing_out_base_flag_with_no_value(capsys):
+    rc = badge.main(["--out-base"])
+    assert rc == 2
+    assert "--out-base needs a path" in capsys.readouterr().out
+
+
 def test_badge_path_defaults_to_fencepost_root():
     p = badge.badge_path()
     assert p.name == "BADGE.json"

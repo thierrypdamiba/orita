@@ -291,6 +291,12 @@ def test_cli_reads_from_stdin_sentinel_without_crashing(tmp_path, monkeypatch, c
     assert "nothing cleared the bar" in out.lower()
 
 
+def test_main_rejects_trailing_base_flag_with_no_value(capsys):
+    rc = draftback.main(["email", "--base"])
+    assert rc == 2
+    assert "--base needs a path" in capsys.readouterr().out
+
+
 def test_main_with_no_sealed_arg_raises_named_error_not_keyerror_when_tip_is_malformed(tmp_path: Path):
     # main()'s no-arg-but-a-ledger-exists branch used to read
     # `records[-1]["sealed"]` straight off the ledger tip -- a malformed

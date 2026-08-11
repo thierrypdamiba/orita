@@ -239,3 +239,15 @@ def test_main_exits_nonzero_when_a_false_positive_is_in_the_ledger(tmp_path: Pat
     ledger.append_scan(_scan(confidence=0.60, bar=0.70), now=_at(2026, 7, 12), base=tmp_path)
     rc = audit.main(["--base", str(tmp_path)])
     assert rc == 1
+
+
+def test_main_rejects_trailing_base_flag_with_no_value(capsys):
+    rc = audit.main(["--base"])
+    assert rc == 2
+    assert "--base needs a path" in capsys.readouterr().out
+
+
+def test_main_rejects_trailing_out_base_flag_with_no_value(capsys):
+    rc = audit.main(["--out-base"])
+    assert rc == 2
+    assert "--out-base needs a path" in capsys.readouterr().out

@@ -494,8 +494,15 @@ def main(argv: list[str] | None = None) -> int:
     base: Path | None = None
     if "--base" in argv:
         i = argv.index("--base")
+        if i + 1 >= len(argv):
+            print("--base needs a path to a Ledger directory.")
+            return 2
         base = Path(argv[i + 1])
         del argv[i : i + 2]
+
+    if not argv:
+        print("usage: python -m seam_engine.ledger {append <scan.json>|verify} [--base DIR]")
+        return 2
 
     cmd = argv[0]
     if cmd == "append":
