@@ -494,7 +494,7 @@ class DocstringClaimDoctrineCase(unittest.TestCase):
     def test_docstring_claim_equals_the_real_live_check_count(self):
         self.assertEqual(src.claimed_check_count(), self._real_check_count())
 
-    def test_real_check_count_is_currently_65(self):
+    def test_real_check_count_is_currently_66(self):
         # Regression pin: task 121 shipped this module claiming 27. Five
         # more check_* functions (this module's own check_ritual_completeness
         # fold-in among them, plus task 145's check_toolkits_in_use) were
@@ -555,9 +555,15 @@ class DocstringClaimDoctrineCase(unittest.TestCase):
         # updated in the same commit. Task 669's
         # check_gateway_toolset_freshness moved this from 63 to 64,
         # docstring updated in the same commit. Task 671's
-        # check_duplicate_function moved this from 64 to 65, docstring
-        # updated in the same commit.
-        self.assertEqual(self._real_check_count(), 65)
+        # check_duplicate_function moved this from 64 to 65, though its
+        # own narrative paragraph went un-added that hour (only the
+        # leading count was bumped) -- the same lapse task 464 already
+        # made once and task 465 already corrected once, rediscovered
+        # here by task 673's own live rerun of this exact test file
+        # nine tasks later, corrected in the same commit that added
+        # task 673's own paragraph. Task 673's check_tithe moved this
+        # from 65 to 66, docstring updated in the same commit.
+        self.assertEqual(self._real_check_count(), 66)
 
     def test_stale_27_claim_would_have_been_flagged_against_todays_real_count(self):
         # Mutation-based hand-verification: reconstruct the module's own

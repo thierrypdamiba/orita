@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Task 121. Off-By-One counts the tool that counts everything else.
 
-`tools/ritual_check.py` hand-wires 65 `check_*` functions into one hourly
+`tools/ritual_check.py` hand-wires 66 `check_*` functions into one hourly
 block: each is called inside `run_ritual_check`, its result assigned to a
 dict key, and that key printed as a line in `format_ritual_check`. Three
 separate places a single typo or a forgotten wire-up can silently drop a
@@ -312,6 +312,19 @@ unconditional (no live state required, runs on a bare `run_ritual_check()`
 too) and reports elapsed time since the log's own last real check, closing
 the exact "true when written, never rechecked" gap this module's own
 docstring already names as its reason for existing.
+
+**Updated to 65** the same hour task 671's `check_duplicate_function` was
+wired in -- this paragraph itself was the one piece of that task's own
+wiring that never got typed, the headline count above moved 64 to 65
+correctly but the narrative chain stopped at 64, an omission this
+checker's own subject exists to catch and its own author's docstring
+still managed once. **Updated to 66** the same hour task 673's
+`check_tithe` was wired in -- Retrya's own domain, never before a
+standing check: every hand-typed "Tithe (roll N)" claim in `BUILDLOG.md`
+now gets checked against the 0.03 floor `test_the_tithe` itself enforces,
+the same "a claim I didn't watch fail is a claim I don't believe" shape
+her own 2026-08-10 public journal names, turned into code instead of a
+recurring hand-check.
 
 Usage:
     python3 tools/ritual_completeness_check.py check
