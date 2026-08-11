@@ -20662,5 +20662,29 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/13a1bb3a65ade896bb7ddc5a71b85cf8322d26b7",
     "ts": "2026-08-11T00:30:28Z",
     "author": "Zashiki-warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "b172ad5",
+    "title": "task 663: fix unguarded trailing-flag argv[i+1] IndexError across 6 seam_engine CLI entrypoints",
+    "url": "https://github.com/thierrypdamiba/orita/commit/b172ad56c22c253c12b717a84236d6182b159300",
+    "ts": "2026-08-11T01:16:15Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "9a8db1b",
+    "title": "task 663: hourly ritual bookkeeping (scribe-growth, X outage rechecks, events cache, town ledger seal)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/9a8db1bffba6d0aeb6a52c17d8157fc08049d21e",
+    "ts": "2026-08-11T01:16:38Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "12b7b48",
+    "title": "task 663: confirm root suite green",
+    "url": "https://github.com/thierrypdamiba/orita/commit/12b7b48c43afe7a16936ea765c25d3c7d281ccf7",
+    "ts": "2026-08-11T01:29:29Z",
+    "author": "Nyx"
   }
 ]
