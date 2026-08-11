@@ -99,6 +99,86 @@ class KeywordGrammarCase(unittest.TestCase):
         self.assertEqual(dangerous, [1])
 
 
+class OwnerRepoQualifiedCase(unittest.TestCase):
+    """Task 684. GitHub's real closing-keyword grammar also recognizes an
+    `owner/repo#N` form (docs.github.com, "Linking a pull request to an
+    issue": "if the issue is in a different repository, you can use the
+    owner/repository#issue-number syntax ... This closes octo-org/octo-
+    repo#100"). That form is not cross-repo-only -- writing this town's
+    own `thierrypdamiba/orita#5` closes issue #5 here exactly as `#5`
+    alone would, and the pre-widening regex was silently blind to it
+    (reproduced live before fixing: `find_closing_refs` returned `[]` for
+    it). A reference qualified with any OTHER repo names a different
+    repo's issue namespace, which this module has no visibility into, and
+    stays out of scope on purpose (see module docstring)."""
+
+    def test_self_repo_qualified_reference_is_found(self):
+        self.assertEqual(
+            ckg.find_closing_refs("This closes thierrypdamiba/orita#5"), [5]
+        )
+
+    def test_self_repo_qualified_reference_case_insensitive(self):
+        self.assertEqual(
+            ckg.find_closing_refs("This CLOSES THIERRYPDAMIBA/ORITA#5"), [5]
+        )
+
+    def test_self_repo_qualified_colon_form(self):
+        self.assertEqual(
+            ckg.find_closing_refs("Closes: thierrypdamiba/orita#5"), [5]
+        )
+
+    def test_self_repo_qualified_reference_flagged_as_dangerous(self):
+        ok, dangerous = ckg.check_message(
+            "This closes thierrypdamiba/orita#5", [5]
+        )
+        self.assertFalse(ok)
+        self.assertEqual(dangerous, [5])
+
+    def test_bare_form_still_defaults_to_self_repo(self):
+        # No regression: a bare #N (no owner/repo prefix at all) is
+        # exactly as dangerous as it always was, unaffected by the widening.
+        ok, dangerous = ckg.check_message("closes #5", [5])
+        self.assertFalse(ok)
+        self.assertEqual(dangerous, [5])
+
+    def test_different_repo_qualified_reference_is_out_of_scope(self):
+        # A reference to a DIFFERENT repo's #100 is that repo's problem,
+        # not this one's -- this module has no visibility into whether
+        # #100 is open THERE, and must not guess.
+        self.assertEqual(
+            ckg.find_closing_refs("This closes some-org/some-repo#100"), []
+        )
+        ok, dangerous = ckg.check_message(
+            "This closes some-org/some-repo#100", [100]
+        )
+        self.assertTrue(ok)
+        self.assertEqual(dangerous, [])
+
+    def test_explicit_repo_argument_overrides_the_default(self):
+        # The `repo` parameter is real, not a hardcoded string swapped in
+        # only for the default -- a caller checking a DIFFERENT repo's own
+        # commit sees that repo's own owner/repo#N references as self.
+        self.assertEqual(
+            ckg.find_closing_refs(
+                "This closes some-org/some-repo#100", repo="some-org/some-repo"
+            ),
+            [100],
+        )
+        # ...and the town's own self-repo becomes "a different repo" from
+        # that caller's point of view.
+        self.assertEqual(
+            ckg.find_closing_refs(
+                "This closes thierrypdamiba/orita#5", repo="some-org/some-repo"
+            ),
+            [],
+        )
+
+    def test_self_repo_constant_matches_documented_town_repo(self):
+        # TOWN-OPERATIONS.md's Repos section names this exact repo; this
+        # pins the default so a drifted constant fails loudly, not silently.
+        self.assertEqual(ckg.SELF_REPO, "thierrypdamiba/orita")
+
+
 class DangerScopeCase(unittest.TestCase):
     """Only currently-open numbers are a live risk; closed/nonexistent
     numbers are inert and must not be flagged."""

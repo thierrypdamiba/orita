@@ -1,15 +1,21 @@
-"""Task 397 (widened by tasks 418 and 445). Proves tools/duplicate_regex_
+"""Task 397 (widened by tasks 418, 445, 684). Proves tools/duplicate_regex_
 check.py actually bites on a synthetic hand-typed duplicate, stays clean
-when a file imports a shared name instead of redefining it, does not flag
-either seeded/documented exception (`_CLOSES_RE`, and task 418's `tools/
-closing_keyword_guard.py`/`seam_engine/closing_keywords.py` mirror), and
--- the real point -- confirms the live, current orita checkout holds zero
-real violations today. Task 418 also proves the checker's own `tools/
-*.py` glob (added this task, having never scanned its own directory
-before) is actually wired in, not just documented. Task 445 proves the
-same for `oracle/oracle_engine/src/oracle_engine/*.py` -- the Oracle
-Desk's own cadence/autograde engine, scanned for the first time this
-task.
+when a file imports a shared name instead of redefining it, and -- the
+real point -- confirms the live, current orita checkout holds zero real
+violations today. Task 418 also proves the checker's own `tools/*.py`
+glob (added this task, having never scanned its own directory before) is
+actually wired in, not just documented. Task 445 proves the same for
+`oracle/oracle_engine/src/oracle_engine/*.py` -- the Oracle Desk's own
+cadence/autograde engine, scanned for the first time this task.
+
+`_ALLOWED_DUPLICATES` is empty as of task 684 -- both seeds that used to
+live here (`_CLOSES_RE`, trimmed under ROADMAP.md #543; the `tools/
+closing_keyword_guard.py`/`seam_engine/closing_keywords.py` mirror,
+trimmed this task once closing_keyword_guard.py's own grammar widened
+past it, see that module's docstring) stopped describing real duplicates.
+`LiveRepoCase.test_seeded_exception_still_describes_a_real_duplicate`
+below still guards the general mechanism generically -- it holds
+regardless of whether the dict is currently empty or seeded.
 """
 import importlib.util
 import os
@@ -111,12 +117,22 @@ class FixtureViolationCase(unittest.TestCase):
     # grammar instead of carrying their own narrower local copy). The two
     # tests that used to exercise the seeded-exception mechanism against
     # that pattern (`test_seeded_exception_pair_is_not_flagged`,
-    # `test_exception_pair_widened_to_a_third_file_is_still_flagged`) are
-    # removed rather than repointed at the one remaining seed --
-    # `test_seeded_closing_keyword_guard_mirror_is_not_flagged` and
-    # `test_closing_keyword_guard_exception_widened_to_a_third_file_is_
-    # still_flagged` below already prove the identical mechanism against
-    # that surviving pattern; repointing would have only duplicated them.
+    # `test_exception_pair_widened_to_a_third_file_is_still_flagged`) were
+    # removed rather than repointed at the one remaining seed at the time
+    # (`tools/closing_keyword_guard.py`/`seam_engine/closing_keywords.py`).
+    # Task 684 trimmed that second seed too (closing_keyword_guard.py's
+    # own grammar widened past the mirror, see its module docstring) --
+    # `_ALLOWED_DUPLICATES` is empty as of this task, and the two tests
+    # that exercised IT (`test_seeded_closing_keyword_guard_mirror_is_not_
+    # flagged`, `test_closing_keyword_guard_exception_widened_to_a_third_
+    # file_is_still_flagged`) are removed the identical way, for the
+    # identical reason: nothing left to seed against. The general
+    # seeded-exception mechanism itself stays covered generically by
+    # `LiveRepoCase.test_seeded_exception_still_describes_a_real_
+    # duplicate` below and by `test_two_recipes_with_hand_typed_duplicate_
+    # are_flagged` above (a synthetic pair, not relying on any real seed
+    # existing) -- if a future task seeds a new real exception, it earns
+    # its own from-scratch pair of tests the same way this one once did.
 
     def test_non_literal_pattern_is_ignored(self):
         _write(
@@ -250,41 +266,6 @@ class FixtureViolationCase(unittest.TestCase):
         )
         violations = drc.find_violations(orita_dir=self.orita)
         self.assertEqual(violations, [])
-
-    def test_seeded_closing_keyword_guard_mirror_is_not_flagged(self):
-        # The second seeded exception (task 418): tools/closing_keyword_
-        # guard.py and seam_engine/closing_keywords.py define the
-        # identical grammar on purpose -- seam_engine's own docstring
-        # rules it must NOT import the parent repo's tools/ directory, to
-        # stay portable/forkable. This pair only became visible once the
-        # tools/*.py glob existed at all.
-        pattern = r"\b(?:close[sd]?|fix(?:e[sd])?|resolve[sd]?):?\s+#(\d+)\b"
-        allowed = drc._ALLOWED_DUPLICATES[pattern]
-        self.assertEqual(
-            allowed,
-            {
-                os.path.join("tools", "closing_keyword_guard.py"),
-                os.path.join("fencepost", "seam_engine", "src", "seam_engine", "closing_keywords.py"),
-            },
-        )
-        for rel in allowed:
-            _write(os.path.join(self.orita, rel), f'import re\nCLOSING_KEYWORD_RE = re.compile(r"{pattern}", re.IGNORECASE)\n')
-        violations = drc.find_violations(orita_dir=self.orita)
-        self.assertEqual(violations, [])
-
-    def test_closing_keyword_guard_exception_widened_to_a_third_file_is_still_flagged(self):
-        pattern = r"\b(?:close[sd]?|fix(?:e[sd])?|resolve[sd]?):?\s+#(\d+)\b"
-        allowed = drc._ALLOWED_DUPLICATES[pattern]
-        for rel in allowed:
-            _write(os.path.join(self.orita, rel), f'import re\nCLOSING_KEYWORD_RE = re.compile(r"{pattern}", re.IGNORECASE)\n')
-        _write(
-            os.path.join(self.orita, "tools", "fixture_tool_c.py"),
-            f'import re\nCLOSING_KEYWORD_RE = re.compile(r"{pattern}", re.IGNORECASE)\n',
-        )
-        violations = drc.find_violations(orita_dir=self.orita)
-        self.assertEqual(len(violations), 1)
-        self.assertEqual(violations[0]["pattern"], pattern)
-
 
 class LiveRepoCase(unittest.TestCase):
     """The real point of task 397: run the scan against the actual,

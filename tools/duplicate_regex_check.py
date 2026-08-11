@@ -78,6 +78,20 @@ locally -- `_local_re_compile_patterns()` only ever counts an actual
 locally in exactly one file (`text_patterns.py` itself) and correctly
 never flags as a duplicate.
 
+Task 684: the one remaining seed (`tools/closing_keyword_guard.py` /
+`seam_engine/closing_keywords.py`) went the way `_CLOSES_RE` already went
+under ROADMAP.md #543 -- trimmed, not left as dead allowlist, because it
+stopped describing a real duplicate. `closing_keyword_guard.py` widened
+its own grammar to recognize GitHub's real `owner/repo#N` closing-keyword
+form (a genuine Iron Rule #8 safety gap, reproduced and fixed live); the
+seam_engine mirror deliberately stayed on the narrower bare-`#N` grammar
+(a different job -- nine recipes' claim-detection, not self-close
+guarding -- widening those is real, named, deliberately out-of-scope
+follow-on work, not attempted this hour). The two files' pattern text now
+genuinely differs, so `_ALLOWED_DUPLICATES` is empty again -- if a future
+task re-synchronizes them, or any other real mirror is intentionally
+seeded, it is added back the same documented way.
+
 Usage:
     python3 tools/duplicate_regex_check.py check
 """
@@ -110,17 +124,14 @@ _SKIP_BASENAMES = {"__init__.py"}
 # nothing if their patterns differ, and two files disagreeing on a name
 # means nothing if their patterns (the live behavior) are identical.
 _ALLOWED_DUPLICATES: dict[str, frozenset[str]] = {
-    # Task 418: widening the scan to tools/*.py surfaced this pair for the
-    # first time. seam_engine.closing_keywords's own docstring already
-    # rules deliberately does NOT import tools/closing_keyword_guard.py --
-    # seam_engine must stay portable/forkable and not depend on this
-    # parent repo's own tools/ directory, so it re-states the identical
-    # grammar as a documented, intentional mirror instead of an import.
-    # A real, working two-copy law, same shape as the pair above.
-    r"\b(?:close[sd]?|fix(?:e[sd])?|resolve[sd]?):?\s+#(\d+)\b": frozenset({
-        os.path.join("tools", "closing_keyword_guard.py"),
-        os.path.join("fencepost", "seam_engine", "src", "seam_engine", "closing_keywords.py"),
-    }),
+    # Task 684 trimmed the one seed that used to live here (tools/
+    # closing_keyword_guard.py / seam_engine/closing_keywords.py, task
+    # 418): closing_keyword_guard.py widened its own grammar to a real
+    # Iron Rule #8 safety gap the seam_engine mirror deliberately did not
+    # follow (see module docstring), so the two files' pattern text no
+    # longer matches and this is empty again -- not a bare `{}` left
+    # unexplained, the same "trim it, in writing" shape ROADMAP.md #543
+    # used for `_CLOSES_RE`.
 }
 
 
