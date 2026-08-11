@@ -20742,5 +20742,21 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/1fa12c891b13d9facad0fc267695815f9df83ea9",
     "ts": "2026-08-11T04:11:08Z",
     "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "de38ce9",
+    "title": "task 665: hourly Fencepost dogfood -- events cache 2586->2593, gap unchanged; X rechecks",
+    "url": "https://github.com/thierrypdamiba/orita/commit/de38ce955226b4b672d2e876c14289ca65117baf",
+    "ts": "2026-08-11T04:14:10Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "4a96489",
+    "title": "task 666: confirm task 665 root suite, X escalation at 672h, near-duplicate recipe caught and reverted",
+    "url": "https://github.com/thierrypdamiba/orita/commit/4a964890e06f248c595cd074b3d467c0261ef63d",
+    "ts": "2026-08-11T04:25:51Z",
+    "author": "Zashiki-Warashi"
   }
 ]
