@@ -18,25 +18,58 @@ point the pattern itself is the finding, not any one instance of it." The
 identical sentence applies to whole function bodies, and nothing has ever
 stood watch for it between manual sweeps.
 
-Scope, deliberately narrow for a first version: this checker scans only
-`tools/*.py` (skipping `__init__.py` and every `tests/`-shaped path)
-because that is exactly where all four manual sweeps this docstring cites
-found their real duplicates. `duplicate_regex_check.py`'s own `tools/*.py`
-and `oracle_engine` globs were each widened in a LATER task (418, 445),
-not its first -- the same earn-it-narrow-first shape this checker follows
+Scope, first version: this checker scanned only `tools/*.py` (skipping
+`__init__.py` and every `tests/`-shaped path) because that is exactly
+where all four manual sweeps this docstring cites found their real
+duplicates. `duplicate_regex_check.py`'s own `tools/*.py` and
+`oracle_engine` globs were each widened in a LATER task (418, 445), not
+its first -- the same earn-it-narrow-first shape this checker followed
 on purpose, not a shortcut skipped by accident. `fencepost/RECIPES/*/
-detector.py` in particular is full of *legitimately* parallel functions
-(every recipe's own `load_commits`/`load_issues`/`run_recipe_scan` follows
-the same documented shape on purpose, per `CONTRIBUTING.md`'s own recipe
-template) that would drown a first version in false positives before it
-proved itself against the tree it was actually built to watch. Widening
-to `fencepost/seam_engine/src/seam_engine/*.py` and `oracle/oracle_engine/
-src/oracle_engine/*.py` is a real, separate future task.
+detector.py` stayed OUT of scope on purpose and remains out of scope
+today: it is full of *legitimately* parallel functions (every recipe's
+own `load_commits`/`load_issues`/`run_recipe_scan` follows the same
+documented shape on purpose, per `CONTRIBUTING.md`'s own recipe template)
+that would drown this checker in false positives.
+
+Task 674 widened the scan, the deferred future task this docstring's
+prior version named by name: `fencepost/seam_engine/src/seam_engine/*.py`
+and `oracle/oracle_engine/src/oracle_engine/*.py` joined `tools/*.py`,
+mirroring `duplicate_regex_check.py`'s own real widening (tasks 418, 445)
+exactly. The live tree's first-ever cross-directory run found exactly one
+real hit, immediately: `_dynamic_import_target` -- an `ast.Call` reader
+that recognizes `importlib.import_module(...)`/bare `import_module(...)`/
+`__import__(...)` and returns a literal string first argument -- is
+defined byte-identically in both `tools/network_boundary_check.py` and
+`fencepost/seam_engine/src/seam_engine/recipes.py`. Not a bug: `network_
+boundary_check.py`'s own docstring already named this exact second copy
+by path, from the day the underlying dynamic-import gap was closed
+("`fencepost/seam_engine/src/seam_engine/recipes.py`'s own independent
+copy of this deny-list logic had the identical gap, closed the same
+task") -- confirmed, not discovered, that this is a deliberate two-copy
+law, not an oversight. Real reason it stays two copies rather than one
+shared import: `network_boundary_check.py` is itself one of the thirty
+files it watches for "no network import" (its own file is in
+`EXPECTED_TODAY`) and CI's lean root job (task 404's
+own boundary, `.github/workflows/dawn-run.yml`'s `the-oath` job)
+installs only PyYAML -- no `uv`, no `seam_engine` package on that
+interpreter's path at all. Importing `seam_engine.recipes` from a
+`tools/*.py` file would either break that job outright or force it to
+grow a real dependency it was deliberately kept lean to avoid; reading
+`fencepost/seam_engine/src/seam_engine/` by AST off the filesystem (as
+`network_boundary_check.py` and this checker both already do, extensively)
+crosses no such boundary. Seeded as this checker's first-ever
+`_ALLOWED_DUPLICATES` entry, keyed on the real hash, named by path in the
+dict's own comment -- the same citation discipline `duplicate_regex_
+check.py`'s own `_CLOSES_RE`/closing-keyword-grammar exception already
+set.
 
 For every top-level and class-level `def`/`async def` in a scanned file,
-hashes `ast.dump(node.body, annotate_fields=False)` of the BODY only (the
-statements after the signature; a leading bare-string docstring `Expr` is
-stripped first) -- never the function's own name, since task 513's own
+hashes (sha256 hex digest, task 674 -- the raw `ast.dump` text of a real
+function easily runs past a thousand characters, unreadable as an
+`_ALLOWED_DUPLICATES` dict key) `ast.dump(node.body, annotate_fields=
+False)` of the BODY only (the statements after the signature; a leading
+bare-string docstring `Expr` is stripped first) -- never the function's
+own name, since task 513's own
 real finding (`arcade_hero_check.py`'s `_iter_scan_files` vs. five
 siblings' `_iter_public_files`) was invisible to a name-sensitive hash by
 construction. `ast.dump` with `annotate_fields=False` drops line numbers
@@ -77,6 +110,7 @@ from __future__ import annotations
 
 import ast
 import glob
+import hashlib
 import os
 import sys
 from collections.abc import Iterator
@@ -89,6 +123,10 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DEFAULT_ORITA_DIR = ROOT
 
 _TOOLS_GLOB = "tools/*.py"
+# Task 674: joined tools/*.py, mirroring duplicate_regex_check.py's own
+# real widening history (tasks 418, 445) for its narrower sibling bug.
+_SEAM_ENGINE_GLOB = "fencepost/seam_engine/src/seam_engine/*.py"
+_ORACLE_ENGINE_GLOB = "oracle/oracle_engine/src/oracle_engine/*.py"
 _SKIP_BASENAMES = {"__init__.py"}
 
 # A function's body needs at least this many total AST nodes (via
@@ -100,20 +138,41 @@ _MIN_BODY_NODES = 12
 
 # Body-hash -> the exact set of files it is allowed to be locally defined
 # in more than once. Keyed on the hash (the actual identifying fact),
-# same convention as duplicate_regex_check.py's own _ALLOWED_DUPLICATES --
-# empty today because nothing yet found by this checker has been ruled a
-# deliberate, documented two-copy law the way `_CLOSES_RE` and the
-# closing-keyword grammar mirror were for its sibling checker. A real
-# future exception is added here, named, with the same citation
-# discipline as that dict's own comment -- never silently.
-_ALLOWED_DUPLICATES: dict[str, frozenset[str]] = {}
+# same convention as duplicate_regex_check.py's own _ALLOWED_DUPLICATES.
+#
+# Task 674: the widened scan's first-ever cross-directory run surfaced
+# this checker's first real entry, immediately. `_dynamic_import_target`
+# (recognizes `importlib.import_module(...)`/bare `import_module(...)`/
+# `__import__(...)` and returns a literal-string first argument) is
+# defined byte-identically in `tools/network_boundary_check.py` and
+# `fencepost/seam_engine/src/seam_engine/recipes.py`. Confirmed, not
+# discovered: `network_boundary_check.py`'s own docstring already named
+# this exact second copy by path, from the day the underlying dynamic-
+# import gap was closed ("recipes.py's own independent copy of this deny-
+# list logic had the identical gap, closed the same task"). Stays two
+# copies on purpose: `network_boundary_check.py` is itself one of the
+# thirty files it watches for "no network import," and CI's lean root
+# job (task 404, `.github/workflows/dawn-run.yml`'s `the-oath` job)
+# installs only PyYAML -- no `uv`, no `seam_engine` package anywhere on
+# that interpreter's path. Importing `seam_engine.recipes` from a
+# `tools/*.py` file would either break that job or force it to grow a
+# real dependency kept lean on purpose; reading `seam_engine`'s source by
+# AST off the filesystem (as both files already do, extensively) crosses
+# no such boundary.
+_ALLOWED_DUPLICATES: dict[str, frozenset[str]] = {
+    "3182e07480f334cffbe8b59c2ce16265b134f21f15db8dbfd172d849697c2217": frozenset({
+        os.path.join("tools", "network_boundary_check.py"),
+        os.path.join("fencepost", "seam_engine", "src", "seam_engine", "recipes.py"),
+    }),
+}
 
 
 def _iter_scanned_files(orita_dir: str) -> Iterator[str]:
-    for path in sorted(glob.glob(os.path.join(orita_dir, _TOOLS_GLOB))):
-        if os.path.basename(path) in _SKIP_BASENAMES:
-            continue
-        yield path
+    for rel_glob in (_TOOLS_GLOB, _SEAM_ENGINE_GLOB, _ORACLE_ENGINE_GLOB):
+        for path in sorted(glob.glob(os.path.join(orita_dir, rel_glob))):
+            if os.path.basename(path) in _SKIP_BASENAMES:
+                continue
+            yield path
 
 
 def _strip_docstring(body: list[ast.stmt]) -> list[ast.stmt]:
@@ -170,7 +229,12 @@ def _is_thin_delegator(body: list[ast.stmt]) -> bool:
 def _function_bodies(path: str) -> list[tuple[str, str, int]]:
     """Every `(name, body_hash, lineno)` this file defines for a top-level
     or class-level `def`/`async def` whose body (docstring stripped) has
-    at least `_MIN_BODY_NODES` AST nodes."""
+    at least `_MIN_BODY_NODES` AST nodes. `body_hash` is a sha256 hex
+    digest of the body's `ast.dump`, not the raw dump text itself (task
+    674: the raw dump of a real function easily runs past a thousand
+    characters, unreadable and unwieldy as a `_ALLOWED_DUPLICATES` dict
+    key -- a real hash is exactly what this checker's own name and
+    docstring already claimed it computes)."""
     try:
         with open(path, encoding="utf-8") as f:
             source = f.read()
@@ -191,7 +255,8 @@ def _function_bodies(path: str) -> list[tuple[str, str, int]]:
                     node_count = sum(1 for _ in ast.walk(ast.Module(body=body, type_ignores=[])))
                     if node_count >= _MIN_BODY_NODES:
                         dumped = ast.dump(ast.Module(body=body, type_ignores=[]), annotate_fields=False)
-                        found.append((child.name, dumped, child.lineno))
+                        body_hash = hashlib.sha256(dumped.encode("utf-8")).hexdigest()
+                        found.append((child.name, body_hash, child.lineno))
                 # Nested functions (closures) count too -- task 513's own
                 # `_take(flag)`-shaped closures are exactly this case.
                 _visit(child)
@@ -209,11 +274,14 @@ class Violation(TypedDict):
 
 def _find_violations_uncached(orita_dir: str = DEFAULT_ORITA_DIR) -> list[Violation]:
     """Read-only, local-filesystem-only `ast` scan (no import, no
-    execution, no network) of every `tools/*.py` file for a function body
-    (name-blind, docstring-stripped) defined identically in two or more
-    distinct files. Returns a list of violation records, empty when every
-    duplicate body in the live tree is either a real single definition or
-    a seeded, documented exception."""
+    execution, no network) of every `tools/*.py`,
+    `fencepost/seam_engine/src/seam_engine/*.py`, and
+    `oracle/oracle_engine/src/oracle_engine/*.py` file (task 674 widened
+    past `tools/*.py` alone) for a function body (name-blind, docstring-
+    stripped) defined identically in two or more distinct files. Returns
+    a list of violation records, empty when every duplicate body in the
+    live tree is either a real single definition or a seeded, documented
+    exception."""
     by_hash: dict[str, list[tuple[str, str, int]]] = {}
     for path in _iter_scanned_files(orita_dir):
         rel = os.path.relpath(path, orita_dir)
@@ -241,7 +309,7 @@ find_violations, clear_cache = scan_files.path_memoize(_find_violations_uncached
 
 def format_violations(violations: list[Violation]) -> str:
     if not violations:
-        return "duplicate function check: clean -- every tools/*.py function body (>=12 AST nodes) is either unique or a seeded exception"
+        return "duplicate function check: clean -- every scanned function body (>=12 AST nodes, across tools/*.py, fencepost/seam_engine/src/seam_engine/*.py, oracle/oracle_engine/src/oracle_engine/*.py) is either unique or a seeded exception"
     lines = [f"duplicate function check: {len(violations)} DUPLICATE BODY/BODIES FOUND -- identical logic, no shared import backing it"]
     for v in violations:
         lines.append(f"  hash {v['body_hash'][:16]}...")

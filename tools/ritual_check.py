@@ -884,7 +884,11 @@ def check_duplicate_function(orita_dir: str | None = None) -> dict[str, object]:
     same cheap class `check_checkout`/`check_vault_leak`/
     `check_duplicate_regex` already hold. Never edits anything; a real
     violation, if one is ever found, is a god-on-duty escalation, not
-    something this check silently repairs."""
+    something this check silently repairs. Task 674: the checker's own
+    scan widened past `tools/*.py` to also cover `fencepost/seam_engine/
+    src/seam_engine/*.py` and `oracle/oracle_engine/src/oracle_engine/
+    *.py` -- this fold needed no changes of its own, since it only ever
+    calls the checker's own `find_violations()`."""
     mod = _duplicate_function_check()
     kwargs = {}
     if orita_dir is not None:
@@ -2512,7 +2516,7 @@ def format_ritual_check(result: dict[str, Any]) -> str:
         lines.append(f"  duplicate regex: {dr['count']} DUPLICATE(S) -- hand-typed copy with no import backing it, fix now")
     df = result["duplicate_function"]
     if df["clean"]:
-        lines.append("  duplicate function: clean (every tools/*.py function body unique or a seeded exception)")
+        lines.append("  duplicate function: clean (every scanned function body unique or a seeded exception)")
     else:
         lines.append(f"  duplicate function: {df['count']} DUPLICATE(S) -- identical function body, no shared import backing it, fix now")
     tithe_result = result["tithe"]

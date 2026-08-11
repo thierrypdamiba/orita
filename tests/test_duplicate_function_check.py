@@ -5,8 +5,22 @@ to a shared function (the false-positive shape its own first live run
 against the real tree caught, before shipping), stays name-blind (task
 513's own real finding -- `_iter_scan_files` vs `_iter_public_files`,
 same body, different name), and -- the real point -- confirms the live,
-current `tools/*.py` tree holds zero real violations today.
+current tree holds zero real (unseeded) violations today.
+
+Task 674 widened the scan past `tools/*.py` to also cover
+`fencepost/seam_engine/src/seam_engine/*.py` and
+`oracle/oracle_engine/src/oracle_engine/*.py`, and seeded the checker's
+first-ever `_ALLOWED_DUPLICATES` entry (`_dynamic_import_target`, real
+and deliberate between `tools/network_boundary_check.py` and
+`fencepost/seam_engine/src/seam_engine/recipes.py`). `FixtureViolationCase`
+below still writes its synthetic fixtures under a fake `tools/` dir --
+the checker's own logic (thin-delegator exclusion, size floor, name-
+blindness, `_ALLOWED_DUPLICATES`) does not depend on which of the three
+scanned globs a file lives under, so re-using `tools/` there keeps those
+cases focused on the logic they exist to prove. `WidenedScopeCase` and
+`AllowedDuplicateCase` below are the new, scope-specific coverage.
 """
+import ast
 import importlib.util
 import os
 import shutil
@@ -244,18 +258,177 @@ class FixtureViolationCase(unittest.TestCase):
 
 
 class LiveTreeCase(unittest.TestCase):
-    def test_live_tools_tree_holds_zero_real_violations_today(self):
+    def test_live_tree_holds_zero_real_unseeded_violations_today(self):
         dfc.clear_cache()
         violations = dfc.find_violations()
         self.assertEqual(
             violations, [],
-            f"real duplicate function body/bodies found in the live tools/ tree: {violations!r}",
+            f"real duplicate function body/bodies found in the live tree: {violations!r}",
         )
 
     def test_format_violations_reports_clean_on_the_live_tree(self):
         dfc.clear_cache()
         formatted = dfc.format_violations(dfc.find_violations())
         self.assertIn("clean", formatted)
+
+
+class WidenedScopeCase(unittest.TestCase):
+    """Task 674: `fencepost/seam_engine/src/seam_engine/*.py` and
+    `oracle/oracle_engine/src/oracle_engine/*.py` joined `tools/*.py` as
+    scanned globs. These prove the widened globs are actually walked --
+    not just present as unused constants -- by planting a duplicate that
+    ONLY a cross-directory scan can see."""
+
+    def setUp(self):
+        self.orita = tempfile.mkdtemp()
+        for rel in (
+            os.path.join("tools"),
+            os.path.join("fencepost", "seam_engine", "src", "seam_engine"),
+            os.path.join("oracle", "oracle_engine", "src", "oracle_engine"),
+        ):
+            os.makedirs(os.path.join(self.orita, rel), exist_ok=True)
+        self.addCleanup(_rm, self.orita)
+
+    def test_duplicate_between_tools_and_seam_engine_is_flagged(self):
+        _write(
+            os.path.join(self.orita, "tools", "fixture_tool.py"),
+            "from datetime import datetime, timezone\n\n" + _REAL_DUPLICATE_BODY.format(name="_parse"),
+        )
+        _write(
+            os.path.join(self.orita, "fencepost", "seam_engine", "src", "seam_engine", "fixture_seam.py"),
+            "from datetime import datetime, timezone\n\n" + _REAL_DUPLICATE_BODY.format(name="_parse"),
+        )
+        violations = dfc.find_violations(orita_dir=self.orita)
+        self.assertEqual(len(violations), 1)
+        files = {rel for rel, _name, _lineno in violations[0]["locations"]}
+        self.assertEqual(
+            files,
+            {
+                os.path.join("tools", "fixture_tool.py"),
+                os.path.join("fencepost", "seam_engine", "src", "seam_engine", "fixture_seam.py"),
+            },
+        )
+
+    def test_duplicate_between_tools_and_oracle_engine_is_flagged(self):
+        _write(
+            os.path.join(self.orita, "tools", "fixture_tool.py"),
+            "from datetime import datetime, timezone\n\n" + _REAL_DUPLICATE_BODY.format(name="_parse"),
+        )
+        _write(
+            os.path.join(self.orita, "oracle", "oracle_engine", "src", "oracle_engine", "fixture_oracle.py"),
+            "from datetime import datetime, timezone\n\n" + _REAL_DUPLICATE_BODY.format(name="_parse"),
+        )
+        violations = dfc.find_violations(orita_dir=self.orita)
+        self.assertEqual(len(violations), 1)
+
+    def test_duplicate_confined_to_seam_engine_alone_is_still_flagged(self):
+        for name in ("fixture_seam_a.py", "fixture_seam_b.py"):
+            _write(
+                os.path.join(self.orita, "fencepost", "seam_engine", "src", "seam_engine", name),
+                "from datetime import datetime, timezone\n\n" + _REAL_DUPLICATE_BODY.format(name="_parse"),
+            )
+        violations = dfc.find_violations(orita_dir=self.orita)
+        self.assertEqual(len(violations), 1)
+
+    def test_recipes_detector_py_still_out_of_scope(self):
+        # fencepost/RECIPES/*/detector.py stayed deliberately out of
+        # scope in task 671 (legitimately parallel functions by design)
+        # and task 674's widening did not touch that call -- confirmed
+        # here so a future widening of the RECIPES glob is a conscious
+        # choice, not an accidental side effect of this task's own edit.
+        for slug in ("recipe-a", "recipe-b"):
+            _write(
+                os.path.join(self.orita, "fencepost", "RECIPES", slug, "detector.py"),
+                "from datetime import datetime, timezone\n\n" + _REAL_DUPLICATE_BODY.format(name="_parse"),
+            )
+        violations = dfc.find_violations(orita_dir=self.orita)
+        self.assertEqual(violations, [])
+
+
+class AllowedDuplicateCase(unittest.TestCase):
+    """Task 674: proves `_ALLOWED_DUPLICATES` actually suppresses its one
+    seeded, real, deliberate two-copy pair on the live tree -- and that
+    the exclusion is scoped to exactly those two files, not to the hash
+    everywhere it might appear."""
+
+    def test_live_seeded_pair_is_real_and_shares_the_body_hash(self):
+        real_root = dfc.ROOT
+        bodies_a = dict(
+            (name, h) for name, h, _ in dfc._function_bodies(
+                os.path.join(real_root, "tools", "network_boundary_check.py")
+            )
+        )
+        bodies_b = dict(
+            (name, h) for name, h, _ in dfc._function_bodies(
+                os.path.join(
+                    real_root, "fencepost", "seam_engine", "src", "seam_engine", "recipes.py"
+                )
+            )
+        )
+        self.assertIn("_dynamic_import_target", bodies_a)
+        self.assertIn("_dynamic_import_target", bodies_b)
+        shared_hash = bodies_a["_dynamic_import_target"]
+        self.assertEqual(shared_hash, bodies_b["_dynamic_import_target"])
+        self.assertIn(shared_hash, dfc._ALLOWED_DUPLICATES)
+
+    def test_seeded_hash_is_a_real_sha256_hex_digest(self):
+        for h in dfc._ALLOWED_DUPLICATES:
+            self.assertEqual(len(h), 64, f"{h!r} is not a 64-char hex digest")
+            int(h, 16)  # raises ValueError if not valid hex
+
+    def test_allowed_pair_widened_to_a_third_file_is_still_flagged(self):
+        # The allow-list is a closed SET of files, not a blanket pass for
+        # the hash. A third file sharing the exact same seeded body is a
+        # real, new duplicate the seeded exception must not silently
+        # swallow. Extracts the real function's exact source segment
+        # (via ast.get_source_segment) from the two real, live seeded
+        # files, so the fixture body is provably identical AST, not a
+        # hand-retyped approximation that might drift from the real one.
+        real_root = dfc.ROOT
+        nb_path = os.path.join(real_root, "tools", "network_boundary_check.py")
+        recipes_path = os.path.join(
+            real_root, "fencepost", "seam_engine", "src", "seam_engine", "recipes.py"
+        )
+        with open(nb_path, encoding="utf-8") as f:
+            nb_source = f.read()
+        with open(recipes_path, encoding="utf-8") as f:
+            recipes_source = f.read()
+        nb_tree = ast.parse(nb_source)
+        func_src = None
+        for node in ast.walk(nb_tree):
+            if isinstance(node, ast.FunctionDef) and node.name == "_dynamic_import_target":
+                func_src = ast.get_source_segment(nb_source, node)
+                break
+        self.assertIsNotNone(func_src)
+
+        orita = tempfile.mkdtemp()
+        self.addCleanup(_rm, orita)
+        os.makedirs(os.path.join(orita, "tools"), exist_ok=True)
+        os.makedirs(
+            os.path.join(orita, "fencepost", "seam_engine", "src", "seam_engine"), exist_ok=True
+        )
+        _write(os.path.join(orita, "tools", "network_boundary_check.py"), nb_source)
+        _write(
+            os.path.join(orita, "fencepost", "seam_engine", "src", "seam_engine", "recipes.py"),
+            recipes_source,
+        )
+        # A third, unseeded file, same body under a distinct name (task
+        # 513's own name-blind proof still holds here).
+        _write(
+            os.path.join(orita, "tools", "fixture_third_copy.py"),
+            "import ast\n\n" + func_src.replace("_dynamic_import_target", "_third_copy", 1) + "\n",
+        )
+        violations = dfc.find_violations(orita_dir=orita)
+        self.assertEqual(len(violations), 1)
+        files = {rel for rel, _name, _lineno in violations[0]["locations"]}
+        self.assertEqual(
+            files,
+            {
+                os.path.join("tools", "network_boundary_check.py"),
+                os.path.join("fencepost", "seam_engine", "src", "seam_engine", "recipes.py"),
+                os.path.join("tools", "fixture_third_copy.py"),
+            },
+        )
 
 
 class CacheCase(unittest.TestCase):
