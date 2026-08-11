@@ -113,6 +113,69 @@ class FixtureLeakCase(unittest.TestCase):
         leaks = vlc.find_leaks(orita_dir=self.orita, vault_dir=self.vault)
         self.assertEqual(leaks, [])
 
+    def test_claude_dir_is_not_scanned(self):
+        # Task 681: a harness-issued git worktree can live nested inside
+        # the very checkout it scans (`.claude/worktrees/<name>/...`), a
+        # transient, non-committed directory that must never be treated
+        # as a second, distinct public file -- exactly the shape that
+        # produced one spurious leak against the real live checkouts this
+        # hour (Nisaba's already-reviewed 2026-07-18 same-day self-quote,
+        # re-flagged only because a nested worktree copy's relpath didn't
+        # match the one reviewed relpath on record in `_REVIEWED_NON_LEAKS`).
+        secret = "This private line only ever appears inside a nested dot-claude worktree copy."
+        _write(
+            os.path.join(self.vault, "vault", "nyx", "journal", "0001-test.md"),
+            f"# Vault\n\n{secret}\n",
+        )
+        _write(
+            os.path.join(
+                self.orita, ".claude", "worktrees", "some-session", "houses", "nyx", "journal", "0001-test.md"
+            ),
+            f"# Journal\n\n{secret}\n",
+        )
+        leaks = vlc.find_leaks(orita_dir=self.orita, vault_dir=self.vault)
+        self.assertEqual(leaks, [])
+
+    def test_agents_dir_is_not_scanned(self):
+        # Same shape, the sibling directory name the other six checkers
+        # (task 513/515) already skip alongside ".claude".
+        secret = "This private line only ever appears inside a nested dot-agents worktree copy."
+        _write(
+            os.path.join(self.vault, "vault", "nyx", "journal", "0001-test.md"),
+            f"# Vault\n\n{secret}\n",
+        )
+        _write(
+            os.path.join(self.orita, ".agents", "houses", "nyx", "journal", "0001-test.md"),
+            f"# Journal\n\n{secret}\n",
+        )
+        leaks = vlc.find_leaks(orita_dir=self.orita, vault_dir=self.vault)
+        self.assertEqual(leaks, [])
+
+    def test_leak_at_canonical_path_still_caught_despite_claude_duplicate(self):
+        # The skip must not go blind to a real leak just because a
+        # `.claude`-nested duplicate of the same public file also exists --
+        # proves the exclusion is narrow (one directory name), not a
+        # general "stop looking so hard" regression.
+        secret = "This private line is genuinely leaked at the real public path, not just nested."
+        _write(
+            os.path.join(self.vault, "vault", "nyx", "journal", "0001-test.md"),
+            f"# Vault\n\n{secret}\n",
+        )
+        _write(
+            os.path.join(self.orita, "houses", "nyx", "journal", "0001-test.md"),
+            f"# Journal\n\n{secret}\n",
+        )
+        _write(
+            os.path.join(
+                self.orita, ".claude", "worktrees", "some-session", "houses", "nyx", "journal", "0001-test.md"
+            ),
+            f"# Journal\n\n{secret}\n",
+        )
+        leaks = vlc.find_leaks(orita_dir=self.orita, vault_dir=self.vault)
+        self.assertEqual(len(leaks), 1)
+        self.assertIn("houses", leaks[0]["public_file"])
+        self.assertNotIn(".claude", leaks[0]["public_file"])
+
     def test_missing_vault_dir_returns_empty_not_crash(self):
         leaks = vlc.find_leaks(orita_dir=self.orita, vault_dir=os.path.join(self.vault, "does-not-exist"))
         self.assertEqual(leaks, [])

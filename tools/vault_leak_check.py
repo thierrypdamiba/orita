@@ -46,7 +46,25 @@ DEFAULT_VAULT_DIR = os.path.join(os.path.dirname(ROOT), "orita-vault")
 
 MIN_RUN = 50
 
-_SKIP_DIR_NAMES = {".git", "node_modules", "__pycache__", ".safeword"}
+# Task 513/515 gave six other checkers (arcade_hero_check.py,
+# hand_lore_check.py, no_grading_check.py, rider_check.py,
+# scan_files.py's own PUBLIC_SKIP_DIR_NAMES, star_covenant_check.py) this
+# exact literal set plus ".claude"/".agents" -- this module's own
+# hand-rolled `_iter_md_files` walk (kept separate from `scan_files.
+# iter_public_files` on purpose: this scan wants `.md` only, never
+# `.html`) was the one holdout still missing both, found live task 681:
+# a session whose own harness-issued git worktree happens to live nested
+# inside the checkout it's scanning (`.claude/worktrees/<name>/...`, a
+# transient, non-committed directory, never part of the real pushed
+# tree) walked into that nested copy as if it were a second, distinct
+# public file, and flagged Nisaba's already-reviewed 2026-07-18 same-day
+# self-quote (`_REVIEWED_NON_LEAKS` below) as a fresh "leak" purely
+# because the duplicate's path didn't match the one reviewed relpath on
+# record. Confirmed live: scanning the real checkouts through that one
+# session's own nested worktree read one spurious LEAK; the identical
+# scan with `.claude` excluded read genuinely clean, matching every
+# other checker's own already-adopted convention.
+_SKIP_DIR_NAMES = {".git", "node_modules", "__pycache__", ".safeword", ".claude", ".agents"}
 
 # A founding-council remark is dated, ratified, public record -- quoted
 # verbatim in CHARTER.md, chronicle/, DECREES/, and records/founding|
