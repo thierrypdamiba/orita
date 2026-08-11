@@ -23,6 +23,14 @@ since the claim was last actually re-checked.
 Usage:
     python3 tools/gateway_toolset_check.py check <tool_names.json>
     python3 tools/gateway_toolset_check.py record <tool_names.json> <checked_at>
+    python3 tools/gateway_toolset_check.py freshness
+
+`freshness` is task 669's own answer to this docstring's last sentence
+above ("report how long it's been since the claim was last actually
+re-checked") -- written at task 464's founding but never actually
+implemented until this log itself sat stale for nine days, unnoticed,
+before task 669 found it. Needs no <tool_names.json>: it reads only this
+log's own last entry and reports elapsed time, never a live tool list.
 
 <tool_names.json> shape: {"tool_names": ["Github_ListIssues", "X_PostTweet", ...]}
 -- the caller's own live enumeration of the-hand's exposed tools (e.g. a
@@ -33,6 +41,7 @@ import json
 import os
 import re
 import sys
+from datetime import datetime, timezone
 from typing import TypedDict, cast
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -164,6 +173,85 @@ def toolset_delta(state: ToolsetState, path: str = LOG) -> tuple[bool, str]:
     return False, "unchanged, still zero gmail/calendar-capable tools on the-hand gateway"
 
 
+# Task 669: `toolset_delta`/`record_toolset_check` above only ever run when
+# some hourly session happens to hand this module a live tool-name list --
+# unlike `records/metrics.jsonl`'s daily aggregate or `ci_watch.py`'s own
+# cron-driven cadence, nothing enforces that this happens on any regular
+# beat. The result was invisible until checked by hand: this log's last
+# real entry sat at 2026-08-02T09:10:44Z for nine days (confirmed live this
+# hour, task 669) before anyone noticed, because `ritual_check.py`'s own
+# printed block only ever showed a `gateway_toolset` line when a caller
+# actively passed `--gateway-toolset` -- silence read identical to "checked
+# recently, nothing new" from the outside. `ci_watch.py`'s own sibling
+# staleness (task 467's `run_id` bug aside) was caught the same way, by
+# hand, one hour earlier (task 667) -- this closes the durable version of
+# that same gap for the toolset log specifically, so a fresh session's own
+# live `ritual_check.py` run surfaces it without anyone having to remember
+# to look.
+STALE_AFTER_DAYS = 7.0
+
+
+class ToolsetFreshness(TypedDict):
+    """`compute_toolset_freshness()`'s own return shape."""
+
+    status: str  # "never" | "fresh" | "stale"
+    days_since: float | None
+    checked_at: str | None
+    reason: str | None
+
+
+def compute_toolset_freshness(now: datetime, path: str = LOG) -> ToolsetFreshness:
+    """How long since this log last carried a REAL recorded check, keyed on
+    elapsed time rather than a calendar date -- unlike a daily report or a
+    daily metrics aggregate, this log has no fixed "expected reading for
+    today," so `check_report_freshness`/`compute_metrics_freshness`'s own
+    current/pending/stale-by-date shape does not fit. Three states instead:
+    "never" (the log is empty -- no check has ever been recorded), "fresh"
+    (the last entry is within `STALE_AFTER_DAYS`), "stale" (older than
+    that, or the log's own tip is malformed and its true freshness cannot
+    be trusted). Read-only: makes no network call and writes nothing,
+    mirroring `check_badge_freshness`'s own live-recompute-vs-committed-
+    state split -- freshness is a fact ABOUT the log, not a new entry in
+    it."""
+    try:
+        last = last_toolset_state(path)
+    except GatewayToolsetCheckTamperedError:
+        return {
+            "status": "stale",
+            "days_since": None,
+            "checked_at": None,
+            "reason": "the log's own tip is malformed -- last real freshness cannot be trusted",
+        }
+    if last is None:
+        return {
+            "status": "never",
+            "days_since": None,
+            "checked_at": None,
+            "reason": "no gateway-toolset check has ever been recorded",
+        }
+    checked_at_raw = cast(str, last["checked_at"])
+    checked_at = datetime.fromisoformat(checked_at_raw.replace("Z", "+00:00"))
+    if checked_at.tzinfo is None:
+        checked_at = checked_at.replace(tzinfo=timezone.utc)
+    now_utc = now if now.tzinfo is not None else now.replace(tzinfo=timezone.utc)
+    days_since = (now_utc.astimezone(timezone.utc) - checked_at.astimezone(timezone.utc)).total_seconds() / 86400.0
+    status = "fresh" if days_since <= STALE_AFTER_DAYS else "stale"
+    return {"status": status, "days_since": round(days_since, 1), "checked_at": checked_at_raw, "reason": None}
+
+
+def format_toolset_freshness(result: ToolsetFreshness) -> str:
+    if result["status"] == "never":
+        return "gateway toolset freshness: NEVER CHECKED -- no gateway-toolset check has ever been recorded"
+    if result["status"] == "fresh":
+        return f"gateway toolset freshness: fresh (last checked {result['days_since']}d ago, {result['checked_at']})"
+    if result["checked_at"] is None:
+        return f"gateway toolset freshness: STALE -- {result['reason']}"
+    return (
+        f"gateway toolset freshness: STALE -- last checked {result['days_since']}d ago "
+        f"({result['checked_at']}), over the {STALE_AFTER_DAYS:.0f}-day bar"
+    )
+
+
 class GatewayToolsetCheckArgError(ValueError):
     """<tool_names.json> parsed as valid JSON but not into a dict. Mirrors
     arcade_app_watch.py's ArcadeAppWatchArgError."""
@@ -180,6 +268,13 @@ def _load_tool_names_json(path: str) -> dict[str, object]:
 
 
 def main(argv: list[str]) -> int:
+    if len(argv) >= 2 and argv[1] == "freshness":
+        # Unlike check/record, freshness reads no live tool-name list --
+        # it is a fact about the LOG's own last entry, so it needs no
+        # <tool_names.json> argument at all.
+        result = compute_toolset_freshness(datetime.now(timezone.utc))
+        print(format_toolset_freshness(result))
+        return 0
     if len(argv) < 3:
         print(__doc__)
         return 1

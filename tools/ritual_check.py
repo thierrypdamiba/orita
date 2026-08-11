@@ -631,6 +631,24 @@ def check_gateway_toolset(gateway_toolset_state: dict[str, object] | None, now_i
     return {"changed": changed, "reason": reason}
 
 
+def check_gateway_toolset_freshness(now: datetime) -> dict[str, object]:
+    """Task 669: the freshness half `check_gateway_toolset` above doesn't
+    and structurally can't hold -- that function only ever runs, and only
+    ever prints a line, when a caller happens to pass `--gateway-toolset`
+    with this hour's live tool-name read. A session that skips the flag
+    (most of them, historically -- this log's real entries are sparse)
+    leaves NO trace in this block at all, so a gap of days or weeks looked
+    identical to "nothing to report." Mirrors `check_report_freshness`/
+    `check_metrics_freshness`: unconditional, no live network call, reads
+    only the log's own last entry (via `gateway_toolset_check.
+    compute_toolset_freshness`) and reports elapsed time. Never flips
+    `broken` -- a stale gateway-toolset check is a fact worth surfacing to
+    the next hour's run, not a currently-live rule violation, the same
+    distinction the report/metrics freshness checks already hold."""
+    mod = _gateway_toolset_check()
+    return cast(dict[str, object], mod.compute_toolset_freshness(now, path=mod.LOG))
+
+
 def check_good_first_issues(open_issues: list[dict[str, object]] | None) -> dict[str, object] | None:
     """Task 477: fold `good_first_issue_check.py`'s own live-vs-Charter
     compare into the one block. Makes no network call -- `open_issues` is
@@ -2134,6 +2152,7 @@ def run_ritual_check(
     square = check_square(square_state, now_iso)
     arcade_apps = check_arcade_apps(arcade_apps_state, now_iso)
     gateway_toolset = check_gateway_toolset(gateway_toolset_state, now_iso)
+    gateway_toolset_freshness = check_gateway_toolset_freshness(now)
     good_first_issues = check_good_first_issues(good_first_issues_state)
     scribe_growth = check_scribe_growth(now_iso, scribe_root=scribe_root, record=record_scribe_growth)
     ci = check_ci(ci_checks)
@@ -2294,6 +2313,7 @@ def run_ritual_check(
         "square": square,
         "arcade_apps": arcade_apps,
         "gateway_toolset": gateway_toolset,
+        "gateway_toolset_freshness": gateway_toolset_freshness,
         "good_first_issues": good_first_issues,
         "scribe_growth": scribe_growth,
         "ci": ci,
@@ -2388,6 +2408,7 @@ def format_ritual_check(result: dict[str, Any]) -> str:
     if result["gateway_toolset"] is not None:
         gt = result["gateway_toolset"]
         lines.append(f"  gateway toolset (gmail/calendar): {'changed' if gt['changed'] else 'unchanged'} -- {gt['reason']}")
+    lines.append("  " + _gateway_toolset_check().format_toolset_freshness(result["gateway_toolset_freshness"]))
     lines.append("  " + _good_first_issue_check().format_good_first_issues(result["good_first_issues"]))
     sg = result["scribe_growth"]
     lines.append(

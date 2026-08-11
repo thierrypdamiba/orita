@@ -8,6 +8,7 @@ import os
 import sys
 import tempfile
 import unittest
+from datetime import datetime, timezone
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -245,6 +246,105 @@ class TestToolsetDelta(_TempLogCase):
         self.assertIn("True -> False", reason)
 
 
+class TestComputeToolsetFreshness(_TempLogCase):
+    """Task 669: the freshness half `toolset_delta`/`check` don't cover --
+    how long since this log's own last entry, elapsed-time-keyed since (
+    unlike a daily report) there is no fixed 'expected reading for today'
+    for this log to be measured against."""
+
+    def test_never_checked_when_log_is_empty(self):
+        result = gt.compute_toolset_freshness(datetime(2026, 8, 11, tzinfo=timezone.utc), path=self.path)
+        self.assertEqual(result["status"], "never")
+        self.assertIsNone(result["days_since"])
+        self.assertIsNone(result["checked_at"])
+
+    def test_fresh_well_under_the_bar(self):
+        state = gt.compute_toolset_state(TOOLS_GITHUB_X_ONLY)
+        gt.record_toolset_check(state, "2026-08-04T00:00:00Z", path=self.path)
+        now = datetime(2026, 8, 10, 0, 0, 0, tzinfo=timezone.utc)  # 6.0 days later
+        result = gt.compute_toolset_freshness(now, path=self.path)
+        self.assertEqual(result["status"], "fresh")
+        self.assertLess(result["days_since"], gt.STALE_AFTER_DAYS)
+        self.assertEqual(result["days_since"], 6.0)
+
+    def test_exactly_on_the_bar_reads_fresh(self):
+        state = gt.compute_toolset_state(TOOLS_GITHUB_X_ONLY)
+        gt.record_toolset_check(state, "2026-08-04T00:00:00Z", path=self.path)
+        now = datetime(2026, 8, 11, 0, 0, 0, tzinfo=timezone.utc)  # exactly 7.0 days later
+        result = gt.compute_toolset_freshness(now, path=self.path)
+        self.assertEqual(result["status"], "fresh")
+        self.assertEqual(result["days_since"], gt.STALE_AFTER_DAYS)
+
+    def test_stale_well_over_the_bar(self):
+        state = gt.compute_toolset_state(TOOLS_GITHUB_X_ONLY)
+        gt.record_toolset_check(state, "2026-08-04T00:00:00Z", path=self.path)
+        now = datetime(2026, 8, 12, 0, 0, 0, tzinfo=timezone.utc)  # 8.0 days later
+        result = gt.compute_toolset_freshness(now, path=self.path)
+        self.assertEqual(result["status"], "stale")
+        self.assertGreater(result["days_since"], gt.STALE_AFTER_DAYS)
+        self.assertEqual(result["days_since"], 8.0)
+        self.assertEqual(result["checked_at"], "2026-08-04T00:00:00Z")
+
+    def test_stale_matches_this_hours_real_nine_day_gap(self):
+        # Reproduces the real, live gap task 669 found in the durable log
+        # (last real entry 2026-08-02T09:10:44Z) rather than only a
+        # synthetic fixture -- pinned so a future fix to the real log
+        # doesn't silently make this test meaningless.
+        gt._append({"has_gmail_calendar_tools": False, "matched_tools": [],
+                    "checked_at": "2026-08-02T09:10:44Z"}, self.path)
+        now = datetime(2026, 8, 11, 7, 4, 41, tzinfo=timezone.utc)
+        result = gt.compute_toolset_freshness(now, path=self.path)
+        self.assertEqual(result["status"], "stale")
+        self.assertAlmostEqual(result["days_since"], 8.9, delta=0.1)
+
+    def test_malformed_tip_reads_stale_not_a_crash(self):
+        with open(self.path, "w") as f:
+            f.write("not valid json\n")
+        result = gt.compute_toolset_freshness(datetime(2026, 8, 11, tzinfo=timezone.utc), path=self.path)
+        self.assertEqual(result["status"], "stale")
+        self.assertIsNone(result["checked_at"])
+        self.assertIn("malformed", result["reason"])
+
+    def test_naive_now_is_treated_as_utc(self):
+        state = gt.compute_toolset_state(TOOLS_GITHUB_X_ONLY)
+        gt.record_toolset_check(state, "2026-08-10T00:00:00Z", path=self.path)
+        naive_now = datetime(2026, 8, 11, 0, 0, 0)  # no tzinfo
+        result = gt.compute_toolset_freshness(naive_now, path=self.path)
+        self.assertEqual(result["status"], "fresh")
+        self.assertAlmostEqual(result["days_since"], 1.0, delta=0.01)
+
+
+class TestFormatToolsetFreshness(unittest.TestCase):
+    def test_never_checked_message(self):
+        msg = gt.format_toolset_freshness(
+            {"status": "never", "days_since": None, "checked_at": None, "reason": "no gateway-toolset check has ever been recorded"}
+        )
+        self.assertIn("NEVER CHECKED", msg)
+
+    def test_fresh_message_names_the_elapsed_days(self):
+        msg = gt.format_toolset_freshness(
+            {"status": "fresh", "days_since": 2.3, "checked_at": "2026-08-09T00:00:00Z", "reason": None}
+        )
+        self.assertIn("fresh", msg)
+        self.assertIn("2.3", msg)
+        self.assertIn("2026-08-09T00:00:00Z", msg)
+
+    def test_stale_message_names_the_elapsed_days_and_the_bar(self):
+        msg = gt.format_toolset_freshness(
+            {"status": "stale", "days_since": 8.9, "checked_at": "2026-08-02T09:10:44Z", "reason": None}
+        )
+        self.assertIn("STALE", msg)
+        self.assertIn("8.9", msg)
+        self.assertIn("7-day", msg)
+
+    def test_malformed_tip_message_uses_the_reason_not_a_day_count(self):
+        msg = gt.format_toolset_freshness(
+            {"status": "stale", "days_since": None, "checked_at": None, "reason": "the log's own tip is malformed -- last real freshness cannot be trusted"}
+        )
+        self.assertIn("STALE", msg)
+        self.assertIn("malformed", msg)
+
+
 class TestMainCLI(_TempLogCase):
     def _write_tools_json(self, tool_names):
         import json
@@ -264,6 +364,15 @@ class TestMainCLI(_TempLogCase):
         finally:
             gt.LOG = real_log
             os.remove(tools_path)
+
+    def test_freshness_command_needs_no_tools_json(self):
+        real_log = gt.LOG
+        gt.LOG = self.path  # never touch the real durable log from a test
+        try:
+            rc = gt.main(["gateway_toolset_check.py", "freshness"])
+            self.assertEqual(rc, 0)
+        finally:
+            gt.LOG = real_log
 
     def test_main_raises_named_error_on_non_dict_tools_json(self):
         import json

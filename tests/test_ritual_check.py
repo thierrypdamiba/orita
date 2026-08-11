@@ -717,7 +717,12 @@ class GatewayToolsetFoldCase(unittest.TestCase):
             with_state,
         )
         without_state = rc.format_ritual_check(rc.run_ritual_check())
-        self.assertNotIn("gateway toolset", without_state)
+        # Task 669: the DELTA line ("gateway toolset (gmail/calendar): ...")
+        # stays conditional on a caller-supplied live state, same as ever --
+        # but the FRESHNESS line (below) is unconditional, so this can no
+        # longer assert the whole "gateway toolset" substring is absent.
+        self.assertNotIn("gateway toolset (gmail/calendar)", without_state)
+        self.assertIn("gateway toolset freshness", without_state)
 
     def test_gateway_toolset_change_never_flips_broken(self):
         old = self._state(["Github_ListIssues"])
@@ -725,6 +730,69 @@ class GatewayToolsetFoldCase(unittest.TestCase):
         new = self._state(["Github_ListIssues", "Gmail_ListEmails"])
         result = rc.run_ritual_check(gateway_toolset_state=new)
         self.assertTrue(result["gateway_toolset"]["changed"])
+        self.assertFalse(result["broken"])
+
+
+class GatewayToolsetFreshnessFoldCase(unittest.TestCase):
+    """Task 669: mirrors MetricsFreshnessCase one ground down -- the
+    freshness half `check_gateway_toolset` (above) structurally can't
+    hold, since that only ever runs when a caller passes a live
+    `gateway_toolset_state`. `check_gateway_toolset_freshness` needs no
+    such state: it is unconditional, reads only the log's own last
+    entry via `gateway_toolset_check.compute_toolset_freshness`, and runs
+    on every `run_ritual_check()` call including a bare one with no
+    arguments -- the same class `scribe_growth`/`checkout` already hold,
+    proven here rather than assumed by analogy."""
+
+    def setUp(self):
+        self.tmpdir = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.tmpdir, ignore_errors=True)
+        self.gt = _load(
+            f"_test_ritual_gateway_toolset_freshness_{id(self)}",
+            os.path.join(ROOT, "tools", "gateway_toolset_check.py"),
+        )
+        self.gt.LOG = os.path.join(self.tmpdir, "gateway-toolset-check-log.jsonl")
+        original_loader = rc._gateway_toolset_check
+        rc._gateway_toolset_check = lambda: self.gt
+        self.addCleanup(setattr, rc, "_gateway_toolset_check", original_loader)
+
+    def test_never_checked_when_log_is_empty(self):
+        now = datetime(2026, 8, 11, tzinfo=timezone.utc)
+        result = rc.check_gateway_toolset_freshness(now)
+        self.assertEqual(result["status"], "never")
+
+    def test_stale_after_a_real_nine_day_gap(self):
+        state = self.gt.compute_toolset_state(["Github_ListIssues"])
+        self.gt.record_toolset_check(state, "2026-08-02T09:10:44Z", path=self.gt.LOG)
+        now = datetime(2026, 8, 11, 7, 0, 0, tzinfo=timezone.utc)
+        result = rc.check_gateway_toolset_freshness(now)
+        self.assertEqual(result["status"], "stale")
+
+    def test_fresh_right_after_recording(self):
+        state = self.gt.compute_toolset_state(["Github_ListIssues"])
+        self.gt.record_toolset_check(state, "2026-08-11T07:00:00Z", path=self.gt.LOG)
+        now = datetime(2026, 8, 11, 7, 30, 0, tzinfo=timezone.utc)
+        result = rc.check_gateway_toolset_freshness(now)
+        self.assertEqual(result["status"], "fresh")
+
+    def test_folded_into_run_ritual_check_with_no_arguments(self):
+        now = datetime(2026, 8, 11, tzinfo=timezone.utc)
+        result = rc.run_ritual_check(now=now)
+        self.assertIn("gateway_toolset_freshness", result)
+        self.assertEqual(result["gateway_toolset_freshness"]["status"], "never")
+        self.assertFalse(result["broken"])
+
+    def test_format_always_includes_the_freshness_line(self):
+        now = datetime(2026, 8, 11, tzinfo=timezone.utc)
+        formatted = rc.format_ritual_check(rc.run_ritual_check(now=now))
+        self.assertIn("gateway toolset freshness: NEVER CHECKED", formatted)
+
+    def test_stale_never_flips_broken(self):
+        state = self.gt.compute_toolset_state(["Github_ListIssues"])
+        self.gt.record_toolset_check(state, "2026-07-01T00:00:00Z", path=self.gt.LOG)
+        now = datetime(2026, 8, 11, tzinfo=timezone.utc)
+        result = rc.run_ritual_check(now=now)
+        self.assertEqual(result["gateway_toolset_freshness"]["status"], "stale")
         self.assertFalse(result["broken"])
 
 
