@@ -598,6 +598,59 @@ def test_run_scan_does_not_raise_when_the_override_still_carries_all_open_eviden
     assert result["github_events_source"] == "override"
 
 
+def test_check_prior_milestones_guards_evidence_urls_not_the_reported_count(tmp_path):
+    # Live, real finding (2026-08-11, task 677): the same production entrypoint
+    # (`seam_engine.scan --github-events <cache>`) run twice a few hours apart
+    # against the town's own real cache reported 116 milestone commits at
+    # 12:59 UTC (the day's live-fetch seam-scan.yml cron run, sealed into
+    # today's Ledger tip) and 111 at 15:10 UTC (this hour's cache-override
+    # rerun, after ingesting only 6 new, non-milestone-matching commits) --
+    # same slug, same confidence, the identical 5 evidence URLs in the same
+    # order, just a smaller `detail` count. `check_prior_milestones=True`
+    # raised nothing, correctly: every previously-sealed EVIDENCE url was
+    # still present in the smaller run. That is `_unresolved_prior_milestone_
+    # evidence`'s real, honest scope (its own docstring already says so --
+    # "narrowed to the ones still genuinely open", read via the Ledger's
+    # `evidence` list, capped at 5 by `run_scan`'s own `[:5]` slice) -- it
+    # was never a promise to reconcile the full `len(milestones)` denominator
+    # a `detail` string reports, only the handful of URLs a reader might
+    # click. This test pins that boundary on purpose, with a fixture shaped
+    # like the real 2026-08-11 case (all sealed evidence present, one real
+    # additional milestone commit missing from the override), so a future
+    # reader finds a tested boundary here instead of re-discovering the same
+    # live surprise this docstring is quoting from.
+    _seal_milestone_gap(tmp_path, evidence=_REAL_0718_EVIDENCE, generated_at=_REAL_0718_SEALED_AT)
+    # All 4 sealed evidence URLs present (nothing missing -- check_prior_
+    # milestones has no complaint), PLUS one extra real milestone commit
+    # that a fuller live-fetch would have found but this override omits.
+    # The omitted commit is never named in the ledger's own evidence (only
+    # the first 5 milestone commits ever become `evidence`), so nothing
+    # anywhere records that it went missing -- the exact silent-denominator-
+    # shrink shape this test documents.
+    events_missing_one_unsealed_milestone_commit = [
+        {"kind": "commit", "id": url.rsplit("/", 1)[-1][:7], "title": "fencepost milestone work",
+         "url": url, "ts": "2026-07-18T12:00:00Z", "author": "someone"}
+        for url in _REAL_0718_EVIDENCE
+    ]
+
+    result = run_scan(
+        "thierrypdamiba", "orita",
+        x_posts=_live_x_posts_no_new_activity(),
+        github_events=events_missing_one_unsealed_milestone_commit,
+        check_prior_milestones=True,
+        ledger_base=tmp_path,
+    )
+
+    # No raise (asserted implicitly by reaching here) -- and the surfaced
+    # gap's own reported count reflects only what THIS run's events held,
+    # 4 milestone commits, never the 5th the real town's own history had
+    # that hour. A smaller, true-to-this-run count, not a fabricated one --
+    # but nothing compares it against the Ledger's own last-sealed count
+    # either. That asymmetry (URLs checked, counts not) is the real boundary.
+    assert result["primary_gap"]["slug"] == "milestone-unannounced"
+    assert result["primary_gap"]["detail"].startswith("4 milestone commit(s)")
+
+
 def test_run_scan_check_prior_milestones_defaults_off_preserving_old_behavior(tmp_path):
     # Backward compatibility: a fixture ledger with real missing evidence is
     # present, but check_prior_milestones is left at its default (False) --

@@ -694,6 +694,21 @@ def _unresolved_prior_milestone_evidence(
     resolution and drops that gap's evidence from the result — this
     function's job is to catch a truncated events window impersonating a
     resolved gap, not to relitigate whether a resolution was a good one.
+
+    Task 677 (2026-08-11) named one more real, narrower-than-it-sounds edge,
+    live: this function (and `run_scan`'s `check_prior_milestones` gate built
+    on it) only ever compares EVIDENCE URLS — the up-to-5 commits `evidence`
+    actually names — never the full `len(milestones)` count the surfaced
+    gap's own `detail` string reports. The town's own real cache-override
+    rerun that hour read 111 milestone commits against the same day's
+    earlier live-fetch cron run's sealed 116 — same slug, same confidence,
+    identical evidence URLs, a smaller denominator, and no raise, correctly,
+    because nothing in the missing 5 was ever a NAMED evidence URL. See
+    `test_check_prior_milestones_guards_evidence_urls_not_the_reported_count`
+    in `tests/test_scan.py` for a fixture pinning this exact boundary. Not a
+    bug fixed here — a scope this module already held honestly (the
+    docstring above already says "narrowed to the ones still genuinely
+    open"), now tested instead of only asserted.
     """
     from seam_engine import ledger as _ledger
 
