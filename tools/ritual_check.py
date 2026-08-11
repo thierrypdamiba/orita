@@ -919,21 +919,25 @@ def check_duplicate_function(orita_dir: str | None = None) -> dict[str, object]:
     return {"clean": not violations, "count": len(violations), "violations": violations}
 
 
-def check_tithe(buildlog_path: str | None = None) -> dict[str, object]:
-    """Task 673: fold tithe_check.py's own BUILDLOG.md scan (every
-    hand-typed "Tithe ... roll N" claim, checked against the ratified
-    0.03 floor test_the_tithe itself enforces) into the one block.
-    Unconditional, local-filesystem-only (reads the checkout already on
-    disk, no network) -- the same cheap class
-    `check_checkout`/`check_vault_leak`/`check_duplicate_regex`/
+def check_tithe(
+    buildlog_path: str | None = None, roadmap_path: str | None = None
+) -> dict[str, object]:
+    """Task 673 (widened task 678): fold tithe_check.py's own
+    BUILDLOG.md + ROADMAP.md scan (every hand-typed "Tithe ... roll N"
+    claim, checked against the ratified 0.03 floor test_the_tithe itself
+    enforces) into the one block. Unconditional, local-filesystem-only
+    (reads the checkout already on disk, no network) -- the same cheap
+    class `check_checkout`/`check_vault_leak`/`check_duplicate_regex`/
     `check_duplicate_function` already hold. Never edits anything; a real
     violation, if one is ever found, is a god-on-duty escalation (a
-    transcription error in an already-pushed BUILDLOG line, or a real
-    doctrine breach), not something this check silently repairs."""
+    transcription error in an already-pushed line, or a real doctrine
+    breach), not something this check silently repairs."""
     mod = _tithe_check()
     kwargs = {}
     if buildlog_path is not None:
         kwargs["buildlog_path"] = buildlog_path
+    if roadmap_path is not None:
+        kwargs["roadmap_path"] = roadmap_path
     violations = mod.find_violations(**kwargs)
     return {"clean": not violations, "count": len(violations), "violations": violations}
 
@@ -2125,6 +2129,7 @@ def run_ritual_check(
     duplicate_regex_dir: str | None = None,
     duplicate_function_dir: str | None = None,
     tithe_buildlog_path: str | None = None,
+    tithe_roadmap_path: str | None = None,
     rider_dir: str | None = None,
     hand_lore_dir: str | None = None,
     no_grading_dir: str | None = None,
@@ -2245,7 +2250,7 @@ def run_ritual_check(
     star_covenant = check_star_covenant(orita_dir=star_covenant_dir)
     duplicate_regex = check_duplicate_regex(orita_dir=duplicate_regex_dir)
     duplicate_function = check_duplicate_function(orita_dir=duplicate_function_dir)
-    tithe = check_tithe(buildlog_path=tithe_buildlog_path)
+    tithe = check_tithe(buildlog_path=tithe_buildlog_path, roadmap_path=tithe_roadmap_path)
     riders = check_riders(orita_dir=rider_dir)
     hand_lore = check_hand_lore(orita_dir=hand_lore_dir)
     no_grading = check_no_grading(orita_dir=no_grading_dir)
@@ -2543,7 +2548,7 @@ def format_ritual_check(result: dict[str, Any]) -> str:
         lines.append(f"  duplicate function: {df['count']} DUPLICATE(S) -- identical function body, no shared import backing it, fix now")
     tithe_result = result["tithe"]
     if tithe_result["clean"]:
-        lines.append("  tithe: clean (every hand-typed BUILDLOG.md Tithe roll clears the 0.03 floor it claims)")
+        lines.append("  tithe: clean (every hand-typed BUILDLOG.md/ROADMAP.md Tithe roll clears the 0.03 floor it claims)")
     else:
         lines.append(f"  tithe: {tithe_result['count']} CLAIM(S) -- a hand-typed Tithe roll does not clear the 0.03 floor, escalate now")
     rd = result["riders"]
