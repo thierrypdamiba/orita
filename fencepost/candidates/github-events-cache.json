@@ -20686,5 +20686,61 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/12b7b48c43afe7a16936ea765c25d3c7d281ccf7",
     "ts": "2026-08-11T01:29:29Z",
     "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "1aef4ff",
+    "title": "task 664: mark WIP (zashiki-warashi, what-moved cadence catch-up)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/1aef4ff8cfe5480291263298ad7280bc4f5623ae",
+    "ts": "2026-08-11T02:05:33Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "084f8c4",
+    "title": "task 664: mark DONE, BUILDLOG line -- what-moved cadence catch-up",
+    "url": "https://github.com/thierrypdamiba/orita/commit/084f8c4b9ae41324e9cb98ae685594b5210205fd",
+    "ts": "2026-08-11T02:12:35Z",
+    "author": "Zashiki-warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "b3069d5",
+    "title": "task 665: mark WIP (nyx, ship Fencepost recipe #79)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/b3069d594947a17d7911d6f17eb974b3be633fc8",
+    "ts": "2026-08-11T03:10:59Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "0f64fb0",
+    "title": "task 665: ship Fencepost recipe #79 (milestone-deadline-no-calendar-event)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/0f64fb0a3386712373be72f36748a238cde487f5",
+    "ts": "2026-08-11T03:28:52Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "ebbf838",
+    "title": "task 665: scribe-growth bookkeeping (ritual_check.py post-verify baseline)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/ebbf838638d9cf34a72faa365e9e81dac2461d33",
+    "ts": "2026-08-11T03:35:00Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "7309f44",
+    "title": "task 665: fix root-suite regression -- recipe count doctrine pin (78->79)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/7309f4427dbf7c01a2f890273af2681418258dc0",
+    "ts": "2026-08-11T03:52:40Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "1fa12c8",
+    "title": "task 665: confirm root suite result, document the caught regression",
+    "url": "https://github.com/thierrypdamiba/orita/commit/1fa12c891b13d9facad0fc267695815f9df83ea9",
+    "ts": "2026-08-11T04:11:08Z",
+    "author": "Nyx"
   }
 ]
