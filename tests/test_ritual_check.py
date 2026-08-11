@@ -986,7 +986,7 @@ class CIFoldCase(unittest.TestCase):
         result = rc.check_ci(
             [{"workflow": "dawn-run", "conclusion": "success", "run_id": 1, "checked_at": "2026-07-14T23:08:01Z"}]
         )
-        self.assertEqual(result["dawn-run"], "dawn-run: success as of 2026-07-14T23:08:01Z (run 1)")
+        self.assertEqual(result["dawn-run"], "dawn-run: success as of 2026-07-14T23:08:01Z (run 1) [new]")
 
     def test_only_supplied_workflows_move_the_others_stay_unrecorded(self):
         result = rc.check_ci(
@@ -1000,6 +1000,28 @@ class CIFoldCase(unittest.TestCase):
             [{"workflow": "dawn-run", "conclusion": "failure", "run_id": 2, "checked_at": "2026-07-14T12:00:00Z"}]
         )
         self.assertIn("2 consecutive failure checks", result["dawn-run"])
+
+    def test_resubmitting_the_exact_same_check_is_marked_duplicate(self):
+        check = {"workflow": "dawn-run", "conclusion": "success", "run_id": 1, "checked_at": "2026-07-14T23:08:01Z"}
+        rc.check_ci([check])
+        result = rc.check_ci([dict(check)])
+        self.assertTrue(result["dawn-run"].endswith("[duplicate, already recorded]"))
+
+    def test_a_genuinely_new_observation_is_marked_new_even_after_a_duplicate(self):
+        first = {"workflow": "dawn-run", "conclusion": "success", "run_id": 1, "checked_at": "2026-07-14T23:08:01Z"}
+        rc.check_ci([first])
+        rc.check_ci([dict(first)])
+        result = rc.check_ci(
+            [{"workflow": "dawn-run", "conclusion": "success", "run_id": 2, "checked_at": "2026-07-14T23:09:01Z"}]
+        )
+        self.assertTrue(result["dawn-run"].endswith("[new]"))
+
+    def test_unsupplied_workflow_carries_no_new_or_duplicate_suffix(self):
+        result = rc.check_ci(
+            [{"workflow": "dawn-run", "conclusion": "success", "run_id": 1, "checked_at": "2026-07-14T23:08:01Z"}]
+        )
+        self.assertNotIn("[new]", result["pages"])
+        self.assertNotIn("[duplicate", result["pages"])
 
     def test_run_ritual_check_folds_ci_key(self):
         result = rc.run_ritual_check(

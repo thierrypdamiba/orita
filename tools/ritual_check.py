@@ -703,14 +703,36 @@ def check_ci(ci_checks: list[dict[str, object]] | None) -> dict[str, object] | N
     `list_workflow_runs` read for the tracked workflows. Each supplied
     check is recorded (append-only) before the status lines are read back,
     same order `x_outage_tracker`'s own recheck-then-record flow already
-    holds."""
+    holds.
+
+    Task 676: `ci_watch.record_check`'s bool return (True = a new line was
+    written, False = this exact `{workflow, conclusion, run_id, checked_at}`
+    was already the last one recorded) sat unused here since task 501 named
+    and deferred it -- the log carries real duplicate lines (task 495's own
+    example) whenever two hourly runs feed this function the same
+    already-recorded observation, and the printed ritual note had no way to
+    tell a god on duty whether THIS hour's own supplied check actually added
+    new information or just resubmitted one already on file. Each workflow
+    present in `ci_checks` now gets its status line suffixed with
+    `[new]` or `[duplicate, already recorded]`; workflows not supplied this
+    hour are unmarked, unchanged from before."""
     if ci_checks is None:
         return None
     mod = _ci_watch()
+    recorded_this_hour: dict[str, bool] = {}
     for c in ci_checks:
-        mod.record_check(c["workflow"], c["conclusion"], c["run_id"], c["checked_at"], path=mod.LOG)
+        workflow = cast(str, c["workflow"])
+        recorded_this_hour[workflow] = mod.record_check(
+            c["workflow"], c["conclusion"], c["run_id"], c["checked_at"], path=mod.LOG
+        )
     entries = mod._entries(mod.LOG)
-    return {w: mod.format_status_line(entries, w) for w in mod.TRACKED_WORKFLOWS}
+    result: dict[str, object] = {}
+    for w in mod.TRACKED_WORKFLOWS:
+        line = mod.format_status_line(entries, w)
+        if w in recorded_this_hour:
+            line += " [new]" if recorded_this_hour[w] else " [duplicate, already recorded]"
+        result[w] = line
+    return result
 
 
 def check_cron(cron_checks: list[dict[str, object]] | None, now_iso: str) -> dict[str, object] | None:
