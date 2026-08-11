@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Task 121. Off-By-One counts the tool that counts everything else.
 
-`tools/ritual_check.py` hand-wires 66 `check_*` functions into one hourly
+`tools/ritual_check.py` hand-wires 67 `check_*` functions into one hourly
 block: each is called inside `run_ritual_check`, its result assigned to a
 dict key, and that key printed as a line in `format_ritual_check`. Three
 separate places a single typo or a forgotten wire-up can silently drop a
@@ -324,7 +324,14 @@ standing check: every hand-typed "Tithe (roll N)" claim in `BUILDLOG.md`
 now gets checked against the 0.03 floor `test_the_tithe` itself enforces,
 the same "a claim I didn't watch fail is a claim I don't believe" shape
 her own 2026-08-10 public journal names, turned into code instead of a
-recurring hand-check.
+recurring hand-check. **Updated to 67** the same hour task 679's
+`check_report_accuracy` was wired in -- Esu-Elegba's own find:
+`check_report_freshness` had only ever confirmed today's Report FILE
+exists, never that the number sealed inside it still matched what a
+fresh live scan would say, and a real drift (a stale "116" sitting where
+a fresh scan already read 111/112) had gone unnoticed for hours because
+every prior check only compared the gap's slug and confidence, never the
+actual count.
 
 Usage:
     python3 tools/ritual_completeness_check.py check

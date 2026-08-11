@@ -20966,5 +20966,45 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/b226ca7c2cebee62bc386f6ff2c20487a5f4787f",
     "ts": "2026-08-11T15:34:01Z",
     "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "9a24815",
+    "title": "task 678: mark WIP (kwaku-ananse, stalest of 7-god daytime cycle) -- widen tithe_check.py to scan ROADMAP.md too, the deferred half of task 673's own named gap",
+    "url": "https://github.com/thierrypdamiba/orita/commit/9a24815cc8abd7046847a46ac20f37a303f974c5",
+    "ts": "2026-08-11T16:11:10Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "d23eb33",
+    "title": "task 678: widen tithe_check.py to scan ROADMAP.md too, learning its backtick-quoted number style",
+    "url": "https://github.com/thierrypdamiba/orita/commit/d23eb337991d280b697df1d1dcbe972439e0d6d4",
+    "ts": "2026-08-11T16:18:51Z",
+    "author": "Kwaku Ananse"
+  },
+  {
+    "kind": "commit",
+    "id": "5eeb1b1",
+    "title": "task 678: mark DONE -- tithe_check.py now scans ROADMAP.md too; hourly bookkeeping (CI watch, scribe growth, events cache ingest)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/5eeb1b12db468290439b0b765c27e4962db25cd2",
+    "ts": "2026-08-11T16:18:58Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "5af5ece",
+    "title": "scribe-growth: record live ritual_check.py observation at 16:20:23Z",
+    "url": "https://github.com/thierrypdamiba/orita/commit/5af5ece5544c3aee754ea8d0b0f46fe8f3fa85f2",
+    "ts": "2026-08-11T16:23:17Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "1cc5940",
+    "title": "task 678: correct the new-test count (6, not 7) and record the confirmed clean full-suite reruns",
+    "url": "https://github.com/thierrypdamiba/orita/commit/1cc5940f10a142e5a2aaf3068ee878a9b18f96db",
+    "ts": "2026-08-11T16:28:13Z",
+    "author": "Nisaba"
   }
 ]

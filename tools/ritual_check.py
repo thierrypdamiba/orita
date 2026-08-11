@@ -166,7 +166,7 @@ Informational only, the same class `report_cadence`/`cluster_day`/
 never flips `broken`.
 
 Usage:
-    python3 tools/ritual_check.py [--now ISO_TS] [--fencepost-base DIR] [--square-state PATH] [--arcade-apps-state PATH] [--gateway-toolset PATH] [--good-first-issues PATH] [--ci-checks PATH] [--cron-checks PATH] [--child-files PATH] [--voice-window-commits PATH] [--github-stars COUNT] [--json]
+    python3 tools/ritual_check.py [--now ISO_TS] [--fencepost-base DIR] [--square-state PATH] [--arcade-apps-state PATH] [--gateway-toolset PATH] [--good-first-issues PATH] [--ci-checks PATH] [--cron-checks PATH] [--child-files PATH] [--voice-window-commits PATH] [--github-stars COUNT] [--live-scan PATH] [--json]
 """
 from __future__ import annotations
 
@@ -345,6 +345,10 @@ def _metrics_cadence_check() -> ModuleType:
 
 def _shared_reports_check() -> ModuleType:
     return _load("_ritual_shared_reports_check", os.path.join(ROOT, "tools", "shared_reports_check.py"))
+
+
+def _report_accuracy_check() -> ModuleType:
+    return _load("_ritual_report_accuracy_check", os.path.join(ROOT, "tools", "report_accuracy_check.py"))
 
 
 def _ritual_completeness_check() -> ModuleType:
@@ -1198,6 +1202,31 @@ def check_shared_reports(shared_path: str | None = None) -> dict[str, object]:
     if shared_path is not None:
         kwargs["shared_path"] = shared_path
     return cast(dict[str, object], mod.compute_shared_reports(**kwargs))
+
+
+def check_report_accuracy(
+    report: dict[str, str | None],
+    live_scan: dict[str, Any] | None,
+) -> dict[str, object]:
+    """Task 679: fold `report_accuracy_check.py`'s own scan into the one
+    block. Reads today's ALREADY-CURRENT report text off disk (via
+    `check_report_freshness`'s own `report["path"]`, when `report["status"]
+    == "current"`) and compares its sealed milestone-commit claim against
+    this hour's live scan result, when one was handed in. Informational
+    only, like `check_report_freshness`/`check_metrics_freshness` --
+    never contributes to `broken`. `live_scan` is this hour's own
+    `seam_engine.scan --github-events <cache>` JSON output, gathered live
+    by the calling god and handed in the same way `--square-state`/
+    `--ci-checks` already work -- this function makes no scan of its own."""
+    mod = _report_accuracy_check()
+    report_text: str | None = None
+    if report.get("status") == "current":
+        report_path = report.get("path")
+        if report_path is not None and os.path.isfile(report_path):
+            with open(report_path, encoding="utf-8") as f:
+                report_text = f.read()
+    live_gap = live_scan.get("primary_gap") if live_scan is not None else None
+    return cast(dict[str, object], mod.compute_report_accuracy(report_text, live_gap))
 
 
 def check_ritual_completeness(
@@ -2147,6 +2176,7 @@ def run_ritual_check(
     report_cadence_dir: str | None = None,
     metrics_cadence_path: str | None = None,
     shared_reports_path: str | None = None,
+    live_scan: dict[str, Any] | None = None,
     ritual_completeness_path: str | None = None,
     ritual_completeness_tools_dir: str | None = None,
     ritual_completeness_seam_engine_dir: str | None = None,
@@ -2230,6 +2260,7 @@ def run_ritual_check(
     town = check_town_ledger()
     fencepost = check_fencepost_ledger(fencepost_base)
     report = check_report_freshness(now)
+    report_accuracy = check_report_accuracy(report, live_scan)
     recheck = check_x_recheck(now_iso)
     escalation = check_x_escalation(now_iso)
     square = check_square(square_state, now_iso)
@@ -2395,6 +2426,7 @@ def run_ritual_check(
         "town_ledger": town,
         "fencepost_ledger": fencepost,
         "report": report,
+        "report_accuracy": report_accuracy,
         "x_recheck": recheck,
         "x_escalation": escalation,
         "square": square,
@@ -2484,6 +2516,8 @@ def format_ritual_check(result: dict[str, Any]) -> str:
         lines.append(f"  report: pending for {r['date']} (falls back to {r['fallback_path']})")
     else:
         lines.append(f"  report: STALE -- no report for {r['date']} or the day before")
+    ra = result["report_accuracy"]
+    lines.append(f"  report accuracy: {'clean' if ra['clean'] else 'STALE'} -- {ra['reason']}")
     for tool, info in result["x_recheck"].items():
         lines.append(f"  {tool}: {'due' if info['due'] else 'not due'} -- {info['status_line']}")
     for tool, info in result["x_escalation"].items():
@@ -2899,6 +2933,7 @@ def main(argv: list[str]) -> int:
     child_files = None
     voice_window_commits = None
     github_stars_count = None
+    live_scan = None
     i = 0
     while i < len(argv):
         if argv[i] == "--now" and i + 1 < len(argv):
@@ -2940,6 +2975,9 @@ def main(argv: list[str]) -> int:
         elif argv[i] == "--github-stars" and i + 1 < len(argv):
             github_stars_count = int(argv[i + 1])
             i += 2
+        elif argv[i] == "--live-scan" and i + 1 < len(argv):
+            live_scan = cast(dict[str, object], _load_json_arg(argv[i + 1], "live-scan", "dict"))
+            i += 2
         elif argv[i] == "--json":
             base = base
             i += 1
@@ -2954,6 +2992,7 @@ def main(argv: list[str]) -> int:
         good_first_issues_state=good_first_issues_state,
         ci_checks=ci_checks,
         cron_checks=cron_checks,
+        live_scan=live_scan,
         child_files=child_files,
         voice_window_commits=voice_window_commits,
         github_stars_count=github_stars_count,
