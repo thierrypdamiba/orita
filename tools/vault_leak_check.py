@@ -302,6 +302,21 @@ def _find_leaks_uncached(
     combined_haystack = _build_combined_haystack(public_corpus, min_run)
     public_hash_set = _haystack_hash_set(combined_haystack, min_run)
 
+    # Task 705: `os.path.relpath(public_path, orita_dir)` only ever depends
+    # on public_path, never on which vault line is being checked, but the
+    # candidates listcomp below used to recompute it fresh for every single
+    # (vault line, public file) pair -- 1.24M relpath calls for today's real
+    # corpus (1207 significant vault lines x 1028 public files), ~21s of the
+    # ~40s this check took standalone, just to answer a lookup against a
+    # frozenset that (as of task 194) holds exactly one entry. Computing each
+    # public file's relpath once here and reusing it below is the same
+    # "hoist the loop-invariant" fix task 236's rolling hash already applied
+    # one level up (haystack scanned once per run, not once per line).
+    public_corpus_with_rel = [
+        (public_path, text, os.path.relpath(public_path, orita_dir))
+        for public_path, text in public_corpus
+    ]
+
     leaks: list[dict[str, object]] = []
     for vault_path in _private_journal_files(vault_dir):
         vault_rel = os.path.relpath(vault_path, os.path.join(vault_dir, "vault"))
@@ -313,9 +328,8 @@ def _find_leaks_uncached(
 
             candidates = [
                 (public_path, text)
-                for public_path, text in public_corpus
-                if (vault_rel, line_no, os.path.relpath(public_path, orita_dir))
-                not in _REVIEWED_NON_LEAKS
+                for public_path, text, public_rel in public_corpus_with_rel
+                if (vault_rel, line_no, public_rel) not in _REVIEWED_NON_LEAKS
             ]
             offsets_by_file: dict[str, int] = {}
             for offset, h in _window_hashes(snippet, min_run):
