@@ -236,7 +236,31 @@ def _find_match(invite: GmailInvite, events: list[CalendarEvent]) -> CalendarEve
     """A calendar event matches an invite if their starts are within
     TIME_TOLERANCE AND their titles share a real keyword — either signal
     alone is too weak (two meetings an hour apart, or two same-named
-    meetings on different days, are not necessarily the same thing)."""
+    meetings on different days, are not necessarily the same thing).
+
+    A short or generic invite title ("QA", "1:1", "Ops") yields NO
+    extractable keyword at all -- `_keywords` needs a letter followed by
+    two-or-more word characters, which a plain short title never carries --
+    so an empty `invite_kw` is empty for a reason that has nothing to do
+    with whether the event actually reached the Calendar. Judging the match
+    by keyword overlap ALONE would then treat every such invite as
+    unmatched even when a calendar event names it verbatim at the exact
+    same time: a false gap, exactly the crying-wolf failure Ogun's law
+    calls fatal. Reproduced live before touching anything:
+    `_find_match(invite=GmailInvite(event_title="QA", ...), [CalendarEvent(
+    title="QA", start=<same time>, ...)])` returned `None` even though the
+    calendar event's own title matches the invite's verbatim -- the exact
+    "bare version-string title yields no keywords" shape
+    `scan.compute_candidates` already carries this identical fallback for
+    (see its own comment on `title_keywords`). So when (and only when) the
+    invite's own title yields no keywords to match on, fall back to a raw
+    case-insensitive substring check of the invite's title against each
+    candidate event's own title -- you name "QA" by literally writing "QA".
+    Invite titles that DO yield keywords keep the exact overlap behavior,
+    unchanged (see `test_matching_time_but_no_shared_keyword_is_still_a_gap`,
+    which relies on that being true for a title that all extracts to real
+    keywords).
+    """
     if invite.event_start is None or invite.event_title is None:
         raise ValueError(
             f"_find_match(): invite {invite.id} reached the matcher without "
@@ -244,10 +268,14 @@ def _find_match(invite: GmailInvite, events: list[CalendarEvent]) -> CalendarEve
             "it out before this call; ruff S101 (task 618)."
         )
     invite_kw = _keywords(invite.event_title)
+    invite_title_needle = invite.event_title.strip().lower()
     for ev in events:
         if abs((ev.start - invite.event_start).total_seconds()) > TIME_TOLERANCE.total_seconds():
             continue
-        if _keywords(ev.title) & invite_kw:
+        if invite_kw:
+            if _keywords(ev.title) & invite_kw:
+                return ev
+        elif invite_title_needle and invite_title_needle in ev.title.strip().lower():
             return ev
     return None
 

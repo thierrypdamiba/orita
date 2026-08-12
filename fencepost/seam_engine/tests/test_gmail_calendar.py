@@ -195,6 +195,34 @@ def test_matching_time_but_no_shared_keyword_is_still_a_gap():
     assert excluded == []
 
 
+def test_short_title_with_no_extractable_keywords_still_matches_a_real_calendar_event():
+    # "QA" is too short for `_keywords` to extract anything from (it needs a
+    # letter followed by two-or-more word characters) -- so keyword overlap
+    # alone can never see this invite and its own matching calendar event as
+    # the same thing, even though they share the exact same title at the
+    # exact same time. Reproduced live pre-fix: this returned a surfaced gap
+    # ("never reached Calendar") for an invite that plainly DID reach it.
+    start = FIXTURE_NOW + timedelta(days=2)
+    invites = [_invite(event_title="QA", event_start=start, subject="Invitation: QA")]
+    events = [_event(title="QA", start=start)]
+    surfaced, excluded = compute_gaps(invites, events, now=FIXTURE_NOW)
+    assert surfaced == []
+    assert len(excluded) == 1
+    assert "matched" in excluded[0].slug
+
+
+def test_short_title_with_no_matching_calendar_event_is_still_a_gap():
+    # The fallback for a keyword-less title must not go the other way and
+    # start matching everything within the time window -- a short-titled
+    # invite with no real calendar counterpart is still a genuine gap.
+    start = FIXTURE_NOW + timedelta(days=2)
+    invites = [_invite(event_title="QA", event_start=start)]
+    events = [_event(title="Unrelated lunch", start=start)]
+    surfaced, excluded = compute_gaps(invites, events, now=FIXTURE_NOW)
+    assert len(surfaced) == 1
+    assert excluded == []
+
+
 def test_future_invite_scores_higher_than_a_stale_one():
     future = _invite("f1", event_title="Future thing", event_start=FIXTURE_NOW + timedelta(days=3))
     past = _invite("p1", event_title="Past thing", event_start=FIXTURE_NOW - timedelta(days=3))
