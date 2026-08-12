@@ -625,6 +625,41 @@ def test_suggest_move_still_matches_calendar_when_unquoted_in_the_template():
     assert "add it to your calendar" in move.lower()
 
 
+# Task 708 (retrya): the second calendar-shaped gap `_MOVE_RULES` never had a
+# needle for -- `milestone-deadline-no-calendar-event`'s own real headline
+# shape (task 665's 79th recipe, GitHub-vs-Calendar rather than
+# gmail_calendar.py's Gmail-vs-Calendar). Reproduces the live pre-fix
+# failure: this exact headline (copied from the recipe's own `detector.py`
+# f-string, not invented here) used to fall through to `_DEFAULT_MOVE`
+# ("Close it yourself, however it's meant to be closed") -- the wrong verb
+# for a deadline gap, since there is nothing to close, only a reminder to
+# add.
+def test_suggest_move_matches_milestone_deadline_no_calendar_event_headline():
+    move = report.suggest_move(
+        {
+            "headline": "Milestone #1 ('v2.0 launch') is due 2026-08-13, no Calendar event tracks it",
+            "detail": "",
+        }
+    )
+    assert "add it to your calendar" in move.lower()
+    assert move != report._DEFAULT_MOVE
+
+
+# A positive control isolating the fix to this one recipe's own phrase:
+# `overdue-milestone-still-open` is the sibling recipe task 665's own README
+# names as genuinely distinct (backward-looking, single-toolkit, no
+# Calendar involved at all) -- its real headline shape must keep the
+# generic close-it-yourself line, unaffected by the new needle.
+def test_suggest_move_leaves_overdue_milestone_still_open_on_the_default_move():
+    move = report.suggest_move(
+        {
+            "headline": "Milestone #20 ('v1.3 Release') was due 2026-07-10, still open with 3 open issue(s)",
+            "detail": "",
+        }
+    )
+    assert move == report._DEFAULT_MOVE
+
+
 # --- task 605 (retrya): an apostrophe is not always a quote ------------------
 #
 # `_QUOTED_SPAN_RE` used to read `'[^']*'` -- every apostrophe treated as a
@@ -752,21 +787,38 @@ def test_no_move_rule_needle_is_a_bare_topic_word():
     )
 
 
-def test_calendar_needle_is_gmail_calendars_own_headline_phrase():
-    """Ties the needle to the only real Calendar gap this engine can build.
+def test_calendar_needles_are_each_real_detectors_own_headline_phrase():
+    """Ties both calendar needles to the two real Calendar gaps this engine
+    can build -- not one, since task 708.
 
-    Read out of `gmail_calendar.py`'s own source rather than hand-typed a
-    second time, so rewording either side goes red here instead of quietly
-    drifting apart -- the same discipline `test_readme_tool_count.py` and
+    `gmail_calendar.py` (Gmail-vs-Calendar) and
+    `RECIPES/milestone-deadline-no-calendar-event/detector.py`
+    (GitHub-vs-Calendar) are two different detectors on the same seam
+    family, each with its own headline wording. Read both phrases out of
+    their own source rather than hand-typed a second time here, so
+    rewording either side goes red instead of quietly drifting apart -- the
+    same discipline `test_readme_tool_count.py` and
     `test_onboarding_test_count.py` already hold for their own claims.
     """
     from seam_engine import gmail_calendar
 
-    source = inspect.getsource(gmail_calendar)
-    needles = [needle for needle, _ in report._MOVE_RULES if "calendar" in needle]
-    assert needles == ["never reached calendar"], needles
-    assert "never reached Calendar" in source, (
+    gmail_source = inspect.getsource(gmail_calendar)
+    recipe_detector = (
+        Path(__file__).resolve().parents[2]
+        / "RECIPES"
+        / "milestone-deadline-no-calendar-event"
+        / "detector.py"
+    )
+    recipe_source = recipe_detector.read_text(encoding="utf-8")
+
+    needles = sorted(needle for needle, _ in report._MOVE_RULES if "calendar" in needle)
+    assert needles == ["never reached calendar", "no calendar event tracks it"], needles
+    assert "never reached Calendar" in gmail_source, (
         "gmail_calendar.py no longer carries the headline phrase _MOVE_RULES matches on"
+    )
+    assert "no Calendar event tracks it" in recipe_source, (
+        "milestone-deadline-no-calendar-event/detector.py no longer carries the headline "
+        "phrase _MOVE_RULES matches on"
     )
 
 
@@ -785,19 +837,28 @@ def test_reminder_needle_is_the_phrase_the_readme_names_that_seam_by():
 def test_no_recipe_gap_is_handed_a_calendar_or_reminder_move():
     """The systemic guard, in the shape tasks 557/586 already established.
 
-    Not one recipe in `RECIPES/` reads Gmail or Calendar -- the whole
-    directory is GitHub/X/Slack/Linear -- so no recipe's real gap may ever
-    be handed the Calendar or reminder hand-off. Pre-fix this failed live on
-    `good-first-issue-never-referenced`, whose own detail prose says
-    "checks nothing else about it -- no reminder, no staleness flag" and was
-    handed "Set the reminder yourself" for an unclaimed good-first-issue.
-    Walks every recipe's own fixture-generated gap, the same mechanism the
-    tweet/announce and dangling-reference sweeps above use.
+    Originally (task 605): not one recipe in `RECIPES/` read Gmail or
+    Calendar, so no recipe's real gap could ever be correctly handed the
+    Calendar or reminder hand-off, and this guard's job was to catch a
+    needle drifting loose enough to false-match one anyway. Task 665 shipped
+    the first (and, as of task 708, only) exception: `milestone-deadline-
+    no-calendar-event` genuinely does read a Calendar (`ListEvents`), and
+    its real gap genuinely IS "add a Calendar event" -- so this one recipe
+    is now checked the other way: its move MUST be the Calendar hand-off,
+    the same live-reproduction discipline task 708 used to find that it
+    used to fall to `_DEFAULT_MOVE` instead. Every other recipe keeps the
+    original blanket guard unchanged. `good-first-issue-never-referenced`'s
+    own detail prose ("checks nothing else about it -- no reminder, no
+    staleness flag") is the pre-605 reminder false-match this guard still
+    exists to catch; no recipe reads a reminder surface at all, so that half
+    of the guard is untouched by task 708.
     """
     from seam_engine.recipes import discover_recipes, load_detector
 
+    calendar_reading_recipes = {"milestone-deadline-no-calendar-event"}
     fencepost_root = Path(__file__).resolve().parents[2]
     checked_any = False
+    checked_calendar_exception = False
     for manifest in discover_recipes(fencepost_root):
         result = load_detector(manifest)()
         gap = result.get("primary_gap") or (result.get("tail") or [None])[0]
@@ -806,15 +867,25 @@ def test_no_recipe_gap_is_handed_a_calendar_or_reminder_move():
         checked_any = True
         move = report.suggest_move(gap)
         lowered = move.lower()
+        if manifest.slug in calendar_reading_recipes:
+            checked_calendar_exception = True
+            assert "add it to your calendar" in lowered, (
+                f"{manifest.slug} genuinely reads a Calendar and its real gap should be "
+                "handed the Calendar hand-off, not a generic one."
+            )
+            continue
         assert "add it to your calendar" not in lowered, (
-            f"{manifest.slug}'s real gap was handed the Calendar hand-off; no recipe in "
-            "RECIPES/ reads Gmail or Calendar at all."
+            f"{manifest.slug}'s real gap was handed the Calendar hand-off; this recipe "
+            "does not read Gmail or Calendar at all."
         )
         assert "set the reminder" not in lowered, (
             f"{manifest.slug}'s real gap was handed the reminder hand-off; no recipe in "
             "RECIPES/ reads a reminder surface at all."
         )
     assert checked_any, "expected at least one real recipe to produce a gap to check"
+    assert checked_calendar_exception, (
+        "expected milestone-deadline-no-calendar-event's own real fixture gap to be checked"
+    )
 
 
 def test_your_move_line_reads_correctly_from_a_live_ledger(tmp_path: Path):

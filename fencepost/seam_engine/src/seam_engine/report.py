@@ -235,9 +235,48 @@ def _strip_mortal_text(field: str) -> str:
 # became a reminder") -- the only place in the repo it is named at all.
 # `test_no_recipe_gap_is_handed_a_calendar_or_reminder_move` sweeps every
 # real recipe fixture so a future recipe cannot quietly re-open this.
+#
+# Task 708 (retrya): the calendar seam grew a second real shape task 605
+# never had to answer for, because it did not exist yet. `gmail_calendar.py`
+# is Gmail-vs-Calendar (an invite that never crossed over); task 665's 79th
+# recipe, `RECIPES/milestone-deadline-no-calendar-event/`, is GitHub-vs-
+# Calendar (a milestone deadline with nothing outside GitHub to track it) --
+# a second, later-shipped detector on the same seam family with its own,
+# differently-worded headline verbatim ("... is due {date}, no Calendar
+# event tracks it"), never "never reached Calendar". Walked every one of the
+# 81 real shipped recipes' own fixture-generated primary gap through
+# `suggest_move` (the same sweep method 537/550/557/586/605 already
+# established) rather than re-reading only the two families those five tasks
+# already named: 61 recipes fell to `_DEFAULT_MOVE`, and of those, exactly
+# one both mentions "calendar" and is not the already-covered, already-
+# correctly-excluded `good-first-issue-never-referenced` negation task 605
+# fixed (confirmed live: that one still correctly falls to `_DEFAULT_MOVE`,
+# unaffected here). Reproduced live pre-fix:
+# `suggest_move(milestone-deadline-no-calendar-event's real fixture gap)`
+# returned `_DEFAULT_MOVE` ("Close it yourself, however it's meant to be
+# closed") for a milestone that is not necessarily even closeable yet --
+# telling a reader to "close" a deadline gap is not merely generic here, it
+# is the wrong verb entirely; there is nothing to close, only a reminder to
+# add. A positive control substituting an unrelated needle-bearing headline
+# ("#42 closed, never tweeted") in the identical harness still correctly
+# matched its own "post about it" rule, isolating the miss to this one
+# recipe's own uncovered phrase. Fixed by naming the phrase directly ("no
+# calendar event tracks it", lifted verbatim from the recipe's own
+# `detector.py` headline template, not invented here) alongside the existing
+# "never reached calendar" needle, both routed to the same Calendar move --
+# same seam, same hand-off, two detectors that can name it differently.
+# Grep-confirmed novelty before adding it: no other recipe's headline
+# template contains the substring "calendar" at all except this one's own
+# three non-gap exclusion lines (already-tracked / already-closed / no-due-
+# date), none of which ever reach `suggest_move` since they are returned in
+# the tail, not as a primary gap.
 _MOVE_RULES: tuple[tuple[str, str], ...] = (
     (
         "never reached calendar",
+        "Add it to your Calendar yourself. Fencepost only found the seam; it does not cross it.",
+    ),
+    (
+        "no calendar event tracks it",
         "Add it to your Calendar yourself. Fencepost only found the seam; it does not cross it.",
     ),
     (
