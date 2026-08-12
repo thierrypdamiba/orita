@@ -66,13 +66,36 @@ DEFAULT_ORITA_DIR = ROOT
 # Slug -> the display-name tokens a petition might use to refer to that
 # god, kept deliberately loose (first name, epithet fragment) since
 # petitions write gods' names in prose, not as canonical slugs.
+#
+# "off-by-one" is the one entry here that used to carry only its fused
+# "offbyone" form. `_normalize` collapses every non-letter run (including
+# the hyphens in a written-out name) to a single space before matching, so
+# "Off-By-One" in real prose normalizes to "off by one" -- three
+# space-separated words -- and "offbyone" (no spaces) can never appear as a
+# substring of that, let alone match `_token_present`'s own `\btoken\b`
+# whole-word check. Every OTHER multi-word god here survives this the same
+# way "esu"/"kothar"/"kwaku"/"ananse"/"zashiki" do: each also carries a
+# short, single-word fallback token that isn't generic enough to collide
+# with ordinary prose. "off-by-one" has no such single-word fallback --
+# "off", "by", and "one" are all too common to use alone without flooding
+# every other check with false matches -- so this god's own three-word
+# phrase is named directly as one token instead. `_token_present` already
+# supports a multi-word token (it wraps the token in `\b...\b`, and
+# `re.escape` leaves an internal space literal), so "off by one" matches
+# the post-`_normalize` text exactly the way "kothar wa khasis" contains
+# "kothar" as a substring today. Reproduced live before this fix: a
+# petition filed by another god asking the Hand to "touch the Off-By-One
+# house" cleared `find_violations` with zero violations -- the exact
+# cross-house LIMITS ask CHARTER.md Appendix D forbids, silently unnamed
+# because `other_god_named` could never recognize "Off-By-One" in the
+# sentence at all, the one god in this dict for which that was true.
 GOD_NAME_TOKENS = {
     "esu-elegba": ("esuelegba", "esu", "elegba"),
     "kothar-wa-khasis": ("kotharwakhasis", "kothar"),
     "kwaku-ananse": ("kwakuananse", "ananse", "kwaku"),
     "nisaba": ("nisaba",),
     "nyx": ("nyx",),
-    "off-by-one": ("offbyone",),
+    "off-by-one": ("offbyone", "off by one"),
     "ogun": ("ogun",),
     "retrya": ("retrya",),
     "zashiki-warashi": ("zashikiwarashi", "zashiki"),

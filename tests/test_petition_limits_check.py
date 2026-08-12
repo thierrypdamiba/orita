@@ -115,6 +115,26 @@ class FixtureViolationCase(unittest.TestCase):
         self.assertEqual(len(violations), 1)
         self.assertEqual(violations[0]["pattern"], "cross-house/Vault ask")
 
+    def test_cross_house_ask_naming_off_by_one_is_detected(self):
+        # GOD_NAME_TOKENS used to carry only "offbyone" (fused, no spaces)
+        # for this god. `_normalize` collapses "Off-By-One"'s own hyphens
+        # to spaces before matching ("off by one"), so that fused token
+        # could never match the god's own real written name -- the one
+        # entry in GOD_NAME_TOKENS with no single-word fallback token
+        # (unlike esu/kothar/kwaku/ananse/zashiki), since "off"/"by"/"one"
+        # are all too generic to use alone. A petition filed by another
+        # god asking the Hand to touch Off-By-One's own house used to
+        # clear this check with zero violations -- the exact cross-house
+        # LIMITS ask CHARTER.md Appendix D forbids, silently unnamed.
+        _write_petition(
+            self.orita, "ogun", "Ogun",
+            "A minor favor.",
+            "Please touch the Off-By-One house and check its ledger for me.",
+        )
+        violations = plc.find_violations(orita_dir=self.orita)
+        self.assertEqual(len(violations), 1)
+        self.assertEqual(violations[0]["pattern"], "cross-house/Vault ask")
+
     def test_formatted_violation_names_the_broken_clause(self):
         _write_petition(
             self.orita, "off-by-one", "Off-By-One",
