@@ -138,8 +138,26 @@ _SENTENCE_BOUNDARY = text_patterns.SENTENCE_BOUNDARY_TIGHT
 # comment) after task 462 found and fixed the identical false "mirrors
 # ... exactly" claim in `rider_check.py` but never checked whether it
 # survived here too.
+# Task 696: `n't` used to sit inside the same outer `\b(...)\b` group as
+# every named word -- but `\b` immediately before "n" can never match
+# inside a real contraction (the "n" in "don't"/"can't"/"couldn't" is
+# always preceded by another letter, not a word boundary), so the `n't`
+# alternative was dead code. Every contraction not spelled out by name
+# ("don't", "can't", "couldn't", "wouldn't", "shouldn't", "hasn't",
+# "haven't", "hadn't", "aren't", "weren't"...) silently failed to register
+# as negation at all. Reproduced live pre-fix: `_is_negated("We don't say
+# the Hand is Thierry.", ...)` returned `False` (should be `True`, the
+# identical restate-the-rule shape `test_negated_confirm_restatement_is_
+# not_flagged` already covers for "never"), and the real scanner raised a
+# false CONFIRM violation on that exact sentence. Fixed the same way
+# `seam_engine.negation.NEGATION_PREFIX_RE` and `gateway.py`'s
+# `_NEGATION_CUE_RE` (task 694) already prove correct: `n't` moved out of
+# the outer `\b(...)\b` group into its own `n't\b` alternative, a trailing
+# boundary only -- it now matches inside any real contraction. The named
+# words are otherwise unchanged, so this module's own "tuned, not a
+# byte-for-byte mirror" list stays exactly as tuned.
 _NEGATION_CUES = re.compile(
-    r"\b(never|not|no|won't|wasn't|isn't|doesn't|didn't|n't|without|zero)\b", re.IGNORECASE
+    r"\b(never|not|no|won't|wasn't|isn't|doesn't|didn't|without|zero)\b|n't\b", re.IGNORECASE
 )
 
 

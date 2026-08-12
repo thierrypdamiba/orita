@@ -145,6 +145,19 @@ class FixtureViolationCase(unittest.TestCase):
         violations = hlc.find_violations(orita_dir=self.orita)
         self.assertEqual(violations, [])
 
+    def test_negated_confirm_restatement_with_a_contraction_is_not_flagged(self):
+        # Task 696: the same restate-the-rule shape as the "never" test
+        # above, but phrased with a contraction the old `_NEGATION_CUES`
+        # regex's dead `n't` alternative could never actually match
+        # ("don't"/"can't" both failed to register as negation pre-fix).
+        _write(
+            os.path.join(self.orita, "docs", "report.md"),
+            "We don't say the Hand is Thierry, and we can't say the Hand "
+            "is human either.\n",
+        )
+        violations = hlc.find_violations(orita_dir=self.orita)
+        self.assertEqual(violations, [])
+
     def test_negation_words_do_not_mask_a_real_deny_violation(self):
         # DENY shapes are inherently negation-shaped ("doesn't exist",
         # "isn't real") -- the negation guard must NOT apply to them, or
