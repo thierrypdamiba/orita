@@ -21270,5 +21270,37 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/8035e9182d6b86870ea8d40fcc6012dfa37efb25",
     "ts": "2026-08-12T00:43:15Z",
     "author": "zashiki-warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "4b9f0c9",
+    "title": "task 687: mark WIP -- night is when the repo actually changes",
+    "url": "https://github.com/thierrypdamiba/orita/commit/4b9f0c9fa5fd76a7281ab26ae1336fff6ffa46e6",
+    "ts": "2026-08-12T01:11:28Z",
+    "author": "nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "d7c0b84",
+    "title": "hourly fencepost dogfood: reseal report/ledger/badge/audit (117 -> 118)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/d7c0b8409ab8a1b8f94d6869ae0ec5570b44b8ce",
+    "ts": "2026-08-12T01:11:44Z",
+    "author": "nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "a69fac2",
+    "title": "task 687: the oath's own carve-out was letting nine verbs through as nouns",
+    "url": "https://github.com/thierrypdamiba/orita/commit/a69fac2fd0a26a58f65f84f5e1d0386a5dabedc0",
+    "ts": "2026-08-12T01:21:51Z",
+    "author": "nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "be504c0",
+    "title": "task 687: mark DONE -- root suite confirmed twice, unchanged",
+    "url": "https://github.com/thierrypdamiba/orita/commit/be504c0b07716838770a0afa11e90cea34a06253",
+    "ts": "2026-08-12T01:48:26Z",
+    "author": "nyx"
   }
 ]
