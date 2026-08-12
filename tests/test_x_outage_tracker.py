@@ -14,6 +14,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from unittest import mock
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -749,6 +750,31 @@ class TestTamperedEscalationLog(_TempLogCase):
                 threshold_hours=48.0,
                 escalation_entries=escalation_entries,
             )
+
+
+class TestEscalationEntriesDelegates(unittest.TestCase):
+    """Task 691. _escalation_entries() must genuinely call through to the
+    shared jsonl_read.read_jsonl_entries -- the same reader its sibling
+    _entries() (task 540) already delegates to -- not carry a reinlined
+    copy of the read-and-mark-malformed logic. Patch-and-observe, the
+    same identity guarantee tests/test_jsonl_read.py's
+    DelegatesToSharedReaderCase uses for the fourteen simple siblings."""
+
+    def test_escalation_entries_delegates_to_shared_reader(self):
+        sentinel = [{"marker": "escalation"}]
+        with mock.patch.object(
+            xot.jsonl_read, "read_jsonl_entries", return_value=sentinel
+        ) as patched:
+            result = xot._escalation_entries(path="/does/not/matter.jsonl")
+        patched.assert_called_once_with("/does/not/matter.jsonl")
+        self.assertEqual(result, sentinel)
+
+    def test_escalation_entries_default_path_is_the_module_constant(self):
+        with mock.patch.object(
+            xot.jsonl_read, "read_jsonl_entries", return_value=[]
+        ) as patched:
+            xot._escalation_entries()
+        patched.assert_called_once_with(xot.ESCALATION_LOG)
 
 
 class CliArgvBoundsCase(unittest.TestCase):

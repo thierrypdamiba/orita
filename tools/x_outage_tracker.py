@@ -265,31 +265,19 @@ def should_recheck(entries: list[dict[str, object]], tool: str, now: str, cooldo
 def _escalation_entries(path: str = ESCALATION_LOG) -> list[dict[str, object]]:
     """Every line in the escalation log, parsed.
 
-    Same convention as _entries() above: an unparseable line, or one that
-    parses cleanly but isn't a JSON object, comes back marked
+    Task 691. Delegates to jsonl_read.read_jsonl_entries (task 540), the
+    same shared reader its own sibling _entries() above already delegates
+    to -- until now this was the one hand-rolled copy task 540's sweep
+    missed, because it reads a second log (ESCALATION_LOG, not LOG) inside
+    the same module rather than living in the fourteen-file sibling list
+    that swept the read half of jsonl_append.py's fourteen write-side
+    siblings. Same convention as the shared reader: an unparseable line,
+    or one that parses cleanly but isn't a JSON object, comes back marked
     {"_malformed": True, "_error": ...} instead of raising or being handed
     to already_escalated_for_streak()'s e.get("_malformed") as a bare
     non-dict value (which would crash with an uncaught AttributeError).
     """
-    if not os.path.exists(path):
-        return []
-    entries = []
-    with open(path) as f:
-        for line in f:
-            if not line.strip():
-                continue
-            try:
-                parsed = json.loads(line)
-            except json.JSONDecodeError as exc:
-                entries.append({"_malformed": True, "_error": str(exc)})
-                continue
-            if not isinstance(parsed, dict):
-                entries.append(
-                    {"_malformed": True, "_error": f"not a JSON object: {parsed!r}"}
-                )
-                continue
-            entries.append(parsed)
-    return entries
+    return jsonl_read.read_jsonl_entries(path)
 
 
 def record_escalation(
