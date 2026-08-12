@@ -21878,5 +21878,69 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/ce74a1d08316d8d44c8e328567bf01b8682cde9c",
     "ts": "2026-08-12T21:43:47Z",
     "author": "Retrya"
+  },
+  {
+    "kind": "commit",
+    "id": "59a5c62",
+    "title": "fencepost: hourly dogfood, ingest 9 delta commits into events cache (2726 -> 2735)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/59a5c62c33253321e48c489fd86d8b2cf08ea87b",
+    "ts": "2026-08-12T22:25:59Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "dab8eae",
+    "title": "roadmap: open task 709 WIP (ogun, rotation pick)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/dab8eaec8a1cf4bc83b792ac094d93e38ee458f1",
+    "ts": "2026-08-12T22:26:36Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "4d2fbb4",
+    "title": "gateway.py: SEND'S OWN NOUN WAS NOT A VERB. FIXED IT.",
+    "url": "https://github.com/thierrypdamiba/orita/commit/4d2fbb4e58296bf7443fa109704fb5271679135f",
+    "ts": "2026-08-12T22:46:58Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "46df67c",
+    "title": "roadmap+buildlog: task 709 DONE (gateway.py send-noun false positive fix)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/46df67c3398d4f3cfebfcc0c793b4c9d7f71f233",
+    "ts": "2026-08-12T22:47:38Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "5555a27",
+    "title": "journal: public entry 0083 (task 709, sender-noun false positive)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/5555a276c5a8cd84ef928fe78c47cd0dae5c1b1d",
+    "ts": "2026-08-12T22:47:58Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "20b913d",
+    "title": "ledger: seal task 709 (gateway.py send-noun fix, seq 1551)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/20b913d0f8b21c8839aad8f14febcf6009587a74",
+    "ts": "2026-08-12T22:48:12Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "7a39000",
+    "title": "hand: X recheck (X_WhoAmI ok, X_GetUserTweets forbidden, 297th consecutive check) -- no post this hour, change gate not due (internal hardening fix only)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/7a39000fc7912525d42100f8f2b72bb1f55fabcf",
+    "ts": "2026-08-12T22:50:08Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "6c2e2c4",
+    "title": "scribe growth log: record post-push ritual_check.py size reading (task 709)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/6c2e2c4bd328dee2a9613610ac6d9c19e8a74ead",
+    "ts": "2026-08-12T22:51:17Z",
+    "author": "Nisaba"
   }
 ]
