@@ -633,9 +633,22 @@ def coincidence_candidates(
         all_post_keywords |= _keywords(p.text)
 
     # Count topic recurrence and remember the commits behind each topic.
+    #
+    # Task 577 fixed this exact non-determinism for `compute_candidates`'s
+    # milestone evidence (`milestones_oldest_first`, above) but never reached
+    # this sibling function: `topic_urls[w]` is capped at the first 5 URLs
+    # SEEN, so iterating `github_events` in whatever order the caller's data
+    # source happens to produce -- newest-first from `fetch_github_activity`'s
+    # direct GitHub API pages, oldest-first from a `github_events_cache.json`
+    # override -- silently changes WHICH 5 commits get named as evidence for
+    # the identical coincidence topic, not merely their order. Sorting
+    # oldest-first here first (the persisted cache's own convention, same as
+    # task 577's fix) makes a coincidence gap's evidence deterministic
+    # regardless of data source, the same guarantee the primary gap already
+    # holds.
     topic_count: dict[str, int] = {}
     topic_urls: dict[str, list[str]] = {}
-    for e in github_events:
+    for e in sorted(github_events, key=lambda c: c.ts):
         if e.kind != "commit" or e.ts < account_live_since:
             continue
         if e.author.lower() in QUIET_VOICE_AUTHORS:

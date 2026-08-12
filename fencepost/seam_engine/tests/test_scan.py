@@ -29,6 +29,7 @@ from seam_engine.scan import (
     XPost,
     _effective_since,
     _unresolved_prior_milestone_evidence,
+    coincidence_candidates,
     compute_candidates,
     load_github_events_from_live,
     load_x_posts_from_live,
@@ -847,4 +848,46 @@ def test_milestone_evidence_is_oldest_first_regardless_of_input_commit_order():
     assert gap_from_newest_first_input.evidence == expected_evidence, (
         "evidence must be deterministic (oldest-first) regardless of "
         "which order the caller's github_events happened to arrive in"
+    )
+
+
+def _routine_commit(cid: str, ts: datetime, topic: str = "ledger") -> GithubEvent:
+    return GithubEvent(
+        kind="commit", id=cid, title=f"{topic} recorded entry {cid}",
+        url=f"https://github.com/thierrypdamiba/orita/commit/{cid}",
+        ts=ts, author="test",
+    )
+
+
+def test_coincidence_evidence_is_oldest_first_regardless_of_input_commit_order():
+    # Same bug class task 577 fixed for `compute_candidates`'s milestone
+    # evidence, alive here because that fix never reached this sibling
+    # function: `coincidence_candidates` caps each topic's evidence at the
+    # first 5 URLs SEEN while walking `github_events` in whatever order it
+    # arrived in. A direct-fetch scan (GitHub's own newest-first commit
+    # pages) and a cache-override scan (always saved oldest-first) over the
+    # exact same 6 "ledger"-topic commits therefore named two DISJOINT sets
+    # of evidence commits for the identical coincidence gap -- not just a
+    # different order, a different 5-of-6 subset.
+    oldest_first = [
+        _routine_commit(f"bbb000{i}", datetime(2026, 7, 12, i, tzinfo=timezone.utc))
+        for i in range(6)
+    ]
+    newest_first = list(reversed(oldest_first))
+
+    gap_from_oldest_first_input = next(
+        g for g in coincidence_candidates(oldest_first, [], _LIVE)
+        if g.slug == "coincidence-ledger"
+    )
+    gap_from_newest_first_input = next(
+        g for g in coincidence_candidates(newest_first, [], _LIVE)
+        if g.slug == "coincidence-ledger"
+    )
+
+    expected_evidence = [c.url for c in oldest_first][:5]
+    assert gap_from_oldest_first_input.evidence == expected_evidence
+    assert gap_from_newest_first_input.evidence == expected_evidence, (
+        "evidence must be deterministic (oldest-first, capped at 5) "
+        "regardless of which order the caller's github_events happened "
+        "to arrive in"
     )
