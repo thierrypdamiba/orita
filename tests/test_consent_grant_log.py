@@ -70,6 +70,18 @@ class GateEnforcementCase(unittest.TestCase):
             )
         self.assertFalse(os.path.exists(self.log_path))
 
+    def test_a_blank_human_is_refused_and_writes_nothing(self):
+        # ROADMAP: enforce_consent_gate now refuses a blank/whitespace human
+        # identity -- record_grant re-runs that same gate, so a caller can
+        # never durably count an anonymous grant toward
+        # real_distinct_human_count(), STRATEGY.md's own connected-users
+        # metric.
+        with self.assertRaises(ConsentRequiredError):
+            cgl.record_grant(
+                "", "github", _REAL_ISSUE, REQUIRED_SCOPES["github"], "2026-07-19T04:30:00Z", path=self.log_path
+            )
+        self.assertFalse(os.path.exists(self.log_path))
+
     def test_an_unknown_toolkit_is_refused_and_writes_nothing(self):
         with self.assertRaises(ConsentRequiredError):
             cgl.record_grant(

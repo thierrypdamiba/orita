@@ -143,6 +143,23 @@ def test_a_record_for_a_different_toolkit_does_not_open_this_door():
         enforce_consent_gate(record, toolkit="google_calendar")
 
 
+def test_a_blank_human_blocks_even_with_perfect_issue_and_scopes():
+    # An empty human identity must never clear the gate — record_grant()
+    # (tools/consent_grant_log.py) re-runs this exact gate before durably
+    # counting a connected user, so a blank identity slipping through here
+    # would get counted as a real, distinct human on STRATEGY.md's own
+    # leading "connected users" metric.
+    record = _record("gmail", human="")
+    with pytest.raises(ConsentRequiredError, match="no human"):
+        enforce_consent_gate(record, toolkit="gmail")
+
+
+def test_a_whitespace_only_human_blocks_the_same_way():
+    record = _record("gmail", human="   ")
+    with pytest.raises(ConsentRequiredError, match="no human"):
+        enforce_consent_gate(record, toolkit="gmail")
+
+
 def test_an_unknown_toolkit_can_never_pass():
     record = ConsentRecord(
         human="a-real-human",

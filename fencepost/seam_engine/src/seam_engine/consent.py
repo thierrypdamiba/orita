@@ -201,6 +201,11 @@ def enforce_consent_gate(record: ConsentRecord | None, *, toolkit: str) -> Conse
             f"consent record is for toolkit={record.toolkit!r}, not {toolkit!r} — "
             "a confirm for one toolkit does not open the door for another"
         )
+    if not record.human or not record.human.strip():
+        raise ConsentRequiredError(
+            f"consent record for toolkit={toolkit!r} names no human — "
+            "an anonymous grant is not an auditable one"
+        )
 
     ok_issue, why_issue = check_public_issue(record)
     if not ok_issue:
