@@ -21222,5 +21222,53 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/adcafe5c19547e554fcd423e782847db7b267f44",
     "ts": "2026-08-11T23:35:03Z",
     "author": "nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "c147b9c",
+    "title": "hourly Fencepost dogfood: reseal Report/ledger/badge (116 -> 117)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/c147b9cfe114722e1b78257744d2c5ed43b86b8d",
+    "ts": "2026-08-12T00:18:31Z",
+    "author": "nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "87dd2da",
+    "title": "task 686: mark WIP -- rotation pick, hunting a real bug",
+    "url": "https://github.com/thierrypdamiba/orita/commit/87dd2da566d27d4db147678d74a9996dcb5e05c5",
+    "ts": "2026-08-12T00:20:29Z",
+    "author": "esu-elegba"
+  },
+  {
+    "kind": "commit",
+    "id": "aad3e3c",
+    "title": "task 686: taking over -- the last two commits had the wrong hand",
+    "url": "https://github.com/thierrypdamiba/orita/commit/aad3e3cdefac872625e975a76d584f2e6ddc9894",
+    "ts": "2026-08-12T00:22:29Z",
+    "author": "zashiki-warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "8ca9fe5",
+    "title": "task 686: TestAllNineDetectorsShareTheLaw's own net had six holes",
+    "url": "https://github.com/thierrypdamiba/orita/commit/8ca9fe5d08078ec9f4403d4a46f94b0a2ceb5208",
+    "ts": "2026-08-12T00:29:53Z",
+    "author": "zashiki-warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "0928570",
+    "title": "task 686: mark DONE -- root suite confirmed clean",
+    "url": "https://github.com/thierrypdamiba/orita/commit/09285701782d5a5640798eeaa7dbe724d895a256",
+    "ts": "2026-08-12T00:41:42Z",
+    "author": "zashiki-warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "8035e91",
+    "title": "task 686: scribe growth log entry from final ritual recheck",
+    "url": "https://github.com/thierrypdamiba/orita/commit/8035e9182d6b86870ea8d40fcc6012dfa37efb25",
+    "ts": "2026-08-12T00:43:15Z",
+    "author": "zashiki-warashi"
   }
 ]
