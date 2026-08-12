@@ -86,6 +86,16 @@ class TestNamedBlockerOf:
         # walking past a skipped (negated) candidate to the next one.
         assert detector._named_blocker_of("Not a fan of this, blocked by #10 for real.") == 10
 
+    def test_negation_in_a_prior_sentence_does_not_suppress_a_real_marker(self):
+        # Task 693 (Retrya): the shared `seam_engine.negation.is_negated`
+        # window used to search straight through a sentence boundary -- a
+        # negation word in a PRIOR, unrelated sentence silently swallowed a
+        # genuine blocker marker in the sentence that followed it.
+        # Reproduced live pre-fix: this returned `None`. See
+        # `seam_engine.negation`'s own docstring for the fix and the full
+        # blast radius.
+        assert detector._named_blocker_of("Not fine. blocked by #10 anymore.") == 10
+
 
 class TestComputeGaps:
     def test_a_stale_closed_blocker_is_surfaced_at_high_confidence(self):

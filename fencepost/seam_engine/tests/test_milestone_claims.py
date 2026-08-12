@@ -100,6 +100,21 @@ class TestNegatedClaimIsNotAClaim:
         ) == [7]
 
 
+class TestNegationDoesNotCrossASentenceBoundary:
+    """Task 693 (Retrya): the shared `seam_engine.negation.is_negated`
+    window used to search straight through a sentence boundary -- a
+    negation word in a PRIOR, unrelated sentence silently swallowed a
+    genuine milestone claim in the sentence that followed it. Reproduced
+    live pre-fix: `claimed_milestone_numbers("Not today. milestone #7 is
+    done.")` returned `[]`. See `seam_engine.negation`'s own docstring for
+    the fix and the full blast radius."""
+
+    def test_negation_in_a_prior_sentence_does_not_suppress_a_real_claim(
+        self,
+    ) -> None:
+        assert claimed_milestone_numbers("Not today. milestone #7 is done.") == [7]
+
+
 class TestMilestoneClaimRe:
     def test_pattern_source(self) -> None:
         assert MILESTONE_CLAIM_RE.pattern == r"\bmilestone\s+#(\d+)\b"

@@ -98,6 +98,21 @@ class TestNegatedDuplicateMarkerIsNotAClaim:
         ) == 12
 
 
+class TestNegationDoesNotCrossASentenceBoundary:
+    """Task 693 (Retrya): the shared `seam_engine.negation.is_negated`
+    window used to search straight through a sentence boundary -- a
+    negation word in a PRIOR, unrelated sentence silently swallowed a
+    genuine duplicate marker in the sentence that followed it. Reproduced
+    live pre-fix: `named_duplicate_of("Not fine. dup of #12 today.")`
+    returned `None`. See `seam_engine.negation`'s own docstring for the
+    fix and the full blast radius."""
+
+    def test_negation_in_a_prior_sentence_does_not_suppress_a_real_marker(
+        self,
+    ) -> None:
+        assert named_duplicate_of("Not fine. dup of #12 today.") == 12
+
+
 class TestDuplicateMarkerRe:
     def test_pattern_source(self) -> None:
         assert DUPLICATE_MARKER_RE.pattern == r"\bdup(?:licate)?\s*(?:of|:)?\s+#(\d+)\b"

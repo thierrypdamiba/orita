@@ -53,6 +53,51 @@ class TestIsNegated:
         assert is_negated(text, 0, window=20) is False
 
 
+class TestSentenceBoundaryStopsTheWindow:
+    """Task 693: a negation word belonging to an earlier, unrelated
+    sentence must not be able to negate a claim in the sentence that
+    follows it just because both happen to fall inside a fixed character
+    window -- see this module's own docstring for the live pre-fix
+    reproduction across all four real callers."""
+
+    def test_negation_in_a_prior_sentence_is_not_seen(self) -> None:
+        text = "It is not okay. thanks @user for the fix."
+        start = text.index("thanks")
+        # "not" sits well inside a 10-char window, but a period ends its
+        # own sentence first -- the claim after it is genuinely unnegated.
+        assert is_negated(text, start, window=10) is False
+
+    def test_negation_in_the_same_sentence_after_the_boundary_still_seen(
+        self,
+    ) -> None:
+        text = "It is fine. not fine, ships #45 anyway."
+        start = text.index("ships")
+        # The nearer "not" (after the period) is in the SAME sentence as
+        # the claim and must still count.
+        assert is_negated(text, start, window=30) is True
+
+    def test_exclamation_and_question_mark_are_also_boundaries(self) -> None:
+        for punct in ("!", "?"):
+            text = f"Not this{punct} dup of #12 today."
+            start = text.index("dup")
+            assert is_negated(text, start, window=20) is False, punct
+
+    def test_comma_is_not_a_boundary(self) -> None:
+        # Every real caller relies on "no, thanks @user" / "no, not a
+        # duplicate of #12" staying inside the same window -- a comma must
+        # not end it.
+        text = "no, thanks @user"
+        start = text.index("thanks")
+        assert is_negated(text, start, window=20) is True
+
+    def test_boundary_uses_the_last_punctuation_not_the_first(self) -> None:
+        # Two sentence boundaries inside the window -- only the text after
+        # the LAST one is searched.
+        text = "Not this. Also not this. ships #45 for real."
+        start = text.index("ships")
+        assert is_negated(text, start, window=len(text)) is False
+
+
 class TestNegationPrefixRe:
     def test_pattern_source(self) -> None:
         assert NEGATION_PREFIX_RE.pattern == r"\b(?:not|never|no)\b|n't\b"

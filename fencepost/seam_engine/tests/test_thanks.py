@@ -139,6 +139,24 @@ class TestNegatedThanksIsNotAMatch:
         assert thanked_handle("shouldn't thank @user for this") is None
 
 
+class TestNegationDoesNotCrossASentenceBoundary:
+    """Task 693 (Retrya): the shared `seam_engine.negation.is_negated`
+    window used to search straight through a sentence boundary -- a
+    negation word in a PRIOR, unrelated sentence silently swallowed a
+    genuine thanks in the sentence that followed it. Reproduced live
+    pre-fix: `thanked_handle("It is not okay. thanks @user for the fix.")`
+    returned `None`. See `seam_engine.negation`'s own docstring for the
+    fix and the full blast radius."""
+
+    def test_negation_in_a_prior_sentence_does_not_suppress_a_real_thanks(
+        self,
+    ) -> None:
+        assert (
+            thanked_handle("It is not okay. thanks @user for the fix.")
+            == "user"
+        )
+
+
 class TestThanksRe:
     def test_pattern_source(self) -> None:
         assert THANKS_RE.pattern == r"thanks?(?:\s+you)?\b.{0,40}?@(\w[\w-]*)"
