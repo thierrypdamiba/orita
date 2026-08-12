@@ -21,6 +21,7 @@ from seam_engine.recipes import (
     REQUIRED_FIELDS,
     RecipeManifest,
     RecipeValidationError,
+    _check_scope_is_read_only,
     discover_recipes,
     load_detector,
     load_recipe_manifest,
@@ -380,6 +381,51 @@ def test_a_write_verb_glued_into_the_middle_of_a_word_is_rejected(scope):
     # a prefix AND a suffix around it).
     with pytest.raises(RecipeValidationError, match="glues the write verb"):
         validate_recipe(_manifest(scopes=(scope,)))
+
+
+@pytest.mark.parametrize(
+    "scope",
+    [
+        "ListRemovesForIssue",
+        "ListUpdatesForRepo",
+        "GetCreatesQueue",
+        "ListDeletesLog",
+        "GetInvitesForOrg",
+        "ListRevokesLog",
+        "GetWritesLog",
+        "ListDraftsQueue",
+        "GetSharesLog",
+    ],
+)
+def test_a_write_verb_conjugated_with_a_bare_s_is_rejected(scope):
+    # Found live this task: `_word_hides_glued_verb`'s plural-noun carve-out
+    # ("a word that is precisely verb + 's' is a legitimate plural noun, not
+    # a glued verb") was generalized to all seventeen `_FORBIDDEN_VERBS`
+    # rather than just "Label" (the one word it was actually written for),
+    # so "Removes"/"Updates"/"Creates"/etc -- present-tense verb
+    # conjugations, not plural nouns -- silently cleared the oath with a
+    # literal write verb inside one of their own words.
+    # `_check_scope_is_read_only("ListRemovesForIssue", where=...)` raised
+    # nothing before this fix. No real recipe's `scopes` field has ever used
+    # any of these forms.
+    with pytest.raises(RecipeValidationError, match="glues the write verb"):
+        validate_recipe(_manifest(scopes=(scope,)))
+
+
+def test_labels_the_one_real_plural_noun_still_accepted():
+    # "Label" is the only forbidden verb with a genuine plural-noun reading
+    # ("Labels", as in SCOPES.md's own ListRepositoryLabels) -- narrowing
+    # the carve-out to name it explicitly must not start refusing it.
+    #
+    # Calls _check_scope_is_read_only (checks 1/2, the shape/deny-list pair
+    # the carve-out actually lives in) directly rather than going through
+    # validate_recipe: ListRepositoryLabels clears checks 1/2 fine but is
+    # not in consent.REQUIRED_SCOPES for the "github" toolkit (a separate,
+    # pre-existing gap between SCOPES.md's prose table and consent.py's own
+    # table -- out of scope for this task, named here rather than routed
+    # around silently), so validate_recipe would raise for an unrelated
+    # reason and this test would stop proving what its name says.
+    _check_scope_is_read_only("ListRepositoryLabels", where="test")
 
 
 def test_scope_with_trailing_newline_is_rejected():

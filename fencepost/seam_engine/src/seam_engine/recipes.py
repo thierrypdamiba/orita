@@ -107,6 +107,16 @@ _FORBIDDEN_VERBS: frozenset[str] = frozenset({
     "Revoke", "Publish", "Share",
 })
 
+# Named, not inherited: of the seventeen `_FORBIDDEN_VERBS` above, only
+# "Label" has a genuine plural-NOUN reading ("Labels", as in the real
+# `ListRepositoryLabels`). `_word_hides_glued_verb` below used to grant
+# every forbidden verb the same `verb + "s"` carve-out by default, which
+# silently passed "Removes"/"Updates"/"Creates"/etc as if they too were
+# nouns rather than verb conjugations -- found live this task. Add a verb
+# here only when a real recipe's `scopes` field genuinely needs its
+# plural-noun form to pass.
+_PLURAL_NOUN_VERBS: frozenset[str] = frozenset({"Label"})
+
 _PASCAL_WORD_RE = re.compile(r"[A-Z][a-z0-9]*")
 
 # Task 529: the fixture-path check above ("fixture must live under
@@ -259,16 +269,36 @@ def _word_hides_glued_verb(word: str) -> str | None:
     front/middle/end alike, with exactly one carve-out: a word that is
     precisely `verb + "s"` is a legitimate plural noun, not a glued verb --
     SCOPES.md's real `ListRepositoryLabels` depends on `"Labels"` (`"Label"`
-    + `"s"`) passing, the same reasoning this carve-out already existed for
-    under the old end-anchor check, generalized to every verb rather than
-    left implicit in where the old checks happened not to look.
+    + `"s"`) passing.
+
+    Found this task, live: the carve-out above was written generalized to
+    EVERY forbidden verb, not just `"Label"` (the one word that actually
+    needed it) -- so `word == verb + "s"` also silently exempted
+    `"Removes"`, `"Updates"`, `"Creates"`, `"Deletes"`, `"Invites"`,
+    `"Revokes"`, `"Writes"`, `"Drafts"`, `"Shares"` (nine more of the
+    seventeen forbidden verbs), none of which have any legitimate
+    plural-noun reading the way `"Label"` -> `"Labels"` does -- they are
+    present-tense verb conjugations, not nouns.
+    `_check_scope_is_read_only("ListRemovesForIssue", where=...)` raised
+    nothing, cleared with a literal write verb inside one of its own
+    words (`"Remove"` glued to a bare `"s"`), exactly the shape this
+    function exists to refuse. No real recipe's `scopes` field has ever
+    used any of these nine forms (grepped every `fencepost/RECIPES/*/
+    recipe.json` live before narrowing this) -- the carve-out only ever
+    needed to cover the one real, documented case.
+
+    Narrowed the carve-out to name the verbs it actually protects
+    (`_PLURAL_NOUN_VERBS`, currently just `"Label"`) instead of applying
+    to all seventeen by default -- a future verb that legitimately needs
+    the same plural-noun exemption now has to be added here on purpose,
+    not inherited for free by virtue of ending in `"s"`.
 
     Returns the forbidden verb found glued in, or `None` if `word` hides no
     forbidden verb behind a missing capital letter."""
     lowered = word.lower()
     for verb in _FORBIDDEN_VERBS:
         verb_lower = verb.lower()
-        if lowered == verb_lower + "s":
+        if verb in _PLURAL_NOUN_VERBS and lowered == verb_lower + "s":
             continue
         if verb_lower in lowered:
             return verb
