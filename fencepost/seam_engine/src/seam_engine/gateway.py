@@ -199,36 +199,66 @@ _LEADING_CUE_RE = re.compile(r"^(?:not|never|no|cannot|\w*n't)\b\s*")
 _LEADING_CONJ_RE = re.compile(r"^(?:and|or)\b\s*")
 _BARE_VERB_RE = re.compile(r"^(?:" + "|".join(_WRITE_VERBS) + r")\w*$")
 
+# Task 699 (Esu-Elegba): task 694 named, but deliberately did not fix, a
+# third gap in this same function -- `_LEADING_CUE_RE` only strips a cue
+# that opens the segment, so "It never creates, updates, ... or deletes
+# anything..." and "It doesn't create, update, ... or delete anything..."
+# both fail `_is_bare_verb_item` on their first segment (a SUBJECT sits in
+# front of the cue), and the enumeration falls apart into separate,
+# uncovered clauses -- a later bare item (e.g. plain " update") then reads
+# as an unnegated ask even though a real negation cue governs the whole
+# list. Reproduced live pre-fix: `is_read_only_capabilities("It never
+# creates, updates, merges, or deletes anything on any connected
+# account.")` and the `"doesn't"` sibling both returned `False`.
+#
+# `_ANY_CUE_RE` finds the cue ANYWHERE in the segment rather than only at
+# its start. The fix stays narrow, not "strip any subject": everything
+# from the cue's own end to the end of the segment must be nothing but a
+# (optionally conjunction-prefixed) bare write verb -- exactly the same
+# `_BARE_VERB_RE` bar the leading-cue case already enforces, just applied
+# to the tail after the cue instead of the whole segment. The docstring's
+# named risk ("a subject clause hiding an unrelated negation") does not
+# apply here: whatever sits BEFORE the cue is discarded, never trusted as
+# safe by this function alone -- if that prefix itself contains its own
+# unnegated write verb from `_WRITE_VERBS` (e.g. "It will delete data,
+# never creates, updates, or merges anything"), this segment fails to
+# match a cue immediately followed by nothing-but-a-bare-verb across the
+# WHOLE segment (the prefix survives inside the search window `_ANY_CUE_
+# RE.search` still has to clear before the cue token, but the returned
+# `tail` is always only what comes AFTER the cue -- the prefix is simply
+# not consulted, so it can never launder itself INTO safety via this
+# function), and `is_read_only_capabilities`'s own per-clause loop still
+# finds "delete" with no cue before it in that same first segment and
+# correctly flags it. Reproduced live: that exact sentence still returns
+# `False` post-fix (see `test_a_leading_subject_before_the_cue_does_not_
+# launder_an_unrelated_earlier_write_verb`).
+_ANY_CUE_RE = re.compile(r"\b(?:not|never|no|cannot)\b|\w*n't\b")
+
 
 def _is_bare_verb_item(segment: str) -> bool:
-    """True iff ``segment`` is nothing but a (optionally cue/conjunction-
-    prefixed) single write verb — one bare item of an enumerated list like
-    "Never create, update, ... or modify", not an independent clause with
-    its own object (e.g. "delete the connected account entirely").
+    """True iff ``segment`` is nothing but a (optionally subject/cue/
+    conjunction-prefixed) single write verb — one bare item of an
+    enumerated list like "Never create, update, ... or modify" or "It
+    never creates, updates, ... or deletes", not an independent clause
+    with its own object (e.g. "delete the connected account entirely").
 
-    Named, not fixed (task 694): ``_LEADING_CUE_RE`` is anchored at the
-    very start of ``segment``, so this only recognizes the enumeration
-    shape when the cue itself opens the sentence ("Never create, update,
-    ..."). A subject sitting in front of the cue ("It never creates,
-    updates, ... or deletes anything...", "It doesn't create, update, ...
-    or delete anything...") makes the first comma-segment fail this check,
-    so `_split_clauses` falls back to treating every enumerated item as
-    its own separate, uncovered clause — and a later item with no verb
-    text of its own before it in that clause (e.g. bare " update") then
-    reads as an unnegated ask. Reproduced live: `is_read_only_
-    capabilities("It never creates, updates, merges, or deletes anything
-    on any connected account.")` returns `False` even though "never" is
-    already a recognized cue — this is a pre-existing gap in the subject-
-    handling here, independent of task 694's substring/contraction fix
-    above, not a regression it introduced. Fixing it would mean stripping
-    an arbitrary leading subject before checking for the cue, which risks
-    its own false-positive shape (a subject clause hiding an unrelated
-    negation) and is real, separate follow-up work, not folded in here.
+    A cue at the very START of the segment is the common case
+    (``_LEADING_CUE_RE``). Task 699 widens this to a cue found ANYWHERE in
+    the segment (``_ANY_CUE_RE``, e.g. after a leading subject like "It
+    never" or "It doesn't"): whatever precedes the cue is discarded, not
+    trusted — only the text strictly AFTER the cue is required to reduce
+    to a bare verb. See the long comment above ``_ANY_CUE_RE`` for why
+    this cannot launder an unrelated write verb sitting before the cue.
     """
     s = segment.strip().lower()
-    s = _LEADING_CUE_RE.sub("", s, count=1)
-    s = _LEADING_CONJ_RE.sub("", s, count=1)
-    return bool(_BARE_VERB_RE.match(s))
+    leading = _LEADING_CONJ_RE.sub("", _LEADING_CUE_RE.sub("", s, count=1), count=1)
+    if _BARE_VERB_RE.match(leading):
+        return True
+    m = _ANY_CUE_RE.search(s)
+    if not m:
+        return False
+    tail = _LEADING_CONJ_RE.sub("", s[m.end() :].strip(), count=1)
+    return bool(_BARE_VERB_RE.match(tail))
 
 
 # A contrastive/causal conjunction ("but", "though", "since", ...) reverses

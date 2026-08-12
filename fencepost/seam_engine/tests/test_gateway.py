@@ -197,6 +197,42 @@ def test_a_leading_bare_verb_enumeration_with_a_contraction_still_covers_the_lis
     assert is_read_only_capabilities(text)
 
 
+@pytest.mark.parametrize(
+    "text",
+    [
+        # Task 699: task 694 named, but deliberately did not fix, this gap
+        # -- a SUBJECT sitting in front of the negation cue used to make
+        # the enumeration fall apart into separate, uncovered clauses.
+        # Reproduced live pre-fix: both of these returned False.
+        "It never creates, updates, merges, or deletes anything on any "
+        "connected account.",
+        "It doesn't create, update, merge, or delete anything on any "
+        "connected account.",
+        "It cannot create, update, or delete anything on any connected "
+        "account.",
+        # A subject longer than one word still clears it -- nothing about
+        # the fix is anchored to a single-token subject.
+        "This gateway never creates, updates, or deletes anything.",
+    ],
+)
+def test_a_leading_subject_before_the_cue_still_covers_the_enumerated_list(
+    text: str,
+):
+    assert is_read_only_capabilities(text)
+
+
+def test_a_leading_subject_before_the_cue_does_not_launder_an_unrelated_earlier_write_verb():
+    # The named risk in the old docstring ("a subject clause hiding an
+    # unrelated negation") does not materialize: the fix only ever reduces
+    # the TAIL after the cue to a bare verb, so an unrelated, genuinely
+    # unnegated write verb sitting in the subject BEFORE the cue is never
+    # laundered into safety by this same-segment check -- it is still
+    # caught by `is_read_only_capabilities`'s own per-clause loop, which
+    # finds "delete" with no cue anywhere before it in this clause.
+    text = "It will delete data, never creates, updates, or merges anything."
+    assert not is_read_only_capabilities(text)
+
+
 def test_gateway_url_builds_the_real_arcade_mcp_url():
     assert gateway_url("my-fencepost") == "https://api.arcade.dev/mcp/my-fencepost"
 
