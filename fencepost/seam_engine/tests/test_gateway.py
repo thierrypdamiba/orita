@@ -328,6 +328,41 @@ def test_a_negated_irregular_past_tense_form_still_does_not_fail_the_law(
     assert is_read_only_capabilities(text)
 
 
+@pytest.mark.parametrize(
+    "text",
+    [
+        # Task 709: the opposite direction from every fix above -- not an
+        # unnegated write ask going undetected, but a genuinely read-only
+        # sentence wrongly judged unsafe because "send" is a literal prefix
+        # of the ordinary agent noun "sender"/"senders" ("one who sends",
+        # not a conjugation of the verb). Reproduced live pre-fix: both of
+        # these returned False despite naming no write ask at all.
+        "Read the sender field of every email in the connected inbox.",
+        "List and read the sender of each message, never anything else.",
+        "Read only the message senders, nothing more.",
+        "sender",
+        "senders",
+    ],
+)
+def test_the_send_agent_noun_is_not_mistaken_for_the_verb(text: str):
+    assert is_read_only_capabilities(text)
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        # The fix must not narrow real detection: every genuine
+        # conjugation of "send" still fails the law exactly as before.
+        "Send an email summarizing the report.",
+        "It sends new emails automatically.",
+        "It will begin sending new emails automatically.",
+        "It sent three new emails to every contact in the address book.",
+    ],
+)
+def test_the_send_agent_noun_fix_does_not_narrow_real_send_detection(text: str):
+    assert not is_read_only_capabilities(text)
+
+
 def test_gateway_url_builds_the_real_arcade_mcp_url():
     assert gateway_url("my-fencepost") == "https://api.arcade.dev/mcp/my-fencepost"
 

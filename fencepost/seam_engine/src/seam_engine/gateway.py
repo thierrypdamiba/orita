@@ -247,9 +247,60 @@ def _verb_pattern(verb: str) -> str:
     "ied"/"ies" forms named explicitly rather than derived, since the
     stem-minus-"y" isn't a real prefix of either); every verb NOT listed
     keeps relying on the rules above it, so this only ever widens
-    detection, never narrows it."""
+    detection, never narrows it.
+
+    Task 709 (Ogun): the opposite direction from every fix above -- not an
+    unnegated write ask going undetected, but the reverse: `verb + r"\\w*"`
+    matches ANY continuation of a write verb, including one that spells a
+    genuine, common English word which is NOT a conjugation of that verb
+    at all, only a derived AGENT NOUN sharing its first letters ("sender" =
+    "one who sends", not a tense of "send" -- the same relationship
+    "teacher" has to "teach", not a form of the verb "teach" meaning
+    something happened). Reproduced live pre-fix, on a sentence with no
+    write ask anywhere in it: `is_read_only_capabilities("Read the sender
+    field of every email in the connected inbox.")` returned `False`
+    (wrongly judged AS asking for a write) -- `\\bsend\\w*\\b` matched the
+    noun "sender" purely because "send" happens to be its own literal
+    prefix, the identical false-positive shape tasks 690/694/699 already
+    fixed on the NEGATION-CUE side of this same function (an unrelated word
+    laundering a false read off a substring it merely contains) but never
+    on the WRITE-VERB side until now. This one is squarely live and
+    forward-relevant, not hypothetical: SCOPES.md's own Gmail row (task
+    122) is registered future work, and "sender" is the single most
+    natural English word for describing what `GetEmail`/`ListEmails`
+    actually reads -- the day that wording lands in `READ_ONLY_CAPABILITIES`
+    itself, this bug would reject the town's own genuinely read-only string.
+    A negative control on an unrelated but structurally identical sentence
+    confirms the mechanism is real and narrow, not a misreading of the
+    whole function: `is_read_only_capabilities("Read the message content
+    of every email in the connected inbox.")` (same shape, no "sender")
+    correctly returned `True`, both before and after this fix.
+
+    Fixed the same way every prior fix in this function named its own
+    exception explicitly rather than reaching for a blanket rule:
+    `_NON_VERB_FORMS` names the literal whole words that must NOT count as
+    a match for a given verb despite matching `verb + r"\\w*"`, and a
+    negative lookahead keyed off those exact words (via their own trailing
+    suffix, e.g. "er"/"ers" for "send") excludes only a match that
+    terminates there -- "sending"/"sends"/"sent" (real conjugations) still
+    match every bit as before; only the standalone noun itself is excluded.
+    No verb without an entry in `_NON_VERB_FORMS` is affected at all."""
     extra = _IRREGULAR_FORMS.get(verb, ())
-    alternatives = [rf"{verb}\w*"]
+    excluded = _NON_VERB_FORMS.get(verb, ())
+    if excluded:
+        # Block the match only when it would stop exactly at one of the
+        # named non-verb words (the `\b` after the alternation is what
+        # limits this to a WHOLE-WORD completion) -- a longer word that
+        # merely starts the same way (were one to exist) is untouched,
+        # and every genuine conjugation of `verb` (which never ends in one
+        # of these excluded suffixes) still matches via `\w*` as before.
+        non_verb_suffixes = "|".join(
+            re.escape(form[len(verb):]) for form in excluded
+        )
+        base = rf"{verb}(?!(?:{non_verb_suffixes})\b)\w*"
+    else:
+        base = rf"{verb}\w*"
+    alternatives = [base]
     if verb.endswith("e"):
         alternatives.append(rf"{verb[:-1]}ing")
     alternatives.extend(re.escape(form) for form in extra)
@@ -270,6 +321,21 @@ _IRREGULAR_FORMS: dict[str, tuple[str, ...]] = {
     "modify": ("modified", "modifies"),
     "send": ("sent",),
     "write": ("wrote", "written"),
+}
+
+# The mirror image of `_IRREGULAR_FORMS` above: literal whole words that
+# `verb + r"\w*"` would otherwise match but which are NOT a conjugation of
+# `verb` at all -- an agent noun ("one who [verb]s") that only happens to
+# share the verb as a literal prefix. See `_verb_pattern`'s own docstring
+# (task 709) for the live repro. Named explicitly, one verb at a time, the
+# same "Add a verb here only when a real ... case genuinely needs it"
+# discipline `recipes._PLURAL_NOUN_VERBS` already holds for the identical
+# shape of exception on `recipes.py`'s own independent oath gate -- not a
+# blanket suffix rule, since most _WRITE_VERBS have no real agent-noun
+# collision at all and a rule that excluded "-er"/"-or" endings everywhere
+# would be guessing at words nobody has ever actually hit.
+_NON_VERB_FORMS: dict[str, tuple[str, ...]] = {
+    "send": ("sender", "senders"),
 }
 
 
