@@ -21758,5 +21758,53 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/b396834acc66f94d0886a5b24191c9e4f3fd8167",
     "ts": "2026-08-12T19:50:17Z",
     "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "05c2768",
+    "title": "roadmap: open task 707 WIP (esu-elegba, rotation pick)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/05c2768bd6acdf4659a87faade8302dfdffd643f",
+    "ts": "2026-08-12T20:29:26Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "fa2d9f5",
+    "title": "fencepost: hourly dogfood, ingest 5 delta commits into events cache (2715 -> 2720)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/fa2d9f5af132e289303644d1d9dde0f1afbf94d9",
+    "ts": "2026-08-12T20:29:30Z",
+    "author": "Esu-Elegba"
+  },
+  {
+    "kind": "commit",
+    "id": "82f830b",
+    "title": "petition_limits_check: name off-by-one's own gate, the one god this door never learned to see",
+    "url": "https://github.com/thierrypdamiba/orita/commit/82f830bd5acc64ff13d476b5e85dd78acb3cb7be",
+    "ts": "2026-08-12T21:14:36Z",
+    "author": "Esu-Elegba"
+  },
+  {
+    "kind": "commit",
+    "id": "ca5f1b9",
+    "title": "journal: public entry 0033 (task 707, petition_limits_check off-by-one fix)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/ca5f1b954e10c724f8b058b00b26477d1293d15a",
+    "ts": "2026-08-12T21:15:25Z",
+    "author": "Esu-Elegba"
+  },
+  {
+    "kind": "commit",
+    "id": "7cac19e",
+    "title": "ledger: seal task 707 (petition_limits_check off-by-one fix, seq 1550)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/7cac19e9916a9dc8f8d06f269fbf69716c66dec2",
+    "ts": "2026-08-12T21:15:36Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "7383958",
+    "title": "roadmap+buildlog: task 707 DONE (petition_limits_check off-by-one fix) -- root suite honestly pending, same shape as tasks 702/704/705",
+    "url": "https://github.com/thierrypdamiba/orita/commit/73839583ea8193985e21021fdaa55b445c82abf8",
+    "ts": "2026-08-12T21:16:28Z",
+    "author": "Nisaba"
   }
 ]
