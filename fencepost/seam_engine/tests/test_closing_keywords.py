@@ -14,7 +14,7 @@ from drifting apart" shape task 389 found and fixed for `#N` extraction
 fixed a third time for the "ships/includes/merges/via #N" claim phrase
 (`pr_claims.py`), found here a fourth time (task 394) and fixed the same
 way. This module is now the one real source; these tests check its own
-behavior directly, and `TestAllNineDetectorsShareTheLaw` below is the
+behavior directly, and `TestAllFifteenDetectorsShareTheLaw` below is the
 regression test that is supposed to go red the moment any recipe's
 detector goes back to defining its own local copy instead of importing
 this one.
@@ -35,13 +35,27 @@ to catch) left every test in this file green -- the class's own docstring
 claim was false for those four detectors. `tools/duplicate_regex_check.py`
 (a separate, repo-wide sweep) still caught that same hand-revert, so the
 gap was never a totally silent one -- but this file's own regression net,
-the one this class's docstring specifically promises, missed it. `_CASES`
-now names all nine real `CLOSING_KEYWORD_RE`/`CLAIM_RE` consumers; two
-further recipes (`good-first-issue-never-referenced`,
-`readme-claims-unfixed-issue`) import the wrapper function
-`closing_keyword_numbers` instead of the raw regex and are a genuinely
-different shape (no module-level regex attribute to assert parity on),
-out of scope for this class same as before.
+the one this class's docstring specifically promises, missed it.
+
+Task 686: the identical lapse happened a THIRD time, the same "grows by
+hand, never re-swept" shape tasks 544 and 543 already named twice. Six
+more recipes had quietly joined the direct-`CLOSING_KEYWORD_RE`-importer
+set since task 544, each correctly wired from birth, none ever added to
+`_CASES`: `commit-closes-keyword-issue-closed-not-planned`,
+`issue-comment-claims-unfixed-issue`, `linear-comment-claims-unfixed-issue`,
+`mention-claims-unfixed-issue`, `review-comment-claims-unfixed-issue`, and
+`slack-message-claims-unfixed-issue`. Proven live the same way as task 544:
+hand-reverting `mention-claims-unfixed-issue/detector.py` to its own local
+`re.compile` copy left all 19 tests in this file green. `_CASES` now names
+all fifteen real `CLOSING_KEYWORD_RE`/`CLAIM_RE` consumers, grepped fresh
+against the live `RECIPES/` tree rather than trusting the previous count.
+Four recipes (`good-first-issue-never-referenced`,
+`readme-claims-unfixed-issue`, `draft-pr-closes-keyword-issue`,
+`issue-assignee-never-opened-pr` -- two more than task 544's docstring
+named) import the wrapper function `closing_keyword_numbers` instead of
+the raw regex and are a genuinely different shape (no module-level regex
+attribute to assert parity on), out of scope for this class same as
+before.
 """
 from __future__ import annotations
 
@@ -146,8 +160,8 @@ class TestClosingKeywordRe:
         )
 
 
-class TestAllNineDetectorsShareTheLaw:
-    """The regression test: all nine closing-keyword-grammar recipes must
+class TestAllFifteenDetectorsShareTheLaw:
+    """The regression test: all fifteen closing-keyword-grammar recipes must
     actually IMPORT `CLOSING_KEYWORD_RE` from `seam_engine.closing_keywords`
     and must NOT also define their own local `re.compile` for it. Checked
     two ways for each detector: (1) the loaded module's own attribute still
@@ -167,17 +181,30 @@ class TestAllNineDetectorsShareTheLaw:
     shown to actually miss real past-tense closing promises GitHub itself
     honors.
 
-    ROADMAP.md #544 added the remaining four: `commit-closes-keyword-
+    ROADMAP.md #544 added four more: `commit-closes-keyword-
     pr-still-open`, `merged-pr-pr-still-open`, `tweet-claims-unfixed-issue`,
     and `milestone-claims-unfixed-issue` -- each already correctly imported
     the shared regex from the day it shipped, so this was never a live bug
-    in those detectors, only a hole in this class's own coverage of them."""
+    in those detectors, only a hole in this class's own coverage of them.
+
+    ROADMAP.md #686 added the remaining six: `commit-closes-keyword-issue-
+    closed-not-planned`, `issue-comment-claims-unfixed-issue`, `linear-
+    comment-claims-unfixed-issue`, `mention-claims-unfixed-issue`, `review-
+    comment-claims-unfixed-issue`, and `slack-message-claims-unfixed-issue`
+    -- same shape again: each already correctly imported the shared regex
+    from the day it shipped, only a hole in this class's own coverage."""
 
     _CASES = [
         ("commit-closes-keyword-issue-still-open", "CLOSING_KEYWORD_RE"),
         ("commit-closes-keyword-pr-still-open", "CLOSING_KEYWORD_RE"),
+        ("commit-closes-keyword-issue-closed-not-planned", "CLOSING_KEYWORD_RE"),
         ("issue-closed-never-released", "CLAIM_RE"),
         ("release-claims-unfixed-issue", "CLOSING_KEYWORD_RE"),
+        ("issue-comment-claims-unfixed-issue", "CLOSING_KEYWORD_RE"),
+        ("linear-comment-claims-unfixed-issue", "CLOSING_KEYWORD_RE"),
+        ("mention-claims-unfixed-issue", "CLOSING_KEYWORD_RE"),
+        ("review-comment-claims-unfixed-issue", "CLOSING_KEYWORD_RE"),
+        ("slack-message-claims-unfixed-issue", "CLOSING_KEYWORD_RE"),
         ("merged-pr-issue-still-open", "CLOSING_KEYWORD_RE"),
         ("merged-pr-pr-still-open", "CLOSING_KEYWORD_RE"),
         ("issue-closed-pr-still-open", "CLOSING_KEYWORD_RE"),

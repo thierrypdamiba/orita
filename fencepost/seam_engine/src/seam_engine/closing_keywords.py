@@ -36,21 +36,27 @@ tense exactly as readily as present tense, the exact form this pair could
 never see. Both now import `CLOSING_KEYWORD_RE` from here too, closing the
 false-negative rather than leaving it as a documented gap.
 
-This module is now the one real source. Nine recipes import
-`CLOSING_KEYWORD_RE` directly (the five named above plus
+This module is now the one real source. Fifteen recipes import
+`CLOSING_KEYWORD_RE`/`CLAIM_RE` directly (the five named above,
 `commit-closes-keyword-pr-still-open`, `merged-pr-pr-still-open`,
-`tweet-claims-unfixed-issue`, and `milestone-claims-unfixed-issue`, each
-correctly wired from birth -- never a live bug, just four recipes this
-docstring's own count never caught up with, until ROADMAP.md #544 swept
-the real total and fixed both the count here and `tests/
-test_closing_keywords.py`'s own `_CASES`, which had the identical stale-
-count shape). Two more (`good-first-issue-never-referenced`,
-`readme-claims-unfixed-issue`) import the `closing_keyword_numbers`
-wrapper function instead. Each binds the import to its own existing
-module-level name (`CLOSING_KEYWORD_RE` or `CLAIM_RE`), so none of their
-`recipe.json`s, fixtures, or existing tests have to change shape. Any
-future recipe that needs the same closing-keyword grammar reuses this
-module too, rather than writing its own copy.
+`tweet-claims-unfixed-issue`, and `milestone-claims-unfixed-issue` from
+ROADMAP.md #544, plus `commit-closes-keyword-issue-closed-not-planned`,
+`issue-comment-claims-unfixed-issue`, `linear-comment-claims-unfixed-issue`,
+`mention-claims-unfixed-issue`, `review-comment-claims-unfixed-issue`, and
+`slack-message-claims-unfixed-issue` from ROADMAP.md #686 -- each
+correctly wired from birth, never a live bug, just this docstring's own
+count never caught up with them until each sweep fixed both the count
+here and `tests/test_closing_keywords.py`'s own `_CASES`, which had the
+identical stale-count shape both times). Four more (`good-first-issue-
+never-referenced`, `readme-claims-unfixed-issue`,
+`draft-pr-closes-keyword-issue`, `issue-assignee-never-opened-pr` -- two
+more than ROADMAP.md #544's count named) import the
+`closing_keyword_numbers` wrapper function instead. Each binds the import
+to its own existing module-level name (`CLOSING_KEYWORD_RE` or
+`CLAIM_RE`), so none of their `recipe.json`s, fixtures, or existing tests
+have to change shape. Any future recipe that needs the same
+closing-keyword grammar reuses this module too, rather than writing its
+own copy.
 
 Deliberately does NOT import `tools/closing_keyword_guard.py` (the real
 canonical, safety-critical source of this grammar, guarding Iron Rule #8
