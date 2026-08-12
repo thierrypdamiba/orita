@@ -197,7 +197,38 @@ _NEGATION_CUE_RE = re.compile(r"\b(?:not|never|no|cannot)\b|n't\b")
 # lists.
 _LEADING_CUE_RE = re.compile(r"^(?:not|never|no|cannot|\w*n't)\b\s*")
 _LEADING_CONJ_RE = re.compile(r"^(?:and|or)\b\s*")
-_BARE_VERB_RE = re.compile(r"^(?:" + "|".join(_WRITE_VERBS) + r")\w*$")
+
+
+def _verb_pattern(verb: str) -> str:
+    """The regex alternation fragment that detects ``verb`` in every
+    inflected form actually reachable from it.
+
+    ``verb + r"\\w*"`` alone is enough for every _WRITE_VERBS entry EXCEPT
+    the nine that end in a silent "e" (create, update, merge, delete,
+    write, remove, revoke, invite, share): English drops that trailing "e"
+    before adding "-ing" (create -> creating, not createing), so the
+    gerund form no longer has the bare verb as a literal prefix and a plain
+    ``\\bverb\\w*\\b`` match never fires on it at all -- not a false
+    positive but the opposite, more dangerous direction Ogun's earlier
+    fixes (tasks 690/694/699) were about: a real, unnegated write ask that
+    goes completely undetected. Reproduced live pre-fix on the single
+    shared regex this function replaces: `is_read_only_capabilities("It
+    will begin creating new comments on every issue.")` returned `True`
+    (judged read-only-safe) with no negation cue anywhere in the sentence
+    -- the identical gap reproduced for every other e-ending verb's
+    gerund (updating, merging, deleting, writing, removing, revoking,
+    inviting, sharing). Fixed by also matching the silent-e-dropped stem
+    plus "ing" for every verb ending in "e"; every other verb's plain
+    ``verb\\w*`` already covers its own "-ing" form (post -> posting)
+    since nothing gets dropped when the verb doesn't end in "e"."""
+    if verb.endswith("e"):
+        return rf"(?:{verb}\w*|{verb[:-1]}ing)"
+    return rf"{verb}\w*"
+
+
+_BARE_VERB_RE = re.compile(
+    r"^(?:" + "|".join(_verb_pattern(v) for v in _WRITE_VERBS) + r")$"
+)
 
 # Task 699 (Esu-Elegba): task 694 named, but deliberately did not fix, a
 # third gap in this same function -- `_LEADING_CUE_RE` only strips a cue
@@ -337,7 +368,7 @@ def is_read_only_capabilities(text: str) -> bool:
     for clause in _split_clauses(text):
         lowered = clause.lower()
         for verb in _WRITE_VERBS:
-            for m in re.finditer(rf"\b{verb}\w*\b", lowered):
+            for m in re.finditer(rf"\b{_verb_pattern(verb)}\b", lowered):
                 before = lowered[: m.start()]
                 if not _NEGATION_CUE_RE.search(before):
                     return False

@@ -233,6 +233,57 @@ def test_a_leading_subject_before_the_cue_does_not_launder_an_unrelated_earlier_
     assert not is_read_only_capabilities(text)
 
 
+@pytest.mark.parametrize(
+    "text",
+    [
+        # Task 700: nine of the seventeen `_WRITE_VERBS` end in a silent
+        # "e" (create, update, merge, delete, write, remove, revoke,
+        # invite, share). English drops that "e" before adding "-ing"
+        # (create -> creating, not createing), so the gerund form no
+        # longer has the bare verb as a literal prefix and the old plain
+        # `\bverb\w*\b` match never fired on it at all — not a laundering
+        # false positive like tasks 690/694/699 found, but the more
+        # dangerous opposite direction: a real, completely unnegated write
+        # ask that went entirely undetected. Reproduced live pre-fix, with
+        # NO negation cue anywhere in the sentence: every one of these
+        # returned True (judged read-only-safe).
+        "It will begin creating new comments on every issue.",
+        "It will begin updating every open issue on the account.",
+        "It will begin merging every open pull request.",
+        "It will begin deleting old branches from the account.",
+        "It will begin writing new comments on every issue.",
+        "It will begin removing old branches from the account.",
+        "It will begin revoking access for other users.",
+        "It will begin inviting strangers to the repository.",
+        "It will start sharing files with everyone on the connected "
+        "account.",
+    ],
+)
+def test_the_silent_e_dropped_gerund_of_an_e_ending_write_verb_is_still_caught(
+    text: str,
+):
+    assert not is_read_only_capabilities(text)
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        # The negated siblings of the cases above, both as a plain
+        # leading negation and as a bare gerund enumeration — proving the
+        # fix widens what `_verb_pattern` matches without disturbing
+        # negation scope, the same "detect widened, scope unchanged" shape
+        # task 699's own fix held to.
+        "It will never begin creating new comments on any issue.",
+        "It will never begin updating any open issue on the account.",
+        "Never creating, updating, or merging anything on any connected "
+        "account.",
+        "It never creating, updating, or merging anything.",
+    ],
+)
+def test_a_negated_silent_e_gerund_still_does_not_fail_the_law(text: str):
+    assert is_read_only_capabilities(text)
+
+
 def test_gateway_url_builds_the_real_arcade_mcp_url():
     assert gateway_url("my-fencepost") == "https://api.arcade.dev/mcp/my-fencepost"
 
