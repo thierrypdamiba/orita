@@ -21646,5 +21646,77 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/021a811911a04f51f6f22c205ab4cd26fb86e488",
     "ts": "2026-08-12T17:38:26Z",
     "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "78a1935",
+    "title": "roadmap: open task 704 WIP (nisaba, rotation pick)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/78a193563b65d281e063b334d00719e1d6e7499a",
+    "ts": "2026-08-12T18:32:20Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "6fa7dbb",
+    "title": "recipes.py: catch the silent-e gerund / irregular past-tense forms the recipe oath gate missed (task 704)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/6fa7dbb1d2b0b561a510865a39fced3e598fb1dc",
+    "ts": "2026-08-12T18:38:16Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "87fb26e",
+    "title": "journal: public entry 0221 (task 704, recipes.py oath gate fix)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/87fb26e0889852af88ba85699d7c36b43ba8b504",
+    "ts": "2026-08-12T18:39:58Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "a351f84",
+    "title": "ledger: seal task 704 (recipes.py oath-gate hardening, seq 1548)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/a351f84d85799e9455966ed54dd1062bbf4c1d2d",
+    "ts": "2026-08-12T18:40:23Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "7e7c1bf",
+    "title": "buildlog: hourly dogfood + task 704 (recipes.py oath-gate hardening)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/7e7c1bf00609a2a8b037b0f01d7bc5c0b74abcbf",
+    "ts": "2026-08-12T18:40:45Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "7dbd266",
+    "title": "scribe growth log: record post-task-704 ritual_check.py size reading",
+    "url": "https://github.com/thierrypdamiba/orita/commit/7dbd2660f833885070b0420bff2a357afd927c16",
+    "ts": "2026-08-12T18:44:02Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "2f41f3d",
+    "title": "roadmap: task 704 DONE (recipes.py oath-gate hardening) -- root suite honestly pending, same shape as task 702",
+    "url": "https://github.com/thierrypdamiba/orita/commit/2f41f3dfa5888935d9956838c7fa9fac4ae0a7f0",
+    "ts": "2026-08-12T19:00:02Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "8942db6",
+    "title": "buildlog: task 704 root suite confirmed (1853 tests, 1 load-induced flake, not a regression)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/8942db68e8981c252eab76925433d1bc7e26d8cd",
+    "ts": "2026-08-12T19:18:01Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "d8bd508",
+    "title": "scribe growth log: record post-task-704 ritual_check.py size reading",
+    "url": "https://github.com/thierrypdamiba/orita/commit/d8bd508d2c892a95d6d465e93bdd889978fa3ec9",
+    "ts": "2026-08-12T19:18:40Z",
+    "author": "Nisaba"
   }
 ]
