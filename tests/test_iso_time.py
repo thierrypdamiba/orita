@@ -15,6 +15,7 @@ structurally impossible going forward.
 import importlib.util
 import os
 import sys
+import time
 import unittest
 from datetime import datetime, timezone
 
@@ -74,6 +75,57 @@ class ParseIsoUtcCase(unittest.TestCase):
     def test_result_is_timezone_aware(self):
         dt = it.parse_iso_utc("2026-08-03T16:00:00Z")
         self.assertIsNotNone(dt.tzinfo)
+
+    def test_naive_timestamp_assumed_utc_not_machine_local_time(self):
+        """A timestamp with no `Z` and no explicit offset (a hand-typed
+        value missing the `Z` this repo's own convention always appends)
+        must parse to the identical instant regardless of the machine's
+        own local timezone -- `datetime.astimezone()` called directly on a
+        naive `datetime` presumes it already represents *local* system
+        time, which would silently make the same input string parse to a
+        different real instant purely depending on which machine ran it.
+        Pinned against `oracle_engine.time_utils.parse_ts` (the sibling
+        parser for the identical class of input), which already holds the
+        naive-means-UTC line explicitly.
+        """
+        original_tz = os.environ.get("TZ")
+        try:
+            os.environ["TZ"] = "America/Los_Angeles"
+            time.tzset()
+            dt = it.parse_iso_utc("2026-07-14T01:15:00")
+        finally:
+            if original_tz is None:
+                os.environ.pop("TZ", None)
+            else:
+                os.environ["TZ"] = original_tz
+            time.tzset()
+        self.assertEqual(dt, datetime(2026, 7, 14, 1, 15, 0, tzinfo=timezone.utc))
+
+    def test_schedule_status_verdict_independent_of_machine_timezone(self):
+        """The same real inputs to `cron_health.schedule_status` must
+        yield the same verdict no matter the machine's own local
+        timezone -- before the fix, a naive `now` (no `Z`) shifted by the
+        machine's local UTC offset, which could move `now` across the
+        cron's own fire hour and flip `on_time` into `pending`/`overdue`
+        purely as a function of which timezone happened to be set."""
+        ch = _load("cron_health", os.path.join(TOOLS, "cron_health.py"))
+        original_tz = os.environ.get("TZ")
+        results = {}
+        try:
+            for tz in ("UTC", "America/Los_Angeles"):
+                os.environ["TZ"] = tz
+                time.tzset()
+                results[tz] = ch.schedule_status(
+                    "0 13 * * *", "2026-07-13T13:05:00Z", "2026-07-14T08:00:00"
+                )
+        finally:
+            if original_tz is None:
+                os.environ.pop("TZ", None)
+            else:
+                os.environ["TZ"] = original_tz
+            time.tzset()
+        self.assertEqual(results["UTC"]["status"], "on_time")
+        self.assertEqual(results["UTC"], results["America/Los_Angeles"])
 
 
 if __name__ == "__main__":

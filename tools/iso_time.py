@@ -30,6 +30,23 @@ from datetime import datetime, timezone
 def parse_iso_utc(ts: str) -> datetime:
     """Parse an ISO-8601 timestamp (`Z`-suffixed or otherwise) into an
     aware `datetime` normalized to UTC. The one shape every call site in
-    this repo actually needs -- no timezone-naive input, no non-UTC
-    offset preserved past the call."""
-    return datetime.fromisoformat(ts.replace("Z", "+00:00")).astimezone(timezone.utc)
+    this repo actually needs -- no timezone-naive input reaches a caller,
+    no non-UTC offset preserved past the call.
+
+    A timestamp with no `Z` and no explicit offset (a hand-typed value
+    missing the `Z` this repo's own convention always appends -- exactly
+    the "a contributor's laptop" risk cron_health.py's own docstring
+    names) is assumed UTC, never the machine's local timezone: calling
+    `.astimezone(timezone.utc)` directly on a naive `datetime` presumes
+    it already represents *local* system time (Python's own documented
+    behavior for naive `astimezone()`), so the same input string silently
+    parsed to a different instant depending on which machine happened to
+    run it -- a canonical UTC parser giving a non-canonical answer.
+    `oracle_engine.time_utils.parse_ts` (this repo's sibling parser for
+    the identical class of input) already holds the naive-means-UTC line
+    explicitly; this now matches it instead of silently disagreeing on
+    the one input shape that actually distinguishes the two."""
+    dt = datetime.fromisoformat(ts.replace("Z", "+00:00"))
+    if dt.tzinfo is None:
+        dt = dt.replace(tzinfo=timezone.utc)
+    return dt.astimezone(timezone.utc)
