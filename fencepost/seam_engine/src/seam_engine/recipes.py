@@ -117,6 +117,42 @@ _FORBIDDEN_VERBS: frozenset[str] = frozenset({
 # plural-noun form to pass.
 _PLURAL_NOUN_VERBS: frozenset[str] = frozenset({"Label"})
 
+# Task 704 (Nisaba): `_word_hides_glued_verb`'s substring check
+# (`verb_lower in lowered`) only ever catches a forbidden verb's BASE form
+# (plus any suffix that keeps the base spelled out literally, e.g.
+# "create" is still a substring of "created"/"creates"). It silently
+# missed every inflected form English does NOT spell the base verb into
+# literally -- the exact same two shapes `gateway.is_read_only_capabilities`
+# was fixed for in tasks 700/701, but never ported to this second,
+# independent oath gate. (1) Nine of the seventeen verbs end in a silent
+# "e" (create, update, merge, delete, write, remove, revoke, invite,
+# share); English drops that "e" before "-ing" (create -> creating), so
+# "create" is not a substring of "creating" at all. Reproduced live
+# pre-fix: `_word_hides_glued_verb("Creating")` returned `None`, and
+# `_check_scope_is_read_only("GetCreatingIssues", where=...)` raised
+# nothing -- a scope shaped to literally create issues cleared the
+# read-only oath. (2) Two irregular verbs whose past tense/participle
+# shares no substring with the base at all (send -> sent, write ->
+# wrote/written) and two consonant-y verbs whose "-ed"/"-s" form swaps
+# the "y" for "ied"/"ies" (reply -> replied/replies, modify ->
+# modified/modifies -- "reply" is not a substring of "replied"; the "y"
+# is gone). Reproduced live pre-fix: `GetSentEmails`, `ListWrittenFiles`,
+# `ListRepliedComments`, and `GetModifiedIssues` all cleared the oath the
+# same way. `_GLUED_VERB_EXTRA_FORMS` names each affected verb's own
+# extra literal surface forms explicitly, the same "no single rule
+# honestly covers both the silent-e drop and the irregulars together"
+# shape `gateway._IRREGULAR_FORMS` already proved correct -- but kept as
+# this module's own independent copy rather than an import, matching its
+# established practice for `NETWORK_CAPABLE_IMPORTS` above (this package
+# ships and tests standalone) and the pre-existing independent
+# `_FORBIDDEN_VERBS`/`gateway._WRITE_VERBS` pairing.
+_GLUED_VERB_EXTRA_FORMS: dict[str, tuple[str, ...]] = {
+    "Reply": ("replied", "replies"),
+    "Modify": ("modified", "modifies"),
+    "Send": ("sent",),
+    "Write": ("wrote", "written"),
+}
+
 _PASCAL_WORD_RE = re.compile(r"[A-Z][a-z0-9]*")
 
 # Task 529: the fixture-path check above ("fixture must live under
@@ -293,6 +329,18 @@ def _word_hides_glued_verb(word: str) -> str | None:
     the same plural-noun exemption now has to be added here on purpose,
     not inherited for free by virtue of ending in `"s"`.
 
+    Task 704: the substring check above only ever catches an inflected
+    form that keeps the base verb spelled out literally inside it --
+    every OTHER inflection (a silent-e verb's gerund, or a genuinely
+    irregular past tense/participle) shares no substring with the base
+    verb at all, so it slipped past silently too. See
+    `_GLUED_VERB_EXTRA_FORMS`'s own comment for the live repro. Fixed by
+    also searching for a verb's silent-e-dropped "-ing" stem (when it
+    ends in "e") and its own named extra surface forms, alongside the
+    base substring check above -- widens detection only, never narrows
+    it: every word the old check already caught still matches on the
+    unchanged `verb_lower in lowered` branch first.
+
     Returns the forbidden verb found glued in, or `None` if `word` hides no
     forbidden verb behind a missing capital letter."""
     lowered = word.lower()
@@ -301,6 +349,10 @@ def _word_hides_glued_verb(word: str) -> str | None:
         if verb in _PLURAL_NOUN_VERBS and lowered == verb_lower + "s":
             continue
         if verb_lower in lowered:
+            return verb
+        if verb_lower.endswith("e") and verb_lower[:-1] + "ing" in lowered:
+            return verb
+        if any(form in lowered for form in _GLUED_VERB_EXTRA_FORMS.get(verb, ())):
             return verb
     return None
 

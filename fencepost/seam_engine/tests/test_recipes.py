@@ -412,6 +412,59 @@ def test_a_write_verb_conjugated_with_a_bare_s_is_rejected(scope):
         validate_recipe(_manifest(scopes=(scope,)))
 
 
+@pytest.mark.parametrize(
+    "scope",
+    [
+        "GetCreatingIssues",
+        "ListUpdatingComments",
+        "GetDeletingRecords",
+        "GetMergingBranches",
+        "GetWritingFiles",
+        "GetRemovingLabels",
+        "GetRevokingAccess",
+        "GetInvitingUsers",
+        "GetSharingLinks",
+    ],
+)
+def test_a_silent_e_verbs_gerund_form_is_rejected(scope):
+    # Task 704: `_word_hides_glued_verb`'s substring check (`verb_lower in
+    # lowered`) only ever catches an inflected form that keeps the base
+    # verb spelled out literally -- but English drops a silent trailing
+    # "e" before adding "-ing" (create -> creating, not createing), so
+    # "create" is not a substring of "creating" at all. The identical gap
+    # `gateway.is_read_only_capabilities` was fixed for (task 700), never
+    # ported to this second, independent oath gate.
+    # `_check_scope_is_read_only("GetCreatingIssues", where=...)` raised
+    # nothing before this fix, clearing a scope shaped to literally create
+    # issues.
+    with pytest.raises(RecipeValidationError, match="glues the write verb"):
+        validate_recipe(_manifest(scopes=(scope,)))
+
+
+@pytest.mark.parametrize(
+    "scope",
+    [
+        "GetSentEmails",
+        "ListRepliedComments",
+        "GetModifiedIssues",
+        "ListWrittenFiles",
+        "GetRepliesForIssue",
+        "ListModifiesLog",
+    ],
+)
+def test_an_irregular_or_consonant_y_past_tense_form_is_rejected(scope):
+    # Task 704: the sibling gap to the gerund case above, on the same two
+    # verb shapes `gateway.is_read_only_capabilities` was fixed for in
+    # task 701 -- two genuinely irregular verbs (send -> sent, write ->
+    # wrote/written) and two consonant-plus-"y" verbs that swap the "y"
+    # for "ied"/"ies" (reply -> replied/replies, modify ->
+    # modified/modifies) share no substring with their own base verb at
+    # all. `_check_scope_is_read_only("GetSentEmails", where=...)` raised
+    # nothing before this fix.
+    with pytest.raises(RecipeValidationError, match="glues the write verb"):
+        validate_recipe(_manifest(scopes=(scope,)))
+
+
 def test_labels_the_one_real_plural_noun_still_accepted():
     # "Label" is the only forbidden verb with a genuine plural-noun reading
     # ("Labels", as in SCOPES.md's own ListRepositoryLabels) -- narrowing
