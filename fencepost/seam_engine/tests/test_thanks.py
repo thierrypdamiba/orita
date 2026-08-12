@@ -120,6 +120,24 @@ class TestNegatedThanksIsNotAMatch:
     def test_genuine_thanks_still_matches_unaffected(self) -> None:
         assert thanked_handle("thanks @mortal-fixer for the patch") == "mortal-fixer"
 
+    def test_doesnt_thank_is_not_a_match(self) -> None:
+        # Live reproduction: `_NEGATION_PREFIX_RE` here only ever matched
+        # the whole words "no"/"not"/"never" -- an "n't" contraction right
+        # in front of "thank(s)" ("doesn't thank @user") slipped past it
+        # entirely, the exact same false-positive shape task 610 already
+        # fixed for the bare-word case, just one contraction short of
+        # complete. `seam_engine.negation.NEGATION_PREFIX_RE` (task 613,
+        # consolidated for `pr_claims.py`/`milestone_claims.py`/
+        # `duplicate_markers.py`) already covers `n't\b` -- this module was
+        # never moved onto it.
+        assert thanked_handle("doesn't thank @user for the fix") is None
+
+    def test_didnt_thank_is_not_a_match(self) -> None:
+        assert thanked_handle("didn't thank @user for the fix") is None
+
+    def test_shouldnt_thank_is_not_a_match(self) -> None:
+        assert thanked_handle("shouldn't thank @user for this") is None
+
 
 class TestThanksRe:
     def test_pattern_source(self) -> None:

@@ -69,20 +69,15 @@ from __future__ import annotations
 
 import re
 
+from seam_engine.negation import is_negated
+
 # Requires "thank(s)" or "thank you", loosely followed by an @handle, in
 # the same tweet. Deliberately its own grammar, distinct from the #N
 # claim-phrase families the issue/PR/milestone-side recipes reuse -- a
 # thank-you names a person, not a numbered record.
 THANKS_RE = re.compile(r"thanks?(?:\s+you)?\b.{0,40}?@(\w[\w-]*)", re.IGNORECASE | re.DOTALL)
 
-# A negation word sitting immediately in front of "thanks" turns a
-# genuine thank-you into a decline -- "no thanks", "not thanks", "no,
-# thanks" -- see this module's own docstring (task 610) for the live
-# reproduction and why the check is scoped to the words right before
-# "thanks" rather than the whole span up to the handle.
-_NEGATION_PREFIX_RE = re.compile(r"\b(?:no|not|never)\b", re.IGNORECASE)
-
-# "never " is the longest of the three negation words plus its own
+# "never " is the longest of the three bare negation words plus its own
 # trailing space; a couple of extra characters of slack covers a comma
 # ("no, thanks @user") without reaching so far back that it starts
 # catching negations that belong to an earlier, unrelated clause.
@@ -95,12 +90,22 @@ def thanked_handle(text: str) -> str | None:
     bare `@handle` with no preceding thanks-shaped language never matches
     -- see `THANKS_RE`'s own comment for why. A thanks-shaped phrase whose
     immediately preceding words negate it ("no thanks @user", "not thanks
-    @user") is skipped, and the search continues to the next candidate --
-    see this module's own docstring (task 610) for the live reproduction.
+    @user") -- including an "n't" contraction ("doesn't thank @user",
+    "didn't thank @user") -- is skipped, and the search continues to the
+    next candidate. This module used to hold its own local
+    `_NEGATION_PREFIX_RE = re.compile(r"\\b(?:no|not|never)\\b", ...)` (task
+    610), which caught the three bare words but never the "n't"
+    contraction `seam_engine.negation.NEGATION_PREFIX_RE` (task 613) added
+    for `duplicate_markers.py`/`pr_claims.py`/`milestone_claims.py` --
+    reproduced live: `thanked_handle("doesn't thank @user for the fix")`
+    returned `"user"`, an unnegated-looking claim laundered past a
+    contraction this module's own check never watched for. Now delegates
+    to the one shared `is_negated` check every other negation-aware
+    grammar in this package already uses, instead of a fourth
+    independently-typed (and, it turns out, narrower) copy.
     """
     for match in THANKS_RE.finditer(text):
-        prefix = text[max(0, match.start() - _NEGATION_PREFIX_WINDOW) : match.start()]
-        if _NEGATION_PREFIX_RE.search(prefix):
+        if is_negated(text, match.start(), _NEGATION_PREFIX_WINDOW):
             continue
         return match.group(1)
     return None
