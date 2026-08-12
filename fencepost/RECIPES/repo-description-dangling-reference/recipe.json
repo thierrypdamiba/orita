@@ -1,0 +1,12 @@
+{
+  "slug": "repo-description-dangling-reference",
+  "title": "The repository's own one-line description counts on an issue or PR that isn't there",
+  "author": "off-by-one",
+  "description": "Reads the repository's own GetRepository description field for a bare '#N' reference and cross-checks it against the repository's own issue and PR sets. The tenth leg of the dangling-reference family alongside dangling-issue-reference (commit messages), mention-dangling-reference (X mentions), release-note-dangling-reference (release notes), issue-body-dangling-reference (issue/PR bodies), milestone-body-dangling-reference (milestone descriptions), own-tweet-dangling-reference (the town's own tweets), review-comment-dangling-reference (inline review comments), issue-comment-dangling-reference (timeline comments), and readme-dangling-reference (README.md) -- the first to read GetRepository's own description field at all, a surface every visitor sees in search results and on the repo's own GitHub homepage, above the fold, before README ever loads.",
+  "toolkit": "github",
+  "scopes": ["GetRepository", "ListIssues", "ListPullRequests"],
+  "fixture": "fixtures/repo_description_dangling_reference",
+  "detector_file": "detector.py",
+  "entrypoint": "run_recipe_scan",
+  "confidence_notes": "Flat 0.85, not age-gated -- matching readme-dangling-reference's own bar and reasoning exactly: a GetRepository read returns the description CURRENT right now, not a change history, so there is no per-claim timestamp to weigh a staleness window against, and no race either -- the description is read live, so a reference it currently carries and the issue/PR tracker's current state are both true at the same instant the scan runs. A reference that resolves against either the issue list or the PR list is excluded at confidence 0.0, named not hidden. A cross-repo owner/repo#N reference, or a repository carrying no description at all, is never even extracted as a candidate."
+}

@@ -1378,6 +1378,20 @@ are exposed on the-hand gateway today, the same WIP boundary
 `gmail_calendar.py` and `tag-never-released` already hold for their own
 not-yet-live scopes.
 
+[`RECIPES/repo-description-dangling-reference/`](RECIPES/repo-description-dangling-reference/)
+is the eightieth (ROADMAP.md #702): the tenth leg of the dangling-reference
+family, and the first to read `GetRepository`'s own `description` field —
+the one-line blurb GitHub shows in search results and above the fold on
+the repo's own homepage, before README.md ever loads. The seam: a `#N`
+inside that description names an issue or pull request that doesn't
+actually exist — a maintainer types the description once, early, and
+almost never revisits it, unlike a README a stranger actually opens and
+skims. Confidence is flat 0.85, mirroring `readme-dangling-reference`'s
+own bar exactly — a live `GetRepository` read carries no staleness
+uncertainty, so there is no per-claim timestamp to weigh an age-gate
+against. A repository carrying no description at all (GitHub allows a
+`null` here) is excluded outright, named not hidden.
+
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)
 (ROADMAP.md #111) is that second promise, kept: it runs `scan.py`'s own

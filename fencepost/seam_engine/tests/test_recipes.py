@@ -609,7 +609,7 @@ _CARDINAL_WORDS = {
     "sixty-nine": 69, "seventy": 70, "seventy-one": 71, "seventy-two": 72,
     "seventy-three": 73, "seventy-four": 74, "seventy-five": 75,
     "seventy-six": 76, "seventy-seven": 77, "seventy-eight": 78,
-    "seventy-nine": 79,
+    "seventy-nine": 79, "eighty": 80,
 }
 
 _PLUS_JOINED_CLAIM_RE = re.compile(
@@ -661,20 +661,19 @@ def test_plus_joined_claim_missing_sentence_raises():
         claimed_plus_joined_counts("Nothing here about plus-joined toolkits.")
 
 
-def test_real_plus_joined_counts_are_currently_twenty_four_of_seventy_nine():
-    # Regression pin: today's real, live counts under RECIPES/. Was (23, 78)
-    # until milestone-deadline-no-calendar-event merged (the seventy-ninth
-    # real recipe, toolkit "github+google_calendar" -- plus-joined, so both
-    # halves climb together this time, the same shape slack-message-
-    # dangling-reference's own merge already showed, unlike tag-never-
-    # released's single-toolkit merge one recipe before it).
+def test_real_plus_joined_counts_are_currently_twenty_four_of_eighty():
+    # Regression pin: today's real, live counts under RECIPES/. Was (24, 79)
+    # until repo-description-dangling-reference merged (the eightieth real
+    # recipe, toolkit "github" -- single-toolkit, so the plus-joined half
+    # stays put while the total climbs, the same shape tag-never-released's
+    # own single-toolkit merge already showed.
     # `real_plus_joined_counts` counts every recipe whose OWN toolkit
     # string contains "+" -- not distinct toolkit-pair strings -- so a
     # single-toolkit recipe leaves the plus-joined half untouched. Verified
     # against the live tree, not assumed from a prior task's own note:
     # every one of today's plus-joined recipes was grepped by hand before
     # pinning this number.
-    assert real_plus_joined_counts(FENCEPOST_ROOT) == (24, 79)
+    assert real_plus_joined_counts(FENCEPOST_ROOT) == (24, 80)
 
 
 def test_oath_scopes_for_toolkit_docstring_matches_the_real_live_counts():
