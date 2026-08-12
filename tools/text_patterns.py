@@ -65,7 +65,7 @@ SENTENCE_BOUNDARY_TIGHT = re.compile(r"[.!?;\n]")
 
 # The one negation-cue list two files happen to define byte-identically.
 NEGATION_CUES_STANDARD = re.compile(
-    r"\b(never|not|won't|wasn't|isn't|doesn't|didn't|n't|will|would|wouldn't)\b",
+    r"\b(never|not|won't|wasn't|isn't|doesn't|didn't|will|would|wouldn't)\b|n't\b",
     re.IGNORECASE,
 )
 

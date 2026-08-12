@@ -105,7 +105,7 @@ _SENTENCE_BOUNDARY = text_patterns.SENTENCE_BOUNDARY_TIGHT
 # file's still-uncorrected claim of byte-identical word lists were found
 # committed side by side, silently contradicting each other.
 _NEGATION_CUES = re.compile(
-    r"\b(never|not|no|won't|wasn't|isn't|doesn't|didn't|n't|without|zero|will|would)\b",
+    r"\b(never|not|no|won't|wasn't|isn't|doesn't|didn't|without|zero|will|would)\b|n't\b",
     re.IGNORECASE,
 )
 

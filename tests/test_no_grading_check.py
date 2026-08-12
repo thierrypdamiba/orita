@@ -147,6 +147,18 @@ class CleanFixtureCase(unittest.TestCase):
         violations = ngc.find_violations(orita_dir=self.orita)
         self.assertEqual(violations, [])
 
+    def test_negated_dropped_the_ball_with_a_contraction_is_not_flagged(self):
+        # Task 697: `_NEGATION_CUES`'s own dead `n't` alternative (the same
+        # class task 696 fixed in hand_lore_check.py) meant "can't" -- not
+        # spelled out by name in this file's tuned word list -- never
+        # actually registered as negation pre-fix.
+        _write(
+            os.path.join(self.orita, "docs", "report.md"),
+            "It can't be true that anyone dropped the ball here.\n",
+        )
+        violations = ngc.find_violations(orita_dir=self.orita)
+        self.assertEqual(violations, [])
+
     def test_quoted_citation_is_not_flagged(self):
         _write(
             os.path.join(self.orita, "docs", "report.md"),

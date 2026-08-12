@@ -131,6 +131,18 @@ class FixtureViolationCase(unittest.TestCase):
         violations = rc.find_violations(orita_dir=self.orita)
         self.assertEqual(violations, [])
 
+    def test_negated_ogun_violence_with_a_contraction_is_not_flagged(self):
+        # Task 697: `_NEGATION_CUES`'s own dead `n't` alternative (the same
+        # class task 696 fixed in hand_lore_check.py) meant "wouldn't" --
+        # not spelled out by name in this file's tuned word list -- never
+        # actually registered as negation pre-fix.
+        _write(
+            os.path.join(self.orita, "docs", "report.md"),
+            "Ogun wouldn't murder the blocked build even when CI fails hard.\n",
+        )
+        violations = rc.find_violations(orita_dir=self.orita)
+        self.assertEqual(violations, [])
+
     def test_negation_cue_does_not_leak_backward_within_the_same_sentence(self):
         # A negation cue AFTER the violation match, elsewhere in the SAME
         # sentence, must not mask a real, present-tense violation -- the

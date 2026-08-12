@@ -107,7 +107,7 @@ _SENTENCE_BOUNDARY = text_patterns.SENTENCE_BOUNDARY_LOOSE
 # identical false "mirrors ... exactly" claim in `rider_check.py` but
 # never checked whether it survived here too.
 _NEGATION_CUES = re.compile(
-    r"\b(never|not|won't|wasn't|isn't|doesn't|didn't|n't|no|nobody|without)\b",
+    r"\b(never|not|won't|wasn't|isn't|doesn't|didn't|no|nobody|without)\b|n't\b",
     re.IGNORECASE,
 )
 

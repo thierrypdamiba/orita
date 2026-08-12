@@ -108,6 +108,14 @@ class NegationCuesCase(unittest.TestCase):
     def test_matches_wouldnt(self):
         self.assertTrue(tp.NEGATION_CUES_STANDARD.search("wouldn't ask"))
 
+    def test_matches_a_contraction_not_spelled_out_by_name(self):
+        # Task 697: the old dead `n't` alternative sat inside the same
+        # outer `\b(...)\b` group as every named word, so a leading `\b`
+        # right before "n" could never match inside a real contraction --
+        # "can't"/"couldn't"/etc. (anything not spelled out by name, unlike
+        # "wouldn't" above) silently failed to register as negation.
+        self.assertTrue(tp.NEGATION_CUES_STANDARD.search("can't do that"))
+
     def test_no_match_on_affirmative_text(self):
         self.assertIsNone(tp.NEGATION_CUES_STANDARD.search("please star this repo"))
 

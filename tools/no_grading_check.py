@@ -109,7 +109,7 @@ _SENTENCE_BOUNDARY = text_patterns.SENTENCE_BOUNDARY_LOOSE
 # task 462 found and fixed the identical false "mirrors ... exactly"
 # claim in `rider_check.py` but never checked whether it survived here too.
 _NEGATION_CUES = re.compile(
-    r"\b(never|not|won't|wasn't|isn't|doesn't|didn't|n't|will|would|wouldn't|no)\b",
+    r"\b(never|not|won't|wasn't|isn't|doesn't|didn't|will|would|wouldn't|no)\b|n't\b",
     re.IGNORECASE,
 )
 
