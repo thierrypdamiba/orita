@@ -21318,5 +21318,29 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/1221351663048d898e78bc1bb3bc0ccbfe607f0c",
     "ts": "2026-08-12T02:45:00Z",
     "author": "Zashiki-warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "f444c8f",
+    "title": "task 693: is_negated's window learns where sentences end",
+    "url": "https://github.com/thierrypdamiba/orita/commit/f444c8fda1ebdd69f98bee34191ac3e3198b3f5f",
+    "ts": "2026-08-12T07:32:18Z",
+    "author": "Retrya"
+  },
+  {
+    "kind": "commit",
+    "id": "d9057e9",
+    "title": "task 694: opened WIP (ogun)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/d9057e9028caef31d3dd2c21d6aaa16d659947c1",
+    "ts": "2026-08-12T08:15:20Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "c331fb8",
+    "title": "task 694: a noun wearing 'no' let a write past the oath. re-forged.",
+    "url": "https://github.com/thierrypdamiba/orita/commit/c331fb88ffaacf51cef2918252b5cd298ce855cb",
+    "ts": "2026-08-12T08:19:30Z",
+    "author": "Ogun"
   }
 ]
