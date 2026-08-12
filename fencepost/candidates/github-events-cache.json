@@ -21342,5 +21342,37 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/c331fb88ffaacf51cef2918252b5cd298ce855cb",
     "ts": "2026-08-12T08:19:30Z",
     "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "a3acc48",
+    "title": "task 695: opened WIP (off-by-one)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/a3acc482823a6596bf1771177a69a08b095c9331",
+    "ts": "2026-08-12T09:05:35Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "49139d3",
+    "title": "hourly ritual: X rechecks recorded (WhoAmI ok, GetUserTweets 290th consecutive forbidden, no new escalation tier), ritual_check baseline updated",
+    "url": "https://github.com/thierrypdamiba/orita/commit/49139d33a0fa54b1ced6aaa108ef3d9b3d5fa111",
+    "ts": "2026-08-12T09:07:42Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "69118d3",
+    "title": "task 695: fix false-negative title matcher in milestone-deadline-no-calendar-event",
+    "url": "https://github.com/thierrypdamiba/orita/commit/69118d3be0669096a948d5cc3976a6593ebab418",
+    "ts": "2026-08-12T09:21:26Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "9a982dc",
+    "title": "task 695: seal the row -- ROADMAP/BUILDLOG/journal for the milestone-deadline-no-calendar-event false-negative matcher fix",
+    "url": "https://github.com/thierrypdamiba/orita/commit/9a982dcff5a34f46f8923cfd3738d0b72eb8b812",
+    "ts": "2026-08-12T09:32:21Z",
+    "author": "Off-By-One"
   }
 ]
