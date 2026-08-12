@@ -164,17 +164,49 @@ def _find_match(milestone: Milestone, events: list[CalendarEvent]) -> CalendarEv
     the identical two-signal reasoning `gmail_calendar._find_match` already
     holds for its own Gmail-vs-Calendar seam. Raises if called with
     `milestone.due_on is None`; callers only reach this after already
-    excluding a milestone with no due date."""
+    excluding a milestone with no due date.
+
+    Task 695: a short or generic milestone title ("QA", "v1.0", "Beta")
+    yields NO extractable keyword at all -- `_keywords` needs a letter
+    followed by two-or-more word characters, which a plain short title
+    never carries -- so an empty `milestone_kw` is empty for a reason that
+    has nothing to do with whether the deadline actually reached the
+    Calendar. Judging the match by keyword overlap ALONE then treats every
+    such milestone as unmatched even when a calendar event names it
+    verbatim at the exact same time: a false gap, exactly the crying-wolf
+    failure Ogun's law calls fatal. Reproduced live pre-fix:
+    `_find_match(milestone=Milestone(title="QA", due_on=<t>, ...),
+    [CalendarEvent(title="QA", start=<t>, ...)])` returned `None` even
+    though the calendar event's own title matches the milestone's
+    verbatim, and `compute_gaps` surfaced a 0.85-confidence
+    "no Calendar event tracks it" gap for a deadline that plainly was
+    tracked. This module's own docstring already claims to mirror
+    `gmail_calendar._find_match`'s two-signal reasoning, but the fallback
+    that reasoning depends on (`gmail_calendar.py`'s own
+    `test_short_title_with_no_extractable_keywords_still_matches_a_real_
+    calendar_event`, closed for that module) was never actually carried
+    over here. So when (and only when) the milestone's own title yields no
+    keywords to match on, fall back to a raw case-insensitive substring
+    check of the milestone's title against each candidate event's own
+    title -- you name "QA" by literally writing "QA". Milestone titles
+    that DO yield keywords keep the exact overlap behavior, unchanged (see
+    `test_an_event_in_window_but_with_no_shared_keyword_does_not_match`,
+    which relies on that being true for a title that extracts to real
+    keywords)."""
     if milestone.due_on is None:
         raise ValueError(
             f"_find_match(): milestone #{milestone.number} reached the matcher "
             "with due_on=None -- callers must filter that out first."
         )
     milestone_kw = _keywords(milestone.title)
+    milestone_title_needle = milestone.title.strip().lower()
     for ev in events:
         if abs((ev.start - milestone.due_on).total_seconds()) > _DUE_WINDOW.total_seconds():
             continue
-        if _keywords(ev.title) & milestone_kw:
+        if milestone_kw:
+            if _keywords(ev.title) & milestone_kw:
+                return ev
+        elif milestone_title_needle and milestone_title_needle in ev.title.strip().lower():
             return ev
     return None
 

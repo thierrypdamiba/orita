@@ -99,6 +99,38 @@ class TestComputeGaps:
         assert excluded[0].confidence == 0.0
         assert excluded[0].evidence == [m.url, "calendar:evt_1"]
 
+    def test_short_title_with_no_extractable_keywords_still_matches_a_real_calendar_event(self):
+        # "QA" is too short for `_keywords` to extract anything from (it
+        # needs a letter followed by two-or-more word characters) -- so
+        # keyword overlap alone can never see this milestone and its own
+        # matching calendar event as the same thing, even though they
+        # share the exact same title at the exact same time. Reproduced
+        # live pre-fix (task 695): this returned a surfaced 0.85-confidence
+        # gap ("no Calendar event tracks it") for a deadline that plainly
+        # was tracked.
+        m = _milestone(1, "QA", datetime(2026, 8, 15, tzinfo=timezone.utc))
+        ev = _event("evt_1", "QA", datetime(2026, 8, 15, tzinfo=timezone.utc))
+
+        surfaced, excluded = detector.compute_gaps([m], [ev], now=_NOW)
+
+        assert surfaced == []
+        assert len(excluded) == 1
+        assert excluded[0].slug == "calendar-matched-1"
+
+    def test_short_title_with_no_matching_calendar_event_is_still_a_gap(self):
+        # The fallback for a keyword-less title must not go the other way
+        # and start matching everything within the due window -- a
+        # short-titled milestone with no real calendar counterpart is
+        # still a genuine gap.
+        m = _milestone(1, "QA", datetime(2026, 8, 15, tzinfo=timezone.utc))
+        unrelated = _event("evt_1", "Unrelated lunch", datetime(2026, 8, 15, tzinfo=timezone.utc))
+
+        surfaced, excluded = detector.compute_gaps([m], [unrelated], now=_NOW)
+
+        assert excluded == []
+        assert len(surfaced) == 1
+        assert surfaced[0].slug == "milestone-deadline-no-calendar-event-1"
+
     def test_an_event_in_window_but_with_no_shared_keyword_does_not_match(self):
         # Proves the matcher needs BOTH signals, not just the date window --
         # a same-week event about something else entirely must not silence
