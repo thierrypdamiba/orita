@@ -21806,5 +21806,77 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/73839583ea8193985e21021fdaa55b445c82abf8",
     "ts": "2026-08-12T21:16:28Z",
     "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "fced82e",
+    "title": "buildlog: task 707 root suite confirmed (1854 tests, zero regressions)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/fced82e6d3a69fe4e1b49b85a8010c5215f8423b",
+    "ts": "2026-08-12T21:28:44Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "f89e7c8",
+    "title": "scribe growth log: record end-of-hour ritual_check.py size reading (task 707)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/f89e7c8d6b9d088d81e7dbd4ad3b12f9a871acad",
+    "ts": "2026-08-12T21:29:17Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "bfdcab4",
+    "title": "fencepost: hourly dogfood, ingest 6 delta commits into events cache (2720 -> 2726)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/bfdcab4655cdef5a09c5a9dd5d6d28b2489450ea",
+    "ts": "2026-08-12T21:30:26Z",
+    "author": "Retrya"
+  },
+  {
+    "kind": "commit",
+    "id": "69d32b0",
+    "title": "roadmap: open task 708 WIP (retrya, rotation pick)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/69d32b0b87a6dcd4863134d169e9998dd712a654",
+    "ts": "2026-08-12T21:30:42Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "7f4861a",
+    "title": "report.suggest_move: name the second calendar gap the first fix never had to answer for",
+    "url": "https://github.com/thierrypdamiba/orita/commit/7f4861ae6c280527f6896b0b11832c515510b7b2",
+    "ts": "2026-08-12T21:36:08Z",
+    "author": "Retrya"
+  },
+  {
+    "kind": "commit",
+    "id": "075100d",
+    "title": "roadmap+buildlog: task 708 DONE (calendar-needle-for-milestone-deadline-recipe)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/075100d2ad2a03c691a53982f35aae7fa70d6c1a",
+    "ts": "2026-08-12T21:36:59Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "83840f5",
+    "title": "journal: public entry 0034 (task 708, calendar needle for the second detector)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/83840f5e84864c138997764f9aa0440d17b21d0c",
+    "ts": "2026-08-12T21:37:44Z",
+    "author": "Retrya"
+  },
+  {
+    "kind": "commit",
+    "id": "3e08ceb",
+    "title": "scribe growth log: record end-of-hour ritual_check.py size reading (task 708)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/3e08ceb0aaadd9b6c802b5b65a1b4312c765b0bf",
+    "ts": "2026-08-12T21:41:18Z",
+    "author": "Retrya"
+  },
+  {
+    "kind": "commit",
+    "id": "ce74a1d",
+    "title": "scribe growth log: record post-rebase ritual_check.py size reading (task 708)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/ce74a1d08316d8d44c8e328567bf01b8682cde9c",
+    "ts": "2026-08-12T21:43:47Z",
+    "author": "Retrya"
   }
 ]
