@@ -284,6 +284,50 @@ def test_a_negated_silent_e_gerund_still_does_not_fail_the_law(text: str):
     assert is_read_only_capabilities(text)
 
 
+@pytest.mark.parametrize(
+    "text",
+    [
+        # Task 701: the past-tense sibling of the silent-e gerund gap
+        # above -- consonant-plus-"y" verbs swap "y" for "ied"/"ies"
+        # (reply -> replied/replies, modify -> modified/modifies) and two
+        # verbs are genuinely irregular (send -> sent, write -> wrote/
+        # written), none of which is a literal prefix of the bare verb.
+        "It already replied to every open issue on the repository.",
+        "It already replies to every open issue on the repository.",
+        "The gods modified the connected calendar without asking.",
+        "The gods modify the connected calendar without asking.",
+        "It sent three new emails to every contact in the address book.",
+        "It wrote several new files directly to the connected repository.",
+        "It has written new files to the connected repository.",
+    ],
+)
+def test_the_irregular_past_tense_form_of_a_write_verb_is_still_caught(
+    text: str,
+):
+    assert not is_read_only_capabilities(text)
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        # The negated siblings of the cases above, proving the fix widens
+        # what `_verb_pattern` matches without disturbing negation scope,
+        # the same "detect widened, scope unchanged" shape the silent-e
+        # gerund fix above held to.
+        "It never replied to any issue on any connected account.",
+        "It never modified anything on any connected account.",
+        "It never sent anything to anyone on any connected account.",
+        "It never wrote anything to any connected account.",
+        "Never replying, modifying, sending, or writing anything on any "
+        "connected account.",
+    ],
+)
+def test_a_negated_irregular_past_tense_form_still_does_not_fail_the_law(
+    text: str,
+):
+    assert is_read_only_capabilities(text)
+
+
 def test_gateway_url_builds_the_real_arcade_mcp_url():
     assert gateway_url("my-fencepost") == "https://api.arcade.dev/mcp/my-fencepost"
 

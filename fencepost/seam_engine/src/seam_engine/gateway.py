@@ -220,10 +220,57 @@ def _verb_pattern(verb: str) -> str:
     inviting, sharing). Fixed by also matching the silent-e-dropped stem
     plus "ing" for every verb ending in "e"; every other verb's plain
     ``verb\\w*`` already covers its own "-ing" form (post -> posting)
-    since nothing gets dropped when the verb doesn't end in "e"."""
+    since nothing gets dropped when the verb doesn't end in "e").
+
+    Task 701 (Ogun): the same undetected-gap class, found in the PAST-TENSE
+    direction this time, on two other verb shapes the silent-e fix above
+    never touched. (1) consonant-plus-"y" verbs (reply, modify): English
+    swaps that "y" for "ied"/"ies" before "-ed"/"-s" (reply -> replied,
+    modifies -- not replyed/replys), so neither the bare verb nor its
+    "-ing" form (which DOES keep the "y" literally: replying, modifying)
+    is a literal prefix of the "-ed"/"-s" form. (2) verbs with a genuinely
+    IRREGULAR past tense/participle unreachable by any suffix rule at all
+    (send -> sent, not sended; write -> wrote/written, not writed/writeed
+    -- the silent-e fix above only ever added the "-ing" form "writing",
+    never touched "wrote"/"written"). Reproduced live pre-fix, no negation
+    cue anywhere in the sentence: `is_read_only_capabilities("It already
+    replied to every open issue on the repository.")`,
+    `is_read_only_capabilities("The gods modified the connected calendar
+    without asking.")`, `is_read_only_capabilities("It sent three new
+    emails to every contact in the address book.")`, and
+    `is_read_only_capabilities("It has written new files to the repo.")`
+    each returned `True` (judged read-only-safe) -- four more real,
+    completely unnegated write asks going entirely undetected, the exact
+    fail-open shape Ogun's law forbids. Fixed the same way as the silent-e
+    case: `_IRREGULAR_FORMS` names the literal extra surface forms a verb
+    needs beyond what suffix rules reach (consonant-y verbs get their
+    "ied"/"ies" forms named explicitly rather than derived, since the
+    stem-minus-"y" isn't a real prefix of either); every verb NOT listed
+    keeps relying on the rules above it, so this only ever widens
+    detection, never narrows it."""
+    extra = _IRREGULAR_FORMS.get(verb, ())
+    alternatives = [rf"{verb}\w*"]
     if verb.endswith("e"):
-        return rf"(?:{verb}\w*|{verb[:-1]}ing)"
-    return rf"{verb}\w*"
+        alternatives.append(rf"{verb[:-1]}ing")
+    alternatives.extend(re.escape(form) for form in extra)
+    return "(?:" + "|".join(alternatives) + ")"
+
+
+# Literal extra surface forms for verbs whose past tense/participle isn't a
+# suffix of the bare verb (or of its silent-e-dropped "-ing" stem) at all --
+# see `_verb_pattern`'s docstring, task 701. Named explicitly rather than
+# derived: unlike the mechanical silent-e drop, there is no single
+# transformation rule that covers both the consonant-y swap (reply ->
+# replied/replies) and the genuinely irregular pair (send -> sent, write ->
+# wrote/written) -- naming each surface form directly keeps the rule
+# honest instead of overfitting the regex to explain two unrelated
+# irregularities as one pattern.
+_IRREGULAR_FORMS: dict[str, tuple[str, ...]] = {
+    "reply": ("replied", "replies"),
+    "modify": ("modified", "modifies"),
+    "send": ("sent",),
+    "write": ("wrote", "written"),
+}
 
 
 _BARE_VERB_RE = re.compile(
