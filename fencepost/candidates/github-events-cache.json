@@ -21550,5 +21550,101 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/a66a0b20c4bb6bcb1c660d5c1a037025f7cff0a2",
     "ts": "2026-08-12T14:45:37Z",
     "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "5bed955",
+    "title": "roadmap: open task 701 WIP (ogun, rotation pick)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/5bed95547c2cbab7dca886d0bb7c2ab06deaa70e",
+    "ts": "2026-08-12T15:09:04Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "46da79c",
+    "title": "hourly fencepost dogfood: cache fed 2685 -> 2694 (9 delta commits) -- no reseal",
+    "url": "https://github.com/thierrypdamiba/orita/commit/46da79c27d17b10694c146c2b65ea44833a19ee0",
+    "ts": "2026-08-12T15:11:07Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "0a27d6f",
+    "title": "gateway.py: catch the irregular past-tense/gerund form of a write verb (task 701)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/0a27d6f6709e62695da7f46bb5c2967821660ea3",
+    "ts": "2026-08-12T15:20:46Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "8285d7f",
+    "title": "roadmap/buildlog: close task 701 (root suite confirmed 1853/1853, zero regressions)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/8285d7f4b7a8e1395eec9b0ec6dd7bcb053f749d",
+    "ts": "2026-08-12T15:22:30Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "b76567b",
+    "title": "roadmap: open task 702 WIP (off-by-one, eightieth Fencepost recipe)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/b76567bcc89d61dcbc16a90e07749b0ed9039fb1",
+    "ts": "2026-08-12T16:18:17Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "129411d",
+    "title": "fencepost: ship the eightieth recipe, repo-description-dangling-reference (task 702)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/129411d59ff7112c2bd0be0964b72c3488f894d6",
+    "ts": "2026-08-12T16:23:50Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "356dac9",
+    "title": "buildlog: task 702 root-suite race explained, confirmed non-regression, full rerun pending",
+    "url": "https://github.com/thierrypdamiba/orita/commit/356dac94f37c5be2be72412d24f93de69fb51f3d",
+    "ts": "2026-08-12T16:28:42Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "b1b3768",
+    "title": "buildlog: task 702 root suite confirmed clean, 1853/1853, zero regressions",
+    "url": "https://github.com/thierrypdamiba/orita/commit/b1b3768ec405bcbc852b309ffabf5e375992abbf",
+    "ts": "2026-08-12T16:40:15Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "22bc59a",
+    "title": "roadmap: open task 703 WIP (kothar-wa-khasis, rotation pick)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/22bc59ad32ac46f5037b0d8ede9da2fa514fe71b",
+    "ts": "2026-08-12T17:26:42Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "14d1f9b",
+    "title": "scribe growth log: record this hour's ritual_check.py size reading",
+    "url": "https://github.com/thierrypdamiba/orita/commit/14d1f9b02cb0d41177e64ae816a315cbb92fe52c",
+    "ts": "2026-08-12T17:27:40Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "ce29e83",
+    "title": "task 703: re-verify task 697's n't-negation fix holds, close the stale thread; explore pass finds no new safe fix",
+    "url": "https://github.com/thierrypdamiba/orita/commit/ce29e830c10369259b638257f432666fcfd48c4f",
+    "ts": "2026-08-12T17:36:57Z",
+    "author": "Kothar-wa-Khasis"
+  },
+  {
+    "kind": "commit",
+    "id": "021a811",
+    "title": "scribe growth log: record post-task-703 ritual_check.py size reading",
+    "url": "https://github.com/thierrypdamiba/orita/commit/021a811911a04f51f6f22c205ab4cd26fb86e488",
+    "ts": "2026-08-12T17:38:26Z",
+    "author": "Nisaba"
   }
 ]
