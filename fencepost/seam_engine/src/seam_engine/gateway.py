@@ -158,11 +158,44 @@ _WRITE_VERBS = (
 )
 
 # A verb only counts as a live ask if it isn't itself being ruled out.
-_NEGATION_CUES = ("never", "not ", "cannot", "may not", "won't", "no ")
+#
+# Task 694 (Ogun): the OLD `_NEGATION_CUES` was a tuple of literal
+# substrings ("no ", "not ", ...) checked with plain `cue in before`
+# containment in `is_read_only_capabilities` below -- which matches inside
+# any unrelated word that merely happens to end in the same letters
+# followed by the same trailing character, not just the real cue word.
+# Reproduced live pre-fix: `is_read_only_capabilities("Reads data from a
+# casino ledger and create new records on the account.")` returned `True`
+# (judged read-only-safe) purely because "casino " contains the substring
+# "no " immediately before the genuinely unnegated "create" ask in the
+# same clause -- an unrelated noun laundering a real write ask past the
+# checker, the exact fail-open shape STRATEGY.md's Ogun's law forbids
+# ("...piano archives and delete old drafts..." reproduced the same way,
+# with "piano " laundering "delete"). Separately: the only negative
+# CONTRACTION this tuple recognized was the one hardcoded "won't" --
+# "doesn't", "isn't", "can't", "shouldn't", and every other `n't`-ending
+# cue failed to register as negation at all (`is_read_only_capabilities(
+# "This doesn't create anything on any connected account.")` also
+# reproduced `False` pre-fix) -- the identical gap `thanks.py`'s own local
+# negation copy had before task 690 moved it onto the shared
+# `seam_engine.negation` grammar's `n't\b` pattern. This module keeps its
+# own clause-level check rather than importing that module (see the
+# module docstring above), but the same `n't\b` shape applies here too.
+# Both fixed together with one real word-boundary regex: no substring can
+# match inside an unrelated word, and any `n't`-ending contraction now
+# counts as negation, not only "won't".
+_NEGATION_CUE_RE = re.compile(r"\b(?:not|never|no|cannot)\b|n't\b")
 
-_LEADING_CUE_RE = re.compile(
-    r"^(?:" + "|".join(re.escape(c.strip()) for c in _NEGATION_CUES) + r")\b\s*"
-)
+# `_LEADING_CUE_RE` strips a LEADING cue from one item of an enumerated
+# bare-verb list ("never create, update, ... or modify") -- anchored at
+# the string start (`^...\b`), so the substring-containment flaw above
+# never applied here, but the missing-contraction gap did ("doesn't
+# create, update, or modify" never registered "doesn't create" as a
+# cue-prefixed bare verb item). `\w*n't` covers any contraction
+# generically; the bare words mirror `_NEGATION_CUE_RE` above so the two
+# stay in step by construction rather than as two independently hand-typed
+# lists.
+_LEADING_CUE_RE = re.compile(r"^(?:not|never|no|cannot|\w*n't)\b\s*")
 _LEADING_CONJ_RE = re.compile(r"^(?:and|or)\b\s*")
 _BARE_VERB_RE = re.compile(r"^(?:" + "|".join(_WRITE_VERBS) + r")\w*$")
 
@@ -171,7 +204,27 @@ def _is_bare_verb_item(segment: str) -> bool:
     """True iff ``segment`` is nothing but a (optionally cue/conjunction-
     prefixed) single write verb — one bare item of an enumerated list like
     "Never create, update, ... or modify", not an independent clause with
-    its own object (e.g. "delete the connected account entirely")."""
+    its own object (e.g. "delete the connected account entirely").
+
+    Named, not fixed (task 694): ``_LEADING_CUE_RE`` is anchored at the
+    very start of ``segment``, so this only recognizes the enumeration
+    shape when the cue itself opens the sentence ("Never create, update,
+    ..."). A subject sitting in front of the cue ("It never creates,
+    updates, ... or deletes anything...", "It doesn't create, update, ...
+    or delete anything...") makes the first comma-segment fail this check,
+    so `_split_clauses` falls back to treating every enumerated item as
+    its own separate, uncovered clause — and a later item with no verb
+    text of its own before it in that clause (e.g. bare " update") then
+    reads as an unnegated ask. Reproduced live: `is_read_only_
+    capabilities("It never creates, updates, merges, or deletes anything
+    on any connected account.")` returns `False` even though "never" is
+    already a recognized cue — this is a pre-existing gap in the subject-
+    handling here, independent of task 694's substring/contraction fix
+    above, not a regression it introduced. Fixing it would mean stripping
+    an arbitrary leading subject before checking for the cue, which risks
+    its own false-positive shape (a subject clause hiding an unrelated
+    negation) and is real, separate follow-up work, not folded in here.
+    """
     s = segment.strip().lower()
     s = _LEADING_CUE_RE.sub("", s, count=1)
     s = _LEADING_CONJ_RE.sub("", s, count=1)
@@ -256,7 +309,7 @@ def is_read_only_capabilities(text: str) -> bool:
         for verb in _WRITE_VERBS:
             for m in re.finditer(rf"\b{verb}\w*\b", lowered):
                 before = lowered[: m.start()]
-                if not any(cue in before for cue in _NEGATION_CUES):
+                if not _NEGATION_CUE_RE.search(before):
                     return False
     return True
 

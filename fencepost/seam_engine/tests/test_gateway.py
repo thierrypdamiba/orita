@@ -153,6 +153,50 @@ def test_a_bare_verb_enumeration_stays_covered_by_one_leading_negation(text: str
     assert is_read_only_capabilities(text)
 
 
+@pytest.mark.parametrize(
+    "text",
+    [
+        # Task 694: an unrelated word that merely CONTAINS a negation cue
+        # as a substring ("casino " contains "no ", "piano " contains
+        # "no ") used to launder a real, unnegated write ask sitting right
+        # after it in the same clause — the old check was `cue in before`
+        # plain containment, not a word-boundary match. Reproduced live
+        # pre-fix: both of these returned True.
+        "Reads data from a casino ledger and create new records on the account.",
+        "Reads sheet piano archives and delete old drafts on the account.",
+        "Checks the volcano monitoring feed and post updates automatically.",
+    ],
+)
+def test_negation_cue_does_not_match_inside_an_unrelated_word(text: str):
+    assert not is_read_only_capabilities(text)
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        # Task 694: the only negative contraction the old cue tuple
+        # recognized was the one hardcoded "won't" — every other `n't`
+        # contraction failed to register as negation at all. Reproduced
+        # live pre-fix: all three of these returned False (judged as
+        # asking for a write) despite being genuinely negated.
+        "This doesn't create anything on any connected account.",
+        "It isn't going to delete anything on the account.",
+        "It can't modify anything on any connected account.",
+    ],
+)
+def test_any_nt_contraction_counts_as_negation_not_only_wont(text: str):
+    assert is_read_only_capabilities(text)
+
+
+def test_a_leading_bare_verb_enumeration_with_a_contraction_still_covers_the_list():
+    # The `_LEADING_CUE_RE` sibling of the fix above: a bare enumerated
+    # verb list introduced by a contraction with no leading subject, the
+    # same shape the existing "Never create, update, ..." test already
+    # covers for "never".
+    text = "Doesn't create, update, merge, or delete anything on any connected account."
+    assert is_read_only_capabilities(text)
+
+
 def test_gateway_url_builds_the_real_arcade_mcp_url():
     assert gateway_url("my-fencepost") == "https://api.arcade.dev/mcp/my-fencepost"
 
