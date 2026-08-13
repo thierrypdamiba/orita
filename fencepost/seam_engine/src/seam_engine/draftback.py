@@ -191,6 +191,12 @@ def render_notion_page(sealed: dict[str, Any]) -> NotionPageDraft:
         NotionBlock("paragraph", f"The one thing that fell between {repo}'s accounts yesterday."),
         NotionBlock("divider"),
     ]
+    # Task 728 (retrya): mirrors `report.render_report`'s own three-way split
+    # (primary / contender-too-close / nothing cleared) -- this page used to
+    # collapse the contender case into the same "Nothing cleared the bar"
+    # line as a genuinely quiet day, the same false-claim shape task 605
+    # already fixed once in `report.py` but never carried over here.
+    has_contender = (not primary) and any(t.get("label") == "contender" for t in sealed.get("tail", []))
     if primary:
         blocks.append(NotionBlock("heading", primary["headline"]))
         blocks.append(NotionBlock("paragraph", f"Confidence {primary['confidence']}."))
@@ -199,12 +205,20 @@ def render_notion_page(sealed: dict[str, Any]) -> NotionPageDraft:
             blocks.append(NotionBlock("paragraph", detail))
         for ev in primary.get("evidence", []):
             blocks.append(NotionBlock("bulleted_list_item", ev))
+    elif has_contender:
+        blocks.append(
+            NotionBlock(
+                "paragraph",
+                "None elected today. A candidate cleared the bar, but the field "
+                "stood too close together to honestly call one THE gap.",
+            )
+        )
     else:
         blocks.append(NotionBlock("paragraph", "Nothing cleared the bar today. The seam held."))
 
     plural = "" if recorded == 1 else "s"
     blocks.append(NotionBlock("paragraph", f"{recorded} fencepost{plural} named to date. The wall reads {wall}."))
-    blocks.append(NotionBlock("paragraph", f"Your move: {report.suggest_move(primary)}"))
+    blocks.append(NotionBlock("paragraph", f"Your move: {report.suggest_move(primary, has_contender=has_contender)}"))
     blocks.append(NotionBlock("paragraph", report.THE_LINE))
 
     return NotionPageDraft(title=f"Fencepost — {date}", blocks=blocks)

@@ -156,6 +156,22 @@ def test_no_primary_but_a_contender_cleared_the_bar_says_none_elected():
     assert "gap-a" not in text  # the report still never names the tail
 
 
+def test_no_primary_but_a_contender_cleared_the_bar_hands_off_honestly():
+    # Task 728 (retrya). The headline fix (605, above) stopped the report
+    # from claiming the bar was never cleared -- but `render_report` still
+    # called `suggest_move(None)` unconditionally, so the "Your move" line
+    # four lines below kept reading "Nothing to hand off today ... the seam
+    # is still watched" in the exact same report: one true line, one false
+    # line, both in the reader's thirty-second dispatch. `suggest_move`'s own
+    # `_NO_GAP_MOVE` is a quiet-day claim ("nothing cleared the bar") this
+    # scenario has already disproven one paragraph up.
+    sealed = _sealed(primary=False, recorded=0)
+    sealed["tail"] = [{"slug": "gap-a", "confidence": 0.85, "label": "contender"}]
+    text = report.render_report(sealed)
+    assert "Nothing to hand off today" not in text
+    assert report._CONTENDER_MOVE in text
+
+
 # --- rendered from a live ledger, not a hand-built dict -----------------------
 
 

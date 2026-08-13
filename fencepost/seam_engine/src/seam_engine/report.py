@@ -316,6 +316,10 @@ _DEFAULT_MOVE = (
     "Close it yourself, however it's meant to be closed. Fencepost only found the seam; it does not cross it."
 )
 _NO_GAP_MOVE = "Nothing to hand off today. Check back tomorrow — the seam is still watched."
+_CONTENDER_MOVE = (
+    "Nothing elected yet — a candidate is close but the field is too tight to "
+    "honestly call. Check back tomorrow; a clearer lead may separate it."
+)
 
 # The live walkthrough (CONNECT.md, mirrored at docs/fencepost/connect.html)
 # — the exact page a reader lands on to build their own read-only gateway.
@@ -336,17 +340,27 @@ CONNECT_YOUR_OWN = (
 )
 
 
-def suggest_move(primary_gap: dict[str, Any] | None) -> str:
+def suggest_move(primary_gap: dict[str, Any] | None, *, has_contender: bool = False) -> str:
     """The single hand-off: one suggested human action, phrased as the reader's
     move, and never Fencepost's. Pure — no I/O, no side effect, nothing fired.
 
-    Deterministic: the same `primary_gap` always yields the same line. When
-    there is no primary gap, the move is still exactly one line — checking
-    back tomorrow is a move too, and the promise ("every report carries one
-    hand-off") does not get an exception for a quiet day.
+    Deterministic: the same `primary_gap`/`has_contender` pair always yields
+    the same line. When there is no primary gap, the move is still exactly
+    one line — checking back tomorrow is a move too, and the promise ("every
+    report carries one hand-off") does not get an exception for a quiet day.
+
+    `has_contender` mirrors `render_report`'s own "None elected today" branch
+    (task 605): a candidate cleared `confidence_bar` but stood too close to
+    another to honestly elect. Task 728 (retrya): `render_report` used to
+    call this with a bare `primary_gap` of `None` in that exact case, so the
+    headline read "A candidate cleared the bar" four lines above a "Your
+    move" line that flatly claimed "Nothing to hand off today" — one true,
+    one false, both in the reader's thirty-second dispatch. `has_contender`
+    routes that case to its own honest line instead of collapsing it into
+    the quiet-day one.
     """
     if not primary_gap:
-        return _NO_GAP_MOVE
+        return _CONTENDER_MOVE if has_contender else _NO_GAP_MOVE
     # Task 537 (retrya): every detector across scan.py and all 45 RECIPES/
     # embeds mortal-controlled free text (a commit message, an issue/PR/
     # milestone title, a tweet's own text) inside single quotes -- confirmed
@@ -449,6 +463,8 @@ def render_report(
         )
         lines.append("")
 
+    has_contender = (not primary) and any(t.get("label") == "contender" for t in sealed.get("tail", []))
+
     if primary:
         lines.append(f"**{primary['headline']}** — confidence {primary['confidence']}.")
         lines.append("")
@@ -460,7 +476,7 @@ def render_report(
         if evidence:
             lines.append(evidence)
             lines.append("")
-    elif any(t.get("label") == "contender" for t in sealed.get("tail", [])):
+    elif has_contender:
         # A candidate cleared confidence_bar but the field was too close to call
         # (ranking.SEPARATION_MARGIN) -- distinct from nothing clearing the bar
         # at all. The report still names no gap (see docstring); it just stops
@@ -480,7 +496,7 @@ def render_report(
     lines.append("")
     lines.append(TEASER_LINE)
     lines.append("")
-    lines.append(f"**Your move.** {suggest_move(primary)}")
+    lines.append(f"**Your move.** {suggest_move(primary, has_contender=has_contender)}")
     lines.append("")
     lines.append(CONNECT_YOUR_OWN)
     lines.append("")

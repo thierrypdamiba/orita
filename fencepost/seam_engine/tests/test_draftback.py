@@ -49,6 +49,16 @@ FIXTURE_SEALED_NO_GAP: dict = {
     "fenceposts_recorded_total": 4,
 }
 
+FIXTURE_SEALED_CONTENDER: dict = {
+    "date": "2026-07-14",
+    "generated_at": "2026-07-14T09:00:00+00:00",
+    "repo": "thierrypdamiba/orita",
+    "confidence_bar": 0.70,
+    "primary_gap": None,
+    "tail": [{"slug": "gap-a", "confidence": 0.85, "label": "contender"}],
+    "fenceposts_recorded_total": 4,
+}
+
 
 # --- rendering is pure and deterministic ------------------------------------
 
@@ -76,6 +86,20 @@ def test_render_email_draft_handles_no_gap_day_honestly():
     draft = draftback.render_email_draft(FIXTURE_SEALED_NO_GAP)
     assert "nothing cleared the bar" in draft.subject.lower()
     assert "Nothing cleared the bar today" in draft.body
+
+
+def test_render_notion_page_handles_a_close_contender_honestly():
+    # Task 728 (retrya). `render_notion_page` used to collapse this case
+    # into the same "Nothing cleared the bar" + "Nothing to hand off today"
+    # pair FIXTURE_SEALED_NO_GAP correctly earns above -- a real candidate
+    # clearing the bar and a quiet seam are not the same claim, and the
+    # Notion draft is a place the user keeps and rereads, not a footnote.
+    page = draftback.render_notion_page(FIXTURE_SEALED_CONTENDER)
+    text = "\n".join(b.text for b in page.blocks)
+    assert "Nothing cleared the bar today" not in text
+    assert "None elected today" in text
+    assert "Nothing to hand off today" not in text
+    assert "gap-a" not in text  # the draft still never names the tail
 
 
 def test_render_notion_page_carries_the_gap_and_the_count():
