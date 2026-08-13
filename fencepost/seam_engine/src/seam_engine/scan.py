@@ -566,8 +566,26 @@ def compute_candidates(
 
     milestones = [c for c in commits if c.ts >= account_live_since and _is_milestone(c)]
     if milestones:
-        overlap = set().union(*(_keywords(m.title) for m in milestones)) & all_post_keywords
-        matched_keyword = overlap & MILESTONE_KEYWORDS
+        # `_is_milestone` above decides a commit is milestone-worthy with a
+        # plain substring check against MILESTONE_KEYWORDS -- it matches a
+        # keyword glued into a larger hyphenated word too (e.g. "fencepost-
+        # engine"). The "was it announced" check here used to require that
+        # same keyword to survive as its own exact `_keywords()` token in
+        # both the title and a post -- but `_keywords()` keeps a hyphen as
+        # part of the token, so "fencepost-engine" tokenizes as one glued
+        # token, never the bare "fencepost" word a real announcing post
+        # would use. Reproduced live: a commit titled "fencepost-engine:
+        # add retry logic" (correctly milestone-worthy) alongside a post
+        # reading "The fencepost is finally live!" (a genuine, unambiguous
+        # announcement) still surfaced milestone-unannounced -- a
+        # 0.85-confidence false positive, the crying-wolf failure Ogun's
+        # law forbids. Matching on the same substring convention
+        # `_is_milestone` already uses, not an exact token, closes it.
+        titles_lower = " ".join(m.title.lower() for m in milestones)
+        matched_keyword = {
+            k for k in MILESTONE_KEYWORDS
+            if k in titles_lower and any(k in p.text.lower() for p in x_posts)
+        }
         if not matched_keyword:
             confidence = min(0.85, 0.35 + 0.1 * len(milestones))
             # Task 577: `commits`' own order silently depends on which of the

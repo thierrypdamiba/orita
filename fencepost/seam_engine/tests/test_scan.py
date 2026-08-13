@@ -851,6 +851,53 @@ def test_milestone_evidence_is_oldest_first_regardless_of_input_commit_order():
     )
 
 
+def test_milestone_keyword_glued_into_a_hyphenated_title_word_still_reads_as_announced():
+    # `_is_milestone` decides a commit is milestone-worthy with a plain
+    # substring check ("fencepost" in the lowered title) -- it matches even
+    # when the keyword is glued into a larger hyphenated word, e.g.
+    # "fencepost-engine". The "was it announced" check used to require that
+    # same keyword to survive as its own exact `_keywords()` token in both
+    # the title and a post, but `_keywords()` keeps a hyphen as part of the
+    # token, so "fencepost-engine" tokenizes as one glued token, never the
+    # bare "fencepost" word a real announcing post would use. Reproduced
+    # live pre-fix: this exact commit/post pair still surfaced
+    # `milestone-unannounced` even though the post plainly announces it --
+    # a 0.85-confidence false positive, the crying-wolf failure Ogun's law
+    # forbids.
+    commit = GithubEvent(
+        kind="commit", id="abc1234", title="fencepost-engine: add retry logic",
+        url="https://github.com/thierrypdamiba/orita/commit/abc1234",
+        ts=datetime(2026, 7, 10, tzinfo=timezone.utc), author="nisaba",
+    )
+    posts = [_post("The fencepost is finally live!")]
+
+    surfaced, _excluded = compute_candidates([commit], posts, _LIVE)
+
+    assert not any(g.slug == "milestone-unannounced" for g in surfaced), (
+        "a milestone keyword announced in a post must not be a gap just "
+        "because the commit title glued the same keyword into a "
+        "hyphenated compound word"
+    )
+
+
+def test_milestone_keyword_glued_into_a_hyphenated_title_word_is_still_a_gap_when_truly_unannounced():
+    # The fix above must not swing the other way into a false NEGATIVE: a
+    # hyphenated-title milestone commit that no post actually announces is
+    # still a real gap.
+    commit = GithubEvent(
+        kind="commit", id="abc1234", title="fencepost-engine: add retry logic",
+        url="https://github.com/thierrypdamiba/orita/commit/abc1234",
+        ts=datetime(2026, 7, 10, tzinfo=timezone.utc), author="nisaba",
+    )
+    posts = [_post("good morning from the town, a quiet day at the crossroads")]
+
+    surfaced, _excluded = compute_candidates([commit], posts, _LIVE)
+
+    assert any(g.slug == "milestone-unannounced" for g in surfaced), (
+        "an unannounced milestone commit is still the gap it always was"
+    )
+
+
 def _routine_commit(cid: str, ts: datetime, topic: str = "ledger") -> GithubEvent:
     return GithubEvent(
         kind="commit", id=cid, title=f"{topic} recorded entry {cid}",
