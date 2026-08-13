@@ -163,11 +163,25 @@ def _has_independent_public_provenance(
 # 2026-07-18 entry explicitly narrates having "called it [a phrase] in the
 # public entry" -- her own private reflection quoting her own same-day
 # already-public words, public-to-private, not a leak.
+#
+# Reviewed 2026-08-13 (task 718): the same shape recurred. Kothar-wa-khasis's
+# private 0045 entry narrates "the public line about 'a site that holds is
+# not a site that stopped needing me' is true" -- an explicit, self-aware
+# quote of her own same-hour public journal line, not the other way round.
+# Commit order confirms direction: the public journal file's commit
+# (e59c749, 2026-08-13T06:37:31Z) landed 5 seconds before the private vault
+# commit (d940f82, 2026-08-13T06:37:36Z) that quotes it -- public-to-private,
+# same as Nisaba's case, not a leak.
 _REVIEWED_NON_LEAKS = frozenset({
     (
         os.path.join("nisaba", "journal", "0023-2026-07-18.md"),
         3,
         os.path.join("houses", "nisaba", "journal", "0023-2026-07-18.md"),
+    ),
+    (
+        os.path.join("kothar-wa-khasis", "journal", "0045-2026-08-13.md"),
+        1,
+        os.path.join("houses", "kothar-wa-khasis", "journal", "0045-2026-08-13.md"),
     ),
 })
 
