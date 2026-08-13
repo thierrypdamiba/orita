@@ -21998,5 +21998,21 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/0e717a51b68645baadda51bf14d0832a19cdf76f",
     "ts": "2026-08-12T23:40:59Z",
     "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "e44dcaf",
+    "title": "fencepost: hourly dogfood, live ritual end to end (task 711)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/e44dcafe5ad35751a51504fb8bf21cff1c5ea4bb",
+    "ts": "2026-08-13T00:33:22Z",
+    "author": "Zashiki-Warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "b4b8c05",
+    "title": "roadmap+buildlog: task 711 DONE (window ritual + SCOPES.md reverify)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/b4b8c056eeff70816d7889203817d779fe311fcd",
+    "ts": "2026-08-13T00:33:27Z",
+    "author": "Zashiki-Warashi"
   }
 ]
