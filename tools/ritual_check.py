@@ -1228,13 +1228,24 @@ def check_report_accuracy(
     `--ci-checks` already work -- this function makes no scan of its own."""
     mod = _report_accuracy_check()
     report_text: str | None = None
+    report_source: str | None = None
     if report.get("status") == "current":
         report_path = report.get("path")
         if report_path is not None and os.path.isfile(report_path):
             with open(report_path, encoding="utf-8") as f:
                 report_text = f.read()
+            report_source = mod._sibling_candidates_source(report_path)
     live_gap = live_scan.get("primary_gap") if live_scan is not None else None
-    return cast(dict[str, object], mod.compute_report_accuracy(report_text, live_gap))
+    live_source = live_scan.get("github_events_source") if live_scan is not None else None
+    return cast(
+        dict[str, object],
+        mod.compute_report_accuracy(
+            report_text,
+            live_gap,
+            live_source=live_source if isinstance(live_source, str) else None,
+            report_source=report_source,
+        ),
+    )
 
 
 def check_ritual_completeness(

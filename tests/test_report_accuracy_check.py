@@ -103,6 +103,74 @@ class ComputeReportAccuracyCase(unittest.TestCase):
         result = src.compute_report_accuracy(REPORT_116, gap_no_detail)
         self.assertTrue(result["clean"])
 
+    def test_lower_live_count_from_override_cache_does_not_downgrade_a_direct_report(self):
+        """Task 724: the real 2026-08-13 case. seam-scan.yml's automatic
+        direct-fetch resealed the report to 146; this sandbox's own
+        override-sourced cache rescan the very next hour read only 135
+        (the local cache's standing undercount, not a real drop). Without
+        the source-aware guard this read "STALE, reseal it" and would have
+        overwritten the more-complete 146 with the less-complete 135."""
+        report_146 = (
+            "# Fencepost Report -- 2026-08-13\n\n"
+            "**Milestone-level work shipped but never reached @oritatown** -- confidence 0.85.\n\n"
+            "146 milestone commit(s) since 2026-07-12 (matching ['fencepost', 'flagship', 'strategy']), "
+            "none echoed in a post.\n"
+        )
+        gap_135 = {
+            "slug": "milestone-unannounced",
+            "confidence": 0.85,
+            "detail": "135 milestone commit(s) since 2026-07-12 (matching ['fencepost', 'flagship', 'strategy']), none echoed in a post.",
+        }
+        result = src.compute_report_accuracy(
+            report_146, gap_135, live_source="override", report_source="direct"
+        )
+        self.assertTrue(result["clean"])
+        self.assertTrue(result.get("cache_behind_direct"))
+        self.assertEqual(result["report_count"], 146)
+        self.assertEqual(result["live_count"], 135)
+        self.assertNotIn("STALE", result["reason"])
+
+    def test_lower_live_count_still_flags_stale_when_sources_unknown(self):
+        """Backward compatible: callers that don't pass live_source/report_source
+        (the exact old call shape) keep the original behavior -- a lower
+        live count still reads STALE without the new guard's information."""
+        result = src.compute_report_accuracy(REPORT_116, GAP_112)
+        self.assertFalse(result["clean"])
+
+    def test_lower_live_count_still_flags_stale_when_both_sources_are_override(self):
+        """The guard only ever fires for report_source == 'direct' AND a
+        non-direct live_source -- two override-sourced scans disagreeing
+        is still a real drift worth catching, same as before."""
+        result = src.compute_report_accuracy(
+            REPORT_116, GAP_112, live_source="override", report_source="override"
+        )
+        self.assertFalse(result["clean"])
+
+    def test_higher_live_count_still_reseals_even_when_report_is_direct(self):
+        """The guard never blocks a real upward reseal -- only a downgrade
+        of an already-more-authoritative direct-sourced report."""
+        higher_gap = {
+            "slug": "milestone-unannounced",
+            "detail": "150 milestone commit(s) since 2026-07-12 (matching ['fencepost', 'flagship', 'strategy']), none echoed in a post.",
+        }
+        report_146 = REPORT_116.replace("116", "146")
+        result = src.compute_report_accuracy(
+            report_146, higher_gap, live_source="override", report_source="direct"
+        )
+        self.assertFalse(result["clean"])
+        self.assertEqual(result["live_count"], 150)
+
+
+class SiblingCandidatesSourceCase(unittest.TestCase):
+    def test_reads_real_todays_source(self):
+        report_path = os.path.join(ROOT, "fencepost", "REPORTS", "2026-08-13.md")
+        source = src._sibling_candidates_source(report_path)
+        self.assertEqual(source, "direct")
+
+    def test_none_on_missing_sibling(self):
+        source = src._sibling_candidates_source("/no/such/dir/REPORTS/2099-01-01.md")
+        self.assertIsNone(source)
+
 
 class RealTodayReportCase(unittest.TestCase):
     """The real point: proves the fix actually landed against the live

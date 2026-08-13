@@ -52,6 +52,8 @@ def extract_milestone_count(text: str) -> int | None:
 def compute_report_accuracy(
     report_text: str | None,
     live_gap: dict[str, Any] | None,
+    live_source: str | None = None,
+    report_source: str | None = None,
 ) -> dict[str, Any]:
     """Compare today's committed Report's own milestone-count claim against
     a fresh live scan's `primary_gap`, when both name the same gap
@@ -65,6 +67,33 @@ def compute_report_accuracy(
     carries no milestone sentence to compare) reads `clean: True` -- absence
     of a comparison is not evidence of drift, the same discipline
     `check_metrics_freshness`'s own gap-in-the-data handling already holds.
+
+    Task 724: caught live this hour, a case the original version got
+    backwards. `fencepost/REPORTS/2026-08-13.md` was resealed at 13:05:41Z
+    by `seam-scan.yml`'s automatic cron run with `github_events_source:
+    "direct"` (a real unproxied `api.github.com` fetch covering the FULL
+    history) reading 146 milestone commits. The very next session's own
+    live rescan, built from this sandbox's local `github-events-cache.json`
+    (`github_events_source: "override"` -- this sandbox's outbound
+    `api.github.com` access is 403'd, so every session here has only ever
+    been able to grow that cache by small incremental deltas, never a full
+    from-scratch fetch) read 135 -- a real, reproducible 11-commit
+    undercount, not noise. The pre-existing logic would have called this
+    "report is STALE, reseal it" and, followed literally, overwritten an
+    already-correct, more-complete 146 with a wrong, smaller 135 -- the
+    exact false-negative direction Ogun's law exists to catch, just one
+    this checker itself was capable of causing rather than catching.
+    `live_source`/`report_source` (both optional, default `None` --
+    existing callers that don't pass them keep the exact old behavior)
+    let a caller who has both scans' own `github_events_source` field
+    name which one produced by the fuller method: a lower live count is
+    only ever treated as "cache is behind the already-more-authoritative
+    report, do not reseal down" when the currently-sealed report was
+    itself `"direct"`-sourced and this hour's live scan was not. Every
+    other shape (higher live count in either direction, both sides the
+    same source class, source unknown) keeps comparing on the numbers
+    alone, exactly as before -- this guard only ever prevents a downgrade,
+    never blocks a real reseal upward or a same-source drift catch.
     """
     if report_text is None:
         return {
@@ -87,6 +116,24 @@ def compute_report_accuracy(
         return {"clean": True, "reason": "live scan's own detail text carries no milestone-commit sentence to compare"}
     if report_count == live_count:
         return {"clean": True, "reason": f"report's {report_count} matches this hour's live scan"}
+    if (
+        live_count < report_count
+        and report_source == "direct"
+        and live_source is not None
+        and live_source != "direct"
+    ):
+        return {
+            "clean": True,
+            "reason": (
+                f"report's {report_count} milestone commit(s) ({report_source}-sourced) exceeds this "
+                f"hour's {live_count} ({live_source}-sourced) -- the local cache is behind the "
+                f"already-more-authoritative direct-sourced report, not the other way around; do NOT "
+                f"reseal down"
+            ),
+            "report_count": report_count,
+            "live_count": live_count,
+            "cache_behind_direct": True,
+        }
     return {
         "clean": False,
         "reason": (
@@ -98,6 +145,28 @@ def compute_report_accuracy(
     }
 
 
+def _sibling_candidates_source(report_path: str) -> str | None:
+    """Task 724: a report at `.../REPORTS/<date>.md` has a sibling
+    `.../candidates/<date>.json` one directory over -- read live and
+    written by the same scan that sealed the report, carrying the exact
+    `github_events_source` ("direct" or "override") that scan used. `None`
+    on any miss (different naming, file absent, unparseable) -- the CLI
+    then falls back to the old source-blind comparison rather than
+    guessing."""
+    import os
+
+    reports_dir, filename = os.path.split(report_path)
+    root_dir = os.path.dirname(reports_dir)
+    candidates_path = os.path.join(root_dir, "candidates", filename.replace(".md", ".json"))
+    try:
+        with open(candidates_path, encoding="utf-8") as f:
+            data = json.load(f)
+    except (OSError, ValueError):
+        return None
+    source = data.get("github_events_source")
+    return source if isinstance(source, str) else None
+
+
 if __name__ == "__main__":
     argv = sys.argv[1:]
     if len(argv) < 3 or argv[0] != "check":
@@ -107,6 +176,13 @@ if __name__ == "__main__":
         report_text = f.read()
     with open(argv[2], encoding="utf-8") as f:
         scan_result = json.load(f)
-    out = compute_report_accuracy(report_text, scan_result.get("primary_gap"))
+    report_source = _sibling_candidates_source(argv[1])
+    live_source = scan_result.get("github_events_source")
+    out = compute_report_accuracy(
+        report_text,
+        scan_result.get("primary_gap"),
+        live_source=live_source if isinstance(live_source, str) else None,
+        report_source=report_source,
+    )
     print(out["reason"])
     sys.exit(0 if out["clean"] else 1)
