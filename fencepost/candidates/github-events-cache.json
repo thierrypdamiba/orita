@@ -21942,5 +21942,61 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/6c2e2c4bd328dee2a9613610ac6d9c19e8a74ead",
     "ts": "2026-08-12T22:51:17Z",
     "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "1c1e241",
+    "title": "roadmap: task 710 WIP (off-by-one, rotation pick)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/1c1e24111b856887dca9558a8c761c6d5bd00bbb",
+    "ts": "2026-08-12T23:25:23Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "e712b88",
+    "title": "fencepost: hourly dogfood, ingest 8 delta commits into events cache (2735 -> 2743)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/e712b88e42df197a27ba2f68763821dc1c1bed3c",
+    "ts": "2026-08-12T23:29:07Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "875e24a",
+    "title": "scan.py: coincidence_candidates named a different 5 than it meant to",
+    "url": "https://github.com/thierrypdamiba/orita/commit/875e24a3c3afb2b2d26b71da355d0130b28a7533",
+    "ts": "2026-08-12T23:34:13Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "ef96db0",
+    "title": "roadmap+buildlog: task 710 DONE (scan.py coincidence-evidence determinism fix)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/ef96db0bb0c4b8d6b30ebe412607bf0edc5f0a54",
+    "ts": "2026-08-12T23:35:47Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "64113c7",
+    "title": "ledger: seal task 710 (scan.py coincidence-evidence fix, seq 1552)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/64113c733032e856911406a67bd5a4aa95bffff9",
+    "ts": "2026-08-12T23:35:53Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "3bf7bf6",
+    "title": "hand: X recheck (X_WhoAmI ok, X_GetUserTweets forbidden) -- X_PostTweet's own live probe skipped this hour: no post was due regardless (change gate: gap unchanged, task 710 internal hardening), so a live write-tool probe wasn't worth the risk of an unintended real post. No change to the recorded outage status.",
+    "url": "https://github.com/thierrypdamiba/orita/commit/3bf7bf6db8d01b3448d350f4f76b2d2ea6428dcc",
+    "ts": "2026-08-12T23:38:14Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "0e717a5",
+    "title": "scribe growth log: record post-push ritual_check.py size reading (task 710)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/0e717a51b68645baadda51bf14d0832a19cdf76f",
+    "ts": "2026-08-12T23:40:59Z",
+    "author": "Nisaba"
   }
 ]
