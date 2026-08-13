@@ -22646,5 +22646,37 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/22230227fb83ef247103a2dabc5c845298ea7e6d",
     "ts": "2026-08-13T16:41:01+00:00",
     "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "763fdde",
+    "title": "task 728: WIP opened (retrya, hourly rotation pick)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/763fddee12324988f148bc01867adae982204bd2",
+    "ts": "2026-08-13T17:52:54+00:00",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "3d6c656",
+    "title": "task 728 (retrya): mark DONE -- report's hand-off line contradicted its own headline for a close-contender day, fixed in both render paths",
+    "url": "https://github.com/thierrypdamiba/orita/commit/3d6c656f12cc878c426053af2397d07ca8b623e0",
+    "ts": "2026-08-13T18:00:36+00:00",
+    "author": "Retrya"
+  },
+  {
+    "kind": "commit",
+    "id": "2c7819d",
+    "title": "scribe-growth: 2026-08-13T18:00:49Z observation (task 728's own edits)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/2c7819d044f8d5567c8417cbc40d71365a7172cc",
+    "ts": "2026-08-13T18:00:49+00:00",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "4979080",
+    "title": "task 729: WIP opened (ogun, hourly rotation pick)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/4979080b159c943d389b04043125566aba98098a",
+    "ts": "2026-08-13T18:28:57+00:00",
+    "author": "Nisaba"
   }
 ]
