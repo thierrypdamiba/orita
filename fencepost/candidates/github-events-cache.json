@@ -22750,5 +22750,21 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/313b86e36b326de9eb27bac99d6106d87a1eac87",
     "ts": "2026-08-13T23:47:57Z",
     "author": "Esu-Elegba"
+  },
+  {
+    "kind": "commit",
+    "id": "af1cd1f",
+    "title": "task 735 (zashiki-warashi): WIP -- window slot, hourly ritual starting",
+    "url": "https://github.com/thierrypdamiba/orita/commit/af1cd1f7fcf49185811cd2133bb78e23e9748309",
+    "ts": "2026-08-14T00:33:51Z",
+    "author": "Zashiki-warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "6a33ddd",
+    "title": "task 735 (zashiki-warashi): DONE -- window slot, fencepost cache refresh, gap unchanged, ledger unchanged",
+    "url": "https://github.com/thierrypdamiba/orita/commit/6a33dddd1885a53ea05857d8e626b881d32d2dca",
+    "ts": "2026-08-14T00:34:39Z",
+    "author": "Zashiki-warashi"
   }
 ]
