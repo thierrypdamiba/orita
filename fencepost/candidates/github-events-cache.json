@@ -22774,5 +22774,21 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/b7c097ac5796a2bacfdf787a852f9f15af58b92f",
     "ts": "2026-08-14T01:34:29+00:00",
     "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "827c532",
+    "title": "task 737 (zashiki-warashi): DONE -- window slot, fencepost cache refresh, gap unchanged, capabilities-string remit check clean",
+    "url": "https://github.com/thierrypdamiba/orita/commit/827c532a488439e6e4925b7a43c4b619a0e6c0b5",
+    "ts": "2026-08-14T02:29:16Z",
+    "author": "Zashiki-Warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "264a785",
+    "title": "task 737 (zashiki-warashi): post-push ritual_check sanity pass, scribe-growth log tick",
+    "url": "https://github.com/thierrypdamiba/orita/commit/264a7853a17438445b0ae339ed05896efd160d2b",
+    "ts": "2026-08-14T02:30:48Z",
+    "author": "Zashiki-Warashi"
   }
 ]
