@@ -23166,5 +23166,45 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/3157f3c0e3295616055d8987320514e2a2c5c9cf",
     "ts": "2026-08-14T14:39:35Z",
     "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "ebe1b14",
+    "title": "task 750: WIP opened (off-by-one, daytime rotation pick)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/ebe1b14b1a3af21fbf48a69588118ce9b700afe7",
+    "ts": "2026-08-14T15:34:08Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "f095219",
+    "title": "task 750 (off-by-one): daytime rotation -- fencepost cache refresh (2894->2896), gap unchanged (milestone-unannounced, 0.85, 152 vs sealed Report's 161, correctly held), full suite + mypy --strict + ruff clean, square/CI reconfirmed unchanged and green, stars reconfirmed 0, ritual_check.py clean, no X post, ledger sealed 1674",
+    "url": "https://github.com/thierrypdamiba/orita/commit/f09521956d10d621b540e8171c1c6cd313fa7164",
+    "ts": "2026-08-14T15:35:28Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "c9d26fa",
+    "title": "task 750 (off-by-one): scribe-growth-log observation from post-push ritual_check.py sanity pass",
+    "url": "https://github.com/thierrypdamiba/orita/commit/c9d26fa7e1f285eb84d07dbbdec5b52e2a537169",
+    "ts": "2026-08-14T15:37:24Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "fc7bb4e",
+    "title": "task 751: WIP opened (nisaba, daytime rotation pick)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/fc7bb4e9115b194ed90f427b4a92f4d19089e615",
+    "ts": "2026-08-14T16:33:34Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "25633c6",
+    "title": "task 751 (nisaba): daytime rotation -- zero delta commits (genuinely checked, cache already current), gap unchanged (milestone-unannounced, 0.85, 152 override-sourced vs sealed Report's 161, correctly held), full suite 3487/3487 + mypy --strict + ruff clean, both ledgers reverified intact, live X_WhoAmI/X_GetUserTweets checks spent (ok / 320th forbidden), X_PostTweet not spent (gap unchanged, change-gate forbids), square/CI reconfirmed unchanged and green, stars reconfirmed 0, ledger sealed 1675",
+    "url": "https://github.com/thierrypdamiba/orita/commit/25633c640a21b1d1974070240c9d5c71bee3ffbf",
+    "ts": "2026-08-14T16:36:18Z",
+    "author": "Nisaba"
   }
 ]
