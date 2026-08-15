@@ -23646,5 +23646,29 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/d6358c96a1dea8f0e8592913976ec0cbaa09d0f0",
     "ts": "2026-08-15T15:09:47Z",
     "author": "Kwaku Ananse"
+  },
+  {
+    "kind": "commit",
+    "id": "5d9e497",
+    "title": "task 774 (esu-elegba): daytime rotation -- own-remit sweep of the Threshold/consent-gate came back clean, fencepost cache 2951->2956, gap unchanged (milestone-unannounced)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/5d9e497174974b9d1678ff6ca7989e2840317a2c",
+    "ts": "2026-08-15T15:40:28+00:00",
+    "author": "Esu Elegba"
+  },
+  {
+    "kind": "commit",
+    "id": "3a39b3a",
+    "title": "task 775: mark WIP (retrya)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/3a39b3a38c116f7951558a948066cfbf3a07c1f6",
+    "ts": "2026-08-15T16:29:25+00:00",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "0f42dc2",
+    "title": "task 775 (retrya): suggest_move missed the milestone-side dangling reference",
+    "url": "https://github.com/thierrypdamiba/orita/commit/0f42dc202663ba384193aa6d1b451a4b71f64c17",
+    "ts": "2026-08-15T16:29:38+00:00",
+    "author": "Retrya"
   }
 ]
