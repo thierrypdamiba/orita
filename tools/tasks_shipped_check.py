@@ -68,7 +68,17 @@ DEFAULT_BUILDLOG_PATH = os.path.join(ROOT, "BUILDLOG.md")
 
 _ROW_RE = re.compile(r"^(\d{4}-\d{2}-\d{2}) [^|\n]*\|([^|\n]*)\|([^|\n]*)\|")
 _NUM_RE = re.compile(r"\d+")
-_AGGREGATE_RE = re.compile(r"daily aggregate", re.IGNORECASE)
+# Task 778: the town's own git commit messages for this work spell it
+# hyphenated ("18:00 UTC daily-aggregate metrics.jsonl reading") while
+# BUILDLOG.md's established row convention (task 753's precedent) spells
+# it with a space ("daytime rotation + 18:00 UTC daily aggregate"). A row
+# written before its hour's daily-aggregate commit landed (task 777) never
+# got the space-separated phrase folded back in, and the space-only regex
+# read the day as having no aggregate row at all -- real ground truth
+# silently became None while a real claimed count stood, breaking the
+# live cross-check in RealLiveStateCase. Matches either spelling now so a
+# future row using either punctuation is still found.
+_AGGREGATE_RE = re.compile(r"daily[- ]aggregate", re.IGNORECASE)
 
 # Task 508: consolidated into tools/metrics_reader.py -- six sibling
 # checks each carried a byte-identical copy of this reader, invisible to

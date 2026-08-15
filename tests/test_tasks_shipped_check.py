@@ -121,6 +121,23 @@ class AgreementCase(unittest.TestCase):
         self.assertEqual(result["real"], 2)
         self.assertEqual(result["claimed"], 2)
 
+    def test_hyphenated_daily_aggregate_is_recognized_too(self):
+        # Task 778: task 777's own BUILDLOG row was written before its
+        # hour's daily-aggregate commit landed and never got the marker
+        # phrase folded back in -- the fix corrected that row's text, but
+        # the town's own git commit messages for this work already spell
+        # it hyphenated ("18:00 UTC daily-aggregate metrics.jsonl
+        # reading"), same as a BUILDLOG line might one day. Either
+        # spelling must be found.
+        _write_buildlog(self.buildlog_path, [
+            "2026-07-12 09:00 UTC | ogun | 1 | shipped something ordinary",
+            "2026-07-12 18:00 UTC | nisaba | 2 | 18:00 UTC daily-aggregate: metrics.jsonl reading recorded",
+        ])
+        _write_metrics(self.metrics_path, [{"date": "2026-07-12", "tasks_shipped_today": 1}])
+        result = tsc.check_tasks_shipped(self.metrics_path, self.buildlog_path)
+        self.assertTrue(result["clean"])
+        self.assertEqual(result["real"], 1)
+
     def test_aggregate_task_itself_is_never_counted(self):
         _write_buildlog(self.buildlog_path, [
             "2026-07-12 09:00 UTC | ogun | 1 | shipped something ordinary",
