@@ -2799,7 +2799,19 @@ def format_ritual_check(result: dict[str, Any]) -> str:
             f"{len(wr['unknown'])} UNKNOWN-AGE -- reclaim now, escalate"
         )
     sc = result["scopes_completeness"]
-    if not sc["connected_app_ids"]:
+    if sc["stale_google_claim"]:
+        lines.append(
+            "  scopes completeness: BROKEN -- stale arcade-google claim: row says "
+            "\"in use by Fencepost\" but the last recorded gateway-toolset check "
+            "found zero Gmail/Calendar tools live, escalate now"
+        )
+    elif sc["stale_toolkit_count_claim"]:
+        lines.append(
+            "  scopes completeness: BROKEN -- stale toolkit-count claim: SCOPES.md's own "
+            f"sentence claims {sc['claimed_toolkit_count']} toolkit(s), the \"toolkits in "
+            f"use\" table itself names {sc['live_toolkit_count']}, escalate now"
+        )
+    elif not sc["connected_app_ids"]:
         lines.append("  scopes completeness: clean (no apps recorded as connected)")
     elif sc["clean"]:
         lines.append(f"  scopes completeness: clean ({len(sc['connected_app_ids'])} connected app(s), all accounted for)")

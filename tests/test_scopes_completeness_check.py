@@ -262,5 +262,144 @@ class RealDocCase(unittest.TestCase):
             self.assertTrue(restored_result["clean"])
 
 
+class ToolkitCountClaimCase(unittest.TestCase):
+    """Task 781 (Esu-Elegba). `SCOPES.md`'s own "Task 135. The table above
+    names the {N} toolkits..." sentence had said "four" since the day it
+    was written, while tasks 599/600 later grew the "Concretely, on the
+    toolkits in use:" table it describes to six rows (Slack, Linear) --
+    nothing had ever counted the table's real rows against that sentence's
+    number-word, so the two silently disagreed for weeks. These tests
+    prove `_toolkit_table_row_count`/`_claimed_toolkit_count` read the
+    live table and the live claim independently, and that
+    `check_scopes_completeness` flips `stale_toolkit_count_claim` (and
+    therefore `clean`) the moment they disagree -- never silently, and
+    never conflated with `stale_google_claim`'s own, different staleness
+    class in the same result dict."""
+
+    _TABLE_TEXT = """Concretely, on the toolkits in use:
+
+| toolkit | Fencepost uses | Fencepost may NEVER use |
+|--|--|--|
+| GitHub | GetRepository | CreateFile |
+| X | GetUserTweets | PostTweet |
+| Gmail (v0.2) | ListEmails | SendEmail |
+| Google Calendar (v0.2) | ListEvents | CreateEvent |
+| Slack (proposed) | SearchChannelMessages | PostMessage |
+| Linear (proposed) | SearchIssueComments | CreateIssue |
+
+**WIP note (ROADMAP.md #653):** some unrelated trailing prose that must
+never be counted as a seventh table row.
+
+## Every connected app, accounted for
+
+*Task 135. The table above names the {word} toolkits Fencepost's own code
+uses. It says nothing about what else the shared gateway can reach.*
+
+| app_id | status |
+|--|--|
+| `arcade-github` | in use by Fencepost |
+
+## The oath
+
+1. some other section
+"""
+
+    def _scopes_text(self, word):
+        return self._TABLE_TEXT.format(word=word)
+
+    def _write(self, tmpdir, word, connected_app_ids=("arcade-github",)):
+        scopes_path = os.path.join(tmpdir, "SCOPES.md")
+        with open(scopes_path, "w") as f:
+            f.write(self._scopes_text(word))
+        log_path = os.path.join(tmpdir, "log.jsonl")
+        with open(log_path, "w") as f:
+            f.write(json.dumps({"connected_app_ids": list(connected_app_ids), "checked_at": "2026-08-15T22:00:00+00:00"}) + "\n")
+        return scopes_path, log_path
+
+    def test_live_table_row_count_is_six_never_hardcoded(self):
+        self.assertEqual(scc._toolkit_table_row_count(self._scopes_text("six")), 6)
+
+    def test_trailing_wip_note_prose_is_not_counted_as_a_row(self):
+        text = self._scopes_text("six")
+        self.assertIn("WIP note", text)
+        self.assertEqual(scc._toolkit_table_row_count(text), 6)
+
+    def test_missing_table_reads_zero_not_error(self):
+        self.assertEqual(scc._toolkit_table_row_count("# no table here\n"), 0)
+
+    def test_claimed_count_parses_the_number_word(self):
+        self.assertEqual(scc._claimed_toolkit_count(self._scopes_text("six")), 6)
+        self.assertEqual(scc._claimed_toolkit_count(self._scopes_text("four")), 4)
+
+    def test_missing_claim_sentence_returns_none_not_error(self):
+        self.assertIsNone(scc._claimed_toolkit_count("# no claim sentence here\n"))
+
+    def test_matching_claim_reads_clean(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            scopes_path, log_path = self._write(tmpdir, "six")
+            result = scc.check_scopes_completeness(scopes_path=scopes_path, app_log_path=log_path)
+            self.assertFalse(result["stale_toolkit_count_claim"])
+            self.assertTrue(result["clean"])
+            self.assertEqual(result["claimed_toolkit_count"], 6)
+            self.assertEqual(result["live_toolkit_count"], 6)
+
+    def test_stale_four_claim_against_a_live_six_row_table_is_flagged(self):
+        """The exact real-world drift this task found: the sentence still
+        said "four" after the table had grown to six rows."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            scopes_path, log_path = self._write(tmpdir, "four")
+            result = scc.check_scopes_completeness(scopes_path=scopes_path, app_log_path=log_path)
+            self.assertTrue(result["stale_toolkit_count_claim"])
+            self.assertFalse(result["clean"])
+            self.assertEqual(result["claimed_toolkit_count"], 4)
+            self.assertEqual(result["live_toolkit_count"], 6)
+            self.assertIn("stale toolkit-count claim", scc.format_result(result))
+
+    def test_stale_claim_is_reported_even_with_zero_connected_apps(self):
+        """The claim is about SCOPES.md's own table, independent of
+        anything in arcade_app_watch.py's connected-apps log -- must not
+        be masked by the "no apps recorded as connected" clean-looking
+        path the way `format_ritual_check`'s old branch order could have
+        let happen before this task reordered it."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            scopes_path, log_path = self._write(tmpdir, "four", connected_app_ids=())
+            result = scc.check_scopes_completeness(scopes_path=scopes_path, app_log_path=log_path)
+            self.assertEqual(result["connected_app_ids"], [])
+            self.assertTrue(result["stale_toolkit_count_claim"])
+            self.assertFalse(result["clean"])
+
+    def test_real_live_scopes_md_claim_matches_its_own_real_table(self):
+        """Hand-verification against the actual repo file: proves this
+        task's own fix (four -> six) is real, not just true against a
+        synthetic fixture."""
+        result = scc.check_scopes_completeness()
+        self.assertFalse(result["stale_toolkit_count_claim"])
+        self.assertEqual(result["claimed_toolkit_count"], 6)
+        self.assertEqual(result["live_toolkit_count"], 6)
+
+    def test_mutating_the_real_file_back_to_four_is_caught(self):
+        """The same before/after discipline `test_consent_doctrine.py`'s
+        own `test_parser_actually_detects_drift_not_just_tautologically_
+        passes` holds itself to: mutate a COPY of the real, live SCOPES.md
+        the exact way it read before this task's fix, and prove the real
+        parser used above disagrees -- so this file's silence on a future
+        drift can't be mistaken for a check that would pass no matter what
+        the doc said."""
+        with open(scc.DEFAULT_SCOPES_PATH, encoding="utf-8") as f:
+            real_text = f.read()
+        real_sentence = "table above names the six toolkits"
+        self.assertIn(real_sentence, real_text, "SCOPES.md's claim sentence has already changed shape -- update this fixture")
+        mutated_text = real_text.replace(real_sentence, "table above names the four toolkits")
+        self.assertNotEqual(mutated_text, real_text)
+        with tempfile.TemporaryDirectory() as tmpdir:
+            mutated_path = os.path.join(tmpdir, "SCOPES.md")
+            with open(mutated_path, "w") as f:
+                f.write(mutated_text)
+            result = scc.check_scopes_completeness(scopes_path=mutated_path, app_log_path=scc.DEFAULT_APP_LOG_PATH)
+            self.assertTrue(result["stale_toolkit_count_claim"])
+            self.assertEqual(result["claimed_toolkit_count"], 4)
+            self.assertEqual(result["live_toolkit_count"], 6)
+
+
 if __name__ == "__main__":
     unittest.main()

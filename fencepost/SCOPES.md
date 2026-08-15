@@ -139,7 +139,7 @@ the claim quietly aging past whatever it says.
 
 ## Every connected app, accounted for
 
-*Task 135. The table above names the four toolkits Fencepost's own code uses. It says nothing about what else the-hand's shared gateway can already reach — an Oath that stays silent on that is not the complete account of risk surface. `tools/arcade_app_watch.py`'s durable log is the source of truth; this section is re-derived from its last recorded state, never typed from memory.*
+*Task 135. The table above names the six toolkits Fencepost's own code uses. It says nothing about what else the-hand's shared gateway can already reach — an Oath that stays silent on that is not the complete account of risk surface. `tools/arcade_app_watch.py`'s durable log is the source of truth; this section is re-derived from its last recorded state, never typed from memory.*
 
 | app_id | status |
 |--|--|

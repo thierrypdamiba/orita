@@ -4335,5 +4335,93 @@ class GoodFirstIssuesFoldCase(unittest.TestCase):
         self.assertIn("[42]", formatted)
 
 
+class ScopesCompletenessFoldCase(unittest.TestCase):
+    """Task 781 (Esu-Elegba). `check_scopes_completeness`/its printed line
+    had never been exercised by a fold test at all -- not even the
+    `stale_google_claim` path task 542 added. That gap was live: the old
+    printed-block code checked `not sc["connected_app_ids"]` BEFORE
+    `sc["clean"]`, so a stale doc claim on a SCOPES.md with zero connected
+    apps recorded would have printed the clean-looking "no apps recorded
+    as connected" line instead of surfacing the real problem -- true for
+    `stale_google_claim` from the day task 542 shipped it, and would have
+    been true for this task's own new `stale_toolkit_count_claim` too, had
+    the branch order not been fixed in the same commit. These tests prove
+    both stale-claim branches are checked first and always name the real
+    reason, for both fields, with and without connected apps on record."""
+
+    _TABLE_AND_CLAIM = """Concretely, on the toolkits in use:
+
+| toolkit | Fencepost uses | Fencepost may NEVER use |
+|--|--|--|
+| GitHub | GetRepository | CreateFile |
+| X | GetUserTweets | PostTweet |
+| Gmail (v0.2) | ListEmails | SendEmail |
+| Google Calendar (v0.2) | ListEvents | CreateEvent |
+| Slack (proposed) | SearchChannelMessages | PostMessage |
+| Linear (proposed) | SearchIssueComments | CreateIssue |
+
+**WIP note:** trailing prose, not a seventh row.
+
+## Every connected app, accounted for
+
+*Task 135. The table above names the {word} toolkits Fencepost's own code
+uses.*
+
+| app_id | status |
+|--|--|
+"""
+
+    def _write(self, tmpdir, word, app_rows="| `arcade-github` | in use by Fencepost |\n"):
+        scopes_path = os.path.join(tmpdir, "SCOPES.md")
+        with open(scopes_path, "w") as f:
+            f.write(self._TABLE_AND_CLAIM.format(word=word) + app_rows)
+        log_path = os.path.join(tmpdir, "log.jsonl")
+        with open(log_path, "w") as f:
+            f.write(json.dumps({"connected_app_ids": ["arcade-github"], "checked_at": "2026-08-15T22:00:00+00:00"}) + "\n")
+        return scopes_path, log_path
+
+    def test_matching_claim_reads_clean_in_the_printed_block(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            scopes_path, log_path = self._write(tmpdir, "six")
+            result = rc.run_ritual_check(scopes_path=scopes_path, app_log_path=log_path)
+            self.assertTrue(result["scopes_completeness"]["clean"])
+            formatted = rc.format_ritual_check(result)
+            self.assertIn("scopes completeness: clean", formatted)
+
+    def test_stale_toolkit_count_claim_names_the_real_reason_not_missing_apps(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            scopes_path, log_path = self._write(tmpdir, "four")
+            result = rc.run_ritual_check(scopes_path=scopes_path, app_log_path=log_path)
+            self.assertTrue(result["scopes_completeness"]["stale_toolkit_count_claim"])
+            self.assertFalse(result["scopes_completeness"]["clean"])
+            formatted = rc.format_ritual_check(result)
+            self.assertIn("stale toolkit-count claim", formatted)
+            self.assertNotIn("undocumented connected app(s)", formatted)
+
+    def test_stale_toolkit_count_claim_is_not_masked_by_zero_connected_apps(self):
+        """The exact latent-gap shape this task's own fix closes: a stale
+        doc claim must surface even when nothing is recorded as connected
+        at all, not be swallowed by the "no apps recorded" clean-looking
+        branch."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            scopes_path = os.path.join(tmpdir, "SCOPES.md")
+            with open(scopes_path, "w") as f:
+                f.write(self._TABLE_AND_CLAIM.format(word="four"))
+            log_path = os.path.join(tmpdir, "empty-log.jsonl")
+            with open(log_path, "w") as f:
+                f.write(json.dumps({"connected_app_ids": [], "checked_at": "2026-08-15T22:00:00+00:00"}) + "\n")
+            result = rc.run_ritual_check(scopes_path=scopes_path, app_log_path=log_path)
+            self.assertEqual(result["scopes_completeness"]["connected_app_ids"], [])
+            self.assertTrue(result["scopes_completeness"]["stale_toolkit_count_claim"])
+            formatted = rc.format_ritual_check(result)
+            self.assertIn("stale toolkit-count claim", formatted)
+            self.assertNotIn("no apps recorded as connected", formatted)
+
+    def test_real_live_scopes_md_reads_clean_end_to_end(self):
+        result = rc.run_ritual_check()
+        self.assertTrue(result["scopes_completeness"]["clean"], msg=result["scopes_completeness"])
+        self.assertFalse(result["broken"])
+
+
 if __name__ == "__main__":
     unittest.main()
