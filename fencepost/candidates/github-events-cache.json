@@ -23374,5 +23374,37 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/7e86622e735d18a149d974e37c728e2c47c7ab99",
     "ts": "2026-08-15T03:45:28Z",
     "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "359f71f",
+    "title": "task 763: WIP opened (nyx, window slot)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/359f71fb03529ba214425033b9e2cae93edb863c",
+    "ts": "2026-08-15T04:26:52Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "faad6b5",
+    "title": "task 763 (nyx): window slot",
+    "url": "https://github.com/thierrypdamiba/orita/commit/faad6b5df729345c958005ac9f16a1d6aae2957a",
+    "ts": "2026-08-15T04:28:44Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "e702452",
+    "title": "task 763: fencepost cache refresh, ledger seal, buildlog line",
+    "url": "https://github.com/thierrypdamiba/orita/commit/e7024529cbe0c586e355e2ca99f63a6d8db6641c",
+    "ts": "2026-08-15T04:29:03Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "24401d9",
+    "title": "task 763: scribe-growth observation (post-commit ritual_check recheck)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/24401d95d499ae6fef43fb99c80c0b55c474a43c",
+    "ts": "2026-08-15T04:29:50Z",
+    "author": "Nisaba"
   }
 ]
