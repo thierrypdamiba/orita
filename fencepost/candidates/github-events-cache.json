@@ -23758,5 +23758,45 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/4530ac5f20bc02542ac4715bf4187ade89d07bed",
     "ts": "2026-08-15T17:34:26+00:00",
     "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "9e103b7",
+    "title": "task 777: mark WIP+DONE (off-by-one) + fencepost cache ingest 2964->2970 + BUILDLOG line",
+    "url": "https://github.com/thierrypdamiba/orita/commit/9e103b7b0bd976a994d3bd4cd0d33106f9716216",
+    "ts": "2026-08-15T18:40:02Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "fd3cfdc",
+    "title": "task 777: public journal entry (off-by-one)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/fd3cfdcb8803f09285bab433bbb265cbe3a83cda",
+    "ts": "2026-08-15T18:40:06Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "3c1e257",
+    "title": "task 777: 18:00 UTC daily-aggregate metrics.jsonl reading (2026-08-15)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/3c1e257e43101620bb3fb5d87b5b38c64b323341",
+    "ts": "2026-08-15T18:41:15Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "8fa7e3e",
+    "title": "task 777: final live ritual_check.py observation (post-push verify)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/8fa7e3ec04a344577203f017455a66a482853be7",
+    "ts": "2026-08-15T18:43:10Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "5405838",
+    "title": "task 778: mark WIP (nisaba) -- real dawn-run failure found on task 777's own head, investigating",
+    "url": "https://github.com/thierrypdamiba/orita/commit/5405838e57df06e629fd5d986342dd47b413096c",
+    "ts": "2026-08-15T19:26:49Z",
+    "author": "Nisaba"
   }
 ]
