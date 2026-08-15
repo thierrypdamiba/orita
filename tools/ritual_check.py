@@ -351,6 +351,10 @@ def _report_accuracy_check() -> ModuleType:
     return _load("_ritual_report_accuracy_check", os.path.join(ROOT, "tools", "report_accuracy_check.py"))
 
 
+def _report_regression_check() -> ModuleType:
+    return _load("_ritual_report_regression_check", os.path.join(ROOT, "tools", "report_regression_check.py"))
+
+
 def _ritual_completeness_check() -> ModuleType:
     return _load("_ritual_completeness_check", os.path.join(ROOT, "tools", "ritual_completeness_check.py"))
 
@@ -1246,6 +1250,28 @@ def check_report_accuracy(
             report_source=report_source,
         ),
     )
+
+
+def check_report_regression(reports_dir: str | None = None) -> dict[str, object]:
+    """Task 773: fold `report_regression_check.py`'s own day-over-day
+    milestone-count regression scan into the one block. Unconditional,
+    local-filesystem-only (reads every sealed `fencepost/REPORTS/*.md`
+    already on disk, no network) -- walks them in date order and flags
+    any "N milestone commit(s) since &lt;date&gt;" running total that
+    reads LOWER than the previous sealed tablet's own claim and isn't
+    already named in `report_regression_check.SEEDED_EXCEPTIONS`. Two
+    historical drops (2026-07-12 -> 07-13, 2026-07-13 -> 07-18, both from
+    the town's first week, both documented in `fencepost/AUDIT.md`'s
+    "Known anomalies" section) are seeded; a THIRD, unseeded drop flips
+    `broken` -- caught the hour it happens, unlike the two that sat
+    silent for over a month before an Explore sweep of the narrative
+    remit found them."""
+    mod = _report_regression_check()
+    kwargs = {}
+    if reports_dir is not None:
+        kwargs["reports_dir"] = reports_dir
+    counts = mod.read_report_counts(**kwargs)
+    return cast(dict[str, object], mod.compute_report_regression(counts))
 
 
 def check_ritual_completeness(
@@ -2282,6 +2308,7 @@ def run_ritual_check(
     fencepost = check_fencepost_ledger(fencepost_base)
     report = check_report_freshness(now)
     report_accuracy = check_report_accuracy(report, live_scan)
+    report_regression = check_report_regression()
     recheck = check_x_recheck(now_iso)
     escalation = check_x_escalation(now_iso)
     square = check_square(square_state, now_iso)
@@ -2445,6 +2472,7 @@ def run_ritual_check(
         or (not github_stars["clean"])
         or (not escape_sequences["clean"])
         or (not metrics_field_completeness["clean"])
+        or (not report_regression["clean"])
     )
     return {
         "now": now_iso,
@@ -2453,6 +2481,7 @@ def run_ritual_check(
         "fencepost_ledger": fencepost,
         "report": report,
         "report_accuracy": report_accuracy,
+        "report_regression": report_regression,
         "x_recheck": recheck,
         "x_escalation": escalation,
         "square": square,
@@ -2544,6 +2573,8 @@ def format_ritual_check(result: dict[str, Any]) -> str:
         lines.append(f"  report: STALE -- no report for {r['date']} or the day before")
     ra = result["report_accuracy"]
     lines.append(f"  report accuracy: {'clean' if ra['clean'] else 'STALE'} -- {ra['reason']}")
+    rr = result["report_regression"]
+    lines.append(f"  report regression: {'clean' if rr['clean'] else 'REGRESSED'} -- {rr['reason']}")
     for tool, info in result["x_recheck"].items():
         lines.append(f"  {tool}: {'due' if info['due'] else 'not due'} -- {info['status_line']}")
     for tool, info in result["x_escalation"].items():

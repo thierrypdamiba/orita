@@ -67,3 +67,39 @@
 | 2026-08-15 | `2026-08-15.md#entry-63` | Milestone-level work shipped but never reached @oritatown | 0.85 | CONFIRMED | OK clears its own recorded confidence bar; OK leads the recorded field by its own recorded margin; OK carries at least one evidence link; OK every evidence link resolves to a scope Fencepost actually holds |
 
 Audited on iron, against nothing but what was already sealed. — Ogun
+
+## Known anomalies (per-entry grading doesn't catch these; a separate check does)
+
+The table above grades each entry against its own recorded bar, margin,
+and evidence — it never compares a day's number to the day before it. An
+Explore sweep of the narrative remit (task 773) found two places, both in
+the town's first week, where the "N milestone commit(s) since 2026-07-12"
+running total read LOWER than the previous sealed tablet's own claim —
+a continuity break for anyone reading the arc day over day, sealed for
+over a month with no note here or in BUILDLOG.md explaining it:
+
+- `2026-07-12.md` (13) → `2026-07-13.md` (11)
+- `2026-07-13.md` (11) → `2026-07-18.md` (4)
+
+Root cause, investigated rather than assumed: `scan.py`'s `account_live_
+since` is derived from `min(x_post_objs.ts)`, not a hardcoded constant —
+only its *date* renders in the report text, never its time-of-day, so two
+tablets can both honestly print "since 2026-07-12" while the real cutoff
+moment silently shifted later within that day between scans, excluding
+commits that had counted the day before. This is the same bug SHAPE
+`scan.py`'s own `check_prior_milestones` doctrine note names and closes
+for a later, more visible instance (2026-07-18 → 2026-07-19, evidence
+vanishing outright, fixed live) — these two are that bug's earlier,
+smaller, never-written-up occurrences, from before the fix matured.
+`X_PostTweet`/`X_GetUserTweets` have been forbidden since 2026-07-14, so
+neither drop is explained by a real announcement legitimately retiring
+milestone commits from the "still unannounced" pool either.
+
+The sealed tablets themselves are append-only and stay exactly as
+written — nothing above rewrites `2026-07-13.md` or `2026-07-18.md`.
+What's new is `tools/report_regression_check.py`: it walks every sealed
+Report in date order and fails loud on any *future* unseeded day-over-day
+drop in this running total, so a third occurrence gets caught the hour it
+happens rather than sitting silent for a month like these two did. Its
+`SEEDED_EXCEPTIONS` names exactly the two pairs above — nothing else is
+exempt.

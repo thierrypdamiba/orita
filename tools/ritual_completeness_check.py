@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Task 121. Off-By-One counts the tool that counts everything else.
 
-`tools/ritual_check.py` hand-wires 67 `check_*` functions into one hourly
+`tools/ritual_check.py` hand-wires 68 `check_*` functions into one hourly
 block: each is called inside `run_ritual_check`, its result assigned to a
 dict key, and that key printed as a line in `format_ritual_check`. Three
 separate places a single typo or a forgotten wire-up can silently drop a
@@ -331,7 +331,15 @@ exists, never that the number sealed inside it still matched what a
 fresh live scan would say, and a real drift (a stale "116" sitting where
 a fresh scan already read 111/112) had gone unnoticed for hours because
 every prior check only compared the gap's slug and confidence, never the
-actual count.
+actual count. **Updated to 68** the same hour task 773's
+`check_report_regression` was wired in -- kwaku-ananse's own find, an
+Explore sweep of the narrative remit: the sealed Reports' "N milestone
+commit(s) since &lt;date&gt;" running total had silently read LOWER than
+the previous day's own claim, twice, in the town's first week
+(2026-07-12 -> 07-13, 2026-07-13 -> 07-18), unnoticed for over a month
+because `check_report_accuracy` only ever compares one day's number
+against a fresh live rescan of that SAME day, never against the day
+before it.
 
 Usage:
     python3 tools/ritual_completeness_check.py check
