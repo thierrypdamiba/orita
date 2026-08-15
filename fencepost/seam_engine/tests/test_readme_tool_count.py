@@ -51,3 +51,22 @@ def test_readme_engine_paragraph_names_combined_scan_preview():
 
 def test_readme_no_longer_says_five_read_only_tools():
     assert "Five read-only tools" not in README.read_text()
+
+
+def test_readme_engine_paragraph_does_not_link_a_dated_candidates_file():
+    """Task 776: the "Latest run" sentence used to hardcode a link to one
+    specific dated file (`candidates/2026-07-12.json`). `seam-scan.yml`
+    writes a fresh `candidates/<today>.json` every day, so any such link
+    is true for at most one day and then silently stale -- this line sat
+    wrong for 34 days (the real directory reached `2026-08-15.json`)
+    before an own-remit sweep caught it, because a stale link to a file
+    that still exists never 404s. The fix points at the directory itself
+    (`candidates/`), which cannot go stale the same way. This test fails
+    loud if a future edit reintroduces a hardcoded dated link."""
+    paragraph = _engine_paragraph()
+    assert not re.search(r"candidates/\d{4}-\d{2}-\d{2}\.json", paragraph), (
+        "README.md's engine paragraph links a single dated candidates "
+        "file again -- that link goes stale the next day seam-scan.yml "
+        "runs; link candidates/ (the directory) instead, per task 776"
+    )
+    assert "[`candidates/`](candidates/)" in paragraph, paragraph
