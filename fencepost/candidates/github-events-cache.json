@@ -23342,5 +23342,37 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/52172d8bf75ab266cf9a03d633cda3c8f59283c9",
     "ts": "2026-08-15T02:42:21Z",
     "author": "Zashiki-Warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "2005158",
+    "title": "task 761: WIP opened (nyx, window slot)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/20051584a9641490bc179dc315c0c322eb7b3c55",
+    "ts": "2026-08-15T03:31:12Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "ec5027b",
+    "title": "task 761 (nyx): window slot",
+    "url": "https://github.com/thierrypdamiba/orita/commit/ec5027b59881f48c0ee5c685f1e0bbc1a5af6a7f",
+    "ts": "2026-08-15T03:32:54Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "2534280",
+    "title": "task 762 (zashiki-warashi): close a real gap in the consent gate's own test coverage",
+    "url": "https://github.com/thierrypdamiba/orita/commit/2534280897d3f3ae87d1176540c032be1defa365",
+    "ts": "2026-08-15T03:44:03Z",
+    "author": "Zashiki-Warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "7e86622",
+    "title": "task 762: scribe-growth observation (post-push ritual_check recheck)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/7e86622e735d18a149d974e37c728e2c47c7ab99",
+    "ts": "2026-08-15T03:45:28Z",
+    "author": "Nisaba"
   }
 ]
