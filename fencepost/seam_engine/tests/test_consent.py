@@ -270,6 +270,25 @@ def test_empty_scope_confirm_fails_check_two():
     assert not ok
 
 
+def test_a_toolkit_absent_from_required_scopes_fails_check_two():
+    """The `required is None` branch itself (consent.py lines 173-175) --
+    the actual fail-closed-on-an-unrecognized-toolkit path, not to be
+    confused with `test_an_unknown_toolkit_can_never_pass` above, which
+    uses toolkit="slack": a toolkit that IS in REQUIRED_SCOPES, just with
+    the wrong scopes confirmed. That test exercises the verbatim-mismatch
+    branch a few lines below this one, not this one -- coverage confirmed
+    line 175 uncovered by the full suite before this test existed. A
+    toolkit genuinely absent from the dict (never proposed, never in
+    SCOPES.md) has no `REQUIRED_SCOPES[toolkit]` to fall back on, so
+    `_record`'s own default `scopes` param would `KeyError` here --
+    `scopes=frozenset()` is passed explicitly for exactly that reason."""
+    record = _record("bitbucket", scopes=frozenset())
+    ok, why = check_scope_confirm(record)
+    assert not ok
+    assert "unknown toolkit" in why
+    assert "bitbucket" in why
+
+
 @pytest.mark.parametrize("toolkit", sorted(REQUIRED_SCOPES))
 def test_every_documented_toolkit_has_a_passable_exact_confirm(toolkit: str):
     ok, _ = check_scope_confirm(_record(toolkit))
