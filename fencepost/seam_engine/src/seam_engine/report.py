@@ -270,6 +270,27 @@ def _strip_mortal_text(field: str) -> str:
 # three non-gap exclusion lines (already-tracked / already-closed / no-due-
 # date), none of which ever reach `suggest_move` since they are returned in
 # the tail, not as a primary gap.
+#
+# Task 775 (retrya): a sixth recurrence of the exact drift shape task 586
+# named for the issue/PR-numbered dangling-reference family, this time on a
+# seam that family's own "no issue or pr" needle was never written to catch:
+# `commit-claims-dangling-milestone` (task ~647), a commit message claiming
+# a `milestone #N` that names no real milestone at all. Milestones keep
+# their own GitHub number sequence, entirely separate from issues/PRs
+# (`dangling-issue-reference` never opens `ListMilestones`, by that
+# recipe's own docstring) -- so its real, shipped headline reads "Commit
+# {sha} claims milestone #{number}, which doesn't exist", never "no issue
+# or PR #{n} exists". Confirmed live pre-fix, walking all 80 real recipes'
+# own fixture-generated primary gap through `suggest_move` (the same sweep
+# 537/550/557/586/605/708 already established): this was the only one of
+# the 80 whose stripped headline contains "doesn't exist"/"does not exist"
+# at all, and it fell through to `_DEFAULT_MOVE` ("Close it yourself,
+# however it's meant to be closed") -- wrong for the same reason 586's bug
+# was wrong: there is no milestone #8302 to close, the claim just names one
+# that was never real. Routed to the same "correct or delete it yourself"
+# move the dangling-reference family already uses, since the fix is
+# identical in kind (the reference points at nothing, only a human can
+# decide whether to fix the number or drop the claim).
 _MOVE_RULES: tuple[tuple[str, str], ...] = (
     (
         "never reached calendar",
@@ -309,6 +330,10 @@ _MOVE_RULES: tuple[tuple[str, str], ...] = (
     ),
     (
         "no issue or pr",
+        "Correct or delete it yourself — the reference points at nothing. Fencepost only found the seam; it does not cross it.",
+    ),
+    (
+        "doesn't exist",
         "Correct or delete it yourself — the reference points at nothing. Fencepost only found the seam; it does not cross it.",
     ),
 )

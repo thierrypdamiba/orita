@@ -543,11 +543,63 @@ def test_no_dangling_reference_headline_falls_through_to_default():
             "reference to a nonexistent issue/PR but suggest_move fell through "
             "to the generic close-it-yourself line -- add a needle to _MOVE_RULES."
         )
-        assert "correct or delete it yourself" in move.lower()
-    # Same vacuous-pass guard as the tweet/announce sweep: if discover_recipes()
-    # ever stops returning any dangling-reference recipe, fail loudly rather
-    # than silently pass with nothing actually checked.
-    assert checked_any, "expected at least one real recipe headline to name a dangling reference"
+    assert checked_any, "expected at least one real recipe headline to name a dangling issue/PR"
+
+
+# Task 775 (retrya): the sibling systemic guard for `commit-claims-dangling-
+# milestone`'s own seam -- a claim naming a milestone number that resolves
+# to nothing, phrased "which doesn't exist" rather than the issue/PR
+# family's "no issue or pr ... exists" (milestones keep their own GitHub
+# number sequence, so the two families can never share one needle). Same
+# walk-every-real-recipe-fixture mechanism as the guard above, so a future
+# recipe on this same milestone-dangling seam either gets caught for free
+# by the shared "doesn't exist"/"does not exist" needle or trips this guard
+# with a genuinely new phrasing rather than silently inheriting the wrong
+# close-it-yourself hand-off.
+def test_no_dangling_milestone_headline_falls_through_to_default():
+    from seam_engine.recipes import discover_recipes, load_detector
+
+    fencepost_root = Path(__file__).resolve().parents[2]
+    checked_any = False
+    for manifest in discover_recipes(fencepost_root):
+        result = load_detector(manifest)()
+        gap = result.get("primary_gap") or (result.get("tail") or [None])[0]
+        if gap is None:
+            continue
+        headline = gap.get("headline", "")
+        stripped = report._strip_mortal_text(headline).lower()
+        if "doesn't exist" not in stripped and "does not exist" not in stripped:
+            continue
+        checked_any = True
+        move = report.suggest_move(gap)
+        assert move != report._DEFAULT_MOVE, (
+            f"{manifest.slug}'s real headline ({headline!r}) names a dangling "
+            "reference to a nonexistent milestone but suggest_move fell "
+            "through to the generic close-it-yourself line -- add a needle "
+            "to _MOVE_RULES."
+        )
+    assert checked_any, (
+        "expected commit-claims-dangling-milestone's own real fixture gap to "
+        "be checked"
+    )
+
+
+def test_commit_claims_dangling_milestone_gets_the_correct_or_delete_move():
+    # Task 775 (retrya): the exact live reproduction of the bug pre-fix --
+    # this recipe's own real, shipped fixture gap, not a hand-typed guess.
+    from seam_engine.recipes import discover_recipes, load_detector
+
+    fencepost_root = Path(__file__).resolve().parents[2]
+    manifest = next(
+        m for m in discover_recipes(fencepost_root) if m.slug == "commit-claims-dangling-milestone"
+    )
+    result = load_detector(manifest)()
+    gap = result.get("primary_gap") or (result.get("tail") or [None])[0]
+    assert gap is not None, "expected commit-claims-dangling-milestone's fixture to carry a primary gap"
+    assert "doesn't exist" in gap["headline"]
+    move = report.suggest_move(gap)
+    assert move != report._DEFAULT_MOVE
+    assert "correct or delete it yourself" in move.lower()
 
 
 # Task 537 (retrya): every detector embeds mortal-controlled free text (a
