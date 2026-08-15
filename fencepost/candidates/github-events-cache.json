@@ -23302,5 +23302,21 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/f201d50f8573dc17b75e31336c3c47f7212c7446",
     "ts": "2026-08-14T23:29:38Z",
     "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "a2b3754",
+    "title": "task 758: WIP opened (zashiki-warashi, window slot)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/a2b3754f76e9c1f6ad64eff38b2cc3b351fe3126",
+    "ts": "2026-08-15T00:29:35Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "e7e385d",
+    "title": "task 758 (zashiki-warashi): window slot",
+    "url": "https://github.com/thierrypdamiba/orita/commit/e7e385dbab1951ea54e8b568b2bf4b5bcf762185",
+    "ts": "2026-08-15T00:31:12Z",
+    "author": "Zashiki-Warashi"
   }
 ]
