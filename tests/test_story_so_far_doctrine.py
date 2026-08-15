@@ -113,14 +113,23 @@ class FooterArithmeticCase(unittest.TestCase):
         ok, reason = _footer_agrees_with_body(self.text)
         self.assertTrue(ok, reason)
 
-    def test_body_word_count_is_286(self):
+    def test_body_word_count_is_283(self):
         # Names the real number so a future prose rewrite that forgets to
         # touch the footer trips a second, independent assertion, not just
         # the cross-check above. Updated by task 395's rewrite (284 -> 286)
         # to fold in Fencepost's growth to nineteen recipes, chronicle
-        # episode-002, the X outage, and the Cluster Day lapse -- the
-        # count changed because the prose actually changed, not by hand.
-        self.assertEqual(_body_word_count(self.text), 286)
+        # episode-002, the X outage, and the Cluster Day lapse; updated
+        # again by task 780's rewrite (286 -> 283) to fold in Fencepost's
+        # growth to eighty recipes, five chronicle episodes, the third
+        # landing on schedule, and the correction of a stale claim that
+        # Retrya's coin was still unflipped (it was granted and flipped
+        # twice on founding day itself) -- the count changed because the
+        # prose actually changed, not by hand. A `story-so-far-rewrite`
+        # marker line (task 780, tools/story_so_far_check.py) also now
+        # lives in the file; it is a `*`-prefixed line, so
+        # `_body_word_count` already excludes it from this count, same as
+        # the footer itself.
+        self.assertEqual(_body_word_count(self.text), 283)
 
 
 class MutationBitesCase(unittest.TestCase):

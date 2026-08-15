@@ -409,6 +409,10 @@ def _nyx_traffic_check() -> ModuleType:
     return _load("_ritual_nyx_traffic_check", os.path.join(ROOT, "tools", "nyx_traffic_check.py"))
 
 
+def _story_so_far_check() -> ModuleType:
+    return _load("_ritual_story_so_far_check", os.path.join(ROOT, "tools", "story_so_far_check.py"))
+
+
 def _strategy_targets_check() -> ModuleType:
     return _load_once("_ritual_strategy_targets_check", os.path.join(ROOT, "tools", "strategy_targets_check.py"))
 
@@ -1500,6 +1504,41 @@ def check_nyx_traffic_cadence(
     return cast(dict[str, object], mod.compute_cadence(**kwargs))
 
 
+def check_story_so_far_cadence(
+    story_so_far_path: str | None = None,
+    story_so_far_today: date | None = None,
+) -> dict[str, object]:
+    """Task 780: fold `story_so_far_check.py`'s own weekly rewrite-cadence
+    scan into the one block, closing the fifth and last leg of
+    TOWN-OPERATIONS.md's "Weekly, Cluster Day (Monday)" ritual --
+    `check_cluster_day_cadence` (task 387) covers Ananse's chronicle,
+    `check_what_moved_cadence` (task 449) covers Zashiki's mystery page,
+    `check_thegap_cadence` (task 463) covers Off-By-One's `/thegap/`
+    doctrine, `check_nyx_traffic_cadence` (task 465) covers Nyx's traffic
+    report, and this covers "Story-so-far (`docs/story-so-far.md`)
+    rewritten, ≤287 words" -- an own-remit audit this hour found the doc
+    genuinely stale (claiming nineteen recipes and a still-unflipped
+    Retrya coin while the live repo had reached eighty recipes and the
+    coin was granted and flipped twice on founding day itself) with
+    nothing positioned to have caught it, the same blind spot its four
+    siblings once had before each got its own sensor. Unconditional,
+    local-filesystem-only (reads `docs/story-so-far.md`'s own
+    `*story-so-far-rewrite: YYYY-MM-DD*` marker lines -- a `*`-prefixed
+    line, so it costs nothing against the doc's own 287-word cap, the
+    same convention its footer already relies on), the same cheap
+    informational class every check in this family holds. Never flips
+    `broken`: a lapsed week is a fact worth surfacing to the next hour's
+    run, not a currently-live violation -- the same distinction
+    `cluster_day`/`what_moved`/`thegap`/`nyx_traffic` already draw."""
+    mod = _story_so_far_check()
+    kwargs: dict[str, object] = {}
+    if story_so_far_path is not None:
+        kwargs["path"] = story_so_far_path
+    if story_so_far_today is not None:
+        kwargs["today"] = story_so_far_today
+    return cast(dict[str, object], mod.compute_cadence(**kwargs))
+
+
 def check_strategy_targets(strategy_path: str | None = None) -> dict[str, object]:
     """Task 407: fold strategy_targets_check.py's own STRATEGY.md-vs-code
     target cross-check (task 159) into the one block. Unconditional,
@@ -2246,6 +2285,8 @@ def run_ritual_check(
     thegap_today: date | None = None,
     nyx_traffic_vault_dir: str | None = None,
     nyx_traffic_today: date | None = None,
+    story_so_far_path: str | None = None,
+    story_so_far_today: date | None = None,
     strategy_targets_path: str | None = None,
     network_boundary_dirs: tuple[str, ...] | None = None,
     site_link_docs_dir: str | None = None,
@@ -2374,6 +2415,9 @@ def run_ritual_check(
     )
     nyx_traffic = check_nyx_traffic_cadence(
         nyx_traffic_vault_dir=nyx_traffic_vault_dir, nyx_traffic_today=nyx_traffic_today
+    )
+    story_so_far = check_story_so_far_cadence(
+        story_so_far_path=story_so_far_path, story_so_far_today=story_so_far_today
     )
     strategy_targets = check_strategy_targets(strategy_path=strategy_targets_path)
     network_boundary = check_network_boundary(dirs=network_boundary_dirs)
@@ -2523,6 +2567,7 @@ def run_ritual_check(
         "what_moved": what_moved,
         "thegap": thegap,
         "nyx_traffic": nyx_traffic,
+        "story_so_far": story_so_far,
         "strategy_targets": strategy_targets,
         "network_boundary": network_boundary,
         "site_links": site_links,
@@ -2788,6 +2833,8 @@ def format_ritual_check(result: dict[str, Any]) -> str:
     lines.append("  " + _thegap_check().format_cadence(tg))
     nt = result["nyx_traffic"]
     lines.append("  " + _nyx_traffic_check().format_cadence(nt))
+    ssf = result["story_so_far"]
+    lines.append("  " + _story_so_far_check().format_cadence(ssf))
     st = result["strategy_targets"]
     for line in _strategy_targets_check().format_strategy_targets(st).split("\n"):
         lines.append("  " + line)
