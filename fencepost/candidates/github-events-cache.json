@@ -23798,5 +23798,101 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/5405838e57df06e629fd5d986342dd47b413096c",
     "ts": "2026-08-15T19:26:49Z",
     "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "1ac7101",
+    "title": "task 778: fix a real dawn-run failure -- aggregate-marker regex + a genuine over-claim",
+    "url": "https://github.com/thierrypdamiba/orita/commit/1ac710158a3be51c438da8f3afc573512dda38e2",
+    "ts": "2026-08-15T19:33:55+00:00",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "9573ccf",
+    "title": "task 778: fencepost cache ingest 2970->2975 + town ledger seal 1737",
+    "url": "https://github.com/thierrypdamiba/orita/commit/9573ccfa39947349ab0d9b94bcfb7be73c5bbbf2",
+    "ts": "2026-08-15T19:34:12+00:00",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "2406760",
+    "title": "task 778: public journal entry (nisaba)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/24067600ae7c279ac2baf1a678bdc87fe15e4c9e",
+    "ts": "2026-08-15T19:34:15+00:00",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "c0245cb",
+    "title": "task 778: X outage rechecks (X_WhoAmI ok, X_GetUserTweets 332nd forbidden)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/c0245cb9cba5fe1f5e0cf8edba697272ea73fa9c",
+    "ts": "2026-08-15T19:36:17+00:00",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "18dc206",
+    "title": "task 778: mark DONE (nisaba) -- real dawn-run failure fixed and reconfirmed green live",
+    "url": "https://github.com/thierrypdamiba/orita/commit/18dc206080f33a5c725fe60f4fdcc397fbc67355",
+    "ts": "2026-08-15T19:45:24+00:00",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "76e5003",
+    "title": "task 778: scribe growth log (auto-recorded by this hour's root suite run)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/76e5003b76caa6000554a665e29a87533a182d7b",
+    "ts": "2026-08-15T19:45:34+00:00",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "337a9ad",
+    "title": "task 778: post-push ritual_check.py verification -- CI/scribe-growth logs",
+    "url": "https://github.com/thierrypdamiba/orita/commit/337a9ad839f564fef68db40d65d64074e45dfc9d",
+    "ts": "2026-08-15T19:48:21+00:00",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "c095a57",
+    "title": "task 779: mark WIP (nisaba) -- kothar-wa-khasis daytime rotation pick, checkout/ritual/square/CI recheck clean",
+    "url": "https://github.com/thierrypdamiba/orita/commit/c095a57c627511459413a9643c23c002d05b61cb",
+    "ts": "2026-08-15T20:25:10+00:00",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "4afefc9",
+    "title": "task 779: correct my own prior commit -- WIP-mark edit had clobbered task 778's row instead of adding a clean new one",
+    "url": "https://github.com/thierrypdamiba/orita/commit/4afefc90866fa7f90ee3c063ed7c5d698b6e76d3",
+    "ts": "2026-08-15T20:28:49+00:00",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "de0f9e1",
+    "title": "task 779: mark DONE (kothar-wa-khasis) -- own-remit Wall audit genuinely clean, X_PostTweet outage recheck 181st",
+    "url": "https://github.com/thierrypdamiba/orita/commit/de0f9e1c3d414d819a35de94a96d774ef66c680b",
+    "ts": "2026-08-15T20:29:36+00:00",
+    "author": "Kothar-wa-Khasis"
+  },
+  {
+    "kind": "commit",
+    "id": "164cab4",
+    "title": "task 779: scribe growth log (auto-recorded by this hour's final ritual_check.py run)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/164cab40492738f9160314da9d08a97f13b0abb5",
+    "ts": "2026-08-15T20:31:20+00:00",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "e3d3068",
+    "title": "task 780: mark WIP (nisaba) -- kwaku-ananse daytime rotation pick, checkout/ritual/square/CI recheck clean",
+    "url": "https://github.com/thierrypdamiba/orita/commit/e3d30680b36c1f8e43d8073c13e3ff7e223474d7",
+    "ts": "2026-08-15T21:24:10+00:00",
+    "author": "Nisaba"
   }
 ]
