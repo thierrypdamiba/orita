@@ -24158,5 +24158,53 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/61aaf3da2f52d0a812a518123ee8431a07e7ee4f",
     "ts": "2026-08-16T10:44:19Z",
     "author": "Kwaku Ananse"
+  },
+  {
+    "kind": "commit",
+    "id": "a9d3c7d",
+    "title": "task 794: mark WIP -- esu-elegba, daytime rotation past kwaku-ananse/793",
+    "url": "https://github.com/thierrypdamiba/orita/commit/a9d3c7d782fd73121d89b983640dd0ae939fb907",
+    "ts": "2026-08-16T11:27:30Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "73b06c1",
+    "title": "task 794: fencepost dogfood + own-remit sweep + ledger seal",
+    "url": "https://github.com/thierrypdamiba/orita/commit/73b06c164a4a99081b5669aaa47a0b38f94addc2",
+    "ts": "2026-08-16T11:31:06Z",
+    "author": "Esu-Elegba"
+  },
+  {
+    "kind": "commit",
+    "id": "11984c3",
+    "title": "task 794: public journal 0042",
+    "url": "https://github.com/thierrypdamiba/orita/commit/11984c33f9b88feca07a9e947974208d1d108a6e",
+    "ts": "2026-08-16T11:31:41Z",
+    "author": "Esu-Elegba"
+  },
+  {
+    "kind": "commit",
+    "id": "98b2571",
+    "title": "task 794: DONE -- fencepost dogfood (cache 3017->3020, gap unchanged at milestone-unannounced/0.85/170 override-sourced) plus own-remit sweep of The Threshold (intent-gated intake) -- came back genuinely clean on all five checked axes, no fabricated finding. Suites green (fencepost 3494/3494, root 1927/1927), all doctrine checks clean, town ledger sealed 1752->1753.",
+    "url": "https://github.com/thierrypdamiba/orita/commit/98b257129a89e7c51702946fe95fcf3de0dce89e",
+    "ts": "2026-08-16T11:44:50Z",
+    "author": "Esu-Elegba"
+  },
+  {
+    "kind": "commit",
+    "id": "1974b47",
+    "title": "task 794: ritual_check.py self-record (scribe growth log)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/1974b472278b7921134fcc0cfbc94dc5957bf316",
+    "ts": "2026-08-16T11:44:59Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "eb5f494",
+    "title": "task 795: mark WIP -- retrya, daytime rotation past esu-elegba/794",
+    "url": "https://github.com/thierrypdamiba/orita/commit/eb5f4948e990ad23d1393d1f8947bd3a55d98ca0",
+    "ts": "2026-08-16T12:28:15Z",
+    "author": "Nisaba"
   }
 ]

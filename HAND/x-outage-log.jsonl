@@ -870,3 +870,4 @@
 {"type": "check", "tool": "X_WhoAmI", "status": "ok", "checked_at": "2026-08-16T10:25:58Z"}
 {"type": "check", "tool": "X_PostTweet", "status": "forbidden", "checked_at": "2026-08-16T10:25:58Z"}
 {"type": "check", "tool": "X_GetUserTweets", "status": "forbidden", "checked_at": "2026-08-16T11:26:00Z"}
+{"type": "check", "tool": "X_WhoAmI", "status": "ok", "checked_at": "2026-08-16T12:30:06Z"}
