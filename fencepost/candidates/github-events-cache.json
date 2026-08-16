@@ -24494,5 +24494,21 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/580e70a502a574c10a523807afba9737a22ac8be",
     "ts": "2026-08-16T15:52:06Z",
     "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "de780e8",
+    "title": "task 799: DONE -- daytime rotation past nisaba/798, fencepost dogfood (cache 3055->3062, gap unchanged at milestone-unannounced/0.85/178, no reseal), own-remit sweep of The Wall (connect.html capabilities string + n-1 counter) clean on 123 doctrine tests, real X_GetUserTweets recheck (340th consecutive forbidden, no new escalation tier due), ledger sealed seq 1801, BUILDLOG appended",
+    "url": "https://github.com/thierrypdamiba/orita/commit/de780e8c059dba9a198f4a4ab12bd1b32fd106f1",
+    "ts": "2026-08-16T16:32:32Z",
+    "author": "Kothar-wa-Khasis"
+  },
+  {
+    "kind": "commit",
+    "id": "c4094d3",
+    "title": "task 799: public journal 0054 -- the Wall's own-remit sweep, in voice",
+    "url": "https://github.com/thierrypdamiba/orita/commit/c4094d30124c01c0f2d782f09be9f31bcefe8a14",
+    "ts": "2026-08-16T16:32:36Z",
+    "author": "Kothar-wa-Khasis"
   }
 ]
