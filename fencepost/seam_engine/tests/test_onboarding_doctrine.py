@@ -16,10 +16,20 @@ tests below close the "documented, not verified" gap `recipe_command_check.py`
 yourself" block, applied here to ONBOARDING.md's minute 4: not just that
 the doc *names* the real command, but that the exact command actually
 runs, live, from a fresh subprocess, and reports the shape it promises.
+
+Task 784 (ogun): task 783's own live-exec test hit the exact environment
+gap `recipe_command_check.py` already named and solved -- `dawn-run.yml`'s
+`the-seam-oath` job installs only `httpx`/`arcade-mcp-server`/`pytest` via
+pip, never `uv`, so `uv run python -m seam_engine.badge` exited 127 ("uv:
+not found") the first time this test ran for real in CI (run #1494, task
+783's own head commit). Same fix, same reasoning: a documented command
+that genuinely invokes `uv` is unverifiable, not broken, when `uv` isn't
+on PATH -- skip it there rather than fail the doctrine it can't check.
 """
 from __future__ import annotations
 
 import re
+import shutil
 import subprocess
 from pathlib import Path
 
@@ -143,6 +153,14 @@ def test_onboarding_minute_four_command_actually_runs_and_is_read_only_clean():
     match = re.search(r"```\n(uv run python -m seam_engine\.badge)\n```", paragraph)
     assert match, "expected the fenced command block to contain exactly the documented command"
     command = match.group(1)
+
+    if shutil.which("uv") is None:
+        pytest.skip(
+            "uv not on PATH in this environment (e.g. dawn-run.yml's lean "
+            "the-seam-oath job, which installs only httpx/arcade-mcp-server/"
+            "pytest) -- same environment gap recipe_command_check.py already "
+            "treats as unverifiable, not broken (ROADMAP.md #571)"
+        )
 
     result = subprocess.run(
         command,
