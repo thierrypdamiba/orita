@@ -189,6 +189,47 @@ class RoadmapFixtureCase(unittest.TestCase):
         self.assertEqual(len(violations), 2)
         self.assertEqual({v["source"] for v in violations}, {"BUILDLOG.md", "ROADMAP.md"})
 
+    def test_sibling_roadmap_archive_file_is_also_scanned(self):
+        # Task 798: ROADMAP.md is periodically cut by roadmap_archive.py,
+        # moving old rows -- including any Tithe roll they narrated --
+        # verbatim into a dated ROADMAP-ARCHIVE-NNN-X-Y.md sitting next
+        # to the live file. A violation living only in the archive must
+        # still be found, tagged with the archive's own filename.
+        tmp = tempfile.mkdtemp()
+        roadmap = os.path.join(tmp, "ROADMAP.md")
+        with open(roadmap, "w", encoding="utf-8") as f:
+            f.write("| 800 | WIP | god | still open, no Tithe mention here. |\n")
+        self._paths.append(roadmap)
+        archive = os.path.join(tmp, "ROADMAP-ARCHIVE-004-482-797.md")
+        with open(archive, "w", encoding="utf-8") as f:
+            f.write("| 500 | DONE | god | the Tithe rolled `0.09` against the `0.03` floor. |\n")
+        self._paths.append(archive)
+        violations = tc.find_violations(
+            buildlog_path=_NO_ROADMAP, roadmap_path=roadmap,
+            houses_dir=_NO_HOUSES, chronicle_dir=_NO_CHRONICLE,
+        )
+        self.assertEqual(len(violations), 1)
+        self.assertEqual(violations[0]["source"], "ROADMAP-ARCHIVE-004-482-797.md")
+        self.assertEqual(violations[0]["offending_rolls"], [0.09])
+
+    def test_archive_sibling_with_no_violation_stays_clean(self):
+        tmp = tempfile.mkdtemp()
+        roadmap = os.path.join(tmp, "ROADMAP.md")
+        with open(roadmap, "w", encoding="utf-8") as f:
+            f.write("| 800 | WIP | god | still open. |\n")
+        self._paths.append(roadmap)
+        archive = os.path.join(tmp, "ROADMAP-ARCHIVE-001-169.md")
+        with open(archive, "w", encoding="utf-8") as f:
+            f.write("| 100 | DONE | god | the Tithe rolled `0.0208` against the `0.03` floor. |\n")
+        self._paths.append(archive)
+        self.assertEqual(
+            tc.find_violations(
+                buildlog_path=_NO_ROADMAP, roadmap_path=roadmap,
+                houses_dir=_NO_HOUSES, chronicle_dir=_NO_CHRONICLE,
+            ),
+            [],
+        )
+
 
 class JournalChronicleFixtureCase(unittest.TestCase):
     """Task 680. Proves the new houses/*/journal/*.md + chronicle/*.md

@@ -104,7 +104,8 @@ would be exactly the "crying wolf" false-confidence Ogun's own law
 (STRATEGY.md) warns Fencepost itself against; this checker states its
 own limit instead of quietly overreaching it.
 
-For each line in `BUILDLOG.md`, `ROADMAP.md`, any `houses/<god>/journal/
+For each line in `BUILDLOG.md`, `ROADMAP.md` (plus any sibling
+`ROADMAP-ARCHIVE-*.md`, task 798), any `houses/<god>/journal/
 *.md`, or any `chronicle/*.md` that contains the literal word "Tithe",
 every `roll 0.NNNN` / `rolled 0.NNNN` number on that line (each side
 optionally backtick-quoted) is extracted and compared against
@@ -208,6 +209,44 @@ def _journal_and_chronicle_roll_lines(
     return found
 
 
+def _roadmap_and_archive_roll_lines(roadmap_path: str) -> list[tuple[str, int, str, list[float]]]:
+    """Every `(source, line_number, line, rolls)` hit inside `roadmap_path`
+    itself AND any sibling `ROADMAP-ARCHIVE-*.md` file in the same
+    directory.
+
+    `ROADMAP.md` is periodically cut down by `tools/roadmap_archive.py`
+    (tasks 169/366/482/798): fully-DONE task rows, including any
+    hand-typed Tithe roll they narrated, move verbatim into a dated
+    `ROADMAP-ARCHIVE-NNN-X-Y.md` file and stop being live text. A roll
+    number that was ever a public claim ("the Tithe rolled 0.0512
+    against the 0.03 floor") does not stop being a claim this checker
+    owes an answer to just because it aged out of the live file -- the
+    archived text is still real, still published, and reads
+    byte-for-byte identical to what `ROADMAP.md` said the hour it was
+    written (task 798's own archive run verified that reconstruction by
+    hand before trusting it). Scanning only `roadmap_path` and going
+    silently blind to everything the scalpel already cut out would be
+    exactly the kind of drift this file's own docstring warns other
+    checkers against: a claim nobody is watching any more, not because
+    it was resolved, but because it moved. Discovered here rather than
+    named as a future gap, task 798: the live scan across `ROADMAP.md`
+    alone came up empty the same hour the file was cut to 2,689 bytes,
+    which is exactly the "silently-empty scan" shape
+    `test_real_roadmap_has_actually_been_scanned` exists to catch.
+
+    `source` for an archived hit is the archive file's own basename
+    (e.g. `ROADMAP-ARCHIVE-004-482-797.md`), not the fixed literal
+    `ROADMAP.md`, so a violation still names exactly which file to go
+    fix. A fixture `roadmap_path` pointed at an isolated tmpdir (as
+    every test below does) finds no `ROADMAP-ARCHIVE-*.md` siblings
+    there and behaves exactly as before this widening."""
+    found = _tithe_roll_lines(roadmap_path, "ROADMAP.md")
+    archive_dir = os.path.dirname(roadmap_path) or "."
+    for path in sorted(glob.glob(os.path.join(archive_dir, "ROADMAP-ARCHIVE-*.md"))):
+        found.extend(_tithe_roll_lines(path, os.path.basename(path)))
+    return found
+
+
 def _all_tithe_roll_lines(
     buildlog_path: str,
     roadmap_path: str,
@@ -216,7 +255,7 @@ def _all_tithe_roll_lines(
 ) -> list[tuple[str, int, str, list[float]]]:
     return (
         _tithe_roll_lines(buildlog_path, "BUILDLOG.md")
-        + _tithe_roll_lines(roadmap_path, "ROADMAP.md")
+        + _roadmap_and_archive_roll_lines(roadmap_path)
         + _journal_and_chronicle_roll_lines(houses_dir, chronicle_dir)
     )
 
