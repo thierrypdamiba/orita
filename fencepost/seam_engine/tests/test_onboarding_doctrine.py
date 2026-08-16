@@ -36,7 +36,7 @@ from pathlib import Path
 import pytest
 
 ONBOARDING = Path(__file__).resolve().parents[2] / "ONBOARDING.md"
-_SEAM_ENGINE_DIR = Path(__file__).resolve().parents[2]
+_SEAM_ENGINE_DIR = Path(__file__).resolve().parents[1]
 
 # Every write-capable tool name SCOPES.md swears Fencepost never touches.
 # If one of these substrings shows up in ONBOARDING.md, it may only appear
@@ -177,4 +177,20 @@ def test_onboarding_minute_four_command_actually_runs_and_is_read_only_clean():
     assert re.search(r"\d+/\d+ tools read-only", result.stdout), (
         f"{command!r} did not print the promised 'N/N tools read-only' "
         f"shape -- stdout:\n{result.stdout[-2000:]}"
+    )
+
+
+def test_seam_engine_dir_is_the_real_uv_project():
+    """Task 790 (off-by-one): `_SEAM_ENGINE_DIR` was `parents[2]`
+    (`fencepost/`, one level too high) instead of `parents[1]`
+    (`fencepost/seam_engine/`, where `pyproject.toml` and the `uv`-managed
+    venv actually live). The prior test above never caught it live because
+    every hour's own verification already runs it through `uv run --extra
+    dev pytest`, which leaks `VIRTUAL_ENV` into the nested subprocess and
+    finds the right venv regardless of the wrong `cwd` -- masking, not
+    correctness. This checks the path itself, not a subprocess outcome
+    that a leaked env var can paper over."""
+    assert (_SEAM_ENGINE_DIR / "pyproject.toml").is_file(), (
+        f"_SEAM_ENGINE_DIR ({_SEAM_ENGINE_DIR}) does not contain "
+        "pyproject.toml -- it no longer points at the real uv project"
     )
