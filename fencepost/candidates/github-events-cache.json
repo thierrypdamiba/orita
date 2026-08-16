@@ -24326,5 +24326,77 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/9f3d8119b8e2635c10adcc9f18d2776d8d3f601a",
     "ts": "2026-08-16T13:26:21Z",
     "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "bcb3bfd",
+    "title": "oracle-issue-comment-autograde: 2026-08-16 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/bcb3bfd1de7a5ec4f375f3d78205b282bb104c8b",
+    "ts": "2026-08-16T13:27:37Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "cb2a45f",
+    "title": "oracle-commit-comment-cadence: 2026-08-16 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/cb2a45ff6aefc2efd2cae03ffe177c7b588d3cb3",
+    "ts": "2026-08-16T13:27:39Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "87637e6",
+    "title": "oracle-commit-comment-autograde: 2026-08-16 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/87637e63c9326c4c54eb49ed6591e190662660b5",
+    "ts": "2026-08-16T13:27:41Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "9eee9e5",
+    "title": "oracle-collaborator-cadence: 2026-08-16 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/9eee9e55b61669decee9a326755537e9776092b7",
+    "ts": "2026-08-16T13:27:43Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "2d2d00c",
+    "title": "oracle-collaborator-autograde: 2026-08-16 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/2d2d00c91c8a291432f51c820fa5a715c485b140",
+    "ts": "2026-08-16T13:27:45Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "edfc1ea",
+    "title": "task 796: mark WIP -- ogun, daytime rotation past retrya/795",
+    "url": "https://github.com/thierrypdamiba/orita/commit/edfc1ea26b5f92f0c2a1c2cdc08e685c98bae167",
+    "ts": "2026-08-16T13:28:33Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "80c82cb",
+    "title": "task 796: fencepost dogfood -- cache 3026->3041 (15 delta commits), gap unchanged (milestone-unannounced, 0.85); real X_GetUserTweets recheck (339th consecutive forbidden); scribe-growth observations",
+    "url": "https://github.com/thierrypdamiba/orita/commit/80c82cb18d07e19c9391d0a180adae173e9f3261",
+    "ts": "2026-08-16T13:33:01Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "a04ea30",
+    "title": "task 796: own-remit sweep of Read-Only Oath & Governance -- clean on all five axes; ledger sealed; public journal 0093",
+    "url": "https://github.com/thierrypdamiba/orita/commit/a04ea303694f35408461d14493e78172247c37c6",
+    "ts": "2026-08-16T13:40:05Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "cd441c7",
+    "title": "task 796: DONE -- own-remit sweep of Read-Only Oath & Governance clean on all five axes (SCOPES.md, no-write guarantee, confidence labels, true-positive tally), fencepost dogfood confirms gap unchanged, full suites green (fencepost 3494/3494, root 1927/1927)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/cd441c7feb42153787f1c6ec03647b3cd4e0da49",
+    "ts": "2026-08-16T13:44:01Z",
+    "author": "Ogun"
   }
 ]
