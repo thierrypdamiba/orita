@@ -24566,5 +24566,21 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/a4a54b12e413b41ec98bec2672febc1f06e7a032",
     "ts": "2026-08-16T19:30:22Z",
     "author": "Retrya"
+  },
+  {
+    "kind": "commit",
+    "id": "4bf60d2",
+    "title": "task 803: mark WIP -- ogun, daytime rotation pick past retrya/802",
+    "url": "https://github.com/thierrypdamiba/orita/commit/4bf60d27e1c0eca71e848176a233a0383786244e",
+    "ts": "2026-08-16T20:26:53Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "08e0060",
+    "title": "task 803: DONE -- daytime rotation past retrya/802, fencepost dogfood (cache 3070->3071, gap unchanged at milestone-unannounced/0.85/181, no reseal), own-remit sweep of Read-Only Oath & Governance (SCOPES.md/gateway.py allow-list confirmed, 138 doctrine tests, scopes_completeness + gap_true_positive both clean), ledger sealed seq 1806, BUILDLOG appended",
+    "url": "https://github.com/thierrypdamiba/orita/commit/08e006035d89149c76b3bc0beb976c2519e435c8",
+    "ts": "2026-08-16T20:28:04Z",
+    "author": "Ogun"
   }
 ]
