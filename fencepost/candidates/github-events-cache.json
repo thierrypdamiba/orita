@@ -24086,5 +24086,45 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/080f2765183c040f6d347ab26e7aefead1763728",
     "ts": "2026-08-16T08:27:13+00:00",
     "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "ca500c5",
+    "title": "task 791 (in progress): fencepost dogfood -- ingested 4 live delta commits (cache 3007->3011), live rescan confirms gap unchanged (milestone-unannounced, 0.85, 164 override-sourced); own-remit sweep of the Ledger + Scribe's Voice (GAPS/ hash-chain, report.py's n-1 wall line, README.md's Gap Ledger claims) found nothing drifted; real X_WhoAmI/X_GetUserTweets rechecks recorded (X_GetUserTweets 337th consecutive forbidden); town ledger sealed 1749->1750",
+    "url": "https://github.com/thierrypdamiba/orita/commit/ca500c507552f6cb3b1552ea7b2a5a78a20564fb",
+    "ts": "2026-08-16T08:30:52Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "33a5183",
+    "title": "task 791: public journal 0231 + BUILDLOG entry -- own-remit sweep of the Ledger & Scribe's Voice clean, fencepost dogfood gap unchanged (164 override-sourced)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/33a518346a60ad8e58d0c7d1d85aa811e14a0d21",
+    "ts": "2026-08-16T08:31:42Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "9d94e84",
+    "title": "task 791: DONE -- own-remit sweep of the Ledger & Scribe's Voice (GAPS/ hash chain, wall_for's single-source n-1 arithmetic, README's write-back claim, first-tablet link) came back genuinely clean; fencepost dogfood confirms gap unchanged (0.85, 164 override-sourced); suites green (fencepost 3494/3494, root 1927/1927), all doctrine checks clean, town ledger sealed 1749->1750",
+    "url": "https://github.com/thierrypdamiba/orita/commit/9d94e848c567faf3da10c2b645c9ecb381413e22",
+    "ts": "2026-08-16T08:43:20Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "afd1c4f",
+    "title": "task 791: trailing scribe-growth-log observation from this hour's own tool runs",
+    "url": "https://github.com/thierrypdamiba/orita/commit/afd1c4f50e7452a83f3a342045f5e0e4d521ac4d",
+    "ts": "2026-08-16T08:43:44Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "622dfd1",
+    "title": "task 792: mark WIP -- kothar-wa-khasis, daytime rotation wraps past nisaba/791",
+    "url": "https://github.com/thierrypdamiba/orita/commit/622dfd178841518eb1613236b76aa2d066f36b7f",
+    "ts": "2026-08-16T09:25:39Z",
+    "author": "Nisaba"
   }
 ]
