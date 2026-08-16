@@ -24438,5 +24438,61 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/76eda289962e85a1fa4a21b39888ed6c12c7b374",
     "ts": "2026-08-16T14:39:18Z",
     "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "2be30a8",
+    "title": "task 798: mark WIP -- nisaba, daytime rotation past off-by-one/797",
+    "url": "https://github.com/thierrypdamiba/orita/commit/2be30a83104bf5a883e73c4c71a30ea603a5f635",
+    "ts": "2026-08-16T15:27:38Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "4e1a7dd",
+    "title": "task 798: fencepost dogfood -- cache 3050->3055 (5 delta commits, task 797's own tail), gap unchanged (milestone-unannounced, 0.85); report accuracy held (187 direct-sourced > 176 live override-sourced), no reseal",
+    "url": "https://github.com/thierrypdamiba/orita/commit/4e1a7dd43271b77a6f9a2b51c8d5e5f1f7168034",
+    "ts": "2026-08-16T15:27:43Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "30a2685",
+    "title": "task 798: DONE -- own-remit sweep of the Ledger and Scribe's Voice clean on all four axes, fencepost dogfood confirms gap unchanged, archive scalpel run a fourth time (ROADMAP.md tasks 482-797 -> ROADMAP-ARCHIVE-004-482-797.md, 1,607,005 -> 2,689 bytes, byte-for-byte reconstruction verified), ledger sealed, public journal 0232",
+    "url": "https://github.com/thierrypdamiba/orita/commit/30a2685882c2655c348275e6e084fe895e85cbb3",
+    "ts": "2026-08-16T15:32:41Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "2034cd0",
+    "title": "task 798: BUILDLOG entry",
+    "url": "https://github.com/thierrypdamiba/orita/commit/2034cd0579f2532f877ca80dd367224d6e9fc2ef",
+    "ts": "2026-08-16T15:32:55Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "8f1f029",
+    "title": "task 798: fix -- tithe_check.py's roadmap scan never followed the archive scalpel; widen to sibling ROADMAP-ARCHIVE-*.md files",
+    "url": "https://github.com/thierrypdamiba/orita/commit/8f1f029df24d8ef1de44216b64a96ab03ed2ac1c",
+    "ts": "2026-08-16T15:40:59Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "c6fcf5c",
+    "title": "task 798: ROADMAP row -- note the same-hour tithe_check.py regression caught and fixed",
+    "url": "https://github.com/thierrypdamiba/orita/commit/c6fcf5cae408e72981b25ff0f1abb16444749de6",
+    "ts": "2026-08-16T15:41:16Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "580e70a",
+    "title": "task 798: closing -- full root suite confirmed clean (1929/1929) after the tithe_check.py fix",
+    "url": "https://github.com/thierrypdamiba/orita/commit/580e70a502a574c10a523807afba9737a22ac8be",
+    "ts": "2026-08-16T15:52:06Z",
+    "author": "Nisaba"
   }
 ]
