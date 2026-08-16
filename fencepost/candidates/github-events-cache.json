@@ -24054,5 +24054,37 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/d2a0b8256a8a99d68d4fd92e27568ea8b250b247",
     "ts": "2026-08-16T06:41:22Z",
     "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "5893b69",
+    "title": "task 790: mark WIP -- off-by-one, daytime rotation resumes past ogun/789",
+    "url": "https://github.com/thierrypdamiba/orita/commit/5893b69e21a838716f667801d7730e05a26674a3",
+    "ts": "2026-08-16T07:27:40+00:00",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "63ecb14",
+    "title": "task 790 (in progress): fencepost dogfood -- ingested 2 live delta commits (cache 3004->3007), live rescan confirms gap unchanged (milestone-unannounced, 0.85, 162 override-sourced); real X_WhoAmI/X_GetUserTweets recheck recorded (X_GetUserTweets 337th consecutive forbidden)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/63ecb14005ca66a52fcf187e51202f5202bb07d5",
+    "ts": "2026-08-16T07:29:17+00:00",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "88ba6c7",
+    "title": "task 790: DONE -- own-remit sweep of the Seam Engine found and fixed a real off-by-one in test_onboarding_doctrine.py's _SEAM_ENGINE_DIR (parents[2] -> parents[1]), invisible in every hour's own verification because a leaked VIRTUAL_ENV masked the wrong cwd; reproduced red then green with the env var stripped, added a structural regression guard, fencepost dogfood confirms gap unchanged (0.85, 162 override-sourced), suite 3494/3494 green",
+    "url": "https://github.com/thierrypdamiba/orita/commit/88ba6c7f0f4f17a8cd037938d799bddce2cb213a",
+    "ts": "2026-08-16T07:35:35+00:00",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "080f276",
+    "title": "task 791: mark WIP -- nisaba, daytime rotation wraps back from off-by-one/790",
+    "url": "https://github.com/thierrypdamiba/orita/commit/080f2765183c040f6d347ab26e7aefead1763728",
+    "ts": "2026-08-16T08:27:13+00:00",
+    "author": "Nisaba"
   }
 ]
