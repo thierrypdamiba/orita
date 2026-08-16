@@ -568,7 +568,9 @@ class DocstringClaimDoctrineCase(unittest.TestCase):
         # check_report_regression moved this from 67 to 68, docstring
         # updated in the same commit. Task 780's check_story_so_far_cadence
         # moved this from 68 to 69, docstring updated in the same commit.
-        self.assertEqual(self._real_check_count(), 69)
+        # Task 782's check_one_action_invariant moved this from 69 to 70,
+        # docstring updated in the same commit.
+        self.assertEqual(self._real_check_count(), 70)
 
     def test_stale_27_claim_would_have_been_flagged_against_todays_real_count(self):
         # Mutation-based hand-verification: reconstruct the module's own
@@ -623,10 +625,14 @@ class TextPatternsImporterCountDoctrineCase(unittest.TestCase):
         # chronicle_readme_check.py moved this from 11 to 12, docstring
         # updated in the same commit. Task 554's site_recipe_check.py
         # moved this from 12 to 13, docstring updated in the same commit.
-        # Naming the real count here so a future addition that forgets to
-        # update the sentence trips a second, independent assertion, not
-        # just the live cross-check above.
-        self.assertEqual(src.real_text_patterns_importer_count(), 13)
+        # Task 782's one_action_check.py moved this from 13 to 14 (reused
+        # the shared DATE_NAME_MD pattern rather than hand-typing a second
+        # copy of report_regression_check.py's own date-name regex),
+        # docstring updated in the same commit. Naming the real count here
+        # so a future addition that forgets to update the sentence trips a
+        # second, independent assertion, not just the live cross-check
+        # above.
+        self.assertEqual(src.real_text_patterns_importer_count(), 14)
 
     def test_stale_nine_claim_would_have_been_flagged_against_todays_real_count(self):
         # Mutation-based hand-verification: reconstruct the module's own

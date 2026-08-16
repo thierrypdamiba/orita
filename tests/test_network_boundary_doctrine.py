@@ -234,6 +234,7 @@ class RealToolsDirCase(unittest.TestCase):
         "metrics_field_completeness_check.py",
         "network_boundary_check.py",
         "nyx_traffic_check.py",
+        "one_action_check.py",
         "petition_cadence_check.py",
         "petition_limits_check.py",
         "proclamation_count_check.py",
@@ -630,7 +631,7 @@ _CARDINAL_WORDS = {
     "seventeen": 17, "eighteen": 18, "nineteen": 19, "twenty": 20,
     "twenty-one": 21, "twenty-two": 22, "twenty-three": 23, "twenty-four": 24,
     "twenty-five": 25, "twenty-six": 26, "twenty-seven": 27, "twenty-eight": 28,
-    "twenty-nine": 29, "thirty": 30,
+    "twenty-nine": 29, "thirty": 30, "thirty-one": 31,
 }
 
 _TODAY_COUNT_CLAIM_RE = re.compile(r"([a-z-]+) carry it today")
@@ -675,7 +676,11 @@ class DocstringCountDoctrineCase(unittest.TestCase):
         # Task 554's site_recipe_check.py moved this from 27 to 28.
         # Task 671's duplicate_function_check.py moved this from 28 to 29.
         # Task 673's tithe_check.py moved this from 29 to 30.
-        self.assertEqual(len(nbc.find_claiming_files()), 30)
+        # Task 782's one_action_check.py moved this from 30 to 31 (its own
+        # "local-filesystem-only ... no network call of its own" claim,
+        # true the same way every sibling's is), docstring updated in the
+        # same commit.
+        self.assertEqual(len(nbc.find_claiming_files()), 31)
 
     def test_docstring_matches_the_real_live_count(self):
         real_count = len(nbc.find_claiming_files())
@@ -694,7 +699,7 @@ class DocstringCountDoctrineCase(unittest.TestCase):
         not just that it happens to pass today."""
         real_count = len(nbc.find_claiming_files())
         wrong_word = _word_for(real_count - 1)
-        wrong_doc = nbc.__doc__.replace("thirty carry it today", f"{wrong_word} carry it today")
+        wrong_doc = nbc.__doc__.replace("thirty-one carry it today", f"{wrong_word} carry it today")
         claimed = claimed_today_count(wrong_doc)
         self.assertNotEqual(claimed, real_count)
 

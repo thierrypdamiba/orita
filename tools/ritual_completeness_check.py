@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Task 121. Off-By-One counts the tool that counts everything else.
 
-`tools/ritual_check.py` hand-wires 69 `check_*` functions into one hourly
+`tools/ritual_check.py` hand-wires 70 `check_*` functions into one hourly
 block: each is called inside `run_ritual_check`, its result assigned to a
 dict key, and that key printed as a line in `format_ritual_check`. Three
 separate places a single typo or a forgotten wire-up can silently drop a
@@ -339,7 +339,21 @@ the previous day's own claim, twice, in the town's first week
 (2026-07-12 -> 07-13, 2026-07-13 -> 07-18), unnoticed for over a month
 because `check_report_accuracy` only ever compares one day's number
 against a fresh live rescan of that SAME day, never against the day
-before it.
+before it. **Updated to 69** the same hour task 780's
+`check_story_so_far_cadence` was wired in -- kwaku-ananse's own second
+find that hour, closing the fifth of TOWN-OPERATIONS.md's five weekly
+Cluster Day obligations, the one that had never gotten a cadence sensor
+across tasks 387/449/463/465. **Updated to 70** the same hour task 782's
+`check_one_action_invariant` was wired in -- retrya's own remit sweep of
+"The One Action, Left to You" (STRATEGY.md): every sealed
+`fencepost/REPORTS/*.md` tablet held the invariant (exactly one
+reader-phrased `**Your move.**` line) at the time of the sweep, but
+nothing had ever checked the LIVE tablets structurally -- only
+`seam_engine/tests/test_report.py`'s own in-memory unit tests of the
+generator function, never the artifact it actually writes to disk. The
+same "true by convention and unit-test coverage of the generator alone,
+never checked against what shipped" shape task 779's own Wall sweep
+found for `connect.html` against `gateway.py`.
 
 Usage:
     python3 tools/ritual_completeness_check.py check
@@ -379,7 +393,7 @@ EXEMPT_TOOL_FILES = {
     "roadmap_archive.py": "one-off length-triggered archival tool run by hand, not a periodic repo-state check",
     "closing_keyword_guard.py": "takes a commit-message-and-open-issues-csv argument each call -- a per-commit guard, not the hourly repo-state sweep run_ritual_check folds",
     "consent_grant_log.py": "append-only log library, called by toolkits_in_use_check.py (already wired) rather than loaded standalone",
-    "text_patterns.py": "shared regex-pattern library (task 418), imported directly by the 13 tools/*.py files that use it rather than loaded standalone by ritual_check.py (task 484: grown from the original nine as later tasks, task 461 among them, wired more callers without revisiting this count; task 545's chronicle_readme_check.py the twelfth, task 554's site_recipe_check.py the thirteenth)",
+    "text_patterns.py": "shared regex-pattern library (task 418), imported directly by the 14 tools/*.py files that use it rather than loaded standalone by ritual_check.py (task 484: grown from the original nine as later tasks, task 461 among them, wired more callers without revisiting this count; task 545's chronicle_readme_check.py the twelfth, task 554's site_recipe_check.py the thirteenth, task 782's one_action_check.py the fourteenth -- reused the shared `DATE_NAME_MD` tablet-name pattern rather than hand-typing a second copy of `report_regression_check.py`'s own, the exact duplicate `duplicate_regex_check.py` flagged live pre-fix)",
     "metrics_reader.py": "shared records/metrics.jsonl reader library (task 508), imported directly by the six tools/*.py checks that use it (connected_users_check.py, gap_true_positive_check.py, github_stars_check.py, report_shipped_check.py, tasks_shipped_check.py, toolkits_in_use_check.py -- all already wired) rather than loaded standalone by ritual_check.py, the same shape consent_grant_log.py/text_patterns.py already hold",
     "iso_time.py": "shared Z-suffixed ISO timestamp parser library (task 509), imported directly by the three tools/*.py checks that use it (cron_health.py, voice_window_check.py, x_outage_tracker.py -- all already wired) rather than loaded standalone by ritual_check.py, the same shape metrics_reader.py/consent_grant_log.py/text_patterns.py already hold",
     "jsonl_append.py": "shared append-one-JSON-line library (task 510), imported directly by the ten tools/*.py checks that use it (arcade_app_watch.py, change_gate.py, ci_watch.py, gateway_toolset_check.py, github_stars_check.py, scribe_growth_check.py, square_check.py, word_watch.py, x_outage_tracker.py, x_post_queue.py -- all already wired) rather than loaded standalone by ritual_check.py, the same shape metrics_reader.py/iso_time.py/consent_grant_log.py/text_patterns.py already hold",

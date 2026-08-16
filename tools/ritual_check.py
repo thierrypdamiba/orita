@@ -355,6 +355,10 @@ def _report_regression_check() -> ModuleType:
     return _load("_ritual_report_regression_check", os.path.join(ROOT, "tools", "report_regression_check.py"))
 
 
+def _one_action_check() -> ModuleType:
+    return _load("_ritual_one_action_check", os.path.join(ROOT, "tools", "one_action_check.py"))
+
+
 def _ritual_completeness_check() -> ModuleType:
     return _load("_ritual_completeness_check", os.path.join(ROOT, "tools", "ritual_completeness_check.py"))
 
@@ -1276,6 +1280,26 @@ def check_report_regression(reports_dir: str | None = None) -> dict[str, object]
         kwargs["reports_dir"] = reports_dir
     counts = mod.read_report_counts(**kwargs)
     return cast(dict[str, object], mod.compute_report_regression(counts))
+
+
+def check_one_action_invariant(reports_dir: str | None = None) -> dict[str, object]:
+    """Task 782: fold `one_action_check.py`'s own sweep of STRATEGY.md's
+    "The One Action, Left to You" law into the one block. Unconditional,
+    local-filesystem-only (reads every sealed `fencepost/REPORTS/*.md`
+    already on disk, no network) -- flags any sealed tablet that doesn't
+    carry exactly one `**Your move.**` line, or whose one line reads as
+    something Fencepost/`I`/`we` already did or is about to do rather
+    than something the reader does next. Retrya's own remit sweep (task
+    782) found the live directory clean at the time this check was
+    written; a real hit here DOES flip `broken` -- the same "unconditional,
+    a real hit is a live regression" treatment `check_report_regression`
+    already gets for the identical directory, not an honest zero-state
+    waiting on the calendar the way `report_cadence`/`shared_reports` are."""
+    mod = _one_action_check()
+    kwargs = {}
+    if reports_dir is not None:
+        kwargs["reports_dir"] = reports_dir
+    return cast(dict[str, object], mod.check_one_action_invariant(**kwargs))
 
 
 def check_ritual_completeness(
@@ -2309,6 +2333,7 @@ def run_ritual_check(
     escape_sequence_orita_dir: str | None = None,
     metrics_field_completeness_metrics_path: str | None = None,
     metrics_field_completeness_tools_dir: str | None = None,
+    one_action_reports_dir: str | None = None,
     strategy_true_positive_path: str | None = None,
     strategy_true_positive_ledger_base: str | None = None,
     gap_true_positive_metrics_path: str | None = None,
@@ -2350,6 +2375,7 @@ def run_ritual_check(
     report = check_report_freshness(now)
     report_accuracy = check_report_accuracy(report, live_scan)
     report_regression = check_report_regression()
+    one_action = check_one_action_invariant(reports_dir=one_action_reports_dir)
     recheck = check_x_recheck(now_iso)
     escalation = check_x_escalation(now_iso)
     square = check_square(square_state, now_iso)
@@ -2517,6 +2543,7 @@ def run_ritual_check(
         or (not escape_sequences["clean"])
         or (not metrics_field_completeness["clean"])
         or (not report_regression["clean"])
+        or (not one_action["clean"])
     )
     return {
         "now": now_iso,
@@ -2526,6 +2553,7 @@ def run_ritual_check(
         "report": report,
         "report_accuracy": report_accuracy,
         "report_regression": report_regression,
+        "one_action": one_action,
         "x_recheck": recheck,
         "x_escalation": escalation,
         "square": square,
@@ -2620,6 +2648,8 @@ def format_ritual_check(result: dict[str, Any]) -> str:
     lines.append(f"  report accuracy: {'clean' if ra['clean'] else 'STALE'} -- {ra['reason']}")
     rr = result["report_regression"]
     lines.append(f"  report regression: {'clean' if rr['clean'] else 'REGRESSED'} -- {rr['reason']}")
+    oa = result["one_action"]
+    lines.append(f"  one action invariant: {'clean' if oa['clean'] else 'BROKEN'} -- {oa['reason']}")
     for tool, info in result["x_recheck"].items():
         lines.append(f"  {tool}: {'due' if info['due'] else 'not due'} -- {info['status_line']}")
     for tool, info in result["x_escalation"].items():
