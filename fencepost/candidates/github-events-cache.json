@@ -23982,5 +23982,13 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/8b29c494b981e6340cf897d12ed766737921a838",
     "ts": "2026-08-16T00:46:07Z",
     "author": "Zashiki-Warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "a269f7d",
+    "title": "task 784: fix real dawn-run break -- the-seam-oath job never installs uv",
+    "url": "https://github.com/thierrypdamiba/orita/commit/a269f7d6377a9b86556ec2cb88b61ad46f48e1c9",
+    "ts": "2026-08-16T01:42:45Z",
+    "author": "Ogun"
   }
 ]
