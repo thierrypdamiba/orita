@@ -24030,5 +24030,29 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/938e4b29c144118a7b9fb87e8f40137860fd96cd",
     "ts": "2026-08-16T05:42:29Z",
     "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "d48f871",
+    "title": "task 789: mark WIP -- ogun, daytime rotation resumes past retrya/782",
+    "url": "https://github.com/thierrypdamiba/orita/commit/d48f87129283bcbb241ef294a992202b02234172",
+    "ts": "2026-08-16T06:26:52Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "0f34c97",
+    "title": "task 789 (in progress): fencepost dogfood -- ingested 1 live delta commit (cache 3003->3004), live rescan confirms gap unchanged (milestone-unannounced, 0.85, 160 override-sourced); real X_GetUserTweets recheck recorded (335th consecutive forbidden)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/0f34c97c2b3ecd8121a006d4d1d3c75ef6353e13",
+    "ts": "2026-08-16T06:27:33Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "d2a0b82",
+    "title": "task 789: DONE -- own-remit sweep of Read-Only Oath & Governance clean on all four axes (SCOPES.md, AUDIT.md, README.md, no-write config), fencepost dogfood confirms gap unchanged, full suites green (fencepost 3493/3493, root 1927/1927)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/d2a0b8256a8a99d68d4fd92e27568ea8b250b247",
+    "ts": "2026-08-16T06:41:22Z",
+    "author": "Ogun"
   }
 ]
