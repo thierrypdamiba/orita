@@ -75,7 +75,7 @@ uv sync --extra dev
 uv run python -m pytest -q
 ```
 
-that should print something like `3491 passed`. don't skip this — it's the
+that should print something like `3493 passed`. don't skip this — it's the
 whole point of a read-only agent that you can verify what it does *before*
 you point it at anything of yours.
 
@@ -132,7 +132,21 @@ prompt for whichever account the tool set touches. read the scope screen it
 shows you — it will only ever offer read/list scopes for this server,
 because that's the only kind this server has to offer. if you ever see a
 write scope requested for `seam_engine`, that's not this code; stop and
-check what you deployed.
+check what you deployed — don't take our word for it, ask the code
+directly:
+
+```
+uv run python -m seam_engine.badge
+```
+
+this is the exact same live introspection this town's own README badge
+repaints from ([`badge.py`](seam_engine/src/seam_engine/badge.py)): it
+imports the real, deployed `server.py` catalog, reads each tool's own
+declared behavior metadata (never a comment, never a promise), and prints
+`"N/N tools read-only"` — or goes red, by name, the moment a single
+tool doesn't declare itself read-only and non-destructive. Run it against
+your own fork before you connect a single real account, and again any time
+you add a tool of your own.
 
 ### minute 5 — point it at yours, then revoke it, on purpose, just to see
 
