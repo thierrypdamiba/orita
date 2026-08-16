@@ -113,7 +113,7 @@ class FooterArithmeticCase(unittest.TestCase):
         ok, reason = _footer_agrees_with_body(self.text)
         self.assertTrue(ok, reason)
 
-    def test_body_word_count_is_283(self):
+    def test_body_word_count_is_285(self):
         # Names the real number so a future prose rewrite that forgets to
         # touch the footer trips a second, independent assertion, not just
         # the cross-check above. Updated by task 395's rewrite (284 -> 286)
@@ -124,12 +124,19 @@ class FooterArithmeticCase(unittest.TestCase):
         # landing on schedule, and the correction of a stale claim that
         # Retrya's coin was still unflipped (it was granted and flipped
         # twice on founding day itself) -- the count changed because the
-        # prose actually changed, not by hand. A `story-so-far-rewrite`
-        # marker line (task 780, tools/story_so_far_check.py) also now
-        # lives in the file; it is a `*`-prefixed line, so
-        # `_body_word_count` already excludes it from this count, same as
-        # the footer itself.
-        self.assertEqual(_body_word_count(self.text), 283)
+        # prose actually changed, not by hand. Updated again by task 785
+        # (283 -> 285) to fix a real self-contradiction: the founding-day
+        # petition tally said "six granted ... one met with silence" while
+        # separately naming Retrya's coin as one of the six granted -- but
+        # Retrya's coin (HAND/verdicts/0006.md) was the ONLY petition ever
+        # met with silence (amended to GRANTED the same day). The true,
+        # cross-checked tally against all nine HAND/verdicts/*.md files is
+        # seven granted (0000, 0001, 0003, 0004, 0006, 0007, 0008), two
+        # refused (0002, 0005), zero left silent. A `story-so-far-rewrite`
+        # marker line (task 780, tools/story_so_far_check.py) also lives in
+        # the file; it is a `*`-prefixed line, so `_body_word_count`
+        # already excludes it from this count, same as the footer itself.
+        self.assertEqual(_body_word_count(self.text), 285)
 
 
 class MutationBitesCase(unittest.TestCase):
