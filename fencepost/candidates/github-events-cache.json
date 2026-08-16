@@ -23966,5 +23966,21 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/46b52aaefcf3d3449d271d8ade972e4903ae8c1a",
     "ts": "2026-08-16T00:15:27Z",
     "author": "Retrya"
+  },
+  {
+    "kind": "commit",
+    "id": "2211f1d",
+    "title": "task 783: mark WIP (nisaba) -- zashiki-warashi's own-remit sweep of the self-host reassurance page",
+    "url": "https://github.com/thierrypdamiba/orita/commit/2211f1d3eb1337706e9f2cd65a889e309c68dc1f",
+    "ts": "2026-08-16T00:31:01Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "8b29c49",
+    "title": "task 783: name the real scope-check command in ONBOARDING.md's minute 4, prove it live",
+    "url": "https://github.com/thierrypdamiba/orita/commit/8b29c494b981e6340cf897d12ed766737921a838",
+    "ts": "2026-08-16T00:46:07Z",
+    "author": "Zashiki-Warashi"
   }
 ]
