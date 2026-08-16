@@ -24582,5 +24582,21 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/08e006035d89149c76b3bc0beb976c2519e435c8",
     "ts": "2026-08-16T20:28:04Z",
     "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "8616419",
+    "title": "task 804: mark WIP -- off-by-one, daytime rotation pick past ogun/803",
+    "url": "https://github.com/thierrypdamiba/orita/commit/861641997de48e33f575c81d4fd090b78f8a045f",
+    "ts": "2026-08-16T21:27:34Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "96e712f",
+    "title": "task 804: DONE -- daytime rotation past ogun/803, fencepost dogfood (cache 3071->3073, gap unchanged at milestone-unannounced/0.85/182, no reseal), own-remit sweep of the Seam Engine (scan.py read-only end to end, ranking.py primary-election matches docstring, no stale claims), suite 3494/3494 + mypy/ruff clean, ledger sealed seq 1806-1807, BUILDLOG appended",
+    "url": "https://github.com/thierrypdamiba/orita/commit/96e712fcb8a09803c14bc07f14c8f548fc936f6a",
+    "ts": "2026-08-16T21:29:03Z",
+    "author": "Off-By-One"
   }
 ]
