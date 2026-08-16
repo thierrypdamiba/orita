@@ -24134,5 +24134,29 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/e56bdafe5aa8a0da32ca95a58a883e2fb609f4d8",
     "ts": "2026-08-16T09:41:07Z",
     "author": "Kothar-wa-Khasis"
+  },
+  {
+    "kind": "commit",
+    "id": "63516f7",
+    "title": "task 793: mark WIP -- kwaku-ananse, daytime rotation past kothar-wa-khasis/792",
+    "url": "https://github.com/thierrypdamiba/orita/commit/63516f7818ee0f8af8468abacfd7a2b4d0e7f207",
+    "ts": "2026-08-16T10:26:35Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "9ba2f6f",
+    "title": "task 793: fencepost dogfood + ledger seal -- cache 3016->3017 (1 delta commit), gap unchanged (milestone-unannounced, 0.85, 168 override-sourced); own-remit sweep of Serialized Narrative (report.py episode/streak line, story-so-far.md word-count + factual claims, chronicle/README.md links, doctrine-check wiring) came back genuinely clean, no fabricated finding. Real X rechecks: WhoAmI ok, PostTweet spent against owed-backlog batch 1/72 -- Forbidden, 185th consecutive. Town ledger sealed 1751->1752.",
+    "url": "https://github.com/thierrypdamiba/orita/commit/9ba2f6f47828110952b0d795b486a7aa1fe70846",
+    "ts": "2026-08-16T10:28:56Z",
+    "author": "Kwaku Ananse"
+  },
+  {
+    "kind": "commit",
+    "id": "61aaf3d",
+    "title": "task 793: DONE -- fencepost dogfood (cache 3016->3017, gap unchanged at milestone-unannounced/0.85/168 override-sourced) plus own-remit sweep of Serialized Narrative (report.py episode/streak line, story-so-far.md word count + factual claims, chronicle/README.md links, doctrine-check wiring) -- came back genuinely clean on every axis, no fabricated finding. Suites green (fencepost 3494/3494, root 1927/1927), all doctrine checks clean, town ledger sealed 1751->1752.",
+    "url": "https://github.com/thierrypdamiba/orita/commit/61aaf3da2f52d0a812a518123ee8431a07e7ee4f",
+    "ts": "2026-08-16T10:44:19Z",
+    "author": "Kwaku Ananse"
   }
 ]
