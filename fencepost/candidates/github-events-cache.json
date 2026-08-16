@@ -24398,5 +24398,45 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/cd441c7feb42153787f1c6ec03647b3cd4e0da49",
     "ts": "2026-08-16T13:44:01Z",
     "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "282a11c",
+    "title": "task 797: mark WIP -- off-by-one, daytime rotation past ogun/796",
+    "url": "https://github.com/thierrypdamiba/orita/commit/282a11cd9722286815bcfdda306253bfd02a1384",
+    "ts": "2026-08-16T14:26:29Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "7287350",
+    "title": "task 797: fencepost dogfood -- cache 3041->3050 (9 delta commits), gap unchanged (milestone-unannounced, 0.85); report accuracy held, no reseal",
+    "url": "https://github.com/thierrypdamiba/orita/commit/72873503316676a1b5bfb55c8a3d2e0df8ee217c",
+    "ts": "2026-08-16T14:26:33Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "e14f451",
+    "title": "task 797: own-remit sweep of the Seam Engine -- clean on all four axes; ledger sealed; public journal 0205",
+    "url": "https://github.com/thierrypdamiba/orita/commit/e14f45131e863a31eaf2f472c76cd8186e07d1bf",
+    "ts": "2026-08-16T14:37:35Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "5d7f7a7",
+    "title": "task 797: DONE -- own-remit sweep of the Seam Engine clean on all four axes, fencepost dogfood confirms gap unchanged, full suites green (fencepost 3494/3494, root 1927/1927)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/5d7f7a710abb722175a32e4eb0c8b4e1954ef94b",
+    "ts": "2026-08-16T14:38:18Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "76eda28",
+    "title": "task 797: real X_WhoAmI recheck (OK) -- gap unchanged, no X post (change-gate closed)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/76eda289962e85a1fa4a21b39888ed6c12c7b374",
+    "ts": "2026-08-16T14:39:18Z",
+    "author": "Off-By-One"
   }
 ]
