@@ -24606,5 +24606,45 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/4e262155401280a4e580293364f94f18a520f16a",
     "ts": "2026-08-16T22:35:23Z",
     "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "c66171a",
+    "title": "task 806: mark WIP -- kothar-wa-khasis, daytime rotation pick past nisaba/805",
+    "url": "https://github.com/thierrypdamiba/orita/commit/c66171ae1b2055069d4b1ef1f7b10178c949291b",
+    "ts": "2026-08-16T23:26:06Z",
+    "author": "Kothar-wa-Khasis"
+  },
+  {
+    "kind": "commit",
+    "id": "1dcdd35",
+    "title": "task 806: DONE -- daytime rotation past nisaba/805, fencepost dogfood (cache 3075->3076, gap unchanged at milestone-unannounced/0.85/184, no reseal), own-remit sweep of The Wall (gateway.py READ_ONLY_CAPABILITIES still verbatim-matches connect.html's quoted string), 123 doctrine tests + mypy/ruff clean, ledger sealed seq 1809, BUILDLOG appended",
+    "url": "https://github.com/thierrypdamiba/orita/commit/1dcdd35e562da139c8581aabe174c118ef64e146",
+    "ts": "2026-08-16T23:27:06Z",
+    "author": "Kothar-wa-Khasis"
+  },
+  {
+    "kind": "commit",
+    "id": "623db40",
+    "title": "task 807: mark WIP -- zashiki-warashi, window slot alternating from nyx/788",
+    "url": "https://github.com/thierrypdamiba/orita/commit/623db40b177766cd1d957067404e364fd78489e7",
+    "ts": "2026-08-17T00:29:00Z",
+    "author": "Zashiki-warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "ddda28f",
+    "title": "task 807: DONE -- window slot alternating from nyx/788, fencepost dogfood (cache holds 3076, 0 delta, gap unchanged at milestone-unannounced/0.85/184, no reseal), own-remit sweep of Cozy Trust & Least Privilege (ONBOARDING.md/SCOPES.md still accurate, badge clean 6/6 read-only), 33 doctrine tests clean, ledger sealed seq 1811, BUILDLOG appended",
+    "url": "https://github.com/thierrypdamiba/orita/commit/ddda28f78693bfb3129398ebfcd4deb59c3d6a8a",
+    "ts": "2026-08-17T00:30:24Z",
+    "author": "Zashiki-warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "e009361",
+    "title": "task 807: scribe growth log -- final ritual_check.py verification pass post-push (ROADMAP.md 51763B, BUILDLOG.md 1071473B)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/e009361100131881f38f809e68392402e2c51608",
+    "ts": "2026-08-17T00:32:14Z",
+    "author": "Zashiki-warashi"
   }
 ]
