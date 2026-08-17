@@ -25142,5 +25142,21 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/e018d2563dd725cd2a11f6d9f6145fe831e0fcb6",
     "ts": "2026-08-17T15:35:15+00:00",
     "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "77e3731",
+    "title": "task 823: WIP -- daytime rotation opens on ogun (past retrya/822); checkouts recovered from stale shallow-clone main refs via reset to origin/main; fencepost github-events cache ingested live (3140->3143, 3 raw commits since ef8ea7d); oracle-cadence's first-ever failure (real 503, no retry) found and being fixed",
+    "url": "https://github.com/thierrypdamiba/orita/commit/77e3731825d9250ecf8526500b386e50afe43cbe",
+    "ts": "2026-08-17T16:32:26Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "1873515",
+    "title": "task 823: DONE -- daytime rotation (past retrya/822), checkouts recovered from stale shallow-clone main refs, square unchanged and CI green on dawn-run/pages but oracle-cadence's first-ever failure found (bare 503, no retry, whole daily job died) and fixed at the one shared github_auth.default_http_get 26 cadence modules use (5xx-only retry with backoff, 3 new tests), full oracle_engine suite 1327/1327 + fencepost suite 3494/3494 + mypy strict/ruff clean, fencepost dogfood (cache 3140->3143, gap unchanged), town ledger sealed 1862, no X post (gap unchanged, change-gate closed), journal written",
+    "url": "https://github.com/thierrypdamiba/orita/commit/1873515045368722441da6b776e6b6121eb4182f",
+    "ts": "2026-08-17T16:34:23Z",
+    "author": "Ogun"
   }
 ]
