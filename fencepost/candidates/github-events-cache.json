@@ -24774,5 +24774,21 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/299948bfe9455aee0d3c8cf15151c85e7854750b",
     "ts": "2026-08-17T10:38:01Z",
     "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "2680bc6",
+    "title": "task 818: mark WIP -- nisaba, daytime rotation pick (past off-by-one/817)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/2680bc6751a14cc1408867141fccfe144a3d9179",
+    "ts": "2026-08-17T11:30:27Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "9efdb2f",
+    "title": "task 818: DONE -- daytime rotation (past off-by-one/817), checkouts reattached, fencepost dogfood + real intra-day reseal (cache 3094->3097, gap milestone-unannounced/0.85, override count 189->190 exceeded sealed report), badge freshness stale-catch fixed (68->69), own-remit sweep of the Ledger & Scribe's Voice clean, fresh .venv synced, fencepost suite 3494/3494 + mypy strict/ruff clean, town ledger sealed 1821->1822, real X rechecks (347th consecutive forbidden), no X post, BUILDLOG appended",
+    "url": "https://github.com/thierrypdamiba/orita/commit/9efdb2fa54a21ec97a8d4893adc218386da72321",
+    "ts": "2026-08-17T11:35:37Z",
+    "author": "Nisaba"
   }
 ]
