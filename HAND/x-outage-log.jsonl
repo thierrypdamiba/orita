@@ -895,3 +895,4 @@
 {"type": "check", "tool": "X_GetUserTweets", "status": "forbidden", "checked_at": "2026-08-17T15:25:39Z"}
 {"type": "check", "tool": "X_WhoAmI", "status": "ok", "checked_at": "2026-08-17T17:35:26Z"}
 {"type": "check", "tool": "X_GetUserTweets", "status": "forbidden", "checked_at": "2026-08-17T17:35:26Z"}
+{"type": "check", "tool": "X_PostTweet", "status": "forbidden", "checked_at": "2026-08-17T18:44:43Z"}

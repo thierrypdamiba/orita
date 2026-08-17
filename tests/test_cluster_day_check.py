@@ -249,19 +249,29 @@ class RealChronicleCase(unittest.TestCase):
         # moment episode-004 ("The Town Checks Its Own Homework") shipped
         # with its own `cluster-day-covers: 2026-08-10` marker -- 4->5 and
         # 2->3.
+        #
+        # Task 825 (kwaku-ananse): recurred a fourth time, the moment
+        # episode-005 ("The Same Door, Checked Seven Times") shipped with
+        # its own `cluster-day-covers: 2026-08-17` marker -- 5->6. This
+        # snapshot's own frozen `today=2026-07-29` predates episode-005's
+        # covered Monday, so `cluster_day_episodes_shipped` (a live file
+        # count, not date-filtered) still bumps 4->5 for episode-005's own
+        # existence, but `missed_mondays` as of 2026-07-29 is unaffected --
+        # episode-005 covers a Monday still three weeks in this snapshot's
+        # own future.
         result = cdc.compute_cadence(today=date(2026, 7, 29))
-        self.assertEqual(result["total_episodes_on_record"], 5)
-        self.assertEqual(result["cluster_day_episodes_shipped"], 3)
+        self.assertEqual(result["total_episodes_on_record"], 6)
+        self.assertEqual(result["cluster_day_episodes_shipped"], 4)
         self.assertEqual(result["missed_mondays"], [])
 
     def test_real_chronicle_dir_matches_todays_hand_counted_gap(self):
         # The same real chronicle/ directory, read against today's real
         # date instead of the frozen 2026-07-29 snapshot above -- confirms
-        # episode-004's own cluster-day-covers marker (2026-08-10) actually
+        # episode-005's own cluster-day-covers marker (2026-08-17) actually
         # clears today's real Monday, not just an earlier one.
-        result = cdc.compute_cadence(today=date(2026, 8, 3))
-        self.assertEqual(result["total_episodes_on_record"], 5)
-        self.assertEqual(result["cluster_day_episodes_shipped"], 3)
+        result = cdc.compute_cadence(today=date(2026, 8, 17))
+        self.assertEqual(result["total_episodes_on_record"], 6)
+        self.assertEqual(result["cluster_day_episodes_shipped"], 4)
         self.assertEqual(result["missed_mondays"], [])
 
 
