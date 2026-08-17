@@ -165,5 +165,112 @@ class DefaultHttpGetCase(unittest.TestCase):
         self.assertTrue(calls["raised"])
 
 
+class DefaultHttpGetRetryCase(unittest.TestCase):
+    """Task 823: `oracle-cadence.yml`'s 2026-08-17T13:34Z run died on a bare
+    `503` from `collaborator_cadence.fetch_collaborator_count` -- no retry,
+    so the one transient hiccup took the whole scheduled job down with it.
+    These prove the fix: 5xx retries with backoff and eventually succeeds
+    or gives up after `_MAX_ATTEMPTS`; a 4xx is never retried at all."""
+
+    @staticmethod
+    def _fake_response(real_httpx, status_code, payload=None):
+        """`real_httpx` must be captured by the caller BEFORE `sys.modules`
+        is patched -- `default_http_get`'s own `import httpx` resolves
+        against whatever `sys.modules["httpx"]` is at call time, so an
+        `import httpx` done here, lazily, inside the patched block would
+        resolve to the fake, not the real module the exception needs to be
+        built from."""
+
+        class FakeResponse:
+            def raise_for_status(self):
+                if status_code >= 400:
+                    request = real_httpx.Request("GET", "https://api.github.com/x")
+                    response = real_httpx.Response(status_code, request=request)
+                    raise real_httpx.HTTPStatusError(
+                        f"{status_code} error", request=request, response=response
+                    )
+
+            def json(self):
+                return payload
+
+        return FakeResponse()
+
+    def test_5xx_retries_then_succeeds(self):
+        import httpx
+
+        calls = {"get": 0}
+        sleeps = []
+
+        def fake_response(*a, **kw):
+            return self._fake_response(httpx, *a, **kw)
+
+        class FakeHttpx:
+            HTTPStatusError = httpx.HTTPStatusError
+
+            @staticmethod
+            def get(url, headers, timeout):
+                calls["get"] += 1
+                if calls["get"] < 3:
+                    return fake_response(503)
+                return fake_response(200, {"ok": True})
+
+        with mock.patch.dict(sys.modules, {"httpx": FakeHttpx}):
+            result = github_auth.default_http_get(
+                "https://api.github.com/x", sleep=sleeps.append
+            )
+
+        self.assertEqual(result, {"ok": True})
+        self.assertEqual(calls["get"], 3)
+        self.assertEqual(sleeps, [0.5, 1.0])
+
+    def test_5xx_exhausts_attempts_and_raises(self):
+        import httpx
+
+        calls = {"get": 0}
+        sleeps = []
+
+        def fake_response(*a, **kw):
+            return self._fake_response(httpx, *a, **kw)
+
+        class FakeHttpx:
+            HTTPStatusError = httpx.HTTPStatusError
+
+            @staticmethod
+            def get(url, headers, timeout):
+                calls["get"] += 1
+                return fake_response(503)
+
+        with mock.patch.dict(sys.modules, {"httpx": FakeHttpx}):
+            with self.assertRaises(httpx.HTTPStatusError):
+                github_auth.default_http_get("https://api.github.com/x", sleep=sleeps.append)
+
+        self.assertEqual(calls["get"], 3, "should stop at _MAX_ATTEMPTS, not retry forever")
+        self.assertEqual(sleeps, [0.5, 1.0], "backoff happens between attempts, not after the last")
+
+    def test_4xx_is_never_retried(self):
+        import httpx
+
+        calls = {"get": 0}
+        sleeps = []
+
+        def fake_response(*a, **kw):
+            return self._fake_response(httpx, *a, **kw)
+
+        class FakeHttpx:
+            HTTPStatusError = httpx.HTTPStatusError
+
+            @staticmethod
+            def get(url, headers, timeout):
+                calls["get"] += 1
+                return fake_response(404)
+
+        with mock.patch.dict(sys.modules, {"httpx": FakeHttpx}):
+            with self.assertRaises(httpx.HTTPStatusError):
+                github_auth.default_http_get("https://api.github.com/x", sleep=sleeps.append)
+
+        self.assertEqual(calls["get"], 1, "a 4xx is the caller's fault, not retried")
+        self.assertEqual(sleeps, [])
+
+
 if __name__ == "__main__":
     unittest.main()

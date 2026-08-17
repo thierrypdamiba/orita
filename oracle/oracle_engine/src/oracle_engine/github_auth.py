@@ -43,11 +43,32 @@ true: every sibling now points `_default_http_get` at this one function
 object (`tests/test_github_auth.py` asserts identity, not source equality),
 so a future fix here is a fix everywhere at once, the guarantee the
 docstring already promised and never quite kept.
+
+Task 823: `oracle-cadence.yml`'s 2026-08-17T13:34Z run died mid-job —
+`collaborator_cadence.fetch_collaborator_count` hit a bare `503 Service
+Unavailable` from `api.github.com/.../collaborators` (a transient upstream
+hiccup, GitHub's own status, nothing wrong with the request) and this
+function had no retry, so `raise_for_status()` propagated straight up and
+took the *whole* scheduled job down with it — every cadence step after
+collaborator's in that one long `the-call` job (star, fork, issue, and
+their grades) never ran that day, not just the one call that hit the 5xx.
+Twenty-six modules share this one function, so the fix belongs here once:
+retry a handful of times with short exponential backoff, but ONLY on 5xx
+(the server's own fault, plausibly gone on the next try) — a 4xx (404, or
+403 rate-limit) is retried zero times, since retrying an unauthorized or
+not-found request is not an existing-request problem, it just spends the
+job's wall-clock for the identical failure. `sleep` is an injected
+dependency (defaults to `time.sleep`) so the retry path is exercised under
+test without a real test suite ever actually pausing.
 """
 from __future__ import annotations
 
 import os
-from typing import Any
+import time
+from typing import Any, Callable
+
+_MAX_ATTEMPTS = 3
+_RETRY_BASE_DELAY_SECONDS = 0.5
 
 
 def github_headers(accept: str = "application/vnd.github+json") -> dict[str, str]:
@@ -62,16 +83,31 @@ def github_headers(accept: str = "application/vnd.github+json") -> dict[str, str
     return headers
 
 
-def default_http_get(url: str) -> Any:
+def default_http_get(url: str, sleep: Callable[[float], None] = time.sleep) -> Any:
     """The real network call every cadence module's `fetch_*` falls back to
     when no `http_get` override is given (every existing test always
     injects one, so this body itself has never been under direct test —
     same boundary the twenty prior private copies shared). `httpx` is
     imported lazily, matching every sibling's own prior copy, so importing
     this module for `github_headers()` alone — already done everywhere —
-    never requires `httpx` to be installed."""
+    never requires `httpx` to be installed.
+
+    Retries up to `_MAX_ATTEMPTS` times, but only on a 5xx response (GitHub's
+    own fault, plausibly transient — task 823's real `503`) with exponential
+    backoff between attempts. A 4xx is raised immediately, unretried: it is
+    the request that is wrong (bad auth, not found, rate-limited), and
+    trying the identical request again wastes the caller's wall-clock for
+    the identical failure."""
     import httpx
 
-    resp = httpx.get(url, headers=github_headers(), timeout=10.0)
-    resp.raise_for_status()
-    return resp.json()
+    for attempt in range(_MAX_ATTEMPTS):
+        try:
+            resp = httpx.get(url, headers=github_headers(), timeout=10.0)
+            resp.raise_for_status()
+            return resp.json()
+        except httpx.HTTPStatusError as exc:
+            is_last_attempt = attempt == _MAX_ATTEMPTS - 1
+            if exc.response.status_code < 500 or is_last_attempt:
+                raise
+            sleep(_RETRY_BASE_DELAY_SECONDS * (2**attempt))
+    raise AssertionError("unreachable: loop always returns or raises")
