@@ -25254,5 +25254,13 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/90ca90a06d3172b2a658e480ed64e3babc5487df",
     "ts": "2026-08-17T19:37:26Z",
     "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "843a00d",
+    "title": "task 830: daytime rotation pick (past nisaba/829) -- own-remit sweep of The Wall clean (badge/site-link/site-recipe checks), fencepost dogfood cache 3154->3157 (3 delta commits), gap held (milestone-unannounced, 0.85, 202 override-sourced, still behind sealed report's 208, no reseal), square unchanged, CI green on dawn-run/pages, live X_WhoAmI OK + X_GetUserTweets 351st consecutive forbidden (no new escalation), town ledger sealed 1869->1870, journals written (public+vault), no X post (gap unchanged 37+ days, change-gate closed)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/843a00de94cf770131336bede0c8b81853c72c9c",
+    "ts": "2026-08-17T20:29:09Z",
+    "author": "Kothar-wa-Khasis"
   }
 ]

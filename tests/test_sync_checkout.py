@@ -88,6 +88,59 @@ class TestAlreadyOnBranch(_RepoPairCase):
         self.assertEqual(_git(self.clone, "symbolic-ref", "--short", "HEAD"), "main")
 
 
+class TestAttachedButStaleBehindOrigin(_RepoPairCase):
+    """Task 831. The real bug hit live: attached to the right branch NAME,
+    but that branch is a stale local ref left behind origin -- the old
+    script's case 1 called this clean without ever checking. Ancestor
+    case only: nothing local sits on this branch, so a fast-forward
+    loses nothing."""
+
+    def test_fast_forwards_stale_attached_branch(self):
+        self._commit_on_origin("origin moved on while clone stayed attached")
+        r = _run(self.clone, "main")
+        self.assertEqual(r.returncode, 0, r.stderr)
+        self.assertIn("fast-forwarded", r.stdout)
+        self.assertEqual(_git(self.clone, "symbolic-ref", "--short", "HEAD"), "main")
+        _git_quiet(self.clone, "fetch", "origin", "main")
+        self.assertEqual(_git(self.clone, "rev-parse", "main"), _git(self.clone, "rev-parse", "origin/main"))
+
+
+class TestAttachedAheadOfOrigin(_RepoPairCase):
+    def test_leaves_local_only_work_alone(self):
+        self._commit_local_only(self.clone, "local work not yet pushed, still attached")
+        local_sha = _git(self.clone, "rev-parse", "HEAD")
+
+        r = _run(self.clone, "main")
+        self.assertEqual(r.returncode, 0, r.stderr)
+        self.assertIn("nothing to recover", r.stdout)
+        self.assertEqual(_git(self.clone, "rev-parse", "main"), local_sha)
+
+
+class TestAttachedDiverged(_RepoPairCase):
+    def test_warns_and_touches_nothing(self):
+        self._commit_local_only(self.clone, "local-only divergent commit, still attached")
+        diverged_sha = _git(self.clone, "rev-parse", "HEAD")
+        self._commit_on_origin("origin-only divergent commit")
+
+        r = _run(self.clone, "main")
+        self.assertNotEqual(r.returncode, 0)
+        self.assertIn("diverged", r.stderr)
+        self.assertEqual(_git(self.clone, "symbolic-ref", "--short", "HEAD"), "main")
+        self.assertEqual(_git(self.clone, "rev-parse", "HEAD"), diverged_sha)
+
+
+class TestAttachedToDifferentBranch(_RepoPairCase):
+    """Attached, but not to the branch the caller asked to sync -- out of
+    scope, untouched, exactly the old behavior for this one sub-case."""
+
+    def test_is_a_noop(self):
+        _git_quiet(self.clone, "checkout", "-b", "some-other-branch")
+        r = _run(self.clone, "main")
+        self.assertEqual(r.returncode, 0, r.stderr)
+        self.assertIn("nothing to recover", r.stdout)
+        self.assertEqual(_git(self.clone, "symbolic-ref", "--short", "HEAD"), "some-other-branch")
+
+
 class TestDetachedAtOrigin(_RepoPairCase):
     def test_recovers_cleanly_with_no_local_work(self):
         self._detach_at_current(self.clone)
