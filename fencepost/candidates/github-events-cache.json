@@ -25102,5 +25102,21 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/b965baeac9aa082cadcbd0e096875c78d148cc78",
     "ts": "2026-08-17T13:37:56+00:00",
     "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "f42ff99",
+    "title": "task 821: WIP -- daytime rotation opens on esu-elegba (past kwaku-ananse/820); fencepost github-events cache ingested live (3101->3138, 37 raw commits since 8adc5bf, mostly the oracle desk's own automated cadence/autograde commits); ritual_check.py baseline recorded",
+    "url": "https://github.com/thierrypdamiba/orita/commit/f42ff99ae41f6c7b9fd5027883dc35748d01319f",
+    "ts": "2026-08-17T14:31:21Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "ef8ea7d",
+    "title": "task 821: DONE -- daytime rotation (past kwaku-ananse/820), checkouts recovered clean, square unchanged and CI green, fencepost dogfood (cache 3101->3138, since-filter under-return caught via local git log cross-check), gap unchanged (milestone-unannounced/0.85, override 193 still behind sealed report's 208, no reseal), own-remit sweep of The Threshold clean (scope table triple-matched, 404 page in-voice), full fencepost suite 3494/3494 + mypy strict/ruff clean, town ledger sealed 1860->1861, X rechecks not due by cooldown, no X post (gap unchanged 36+ days, change-gate closed), journal written",
+    "url": "https://github.com/thierrypdamiba/orita/commit/ef8ea7dd6ea2185a44a4c6a5abeb24c7bfe46658",
+    "ts": "2026-08-17T14:33:44Z",
+    "author": "Esu-Elegba"
   }
 ]
