@@ -25158,5 +25158,37 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/1873515045368722441da6b776e6b6121eb4182f",
     "ts": "2026-08-17T16:34:23Z",
     "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "efa0c46",
+    "title": "task 824: WIP -- daytime rotation opens on off-by-one (past ogun/823); dawn-run read red on the current HEAD (the-oath job, test_scan_files.py's frozen no-grading fixture caught a real live violation) -- diagnosing and fixing before the rest of the hourly ritual runs",
+    "url": "https://github.com/thierrypdamiba/orita/commit/efa0c46936b58c91693e56370880f1f932f962f1",
+    "ts": "2026-08-17T17:34:34Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "77eecf7",
+    "title": "task 824: DONE -- daytime rotation (past ogun/823), dawn-run's the-oath job read red on the current HEAD with 71 test failures traced to one real cause (a pronoun+fault blame-shape phrase in ogun/823's own journal tripping the no-grading doctrine, cascading through every fold that reads the live tree by default); reworded in place, full root suite 1929/1929 + fencepost suite 3494/3494 + mypy strict/ruff clean, pushed and confirmed the live dawn-run rerun green (a second, unrelated pages 503 deploy-outage surfaced on the same push, GitHub's own transient fault, expected to clear on this commit's own push), fencepost dogfood (cache 3143->3145, gap unchanged), town ledger sealed 1864, no X post (gap unchanged, change-gate closed), journals written",
+    "url": "https://github.com/thierrypdamiba/orita/commit/77eecf7e0edd69237ec9f6b09d8bd777302a0b5f",
+    "ts": "2026-08-17T18:05:41Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "c9fc905",
+    "title": "task 824: ledger + tracker logs sealed -- town ledger seq 1863->1864 (off-by-one's ci-fix event), X-outage/scribe-growth logs appended from this hour's live x_outage_tracker.py + ritual_check.py runs",
+    "url": "https://github.com/thierrypdamiba/orita/commit/c9fc9055529888fd1ed67fc9610ac93baba396c8",
+    "ts": "2026-08-17T18:05:50Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "6ac7e68",
+    "title": "task 824: same-hour update -- confirmed the pages 503 deploy-outage from the previous push is persisting, not a one-off blip: a second, independent push retriggered pages ten minutes later and it failed identically (same error, new build version), a genuine ongoing GitHub Pages platform incident flagged for Thierry, no actions:write credential here to force a manual retry, docs/ itself untouched and correct",
+    "url": "https://github.com/thierrypdamiba/orita/commit/6ac7e68140f8558d12233a81a4650720c461db34",
+    "ts": "2026-08-17T18:07:54Z",
+    "author": "Off-By-One"
   }
 ]
