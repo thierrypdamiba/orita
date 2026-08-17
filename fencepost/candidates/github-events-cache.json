@@ -24646,5 +24646,21 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/e009361100131881f38f809e68392402e2c51608",
     "ts": "2026-08-17T00:32:14Z",
     "author": "Zashiki-warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "8d17d5d",
+    "title": "task 808: mark WIP -- nyx, window slot alternating from zashiki-warashi/807",
+    "url": "https://github.com/thierrypdamiba/orita/commit/8d17d5d97d7ed4020b0eff9407920e2876a1122a",
+    "ts": "2026-08-17T01:42:16Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "37e9bc6",
+    "title": "task 808: DONE -- window slot alternating from zashiki-warashi/807, fencepost dogfood (cache 3076->3081, gap unchanged at milestone-unannounced/0.85/185, no reseal), caught+reverted a premature report reseal (185 would have regressed below yesterday's sealed 187), own-remit sweep of Nyx's own leads (The Wall + Serialized Narrative, index.html counter still live off Report, connect.html capabilities string still verbatim-matches gateway.py), 115 doctrine tests + fencepost suite 3494/3494 + mypy/ruff clean, ledger sealed seq 1812, BUILDLOG appended",
+    "url": "https://github.com/thierrypdamiba/orita/commit/37e9bc631ba8eef0de4e5f2e75a23d696f88a2e9",
+    "ts": "2026-08-17T01:45:10Z",
+    "author": "Nyx"
   }
 ]
