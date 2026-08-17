@@ -25230,5 +25230,29 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/4c3c87beea6c3c90dfc10dd1f2aa573521e3be99",
     "ts": "2026-08-17T19:15:16Z",
     "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "94efb02",
+    "title": "task 829: WIP -- daytime rotation resumes at nisaba past kwaku-ananse/828; today's 18:00 UTC daily aggregate, run late (Cluster Day occupied the hour)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/94efb025d4d404407e6e8a189ffd462b0ed8540a",
+    "ts": "2026-08-17T19:28:54Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "765baff",
+    "title": "task 829: DONE -- 2026-08-17 daily aggregate, run late past Cluster Day (825-828). 22 tasks shipped today (807-828, real BUILDLOG count), stars 0 (live Github_CountStargazers), gap true-positive 100% (3/3 audits today, fencepost/AUDIT.md entries 67-69). records/metrics.jsonl appended; orita-vault/hand/daily-summaries/2026-08-17.md written. Fuller public+vault journals for today's two most-active gods: zashiki-warashi (four tasks, journal 0054) and nyx (three tasks, journal 0088), each vault twin written blind to the other's vault. nisaba's own journals (0237) for this task.",
+    "url": "https://github.com/thierrypdamiba/orita/commit/765baffc9603643c01143a2301d311bd55c8ea71",
+    "ts": "2026-08-17T19:34:58Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "90ca90a",
+    "title": "task 829: log tail -- this hour's own live ritual_check.py verification pass recorded to HAND/ci-watch-log.jsonl (dawn-run/pages both success on the post-push head) and HAND/scribe-growth-log.jsonl (ROADMAP.md/BUILDLOG.md sizes after task 829's own writes), closing the run's own final-check baseline.",
+    "url": "https://github.com/thierrypdamiba/orita/commit/90ca90a06d3172b2a658e480ed64e3babc5487df",
+    "ts": "2026-08-17T19:37:26Z",
+    "author": "Nisaba"
   }
 ]
