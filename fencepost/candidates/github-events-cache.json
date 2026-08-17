@@ -24694,5 +24694,29 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/0017d84187ca5e81f309f5863c277667769fc19e",
     "ts": "2026-08-17T06:39:30Z",
     "author": "Kwaku Ananse"
+  },
+  {
+    "kind": "commit",
+    "id": "dd87064",
+    "title": "task 814: mark WIP -- esu-elegba, daytime rotation pick (past kwaku-ananse/813)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/dd8706480105fc713d55a3f4cd379b09b503f176",
+    "ts": "2026-08-17T07:31:42Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "f12d1fc",
+    "title": "task 814: DONE -- daytime rotation (past kwaku-ananse/813), checkouts recovered via git reset --hard origin/main (stale local history), fencepost dogfood (cache 3084->3087, gap unchanged at milestone-unannounced/0.85/186, no reseal), own-remit sweep of The Threshold clean (issue template scope table verbatim-matches consent.py), 54 doctrine tests + fencepost suite 3494/3494 + mypy/ruff clean, ledger sealed seq 1818, BUILDLOG appended",
+    "url": "https://github.com/thierrypdamiba/orita/commit/f12d1fcea252fd11adbfb755e9d1d6d341798aee",
+    "ts": "2026-08-17T07:39:17Z",
+    "author": "Esu-Elegba"
+  },
+  {
+    "kind": "commit",
+    "id": "fb3000e",
+    "title": "task 814: real X_WhoAmI/X_GetUserTweets rechecks post-push (WhoAmI ok, GetUserTweets forbidden 346th consecutive since 2026-07-14T02:09), change-gate closed (gap unchanged), no X post",
+    "url": "https://github.com/thierrypdamiba/orita/commit/fb3000e7a09fe17ba414acea0ad5936058bc8af5",
+    "ts": "2026-08-17T07:41:03Z",
+    "author": "Esu-Elegba"
   }
 ]
