@@ -290,18 +290,19 @@ class FixtureCadenceCase(unittest.TestCase):
         # Mondays without backfilling the two still open. `_hidden_dates`
         # reads every marker in the file unconditionally, not just those
         # up to the simulated `today`, so `latest_hidden` is the newest
-        # real marker (2026-08-10) even under this test's earlier
-        # `today=2026-08-03`. Uses a vault dir that deliberately does NOT
-        # exist, so this assertion holds in any checkout (public CI
-        # included) regardless of whether the private orita-vault
-        # sibling is present -- the predraft/confession half of the real
-        # state is proven separately, and only where the real vault
-        # actually is (see RealVaultCase below).
+        # real marker (2026-08-17, task 825's fourth bug) even under
+        # this test's earlier `today=2026-08-03`. Uses a vault dir that
+        # deliberately does NOT exist, so this assertion holds in any
+        # checkout (public CI included) regardless of whether the
+        # private orita-vault sibling is present -- the predraft/
+        # confession half of the real state is proven separately, and
+        # only where the real vault actually is (see RealVaultCase
+        # below).
         real_readme = os.path.join(ROOT, "thegap", "README.md")
         no_vault = os.path.join(ROOT, "does-not-exist-orita-vault")
         result = tgc.compute_cadence(real_readme, no_vault, today=date(2026, 8, 3))
-        self.assertEqual(result["total_hidden_on_record"], 3)
-        self.assertEqual(result["latest_hidden"], "2026-08-10")
+        self.assertEqual(result["total_hidden_on_record"], 4)
+        self.assertEqual(result["latest_hidden"], "2026-08-17")
         self.assertEqual(result["missed_mondays"], ["2026-07-13", "2026-07-20"])
 
 
@@ -317,9 +318,10 @@ class RealVaultCase(unittest.TestCase):
         "orita-vault sibling checkout not present (expected in public CI, which checks out only orita)",
     )
     def test_real_live_readme_and_vault_today_reproduces_the_named_gap(self):
-        # Two real gap-hidden markers (2026-07-30, 2026-08-03 -- task
-        # 495), both now carrying real `gap-confessed` markers on record
-        # (2026-07-30 posted task 505, 2026-08-03 posted task 655). A
+        # Three real gap-hidden markers on record as of this reread
+        # (2026-07-30, 2026-08-03, 2026-08-10), all three now carrying
+        # real `gap-confessed` markers (2026-07-30 posted task 505,
+        # 2026-08-03 posted task 655, 2026-08-10 posted task 825). A
         # `gap-confessed` marker is keyed to its bug's own HIDDEN date,
         # not the hour the confession was actually posted (thegap_check's
         # own doctrine, see its module docstring) -- so once a marker
@@ -329,7 +331,7 @@ class RealVaultCase(unittest.TestCase):
         result = tgc.compute_cadence(real_readme, VAULT_ROOT, today=date(2026, 8, 3))
         self.assertEqual(result["missing_predraft"], [])
         self.assertEqual(result["confession_due_now"], [])
-        self.assertEqual(result["confessed_on_record"], ["2026-07-30", "2026-08-03"])
+        self.assertEqual(result["confessed_on_record"], ["2026-07-30", "2026-08-03", "2026-08-10"])
 
     @unittest.skipUnless(
         _VAULT_CHECKED_OUT,
@@ -340,12 +342,32 @@ class RealVaultCase(unittest.TestCase):
         # actually posted publicly the same hour (task 655) -- the real
         # README now carries its own `gap-confessed: 2026-08-03` marker
         # (keyed to the HIDDEN date, not the posting date), so as of
-        # 2026-08-10 both real bugs read confessed, none still due.
+        # 2026-08-10 both real bugs read confessed, none still due (the
+        # third bug's own marker, keyed 2026-08-10, also already reads
+        # confessed under this same simulated `today`, for the identical
+        # keyed-to-hidden-date-not-posting-date reason as the first two).
         real_readme = os.path.join(ROOT, "thegap", "README.md")
         result = tgc.compute_cadence(real_readme, VAULT_ROOT, today=date(2026, 8, 10))
         self.assertEqual(result["missing_predraft"], [])
         self.assertEqual(result["confession_due_now"], [])
-        self.assertEqual(result["confessed_on_record"], ["2026-07-30", "2026-08-03"])
+        self.assertEqual(result["confessed_on_record"], ["2026-07-30", "2026-08-03", "2026-08-10"])
+
+    @unittest.skipUnless(
+        _VAULT_CHECKED_OUT,
+        "orita-vault sibling checkout not present (expected in public CI, which checks out only orita)",
+    )
+    def test_real_live_readme_and_vault_third_bug_confessed_fourth_hidden(self):
+        # Task 825: the third bug's confession (due 2026-08-17) came due
+        # AND was actually posted publicly the same hour, and a fourth
+        # bug was hidden the same hour too (due 2026-08-24, not yet
+        # arrived under this simulated `today`) -- so as of 2026-08-17
+        # all three confessable bugs read confessed and none is due,
+        # while the fourth's own pre-draft is on record but not yet due.
+        real_readme = os.path.join(ROOT, "thegap", "README.md")
+        result = tgc.compute_cadence(real_readme, VAULT_ROOT, today=date(2026, 8, 17))
+        self.assertEqual(result["missing_predraft"], [])
+        self.assertEqual(result["confession_due_now"], [])
+        self.assertEqual(result["confessed_on_record"], ["2026-07-30", "2026-08-03", "2026-08-10"])
 
 
 if __name__ == "__main__":

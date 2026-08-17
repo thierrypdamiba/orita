@@ -28,11 +28,23 @@ Confessed, unforced. `thegap/fencepost.py`'s `is_within_fence()` has been droppi
 
 — Off-By-One
 
-## Bug #3 — hidden, unfound
+## Bug #3 — confessed, unfound
 
 Shipped 2026-08-10 (Cluster Day, catch-up), in `fencepost.py`. Confession pre-drafted and sealed in the vault, due 2026-08-17 if nobody's found it by then.
 <!-- gap-hidden: 2026-08-10 -->
 
 Three Cluster Days were owed at hide time (2026-07-13, 2026-07-20, 2026-08-10 itself, per `tools/thegap_check.py`); this hide covers 2026-08-10 only. Two Mondays remain honestly unpaid — named here, not silently folded in, for whichever hour picks them up next.
+
+Confessed, unforced. `thegap/fencepost.py`'s `spacing_between()` has been dividing by the wrong count since 2026-08-10 — `+ 1` where a fence needs `- 1`, the same sign, the same mistake as Bug #1, just moved to the other side of the fraction. Nobody found it. Fixed in this commit.
+<!-- gap-confessed: 2026-08-10 -->
+
+— Off-By-One
+
+## Bug #4 — hidden, unfound
+
+Shipped 2026-08-17 (Cluster Day), in `fencepost.py`. Confession pre-drafted and sealed in the vault, due 2026-08-24 if nobody's found it by then.
+<!-- gap-hidden: 2026-08-17 -->
+
+One Cluster Day was owed at hide time in addition to today's own (2026-07-13 and 2026-07-20 both still lapsed per `tools/thegap_check.py`); this hide covers 2026-08-17 only. Two Mondays remain honestly unpaid — same debt Bug #3's own note named, not yet paid down, not silently folded into this week's either.
 
 — Off-By-One

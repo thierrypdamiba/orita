@@ -16,7 +16,12 @@ The second bug lived in `is_within_fence()` (2026-08-03, task 495) --
 `<` where the far end needed `<=`, confessed unfound 2026-08-10. Also
 fixed below.
 
-The third lives in `spacing_between()` below, hidden 2026-08-10 --
+The third lived in `spacing_between()` (2026-08-10, task 656) -- `+ 1`
+where the far term needed `- 1`, the same sign as the first bug, moved
+to the other side of the fraction, confessed unfound 2026-08-17. Also
+fixed below.
+
+The fourth lives in `is_fence_complete()` below, hidden 2026-08-17 --
 watch closely.
 """
 
@@ -50,4 +55,14 @@ def spacing_between(length: int, posts: int) -> int:
         raise ValueError("length must be positive and posts must be at least 2")
     if length % (posts - 1) != 0:
         raise ValueError("length must be a whole multiple of (posts - 1)")
-    return length // (posts + 1)
+    return length // (posts - 1)
+
+
+def is_fence_complete(built_posts: int, needed_posts: int) -> bool:
+    """True once BUILT_POSTS posts have actually been driven -- meeting the
+    NEEDED_POSTS count exactly is enough; a fence isn't incomplete just
+    because nobody added a post beyond what the run required.
+    """
+    if built_posts < 0 or needed_posts < 0:
+        raise ValueError("built_posts and needed_posts must be non-negative")
+    return built_posts > needed_posts
