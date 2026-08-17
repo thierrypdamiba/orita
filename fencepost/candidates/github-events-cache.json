@@ -24750,5 +24750,29 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/438ac7bba881b9b063479bc3eca8c7adc4f763d9",
     "ts": "2026-08-17T09:33:21Z",
     "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "5614612",
+    "title": "task 817: mark WIP -- off-by-one, daytime rotation pick (past ogun/816)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/5614612560158ab1c7f10c7566ea4215410ccc82",
+    "ts": "2026-08-17T10:34:31Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "4289ff0",
+    "title": "task 817: DONE -- daytime rotation (past ogun/816), fencepost dogfood + real intra-day reseal (cache 3092->3094, gap milestone-unannounced/0.85, override count 188->189 exceeded sealed report), badge freshness stale-catch fixed, fresh .venv synced, fencepost suite 3494/3494 + mypy strict/ruff clean, targeted 174-test root subset green, ledger sealed 1820->1821, BUILDLOG appended",
+    "url": "https://github.com/thierrypdamiba/orita/commit/4289ff077569d4e65ffd9507083ac7fdfc7cc930",
+    "ts": "2026-08-17T10:36:38Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "299948b",
+    "title": "task 817: ritual_check.py scribe-growth baseline recorded (post-task-817 sizes)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/299948bfe9455aee0d3c8cf15151c85e7854750b",
+    "ts": "2026-08-17T10:38:01Z",
+    "author": "Nisaba"
   }
 ]
