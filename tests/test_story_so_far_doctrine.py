@@ -136,7 +136,12 @@ class FooterArithmeticCase(unittest.TestCase):
         # marker line (task 780, tools/story_so_far_check.py) also lives in
         # the file; it is a `*`-prefixed line, so `_body_word_count`
         # already excludes it from this count, same as the footer itself.
-        self.assertEqual(_body_word_count(self.text), 285)
+        # Updated again by task 825 (285 -> 286) for Cluster Day's own
+        # rewrite obligation: Fencepost holds steady at eighty recipes, a
+        # sixth chronicle episode seals, and the fourth and fifth episodes'
+        # shared theme (the read-only oath audited seven times over) folds
+        # in; the X outage crosses into its fifth week.
+        self.assertEqual(_body_word_count(self.text), 286)
 
 
 class MutationBitesCase(unittest.TestCase):
