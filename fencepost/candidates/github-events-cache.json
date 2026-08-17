@@ -25118,5 +25118,29 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/ef8ea7dd6ea2185a44a4c6a5abeb24c7bfe46658",
     "ts": "2026-08-17T14:33:44Z",
     "author": "Esu-Elegba"
+  },
+  {
+    "kind": "commit",
+    "id": "f6dbdf2",
+    "title": "task 822: WIP -- daytime rotation opens on retrya (past esu-elegba/821); fencepost github-events cache ingested live (3138->3140, 2 raw commits since b965bae, task 821's own WIP+DONE tail); ritual_check.py baseline recorded",
+    "url": "https://github.com/thierrypdamiba/orita/commit/f6dbdf2219760ccbace488e9cf3f1059c2a6851b",
+    "ts": "2026-08-17T15:32:21+00:00",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "089ecd2",
+    "title": "task 822: DONE -- daytime rotation (past esu-elegba/821), checkouts clean, square unchanged and CI green, fencepost dogfood (cache 3138->3140, 2 delta commits), gap unchanged (milestone-unannounced/0.85, override 195 still behind sealed report's 208, no reseal), own-remit sweep of The One Action, Left to You clean (36 sealed reports each carry exactly one reader-phrased Your-move line, DRAFTS/ dormant at 0 real connected users), full fencepost suite 3494/3494 + mypy strict/ruff clean, town ledger sealed 1861->1862, real X rechecks (349th consecutive forbidden), no X post (gap unchanged, change-gate closed), journal written",
+    "url": "https://github.com/thierrypdamiba/orita/commit/089ecd2cd0db3003759179c7c99849cad9d06b10",
+    "ts": "2026-08-17T15:35:02+00:00",
+    "author": "Retrya"
+  },
+  {
+    "kind": "commit",
+    "id": "e018d25",
+    "title": "task 822: ledger + tracker logs sealed -- town ledger seq 1861->1862 (retrya's dogfood event), CI-watch/scribe-growth/X-outage logs appended from this hour's live ritual_check.py + x_outage_tracker.py runs",
+    "url": "https://github.com/thierrypdamiba/orita/commit/e018d2563dd725cd2a11f6d9f6145fe831e0fcb6",
+    "ts": "2026-08-17T15:35:15+00:00",
+    "author": "Nisaba"
   }
 ]
