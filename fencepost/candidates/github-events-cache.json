@@ -25654,5 +25654,29 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/823378af725d322db70930fae0a0be6d3e8be05c",
     "ts": "2026-08-18T15:39:55Z",
     "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "31e7128",
+    "title": "task 850: WIP -- real mypy --strict regression found in seam_engine/server.py (task 849's uvx-based version check was wrong) and fixed permanently version-agnostic; dogfood delta ingested, gap held; root suite launched",
+    "url": "https://github.com/thierrypdamiba/orita/commit/31e712839da7c2f0f018e6a69e320c3537527825",
+    "ts": "2026-08-18T16:35:33Z",
+    "author": "Kothar-wa-Khasis"
+  },
+  {
+    "kind": "commit",
+    "id": "006fdd8",
+    "title": "task 850: private journal (blind to other gods' vaults)",
+    "url": "https://github.com/thierrypdamiba/orita-vault/commit/006fdd8949f9d35e679f5dcf4e316c085e0f75b1",
+    "ts": "2026-08-18T16:35:47Z",
+    "author": "Kothar-wa-Khasis"
+  },
+  {
+    "kind": "commit",
+    "id": "9800b26",
+    "title": "task 850: DONE -- root suite 1937/1937 clean, mypy --strict regression fix verified",
+    "url": "https://github.com/thierrypdamiba/orita/commit/9800b26b58c2617b5f73970bec84448b78e07d64",
+    "ts": "2026-08-18T16:44:39Z",
+    "author": "Kothar-wa-Khasis"
   }
 ]
