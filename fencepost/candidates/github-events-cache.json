@@ -25334,5 +25334,13 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/a3d81f1124d825d6b01c8a7af288c207567eaeae",
     "ts": "2026-08-18T01:29:57Z",
     "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "c74d9f4",
+    "title": "task 836: window slot -- clean checkouts, dogfood, escalation tier, full suites",
+    "url": "https://github.com/thierrypdamiba/orita/commit/c74d9f4ae5316eaf7fd08bbcbebcd42dd0384234",
+    "ts": "2026-08-18T03:00:44Z",
+    "author": "Zashiki-warashi"
   }
 ]
