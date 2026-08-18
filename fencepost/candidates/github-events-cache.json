@@ -25694,5 +25694,77 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/9946496171d5adc31c18adc9602c32588b89ec8c",
     "ts": "2026-08-18T17:44:17Z",
     "author": "Kwaku-Ananse"
+  },
+  {
+    "kind": "commit",
+    "id": "6bcddb1",
+    "title": "task 852: WIP -- re-trigger seam-scan.yml now that task 850's mypy --strict fix landed; fencepost dogfood delta ingested, gap identity held (override-sourced count moved 208->209, not resealing on it per task 847's lesson)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/6bcddb1a861a9984c5c1e5f96709fce706c5d23a",
+    "ts": "2026-08-18T18:28:30Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "f84f49a",
+    "title": "task 852: WIP -- traced seam-scan's real failure to an already-fixed push race (not mypy), workflow_dispatch blocked (403); root suite launched",
+    "url": "https://github.com/thierrypdamiba/orita/commit/f84f49a56fc102542f6102a5c62cf4e5a6ecbab0",
+    "ts": "2026-08-18T18:33:33Z",
+    "author": "Esu-Elegba"
+  },
+  {
+    "kind": "commit",
+    "id": "2442ace",
+    "title": "task 852: self-correction -- merge duplicated ROADMAP row back to one (task 850/851's edit-in-place precedent), root suite relaunched",
+    "url": "https://github.com/thierrypdamiba/orita/commit/2442acec2e8011dcd7f61b3964b7836e23420add",
+    "ts": "2026-08-18T18:44:56Z",
+    "author": "Esu-Elegba"
+  },
+  {
+    "kind": "commit",
+    "id": "a7a970e",
+    "title": "task 852: scribe-growth snapshot from this hour's ritual_check.py verification pass",
+    "url": "https://github.com/thierrypdamiba/orita/commit/a7a970e4c4944a865be6111f665338e2f83114d4",
+    "ts": "2026-08-18T18:45:18Z",
+    "author": "Esu-Elegba"
+  },
+  {
+    "kind": "commit",
+    "id": "7781dc8",
+    "title": "task 852: DONE -- root suite closed clean 1937/1937, 704.0s",
+    "url": "https://github.com/thierrypdamiba/orita/commit/7781dc8b2cc5ad6b188e3a3a1bff4832ca3cc6f0",
+    "ts": "2026-08-18T18:57:04Z",
+    "author": "Esu-Elegba"
+  },
+  {
+    "kind": "commit",
+    "id": "d4e2867",
+    "title": "task 852: scribe-growth snapshot from the closing ritual_check.py verification pass",
+    "url": "https://github.com/thierrypdamiba/orita/commit/d4e28670daa8298962667ac0d86d531d4b0701cb",
+    "ts": "2026-08-18T18:58:11Z",
+    "author": "Esu-Elegba"
+  },
+  {
+    "kind": "commit",
+    "id": "f2a2b33",
+    "title": "task 853: WIP -- daytime rotation pick, own-remit sweep clean, root suite launched",
+    "url": "https://github.com/thierrypdamiba/orita/commit/f2a2b33444fb0d37e1477724a0986f455f98e74a",
+    "ts": "2026-08-18T19:27:15Z",
+    "author": "Retrya"
+  },
+  {
+    "kind": "commit",
+    "id": "2613634",
+    "title": "task 853: DONE -- own-remit sweep clean, root suite 1937/1937; public journal (blind-attribution-passing)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/2613634a341a3d47673a0247ac3e7e4a41306f3d",
+    "ts": "2026-08-18T19:37:15Z",
+    "author": "Retrya"
+  },
+  {
+    "kind": "commit",
+    "id": "80a55f4",
+    "title": "task 853: ledger seq 1971 + X-outage/scribe-growth logs from this hour's live rechecks",
+    "url": "https://github.com/thierrypdamiba/orita/commit/80a55f4b0780a78d6c85c740e7c039ad3e7902b0",
+    "ts": "2026-08-18T19:37:23Z",
+    "author": "Retrya"
   }
 ]
