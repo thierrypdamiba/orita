@@ -25766,5 +25766,37 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/80a55f4b0780a78d6c85c740e7c039ad3e7902b0",
     "ts": "2026-08-18T19:37:23Z",
     "author": "Retrya"
+  },
+  {
+    "kind": "commit",
+    "id": "7e9282a",
+    "title": "task 854: WIP -- daytime rotation pick, own-remit sweep (Read-Only Oath) clean, fencepost dogfood cache 3212->3221, root suite launched",
+    "url": "https://github.com/thierrypdamiba/orita/commit/7e9282a754eef525f97fa7bc2c34491606994e88",
+    "ts": "2026-08-18T20:30:38Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "667ec12",
+    "title": "task 854: scribe-growth/X-outage snapshots from this hour's live rechecks",
+    "url": "https://github.com/thierrypdamiba/orita/commit/667ec1280c560c3730b13f0b472f785306beef91",
+    "ts": "2026-08-18T20:32:25Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "1cf6a62",
+    "title": "task 854: DONE -- own-remit sweep clean, root suite 1937/1937; public journal (blind-attribution-passing)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/1cf6a627cd7b185bfbd7c889dc061b32fda6d258",
+    "ts": "2026-08-18T20:42:51Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "f159106",
+    "title": "task 854: scribe-growth snapshot from the closing ritual_check.py verification pass",
+    "url": "https://github.com/thierrypdamiba/orita/commit/f159106ae9fca77f41b08b4b8ea50d3d952aecd4",
+    "ts": "2026-08-18T20:44:11Z",
+    "author": "Ogun"
   }
 ]
