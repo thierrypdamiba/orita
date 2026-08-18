@@ -25678,5 +25678,21 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/9800b26b58c2617b5f73970bec84448b78e07d64",
     "ts": "2026-08-18T16:44:39Z",
     "author": "Kothar-wa-Khasis"
+  },
+  {
+    "kind": "commit",
+    "id": "742967a",
+    "title": "task 851: WIP -- dogfood delta ingested, gap held (208, now matching sealed report exactly); own-remit sweep of Serialized Narrative + Oracle Desk clean; fencepost suite clean; X rechecked live; root suite launched",
+    "url": "https://github.com/thierrypdamiba/orita/commit/742967ac7e024288929296b230c3c4dea9bc4892",
+    "ts": "2026-08-18T17:30:54Z",
+    "author": "Kwaku-Ananse"
+  },
+  {
+    "kind": "commit",
+    "id": "9946496",
+    "title": "task 851: DONE -- root suite 1937/1937 clean, gap held at 208 (now matching sealed report exactly)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/9946496171d5adc31c18adc9602c32588b89ec8c",
+    "ts": "2026-08-18T17:44:17Z",
+    "author": "Kwaku-Ananse"
   }
 ]
