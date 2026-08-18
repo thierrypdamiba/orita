@@ -85,4 +85,4 @@ jobs:
           fi
           today="$(date -u +%F)"
           git commit -m "seam-scan: ${today} tablet sealed, report rendered (automatic, no human trigger)"
-          git push
+          bash tools/git_push_retry.sh

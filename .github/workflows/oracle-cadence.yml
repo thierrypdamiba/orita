@@ -49,7 +49,7 @@ jobs:
           fi
           today="$(date -u +%F)"
           git commit -m "oracle-cadence: ${today} call sealed (automatic, no human trigger)"
-          git push
+          bash tools/git_push_retry.sh
 
       - name: grade any cadence predictions whose window has closed (ROADMAP #37)
         env:
@@ -71,7 +71,7 @@ jobs:
           fi
           today="$(date -u +%F)"
           git commit -m "oracle-autograde: ${today} due call(s) graded (automatic, no human trigger)"
-          git push
+          bash tools/git_push_retry.sh
 
       - name: seal one real, timestamped, copylint-clean star-cadence prediction (ROADMAP #38)
         env:
@@ -93,7 +93,7 @@ jobs:
           fi
           today="$(date -u +%F)"
           git commit -m "oracle-star-cadence: ${today} snapshot + call sealed (automatic, no human trigger)"
-          git push
+          bash tools/git_push_retry.sh
 
       - name: grade any star-cadence predictions whose window has closed (ROADMAP #38)
         env:
@@ -115,7 +115,7 @@ jobs:
           fi
           today="$(date -u +%F)"
           git commit -m "oracle-star-autograde: ${today} due call(s) graded (automatic, no human trigger)"
-          git push
+          bash tools/git_push_retry.sh
 
       - name: seal one real, timestamped, copylint-clean fork-cadence prediction (ROADMAP #39)
         env:
@@ -137,7 +137,7 @@ jobs:
           fi
           today="$(date -u +%F)"
           git commit -m "oracle-fork-cadence: ${today} snapshot + call sealed (automatic, no human trigger)"
-          git push
+          bash tools/git_push_retry.sh
 
       - name: grade any fork-cadence predictions whose window has closed (ROADMAP #39)
         env:
@@ -159,7 +159,7 @@ jobs:
           fi
           today="$(date -u +%F)"
           git commit -m "oracle-fork-autograde: ${today} due call(s) graded (automatic, no human trigger)"
-          git push
+          bash tools/git_push_retry.sh
 
       - name: seal one real, timestamped, copylint-clean issue-cadence prediction (ROADMAP #40)
         env:
@@ -181,7 +181,7 @@ jobs:
           fi
           today="$(date -u +%F)"
           git commit -m "oracle-issue-cadence: ${today} snapshot + call sealed (automatic, no human trigger)"
-          git push
+          bash tools/git_push_retry.sh
 
       - name: grade any issue-cadence predictions whose window has closed (ROADMAP #40)
         env:
@@ -203,7 +203,7 @@ jobs:
           fi
           today="$(date -u +%F)"
           git commit -m "oracle-issue-autograde: ${today} due call(s) graded (automatic, no human trigger)"
-          git push
+          bash tools/git_push_retry.sh
 
       - name: seal one real, timestamped, copylint-clean release-cadence prediction (ROADMAP #41)
         env:
@@ -225,7 +225,7 @@ jobs:
           fi
           today="$(date -u +%F)"
           git commit -m "oracle-release-cadence: ${today} snapshot + call sealed (automatic, no human trigger)"
-          git push
+          bash tools/git_push_retry.sh
 
       - name: grade any release-cadence predictions whose window has closed (ROADMAP #41)
         env:
@@ -247,7 +247,7 @@ jobs:
           fi
           today="$(date -u +%F)"
           git commit -m "oracle-release-autograde: ${today} due call(s) graded (automatic, no human trigger)"
-          git push
+          bash tools/git_push_retry.sh
 
       # Unlike tasks 38-41's GitHub-sourced fetches, this one has no public
       # unauthenticated endpoint the runner can hit unassisted -- the real
@@ -278,7 +278,7 @@ jobs:
           fi
           today="$(date -u +%F)"
           git commit -m "oracle-follower-cadence: ${today} snapshot + call sealed (automatic, no human trigger)"
-          git push
+          bash tools/git_push_retry.sh
 
       - name: grade any follower-cadence predictions whose window has closed (ROADMAP #42)
         env:
@@ -300,7 +300,7 @@ jobs:
           fi
           today="$(date -u +%F)"
           git commit -m "oracle-follower-autograde: ${today} due call(s) graded (automatic, no human trigger)"
-          git push
+          bash tools/git_push_retry.sh
 
       # Same X_WhoAmI gap as task 42's follower-cadence step above -- no
       # public unauthenticated endpoint for a profile's tweet count either.
@@ -327,7 +327,7 @@ jobs:
           fi
           today="$(date -u +%F)"
           git commit -m "oracle-tweet-cadence: ${today} snapshot + call sealed (automatic, no human trigger)"
-          git push
+          bash tools/git_push_retry.sh
 
       - name: grade any tweet-cadence predictions whose window has closed (ROADMAP #43)
         env:
@@ -349,7 +349,7 @@ jobs:
           fi
           today="$(date -u +%F)"
           git commit -m "oracle-tweet-autograde: ${today} due call(s) graded (automatic, no human trigger)"
-          git push
+          bash tools/git_push_retry.sh
 
       # Same X_WhoAmI gap as tasks 42/43's steps above -- no public
       # unauthenticated endpoint for a profile's listed count either.
@@ -376,7 +376,7 @@ jobs:
           fi
           today="$(date -u +%F)"
           git commit -m "oracle-listed-cadence: ${today} snapshot + call sealed (automatic, no human trigger)"
-          git push
+          bash tools/git_push_retry.sh
 
       - name: grade any listed-cadence predictions whose window has closed (ROADMAP #44)
         env:
@@ -398,7 +398,7 @@ jobs:
           fi
           today="$(date -u +%F)"
           git commit -m "oracle-listed-autograde: ${today} due call(s) graded (automatic, no human trigger)"
-          git push
+          bash tools/git_push_retry.sh
 
       # Same X_WhoAmI gap as tasks 42/43/44's steps above -- no public
       # unauthenticated endpoint for a profile's media count either.
@@ -425,7 +425,7 @@ jobs:
           fi
           today="$(date -u +%F)"
           git commit -m "oracle-media-cadence: ${today} snapshot + call sealed (automatic, no human trigger)"
-          git push
+          bash tools/git_push_retry.sh
 
       - name: grade any media-cadence predictions whose window has closed (ROADMAP #45)
         env:
@@ -447,7 +447,7 @@ jobs:
           fi
           today="$(date -u +%F)"
           git commit -m "oracle-media-autograde: ${today} due call(s) graded (automatic, no human trigger)"
-          git push
+          bash tools/git_push_retry.sh
 
       # Same X_WhoAmI gap as tasks 42/43/44/45's steps above -- no public
       # unauthenticated endpoint for a profile's following count either.
@@ -474,7 +474,7 @@ jobs:
           fi
           today="$(date -u +%F)"
           git commit -m "oracle-following-cadence: ${today} snapshot + call sealed (automatic, no human trigger)"
-          git push
+          bash tools/git_push_retry.sh
 
       - name: grade any following-cadence predictions whose window has closed (ROADMAP #46)
         env:
@@ -496,7 +496,7 @@ jobs:
           fi
           today="$(date -u +%F)"
           git commit -m "oracle-following-autograde: ${today} due call(s) graded (automatic, no human trigger)"
-          git push
+          bash tools/git_push_retry.sh
 
       - name: seal one real, timestamped, copylint-clean contributor-cadence prediction (ROADMAP #47)
         env:
@@ -518,7 +518,7 @@ jobs:
           fi
           today="$(date -u +%F)"
           git commit -m "oracle-contributor-cadence: ${today} snapshot + call sealed (automatic, no human trigger)"
-          git push
+          bash tools/git_push_retry.sh
 
       - name: grade any contributor-cadence predictions whose window has closed (ROADMAP #47)
         env:
@@ -540,7 +540,7 @@ jobs:
           fi
           today="$(date -u +%F)"
           git commit -m "oracle-contributor-autograde: ${today} due call(s) graded (automatic, no human trigger)"
-          git push
+          bash tools/git_push_retry.sh
 
       - name: seal one real, timestamped, copylint-clean branch-cadence prediction (ROADMAP #48)
         env:
@@ -562,7 +562,7 @@ jobs:
           fi
           today="$(date -u +%F)"
           git commit -m "oracle-branch-cadence: ${today} snapshot + call sealed (automatic, no human trigger)"
-          git push
+          bash tools/git_push_retry.sh
 
       - name: grade any branch-cadence predictions whose window has closed (ROADMAP #48)
         env:
@@ -584,7 +584,7 @@ jobs:
           fi
           today="$(date -u +%F)"
           git commit -m "oracle-branch-autograde: ${today} due call(s) graded (automatic, no human trigger)"
-          git push
+          bash tools/git_push_retry.sh
 
       - name: seal one real, timestamped, copylint-clean commit-cadence prediction (ROADMAP #49)
         env:
@@ -608,7 +608,7 @@ jobs:
           export GIT_AUTHOR_DATE="${today}T03:00:00Z"
           export GIT_COMMITTER_DATE="${today}T03:00:00Z"
           git commit -m "oracle-commit-cadence: ${today} snapshot + call sealed (automatic, no human trigger)"
-          git push
+          bash tools/git_push_retry.sh
 
       - name: grade any commit-cadence predictions whose window has closed (ROADMAP #49)
         env:
@@ -630,7 +630,7 @@ jobs:
           fi
           today="$(date -u +%F)"
           git commit -m "oracle-commit-autograde: ${today} due call(s) graded (automatic, no human trigger)"
-          git push
+          bash tools/git_push_retry.sh
 
       # ROADMAP #64: this hour's real CI run (2026-07-14T14:44Z, first run
       # after task 63's GITHUB_TOKEN fix) proved GET /repos/{o}/{r}/subscribers
@@ -668,7 +668,7 @@ jobs:
           export GIT_AUTHOR_DATE="${today}T03:00:00Z"
           export GIT_COMMITTER_DATE="${today}T03:00:00Z"
           git commit -m "oracle-subscriber-cadence: ${today} snapshot + call sealed (automatic, no human trigger)"
-          git push
+          bash tools/git_push_retry.sh
 
       - name: grade any subscriber-cadence predictions whose window has closed (ROADMAP #50)
         env:
@@ -690,7 +690,7 @@ jobs:
           fi
           today="$(date -u +%F)"
           git commit -m "oracle-subscriber-autograde: ${today} due call(s) graded (automatic, no human trigger)"
-          git push
+          bash tools/git_push_retry.sh
 
       - name: seal one real, timestamped, copylint-clean tag-cadence prediction (ROADMAP #51)
         env:
@@ -714,7 +714,7 @@ jobs:
           export GIT_AUTHOR_DATE="${today}T03:00:00Z"
           export GIT_COMMITTER_DATE="${today}T03:00:00Z"
           git commit -m "oracle-tag-cadence: ${today} snapshot + call sealed (automatic, no human trigger)"
-          git push
+          bash tools/git_push_retry.sh
 
       - name: grade any tag-cadence predictions whose window has closed (ROADMAP #51)
         env:
@@ -736,7 +736,7 @@ jobs:
           fi
           today="$(date -u +%F)"
           git commit -m "oracle-tag-autograde: ${today} due call(s) graded (automatic, no human trigger)"
-          git push
+          bash tools/git_push_retry.sh
 
       - name: seal one real, timestamped, copylint-clean label-cadence prediction (ROADMAP #52)
         env:
@@ -760,7 +760,7 @@ jobs:
           export GIT_AUTHOR_DATE="${today}T03:00:00Z"
           export GIT_COMMITTER_DATE="${today}T03:00:00Z"
           git commit -m "oracle-label-cadence: ${today} snapshot + call sealed (automatic, no human trigger)"
-          git push
+          bash tools/git_push_retry.sh
 
       - name: grade any label-cadence predictions whose window has closed (ROADMAP #52)
         env:
@@ -782,7 +782,7 @@ jobs:
           fi
           today="$(date -u +%F)"
           git commit -m "oracle-label-autograde: ${today} due call(s) graded (automatic, no human trigger)"
-          git push
+          bash tools/git_push_retry.sh
 
       - name: seal one real, timestamped, copylint-clean topic-cadence prediction (ROADMAP #53)
         env:
@@ -806,7 +806,7 @@ jobs:
           export GIT_AUTHOR_DATE="${today}T03:00:00Z"
           export GIT_COMMITTER_DATE="${today}T03:00:00Z"
           git commit -m "oracle-topic-cadence: ${today} snapshot + call sealed (automatic, no human trigger)"
-          git push
+          bash tools/git_push_retry.sh
 
       - name: grade any topic-cadence predictions whose window has closed (ROADMAP #53)
         env:
@@ -828,7 +828,7 @@ jobs:
           fi
           today="$(date -u +%F)"
           git commit -m "oracle-topic-autograde: ${today} due call(s) graded (automatic, no human trigger)"
-          git push
+          bash tools/git_push_retry.sh
 
       - name: seal one real, timestamped, copylint-clean open-PR-cadence prediction (ROADMAP #54)
         env:
@@ -852,7 +852,7 @@ jobs:
           export GIT_AUTHOR_DATE="${today}T03:00:00Z"
           export GIT_COMMITTER_DATE="${today}T03:00:00Z"
           git commit -m "oracle-pr-cadence: ${today} snapshot + call sealed (automatic, no human trigger)"
-          git push
+          bash tools/git_push_retry.sh
 
       - name: grade any open-PR-cadence predictions whose window has closed (ROADMAP #54)
         env:
@@ -874,7 +874,7 @@ jobs:
           fi
           today="$(date -u +%F)"
           git commit -m "oracle-pr-autograde: ${today} due call(s) graded (automatic, no human trigger)"
-          git push
+          bash tools/git_push_retry.sh
 
       - name: seal one real, timestamped, copylint-clean workflow-cadence prediction (ROADMAP #60)
         env:
@@ -896,7 +896,7 @@ jobs:
           fi
           today="$(date -u +%F)"
           git commit -m "oracle-workflow-cadence: ${today} snapshot + call sealed (automatic, no human trigger)"
-          git push
+          bash tools/git_push_retry.sh
 
       - name: grade any workflow-cadence predictions whose window has closed (ROADMAP #60)
         env:
@@ -918,7 +918,7 @@ jobs:
           fi
           today="$(date -u +%F)"
           git commit -m "oracle-workflow-autograde: ${today} due call(s) graded (automatic, no human trigger)"
-          git push
+          bash tools/git_push_retry.sh
 
       # ROADMAP #79: never yet run for real in production CI (subscriber-
       # cadence's own crash, fixed at task 78, killed the job before
@@ -952,7 +952,7 @@ jobs:
           export GIT_AUTHOR_DATE="${today}T03:00:00Z"
           export GIT_COMMITTER_DATE="${today}T03:00:00Z"
           git commit -m "oracle-milestone-cadence: ${today} snapshot + call sealed (automatic, no human trigger)"
-          git push
+          bash tools/git_push_retry.sh
 
       - name: grade any milestone-cadence predictions whose window has closed (ROADMAP #67)
         env:
@@ -974,7 +974,7 @@ jobs:
           fi
           today="$(date -u +%F)"
           git commit -m "oracle-milestone-autograde: ${today} due call(s) graded (automatic, no human trigger)"
-          git push
+          bash tools/git_push_retry.sh
 
       # ROADMAP #79: same pre-emptive tolerance as milestone-cadence above --
       # never yet run for real in production CI, /deployments' behavior
@@ -1003,7 +1003,7 @@ jobs:
           fi
           today="$(date -u +%F)"
           git commit -m "oracle-deployment-cadence: ${today} snapshot + call sealed (automatic, no human trigger)"
-          git push
+          bash tools/git_push_retry.sh
 
       - name: grade any deployment-cadence predictions whose window has closed (ROADMAP #68)
         env:
@@ -1025,7 +1025,7 @@ jobs:
           fi
           today="$(date -u +%F)"
           git commit -m "oracle-deployment-autograde: ${today} due call(s) graded (automatic, no human trigger)"
-          git push
+          bash tools/git_push_retry.sh
 
       - name: seal one real, timestamped, copylint-clean run-cadence prediction (ROADMAP #75)
         env:
@@ -1049,7 +1049,7 @@ jobs:
           export GIT_AUTHOR_DATE="${today}T03:00:00Z"
           export GIT_COMMITTER_DATE="${today}T03:00:00Z"
           git commit -m "oracle-run-cadence: ${today} snapshot + call sealed (automatic, no human trigger)"
-          git push
+          bash tools/git_push_retry.sh
 
       - name: grade any run-cadence predictions whose window has closed (ROADMAP #75)
         env:
@@ -1071,7 +1071,7 @@ jobs:
           fi
           today="$(date -u +%F)"
           git commit -m "oracle-run-autograde: ${today} due call(s) graded (automatic, no human trigger)"
-          git push
+          bash tools/git_push_retry.sh
 
       - name: seal one real, timestamped, copylint-clean comment-cadence prediction (ROADMAP #76)
         env:
@@ -1095,7 +1095,7 @@ jobs:
           export GIT_AUTHOR_DATE="${today}T03:00:00Z"
           export GIT_COMMITTER_DATE="${today}T03:00:00Z"
           git commit -m "oracle-comment-cadence: ${today} snapshot + call sealed (automatic, no human trigger)"
-          git push
+          bash tools/git_push_retry.sh
 
       - name: grade any comment-cadence predictions whose window has closed (ROADMAP #76)
         env:
@@ -1117,7 +1117,7 @@ jobs:
           fi
           today="$(date -u +%F)"
           git commit -m "oracle-comment-autograde: ${today} due call(s) graded (automatic, no human trigger)"
-          git push
+          bash tools/git_push_retry.sh
 
       # ROADMAP #79: same pre-emptive tolerance as milestone-/deployment-
       # cadence above -- never yet run for real in production CI,
@@ -1149,7 +1149,7 @@ jobs:
           export GIT_AUTHOR_DATE="${today}T03:00:00Z"
           export GIT_COMMITTER_DATE="${today}T03:00:00Z"
           git commit -m "oracle-issue-comment-cadence: ${today} snapshot + call sealed (automatic, no human trigger)"
-          git push
+          bash tools/git_push_retry.sh
 
       - name: grade any issue-comment-cadence predictions whose window has closed (ROADMAP #77)
         env:
@@ -1171,7 +1171,7 @@ jobs:
           fi
           today="$(date -u +%F)"
           git commit -m "oracle-issue-comment-autograde: ${today} due call(s) graded (automatic, no human trigger)"
-          git push
+          bash tools/git_push_retry.sh
 
       # ROADMAP #93: same pre-emptive tolerance as milestone-/deployment-/
       # issue-comment-cadence above -- never yet run for real in production
@@ -1201,7 +1201,7 @@ jobs:
           fi
           today="$(date -u +%F)"
           git commit -m "oracle-commit-comment-cadence: ${today} snapshot + call sealed (automatic, no human trigger)"
-          git push
+          bash tools/git_push_retry.sh
 
       - name: grade any commit-comment-cadence predictions whose window has closed (ROADMAP #93)
         env:
@@ -1223,7 +1223,7 @@ jobs:
           fi
           today="$(date -u +%F)"
           git commit -m "oracle-commit-comment-autograde: ${today} due call(s) graded (automatic, no human trigger)"
-          git push
+          bash tools/git_push_retry.sh
 
       - name: seal one real, timestamped, copylint-clean collaborator-cadence prediction (ROADMAP #134)
         env:
@@ -1245,7 +1245,7 @@ jobs:
           fi
           today="$(date -u +%F)"
           git commit -m "oracle-collaborator-cadence: ${today} snapshot + call sealed (automatic, no human trigger)"
-          git push
+          bash tools/git_push_retry.sh
 
       - name: grade any collaborator-cadence predictions whose window has closed (ROADMAP #134)
         env:
@@ -1267,4 +1267,4 @@ jobs:
           fi
           today="$(date -u +%F)"
           git commit -m "oracle-collaborator-autograde: ${today} due call(s) graded (automatic, no human trigger)"
-          git push
+          bash tools/git_push_retry.sh

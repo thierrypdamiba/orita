@@ -176,7 +176,7 @@ class TestNeverYetSealedCadenceCommitStepsSurviveAMissingSnapshot(unittest.TestC
                     # No `git push` (no remote in this fixture repo) -- swap
                     # the real script's push for a no-op so the test only
                     # exercises the add/diff/commit logic the fix touches.
-                    script_no_push = script.replace("\ngit push", "\ntrue")
+                    script_no_push = script.replace("\nbash tools/git_push_retry.sh", "\ntrue")
                     result = self._run_script_in_repo(tmp, script_no_push)
 
                     self.assertEqual(
@@ -211,7 +211,7 @@ class TestNeverYetSealedCadenceCommitStepsSurviveAMissingSnapshot(unittest.TestC
                     with open(os.path.join(tmp, "records", "ledger.jsonl"), "a") as f:
                         f.write('{"seq": 1}\n')
 
-                    script_no_push = script.replace("\ngit push", "\ntrue")
+                    script_no_push = script.replace("\nbash tools/git_push_retry.sh", "\ntrue")
                     result = self._run_script_in_repo(tmp, script_no_push)
                     self.assertEqual(result.returncode, 0, result.stderr)
 
@@ -293,7 +293,7 @@ class TestVoiceWindowBackdating(unittest.TestCase):
                     with open(os.path.join(tmp, "records", "ledger.jsonl"), "a") as f:
                         f.write('{"seq": 1}\n')
 
-                    script_no_push = script.replace("\ngit push", "\ntrue")
+                    script_no_push = script.replace("\nbash tools/git_push_retry.sh", "\ntrue")
                     result = subprocess.run(
                         ["bash", "-c", script_no_push],
                         cwd=tmp,
