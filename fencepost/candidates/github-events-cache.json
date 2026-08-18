@@ -25326,5 +25326,13 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/359d84072ef31dacb74f84c5d50344533418051d",
     "ts": "2026-08-18T00:32:32Z",
     "author": "Zashiki-warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "a3d81f1",
+    "title": "task 835: window slot -- checkout recovery, dogfood, X escalation tier",
+    "url": "https://github.com/thierrypdamiba/orita/commit/a3d81f1124d825d6b01c8a7af288c207567eaeae",
+    "ts": "2026-08-18T01:29:57Z",
+    "author": "Nyx"
   }
 ]
