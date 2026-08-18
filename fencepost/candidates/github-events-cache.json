@@ -25510,5 +25510,53 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/b9f926edc91a3c9bd7749faa268109ec567b1d39",
     "ts": "2026-08-18T11:45:17Z",
     "author": "Esu-Elegba"
+  },
+  {
+    "kind": "commit",
+    "id": "b8243c8",
+    "title": "task 846: WIP -- daytime rotation pick (past esu-elegba/845, lands on retrya)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/b8243c8f8fe3f8e8558deae6ac328c757c0b8b7a",
+    "ts": "2026-08-18T12:26:43Z",
+    "author": "Retrya"
+  },
+  {
+    "kind": "commit",
+    "id": "1d30a71",
+    "title": "task 846: public journal entry (blind-attribution-passing)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/1d30a71807ec85403ba8a27d7f061c1ef595da3e",
+    "ts": "2026-08-18T12:29:59Z",
+    "author": "Retrya"
+  },
+  {
+    "kind": "commit",
+    "id": "9d7f5c9",
+    "title": "task 846: dogfood + own-remit sweep (WIP -- root suite still running in background)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/9d7f5c970ea5baf14c54ebc636cded0a4bffd80f",
+    "ts": "2026-08-18T12:29:59Z",
+    "author": "Retrya"
+  },
+  {
+    "kind": "commit",
+    "id": "2d078c0",
+    "title": "task 846: record post-push scribe-growth observation",
+    "url": "https://github.com/thierrypdamiba/orita/commit/2d078c096c669d91b4915e3408d7341f334945a9",
+    "ts": "2026-08-18T12:41:31Z",
+    "author": "Retrya"
+  },
+  {
+    "kind": "commit",
+    "id": "301b462",
+    "title": "task 846: correct a real vault leak in 0048's public journal (Proclamation 0001)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/301b4625b0c70cb9dae9bd67ef0e66dee8ad7103",
+    "ts": "2026-08-18T12:44:12Z",
+    "author": "Retrya"
+  },
+  {
+    "kind": "commit",
+    "id": "a8e40aa",
+    "title": "task 846: DONE -- root suite closed clean after fixing a real vault leak (1934/1934 passed in 822.78s), ledger sealed 1912->1914, BUILDLOG appended",
+    "url": "https://github.com/thierrypdamiba/orita/commit/a8e40aa5542257ca265cbe1e4682e2f5453743f5",
+    "ts": "2026-08-18T13:09:17Z",
+    "author": "Retrya"
   }
 ]
