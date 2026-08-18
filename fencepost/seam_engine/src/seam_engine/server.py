@@ -9,7 +9,7 @@ world, it does not belong in this server (Ogun's oath, sworn on iron).
 import sys
 from dataclasses import asdict
 from datetime import datetime, timedelta, timezone
-from typing import Annotated, Any, Literal
+from typing import Annotated, Any, Literal, cast
 
 from arcade_mcp_server import Context, MCPApp
 from arcade_mcp_server.metadata import (
@@ -54,22 +54,29 @@ READ_ONLY = ToolMetadata(
 )
 
 # Every `@app.tool(metadata=READ_ONLY)` below carries a targeted
-# `# type: ignore[untyped-decorator, arg-type]`. Confirmed live (task 658)
-# this is a real gap in the vendor, not seam_engine: `MCPApp.tool()`
-# (arcade_mcp_server/mcp_app.py) is a single, non-`@overload`ed method whose
-# return annotation is the union
+# `# type: ignore[untyped-decorator]`. This is a real gap in the vendor, not
+# seam_engine: `MCPApp.tool()` (arcade_mcp_server/mcp_app.py) is a single,
+# non-`@overload`ed method whose return annotation is the union
 # `Callable[[Callable[P, T]], Callable[P, T]] | Callable[P, T]` — correct at
 # runtime (it branches on whether `func` was passed) but mypy --strict has no
 # way to know, from a kwargs-only call site like `@app.tool(metadata=...)`,
 # which arm of the union applies, so it falls back to treating the decorator
-# as untyped and the two derived arg-type mismatches that follow from that.
-# No PyPI `types-arcade-mcp-server` stub package exists to fix this without
-# touching the vendor (checked live). Ignoring these two specific codes only
-# — anything else `mypy --strict` finds on these lines still fails the
+# as untyped. No PyPI `types-arcade-mcp-server` stub package exists to fix
+# this without touching the vendor (checked live). Ignoring this one code
+# only — anything else `mypy --strict` finds on these lines still fails the
 # build.
+#
+# Task 658 (mypy 2.2.0) also carried a derived `arg-type` mismatch on the
+# same lines and suppressed it alongside `untyped-decorator`. Task 849 (mypy
+# 1.19.1, the version actually live in this environment now, confirmed via
+# `uvx mypy --version` — not 2.2.0, that comment's premise had quietly gone
+# stale) re-ran `--strict` and found all six `arg-type` suppressions unused:
+# the vendor gap that produced them is gone on this mypy version. Narrowed to
+# `[untyped-decorator]` only; a version drift the other way would make
+# `--strict` fail loudly again rather than silently, same as it did here.
 
 
-@app.tool(metadata=READ_ONLY)  # type: ignore[untyped-decorator, arg-type]
+@app.tool(metadata=READ_ONLY)  # type: ignore[untyped-decorator]
 def list_repo_commits(
     owner: Annotated[str, "GitHub owner (user or org), e.g. 'thierrypdamiba'"],
     repo: Annotated[str, "GitHub repository name, e.g. 'orita'"],
@@ -81,7 +88,7 @@ def list_repo_commits(
     return [asdict(e) for e in events if e.kind == "commit"]
 
 
-@app.tool(metadata=READ_ONLY)  # type: ignore[untyped-decorator, arg-type]
+@app.tool(metadata=READ_ONLY)  # type: ignore[untyped-decorator]
 def get_latest_release(
     owner: Annotated[str, "GitHub owner (user or org)"],
     repo: Annotated[str, "GitHub repository name"],
@@ -100,7 +107,7 @@ def get_latest_release(
     return asdict(event) if event is not None else None
 
 
-@app.tool(metadata=READ_ONLY)  # type: ignore[untyped-decorator, arg-type]
+@app.tool(metadata=READ_ONLY)  # type: ignore[untyped-decorator]
 def get_recent_x_posts(
     context: Context,
 ) -> Annotated[list[dict[str, Any]], "Posts the town has made to @oritatown, oldest first"]:
@@ -119,7 +126,7 @@ def get_recent_x_posts(
     return [asdict(p) for p in posts]
 
 
-@app.tool(metadata=READ_ONLY)  # type: ignore[untyped-decorator, arg-type]
+@app.tool(metadata=READ_ONLY)  # type: ignore[untyped-decorator]
 def seam_scan(
     owner: Annotated[str, "GitHub owner (user or org)"] = "thierrypdamiba",
     repo: Annotated[str, "GitHub repository name"] = "orita",
@@ -225,7 +232,7 @@ def seam_scan(
     }
 
 
-@app.tool(metadata=READ_ONLY)  # type: ignore[untyped-decorator, arg-type]
+@app.tool(metadata=READ_ONLY)  # type: ignore[untyped-decorator]
 def gmail_calendar_scan() -> Annotated[
     dict[str, Any],
     "WIP (ROADMAP.md #16): the v0.2 invite-in-Gmail-vs-Calendar gap, computed "
@@ -246,7 +253,7 @@ def gmail_calendar_scan() -> Annotated[
     return run_gmail_calendar_scan()
 
 
-@app.tool(metadata=READ_ONLY)  # type: ignore[untyped-decorator, arg-type]
+@app.tool(metadata=READ_ONLY)  # type: ignore[untyped-decorator]
 def combined_scan_preview(
     owner: Annotated[str, "GitHub owner (user or org)"] = "thierrypdamiba",
     repo: Annotated[str, "GitHub repository name"] = "orita",
@@ -325,11 +332,14 @@ def _resolve_transport(argv: list[str]) -> TransportArg:
             f"(expected one of {', '.join(_VALID_TRANSPORTS)})"
         )
     # task 657 (mypy 1.x): the membership check above didn't narrow the bare
-    # `str` to `TransportArg`, so `cast()` was needed here. task 658 (mypy
-    # 2.2.0, confirmed live): the same tuple-membership guard now narrows on
-    # its own -- the cast had gone stale and mypy --strict flags it as
-    # `redundant-cast`. Removed; the guard alone now satisfies the return type.
-    return transport
+    # `str` to `TransportArg`, so `cast()` was needed here. task 658 claimed
+    # mypy 2.2.0 narrowed the same guard on its own and removed the cast as
+    # redundant. task 849: re-verified live via `uvx mypy --version` -- this
+    # environment runs mypy 1.19.1, not 2.2.0 (task 658's version premise had
+    # gone stale, unnoticed for 191 tasks because nothing rechecked it against
+    # a live `--version` read until this hour's `--strict` run failed on the
+    # now-missing cast). The guard alone does not narrow on 1.19.1; restored.
+    return cast(TransportArg, transport)
 
 
 # Run with specific transport
