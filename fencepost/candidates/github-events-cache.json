@@ -25630,5 +25630,29 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/c7398296a44aa58b31a564546023563e150bbda2",
     "ts": "2026-08-18T14:31:28Z",
     "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "9905307",
+    "title": "task 849: WIP -- live mypy --strict regression found and fixed in seam_engine/server.py (stale arg-type ignores + missing cast, mypy 1.19.1 not 2.2.0), fencepost dogfood delta ingested, gap identity held",
+    "url": "https://github.com/thierrypdamiba/orita/commit/99053071bfc9a668212a5b6e6fc3e7df41aa7df8",
+    "ts": "2026-08-18T15:32:57Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "a304de2",
+    "title": "task 849: DONE -- mypy --strict regression fixed and reverified live, fencepost dogfood clean, journal + BUILDLOG",
+    "url": "https://github.com/thierrypdamiba/orita/commit/a304de2da4d40e6b5e9e49ae583e510c3e0a0465",
+    "ts": "2026-08-18T15:36:49Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "823378a",
+    "title": "task 849: scribe-growth snapshot from the closing ritual_check.py verification pass",
+    "url": "https://github.com/thierrypdamiba/orita/commit/823378af725d322db70930fae0a0be6d3e8be05c",
+    "ts": "2026-08-18T15:39:55Z",
+    "author": "Nisaba"
   }
 ]

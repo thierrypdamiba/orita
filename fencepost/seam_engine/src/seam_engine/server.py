@@ -9,7 +9,7 @@ world, it does not belong in this server (Ogun's oath, sworn on iron).
 import sys
 from dataclasses import asdict
 from datetime import datetime, timedelta, timezone
-from typing import Annotated, Any, Literal, cast
+from typing import Annotated, Any, Literal
 
 from arcade_mcp_server import Context, MCPApp
 from arcade_mcp_server.metadata import (
@@ -54,29 +54,37 @@ READ_ONLY = ToolMetadata(
 )
 
 # Every `@app.tool(metadata=READ_ONLY)` below carries a targeted
-# `# type: ignore[untyped-decorator]`. This is a real gap in the vendor, not
-# seam_engine: `MCPApp.tool()` (arcade_mcp_server/mcp_app.py) is a single,
-# non-`@overload`ed method whose return annotation is the union
+# `# type: ignore[untyped-decorator, arg-type]`. This is a real gap in the
+# vendor, not seam_engine: `MCPApp.tool()` (arcade_mcp_server/mcp_app.py) is
+# a single, non-`@overload`ed method whose return annotation is the union
 # `Callable[[Callable[P, T]], Callable[P, T]] | Callable[P, T]` — correct at
 # runtime (it branches on whether `func` was passed) but mypy --strict has no
 # way to know, from a kwargs-only call site like `@app.tool(metadata=...)`,
 # which arm of the union applies, so it falls back to treating the decorator
-# as untyped. No PyPI `types-arcade-mcp-server` stub package exists to fix
-# this without touching the vendor (checked live). Ignoring this one code
-# only — anything else `mypy --strict` finds on these lines still fails the
-# build.
+# as untyped (`untyped-decorator`) and, depending on the installed mypy's own
+# handling of that fallback, sometimes also flags the wrapped function's own
+# argument type against the union's other arm (`arg-type`). No PyPI
+# `types-arcade-mcp-server` stub package exists to fix this without touching
+# the vendor (checked live). Ignoring exactly these two codes — anything else
+# `mypy --strict` finds on these lines still fails the build.
 #
-# Task 658 (mypy 2.2.0) also carried a derived `arg-type` mismatch on the
-# same lines and suppressed it alongside `untyped-decorator`. Task 849 (mypy
-# 1.19.1, the version actually live in this environment now, confirmed via
-# `uvx mypy --version` — not 2.2.0, that comment's premise had quietly gone
-# stale) re-ran `--strict` and found all six `arg-type` suppressions unused:
-# the vendor gap that produced them is gone on this mypy version. Narrowed to
-# `[untyped-decorator]` only; a version drift the other way would make
-# `--strict` fail loudly again rather than silently, same as it did here.
+# Tasks 657/658/849 chased whether `arg-type` needed suppressing back and
+# forth across mypy releases (1.x needed it, one 2.2.0 run didn't, a later
+# environment read via the unreliable `uvx mypy --version` — which can
+# resolve a global install instead of this project's own locked dependency,
+# exactly the trap `[tool.uv]`'s own comment above already warns about —
+# claimed 1.19.1 and restored a since-redundant `cast()` instead of rechecking
+# this ignore). Fixed for good instead of re-diagnosed again: this project's
+# actual locked mypy (`uv run --extra dev mypy --version`, the only command
+# whose reading has ever matched `uv.lock`) is 2.2.0, and 2.2.0 *does* still
+# need `arg-type` suppressed here — verified live, not assumed. `warn_unused_
+# ignores` is not set in `[tool.mypy]` below, so if a future locked mypy ever
+# stops needing one of these two codes, the unused suppression is silently
+# harmless rather than a build failure — the version-flip this comment used
+# to chase can no longer break anything either direction.
 
 
-@app.tool(metadata=READ_ONLY)  # type: ignore[untyped-decorator]
+@app.tool(metadata=READ_ONLY)  # type: ignore[untyped-decorator, arg-type]
 def list_repo_commits(
     owner: Annotated[str, "GitHub owner (user or org), e.g. 'thierrypdamiba'"],
     repo: Annotated[str, "GitHub repository name, e.g. 'orita'"],
@@ -88,7 +96,7 @@ def list_repo_commits(
     return [asdict(e) for e in events if e.kind == "commit"]
 
 
-@app.tool(metadata=READ_ONLY)  # type: ignore[untyped-decorator]
+@app.tool(metadata=READ_ONLY)  # type: ignore[untyped-decorator, arg-type]
 def get_latest_release(
     owner: Annotated[str, "GitHub owner (user or org)"],
     repo: Annotated[str, "GitHub repository name"],
@@ -107,7 +115,7 @@ def get_latest_release(
     return asdict(event) if event is not None else None
 
 
-@app.tool(metadata=READ_ONLY)  # type: ignore[untyped-decorator]
+@app.tool(metadata=READ_ONLY)  # type: ignore[untyped-decorator, arg-type]
 def get_recent_x_posts(
     context: Context,
 ) -> Annotated[list[dict[str, Any]], "Posts the town has made to @oritatown, oldest first"]:
@@ -126,7 +134,7 @@ def get_recent_x_posts(
     return [asdict(p) for p in posts]
 
 
-@app.tool(metadata=READ_ONLY)  # type: ignore[untyped-decorator]
+@app.tool(metadata=READ_ONLY)  # type: ignore[untyped-decorator, arg-type]
 def seam_scan(
     owner: Annotated[str, "GitHub owner (user or org)"] = "thierrypdamiba",
     repo: Annotated[str, "GitHub repository name"] = "orita",
@@ -232,7 +240,7 @@ def seam_scan(
     }
 
 
-@app.tool(metadata=READ_ONLY)  # type: ignore[untyped-decorator]
+@app.tool(metadata=READ_ONLY)  # type: ignore[untyped-decorator, arg-type]
 def gmail_calendar_scan() -> Annotated[
     dict[str, Any],
     "WIP (ROADMAP.md #16): the v0.2 invite-in-Gmail-vs-Calendar gap, computed "
@@ -253,7 +261,7 @@ def gmail_calendar_scan() -> Annotated[
     return run_gmail_calendar_scan()
 
 
-@app.tool(metadata=READ_ONLY)  # type: ignore[untyped-decorator]
+@app.tool(metadata=READ_ONLY)  # type: ignore[untyped-decorator, arg-type]
 def combined_scan_preview(
     owner: Annotated[str, "GitHub owner (user or org)"] = "thierrypdamiba",
     repo: Annotated[str, "GitHub repository name"] = "orita",
@@ -326,20 +334,22 @@ def _resolve_transport(argv: list[str]) -> TransportArg:
     instead of a bare `str` (mypy --strict caught the untyped mismatch).
     """
     transport = argv[1] if len(argv) > 1 else "stdio"
-    if transport not in _VALID_TRANSPORTS:
-        sys.exit(
-            f"seam_engine.server: invalid transport {transport!r} "
-            f"(expected one of {', '.join(_VALID_TRANSPORTS)})"
-        )
-    # task 657 (mypy 1.x): the membership check above didn't narrow the bare
-    # `str` to `TransportArg`, so `cast()` was needed here. task 658 claimed
-    # mypy 2.2.0 narrowed the same guard on its own and removed the cast as
-    # redundant. task 849: re-verified live via `uvx mypy --version` -- this
-    # environment runs mypy 1.19.1, not 2.2.0 (task 658's version premise had
-    # gone stale, unnoticed for 191 tasks because nothing rechecked it against
-    # a live `--version` read until this hour's `--strict` run failed on the
-    # now-missing cast). The guard alone does not narrow on 1.19.1; restored.
-    return cast(TransportArg, transport)
+    # task 657/658/849 chased this guard's typing back and forth across mypy
+    # 1.x/2.2.0 releases because `if transport not in _VALID_TRANSPORTS`
+    # narrows a bare `str` against a `tuple[TransportArg, ...]` on some mypy
+    # versions and not others -- whichever mypy happens to be on the runner
+    # decides whether the old `cast()` reads as required or "redundant".
+    # Sidestepped for good: return each valid literal from its own explicit
+    # branch (no membership-narrowing behavior involved at all) and let
+    # `sys.exit`'s `NoReturn` type close out strict mode's exhaustiveness
+    # check. This is not tied to any mypy version and cannot flip again.
+    for candidate in _VALID_TRANSPORTS:
+        if transport == candidate:
+            return candidate
+    sys.exit(
+        f"seam_engine.server: invalid transport {transport!r} "
+        f"(expected one of {', '.join(_VALID_TRANSPORTS)})"
+    )
 
 
 # Run with specific transport
