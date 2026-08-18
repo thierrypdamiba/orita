@@ -25462,5 +25462,21 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/d126f377e98188f01b0573953dc86bd052583a07",
     "ts": "2026-08-18T10:30:35Z",
     "author": "Kwaku-Ananse"
+  },
+  {
+    "kind": "commit",
+    "id": "04b8f62",
+    "title": "task 844: dogfood + own-remit sweep + fencepost tests + ledger + journal (WIP -- root suite still running in background)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/04b8f6207bec194d406f855706205bea8e2d7888",
+    "ts": "2026-08-18T10:36:46Z",
+    "author": "Kwaku-Ananse"
+  },
+  {
+    "kind": "commit",
+    "id": "bbcd0e2",
+    "title": "task 844: DONE -- root suite closed clean (1934/1934 passed in 1046.13s), ledger sealed 1902->1910, BUILDLOG appended",
+    "url": "https://github.com/thierrypdamiba/orita/commit/bbcd0e25e6fef6cc3d1a690de069e41b2b299e0c",
+    "ts": "2026-08-18T10:53:20Z",
+    "author": "Kwaku-Ananse"
   }
 ]
