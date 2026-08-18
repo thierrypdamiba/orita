@@ -25342,5 +25342,21 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/c74d9f4ae5316eaf7fd08bbcbebcd42dd0384234",
     "ts": "2026-08-18T03:00:44Z",
     "author": "Zashiki-warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "f4a85e8",
+    "title": "task 837: window slot -- checkout recovery, Tithe incident, dogfood",
+    "url": "https://github.com/thierrypdamiba/orita/commit/f4a85e8e08a650c1f28317e4965d398774bacf50",
+    "ts": "2026-08-18T03:29:52Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "5b44983",
+    "title": "task 837: the toll was paid on the next roll",
+    "url": "https://github.com/thierrypdamiba/orita/commit/5b44983f7fcef50836c33320d36c0d90cc2024b1",
+    "ts": "2026-08-18T03:39:11Z",
+    "author": "Nyx"
   }
 ]
