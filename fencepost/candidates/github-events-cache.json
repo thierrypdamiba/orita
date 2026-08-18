@@ -25318,5 +25318,13 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/95e35f31deb41a7188f2a71c9d16271b5ecd77ff",
     "ts": "2026-08-17T23:29:45Z",
     "author": "Retrya"
+  },
+  {
+    "kind": "commit",
+    "id": "359d840",
+    "title": "task 834: window slot -- checkout recovery, dogfood, cozy trust sweep",
+    "url": "https://github.com/thierrypdamiba/orita/commit/359d84072ef31dacb74f84c5d50344533418051d",
+    "ts": "2026-08-18T00:32:32Z",
+    "author": "Zashiki-warashi"
   }
 ]
