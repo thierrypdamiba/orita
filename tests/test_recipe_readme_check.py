@@ -468,14 +468,14 @@ class DocstringCountDoctrineCase(unittest.TestCase):
         with self.assertRaises(AssertionError):
             claimed_section_count("Nothing here about a recipe count.")
 
-    def test_real_live_section_count_is_currently_eighty_seven(self):
-        # Regression pin: today's real, live linked-recipe count. Was 86
-        # until milestone-claims-dangling-milestone merged (the eighty-
-        # seventh real recipe).
+    def test_real_live_section_count_is_currently_eighty_eight(self):
+        # Regression pin: today's real, live linked-recipe count. Was 87
+        # until readme-claims-dangling-milestone merged (the eighty-
+        # eighth real recipe).
         with open(rrc.DEFAULT_README_PATH, encoding="utf-8") as f:
             text = f.read()
         section = rrc._community_recipes_section(text)
-        self.assertEqual(len(rrc._linked_recipes(section)), 87)
+        self.assertEqual(len(rrc._linked_recipes(section)), 88)
 
     def test_docstring_matches_the_real_live_count(self):
         with open(rrc.DEFAULT_README_PATH, encoding="utf-8") as f:
