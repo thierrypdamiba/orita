@@ -86,14 +86,30 @@ _AGGREGATE_RE = re.compile(r"daily[- ]aggregate", re.IGNORECASE)
 # tests/test_metrics_reader.py asserts this name IS that shared function.
 _last_metrics_entry = metrics_reader.last_metrics_entry
 
+# Task 875: every real aggregate row (117, 414, 753, 777, 801, 829, ...)
+# names the phrase in the first few words of its OWN description -- it is
+# the row's own framing of what it is doing, not incidental prose deep in
+# an unrelated task's paragraph. Task 871's row (2026-08-19) mentioned
+# "never ran the daily aggregate" ~600 characters into a description
+# about a DIFFERENT day's skipped aggregate, and a whole-line search
+# matched it as if it were that day's own aggregate row, undercounting a
+# real 17-task day as 13. A generous prefix window (the phrase has never
+# appeared past column 60 in any real aggregate row on record) keeps
+# every existing precedent matching while refusing a mention buried in
+# the middle of an unrelated row's prose.
+_AGGREGATE_ROW_PREFIX_CHARS = 100
+
 
 def _buildlog_task_rows(buildlog_path: str, date: str) -> list[tuple[set[int], str]]:
-    """`(task_numbers, raw_line)` for every real dated BUILDLOG.md row
+    """`(task_numbers, description)` for every real dated BUILDLOG.md row
     matching `date`, in file order. `task_numbers` is every run of digits
     found in that row's task-field cell (handles both plain numbers and
     multi-task cells like `360/361`); non-numeric cells (`ritual`,
     `roadmap`, `<task#>` the header's own literal, etc.) yield an empty
-    set and are skipped by callers that only want real numbered tasks."""
+    set and are skipped by callers that only want real numbered tasks.
+    `description` is everything after the row's third `|` (the free-text
+    field), used by callers that need to tell a row's own framing apart
+    from an unrelated row that merely mentions the same words."""
     if not os.path.exists(buildlog_path):
         return []
     rows = []
@@ -103,7 +119,7 @@ def _buildlog_task_rows(buildlog_path: str, date: str) -> list[tuple[set[int], s
             if not m or m.group(1) != date:
                 continue
             nums = {int(n) for n in _NUM_RE.findall(m.group(3))}
-            rows.append((nums, line))
+            rows.append((nums, line[m.end():]))
     return rows
 
 
@@ -113,16 +129,20 @@ def _tasks_shipped_ground_truth(buildlog_path: str, date: str) -> int | None:
     task reports what shipped BEFORE it, never counting itself -- task
     117's and task 414's own precedent). Returns `None` if no
     daily-aggregate row is found for `date` at all -- nothing to honestly
-    cross-check, not a guessed cutoff."""
+    cross-check, not a guessed cutoff. Only matches the phrase within the
+    row's OWN description prefix (see `_AGGREGATE_ROW_PREFIX_CHARS`), so a
+    later row's incidental mention of "daily aggregate" deep in unrelated
+    prose can never be mistaken for that day's own aggregate row (task
+    875's own fix, after task 871's mention did exactly that)."""
     rows = _buildlog_task_rows(buildlog_path, date)
     cutoff = None
-    for nums, line in rows:
-        if nums and _AGGREGATE_RE.search(line):
+    for nums, desc in rows:
+        if nums and _AGGREGATE_RE.search(desc[:_AGGREGATE_ROW_PREFIX_CHARS]):
             cutoff = min(nums)
             break
     if cutoff is None:
         return None
-    counted = {n for nums, _line in rows for n in nums if n < cutoff}
+    counted = {n for nums, _desc in rows for n in nums if n < cutoff}
     return len(counted)
 
 
