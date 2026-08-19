@@ -26598,5 +26598,37 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/e56f5dd82c58877c36f399d1a8667099bb40f6c5",
     "ts": "2026-08-19T17:55:39Z",
     "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "4bf88ce",
+    "title": "task 875: fix tasks_shipped_check.py's ground-truth scanner matching an unrelated row's incidental mention",
+    "url": "https://github.com/thierrypdamiba/orita/commit/4bf88ce78508fc3291f6fbcba4f4b065c9a4135e",
+    "ts": "2026-08-19T18:38:39Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "947a8b4",
+    "title": "task 875: DONE -- root suite closed clean (1937 tests, 687.4s, OK), no regression",
+    "url": "https://github.com/thierrypdamiba/orita/commit/947a8b4ceba02bd9a2ca714279173549c892a8fe",
+    "ts": "2026-08-19T18:49:21Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "5e88bab",
+    "title": "task 875: scribe-growth-log tick (final post-DONE ritual_check.py sweep)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/5e88bab176fc374acb7bf1d831be0526072f5378",
+    "ts": "2026-08-19T18:50:34Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "bed9ce5",
+    "title": "task 876: WIP -- open locked-resolved-pr-still-open (91st recipe candidate)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/bed9ce54d19f38bc9c211a3eba6ea5befd55124a",
+    "ts": "2026-08-19T19:31:29Z",
+    "author": "Nisaba"
   }
 ]

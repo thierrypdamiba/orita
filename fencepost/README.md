@@ -1664,6 +1664,37 @@ the plus-joined count climb together this time (27 of 89 → 28 of 90). No
 cells remain open — the family task 870 opened across mention, milestone,
 readme, release, and tweet is closed.
 
+[`RECIPES/locked-resolved-pr-still-open/`](RECIPES/locked-resolved-pr-still-open/)
+is the ninety-first (ROADMAP.md #876): the PR-side twin of
+`locked-resolved-issue-still-open` — the identical `locked`/
+`active_lock_reason` field pair checked against `state`, this time on a
+pull request's own record instead of an issue's. A pull request is an
+issue under GitHub's own REST numbering and locking machinery, and
+GitHub's Lock API (`PUT .../lock`) works identically on both, so the
+identical seam can happen on either side. The seam: a pull request is
+locked with `active_lock_reason` reading `"resolved"` — GitHub's own
+record of a maintainer's explicit claim the matter is settled — but the
+PR's own `state` still reads `"open"`. Locking a PR's conversation and
+actually merging or closing the PR it belongs to are two independent
+GitHub actions; nothing on GitHub's side ever compares the two fields to
+each other, the same "no forcing function, only a human notices" shape
+the rest of the `*-still-open` family already established. Unlike an
+issue, a PR's own `state` is not two-valued: `unblocked-pr-still-open`
+and `duplicate-pr-still-open` (this library's current PR-fixture
+convention) both already read a merged PR's `state` as `"merged"` and a
+closed-without-merging PR's `state` as `"closed"`, two distinct terminal
+values rather than a single `"closed"` plus a separate boolean — this
+recipe excludes on `state != "open"` precisely because that one check
+already covers both, whichever route a given PR reached. Confidence is
+age-gated on how long `updated_at` has sat still while the contradiction
+holds, mirroring `locked-resolved-issue-still-open`'s own 24h bar exactly
+(there is no `locked_at` field on a real GitHub pull request object
+either). Both scopes (`ListPullRequests`, `GetPullRequest`) already sat
+on `SCOPES.md`'s cleared oath table — no new door opened; one fixture,
+the same shape `locked-resolved-issue-still-open` established for this
+surface. Toolkit stays `github`-only, so the total recipe count climbs
+while the plus-joined count does not (28 of 90 → 28 of 91).
+
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)
 (ROADMAP.md #111) is that second promise, kept: it runs `scan.py`'s own

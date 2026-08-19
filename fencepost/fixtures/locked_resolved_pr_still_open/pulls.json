@@ -1,0 +1,101 @@
+[
+  {
+    "number": 1301,
+    "title": "Swap the ranking margin's tie-break to prefer the older candidate",
+    "state": "open",
+    "locked": true,
+    "active_lock_reason": "resolved",
+    "updated_at": "2026-08-08T05:00:00Z",
+    "url": "https://github.com/example/example-repo/pull/1301"
+  },
+  {
+    "number": 1302,
+    "title": "Trim the badge repaint's own duplicate CI poll",
+    "state": "open",
+    "locked": true,
+    "active_lock_reason": "resolved",
+    "updated_at": "2026-08-15T06:00:00Z",
+    "url": "https://github.com/example/example-repo/pull/1302"
+  },
+  {
+    "number": 1303,
+    "title": "Fold the ledger verify offset fix into the nightly build",
+    "state": "merged",
+    "locked": true,
+    "active_lock_reason": "resolved",
+    "updated_at": "2026-08-05T09:00:00Z",
+    "url": "https://github.com/example/example-repo/pull/1303"
+  },
+  {
+    "number": 1304,
+    "title": "Abandoned attempt at a streaming ranking export",
+    "state": "closed",
+    "locked": true,
+    "active_lock_reason": "resolved",
+    "updated_at": "2026-08-03T09:00:00Z",
+    "url": "https://github.com/example/example-repo/pull/1304"
+  },
+  {
+    "number": 1305,
+    "title": "Whether the confidence bar should move with the recipe count, take two",
+    "state": "open",
+    "locked": true,
+    "active_lock_reason": "off-topic",
+    "updated_at": "2026-07-28T09:00:00Z",
+    "url": "https://github.com/example/example-repo/pull/1305"
+  },
+  {
+    "number": 1306,
+    "title": "A repost of an already-open PR from a stale fork",
+    "state": "open",
+    "locked": true,
+    "active_lock_reason": "spam",
+    "updated_at": "2026-07-25T09:00:00Z",
+    "url": "https://github.com/example/example-repo/pull/1306"
+  },
+  {
+    "number": 1307,
+    "title": "Which recipe should own the next locked-resolved leg",
+    "state": "open",
+    "locked": true,
+    "active_lock_reason": "too heated",
+    "updated_at": "2026-07-20T09:00:00Z",
+    "url": "https://github.com/example/example-repo/pull/1307"
+  },
+  {
+    "number": 1308,
+    "title": "Badge repaint lags the real ledger by one run on a slow CI box, PR side",
+    "state": "open",
+    "locked": true,
+    "active_lock_reason": null,
+    "updated_at": "2026-07-30T09:00:00Z",
+    "url": "https://github.com/example/example-repo/pull/1308"
+  },
+  {
+    "number": 1309,
+    "title": "Ranking margin reads flat when only one candidate clears the bar, PR side",
+    "state": "open",
+    "locked": false,
+    "active_lock_reason": null,
+    "updated_at": "2026-08-01T09:00:00Z",
+    "url": "https://github.com/example/example-repo/pull/1309"
+  },
+  {
+    "number": 1310,
+    "title": "A malformed PR record with a lock reason but no lock flag set",
+    "state": "open",
+    "locked": false,
+    "active_lock_reason": "resolved",
+    "updated_at": "2026-07-27T09:00:00Z",
+    "url": "https://github.com/example/example-repo/pull/1310"
+  },
+  {
+    "number": 1311,
+    "title": "Combined scan skips a recipe whose PR fixture path has moved",
+    "state": "closed",
+    "locked": false,
+    "active_lock_reason": null,
+    "updated_at": "2026-07-19T09:00:00Z",
+    "url": "https://github.com/example/example-repo/pull/1311"
+  }
+]
