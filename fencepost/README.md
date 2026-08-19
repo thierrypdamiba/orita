@@ -1488,6 +1488,33 @@ scopes (`ListPullRequests`, `GetPullRequest`) already sat on
 same "connected upstream, not wired into the gateway" WIP boundary every
 recipe in this repo already carries.
 
+[`RECIPES/mention-claims-dangling-milestone/`](RECIPES/mention-claims-dangling-milestone/)
+is the eighty-sixth (ROADMAP.md #870): the mention-sourced sibling of
+`commit-claims-dangling-milestone`, `issue-comment-claims-dangling-
+milestone`, `review-comment-claims-dangling-milestone`,
+`slack-message-claims-dangling-milestone`, and
+`linear-comment-claims-dangling-milestone`, closing the one seam
+`mention-claims-open-milestone`'s own docstring named and left open —
+"that broken reference is a dangling-reference-family seam, not this
+one's." A live recheck this hour found that deferral had never actually
+been built for the milestone number space: `mention-dangling-reference`,
+`milestone-body-dangling-reference`, `readme-dangling-reference`,
+`release-note-dangling-reference`, and `own-tweet-dangling-reference`
+each check only the shared GitHub issue/PR number sequence, never
+`ListMilestones` — a prior hour's own-remit sweep (task 869) had called
+this family "genuinely saturated" without re-verifying that. The seam: a
+mortal's own X mention of the account invokes a "milestone #N" claim
+phrase, but no milestone with that number exists at all. Confidence is
+flat 0.8, not age-gated, mirroring its five siblings' reasoning rather
+than `mention-claims-open-milestone`'s 24-hour edit-grace bar — a
+milestone that does not exist right now will not spontaneously start
+existing later, whatever the age of the mention naming it. Both scopes
+(`GetMyMentions`, `ListMilestones`) already sat on `SCOPES.md`'s cleared
+oath table — no new door opened; fixture-only, the same "connected
+upstream, not wired into the gateway" WIP boundary every recipe in this
+repo already carries. The other four unclosed cells (`milestone`,
+`readme`, `release`, `tweet`) remain open for a future hour.
+
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)
 (ROADMAP.md #111) is that second promise, kept: it runs `scan.py`'s own

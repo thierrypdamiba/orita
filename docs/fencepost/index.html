@@ -70,7 +70,7 @@
     reviewed and merged like any PR. The read-only oath does not loosen for outside code:
     <a href="https://github.com/thierrypdamiba/orita/blob/main/fencepost/CONTRIBUTING.md">CONTRIBUTING.md</a>
     is the schema in prose, enforced in code before a human reviewer ever reads a stranger's
-    detector. Eighty-five real recipes stand today:</p>
+    detector. Eighty-six real recipes stand today:</p>
     <p><b><a href="https://github.com/thierrypdamiba/orita/tree/main/fencepost/RECIPES/example-release-vs-changelog">example-release-vs-changelog</a></b>
     — the reference: proof a first external recipe PR is mergeable at all.<br>
     <b><a href="https://github.com/thierrypdamiba/orita/tree/main/fencepost/RECIPES/merged-pr-issue-still-open">merged-pr-issue-still-open</a></b>
@@ -774,6 +774,22 @@
     <code>seam_engine.duplicate_markers</code> already set for the "duplicate of #N" family. Both scopes
     (<code>ListPullRequests</code>, <code>GetPullRequest</code>) already sat on <code>SCOPES.md</code>'s
     cleared oath table — no new door opened.</p>
+    <p><b><a href="https://github.com/thierrypdamiba/orita/tree/main/fencepost/RECIPES/mention-claims-dangling-milestone">mention-claims-dangling-milestone</a></b>
+    — the eighty-sixth: the mention-sourced sibling of <code>commit-claims-dangling-milestone</code>,
+    <code>issue-comment-claims-dangling-milestone</code>, <code>review-comment-claims-dangling-milestone</code>,
+    <code>slack-message-claims-dangling-milestone</code>, and <code>linear-comment-claims-dangling-milestone</code>,
+    closing the one seam <code>mention-claims-open-milestone</code>'s own docstring named and left open: "that
+    broken reference is a dangling-reference-family seam, not this one's." A live recheck this hour found that
+    deferral had never actually been built for the milestone number space: <code>mention-dangling-reference</code>
+    and its four siblings on the other unshipped sources each check only the shared GitHub issue/PR number
+    sequence, never <code>ListMilestones</code>. The seam: a mortal's own X mention of the account invokes a
+    "milestone #N" claim phrase, but no milestone with that number exists at all. Confidence is flat 0.8, not
+    age-gated, mirroring its five siblings' reasoning rather than <code>mention-claims-open-milestone</code>'s
+    24-hour edit-grace bar — a milestone that does not exist right now will not spontaneously start existing
+    later, whatever the age of the mention naming it. Both scopes (<code>GetMyMentions</code>,
+    <code>ListMilestones</code>) already sat on <code>SCOPES.md</code>'s cleared oath table — no new door
+    opened; fixture-only, same "connected upstream, not wired into the gateway" WIP boundary every recipe in
+    this repo already carries.</p>
     <p>Merging a recipe is one promise; letting it actually compete for the daily primary gap
     is another. <a href="https://github.com/thierrypdamiba/orita/blob/main/fencepost/seam_engine/src/seam_engine/combined_scan.py"><code>combined_scan.py</code></a>
     keeps the second: it pools a recipe's own candidates with <code>scan.py</code>'s, and ranks
