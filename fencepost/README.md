@@ -1463,6 +1463,31 @@ sat on `SCOPES.md`'s cleared oath table — no new door opened;
 fixture-only, the same "connected upstream, not wired into the gateway"
 WIP boundary every Linear-sourced recipe already carries.
 
+[`RECIPES/unblocked-pr-still-open/`](RECIPES/unblocked-pr-still-open/) is
+the eighty-fifth (ROADMAP.md #869): the PR-side twin of
+`unblocked-issue-still-open` (task 593), the same pairing shape
+`duplicate-issue-still-open`/`duplicate-pr-still-open` already
+established for a different marker word. The seam: a pull request's own
+body says it is blocked by another pull request, that other PR has since
+merged or closed, and the blocked PR was never revisited — no comment,
+no state change, nothing. GitHub gives a "blocked by" note no wiring of
+any kind: no auto-close, no auto-comment, no flag anywhere in the API.
+Confidence is age-gated on how long the named blocker has been resolved
+while the blocked PR still sits open, reusing
+`unblocked-issue-still-open`'s and `duplicate-pr-still-open`'s own
+24-hour bar rather than inventing a new number. The "blocked by/on #N"
+grammar itself moved out to
+[`seam_engine/src/seam_engine/blocker_markers.py`](seam_engine/src/seam_engine/blocker_markers.py)
+the moment this second recipe needed the identical grammar
+`unblocked-issue-still-open` first wrote — the same two-user extraction
+discipline `seam_engine.duplicate_markers` already set for the
+"duplicate of #N" family; `unblocked-issue-still-open/detector.py` was
+refactored in the same commit to import the shared function too. Both
+scopes (`ListPullRequests`, `GetPullRequest`) already sat on
+`SCOPES.md`'s cleared oath table — no new door opened; fixture-only, the
+same "connected upstream, not wired into the gateway" WIP boundary every
+recipe in this repo already carries.
+
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)
 (ROADMAP.md #111) is that second promise, kept: it runs `scan.py`'s own

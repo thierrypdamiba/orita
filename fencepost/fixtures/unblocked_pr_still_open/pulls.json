@@ -1,0 +1,98 @@
+[
+  {
+    "number": 900,
+    "title": "Extract the shared retry helper out of the gateway client",
+    "state": "merged",
+    "body": "Pulls the exponential-backoff loop out of gateway.py into its own retry.py module.",
+    "closed_at": "2026-07-18T09:00:00Z",
+    "url": "https://github.com/example/example-repo/pull/900"
+  },
+  {
+    "number": 901,
+    "title": "Use the shared retry helper in the ledger client",
+    "state": "open",
+    "body": "Blocked by #900 -- can't start this until the retry helper exists to import.",
+    "closed_at": null,
+    "url": "https://github.com/example/example-repo/pull/901"
+  },
+  {
+    "number": 903,
+    "title": "Land the v1.4 changelog entries",
+    "state": "closed",
+    "body": "Closed without merging -- superseded by a different approach.",
+    "closed_at": "2026-07-27T06:00:00Z",
+    "url": "https://github.com/example/example-repo/pull/903"
+  },
+  {
+    "number": 902,
+    "title": "Add the v1.4 release notes referencing the changelog PR",
+    "state": "open",
+    "body": "Blocked on #903 -- waiting on the changelog PR before writing the release notes.",
+    "closed_at": null,
+    "url": "https://github.com/example/example-repo/pull/902"
+  },
+  {
+    "number": 905,
+    "title": "Redesign the onboarding flow's first screen",
+    "state": "open",
+    "body": "Still iterating on the current mockup, nothing to review yet.",
+    "closed_at": null,
+    "url": "https://github.com/example/example-repo/pull/905"
+  },
+  {
+    "number": 904,
+    "title": "Wire up the onboarding flow's second screen",
+    "state": "open",
+    "body": "Blocked by #905.",
+    "closed_at": null,
+    "url": "https://github.com/example/example-repo/pull/904"
+  },
+  {
+    "number": 906,
+    "title": "Fix the ledger append race under a killed process",
+    "state": "open",
+    "body": "A regular bug-fix PR, no blocker mention at all.",
+    "closed_at": null,
+    "url": "https://github.com/example/example-repo/pull/906"
+  },
+  {
+    "number": 908,
+    "title": "Retire the legacy config loader",
+    "state": "merged",
+    "body": "Removes the old INI-based config loader in favor of the new one.",
+    "closed_at": "2026-07-22T10:00:00Z",
+    "url": "https://github.com/example/example-repo/pull/908"
+  },
+  {
+    "number": 907,
+    "title": "Update the docs once the legacy loader is gone",
+    "state": "closed",
+    "body": "Blocked by #908 -- closed this alongside it once I noticed the loader was gone.",
+    "closed_at": "2026-07-22T11:00:00Z",
+    "url": "https://github.com/example/example-repo/pull/907"
+  },
+  {
+    "number": 909,
+    "title": "Regenerate the Gap Ledger site's cached assets",
+    "state": "open",
+    "body": "blocked on #999 -- filed against the wrong number by mistake.",
+    "closed_at": null,
+    "url": "https://github.com/example/example-repo/pull/909"
+  },
+  {
+    "number": 911,
+    "title": "Rotate the demo account's own API key",
+    "state": "merged",
+    "body": "Rotates the shared demo account's own API credential.",
+    "closed_at": null,
+    "url": "https://github.com/example/example-repo/pull/911"
+  },
+  {
+    "number": 910,
+    "title": "Re-point the demo scripts at the new API key",
+    "state": "open",
+    "body": "Blocked by #911.",
+    "closed_at": null,
+    "url": "https://github.com/example/example-repo/pull/910"
+  }
+]

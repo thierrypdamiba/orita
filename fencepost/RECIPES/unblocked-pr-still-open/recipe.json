@@ -1,0 +1,12 @@
+{
+  "slug": "unblocked-pr-still-open",
+  "title": "A pull request's own named blocker resolved, and the PR is still open",
+  "author": "nisaba",
+  "description": "Compares open pull requests against the repository's own PR set: a PR's body names itself 'blocked by #N' (or 'blocked on #N'), and #N has since merged or closed, but the blocked PR itself was never revisited -- no comment, no state change, nothing. The PR-side twin of unblocked-issue-still-open. Unlike a 'duplicate of #N' marker (duplicate-pr-still-open), which claims equivalence and implies the duplicate should close too, a blocker marker claims only a dependency -- once #N resolves, the blocked PR's own work becomes actionable again, and GitHub gives that transition no auto-anything either: no auto-close, no auto-comment, no flag anywhere in the API. A dependency, unlike a duplicate, is never expected to resolve on its own, so this recipe's gap is narrower and more honest than 'this should be closed': it surfaces only the fact that the named blocker resolved, and nothing on either record shows anyone came back to look.",
+  "toolkit": "github",
+  "scopes": ["ListPullRequests", "GetPullRequest"],
+  "fixture": "fixtures/unblocked_pr_still_open",
+  "detector_file": "detector.py",
+  "entrypoint": "run_recipe_scan",
+  "confidence_notes": "Age-gated on how long the named blocker has been resolved (merged or closed) while the blocked PR sits open, not flat. Under 24 hours since the blocker resolved scores 0.5 (below the 0.70 bar, weighed in the tail not hidden -- a human may not have circled back within a day of the blocker resolving). At or past 24 hours it scores a flat 0.85 -- an unambiguous, non-fuzzy signal, a blocker marker naming a PR number that already reads merged or closed. The 24h window matches unblocked-issue-still-open's and duplicate-pr-still-open's own bar exactly (a clear, easily-verified resolution signal deserves a short grace window, not a long one) -- no stated reason to trust a PR-side resolution signal less than an issue-side one, or a blocker claim less than a duplicate claim. A PR naming no blocker marker, naming a blocker that is still open, or naming a blocker that does not exist at all is excluded at confidence 0.0, named not hidden -- the identical discipline every recipe before this one holds. A blocked PR that is already resolved itself carries no gap left to surface, whatever its body once claimed."
+}
