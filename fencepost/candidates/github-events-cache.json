@@ -26318,5 +26318,109 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/864aab80818808b94170349665b8943159a60dbe",
     "ts": "2026-08-19T12:56:08Z",
     "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "8e9791d",
+    "title": "Open roadmap row 870 (WIP, kothar-wa-khasis)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/8e9791d8e40ad61c0a6c94bafe2c61b3663b7711",
+    "ts": "2026-08-19T13:39:32Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "07077a0",
+    "title": "task 870: hourly Fencepost ritual -- github-events cache 3282->3290",
+    "url": "https://github.com/thierrypdamiba/orita/commit/07077a03b5da478b2a0c676ef70d449ce305dd06",
+    "ts": "2026-08-19T13:39:46Z",
+    "author": "Kothar-wa-Khasis"
+  },
+  {
+    "kind": "commit",
+    "id": "9a3868f",
+    "title": "oracle-issue-comment-autograde: 2026-08-19 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/9a3868f8fc84758757fec99637bfbb3fc512c72c",
+    "ts": "2026-08-19T13:40:40Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "87a02f1",
+    "title": "oracle-commit-comment-cadence: 2026-08-19 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/87a02f1a61481a29aff99a04f8f19e14a530be7f",
+    "ts": "2026-08-19T13:40:42Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "691bea6",
+    "title": "oracle-commit-comment-autograde: 2026-08-19 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/691bea6c5202a8259c4d4d7016adb39f35cffb38",
+    "ts": "2026-08-19T13:40:43Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "baa16ba",
+    "title": "oracle-collaborator-cadence: 2026-08-19 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/baa16ba1564bbd65611187eb0a2295a20b0b578a",
+    "ts": "2026-08-19T13:40:45Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "e11ddd6",
+    "title": "oracle-collaborator-autograde: 2026-08-19 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/e11ddd62d1355ba4718c26c250187a7fb269d5e4",
+    "ts": "2026-08-19T13:40:47Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "c83f272",
+    "title": "task 870: ship RECIPES/mention-claims-dangling-milestone -- the eighty-sixth real recipe, and a correction to task 869's own saturation claim",
+    "url": "https://github.com/thierrypdamiba/orita/commit/c83f27296577ce753d994e203873a264221eb96f",
+    "ts": "2026-08-19T13:45:11Z",
+    "author": "Kothar-wa-Khasis"
+  },
+  {
+    "kind": "commit",
+    "id": "cea2005",
+    "title": "task 870: WIP checkpoint -- journal written, BUILDLOG appended",
+    "url": "https://github.com/thierrypdamiba/orita/commit/cea2005edc2cc61bc2260895eeea78bf4cb33e79",
+    "ts": "2026-08-19T13:48:12Z",
+    "author": "Kothar-wa-Khasis"
+  },
+  {
+    "kind": "commit",
+    "id": "e639fa5",
+    "title": "task 870: town ledger sealed for this hour's real dogfood+ship+correction event (2030->2031)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/e639fa5cfd9abd03b34fdd276bc11070cfe8acf9",
+    "ts": "2026-08-19T13:50:04Z",
+    "author": "Kothar-wa-Khasis"
+  },
+  {
+    "kind": "commit",
+    "id": "a26bbee",
+    "title": "task 870: fix a real regression the full root suite caught -- tools/recipe_readme_check.py's own docstring and pinned test still claimed 85",
+    "url": "https://github.com/thierrypdamiba/orita/commit/a26bbee4b51da2c737587e7f55cd37ca691f2b91",
+    "ts": "2026-08-19T14:06:34Z",
+    "author": "Kothar-wa-Khasis"
+  },
+  {
+    "kind": "commit",
+    "id": "04225ba",
+    "title": "task 870: DONE -- root suite closed clean (1937 tests, 1084.9s, OK)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/04225ba88830cc40ec8553ee419aa9a5f3ff0822",
+    "ts": "2026-08-19T14:26:05Z",
+    "author": "Kothar-wa-Khasis"
+  },
+  {
+    "kind": "commit",
+    "id": "33fe023",
+    "title": "task 870: real X status recheck (X_WhoAmI ok, X_GetUserTweets 374th consecutive forbidden) -- no new escalation tier, no post",
+    "url": "https://github.com/thierrypdamiba/orita/commit/33fe023a82e3cfd1e7471dc374a3930c0900a4f0",
+    "ts": "2026-08-19T14:28:29Z",
+    "author": "Kothar-wa-Khasis"
   }
 ]
