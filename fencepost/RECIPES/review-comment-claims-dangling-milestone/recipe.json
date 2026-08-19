@@ -1,0 +1,12 @@
+{
+  "slug": "review-comment-claims-dangling-milestone",
+  "title": "A pull request's own review comment claims a milestone that doesn't exist",
+  "author": "retrya",
+  "description": "Extracts every 'milestone #N' claim phrase (milestone_claims.py's shared grammar, reused verbatim) from a pull request's own inline code review comment and checks whether the named milestone exists at all. A claimed milestone number with no real milestone behind it is the seam: GitHub renders the number as a clickable link regardless of whether it resolves to anything. The review-comment-sourced sibling of commit-claims-dangling-milestone and issue-comment-claims-dangling-milestone, closing the one seam review-comment-claims-open-milestone's own docstring named and left open.",
+  "toolkit": "github",
+  "scopes": ["ListReviewCommentsInARepository", "ListMilestones"],
+  "fixture": "fixtures/review_comment_claims_dangling_milestone",
+  "detector_file": "detector.py",
+  "entrypoint": "run_recipe_scan",
+  "confidence_notes": "Flat 0.8, not age-gated, mirroring commit-claims-dangling-milestone's and issue-comment-claims-dangling-milestone's own reasoning rather than review-comment-claims-open-milestone's 24-hour edit-grace bar -- a milestone that does not exist right now will not spontaneously start existing later no matter how long the comment sits, so there is no grace period that means anything here, whatever the age or editability of the comment naming it. A claimed milestone that DOES resolve to a real milestone is excluded at confidence 0.0, named not hidden, regardless of whether it is open or closed -- whether the claim is TRUE is review-comment-claims-open-milestone's own seam, not this one's. A review comment with no 'milestone #N' claim phrase at all, or no body at all, produces no surfaced candidate -- there is no claim to have broken."
+}

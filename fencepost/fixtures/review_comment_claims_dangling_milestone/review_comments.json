@@ -1,0 +1,37 @@
+[
+  {
+    "id": 9401,
+    "pull_request_number": 401,
+    "body": "This also ships milestone #8001 while we're in here. Milestone #8001 confirmed again, still don't think it's real.",
+    "updated_at": "2026-08-09T10:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/pull/401#discussion_r9401"
+  },
+  {
+    "id": 9402,
+    "pull_request_number": 402,
+    "body": "I think this closes milestone #8002 too, worth double-checking after merge.",
+    "updated_at": "2026-08-10T08:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/pull/402#discussion_r9402"
+  },
+  {
+    "id": 9403,
+    "pull_request_number": 403,
+    "body": "Same root cause as #8099, but not touching that here.",
+    "updated_at": "2026-08-09T10:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/pull/403#discussion_r9403"
+  },
+  {
+    "id": 9404,
+    "pull_request_number": 404,
+    "body": "Milestone #8003 shipped as a side effect of this line. See #8999 for background.",
+    "updated_at": "2026-08-11T08:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/pull/404#discussion_r9404"
+  },
+  {
+    "id": 9405,
+    "pull_request_number": 405,
+    "body": null,
+    "updated_at": "2026-08-09T10:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/pull/405#discussion_r9405"
+  }
+]

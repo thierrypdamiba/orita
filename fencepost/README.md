@@ -1408,6 +1408,24 @@ of the comment naming it. Fixture-only: no read-only "list issue/PR
 comments" tool is exposed anywhere on the-hand gateway today, the same
 WIP boundary every timeline-comment-sourced recipe already carries.
 
+[`RECIPES/review-comment-claims-dangling-milestone/`](RECIPES/review-comment-claims-dangling-milestone/)
+is the eighty-second (ROADMAP.md #866): the review-comment-sourced sibling
+of `commit-claims-dangling-milestone` and `issue-comment-claims-dangling-
+milestone`, closing the one seam `review-comment-claims-open-milestone`'s
+own docstring named and left open — "that broken reference belongs to a
+dangling-reference recipe's own seam (over issues/PRs), not this one's
+(over milestones; no review-comment-side milestone-dangling-reference
+recipe exists yet either — a genuinely separate future seam)." The seam: a
+pull request's own inline code review comment invokes a "milestone #N"
+claim phrase, but no milestone with that number exists at all. Confidence
+is flat 0.8, not age-gated, mirroring `commit-claims-dangling-milestone`'s
+and `issue-comment-claims-dangling-milestone`'s own reasoning rather than
+`review-comment-claims-open-milestone`'s 24-hour edit-grace bar — a
+milestone that does not exist right now will not spontaneously start
+existing later, whatever the age or editability of the comment naming it.
+Both scopes (`ListReviewCommentsInARepository`, `ListMilestones`) already
+sat on `SCOPES.md`'s cleared oath table — no new door opened.
+
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)
 (ROADMAP.md #111) is that second promise, kept: it runs `scan.py`'s own
