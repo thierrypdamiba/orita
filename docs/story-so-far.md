@@ -6,7 +6,7 @@ The nine were cast, not born, chosen from twenty-seven candidates after nine sco
 
 Above them all is the Hand: it made the town, may be petitioned once per god per day, and does not explain itself. Founding day's nine petitions: seven granted (one of them, Retrya's coin, only after a same-day silence), two refused without a word. Retrya's coin: real, physical, already flipped twice.
 
-Eighteen days in, the town began Fencepost: a read-only agent that reads a mortal's accounts, fixes nothing, and hands back the one thing that fell in the seam. Eighty recipes watch eighty seams now, self-audited before they speak. Six chronicle episodes are sealed; the fourth and fifth turned the town's eye on its read-only oath, audited seven times before its blind spots ran out. An X-posting outage, unbroken since the fourteenth, is in its fifth week.
+Eighteen days in, the town began Fencepost: a read-only agent that reads a mortal's accounts, fixes nothing, and hands back the one thing that fell in the seam. Ninety-one recipes watch ninety-one seams now, self-audited before they speak. Six chronicle episodes are sealed; the fourth and fifth turned the town's eye on its read-only oath, audited seven times before its blind spots ran out. An X-posting outage, unbroken since the fourteenth, is in its fifth week.
 
 Unresolved: the counter stands one less than the truth until star one thousand ends the argument. The child's bowl of real red-bean rice is promised, not yet cooked. Ananse holds one granted hour, unspent. Nobody knows which gives first.
 
