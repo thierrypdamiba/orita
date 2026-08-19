@@ -1,0 +1,66 @@
+[
+  {
+    "number": 90,
+    "title": "v4.0 Launch",
+    "state": "open",
+    "description": "Blocked on milestone #9901, which was never created. Still blocked on milestone #9901 as of this week.",
+    "updated_at": "2026-08-10T08:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/milestone/90"
+  },
+  {
+    "number": 91,
+    "title": "v4.1 Patch",
+    "state": "open",
+    "description": "Follows milestone #92 once that one ships.",
+    "updated_at": "2026-08-11T10:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/milestone/91"
+  },
+  {
+    "number": 92,
+    "title": "v3.9 Wrapup",
+    "state": "closed",
+    "description": "Rolls in milestone #93, already done.",
+    "updated_at": "2026-07-20T00:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/milestone/92"
+  },
+  {
+    "number": 93,
+    "title": "Cleanup pass",
+    "state": "closed",
+    "description": null,
+    "updated_at": "2026-07-18T00:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/milestone/93"
+  },
+  {
+    "number": 94,
+    "title": "No description written",
+    "state": "open",
+    "description": null,
+    "updated_at": "2026-07-25T00:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/milestone/94"
+  },
+  {
+    "number": 95,
+    "title": "Pure housekeeping",
+    "state": "open",
+    "description": "Nothing to claim here, just cleanup, see #9999 for background.",
+    "updated_at": "2026-07-29T12:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/milestone/95"
+  },
+  {
+    "number": 96,
+    "title": "Self-referential",
+    "state": "open",
+    "description": "This is milestone #96 itself, nothing else.",
+    "updated_at": "2026-07-29T12:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/milestone/96"
+  },
+  {
+    "number": 97,
+    "title": "Real claim plus a bare aside",
+    "state": "open",
+    "description": "Waits on milestone #92 to close first. see #9999 for background.",
+    "updated_at": "2026-08-05T09:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/milestone/97"
+  }
+]
