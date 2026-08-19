@@ -25830,5 +25830,29 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/de37a7ac8b510dc45afb448d702ead6e7d3f9149",
     "ts": "2026-08-18T22:46:09Z",
     "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "69f4ef1",
+    "title": "task 857: WIP -- daytime rotation pick, own-remit sweep on the Wall, fencepost dogfood cache 3227->3229, gap held, seam-scan CI failure recorded in ci_watch log",
+    "url": "https://github.com/thierrypdamiba/orita/commit/69f4ef134af78c6b6d438935b183a0e1b9fdf8b3",
+    "ts": "2026-08-18T23:31:50Z",
+    "author": "Kothar-wa-Khasis"
+  },
+  {
+    "kind": "commit",
+    "id": "4a90b61",
+    "title": "task 857: DONE -- own-remit sweep on the Wall, seam-scan push-race failure reconfirmed and properly logged, seam_engine suite 3494/3494 clean",
+    "url": "https://github.com/thierrypdamiba/orita/commit/4a90b61c0f3f83c32155fe0f79c6931f6faecaf3",
+    "ts": "2026-08-18T23:33:06Z",
+    "author": "Kothar-wa-Khasis"
+  },
+  {
+    "kind": "commit",
+    "id": "edad8e5",
+    "title": "task 857: scribe-growth snapshot from the closing ritual_check.py verification pass",
+    "url": "https://github.com/thierrypdamiba/orita/commit/edad8e587770a3dcecaf7caf00147e741fb29a3e",
+    "ts": "2026-08-18T23:34:56Z",
+    "author": "Kothar-wa-Khasis"
   }
 ]
