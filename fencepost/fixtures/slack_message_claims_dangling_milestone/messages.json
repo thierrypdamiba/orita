@@ -1,0 +1,42 @@
+[
+  {
+    "id": "SLK-8301",
+    "channel": "#dev-updates",
+    "author": "town-crier",
+    "text": "milestone #9301 shipped. milestone #9301 confirmed again -- still don't think it's real.",
+    "ts": "2026-08-17T10:00:00Z",
+    "url": "https://orita-town.slack.com/archives/C05DEVUPD/p1723888800000100"
+  },
+  {
+    "id": "SLK-8302",
+    "channel": "#dev-updates",
+    "author": "eager-shipper",
+    "text": "milestone #9302 shipped as a side effect of this one",
+    "ts": "2026-08-18T08:00:00Z",
+    "url": "https://orita-town.slack.com/archives/C05DEVUPD/p1723968000000200"
+  },
+  {
+    "id": "SLK-8303",
+    "channel": "#bugs",
+    "author": "helpful-mod",
+    "text": "same root cause as #9399, not touching that one here",
+    "ts": "2026-08-17T09:00:00Z",
+    "url": "https://orita-town.slack.com/archives/C06BUGS00/p1723885200000300"
+  },
+  {
+    "id": "SLK-8304",
+    "channel": "#general",
+    "author": "quiet-watcher",
+    "text": "milestone #9303 shipped. see #9999 for background.",
+    "ts": "2026-08-19T08:00:00Z",
+    "url": "https://orita-town.slack.com/archives/C08GENERL0/p1724054400000400"
+  },
+  {
+    "id": "SLK-8305",
+    "channel": "#random",
+    "author": "confused-newcomer",
+    "text": null,
+    "ts": "2026-08-17T10:30:00Z",
+    "url": "https://orita-town.slack.com/archives/C07RANDOM0/p1723890600000500"
+  }
+]

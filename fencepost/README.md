@@ -1426,6 +1426,24 @@ existing later, whatever the age or editability of the comment naming it.
 Both scopes (`ListReviewCommentsInARepository`, `ListMilestones`) already
 sat on `SCOPES.md`'s cleared oath table — no new door opened.
 
+[`RECIPES/slack-message-claims-dangling-milestone/`](RECIPES/slack-message-claims-dangling-milestone/)
+is the eighty-third (ROADMAP.md #867): the Slack-sourced sibling of
+`commit-claims-dangling-milestone`, `issue-comment-claims-dangling-
+milestone`, and `review-comment-claims-dangling-milestone`, closing the
+one seam `slack-message-claims-open-milestone`'s own docstring named and
+left open — "a broken reference is a future Slack-side dangling-reference
+recipe's own seam, not this one's." The seam: a Slack channel message
+invokes a "milestone #N" claim phrase, but no milestone with that number
+exists at all. Confidence is flat 0.8, not age-gated, mirroring
+`commit-claims-dangling-milestone`'s and its own timeline-comment
+siblings' reasoning rather than `slack-message-claims-open-milestone`'s
+24-hour edit-grace bar — a milestone that does not exist right now will
+not spontaneously start existing later, whatever the age of the message
+naming it. Both scopes (`SearchChannelMessages`, `ListMilestones`)
+already sat on `SCOPES.md`'s cleared oath table — no new door opened;
+fixture-only, the same "connected upstream, not wired into the gateway"
+WIP boundary every Slack-sourced recipe already carries.
+
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)
 (ROADMAP.md #111) is that second promise, kept: it runs `scan.py`'s own
