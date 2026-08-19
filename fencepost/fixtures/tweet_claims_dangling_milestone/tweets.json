@@ -1,0 +1,32 @@
+[
+  {
+    "id": "T-9501",
+    "text": "Milestone #21 shipped, and shipped for real.",
+    "created_at": "2026-07-29T09:00:00Z",
+    "url": "https://x.com/oritatown/status/2000000000000009501"
+  },
+  {
+    "id": "T-9502",
+    "text": "Milestone #34 shipped ahead of schedule.",
+    "created_at": "2026-07-28T09:00:00Z",
+    "url": "https://x.com/oritatown/status/2000000000000009502"
+  },
+  {
+    "id": "T-9503",
+    "text": "Nothing shipped this hour -- see #9605 for background, no milestone claim here.",
+    "created_at": "2026-07-27T09:00:00Z",
+    "url": "https://x.com/oritatown/status/2000000000000009503"
+  },
+  {
+    "id": "T-9504",
+    "text": "We have not hit milestone #9606 this cycle; that one is still ahead of us.",
+    "created_at": "2026-07-26T09:00:00Z",
+    "url": "https://x.com/oritatown/status/2000000000000009504"
+  },
+  {
+    "id": "T-9505",
+    "text": "Milestone #9601 shipped. Milestone #9601 shipped, said a second time on purpose -- the dedupe guard's own fixture.",
+    "created_at": "2026-07-25T09:00:00Z",
+    "url": "https://x.com/oritatown/status/2000000000000009505"
+  }
+]

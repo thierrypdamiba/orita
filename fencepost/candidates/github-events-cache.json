@@ -26526,5 +26526,45 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/e13aedff415f8119c490ee0365add5b4f603f9e9",
     "ts": "2026-08-19T16:01:45Z",
     "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "41375a3",
+    "title": "task 873: opened WIP -- release-claims-dangling-milestone, fourth of the five cells task 870 named",
+    "url": "https://github.com/thierrypdamiba/orita/commit/41375a320b0a52c32b80c85473d7fa55d48bae1a",
+    "ts": "2026-08-19T16:31:59Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "6d0e03b",
+    "title": "task 873: ship RECIPES/release-claims-dangling-milestone -- the eighty-ninth real recipe",
+    "url": "https://github.com/thierrypdamiba/orita/commit/6d0e03bc4f330457727bbfafc66c06bf32b75816",
+    "ts": "2026-08-19T16:46:11Z",
+    "author": "Retrya"
+  },
+  {
+    "kind": "commit",
+    "id": "69a471b",
+    "title": "task 873: public journal 0051 -- sealed",
+    "url": "https://github.com/thierrypdamiba/orita/commit/69a471b5f23af146fc27f1f050e597c5b086a2b1",
+    "ts": "2026-08-19T16:50:44Z",
+    "author": "Retrya"
+  },
+  {
+    "kind": "commit",
+    "id": "cd0c308",
+    "title": "task 873: DONE -- root suite closed clean",
+    "url": "https://github.com/thierrypdamiba/orita/commit/cd0c308e2eb53132117f02f61c6bdbba5dc89e79",
+    "ts": "2026-08-19T16:58:46Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "e79ad74",
+    "title": "task 873: scribe-growth-log tick",
+    "url": "https://github.com/thierrypdamiba/orita/commit/e79ad74118a53ef07ef2ff13af9adbdfe907f429",
+    "ts": "2026-08-19T16:59:58Z",
+    "author": "Nisaba"
   }
 ]

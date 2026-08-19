@@ -1619,7 +1619,50 @@ fixtures, the same "recent-releases history" shape
 `release-claims-open-milestone` established for this surface. Toolkit
 stays `github`-only, so the total recipe count climbs while the
 plus-joined count does not. The one remaining unclosed cell (`tweet`)
-stays open for a future hour.
+closes below.
+
+[`RECIPES/tweet-claims-dangling-milestone/`](RECIPES/tweet-claims-dangling-milestone/)
+is the ninetieth (ROADMAP.md #874): the tweet-sourced sibling of
+`commit-claims-dangling-milestone`, `issue-comment-claims-dangling-
+milestone`, `review-comment-claims-dangling-milestone`,
+`slack-message-claims-dangling-milestone`, `linear-comment-claims-
+dangling-milestone`, `mention-claims-dangling-milestone`,
+`milestone-claims-dangling-milestone`, `readme-claims-dangling-
+milestone`, and `release-claims-dangling-milestone` — the fifth and last
+of the five cells task 870 named. The family that door opened is now
+fully saturated across every surface the town watches for a "milestone
+#N" claim. The seam: a tweet from the connected X account invokes a
+"milestone #N" claim phrase, but no milestone with that number exists at
+all. It is not `own-tweet-dangling-reference`'s seam wearing a new name —
+that recipe (the twenty-fourth) already reads the connected account's own
+tweets, but strictly for a bare `#N` against the shared GitHub issue/PR
+number sequence, and never opens `ListMilestones` at all. A milestone
+lives in its own, separate number space, so a claimed `milestone #N` that
+happens to resolve as a real *issue* number would read as perfectly fine
+there while naming no milestone whatsoever — conflating the two spaces
+would misfire exactly the way Ògún's law calls fatal. It is not
+`tweet-claims-open-milestone` either: those two are exact inverses on one
+surface, and the boundary is the point — there a claimed number that
+resolves to nothing is *excluded* at 0.0 and a claim contradicted by a
+still-open milestone is surfaced; here the resolution failure *is* the
+seam, and a claimed number that does resolve is excluded at 0.0, open or
+closed alike. A tweet is X's own permanent, append-only public record —
+the same "never gets a second edit pass" durability
+`own-tweet-dangling-reference`'s own confidence note already relies on,
+and the same the release-sourced sibling already guards against in a
+release body. Confidence is flat 0.8, not age-gated, unlike
+`tweet-claims-open-milestone`'s own 24-hour publish-age grace bar: that
+recipe age-gates because a claimed target could still change state at any
+moment, but a milestone number that does not exist right now will not
+spontaneously start existing later, so no grace period would mean
+anything here. Both scopes (`GetUserTweets`, `ListMilestones`) already
+sat on `SCOPES.md`'s cleared oath table — no new door opened; two
+fixtures, the same "recent-tweets history" shape
+`tweet-claims-unmerged-pr` established for this surface. Toolkit is
+`x+github`, a real cross-toolkit pair, so both the total recipe count and
+the plus-joined count climb together this time (27 of 89 → 28 of 90). No
+cells remain open — the family task 870 opened across mention, milestone,
+readme, release, and tweet is closed.
 
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)

@@ -70,7 +70,7 @@
     reviewed and merged like any PR. The read-only oath does not loosen for outside code:
     <a href="https://github.com/thierrypdamiba/orita/blob/main/fencepost/CONTRIBUTING.md">CONTRIBUTING.md</a>
     is the schema in prose, enforced in code before a human reviewer ever reads a stranger's
-    detector. Eighty-nine real recipes stand today:</p>
+    detector. Ninety real recipes stand today:</p>
     <p><b><a href="https://github.com/thierrypdamiba/orita/tree/main/fencepost/RECIPES/example-release-vs-changelog">example-release-vs-changelog</a></b>
     — the reference: proof a first external recipe PR is mergeable at all.<br>
     <b><a href="https://github.com/thierrypdamiba/orita/tree/main/fencepost/RECIPES/merged-pr-issue-still-open">merged-pr-issue-still-open</a></b>
@@ -844,7 +844,30 @@
     age. Both scopes (<code>GetLatestRelease</code>, <code>ListMilestones</code>) already sat on
     <code>SCOPES.md</code>'s cleared oath table — no new door opened; two fixtures, the same
     "recent-releases history" shape <code>release-claims-open-milestone</code> established for this surface.
-    The one remaining unclosed cell (<code>tweet</code>) stays open for a future hour.</p>
+    The one remaining unclosed cell (<code>tweet</code>) closes below.</p>
+    <p><b><a href="https://github.com/thierrypdamiba/orita/tree/main/fencepost/RECIPES/tweet-claims-dangling-milestone">tweet-claims-dangling-milestone</a></b>
+    — the ninetieth, and the fifth and last: the tweet-sourced sibling of <code>commit-claims-dangling-milestone</code>,
+    <code>issue-comment-claims-dangling-milestone</code>, <code>review-comment-claims-dangling-milestone</code>,
+    <code>slack-message-claims-dangling-milestone</code>, <code>linear-comment-claims-dangling-milestone</code>,
+    <code>mention-claims-dangling-milestone</code>, <code>milestone-claims-dangling-milestone</code>,
+    <code>readme-claims-dangling-milestone</code>, and <code>release-claims-dangling-milestone</code>, closing
+    the fifth of the five cells task 870 named — the family that door opened is now fully saturated across
+    every surface the town watches for a "milestone #N" claim. The seam: a tweet from the connected X account
+    invokes a "milestone #N" claim phrase, but no milestone with that number exists at all. It is not
+    <code>own-tweet-dangling-reference</code>'s seam wearing a new name — that recipe already reads the
+    account's own tweets, but strictly for a bare <code>#N</code> against the shared GitHub issue/PR number
+    sequence, and never opens <code>ListMilestones</code>; a milestone lives in its own, separate number space.
+    It is not <code>tweet-claims-open-milestone</code> either: those two are exact inverses on one surface —
+    there a claimed number resolving to nothing is <i>excluded</i>, here that failure <i>is</i> the seam. A
+    tweet is X's own permanent, append-only public record, so a broken claim inside one is exactly as durable
+    as one sitting in a commit message or a release body. Confidence is flat 0.8, not age-gated — a nonexistent
+    milestone number will not spontaneously start existing later, whatever the tweet's own age. Both scopes
+    (<code>GetUserTweets</code>, <code>ListMilestones</code>) already sat on <code>SCOPES.md</code>'s cleared
+    oath table — no new door opened; two fixtures, the same "recent-tweets history" shape
+    <code>tweet-claims-unmerged-pr</code> established for this surface. Toolkit is <code>x+github</code>, a real
+    cross-toolkit pair, so both the total recipe count and the plus-joined count climb together this time
+    (27 of 89 → 28 of 90). No cells remain — the family task 870 opened across mention, milestone, readme,
+    release, and tweet is closed.</p>
     <p>Merging a recipe is one promise; letting it actually compete for the daily primary gap
     is another. <a href="https://github.com/thierrypdamiba/orita/blob/main/fencepost/seam_engine/src/seam_engine/combined_scan.py"><code>combined_scan.py</code></a>
     keeps the second: it pools a recipe's own candidates with <code>scan.py</code>'s, and ranks
