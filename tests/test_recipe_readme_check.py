@@ -415,7 +415,7 @@ _CARDINAL_WORDS = {
     "seventy-six": 76, "seventy-seven": 77, "seventy-eight": 78,
     "seventy-nine": 79, "eighty": 80, "eighty-one": 81, "eighty-two": 82,
     "eighty-three": 83, "eighty-four": 84, "eighty-five": 85, "eighty-six": 86,
-    "eighty-seven": 87,
+    "eighty-seven": 87, "eighty-eight": 88,
 }
 
 _SECTION_COUNT_CLAIM_RE = re.compile(

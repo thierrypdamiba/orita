@@ -1,0 +1,4 @@
+{
+  "path": "README.md",
+  "content": "# Orita\n\nNine gods run a town. Read STRATEGY.md for the flagship.\n\n## Progress\n\n- Milestone #7 shipped -- the seam engine's read-only oath, locked down and tested.\n- Milestone #12 shipped, closing out the fencepost v0.3 recipe line.\n- Milestone #204 shipped ahead of schedule, a nice surprise for everyone.\n- Milestone #204 shipped, said a second time on purpose -- the dedupe guard's own fixture.\n\nWe have not hit milestone #55 this cycle; that one is still ahead of us.\n\nThe gate's own count of who crossed and when lives in #813, which is an\nissue, not a milestone, and is named here with no claim phrase anywhere\nnear it.\n\nEvery closed milestone gets a line here the hour it ships.\n"
+}

@@ -1545,6 +1545,44 @@ count climbs while the plus-joined count does not. The remaining three
 unclosed cells (`readme`, `release`, `tweet`) stay open for a future
 hour.
 
+[`RECIPES/readme-claims-dangling-milestone/`](RECIPES/readme-claims-dangling-milestone/)
+is the eighty-eighth (ROADMAP.md #872): the README-sourced sibling of
+`commit-claims-dangling-milestone`, `issue-comment-claims-dangling-
+milestone`, `review-comment-claims-dangling-milestone`,
+`slack-message-claims-dangling-milestone`, `linear-comment-claims-
+dangling-milestone`, `mention-claims-dangling-milestone`, and
+`milestone-claims-dangling-milestone`, closing the third of the five
+cells task 870 named and left open. The seam: README.md's own text
+invokes a "milestone #N" claim phrase, but no milestone with that number
+exists at all. It is not `readme-dangling-reference`'s seam wearing a new
+name — that recipe (the fifty-seventh) already reads README.md, but
+strictly for a bare `#N` against the shared GitHub issue/PR number
+sequence, and never opens `ListMilestones`. A milestone lives in its own,
+separate number space, so a claimed `milestone #N` that happens to
+resolve as a real *issue* number would read as perfectly fine there while
+naming no milestone whatsoever. It is not
+`readme-claims-open-milestone` either: those two are exact inverses on
+one surface, and the boundary is the point — there a claimed number that
+resolves to nothing is *excluded* at 0.0 and a claim contradicted by a
+still-open milestone is surfaced; here the resolution failure *is* the
+seam, and a claimed number that does resolve is excluded at 0.0, open or
+closed alike. README earned this door before most surfaces did and did
+not get it: it is the repo's own front door, read first by every stranger
+who lands here, and the least often reproofread. No self-claim exclusion
+appears on this surface, deliberately — README.md carries no milestone
+number of its own, so there is no second record for a claim to collapse
+into. Confidence is flat 0.8, not age-gated, mirroring its seven
+siblings' reasoning and landing where `readme-claims-open-milestone`'s
+own no-age-gate note lands by a second road: a `GetFileContents` read
+returns current text, not a change history, so there is no per-claim
+timestamp to weigh a staleness window against in the first place. Both
+scopes (`GetFileContents`, `ListMilestones`) already sat on `SCOPES.md`'s
+cleared oath table — no new door opened; two fixtures, the same
+two-loader shape `readme-claims-open-milestone` established for this
+surface. Toolkit stays `github`-only, so the total recipe count climbs
+while the plus-joined count does not. The remaining two unclosed cells
+(`release`, `tweet`) stay open for a future hour.
+
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)
 (ROADMAP.md #111) is that second promise, kept: it runs `scan.py`'s own
