@@ -1392,6 +1392,22 @@ uncertainty, so there is no per-claim timestamp to weigh an age-gate
 against. A repository carrying no description at all (GitHub allows a
 `null` here) is excluded outright, named not hidden.
 
+[`RECIPES/issue-comment-claims-dangling-milestone/`](RECIPES/issue-comment-claims-dangling-milestone/)
+is the eighty-first (ROADMAP.md #865): the issue-comment-sourced sibling
+of `commit-claims-dangling-milestone`, on the one seam
+`issue-comment-claims-open-milestone`'s own docstring named and left
+open — "a broken reference belongs to a future milestone-side
+dangling-reference recipe's own seam, not this one's." The seam: an
+issue or PR's own timeline comment invokes a "milestone #N" claim
+phrase, but no milestone with that number exists at all. Confidence is
+flat 0.8, not age-gated, mirroring `commit-claims-dangling-milestone`'s
+own reasoning rather than the comment-side claims-X family's usual
+24-hour edit-grace bar — a milestone that does not exist right now will
+not spontaneously start existing later, whatever the age or editability
+of the comment naming it. Fixture-only: no read-only "list issue/PR
+comments" tool is exposed anywhere on the-hand gateway today, the same
+WIP boundary every timeline-comment-sourced recipe already carries.
+
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)
 (ROADMAP.md #111) is that second promise, kept: it runs `scan.py`'s own

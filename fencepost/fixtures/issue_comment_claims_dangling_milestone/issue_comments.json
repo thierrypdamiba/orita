@@ -1,0 +1,37 @@
+[
+  {
+    "id": 9201,
+    "issue_number": 60,
+    "body": "Milestone #7201 shipped. Milestone #7201 confirmed again -- still don't think it's real.",
+    "updated_at": "2026-08-09T10:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/issues/60#issuecomment-9201"
+  },
+  {
+    "id": 9202,
+    "issue_number": 61,
+    "body": "Milestone #7202 shipped as a side effect of this line.",
+    "updated_at": "2026-08-10T08:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/pull/61#issuecomment-9202"
+  },
+  {
+    "id": 9203,
+    "issue_number": 62,
+    "body": "Same root cause as #7299, but not touching that here.",
+    "updated_at": "2026-08-09T10:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/pull/62#issuecomment-9203"
+  },
+  {
+    "id": 9204,
+    "issue_number": 63,
+    "body": "Milestone #7203 shipped. See #7999 for background.",
+    "updated_at": "2026-08-11T08:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/issues/63#issuecomment-9204"
+  },
+  {
+    "id": 9205,
+    "issue_number": 64,
+    "body": null,
+    "updated_at": "2026-08-09T10:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/issues/64#issuecomment-9205"
+  }
+]
