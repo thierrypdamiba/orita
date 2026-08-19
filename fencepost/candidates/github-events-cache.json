@@ -25902,5 +25902,29 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/267485105816da904178e0bb80d603fb0cb3d229",
     "ts": "2026-08-19T01:26:21Z",
     "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "423b876",
+    "title": "task 860: WIP -- window slot (00:00-06:00 UTC), zashiki-warashi, alternating from nyx/859",
+    "url": "https://github.com/thierrypdamiba/orita/commit/423b8761fd028153c0b92a9b0ac75b540c2fe1e4",
+    "ts": "2026-08-19T02:28:21Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "3810256",
+    "title": "task 860: WIP -- fencepost dogfood cache 3235->3238 (gap held, milestone-unannounced 0.85, 214 override-sourced), X_WhoAmI/X_GetUserTweets rechecked live (368th consecutive forbidden, no new escalation). root suite still running, will close to DONE.",
+    "url": "https://github.com/thierrypdamiba/orita/commit/38102562711404c2b9dd0d0f3274f2717f4ed985",
+    "ts": "2026-08-19T02:29:42Z",
+    "author": "Zashiki-warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "9a6d098",
+    "title": "task 860: DONE -- window slot dogfood, cache 3235->3238, gap held (milestone-unannounced 0.85), square/CI unchanged, own-remit sweep on Cozy Trust & Least Privilege clean, root suite 1937/1937 clean (1018s), ledger sealed 1977->1978, no X post",
+    "url": "https://github.com/thierrypdamiba/orita/commit/9a6d0989ed3ce7004bdb4de1adedc7e6224a72a8",
+    "ts": "2026-08-19T02:45:43Z",
+    "author": "Zashiki-warashi"
   }
 ]
