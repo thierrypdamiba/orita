@@ -663,7 +663,7 @@ _CARDINAL_WORDS = {
     "seventy-three": 73, "seventy-four": 74, "seventy-five": 75,
     "seventy-six": 76, "seventy-seven": 77, "seventy-eight": 78,
     "seventy-nine": 79, "eighty": 80, "eighty-one": 81, "eighty-two": 82,
-    "eighty-three": 83,
+    "eighty-three": 83, "eighty-four": 84,
 }
 
 _PLUS_JOINED_CLAIM_RE = re.compile(
@@ -715,19 +715,18 @@ def test_plus_joined_claim_missing_sentence_raises():
         claimed_plus_joined_counts("Nothing here about plus-joined toolkits.")
 
 
-def test_real_plus_joined_counts_are_currently_twenty_five_of_eighty_three():
-    # Regression pin: today's real, live counts under RECIPES/. Was (24, 82)
-    # until slack-message-claims-dangling-milestone merged (the
-    # eighty-third real recipe, toolkit "slack+github" -- a plus-joined
-    # recipe, so both halves climb together this time, unlike
-    # review-comment-claims-dangling-milestone's single-toolkit "github"
-    # merge one task earlier, which left the plus-joined half untouched.
-    # `real_plus_joined_counts` counts every recipe whose OWN toolkit
+def test_real_plus_joined_counts_are_currently_twenty_six_of_eighty_four():
+    # Regression pin: today's real, live counts under RECIPES/. Was (25, 83)
+    # until linear-comment-claims-dangling-milestone merged (the
+    # eighty-fourth real recipe, toolkit "linear+github" -- a plus-joined
+    # recipe, so both halves climb together this time, the same shape
+    # slack-message-claims-dangling-milestone's own merge one task earlier
+    # held. `real_plus_joined_counts` counts every recipe whose OWN toolkit
     # string contains "+" -- not distinct toolkit-pair strings. Verified
     # against the live tree, not assumed from a prior task's own note:
     # every one of today's plus-joined recipes was grepped by hand before
     # pinning this number.
-    assert real_plus_joined_counts(FENCEPOST_ROOT) == (25, 83)
+    assert real_plus_joined_counts(FENCEPOST_ROOT) == (26, 84)
 
 
 def test_oath_scopes_for_toolkit_docstring_matches_the_real_live_counts():
