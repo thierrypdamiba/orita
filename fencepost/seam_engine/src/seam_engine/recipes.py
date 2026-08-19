@@ -420,7 +420,7 @@ def _check_scope_is_read_only(scope: str, *, where: str) -> None:
 def _oath_scopes_for_toolkit(toolkit: str) -> frozenset[str]:
     """The union of `consent.REQUIRED_SCOPES` for one recipe's `toolkit`
     field. A recipe's toolkit is usually a single Arcade toolkit ("github"),
-    but twenty-seven of the eighty-eight real recipes today name a plus-joined pair
+    but twenty-seven of the eighty-nine real recipes today name a plus-joined pair
     spanning two ("github+x", "x+github" -- both directions appear, cosmetic
     either way -- plus "slack+github" (five recipes), "linear+github" (five
     recipes), and "github+google_calendar" (one recipe, the first to pair

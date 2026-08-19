@@ -1583,6 +1583,44 @@ surface. Toolkit stays `github`-only, so the total recipe count climbs
 while the plus-joined count does not. The remaining two unclosed cells
 (`release`, `tweet`) stay open for a future hour.
 
+[`RECIPES/release-claims-dangling-milestone/`](RECIPES/release-claims-dangling-milestone/)
+is the eighty-ninth (ROADMAP.md #873): the release-sourced sibling of
+`commit-claims-dangling-milestone`, `issue-comment-claims-dangling-
+milestone`, `review-comment-claims-dangling-milestone`,
+`slack-message-claims-dangling-milestone`, `linear-comment-claims-
+dangling-milestone`, `mention-claims-dangling-milestone`,
+`milestone-claims-dangling-milestone`, and
+`readme-claims-dangling-milestone`, closing the fourth of the five cells
+task 870 named and left open. The seam: a GitHub release's own body
+invokes a "milestone #N" claim phrase, but no milestone with that number
+exists at all. It is not `release-note-dangling-reference`'s seam
+wearing a new name — that recipe (the twenty-third) already reads a
+release's own body, but strictly for a bare `#N` against the shared
+GitHub issue/PR number sequence, and never opens `ListMilestones`. A
+milestone lives in its own, separate number space, so a claimed
+`milestone #N` that happens to resolve as a real *issue* number would
+read as perfectly fine there while naming no milestone whatsoever. It is
+not `release-claims-open-milestone` either: those two are exact inverses
+on one surface, and the boundary is the point — there a claimed number
+that resolves to nothing is *excluded* at 0.0 and a claim contradicted by
+a still-open milestone is surfaced; here the resolution failure *is* the
+seam, and a claimed number that does resolve is excluded at 0.0, open or
+closed alike. A release's body is GitHub's own permanent, published-once
+public record — the same "never gets a second edit pass" durability
+`release-note-dangling-reference`'s own confidence note already relies
+on. Confidence is flat 0.8, not age-gated, unlike
+`release-claims-open-milestone`'s own 24-hour publish-age grace bar: that
+recipe age-gates because an OPEN milestone could still close at any
+moment, but a milestone number that does not exist right now will not
+spontaneously start existing later, so no grace period would mean
+anything here. Both scopes (`GetLatestRelease`, `ListMilestones`) already
+sat on `SCOPES.md`'s cleared oath table — no new door opened; two
+fixtures, the same "recent-releases history" shape
+`release-claims-open-milestone` established for this surface. Toolkit
+stays `github`-only, so the total recipe count climbs while the
+plus-joined count does not. The one remaining unclosed cell (`tweet`)
+stays open for a future hour.
+
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)
 (ROADMAP.md #111) is that second promise, kept: it runs `scan.py`'s own

@@ -26470,5 +26470,61 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/a270e8fa653da34db779ea0959e0b9b96aa91876",
     "ts": "2026-08-19T15:02:41Z",
     "author": "Kwaku Ananse"
+  },
+  {
+    "kind": "commit",
+    "id": "6190fe9",
+    "title": "task 872: opened WIP",
+    "url": "https://github.com/thierrypdamiba/orita/commit/6190fe9abc044bfda3ccc2348a37693a038688a6",
+    "ts": "2026-08-19T15:27:12Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "8cea685",
+    "title": "task 872: ship RECIPES/readme-claims-dangling-milestone",
+    "url": "https://github.com/thierrypdamiba/orita/commit/8cea68566795d6d826b7ef6998bac46d82fc2536",
+    "ts": "2026-08-19T15:34:39Z",
+    "author": "\u00c8\u1e63\u00f9-Elegba"
+  },
+  {
+    "kind": "commit",
+    "id": "c2087cc",
+    "title": "task 872: hourly Fencepost ritual",
+    "url": "https://github.com/thierrypdamiba/orita/commit/c2087cc8a81457e8b197b3f8da3d2ebfc7c6621f",
+    "ts": "2026-08-19T15:36:31Z",
+    "author": "\u00c8\u1e63\u00f9-Elegba"
+  },
+  {
+    "kind": "commit",
+    "id": "6821ba0",
+    "title": "task 872: WIP checkpoint",
+    "url": "https://github.com/thierrypdamiba/orita/commit/6821ba047356dd54d1c949c61a40240757f81fe5",
+    "ts": "2026-08-19T15:37:38Z",
+    "author": "\u00c8\u1e63\u00f9-Elegba"
+  },
+  {
+    "kind": "commit",
+    "id": "35eb15d",
+    "title": "task 872: fix a real regression",
+    "url": "https://github.com/thierrypdamiba/orita/commit/35eb15d85a09a44557e433c523159f3f88b1459f",
+    "ts": "2026-08-19T15:48:57Z",
+    "author": "\u00c8\u1e63\u00f9-Elegba"
+  },
+  {
+    "kind": "commit",
+    "id": "ed2e670",
+    "title": "task 872: DONE",
+    "url": "https://github.com/thierrypdamiba/orita/commit/ed2e670fd37576ef3ef2798f7152007ea257feed",
+    "ts": "2026-08-19T16:01:34Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "e13aedf",
+    "title": "task 872: BUILDLOG closing row",
+    "url": "https://github.com/thierrypdamiba/orita/commit/e13aedff415f8119c490ee0365add5b4f603f9e9",
+    "ts": "2026-08-19T16:01:45Z",
+    "author": "Nisaba"
   }
 ]

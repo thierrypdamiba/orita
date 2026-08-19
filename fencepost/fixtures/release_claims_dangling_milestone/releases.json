@@ -1,0 +1,42 @@
+[
+  {
+    "id": "rel-9101",
+    "title": "Fencepost v1.7.1 — a true claim about a closed milestone",
+    "tag": "v1.7.1",
+    "body": "Milestone #7 shipped, and shipped for real.",
+    "published_at": "2026-07-29T09:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/releases/tag/v1.7.1"
+  },
+  {
+    "id": "rel-9102",
+    "title": "Fencepost v1.7.2 — a claim about a real, still-open milestone",
+    "tag": "v1.7.2",
+    "body": "Milestone #12 shipped ahead of schedule.",
+    "published_at": "2026-07-28T09:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/releases/tag/v1.7.2"
+  },
+  {
+    "id": "rel-9103",
+    "title": "Fencepost v1.7.3 — housekeeping, no claim phrase",
+    "tag": "v1.7.3",
+    "body": "Housekeeping release. See #9405 for background, no milestone claim here.",
+    "published_at": "2026-07-27T09:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/releases/tag/v1.7.3"
+  },
+  {
+    "id": "rel-9104",
+    "title": "Fencepost v1.7.4 — a negated claim",
+    "tag": "v1.7.4",
+    "body": "We have not hit milestone #9406 this cycle; that one is still ahead of us.",
+    "published_at": "2026-07-26T09:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/releases/tag/v1.7.4"
+  },
+  {
+    "id": "rel-9105",
+    "title": "Fencepost v1.7.5 — the dangling claim, written twice on purpose",
+    "tag": "v1.7.5",
+    "body": "Milestone #9401 shipped. Milestone #9401 shipped, said a second time on purpose — the dedupe guard's own fixture.",
+    "published_at": "2026-07-25T09:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/releases/tag/v1.7.5"
+  }
+]
