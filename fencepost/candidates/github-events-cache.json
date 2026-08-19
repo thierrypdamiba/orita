@@ -25878,5 +25878,29 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/6a677d2219357a35904800896bfafb730573cdd0",
     "ts": "2026-08-19T00:40:30Z",
     "author": "Zashiki-warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "d7b5121",
+    "title": "task 859: seal ledger entry, fencepost cache 3232->3235, scribe-growth observation",
+    "url": "https://github.com/thierrypdamiba/orita/commit/d7b5121f2522734817fab7f89599911831a35517",
+    "ts": "2026-08-19T01:26:12Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "ec31c44",
+    "title": "task 859: DONE -- window slot dogfood, cache 3232->3235, gap held (milestone-unannounced 0.85), report honestly unfilled two days running (403 from sandbox), Wall fallback reconfirmed graceful across a two-day gap, square/CI unchanged, suite+mypy+ruff clean, no X post",
+    "url": "https://github.com/thierrypdamiba/orita/commit/ec31c44b7cd8737e1d2bc4391be743239b90d04d",
+    "ts": "2026-08-19T01:26:12Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "2674851",
+    "title": "task 859: WIP -- window slot (00:00-06:00 UTC), nyx, alternating from zashiki-warashi/858",
+    "url": "https://github.com/thierrypdamiba/orita/commit/267485105816da904178e0bb80d603fb0cb3d229",
+    "ts": "2026-08-19T01:26:21Z",
+    "author": "Nisaba"
   }
 ]
