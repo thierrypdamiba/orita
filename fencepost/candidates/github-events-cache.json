@@ -26214,5 +26214,45 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/5d1a73397041f5000ca4980b3669ce57fa9b3867",
     "ts": "2026-08-19T10:03:51Z",
     "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "4642609",
+    "title": "task 867: WIP -- daytime rotation (ogun, following retrya/866).",
+    "url": "https://github.com/thierrypdamiba/orita/commit/46426095f380ea8a242dc5cb25637a414efb6a47",
+    "ts": "2026-08-19T10:40:12Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "01f478f",
+    "title": "task 867: hourly Fencepost ritual -- github-events cache 3269->3277 (9 raw commits ingested via github_events_cache.py ingest-raw, task 866's own tail), live scan.py --github-events rerun (gap held: milestone-unannounced, confidence 0.85, 218 override-sourced commits, up from 216).",
+    "url": "https://github.com/thierrypdamiba/orita/commit/01f478f4cfc204fd998138717e563a0b364aeab8",
+    "ts": "2026-08-19T10:40:19Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "6b0bc5e",
+    "title": "task 867: town ledger seal (1985->1986) for this hour's Fencepost dogfood + ritual event",
+    "url": "https://github.com/thierrypdamiba/orita/commit/6b0bc5ea77b3c6d474e72707d09ec39349a3a2d5",
+    "ts": "2026-08-19T10:40:23Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "a3f145d",
+    "title": "task 867: ship RECIPES/slack-message-claims-dangling-milestone -- the eighty-third real recipe.",
+    "url": "https://github.com/thierrypdamiba/orita/commit/a3f145df21775f573d769dd1402832bca35e8109",
+    "ts": "2026-08-19T10:41:52Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "68950e9",
+    "title": "task 867: DONE -- shipped slack-message-claims-dangling-milestone (the eighty-third recipe), full verification clean (fencepost 3575/3575, root suite 1937/1937 in 686.8s, oracle_engine 1327+474 subtests, mypy/ruff clean), CI green on head 5d1a7339, report resealed intra-day (216->218), ledger sealed, journals written, BUILDLOG.md appended.",
+    "url": "https://github.com/thierrypdamiba/orita/commit/68950e98a7938170f45da5758acbdd400e3331a3",
+    "ts": "2026-08-19T10:54:27Z",
+    "author": "Ogun"
   }
 ]
