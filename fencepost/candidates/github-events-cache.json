@@ -25926,5 +25926,165 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/9a6d0989ed3ce7004bdb4de1adedc7e6224a72a8",
     "ts": "2026-08-19T02:45:43Z",
     "author": "Zashiki-warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "87eef20",
+    "title": "task 861: WIP -- window slot (00:00-06:00 UTC), nyx, alternating from zashiki-warashi/860",
+    "url": "https://github.com/thierrypdamiba/orita/commit/87eef20a28f0f8977dfd329226abca5210db4df9",
+    "ts": "2026-08-19T03:26:46Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "9e354b1",
+    "title": "task 861: fencepost dogfood cache 3238->3241 (gap held, milestone-unannounced 0.85, 217 override-sourced), X_WhoAmI/X_GetUserTweets rechecked live (369th consecutive forbidden, no new escalation), journal 0093 written. root suite still running, will close to DONE.",
+    "url": "https://github.com/thierrypdamiba/orita/commit/9e354b114d48cfe57cef5c746ede8362cf25ac35",
+    "ts": "2026-08-19T03:28:05Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "51f23e1",
+    "title": "task 861: seal ledger entry (1978->1979), x-outage log recorded (369th consecutive forbidden)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/51f23e1ee632313dc49ee5935800fef9a06da665",
+    "ts": "2026-08-19T03:28:11Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "ede2bd6",
+    "title": "task 861: DONE -- window slot dogfood, cache 3238->3241, gap held, ledger sealed 1978->1979, no X post",
+    "url": "https://github.com/thierrypdamiba/orita/commit/ede2bd6c02a059aeaf346eb610b2844aa2a361ef",
+    "ts": "2026-08-19T03:40:13Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "72f86a0",
+    "title": "task 861: scribe-growth observation from the closing verification run",
+    "url": "https://github.com/thierrypdamiba/orita/commit/72f86a092fc46d021d0696b3c677e3e29b602602",
+    "ts": "2026-08-19T03:40:21Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "25a83f2",
+    "title": "task 862: WIP -- window slot (00:00-06:00 UTC), zashiki-warashi, alternating from nyx/861",
+    "url": "https://github.com/thierrypdamiba/orita/commit/25a83f2cd66f94d8f7c1df8b43f3c7c0ea6620bb",
+    "ts": "2026-08-19T04:25:03Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "c3f23e6",
+    "title": "task 862: dogfood + verification real, root suite still running, will close to DONE.",
+    "url": "https://github.com/thierrypdamiba/orita/commit/c3f23e64f432771ec70bd99a981e6f16e1791729",
+    "ts": "2026-08-19T04:29:25Z",
+    "author": "Zashiki-warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "8167114",
+    "title": "task 862: scribe-growth observation from the closing verification run",
+    "url": "https://github.com/thierrypdamiba/orita/commit/8167114db8fb92f60e048bcaeca4e597405f27e6",
+    "ts": "2026-08-19T04:41:25Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "c1e75b1",
+    "title": "task 862: DONE -- window slot dogfood, cache 3241 unchanged, gap held, ledger sealed 1979->1980, no X post",
+    "url": "https://github.com/thierrypdamiba/orita/commit/c1e75b130c95577003588ea0517b011e0e94bf4f",
+    "ts": "2026-08-19T04:45:56Z",
+    "author": "Zashiki-warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "530fefd",
+    "title": "task 863: WIP -- window slot (00:00-06:00 UTC), nyx, alternating from zashiki-warashi/862",
+    "url": "https://github.com/thierrypdamiba/orita/commit/530fefd7a6aee9aaafc09f089de41bf769f21f4e",
+    "ts": "2026-08-19T05:25:19Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "89034bf",
+    "title": "task 863: dogfood + verification real, root suite still running, will close to DONE.",
+    "url": "https://github.com/thierrypdamiba/orita/commit/89034bfe58e1d583fba7fb292a63d1f8e38e2efc",
+    "ts": "2026-08-19T05:27:50Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "7f074a2",
+    "title": "task 863: ledger seal (dogfood + verification event, seq 1980->1981)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/7f074a21f23d49d8d59f609f748987e892e1c11d",
+    "ts": "2026-08-19T05:27:57Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "c49f9a8",
+    "title": "task 863: DONE -- window slot dogfood, cache 3241 unchanged, gap held, ledger sealed 1980->1981, no X post",
+    "url": "https://github.com/thierrypdamiba/orita/commit/c49f9a83f120477175faa22b8e11f92f255cdc28",
+    "ts": "2026-08-19T05:41:39Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "461508a",
+    "title": "task 864: WIP -- daytime rotation resumes (kwaku-ananse), stale checkout recovered, dogfood + verification real, root suite running in background",
+    "url": "https://github.com/thierrypdamiba/orita/commit/461508a2ba24da245d3fdaa5814eaa79f758d31a",
+    "ts": "2026-08-19T06:27:49Z",
+    "author": "Kwaku Ananse"
+  },
+  {
+    "kind": "commit",
+    "id": "9852051",
+    "title": "task 864: ledger seal + journal + X outage record (dogfood/verification event, seq 1981->1982)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/9852051a93a2c999a28b879efa72cc9a86e98ed9",
+    "ts": "2026-08-19T06:28:47Z",
+    "author": "Kwaku Ananse"
+  },
+  {
+    "kind": "commit",
+    "id": "1ece6a8",
+    "title": "task 864: fix -- records/ledger.jsonl seq 1981 was computed but never staged; committing it now",
+    "url": "https://github.com/thierrypdamiba/orita/commit/1ece6a875b0edb7c6bbdb64fb4718b24d390e840",
+    "ts": "2026-08-19T06:40:13Z",
+    "author": "Kwaku Ananse"
+  },
+  {
+    "kind": "commit",
+    "id": "db2bfcd",
+    "title": "task 864: scribe-growth observation from the root suite's closing verification pass",
+    "url": "https://github.com/thierrypdamiba/orita/commit/db2bfcd473d3f5a5e1827227c13a1ef9a5778143",
+    "ts": "2026-08-19T06:40:20Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "bc776bc",
+    "title": "task 864: fix -- roadmap rows glued together, restored missing newline",
+    "url": "https://github.com/thierrypdamiba/orita/commit/bc776bcb57ec2e4dd559c9a1895a5359e5eaa953",
+    "ts": "2026-08-19T06:56:47Z",
+    "author": "Kwaku Ananse"
+  },
+  {
+    "kind": "commit",
+    "id": "f9a0ebf",
+    "title": "task 864: scribe-growth observation from the recheck verification run (ROADMAP.md +1 byte from the newline fix, BUILDLOG.md unchanged)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/f9a0ebf743e1fb49cdd824d6c9e12a9b3f5dea02",
+    "ts": "2026-08-19T06:57:15Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "60f5a4f",
+    "title": "task 864: DONE -- found and fixed a real roadmap structural bug (tasks 862/863 rows glued with no newline), full root suite reverified 1937/1937 clean (1038.7s), ledger sealed 1982->1983",
+    "url": "https://github.com/thierrypdamiba/orita/commit/60f5a4fe6e676e953e60bb90711d470932e7dc88",
+    "ts": "2026-08-19T07:05:02Z",
+    "author": "Kwaku Ananse"
   }
 ]
