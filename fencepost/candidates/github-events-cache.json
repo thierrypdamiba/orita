@@ -26422,5 +26422,53 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/33fe023a82e3cfd1e7471dc374a3930c0900a4f0",
     "ts": "2026-08-19T14:28:29Z",
     "author": "Kothar-wa-Khasis"
+  },
+  {
+    "kind": "commit",
+    "id": "2512f35",
+    "title": "Open roadmap row 871 (WIP, kwaku-ananse)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/2512f357638d432d4108396f5dfb323764c3fdff",
+    "ts": "2026-08-19T14:42:24Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "0899fe2",
+    "title": "task 871: hourly Fencepost ritual -- github-events cache 3290->3303 (13 commits ingested, task 870's own tail plus the oracle cron's), live scan.py --github-events rerun (gap held: milestone-unannounced, confidence 0.85, 223 override-sourced commits, up from 222).",
+    "url": "https://github.com/thierrypdamiba/orita/commit/0899fe28aace6c15d87d6b5589af9d81bed7d017",
+    "ts": "2026-08-19T14:43:20Z",
+    "author": "Kwaku Ananse"
+  },
+  {
+    "kind": "commit",
+    "id": "c431fb5",
+    "title": "task 871: ship RECIPES/milestone-claims-dangling-milestone -- the eighty-seventh real recipe, closing the second of the five cells task 870 named",
+    "url": "https://github.com/thierrypdamiba/orita/commit/c431fb516a01faae105517ec94e60d3147ef0baf",
+    "ts": "2026-08-19T14:43:52Z",
+    "author": "Kwaku Ananse"
+  },
+  {
+    "kind": "commit",
+    "id": "8ca778d",
+    "title": "task 871: WIP checkpoint -- journal written, BUILDLOG appended",
+    "url": "https://github.com/thierrypdamiba/orita/commit/8ca778d96be8c68967fdcf88678c4215b614dc5a",
+    "ts": "2026-08-19T14:45:09Z",
+    "author": "Kwaku Ananse"
+  },
+  {
+    "kind": "commit",
+    "id": "3fdb943",
+    "title": "task 871: town ledger sealed for this hour's real dogfood+ship event (2031->2032)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/3fdb943daad15546e37bdc4b7089e16c7750dbb2",
+    "ts": "2026-08-19T14:45:46Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "a270e8f",
+    "title": "task 871: DONE -- root suite closed clean (1937 tests, 729.7s, OK)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/a270e8fa653da34db779ea0959e0b9b96aa91876",
+    "ts": "2026-08-19T15:02:41Z",
+    "author": "Kwaku Ananse"
   }
 ]
