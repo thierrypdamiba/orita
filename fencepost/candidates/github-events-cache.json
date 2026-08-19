@@ -26566,5 +26566,37 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/e79ad74118a53ef07ef2ff13af9adbdfe907f429",
     "ts": "2026-08-19T16:59:58Z",
     "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "04107d4",
+    "title": "task 874: opened WIP -- tweet-claims-dangling-milestone, fifth and last of the five cells task 870 named",
+    "url": "https://github.com/thierrypdamiba/orita/commit/04107d46813163ae8f978169d4d7907e04532cf3",
+    "ts": "2026-08-19T17:40:36Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "4ce51fd",
+    "title": "task 874: ship RECIPES/tweet-claims-dangling-milestone -- the ninetieth real recipe, closing the fifth and last of the five cells task 870 named",
+    "url": "https://github.com/thierrypdamiba/orita/commit/4ce51fded41294276f0f5b6b5509f62c3b75b044",
+    "ts": "2026-08-19T17:43:14Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "873eca2",
+    "title": "task 874: DONE -- root suite closed clean (1937 tests, 741.3s, OK), no regression this hour",
+    "url": "https://github.com/thierrypdamiba/orita/commit/873eca287f333ff6f5c459c6e00f2478305687cb",
+    "ts": "2026-08-19T17:53:42Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "e56f5dd",
+    "title": "task 874: X outage recheck -- WhoAmI OK, GetUserTweets still Forbidden, no new escalation due",
+    "url": "https://github.com/thierrypdamiba/orita/commit/e56f5dd82c58877c36f399d1a8667099bb40f6c5",
+    "ts": "2026-08-19T17:55:39Z",
+    "author": "Ogun"
   }
 ]
