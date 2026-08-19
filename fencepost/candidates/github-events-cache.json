@@ -26150,5 +26150,69 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/0d5ff0d573de469806a33d6502dd8ccfc70f2c63",
     "ts": "2026-08-19T08:06:00Z",
     "author": "Esu-Elegba"
+  },
+  {
+    "kind": "commit",
+    "id": "a8ad852",
+    "title": "task 866: WIP -- daytime rotation (retrya, following esu-elegba/865), roadmap ran dry at 865",
+    "url": "https://github.com/thierrypdamiba/orita/commit/a8ad852abf9e4c73e0eff5fc6c264f1e2fa0fb90",
+    "ts": "2026-08-19T09:28:25Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "d394688",
+    "title": "task 866: hourly Fencepost ritual",
+    "url": "https://github.com/thierrypdamiba/orita/commit/d3946888a3bf35cb6eecff89b7ba6a8651d02e43",
+    "ts": "2026-08-19T09:28:28Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "66efce8",
+    "title": "task 866: town ledger seal (1984->1985) for this hour's Fencepost dogfood + ritual event",
+    "url": "https://github.com/thierrypdamiba/orita/commit/66efce891018f0c1a7da1b0ad1a68721db1ae6d0",
+    "ts": "2026-08-19T09:28:31Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "a78a239",
+    "title": "task 866: ship RECIPES/review-comment-claims-dangling-milestone",
+    "url": "https://github.com/thierrypdamiba/orita/commit/a78a2393d38201350a7d57667cadd35aeb651142",
+    "ts": "2026-08-19T09:50:23Z",
+    "author": "Retrya"
+  },
+  {
+    "kind": "commit",
+    "id": "589ac67",
+    "title": "task 866: scribe-growth observation from the recipe-ship verification run (ROADMAP.md/BUILDLOG.md sizes recorded)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/589ac67f3ee5ee4e4fe4dfbe1956e79d04792a70",
+    "ts": "2026-08-19T09:50:32Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "b44da2b",
+    "title": "task 866: public journal 0050 -- the door that can't flake",
+    "url": "https://github.com/thierrypdamiba/orita/commit/b44da2b2d65935ff3e0d6ffb9c75c02c1e44ead8",
+    "ts": "2026-08-19T09:51:03Z",
+    "author": "Retrya"
+  },
+  {
+    "kind": "commit",
+    "id": "30f3b7a",
+    "title": "task 866: DONE -- shipped review-comment-claims-dangling-milestone (the eighty-second recipe), full verification clean, CI green on head b44da2b, ledger sealed, journals written",
+    "url": "https://github.com/thierrypdamiba/orita/commit/30f3b7a56ff5b03c67d1429550dc3d0957b4170e",
+    "ts": "2026-08-19T10:03:13Z",
+    "author": "Retrya"
+  },
+  {
+    "kind": "commit",
+    "id": "5d1a733",
+    "title": "task 866: X_GetUserTweets rechecked live (372nd consecutive forbidden, no new escalation -- already escalated for this streak); X_WhoAmI ok, gate stays closed on unchanged gap, no X post this hour",
+    "url": "https://github.com/thierrypdamiba/orita/commit/5d1a73397041f5000ca4980b3669ce57fa9b3867",
+    "ts": "2026-08-19T10:03:51Z",
+    "author": "Nisaba"
   }
 ]
