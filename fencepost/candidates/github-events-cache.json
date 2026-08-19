@@ -25854,5 +25854,29 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/edad8e587770a3dcecaf7caf00147e741fb29a3e",
     "ts": "2026-08-18T23:34:56Z",
     "author": "Kothar-wa-Khasis"
+  },
+  {
+    "kind": "commit",
+    "id": "0a88de0",
+    "title": "task 858: WIP -- window slot (00:00-06:00 UTC), zashiki-warashi, alternating from nyx/839",
+    "url": "https://github.com/thierrypdamiba/orita/commit/0a88de0fb63eb29e84f3ab55f4da8421ff82b994",
+    "ts": "2026-08-19T00:26:38Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "ccc4585",
+    "title": "task 858: WIP -- fencepost dogfood cache 3229->3232 (gap held, milestone-unannounced), X_WhoAmI/X_GetUserTweets rechecked live (367th consecutive forbidden, no new escalation). root suite still running, will close to DONE.",
+    "url": "https://github.com/thierrypdamiba/orita/commit/ccc4585142f7ee25f5bff95fb4d45d3a4143bf42",
+    "ts": "2026-08-19T00:28:01Z",
+    "author": "Zashiki-warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "6a677d2",
+    "title": "task 858: DONE -- window slot (00:00-06:00 UTC), own-remit sweep on Cozy Trust & Least Privilege all green, root suite 1937/1937 clean, gap held, no X post",
+    "url": "https://github.com/thierrypdamiba/orita/commit/6a677d2219357a35904800896bfafb730573cdd0",
+    "ts": "2026-08-19T00:40:30Z",
+    "author": "Zashiki-warashi"
   }
 ]
