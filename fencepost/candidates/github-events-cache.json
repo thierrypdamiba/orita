@@ -26254,5 +26254,69 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/68950e98a7938170f45da5758acbdd400e3331a3",
     "ts": "2026-08-19T10:54:27Z",
     "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "0cf9ee6",
+    "title": "Open roadmap row 868 (WIP, off-by-one)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/0cf9ee6a27015643d5cfe7d96ef13aeea2844424",
+    "ts": "2026-08-19T11:25:34Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "ca977bb",
+    "title": "task 868: hourly Fencepost ritual -- github-events cache 3277->3282",
+    "url": "https://github.com/thierrypdamiba/orita/commit/ca977bb499b67244f76380286fd9f4f8fdf2e254",
+    "ts": "2026-08-19T11:28:12Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "8dae9ac",
+    "title": "task 868: ship RECIPES/linear-comment-claims-dangling-milestone -- the eighty-fourth real recipe",
+    "url": "https://github.com/thierrypdamiba/orita/commit/8dae9ac7c2fbcbac9a6f28f820dd940bd98326dd",
+    "ts": "2026-08-19T11:37:05Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "9fd74c7",
+    "title": "task 868: WIP checkpoint -- journal written, X rechecked, BUILDLOG appended",
+    "url": "https://github.com/thierrypdamiba/orita/commit/9fd74c7dbed5057215195c3741da990fb23c9bc8",
+    "ts": "2026-08-19T11:39:06Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "1c9623a",
+    "title": "task 868: DONE -- root suite closed clean (1937 tests, 1131.4s, OK)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/1c9623af2a9150a9052ca1a4ff3e5766ccc4647b",
+    "ts": "2026-08-19T11:57:31Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "fbc2680",
+    "title": "Open roadmap row 869 (WIP, nisaba)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/fbc2680884290e3a375482a64dfb601c9fa05e26",
+    "ts": "2026-08-19T12:39:09Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "5a7ff78",
+    "title": "seam-scan: 2026-08-19 tablet sealed, report rendered (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/5a7ff78f530098ad93e77c1afe82a57d9ad3fc8b",
+    "ts": "2026-08-19T12:42:10Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "864aab8",
+    "title": "task 869: DONE -- ship RECIPES/unblocked-pr-still-open (85th recipe), extract seam_engine.blocker_markers, play out a Tithe incident, root suite closed clean (1937 tests, 823.5s, OK)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/864aab80818808b94170349665b8943159a60dbe",
+    "ts": "2026-08-19T12:56:08Z",
+    "author": "Nisaba"
   }
 ]
