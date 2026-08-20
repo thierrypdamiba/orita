@@ -227,6 +227,25 @@ def test_render_report_with_episode_args_shows_the_line():
     assert "Day 3 of the watch" in text
 
 
+def test_render_report_omits_the_serialization_line_for_a_zeroed_streak():
+    # A streak of 0 is a *broken* watch (consecutive_days returns 0 only when
+    # the anchor day sealed no tablet). Rendering "Day 0 of the watch,
+    # unbroken" would claim a run the tablets don't back — streak.py's own
+    # law ("Nobody's story gets to claim a streak the tablets don't back").
+    # 0 must be treated exactly as None: no serialization line at all.
+    text = report.render_report(_sealed(), episode_number=38, streak_days=0)
+    assert "Day 0 of the watch" not in text
+    assert "watch, unbroken" not in text
+    assert "Episode 38." not in text
+
+
+def test_render_report_never_claims_an_unbroken_watch_on_a_zero_streak():
+    # The word "unbroken" is the load-bearing claim in the line; it must
+    # never appear paired with a zeroed streak, in any phrasing.
+    text = report.render_report(_sealed(primary=True), episode_number=1, streak_days=0)
+    assert "unbroken" not in text
+
+
 def test_render_report_always_carries_the_connect_your_own_ad():
     assert report.CONNECT_YOUR_OWN in report.render_report(_sealed(primary=True))
     assert report.CONNECT_YOUR_OWN in report.render_report(_sealed(primary=False))

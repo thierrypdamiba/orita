@@ -460,9 +460,12 @@ def render_report(
     `episode_number`/`streak_days` are optional and purely additive: pass
     them (as `render_latest` and the CLI's ledger-reading path do, sourced
     from `seam_engine.streak`) to render the serialization line; omit them
-    and the report renders exactly as it always has. `render_report` still
-    takes only its arguments and returns text — it never reaches into the
-    Ledger itself to invent a number that wasn't handed to it.
+    and the report renders exactly as it always has. A `streak_days` of 0 is
+    treated the same as omitting it — a zeroed streak is a broken watch, and
+    the "unbroken" line refuses to claim a run the tablets don't back.
+    `render_report` still takes only its arguments and returns text — it
+    never reaches into the Ledger itself to invent a number that wasn't
+    handed to it.
     """
     date = sealed.get("date") or sealed.get("generated_at", "")[:10]
     repo = sealed.get("repo", "unknown")
@@ -481,7 +484,12 @@ def render_report(
         "",
     ]
 
-    if episode_number is not None and streak_days is not None:
+    # A zeroed streak is a *broken* watch (streak.consecutive_days returns 0
+    # only when the anchor day has no sealed tablet) — so the "unbroken" line
+    # must not render for it, or the report would claim a streak the tablets
+    # don't back (streak.py's own law). None and 0 are both "no current run to
+    # narrate"; only streak_days >= 1 earns the serialization line.
+    if episode_number is not None and streak_days is not None and streak_days >= 1:
         lines.append(
             f"*Episode {episode_number}. Day {streak_days} of the watch, unbroken — "
             f"same seam, same hour, every day.*"

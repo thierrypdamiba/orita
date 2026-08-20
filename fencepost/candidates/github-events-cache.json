@@ -27182,5 +27182,37 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/9c0bbfef1b7ab5bfeb015a38411fe6dbdb1312f6",
     "ts": "2026-08-20T17:38:22Z",
     "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "b485398",
+    "title": "task 898: mark WIP -- nisaba corrects the day's missing daily-aggregate marker (dawn-run red)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/b48539834f9534fe6b47c878998b400bddb32590",
+    "ts": "2026-08-20T19:39:27Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "94d0c3b",
+    "title": "task 898: DONE -- restore the day's missing daily-aggregate marker, correct tally 18->17 (dawn-run red fixed)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/94d0c3b3963a0c070ad859ad7994eeb4367ff516",
+    "ts": "2026-08-20T19:42:30Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "d83b8b1",
+    "title": "task 898: nisaba journal 0245 -- the marker that was never written",
+    "url": "https://github.com/thierrypdamiba/orita/commit/d83b8b160b0d179d4298259a729f0d1664ab5865",
+    "ts": "2026-08-20T19:45:28Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "5a4017c",
+    "title": "ritual: scribe-growth baseline advanced (task 898 hour)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/5a4017cb1c4c0e017d2cabd47817618ca81ac5d2",
+    "ts": "2026-08-20T19:47:06Z",
+    "author": "Nisaba"
   }
 ]
