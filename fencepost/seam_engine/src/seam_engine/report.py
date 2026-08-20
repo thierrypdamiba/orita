@@ -291,6 +291,41 @@ def _strip_mortal_text(field: str) -> str:
 # move the dangling-reference family already uses, since the fix is
 # identical in kind (the reference points at nothing, only a human can
 # decide whether to fix the number or drop the claim).
+#
+# A seventh recurrence, found by re-running the same walk-every-real-recipe-
+# fixture sweep 537/550/557/586/605/708/775 already established (not by
+# re-reading only the families those seven tasks already named): the
+# "claims X, but X isn't actually done yet" family. Ten different sources
+# now carry this shape (a commit message, a GitHub issue/PR/review comment,
+# a Linear comment, an @-mention, a milestone description, README.md, a
+# GitHub Release body, a Slack message, a tweet) each claiming a PR
+# "shipped", an issue "fixed", or a milestone "shipped" — but the PR is
+# still unmerged, the issue is still open, or the milestone is still open.
+# Unlike the dangling-reference family (586) and the dangling-milestone
+# family (775), the thing being claimed here is REAL — #{n} exists, it is
+# simply not finished — so "Correct or delete it yourself — the reference
+# points at nothing" would itself be a false claim about the very thing it
+# is trying to fix. And unlike the plain "still open" recipes that
+# correctly default to "Close it yourself" (`merged-pr-issue-still-open`,
+# `duplicate-issue-still-open`, and the like), there is nothing to close on
+# THIS gap's own claiming record — a milestone that already claims another
+# milestone "shipped" is very often itself already closed, so handing the
+# reader "close it yourself" points at the wrong record and the wrong verb
+# entirely.
+#
+# Confirmed live pre-fix: walked every one of the 92 real, shipped recipes'
+# own fixture-generated primary gap through `suggest_move`. 61 fell to
+# `_DEFAULT_MOVE`; of those, exactly 30 share one of the two needles added
+# below (`*-claims-unmerged-pr`, `*-claims-unfixed-issue`, and
+# `*-claims-open-milestone`, ten sources deep each) and all 30 got the same
+# wrong "Close it yourself, however it's meant to be closed" hand-off,
+# confirmed by name against every one of the ten sources. Grep-confirmed
+# novelty before adding either needle: "shipped, but" and "fixed, but"
+# appear in `RECIPES/*/detector.py` headline templates ONLY inside this
+# family (the sibling "...which doesn't exist" branch of the same
+# detectors already matches the "doesn't exist" needle above and is
+# unaffected — a single detector run only ever produces one shape of gap,
+# never both at once, so the two needles never compete on the same gap).
 _MOVE_RULES: tuple[tuple[str, str], ...] = (
     (
         "never reached calendar",
@@ -335,6 +370,14 @@ _MOVE_RULES: tuple[tuple[str, str], ...] = (
     (
         "doesn't exist",
         "Correct or delete it yourself — the reference points at nothing. Fencepost only found the seam; it does not cross it.",
+    ),
+    (
+        "shipped, but",
+        "Finish it, or correct the claim yourself — the record says something is done that isn't. Fencepost only found the seam; it does not cross it.",
+    ),
+    (
+        "fixed, but",
+        "Finish it, or correct the claim yourself — the record says something is done that isn't. Fencepost only found the seam; it does not cross it.",
     ),
 )
 _DEFAULT_MOVE = (

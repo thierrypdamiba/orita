@@ -12,6 +12,8 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
+import pytest
+
 from seam_engine import ledger, report
 
 # report.py's own docstring makes a safety claim about `suggest_move` (ROADMAP.md
@@ -600,6 +602,85 @@ def test_commit_claims_dangling_milestone_gets_the_correct_or_delete_move():
     move = report.suggest_move(gap)
     assert move != report._DEFAULT_MOVE
     assert "correct or delete it yourself" in move.lower()
+
+
+# The "claims X, but X isn't actually done yet" family (retrya): ten
+# different sources (a commit message, a GitHub issue/PR/review comment, a
+# Linear comment, an @-mention, a milestone description, README.md, a
+# GitHub Release body, a Slack message, a tweet) each claim a real, existing
+# PR "shipped", a real issue "fixed", or a real milestone "shipped" -- but
+# the PR is still unmerged, the issue is still open, or the milestone is
+# still open. Unlike the dangling-reference (task 586) and
+# dangling-milestone (task 775) families, #{n} genuinely exists here, so
+# "the reference points at nothing" would itself be a false claim. And
+# unlike a plain "still open" gap, the record making the false claim is
+# very often ALREADY closed/merged/shipped by the time it made the claim,
+# so `_DEFAULT_MOVE` ("Close it yourself") points at the wrong record and
+# the wrong verb. Confirmed live pre-fix, walking all 92 real recipes' own
+# fixture-generated primary gap through `suggest_move` (the same sweep
+# 537/550/557/586/605/708/775 already established): 30 of the 61 that fell
+# to `_DEFAULT_MOVE` share this exact shape across all ten sources, and all
+# 30 got the wrong close-it-yourself hand-off.
+def test_no_claims_unfinished_headline_falls_through_to_default():
+    from seam_engine.recipes import discover_recipes, load_detector
+
+    fencepost_root = Path(__file__).resolve().parents[2]
+    checked_shipped = 0
+    checked_fixed = 0
+    for manifest in discover_recipes(fencepost_root):
+        result = load_detector(manifest)()
+        gap = result.get("primary_gap") or (result.get("tail") or [None])[0]
+        if gap is None:
+            continue
+        headline = gap.get("headline", "")
+        stripped = report._strip_mortal_text(headline).lower()
+        if "doesn't exist" in stripped or "does not exist" in stripped:
+            # The sibling dangling branch of the same detector family --
+            # a different gap shape, already covered above.
+            continue
+        if "shipped, but" in stripped:
+            checked_shipped += 1
+        elif "fixed, but" in stripped:
+            checked_fixed += 1
+        else:
+            continue
+        move = report.suggest_move(gap)
+        assert move != report._DEFAULT_MOVE, (
+            f"{manifest.slug}'s real headline ({headline!r}) claims something is done that "
+            "isn't, but suggest_move fell through to the generic close-it-yourself line -- "
+            "add a needle to _MOVE_RULES."
+        )
+        assert "finish it, or correct the claim yourself" in move.lower(), (
+            f"{manifest.slug}'s real headline ({headline!r}) got the wrong hand-off: {move!r}"
+        )
+    assert checked_shipped >= 1, "expected at least one 'claims ... shipped, but' recipe headline"
+    assert checked_fixed >= 1, "expected at least one 'claims ... fixed, but' recipe headline"
+
+
+@pytest.mark.parametrize(
+    "slug",
+    [
+        "commit-claims-unmerged-pr",
+        "commit-claims-open-milestone",
+        "milestone-claims-unfixed-issue",
+        "release-claims-unmerged-pr",
+        "readme-claims-open-milestone",
+        "tweet-claims-unfixed-issue",
+    ],
+)
+def test_claims_unfinished_recipes_get_the_finish_or_correct_move(slug: str):
+    # The exact live reproduction: each recipe's own real, shipped fixture
+    # gap, not a hand-typed guess.
+    from seam_engine.recipes import discover_recipes, load_detector
+
+    fencepost_root = Path(__file__).resolve().parents[2]
+    manifest = next(m for m in discover_recipes(fencepost_root) if m.slug == slug)
+    result = load_detector(manifest)()
+    gap = result.get("primary_gap") or (result.get("tail") or [None])[0]
+    assert gap is not None, f"expected {slug}'s fixture to carry a primary gap"
+    move = report.suggest_move(gap)
+    assert move != report._DEFAULT_MOVE
+    assert "finish it, or correct the claim yourself" in move.lower()
 
 
 # Task 537 (retrya): every detector embeds mortal-controlled free text (a
