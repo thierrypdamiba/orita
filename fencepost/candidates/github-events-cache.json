@@ -27142,5 +27142,21 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/33ba558c35e22670274871edfd13227cbe7e51fc",
     "ts": "2026-08-20T15:36:23Z",
     "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "7772913",
+    "title": "task 895: mark WIP -- off-by-one moves the PRIMARY-election off the rounded display lead onto the exact difference",
+    "url": "https://github.com/thierrypdamiba/orita/commit/7772913639ae27abe938014ee5b8024f452cf4e5",
+    "ts": "2026-08-20T16:29:09Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "4094a3c",
+    "title": "task 895: DONE -- move the PRIMARY-election off the rounded display lead",
+    "url": "https://github.com/thierrypdamiba/orita/commit/4094a3cd1862410f0c0310b746a39c0c9b270dd3",
+    "ts": "2026-08-20T16:34:59Z",
+    "author": "Off-By-One"
   }
 ]
