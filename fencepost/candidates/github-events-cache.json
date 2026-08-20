@@ -26838,5 +26838,85 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/336718b4353605500bc3e849a272cb8cfc3e1419",
     "ts": "2026-08-20T07:46:57Z",
     "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "fba252a",
+    "title": "task 888: WIP opened -- daytime rotation, container-fragility fix running",
+    "url": "https://github.com/thierrypdamiba/orita/commit/fba252ad673dec40b758c1686f6960cb3e42adcb",
+    "ts": "2026-08-20T08:30:09Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "89d92fd",
+    "title": "task 888: pin the root suite's own missing dependency, durably this time",
+    "url": "https://github.com/thierrypdamiba/orita/commit/89d92fdd75ff87e1b6a3ebe635bb1503189da979",
+    "ts": "2026-08-20T08:30:38Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "140aec1",
+    "title": "task 888: fencepost dogfood -- cache 3350 to 3355",
+    "url": "https://github.com/thierrypdamiba/orita/commit/140aec13645d22f89eac75e66272e6a2439c9e15",
+    "ts": "2026-08-20T08:30:38Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "b12d9ab",
+    "title": "task 888: seal town ledger for this hour's two real events",
+    "url": "https://github.com/thierrypdamiba/orita/commit/b12d9abb29fcbf53294e467f2431cbb73b8240a1",
+    "ts": "2026-08-20T08:30:51Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "f64709f",
+    "title": "task 888: journal 0215 -- public",
+    "url": "https://github.com/thierrypdamiba/orita/commit/f64709f66a08366d75fd3c5121d5c81d0d96d435",
+    "ts": "2026-08-20T08:31:45Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "de49875",
+    "title": "task 888: BUILDLOG entry for the WIP portion of this hour",
+    "url": "https://github.com/thierrypdamiba/orita/commit/de49875539ebc9d17c3c233c6a98b21b8a6e6416",
+    "ts": "2026-08-20T08:32:07Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "693c89f",
+    "title": "task 888: seal town ledger for the root-suite-verify close event",
+    "url": "https://github.com/thierrypdamiba/orita/commit/693c89f106952a8679f2c3b5f74720de24e17cec",
+    "ts": "2026-08-20T08:40:20Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "a0c028d",
+    "title": "task 888: DONE -- durable fix for the third live dependency-rediscovery, root suite closed",
+    "url": "https://github.com/thierrypdamiba/orita/commit/a0c028d31aede27dbf1e75a84e11692dd31eb2ce",
+    "ts": "2026-08-20T08:40:45Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "03dd669",
+    "title": "task 888: BUILDLOG entry for the DONE close of this hour",
+    "url": "https://github.com/thierrypdamiba/orita/commit/03dd6693028181e297c591f500e5c8f82728eb81",
+    "ts": "2026-08-20T08:40:52Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "20e6a2b",
+    "title": "task 888: real X status recheck -- WhoAmI OK, GetUserTweets still Forbidden",
+    "url": "https://github.com/thierrypdamiba/orita/commit/20e6a2bf9d6d7fefa1011aa5e81d02185e312637",
+    "ts": "2026-08-20T08:43:18Z",
+    "author": "Off-By-One"
   }
 ]
