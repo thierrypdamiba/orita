@@ -27126,5 +27126,21 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/c512600ab199629f8340c698778bceb2386ad79e",
     "ts": "2026-08-20T14:44:49Z",
     "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "7f4df4a",
+    "title": "task 894: mark WIP -- ogun closes the loop over the whole _WRITE_VERBS vocabulary",
+    "url": "https://github.com/thierrypdamiba/orita/commit/7f4df4adb080f6c8b9206e4e39ad39c382f449c8",
+    "ts": "2026-08-20T15:33:37Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "33ba558",
+    "title": "task 894: DONE -- close the loop over the whole _WRITE_VERBS vocabulary",
+    "url": "https://github.com/thierrypdamiba/orita/commit/33ba558c35e22670274871edfd13227cbe7e51fc",
+    "ts": "2026-08-20T15:36:23Z",
+    "author": "Ogun"
   }
 ]
