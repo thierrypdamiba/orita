@@ -20,6 +20,8 @@ import pytest
 from seam_engine.consent import REQUIRED_SCOPES
 from seam_engine.gateway import (
     READ_ONLY_CAPABILITIES,
+    _IRREGULAR_FORMS,
+    _WRITE_VERBS,
     gateway_url,
     is_read_only_capabilities,
     required_scopes_covered_by_capabilities,
@@ -361,6 +363,66 @@ def test_the_send_agent_noun_is_not_mistaken_for_the_verb(text: str):
 )
 def test_the_send_agent_noun_fix_does_not_narrow_real_send_detection(text: str):
     assert not is_read_only_capabilities(text)
+
+
+def _gerund(verb: str) -> str:
+    """The productive `-ing` form under the one mechanical rule
+    `_verb_pattern` itself applies: drop a silent trailing "e" before
+    "-ing" (create -> creating), otherwise just append (post -> posting)."""
+    return (verb[:-1] if verb.endswith("e") else verb) + "ing"
+
+
+@pytest.mark.parametrize("verb", _WRITE_VERBS)
+def test_every_write_verb_and_its_productive_forms_fail_the_law(verb: str):
+    # Task 894 (Ogun): the closing loop over the WHOLE _WRITE_VERBS
+    # vocabulary. Every prior fail-open fix (700/701/709) added a
+    # hand-picked parametrize list naming SPECIFIC verbs; none iterated the
+    # tuple itself, so a NEW verb added to _WRITE_VERBS whose productive
+    # forms the regex misses would fail-open silently with no test red.
+    # This proves, for every verb the oath claims to forbid, that its bare
+    # form and its `-s`/gerund forms are all genuinely caught -- the
+    # by-hand adversarial sweep this hour ran (0 fail-open) made permanent.
+    for form in (verb, verb + "s", _gerund(verb)):
+        text = f"The agent will {form} things on every connected account."
+        assert not is_read_only_capabilities(text), (
+            f"'{form}' (a form of write verb '{verb}') was judged "
+            "read-only-safe -- the exact fail-open Ogun's law forbids"
+        )
+
+
+@pytest.mark.parametrize("verb", _WRITE_VERBS)
+def test_a_consonant_y_write_verb_must_declare_its_irregular_forms(verb: str):
+    # The structural guard that makes the loop future-proof rather than
+    # merely present. A consonant-plus-"y" verb (reply, modify, notify,
+    # ...) swaps "y" for "ied"/"ies" -- forms `verb + r"\w*"` never matches
+    # -- so such a verb is undetectable in its own past/third-person unless
+    # it is named in _IRREGULAR_FORMS. Prior fixes named reply/modify by
+    # hand after they fail-opened live; this asserts the invariant up front,
+    # so the day someone adds a "notify"/"certify"/"verify"-shaped write
+    # verb without its ied/ies forms, THIS test goes red at definition time
+    # rather than the oath quietly going fail-open in production.
+    if len(verb) >= 2 and verb.endswith("y") and verb[-2] not in "aeiou":
+        assert verb in _IRREGULAR_FORMS, (
+            f"consonant-y write verb '{verb}' has no _IRREGULAR_FORMS entry: "
+            f"its '{verb[:-1]}ied'/'{verb[:-1]}ies' forms would fail-open"
+        )
+        for form in _IRREGULAR_FORMS[verb]:
+            text = f"The agent already {form} things on a connected account."
+            assert not is_read_only_capabilities(text)
+
+
+def test_every_named_irregular_form_actually_fails_the_law():
+    # The other half of the closure: every surface form the module CARRIES
+    # for detection must actually be detected. A form present in the data
+    # but not caught by the behavior would be a silent lie -- the exact
+    # inconsistency task 701 shipped a fix for and this pins shut.
+    for verb, forms in _IRREGULAR_FORMS.items():
+        for form in forms:
+            text = f"The agent already {form} things on a connected account."
+            assert not is_read_only_capabilities(text), (
+                f"irregular form '{form}' of '{verb}' is named in "
+                "_IRREGULAR_FORMS but not actually caught by the law"
+            )
 
 
 def test_gateway_url_builds_the_real_arcade_mcp_url():

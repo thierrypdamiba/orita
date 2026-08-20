@@ -27094,5 +27094,37 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/667a4a112e735d43d3411236a0a35c652a2b5116",
     "ts": "2026-08-20T13:42:54Z",
     "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "366fd86",
+    "title": "task 893: mark WIP -- retrya widens the one-action executed-verb guard",
+    "url": "https://github.com/thierrypdamiba/orita/commit/366fd867f6683b0843be5783fce84fb283daa70f",
+    "ts": "2026-08-20T14:29:24Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "9817c62",
+    "title": "task 893: widen the one-action guard past the three verbs it shipped with",
+    "url": "https://github.com/thierrypdamiba/orita/commit/9817c621fecf5938f76c85ac879612fe66ad2fef",
+    "ts": "2026-08-20T14:35:40Z",
+    "author": "Retrya"
+  },
+  {
+    "kind": "commit",
+    "id": "f0d53b5",
+    "title": "task 893: scribe-growth-log snapshot from this hour's ritual_check run",
+    "url": "https://github.com/thierrypdamiba/orita/commit/f0d53b5c7f776186615dd960c684fc90e21b0f8a",
+    "ts": "2026-08-20T14:41:28Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "c512600",
+    "title": "task 893: DONE -- the one-action guard, proved against its own blind spot",
+    "url": "https://github.com/thierrypdamiba/orita/commit/c512600ab199629f8340c698778bceb2386ad79e",
+    "ts": "2026-08-20T14:44:49Z",
+    "author": "Nisaba"
   }
 ]
