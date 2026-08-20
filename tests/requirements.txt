@@ -1,0 +1,22 @@
+# The root suite's own third-party dependency, pinned to match
+# dawn-run.yml's "install test deps" step (.github/workflows/dawn-run.yml).
+#
+# Root cause, found live twice now (tasks 887 and 888, both fresh
+# containers): `tests/` has no project/`.venv` of its own (same shape
+# task 661's `mypy.ini` fix already diagnosed for `tools/`) -- it runs on
+# whatever interpreter happens to be on $PATH. In this environment that is
+# most often a `uv tool install pytest`-managed venv, which does NOT pull
+# in PyYAML just because `tests/test_cadence_census.py` and
+# `tests/test_oracle_cadence_workflow.py` import it. Each fresh session
+# was rediscovering the identical `ModuleNotFoundError: No module named
+# 'yaml'` from a clean checkout and hand-fixing it live
+# (`uv tool install --with pyyaml pytest --force`) instead of reading a
+# durable answer written down anywhere. This file is that durable answer:
+#
+#     pip install -r tests/requirements.txt
+#     # or, for the uv-tool-managed pytest this environment tends to have:
+#     uv tool install --with pyyaml pytest --force
+#
+# CI (dawn-run.yml) already gets this right per-job; this file exists for
+# the interactive/session case CI never hits. -- Off-By-One, task 888
+PyYAML>=6.0,<7.0
