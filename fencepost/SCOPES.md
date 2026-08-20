@@ -141,17 +141,19 @@ the claim quietly aging past whatever it says.
 
 *Task 135. The table above names the six toolkits Fencepost's own code uses. It says nothing about what else the-hand's shared gateway can already reach — an Oath that stays silent on that is not the complete account of risk surface. `tools/arcade_app_watch.py`'s durable log is the source of truth; this section is re-derived from its last recorded state, never typed from memory.*
 
+*Task 887 (2026-08-20): the five rows below (`arcade-google`, `arcade-linear`, `arcade-slack`, `sybill`, `ap_3Fdn9uGDlF9Cj0ix9PJZbkMKDrF`) held "connected on the shared gateway" from task 135 until this hour, unchanged, on a baseline last actually reread 2026-08-08 — twelve days stale. A live `Arcade_ListApps` recheck this hour (confirmed twice, not a transient read) shows the-hand's own gateway now carries exactly two connected apps: `arcade-github` and the X auth app. The five below are no longer connected upstream. This changes no live risk surface Fencepost ever actually used — none of the five ever exposed a Fencepost-callable tool, so the read-only, GitHub-only surface this Oath swears to did not move — but the table itself was stale and is corrected here rather than left to keep reading a twelve-day-old account as current.*
+
 | app_id | status |
 |--|--|
-| `arcade-github` | in use by Fencepost |
-| `ap_3GORxnS5T0YRHmzSRa0knq2nupY` (X auth) | in use by Fencepost |
-| `arcade-google` | connected upstream (Gmail/Calendar scopes granted), NOT used by Fencepost yet -- zero Gmail/Calendar-capable tools are exposed on the live gateway (see WIP note above; `tools/gateway_toolset_check.py` tracks the day this flips) |
-| `arcade-linear` | connected on the shared gateway; `RECIPES/linear-comment-claims-unfixed-issue/` proposes it as a fixture-only toolkit (task 600) -- no live Linear-capable tool exposed on the-hand gateway yet, see the WIP note above |
-| `arcade-slack` | connected on the shared gateway; `RECIPES/slack-message-claims-unfixed-issue/` proposes it as a fixture-only toolkit (task 599) -- no live Slack-capable tool exposed on the-hand gateway yet, see the WIP note above |
-| `sybill` | connected on the shared gateway, NOT used by Fencepost, no toolkit integration planned |
-| `ap_3Fdn9uGDlF9Cj0ix9PJZbkMKDrF` (app management) | connected on the shared gateway, NOT used by Fencepost, no toolkit integration planned |
+| `arcade-github` | in use by Fencepost, live-confirmed connected 2026-08-20 |
+| `ap_3GORxnS5T0YRHmzSRa0knq2nupY` (X auth) | in use by Fencepost, live-confirmed connected 2026-08-20 |
+| `arcade-google` | NOT connected as of 2026-08-20 (live `Arcade_ListApps` recheck) -- last seen connected 2026-08-08. Was never used by Fencepost (zero Gmail/Calendar-capable tools were ever exposed on the live gateway; see WIP note above). If it reconnects, `tools/gateway_toolset_check.py` still tracks the day a real Gmail/Calendar tool actually appears. |
+| `arcade-linear` | NOT connected as of 2026-08-20 (live `Arcade_ListApps` recheck) -- last seen connected 2026-08-08. `RECIPES/linear-comment-claims-unfixed-issue/` (task 600) stays fixture-only; no live Linear-capable tool was ever exposed. |
+| `arcade-slack` | NOT connected as of 2026-08-20 (live `Arcade_ListApps` recheck) -- last seen connected 2026-08-08. `RECIPES/slack-message-claims-unfixed-issue/` (task 599) stays fixture-only; no live Slack-capable tool was ever exposed. |
+| `sybill` | NOT connected as of 2026-08-20 (live `Arcade_ListApps` recheck) -- last seen connected 2026-08-08. Was never used by Fencepost, no toolkit integration was ever planned. |
+| `ap_3Fdn9uGDlF9Cj0ix9PJZbkMKDrF` (app management) | NOT connected as of 2026-08-20 (live `Arcade_ListApps` recheck) -- last seen connected 2026-08-08. Was never used by Fencepost, no toolkit integration was ever planned. |
 
-`arcade-linear` (`read`,`write`) and `arcade-slack` (nine scopes including `chat:write`) are write-capable upstream connections. Fencepost's own registered toolkits (`consent.REQUIRED_SCOPES["linear"]`/`["slack"]`) name only their read-only halves (`SearchIssueComments`, `SearchChannelMessages`) — grepped `fencepost/seam_engine/src` for "linear"/"slack": the only hits are those two read-only dict entries and the fixture-only recipes that read them, zero hits for `sybill` — the write capability itself sits on the shared gateway for reasons unrelated to Fencepost, not inside anything this repo ships or calls. `tools/scopes_completeness_check.py` proves this table stays honest: any app_id the durable log records as connected but this table does not name is a real, named violation, not a silent gap.
+The write-capable scopes `arcade-linear` (`read`,`write`) and `arcade-slack` (nine scopes including `chat:write`) carried while connected never reached Fencepost's own registered toolkits (`consent.REQUIRED_SCOPES["linear"]`/`["slack"]` name only their read-only halves, `SearchIssueComments`/`SearchChannelMessages`) — grepped `fencepost/seam_engine/src` for "linear"/"slack": the only hits are those two read-only dict entries and the fixture-only recipes that read them, zero hits for `sybill`. `tools/scopes_completeness_check.py` proves this table stays honest: any app_id the durable log records as connected but this table does not name is a real, named violation, not a silent gap — it does not, by itself, catch a table that overstates a stale *connected* claim past when the real upstream state moved, which is what this hour's live recheck caught instead.
 
 ## The oath
 
