@@ -58,10 +58,25 @@ extraction at the identical two-user threshold), and this module now
 imports `named_blocker_of` from there and binds it to `_named_blocker_of`
 below, rather than keeping a second hand-typed copy for
 `tools/duplicate_regex_check.py` to eventually flag. No behavior changed;
-`_named_blocker_of` and `BLOCKER_MARKER_RE` keep their same names and
-shapes here so this recipe's own tests (which call
-`detector._named_blocker_of(...)` and `detector.BLOCKER_MARKER_RE`
-directly) do not have to change either.
+`_named_blocker_of` keeps its same name and shape here so this recipe's
+own tests (which call `detector._named_blocker_of(...)` directly) do not
+have to change either.
+
+Task 900: the extraction above left a second name, `BLOCKER_MARKER_RE`,
+riding along in the same import line -- carried over from before the
+extraction, when the regex was defined locally and this module's own code
+referenced it directly. Neither this module's own logic nor any test
+(`detector.BLOCKER_MARKER_RE` is never once called; `test_blocker_markers.
+py` imports the real thing straight from `seam_engine.blocker_markers`,
+not through this recipe) has read it back off `detector` since the
+extraction -- a dead re-export the docstring above kept promising was
+load-bearing after the code stopped needing it, caught live only because
+`ruff check` was finally run against the whole `fencepost/` tree rather
+than a single touched file, the exact blind spot leaving the module-level
+oath ("ruff clean") unverified against files nobody's recent task
+happened to touch. `unblocked-pr-still-open/detector.py`, this recipe's
+own sibling, already only ever imported `named_blocker_of` -- proof the
+second name was never actually required. Removed.
 """
 from __future__ import annotations
 
@@ -71,17 +86,20 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from seam_engine.blocker_markers import BLOCKER_MARKER_RE, named_blocker_of as _named_blocker_of
+from seam_engine.blocker_markers import named_blocker_of as _named_blocker_of
 from seam_engine.scan import GapCandidate
 
 _HERE = Path(__file__).resolve().parent
 DEFAULT_ISSUES_FIXTURE = _HERE.parents[1] / "fixtures" / "unblocked_issue_still_open" / "issues.json"
 
-# `BLOCKER_MARKER_RE`/`_named_blocker_of` are bound above, not redefined
-# here -- `seam_engine.blocker_markers` (ROADMAP.md #869) is the one real
-# law describing a "blocked by/on #N" marker now.
-# `unblocked-pr-still-open/detector.py` imports the identical function
-# rather than each recipe hand-typing its own copy of the same regex.
+# `_named_blocker_of` is bound above, not redefined here -- `seam_engine.
+# blocker_markers` (ROADMAP.md #869) is the one real law describing a
+# "blocked by/on #N" marker now. `unblocked-pr-still-open/detector.py`
+# imports the identical function rather than each recipe hand-typing its
+# own copy of the same regex. `BLOCKER_MARKER_RE` itself is not imported
+# here (task 900) -- nothing in this module or its own tests reads it off
+# `detector`; import it straight from `seam_engine.blocker_markers` if a
+# future caller genuinely needs the compiled pattern.
 
 # A blocker closed under this age may not have been noticed yet by whoever
 # is waiting on it -- not yet a gap. Matches duplicate-issue-still-open's
