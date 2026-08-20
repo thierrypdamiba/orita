@@ -39,7 +39,7 @@ from pathlib import Path
 from typing import Any
 from urllib.parse import urlparse
 
-from seam_engine import ledger
+from seam_engine import ledger, margin_law
 
 # fencepost/  (…/fencepost/seam_engine/src/seam_engine/audit.py → parents[3])
 _FENCEPOST_ROOT = Path(__file__).resolve().parents[3]
@@ -143,7 +143,31 @@ def _audit_primary(tablet: str, seq: int, date: str, sealed: dict[str, Any]) -> 
         ),
         (
             "leads the recorded field by its own recorded margin",
-            margin is not None and round(confidence - runner_up, 4) >= margin,
+            # Task 902: this used to re-derive the margin decision itself
+            # via `round(confidence - runner_up, 4) >= margin` -- a second,
+            # independent copy of the exact election law `ranking.rank`
+            # already computes at seal time, and a STALE copy: task 895
+            # proved that a display-rounded (4-place) boundary decision is
+            # off-by-one's own class of miscount (a true lead of 0.14996
+            # rounds UP to 0.1500 and would wrongly clear a 0.15 margin --
+            # crying wolf, the fatal direction Ogun's law forbids) and fixed
+            # it in what is now `margin_law.clears_margin` (10-place
+            # rounding: enough to erase IEEE-754 dust, far too fine to
+            # round across a real boundary). This audit module
+            # re-implemented the pre-fix 4-place shape independently and
+            # never inherited the correction -- the self-audit that exists
+            # to catch a false PRIMARY could itself rubber-stamp CONFIRMED
+            # one, using exactly the bug its own sibling module already
+            # closed. Now calls the one corrected law (via `margin_law`,
+            # not `ranking` directly -- `ranking.py` imports `scan.py`,
+            # which imports `httpx`; `margin_law.py` carries none of that,
+            # so this module's plain-python3 callers, `tools/
+            # ritual_check.py` included, don't inherit a dependency they
+            # don't need to check one float comparison). Cannot fire on
+            # today's 2-dp confidences (verified, same as task 895's own
+            # note) -- shuts the door before a finer-grained future source
+            # opens it.
+            margin is not None and margin_law.clears_margin(confidence - runner_up, margin),
         ),
         (
             "carries at least one evidence link",

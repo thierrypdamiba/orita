@@ -101,6 +101,24 @@ def test_thin_lead_over_the_tail_is_false(tmp_path: Path):
     assert "FAIL leads the recorded field by its own recorded margin" in t.gaps[0].reason
 
 
+def test_a_hairline_sub_margin_lead_stays_false_not_rounded_into_confirmed(tmp_path: Path):
+    # Task 902: confidence=0.94996, tail=0.8 -> exact lead 0.14996, genuinely
+    # below the 0.15 margin. `round(diff, 4)` (the pre-fix shape) rounds this
+    # UP to 0.1500 and would wrongly pass the margin check, exactly the
+    # display-rounded-boundary bug task 895 already fixed in ranking.py's
+    # own election. The self-audit must use the same corrected law
+    # (`ranking._clears_margin`, 10-place rounding) and correctly grade this
+    # FALSE, not rubber-stamp a lead the real election law would refuse.
+    ledger.append_scan(
+        _scan(confidence=0.94996, bar=0.70, margin=0.15, tail_confidence=0.8),
+        now=_at(2026, 7, 12), base=tmp_path,
+    )
+    t = audit.audit_ledger(tmp_path)
+
+    assert t.gaps[0].verdict == audit.Verdict.FALSE.value
+    assert "FAIL leads the recorded field by its own recorded margin" in t.gaps[0].reason
+
+
 def test_no_evidence_is_false(tmp_path: Path):
     ledger.append_scan(_scan(evidence=[]), now=_at(2026, 7, 12), base=tmp_path)
     t = audit.audit_ledger(tmp_path)

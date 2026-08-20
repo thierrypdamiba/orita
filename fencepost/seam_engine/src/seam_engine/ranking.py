@@ -17,6 +17,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from enum import Enum
 
+from seam_engine import margin_law
 from seam_engine.scan import GapCandidate
 
 # --- The law, as numbers -----------------------------------------------------
@@ -87,13 +88,14 @@ class Ranking:
 # confidence a source could ever emit (they are 2-dp today) yet coarse enough
 # to erase float dust (~1e-16): it elects the real 0.15 lead and refuses the
 # sub-margin 0.14996 one. Every real 2-dp field lands identically to before.
-_MARGIN_DECISION_PLACES = 10
-
-
-def _clears_margin(exact_lead: float, margin: float) -> bool:
-    """True iff `exact_lead` is at least `margin`, with IEEE-754 dust cleaned
-    but no rounding across the real margin boundary. See the note above."""
-    return round(exact_lead, _MARGIN_DECISION_PLACES) >= margin
+#
+# Task 902: this law moved to `margin_law.py` (its own dependency-light
+# module) so `audit.py`'s self-audit could share the exact same corrected
+# law without inheriting this module's `scan.py` -> `httpx` import chain.
+# `_clears_margin` stays here as a private alias -- this module's own
+# election logic below is unchanged, and nothing outside this file ever
+# called the old name directly (grepped clean before aliasing).
+_clears_margin = margin_law.clears_margin
 
 
 def rank(
