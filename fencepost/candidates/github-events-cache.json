@@ -27158,5 +27158,29 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/4094a3cd1862410f0c0310b746a39c0c9b270dd3",
     "ts": "2026-08-20T16:34:59Z",
     "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "aff24b2",
+    "title": "task 896: mark WIP -- nisaba folds the duplicated fencepost-count predicate into one place",
+    "url": "https://github.com/thierrypdamiba/orita/commit/aff24b2547cc170900038cf5cb6610bc7e779720",
+    "ts": "2026-08-20T17:32:43Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "51152f5",
+    "title": "task 896: fold the duplicated fencepost-count predicate into one place",
+    "url": "https://github.com/thierrypdamiba/orita/commit/51152f5588823b3d45ab950876091561658f8d9a",
+    "ts": "2026-08-20T17:36:19Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "9c0bbfe",
+    "title": "task 896: DONE -- fencepost-count predicate folded into one place, both paths proven to agree",
+    "url": "https://github.com/thierrypdamiba/orita/commit/9c0bbfef1b7ab5bfeb015a38411fe6dbdb1312f6",
+    "ts": "2026-08-20T17:38:22Z",
+    "author": "Nisaba"
   }
 ]
