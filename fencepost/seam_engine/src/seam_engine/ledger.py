@@ -208,9 +208,28 @@ def tip_sealed(records: list[dict[str, Any]]) -> dict[str, Any]:
     return cast("dict[str, Any]", tip["sealed"])
 
 
+def _count_fenceposts(records: list[dict[str, Any]]) -> int:
+    """The one predicate for 'this sealed record named a real fencepost'.
+
+    A gap was recorded on a given day exactly when that day's sealed record
+    carries a truthy `primary_gap` (a held or empty day seals `None`, ARC.md
+    "The math, plainly"). That predicate is what decides the running
+    `fenceposts_recorded_total` sealed into every tablet -- and that number is
+    what `wall.wall_for` turns into the public n-1 counter. Until this task it
+    was typed twice: once here, once inline inside `append_scan`'s seal-time
+    recount. Two independent copies of the count that feeds the wall are the
+    exact "two places that must never disagree" shape `wall.py` (ROADMAP.md
+    #21) was built to close for the wall's own arithmetic; this closes it for
+    the count that arithmetic reads. One predicate, one place, every caller
+    imports it -- so a future edit to what counts as a recorded fencepost
+    can't drift the sealed total away from what any reader recomputes.
+    """
+    return sum(1 for r in records if r.get("sealed", {}).get("primary_gap"))
+
+
 def _fenceposts_recorded(base: Path | None = None) -> int:
     """How many entries in the whole ledger named a fencepost (a real gap)."""
-    return sum(1 for r in read_records(base) if r.get("sealed", {}).get("primary_gap"))
+    return _count_fenceposts(read_records(base))
 
 
 # --- rendering ----------------------------------------------------------------
@@ -389,7 +408,7 @@ def append_scan(
         {"slug": t["slug"], "confidence": t["confidence"], "label": t.get("label", "coincidence")}
         for t in scan.get("tail", [])
     ]
-    recorded_before = sum(1 for r in existing if r.get("sealed", {}).get("primary_gap"))
+    recorded_before = _count_fenceposts(existing)
     fenceposts_recorded_total = recorded_before + (1 if primary else 0)
 
     # The sealed payload — the typed record. Only these fields are under the

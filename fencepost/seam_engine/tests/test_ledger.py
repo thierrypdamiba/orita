@@ -302,6 +302,36 @@ def test_count_only_advances_on_a_real_fencepost(tmp_path: Path):
     assert totals == [1, 1, 2]  # the empty day does not inflate the count
 
 
+def test_standalone_recount_agrees_with_the_last_sealed_running_total(tmp_path: Path):
+    # Task 896. `fenceposts_recorded_total` is computed at seal time inside
+    # append_scan and is the number wall_for turns into the public n-1
+    # counter; `_fenceposts_recorded` recomputes the same count for any
+    # reader. They used to be two independent copies of the predicate
+    # `sealed.primary_gap`; now both route through `_count_fenceposts`. This
+    # proves on real sealed data that the two paths never disagree -- the
+    # standalone recount must equal the running total the tip sealed.
+    ledger.append_scan(_scan(primary=True, generated_at="g1"), now=_at(2026, 7, 12), base=tmp_path)
+    ledger.append_scan(_scan(primary=False, generated_at="held"), now=_at(2026, 7, 13), base=tmp_path)
+    ledger.append_scan(_scan(primary=True, generated_at="g2"), now=_at(2026, 7, 14), base=tmp_path)
+    ledger.append_scan(_scan(primary=False, generated_at="held2"), now=_at(2026, 7, 15), base=tmp_path)
+
+    recs = ledger.read_records(tmp_path)
+    last_sealed_total = recs[-1]["sealed"]["fenceposts_recorded_total"]
+    assert ledger._fenceposts_recorded(tmp_path) == last_sealed_total == 2
+
+
+def test_count_fenceposts_counts_only_records_that_sealed_a_primary_gap(tmp_path: Path):
+    # The one predicate, proven directly: a record whose sealed payload
+    # carries a truthy primary_gap counts; a held/empty day (primary_gap
+    # None) does not. This is what both the seal-time total and the reader's
+    # recount now share.
+    ledger.append_scan(_scan(primary=True, generated_at="g1"), now=_at(2026, 7, 12), base=tmp_path)
+    ledger.append_scan(_scan(primary=False, generated_at="held"), now=_at(2026, 7, 13), base=tmp_path)
+    recs = ledger.read_records(tmp_path)
+    assert ledger._count_fenceposts(recs) == 1
+    assert ledger._count_fenceposts([]) == 0
+
+
 def test_no_primary_records_the_seam_held(tmp_path: Path):
     tablet = ledger.append_scan(_scan(primary=False, generated_at="q"), now=_at(2026, 7, 12), base=tmp_path)
     text = tablet.read_text()
