@@ -27014,5 +27014,45 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/d677041625f05f07ffac5cc17ac25484de9ed97b",
     "ts": "2026-08-20T10:54:16Z",
     "author": "Kothar-wa-Khasis"
+  },
+  {
+    "kind": "commit",
+    "id": "709a0c4",
+    "title": "task 891: WIP opened -- daytime rotation, dogfood + own-remit sweep + ruff repin, root suite running",
+    "url": "https://github.com/thierrypdamiba/orita/commit/709a0c4b139fc12d5146527cbee1307139f54822",
+    "ts": "2026-08-20T11:32:02Z",
+    "author": "Kwaku Ananse"
+  },
+  {
+    "kind": "commit",
+    "id": "caf3b4e",
+    "title": "task 891: mid-close X status recheck -- WhoAmI OK, GetUserTweets 384th consecutive forbidden, no new escalation tier",
+    "url": "https://github.com/thierrypdamiba/orita/commit/caf3b4e98d17d6bb4c3693a4040cdb3df24eb8dc",
+    "ts": "2026-08-20T12:29:29Z",
+    "author": "kwaku-ananse"
+  },
+  {
+    "kind": "commit",
+    "id": "d02075d",
+    "title": "seam-scan: 2026-08-20 tablet sealed, report rendered (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/d02075d3f33106d2600129ad24ad4eacd10e10b3",
+    "ts": "2026-08-20T12:44:42Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "8a289f0",
+    "title": "task 891: DONE -- root suite closed clean across a container boundary, no regression",
+    "url": "https://github.com/thierrypdamiba/orita/commit/8a289f08ffa6ff9f0ab9a87c3811da7dfc10485d",
+    "ts": "2026-08-20T12:49:33Z",
+    "author": "kwaku-ananse"
+  },
+  {
+    "kind": "commit",
+    "id": "ad373c0",
+    "title": "task 892: WIP opened -- daytime rotation, Threshold own-remit sweep clean, dogfood + suite verification running",
+    "url": "https://github.com/thierrypdamiba/orita/commit/ad373c0bf0a5111427f442f6b88268573447f5ad",
+    "ts": "2026-08-20T13:30:27Z",
+    "author": "Esu-Elegba"
   }
 ]
