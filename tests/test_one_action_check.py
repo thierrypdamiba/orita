@@ -102,6 +102,46 @@ class FirstPersonViolationCase(unittest.TestCase):
     def test_case_insensitive(self):
         self.assertEqual(src._first_person_violation("FENCEPOST WILL post this for you."), "fencepost will")
 
+    def test_widened_executed_verbs_are_flagged(self):
+        # Task 893 (retrya): the guard shipped covering only post/add/close,
+        # but `report.py`'s generator also emits set/correct/delete and
+        # STRATEGY.md's write-back path (a drafted email-to-self / Notion
+        # page) invites a regression phrasing the hand-off as something
+        # Fencepost already SENT/EMAILED/DRAFTED/CREATED. Every one of these
+        # returned None (clean) pre-893 -- the silent break this module
+        # exists to catch.
+        cases = {
+            "Fencepost sent it to your inbox for you.": "fencepost sent",
+            "I set the reminder for you.": "i set",
+            "I've drafted the email for you.": "i've drafted",
+            "We emailed you the summary.": "we emailed",
+            "Fencepost created the Calendar event.": "fencepost created",
+            "I deleted the dangling reference for you.": "i deleted",
+            "Fencepost scheduled the reminder.": "fencepost scheduled",
+            "We filed it for you.": "we filed",
+            "Fencepost has removed the stale reference.": "fencepost has removed",
+            "I corrected it for you.": "i corrected",
+        }
+        for line, expected in cases.items():
+            with self.subTest(line=line):
+                self.assertEqual(src._first_person_violation(line), expected)
+
+    def test_reader_phrased_lines_carrying_the_same_verbs_stay_clean(self):
+        # The widening must never false-positive against the real
+        # reader-phrased move lines `report.py` actually emits -- several of
+        # which legitimately carry those same verbs as the READER's move
+        # ("Set the reminder yourself", "delete it yourself"). Every guard
+        # entry is subject-paired (i/we/fencepost + verb), never a bare verb,
+        # exactly so these stay clean.
+        for line in (
+            "Add it to your Calendar yourself. Fencepost only found the seam; it does not cross it.",
+            "Set the reminder yourself. Fencepost only found the seam; it does not cross it.",
+            "Correct or delete it yourself — the reference points at nothing. Fencepost only found the seam; it does not cross it.",
+            "Nothing to hand off today. Check back tomorrow — the seam is still watched.",
+        ):
+            with self.subTest(line=line):
+                self.assertIsNone(src._first_person_violation(line))
+
 
 class CheckOneActionInvariantCase(unittest.TestCase):
     def test_empty_directory_reads_clean(self):

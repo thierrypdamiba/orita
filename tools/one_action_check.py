@@ -118,6 +118,80 @@ _FORBIDDEN_EXECUTED_PHRASES: tuple[str, ...] = (
     "fencepost closed",
     "fencepost has closed",
     "fencepost is posting",
+    # Task 893 (retrya): the three verbs above (post/add/close) were the
+    # only ones this guard shipped with, but `report.py`'s live
+    # `_MOVE_RULES`/`_DEFAULT_MOVE` generator also emits "Set the reminder
+    # yourself", "Correct or delete it yourself", and STRATEGY.md's own
+    # write-back path (the Gap Ledger drafted into a place the user owns --
+    # an email-to-self draft or a Notion page) invites a future regression
+    # phrasing the hand-off as something Fencepost already SENT/EMAILED/
+    # DRAFTED/CREATED. All of those slipped this guard clean pre-893
+    # (proved live: "Fencepost sent it to your inbox", "I set the reminder
+    # for you", "I've drafted the email for you" each returned no
+    # violation), the exact silent break in the one place a mortal reader
+    # sees the hand-off that this whole module exists to prevent. Every
+    # entry stays subject-paired (i/we/fencepost + an executed verb), never
+    # a bare verb word, so the real reader-phrased lines that legitimately
+    # carry those same verbs as the READER's move ("delete it yourself",
+    # "Set the reminder yourself") never false-positive -- confirmed live
+    # against every sealed tablet on disk.
+    "i set",
+    "i've set",
+    "we set",
+    "we've set",
+    "fencepost set",
+    "fencepost has set",
+    "i corrected",
+    "i've corrected",
+    "we corrected",
+    "fencepost corrected",
+    "fencepost has corrected",
+    "i deleted",
+    "i've deleted",
+    "we deleted",
+    "fencepost deleted",
+    "fencepost has deleted",
+    "i removed",
+    "we removed",
+    "fencepost removed",
+    "fencepost has removed",
+    "i sent",
+    "i've sent",
+    "i will send",
+    "i'll send",
+    "we sent",
+    "we've sent",
+    "we will send",
+    "fencepost sent",
+    "fencepost has sent",
+    "fencepost will send",
+    "fencepost is sending",
+    "i emailed",
+    "i've emailed",
+    "we emailed",
+    "fencepost emailed",
+    "fencepost has emailed",
+    "i drafted",
+    "i've drafted",
+    "we drafted",
+    "we've drafted",
+    "fencepost drafted",
+    "fencepost has drafted",
+    "fencepost is drafting",
+    "i created",
+    "i've created",
+    "we created",
+    "fencepost created",
+    "fencepost has created",
+    "i filed",
+    "we filed",
+    "fencepost filed",
+    "i scheduled",
+    "we scheduled",
+    "fencepost scheduled",
+    "i reminded",
+    "we reminded",
+    "fencepost reminded",
 )
 
 
