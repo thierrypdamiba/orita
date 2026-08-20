@@ -76,6 +76,26 @@ class Ranking:
         return [g for g in self.ranked if g.label != Label.PRIMARY.value]
 
 
+# The election reads the EXACT lead over the runner-up, never the `lead`
+# FIELD (which is rounded to 4 places for display). A boundary decided on a
+# display-rounded number is off-by-one's own class of miscount: at 4 places a
+# true lead of 0.14996 rounds UP to 0.1500 and would elect a PRIMARY the law's
+# separation forbids -- crying wolf, the fatal direction (Ogun's law). Naive
+# raw subtraction is not the fix either: `0.95 - 0.80 == 0.1499999999999999`
+# in IEEE-754, a genuine 0.15 lead that raw `>= margin` would wrongly REFUSE.
+# So the decision rounds the difference at a precision far finer than any
+# confidence a source could ever emit (they are 2-dp today) yet coarse enough
+# to erase float dust (~1e-16): it elects the real 0.15 lead and refuses the
+# sub-margin 0.14996 one. Every real 2-dp field lands identically to before.
+_MARGIN_DECISION_PLACES = 10
+
+
+def _clears_margin(exact_lead: float, margin: float) -> bool:
+    """True iff `exact_lead` is at least `margin`, with IEEE-754 dust cleaned
+    but no rounding across the real margin boundary. See the note above."""
+    return round(exact_lead, _MARGIN_DECISION_PLACES) >= margin
+
+
 def rank(
     candidates: list[GapCandidate],
     *,
@@ -110,7 +130,9 @@ def rank(
             )
         )
 
-    if ranked and ranked[0].confidence >= bar and ranked[0].lead >= margin:
-        ranked[0].label = Label.PRIMARY.value
+    if ranked and ranked[0].confidence >= bar:
+        runner_up = ordered[1].confidence if len(ordered) > 1 else 0.0
+        if _clears_margin(ordered[0].confidence - runner_up, margin):
+            ranked[0].label = Label.PRIMARY.value
 
     return Ranking(ranked=ranked, confidence_bar=bar, separation_margin=margin)

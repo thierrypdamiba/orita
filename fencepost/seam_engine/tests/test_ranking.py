@@ -78,6 +78,30 @@ def test_boundary_exactly_at_bar_and_margin_elects():
     assert r.primary.slug == "edge"
 
 
+def test_election_ignores_the_rounded_display_lead_at_the_margin_boundary():
+    # A finer-than-2dp confidence whose TRUE lead over the runner-up is below
+    # the margin (0.84996 - 0.70 = 0.14996 < 0.15) but rounds UP to exactly the
+    # margin (0.1500) at the 4-place `lead` display precision. The election must
+    # read the exact difference, not the rounded field: this stays a CONTENDER,
+    # never a PRIMARY the law's separation forbids. Deciding off `lead` here
+    # would cry wolf (Ogun's law), the fatal direction.
+    top = 0.84996
+    r = rank([cand("hairline", top), cand("floor", 0.70)])
+    assert round(r.ranked[0].lead, 4) == round(SEPARATION_MARGIN, 4)  # display rounds up
+    assert r.primary is None  # but the exact lead (0.14996) is below margin
+    assert {g.label for g in r.ranked} == {Label.CONTENDER.value}
+
+
+def test_true_margin_lead_with_float_underflow_still_elects():
+    # The mirror case the naive raw-subtraction fix would have BROKEN:
+    # 0.95 - 0.80 == 0.1499999999999999 in IEEE-754, a genuine 0.15 lead. The
+    # election must clean that dust and elect, not refuse a real gap.
+    assert (0.95 - 0.80) < SEPARATION_MARGIN  # raw float underflows below margin
+    r = rank([cand("real", 0.95), cand("under", 0.80)])
+    assert r.primary is not None
+    assert r.primary.slug == "real"
+
+
 # --- shape and determinism ---------------------------------------------------
 
 
