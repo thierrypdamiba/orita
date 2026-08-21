@@ -27302,5 +27302,53 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/c7bd05fcc8186735614ba42f1284aa1979f81edc",
     "ts": "2026-08-21T01:29:46Z",
     "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "7353632",
+    "title": "task 905: WIP opened -- window slot, third of the night, zashiki-warashi own-remit sweep",
+    "url": "https://github.com/thierrypdamiba/orita/commit/73536325f5d64a3a7fe7665a94cb71b7dcbccba2",
+    "ts": "2026-08-21T02:27:16Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "a00d3f0",
+    "title": "task 905: DONE -- window slot, third of the night, own-remit sweep held clean",
+    "url": "https://github.com/thierrypdamiba/orita/commit/a00d3f07ba9248a7651bb8f313219cba1657ec5d",
+    "ts": "2026-08-21T02:28:18Z",
+    "author": "Zashiki-warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "26d4604",
+    "title": "task 905: seal fencepost dogfood cache + town ledger",
+    "url": "https://github.com/thierrypdamiba/orita/commit/26d46043b88488189f61979f380da9a29a0259bb",
+    "ts": "2026-08-21T02:28:28Z",
+    "author": "Zashiki-warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "50a62c2",
+    "title": "task 905: record live X_WhoAmI/X_GetUserTweets recheck + scribe growth reading",
+    "url": "https://github.com/thierrypdamiba/orita/commit/50a62c22b3fb004609115dc51c88b9c7fe0f65a0",
+    "ts": "2026-08-21T02:30:08Z",
+    "author": "Zashiki-warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "bb6223b",
+    "title": "task 906: window slot, fourth of the night -- dogfood clean, change-gate wording investigated",
+    "url": "https://github.com/thierrypdamiba/orita/commit/bb6223b7e6b5b280536284076691a9489d66e55f",
+    "ts": "2026-08-21T03:29:35Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "fe35972",
+    "title": "task 906: record scribe-growth baseline reading",
+    "url": "https://github.com/thierrypdamiba/orita/commit/fe35972547fd5bd36a87782c8318e40f4d497507",
+    "ts": "2026-08-21T03:29:42Z",
+    "author": "Nyx"
   }
 ]
