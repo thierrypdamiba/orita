@@ -683,6 +683,96 @@ def test_claims_unfinished_recipes_get_the_finish_or_correct_move(slug: str):
     assert "finish it, or correct the claim yourself" in move.lower()
 
 
+# Task 914 (retrya): task 901's own private journal named the unfinished
+# half of that hour's sweep directly -- 32 of the 92 real recipes' own live
+# fixture gaps fall to `_DEFAULT_MOVE` today; 19 are genuine closes, the
+# other 13 shared three sub-shapes where "close it yourself" is the wrong
+# verb entirely (see `_MOVE_RULES`'s own task-914 comment for the full
+# breakdown). This systemic sweep re-walks all 92 live fixtures on every
+# run, exactly like the dangling-reference/dangling-milestone/claims-
+# unfinished guards before it, so a future recipe sharing one of these three
+# shapes cannot silently fall through to the wrong hand-off again.
+_TASK_914_ALREADY_RESOLVED_NO_RELEASE = {
+    "issue-closed-never-released",
+    "merged-pr-never-released",
+    "milestone-closed-never-released",
+    "tag-never-released",
+}
+_TASK_914_ALREADY_RESOLVED_OTHER_BOOKKEEPING = {
+    "merged-pr-branch-not-deleted",
+    "example-release-vs-changelog",
+}
+_TASK_914_NOT_YET_ACTIONABLE_AS_A_CLOSE = {
+    "stale-branch-no-pr",
+    "draft-pr-closes-keyword-issue",
+    "commit-closes-keyword-issue-closed-not-planned",
+    "good-first-issue-never-referenced",
+    "issue-assignee-never-opened-pr",
+    "merged-pr-requested-reviewer-never-reviewed",
+    "pr-checklist-complete-still-open",
+}
+_TASK_914_WRONG_CLOSE_SLUGS = (
+    _TASK_914_ALREADY_RESOLVED_NO_RELEASE
+    | _TASK_914_ALREADY_RESOLVED_OTHER_BOOKKEEPING
+    | _TASK_914_NOT_YET_ACTIONABLE_AS_A_CLOSE
+)
+
+
+def test_no_wrong_close_headline_falls_through_to_default():
+    from seam_engine.recipes import discover_recipes, load_detector
+
+    fencepost_root = Path(__file__).resolve().parents[2]
+    seen = set()
+    for manifest in discover_recipes(fencepost_root):
+        if manifest.slug not in _TASK_914_WRONG_CLOSE_SLUGS:
+            continue
+        result = load_detector(manifest)()
+        gap = result.get("primary_gap") or (result.get("tail") or [None])[0]
+        assert gap is not None, f"expected {manifest.slug}'s fixture to carry a primary gap"
+        move = report.suggest_move(gap)
+        assert move != report._DEFAULT_MOVE, (
+            f"{manifest.slug}'s real headline ({gap.get('headline')!r}) is not a genuine "
+            "close, but suggest_move fell through to the generic close-it-yourself line -- "
+            "add a needle to _MOVE_RULES."
+        )
+        seen.add(manifest.slug)
+    assert seen == _TASK_914_WRONG_CLOSE_SLUGS, (
+        f"expected to check exactly {_TASK_914_WRONG_CLOSE_SLUGS}, saw {seen} -- "
+        "a slug renamed or removed without this test noticing"
+    )
+
+
+@pytest.mark.parametrize(
+    "slug,expected_phrase",
+    [
+        ("issue-closed-never-released", "note it in a release yourself"),
+        ("merged-pr-never-released", "note it in a release yourself"),
+        ("milestone-closed-never-released", "note it in a release yourself"),
+        ("tag-never-released", "publish the release yourself"),
+        ("merged-pr-branch-not-deleted", "delete the branch yourself"),
+        ("stale-branch-no-pr", "open a pull request or delete the branch yourself"),
+        ("draft-pr-closes-keyword-issue", "mark it ready for review"),
+        ("commit-closes-keyword-issue-closed-not-planned", "correct the record yourself"),
+        ("good-first-issue-never-referenced", "nudge a contributor or feature it yourself"),
+        ("issue-assignee-never-opened-pr", "check in with the assignee or open it yourself"),
+        ("merged-pr-requested-reviewer-never-reviewed", "follow up with the reviewer yourself"),
+        ("pr-checklist-complete-still-open", "merge it yourself"),
+        ("example-release-vs-changelog", "update the changelog yourself"),
+    ],
+)
+def test_task_914_recipes_get_their_own_specific_move(slug: str, expected_phrase: str):
+    from seam_engine.recipes import discover_recipes, load_detector
+
+    fencepost_root = Path(__file__).resolve().parents[2]
+    manifest = next(m for m in discover_recipes(fencepost_root) if m.slug == slug)
+    result = load_detector(manifest)()
+    gap = result.get("primary_gap") or (result.get("tail") or [None])[0]
+    assert gap is not None, f"expected {slug}'s fixture to carry a primary gap"
+    move = report.suggest_move(gap)
+    assert move != report._DEFAULT_MOVE
+    assert expected_phrase in move.lower(), f"{slug} got {move!r}"
+
+
 # Task 537 (retrya): every detector embeds mortal-controlled free text (a
 # commit message, a title, a tweet's own words) inside single quotes in its
 # headline/detail f-strings -- confirmed by grep across the whole tree, zero

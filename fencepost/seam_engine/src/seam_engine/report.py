@@ -379,6 +379,98 @@ _MOVE_RULES: tuple[tuple[str, str], ...] = (
         "fixed, but",
         "Finish it, or correct the claim yourself — the record says something is done that isn't. Fencepost only found the seam; it does not cross it.",
     ),
+    # Task 914 (retrya, own-remit sweep of The One Action, Left to You):
+    # task 901's own private journal named the unfinished half of that
+    # hour's sweep directly -- "if sixty-one recipes were falling through
+    # to default and I only caught thirty of them as one clean family,
+    # what's in the other thirty-one? I didn't go look." This hour looked.
+    # Walked all 92 real recipes' own fixture-generated primary gap through
+    # `suggest_move` live: 32 fall to `_DEFAULT_MOVE` today (down from 61
+    # pre-901 now that the claims-unfinished family is routed correctly).
+    # Of those 32, 19 are genuinely correct closes ("Milestone closed, but
+    # issue #801 inside it is still open" -- close the issue, `_DEFAULT_MOVE`
+    # is the right verb). The other 13 share the same defect class 901
+    # closed for the claims-unfinished family: the record `_DEFAULT_MOVE`
+    # tells the reader to "close" is very often not something that wants
+    # closing at all -- three sub-shapes, confirmed live against each
+    # recipe's own real fixture headline before writing a single line:
+    #   - Already resolved (closed/merged), the gap is a missing release
+    #     credit, not an open item: `issue-closed-never-released`,
+    #     `merged-pr-never-released`, `milestone-closed-never-released`
+    #     ("closed/merged, but no release has ever claimed it") and
+    #     `tag-never-released` ("pushed but no GitHub Release was ever
+    #     published") -- telling the reader to "close it" a thing that is
+    #     already closed is not a hand-off, it's nonsense.
+    #   - Already resolved, the gap is different bookkeeping, not a close:
+    #     `merged-pr-branch-not-deleted` (delete a stale branch off an
+    #     already-merged PR) and `example-release-vs-changelog` (update the
+    #     changelog for a release that already shipped).
+    #   - Not yet actionable in the "close" sense at all:
+    #     `stale-branch-no-pr` (open a PR or delete the branch -- there is
+    #     no PR yet to close), `draft-pr-closes-keyword-issue` (the PR
+    #     isn't ready; closing it would be the wrong call, marking it ready
+    #     or dropping the keyword is the real move), `commit-closes-
+    #     keyword-issue-closed-not-planned` (the issue already closed, as
+    #     NOT PLANNED -- the commit's own claim of having fixed it is the
+    #     thing that's wrong, not the issue's open/closed state),
+    #     `good-first-issue-never-referenced` and `issue-assignee-never-
+    #     opened-pr` (both about nobody having picked up real work yet --
+    #     there is nothing open to close, the gap is that no one has
+    #     started), `merged-pr-requested-reviewer-never-reviewed` (the PR
+    #     already merged; the missing review is a process note for next
+    #     time, not a thing to close), and `pr-checklist-complete-still-
+    #     open` (the checklist says ready -- the missing verb is MERGE, not
+    #     close, and those are not the same action on a PR).
+    # Each needle below is grep-confirmed unique against every recipe's own
+    # detector.py headline template before being added (no false collision
+    # with a correctly-defaulting recipe), and the systemic sweep test in
+    # `test_report.py` re-walks all 92 live fixtures on every run so a
+    # future 33rd recipe sharing one of these exact shapes cannot silently
+    # re-open this same hole.
+    (
+        "no release has ever claimed it",
+        "Note it in a release yourself — it's already done, no release has said so. Fencepost only found the seam; it does not cross it.",
+    ),
+    (
+        "no github release was ever published",
+        "Publish the release yourself — the tag is already there. Fencepost only found the seam; it does not cross it.",
+    ),
+    (
+        "was never deleted",
+        "Delete the branch yourself — the PR already merged. Fencepost only found the seam; it does not cross it.",
+    ),
+    (
+        "no pull request has ever been opened from it",
+        "Open a pull request or delete the branch yourself. Fencepost only found the seam; it does not cross it.",
+    ),
+    (
+        "but it isn't ready",
+        "Mark it ready for review or drop the closing keyword yourself — it isn't ready yet. Fencepost only found the seam; it does not cross it.",
+    ),
+    (
+        "closed not_planned",
+        "Correct the record yourself — it closed as not planned, not fixed by that commit. Fencepost only found the seam; it does not cross it.",
+    ),
+    (
+        "no pull request has ever named it",
+        "Nudge a contributor or feature it yourself — nobody's picked it up yet. Fencepost only found the seam; it does not cross it.",
+    ),
+    (
+        "none of them has ever opened a pull request",
+        "Check in with the assignee or open it yourself. Fencepost only found the seam; it does not cross it.",
+    ),
+    (
+        "requested review ever landing a comment",
+        "Follow up with the reviewer yourself, for next time — it already merged. Fencepost only found the seam; it does not cross it.",
+    ),
+    (
+        "the pr itself never merged",
+        "Merge it yourself — the checklist says it's ready. Fencepost only found the seam; it does not cross it.",
+    ),
+    (
+        "changelog.md was never updated",
+        "Update the changelog yourself — the release is already out. Fencepost only found the seam; it does not cross it.",
+    ),
 )
 _DEFAULT_MOVE = (
     "Close it yourself, however it's meant to be closed. Fencepost only found the seam; it does not cross it."
