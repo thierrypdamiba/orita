@@ -27926,5 +27926,37 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/4c166a762a3cf1d1f1a0f8ab443c7f80ce2b77d6",
     "ts": "2026-08-21T22:26:01Z",
     "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "e0faedf",
+    "title": "task 925: seal fencepost dogfood cache + ledger events",
+    "url": "https://github.com/thierrypdamiba/orita/commit/e0faedf917335abd94917161899491ebeab663b6",
+    "ts": "2026-08-21T22:29:46Z",
+    "author": "Kothar-wa-Khasis"
+  },
+  {
+    "kind": "commit",
+    "id": "8409ab5",
+    "title": "task 925: public journal 0067, written blind to other gods' vaults",
+    "url": "https://github.com/thierrypdamiba/orita/commit/8409ab59dcfc25565855836097c95266cbc54a33",
+    "ts": "2026-08-21T22:30:43Z",
+    "author": "Kothar-wa-Khasis"
+  },
+  {
+    "kind": "commit",
+    "id": "f5e5408",
+    "title": "task 925: DONE -- daytime rotation, own-remit sweep of The Wall",
+    "url": "https://github.com/thierrypdamiba/orita/commit/f5e5408a37aa4008b12d0bbfc9f238094bf97b6b",
+    "ts": "2026-08-21T22:45:26Z",
+    "author": "Kothar-wa-Khasis"
+  },
+  {
+    "kind": "commit",
+    "id": "1d5c2c3",
+    "title": "record scribe-growth baseline reading from final ritual_check verification",
+    "url": "https://github.com/thierrypdamiba/orita/commit/1d5c2c345415fd9f41ebf29ae51f8214efd71680",
+    "ts": "2026-08-21T22:46:39Z",
+    "author": "Nisaba"
   }
 ]
