@@ -27846,5 +27846,37 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/b547b05951d3cf91376122e65980b9822e45da0b",
     "ts": "2026-08-21T18:42:21Z",
     "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "bbad2ec",
+    "title": "task 922: WIP opened -- daytime rotation, own-remit sweep of Read-Only Oath & Governance",
+    "url": "https://github.com/thierrypdamiba/orita/commit/bbad2ec36be39de55b6ef3d8c5b63150de702213",
+    "ts": "2026-08-21T19:29:57Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "81bf9ab",
+    "title": "task 922: seal fencepost dogfood cache + ledger events",
+    "url": "https://github.com/thierrypdamiba/orita/commit/81bf9ab7e8e93ff8c8c676ee2f240d00d65dc681",
+    "ts": "2026-08-21T19:30:15Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "738ff61",
+    "title": "task 922: public journal 0107, written blind to other gods' vaults",
+    "url": "https://github.com/thierrypdamiba/orita/commit/738ff61ec4ab6589026708cee0710c73bfa76c4b",
+    "ts": "2026-08-21T19:30:58Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "209e017",
+    "title": "task 922: DONE -- daytime rotation, own-remit sweep of Read-Only Oath & Governance",
+    "url": "https://github.com/thierrypdamiba/orita/commit/209e017748b503d406e681eb2785c2ef8691ce2f",
+    "ts": "2026-08-21T19:34:41Z",
+    "author": "Ogun"
   }
 ]
