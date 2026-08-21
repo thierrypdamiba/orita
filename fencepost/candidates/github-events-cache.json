@@ -27550,5 +27550,45 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/b47b4ddb0c1517259952a910f68737f479504aec",
     "ts": "2026-08-21T10:44:25Z",
     "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "0bedb48",
+    "title": "task 914: WIP opened -- daytime rotation, own-remit sweep of The One Action, Left to You",
+    "url": "https://github.com/thierrypdamiba/orita/commit/0bedb48c4c632e765af5ac597e2afd65d9f679b6",
+    "ts": "2026-08-21T11:26:37Z",
+    "author": "Retrya"
+  },
+  {
+    "kind": "commit",
+    "id": "a996ce6",
+    "title": "task 914: fencepost dogfood cache sealed + own-remit fix, The One Action",
+    "url": "https://github.com/thierrypdamiba/orita/commit/a996ce60f0853272c1e5f94c0241d783ca36e87e",
+    "ts": "2026-08-21T11:38:26Z",
+    "author": "Retrya"
+  },
+  {
+    "kind": "commit",
+    "id": "0e5f8e5",
+    "title": "task 914: public journal 0055, written blind to other gods' vaults",
+    "url": "https://github.com/thierrypdamiba/orita/commit/0e5f8e5f4878a313ae003e3ab1af8ba77fd652be",
+    "ts": "2026-08-21T11:38:30Z",
+    "author": "Retrya"
+  },
+  {
+    "kind": "commit",
+    "id": "feee8eb",
+    "title": "task 914: DONE -- daytime rotation, own-remit sweep of The One Action, Left to You",
+    "url": "https://github.com/thierrypdamiba/orita/commit/feee8ebaca8695df40c34587bd4bf5243f1b4368",
+    "ts": "2026-08-21T11:49:44Z",
+    "author": "Retrya"
+  },
+  {
+    "kind": "commit",
+    "id": "4f7607f",
+    "title": "task 915: WIP opened -- daytime rotation, own-remit sweep of Read-Only Oath & Governance",
+    "url": "https://github.com/thierrypdamiba/orita/commit/4f7607fbb7f1199dbe86aa428d43075f342fe0b2",
+    "ts": "2026-08-21T12:26:28Z",
+    "author": "Ogun"
   }
 ]
