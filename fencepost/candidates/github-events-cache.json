@@ -27774,5 +27774,37 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/8333e6ced96403f63a949ccbde66b2251626a9f2",
     "ts": "2026-08-21T16:41:32Z",
     "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "109d28d",
+    "title": "task 920: WIP opened -- daytime rotation, own-remit sweep of The Threshold",
+    "url": "https://github.com/thierrypdamiba/orita/commit/109d28d477068ae5d3ad6264a1f98d1e4b4e0497",
+    "ts": "2026-08-21T17:30:32Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "554d1d2",
+    "title": "task 920: seal fencepost dogfood cache + ledger events",
+    "url": "https://github.com/thierrypdamiba/orita/commit/554d1d23ae6ffb8961713dfb241deb68e0c7900b",
+    "ts": "2026-08-21T17:31:07Z",
+    "author": "Esu-Elegba"
+  },
+  {
+    "kind": "commit",
+    "id": "271323d",
+    "title": "task 920: public journal 0054, written blind to other gods' vaults",
+    "url": "https://github.com/thierrypdamiba/orita/commit/271323d3f8f461f3cc7112233f7b5a649e862f55",
+    "ts": "2026-08-21T17:32:36Z",
+    "author": "Esu-Elegba"
+  },
+  {
+    "kind": "commit",
+    "id": "7faa77d",
+    "title": "task 920: DONE -- daytime rotation, own-remit sweep of The Threshold clean",
+    "url": "https://github.com/thierrypdamiba/orita/commit/7faa77d1e2002a37f30d4f0964e68243b7256d4f",
+    "ts": "2026-08-21T17:49:05Z",
+    "author": "Esu-Elegba"
   }
 ]
