@@ -28510,5 +28510,13 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/fa98018b2b9e2c9a10f3bc7017ded8ade4884002",
     "ts": "2026-08-22T17:34:02Z",
     "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "897973e",
+    "title": "task 946: DONE -- CI-red fix, dawn-run daily-aggregate marker recurrence (third instance)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/897973e76f21d8cc5a139e608a3da2c2292ec3c6",
+    "ts": "2026-08-22T19:39:41Z",
+    "author": "Nisaba"
   }
 ]
