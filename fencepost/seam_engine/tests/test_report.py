@@ -742,6 +742,46 @@ def test_no_wrong_close_headline_falls_through_to_default():
     )
 
 
+# Task 949 (retrya): the guard above locked 914's own 13, and tasks 921/934/
+# 941 each re-ran the sweep and re-affirmed the remaining 19 as "genuinely
+# correct closes" -- without reading the recipes' own docstrings. Two of the
+# 19 disclaim the close verb explicitly: a blocker marker claims a DEPENDENCY,
+# never an EQUIVALENCE, so when the blocker clears the blocked record is not
+# DONE, it just became POSSIBLE. "Close it yourself" is the one verb both
+# detectors' docstrings rule out by name. Same systemic shape as the guard
+# above, so the family cannot silently re-open the hole when a third blocker-
+# marker recipe lands.
+_TASK_949_BLOCKER_CLEARED_NOT_A_CLOSE = {
+    "unblocked-issue-still-open",
+    "unblocked-pr-still-open",
+}
+
+
+def test_no_cleared_blocker_headline_falls_through_to_default():
+    from seam_engine.recipes import discover_recipes, load_detector
+
+    fencepost_root = Path(__file__).resolve().parents[2]
+    seen = set()
+    for manifest in discover_recipes(fencepost_root):
+        if manifest.slug not in _TASK_949_BLOCKER_CLEARED_NOT_A_CLOSE:
+            continue
+        result = load_detector(manifest)()
+        gap = result.get("primary_gap") or (result.get("tail") or [None])[0]
+        assert gap is not None, f"expected {manifest.slug}'s fixture to carry a primary gap"
+        move = report.suggest_move(gap)
+        assert move != report._DEFAULT_MOVE, (
+            f"{manifest.slug}'s real headline ({gap.get('headline')!r}) reports a CLEARED "
+            "blocker -- the work just became possible, it is not done -- but suggest_move "
+            "fell through to the generic close-it-yourself line, the one verb that recipe's "
+            "own docstring rules out by name. Add a needle to _MOVE_RULES."
+        )
+        seen.add(manifest.slug)
+    assert seen == _TASK_949_BLOCKER_CLEARED_NOT_A_CLOSE, (
+        f"expected to check exactly {_TASK_949_BLOCKER_CLEARED_NOT_A_CLOSE}, saw {seen} -- "
+        "a slug renamed or removed without this test noticing"
+    )
+
+
 @pytest.mark.parametrize(
     "slug,expected_phrase",
     [

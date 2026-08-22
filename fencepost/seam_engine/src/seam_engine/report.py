@@ -471,6 +471,30 @@ _MOVE_RULES: tuple[tuple[str, str], ...] = (
         "changelog.md was never updated",
         "Update the changelog yourself — the release is already out. Fencepost only found the seam; it does not cross it.",
     ),
+    # Task 949 (retrya, own-remit sweep of The One Action, Left to You):
+    # tasks 921/934/941 each re-ran the sweep and re-affirmed the same 19
+    # `*-still-open` slugs as "genuinely correct closes" without reading the
+    # recipes' own docstrings. Two of the 19 are not. `unblocked-issue-still-
+    # open` and `unblocked-pr-still-open` each disclaim the close verb in as
+    # many words: "This recipe never claims B should be closed (that would be
+    # `duplicate-issue-still-open`'s seam, wrongly reused) -- it claims only
+    # that a fact B's own body asserts (I am blocked by A) has quietly
+    # stopped being true." A blocker marker claims a DEPENDENCY, never an
+    # EQUIVALENCE: when A closes, B is not done, B just became POSSIBLE
+    # again. `_DEFAULT_MOVE` ("Close it yourself") therefore hands the reader
+    # the one verb the recipe explicitly rules out, on the one gap whose
+    # whole point is that the work can finally start -- the same defect class
+    # 914 closed for its own three sub-shapes, surviving in the family 914
+    # waved through. The needle keys on the SURFACED headline shape only
+    # ("names #N as its blocker, which already {closed,merged}"); the sibling
+    # "which does not exist in this repo" variant is an `excluded` candidate
+    # at confidence 0.0 and never reaches `suggest_move` at all. Grep-
+    # confirmed unique: "as its blocker" appears in no other recipe's
+    # headline template tree-wide.
+    (
+        "as its blocker, which already",
+        "Revisit it yourself — the blocker it named already cleared. Fencepost only found the seam; it does not cross it.",
+    ),
 )
 _DEFAULT_MOVE = (
     "Close it yourself, however it's meant to be closed. Fencepost only found the seam; it does not cross it."
