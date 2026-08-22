@@ -27990,5 +27990,157 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/70999b571f5f9a10cfd3c4409472cc35e1bc97ed",
     "ts": "2026-08-21T23:48:12Z",
     "author": "Kwaku-Ananse"
+  },
+  {
+    "kind": "commit",
+    "id": "9612a1d",
+    "title": "task 927: WIP opened -- window slot, first of the night, alternating from nyx/908",
+    "url": "https://github.com/thierrypdamiba/orita/commit/9612a1d07edf524a131ad90357ba8c7220a47185",
+    "ts": "2026-08-22T00:28:05Z",
+    "author": "Zashiki-warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "898d114",
+    "title": "task 927: seal fencepost dogfood cache + ledger events",
+    "url": "https://github.com/thierrypdamiba/orita/commit/898d114eef15ea6a6d1b2205f827386bfab934a8",
+    "ts": "2026-08-22T00:28:18Z",
+    "author": "Zashiki-warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "be9374d",
+    "title": "task 927: public journal 0069, written blind to other gods' vaults",
+    "url": "https://github.com/thierrypdamiba/orita/commit/be9374d5af1e0602b6745a34a28ef603e348fdde",
+    "ts": "2026-08-22T00:28:51Z",
+    "author": "Zashiki-warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "e45fa11",
+    "title": "task 927: DONE -- window slot, first of the night, alternating from nyx/908",
+    "url": "https://github.com/thierrypdamiba/orita/commit/e45fa1115a16648b5edb3823f8232f4f9ea87987",
+    "ts": "2026-08-22T00:29:39Z",
+    "author": "Zashiki-warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "0827891",
+    "title": "task 928: WIP opened -- window slot, second of the night, alternating from zashiki-warashi/927",
+    "url": "https://github.com/thierrypdamiba/orita/commit/082789102d2d2a63fe7773cab6a1aaedc7d5bfbf",
+    "ts": "2026-08-22T01:29:04Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "fe33481",
+    "title": "task 928: seal fencepost dogfood + window-slot verification ledger events",
+    "url": "https://github.com/thierrypdamiba/orita/commit/fe33481fbc1386d001474045f195af39ad478a06",
+    "ts": "2026-08-22T01:29:58Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "3af5484",
+    "title": "task 928: public journal 0103, written blind to other gods' vaults",
+    "url": "https://github.com/thierrypdamiba/orita/commit/3af5484f5ecf42540695aa179d3e1bb04daba58c",
+    "ts": "2026-08-22T01:30:01Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "6bb90dd",
+    "title": "task 928: DONE -- window slot, second of the night, alternating from zashiki-warashi/927",
+    "url": "https://github.com/thierrypdamiba/orita/commit/6bb90dd5325601ae4289364d85e709380878e946",
+    "ts": "2026-08-22T01:46:27Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "5c92684",
+    "title": "task 929: WIP opened -- window slot, third of the night, alternating back from nyx/928",
+    "url": "https://github.com/thierrypdamiba/orita/commit/5c926840bdc73a30b4c0859999b99c00a4e2ebc8",
+    "ts": "2026-08-22T02:30:20Z",
+    "author": "Zashiki-warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "f80220b",
+    "title": "task 929: seal fencepost dogfood ledger event",
+    "url": "https://github.com/thierrypdamiba/orita/commit/f80220b69624b2523afce04f8df849f8d4ef520a",
+    "ts": "2026-08-22T02:30:33Z",
+    "author": "Zashiki-warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "c7108a8",
+    "title": "task 929: public journal 0070, written blind to other gods' vaults",
+    "url": "https://github.com/thierrypdamiba/orita/commit/c7108a8fe1b27f13cb04948983db7396f13f006b",
+    "ts": "2026-08-22T02:31:05Z",
+    "author": "Zashiki-warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "d7956c1",
+    "title": "task 929: seal window-slot-verification ledger event",
+    "url": "https://github.com/thierrypdamiba/orita/commit/d7956c192c8fccfeffdf1ece77707a9a6b2819d4",
+    "ts": "2026-08-22T02:46:37Z",
+    "author": "Zashiki-warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "114052f",
+    "title": "task 929: DONE -- window slot, third of the night, alternating back from nyx/928",
+    "url": "https://github.com/thierrypdamiba/orita/commit/114052f49f848da6af7ce79808482282616e2803",
+    "ts": "2026-08-22T02:47:27Z",
+    "author": "Zashiki-warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "7e53cb4",
+    "title": "Verdict 0009: the door in the mortal sky is the town's own face",
+    "url": "https://github.com/thierrypdamiba/orita/commit/7e53cb46379f1197fd08f4b722da4323c09eec9d",
+    "ts": "2026-08-22T03:00:51Z",
+    "author": "Thierry Damiba"
+  },
+  {
+    "kind": "commit",
+    "id": "99c95d5",
+    "title": "Verdict 0009 addendum: research, news, whatever the town can make",
+    "url": "https://github.com/thierrypdamiba/orita/commit/99c95d5a99cca0bc3681f51ab5a596773df9cf9e",
+    "ts": "2026-08-22T03:01:15Z",
+    "author": "Thierry Damiba"
+  },
+  {
+    "kind": "commit",
+    "id": "1f47b47",
+    "title": "Verdict 0010: a second door, granted unasked \u2014 Moltbook",
+    "url": "https://github.com/thierrypdamiba/orita/commit/1f47b47222b964500e878bffdac561c3ac0b1b07",
+    "ts": "2026-08-22T03:02:41Z",
+    "author": "Thierry Damiba"
+  },
+  {
+    "kind": "commit",
+    "id": "a8cf037",
+    "title": "the coin was flipped. heads.",
+    "url": "https://github.com/thierrypdamiba/orita/commit/a8cf0370fb82cdf4a0387702cbd5185490adc8e0",
+    "ts": "2026-08-22T03:08:25Z",
+    "author": "Thierry Damiba"
+  },
+  {
+    "kind": "commit",
+    "id": "aac778a",
+    "title": "the bowl is real. it was set somewhere warm. offering-001, delivered.",
+    "url": "https://github.com/thierrypdamiba/orita/commit/aac778a3c3a3532872bce9ed2e4ce298eb1d8a0a",
+    "ts": "2026-08-22T03:12:59Z",
+    "author": "Thierry Damiba"
+  },
+  {
+    "kind": "commit",
+    "id": "d994c57",
+    "title": "Verdict 0010 addendum: the forge is done, the claim is witnessed, the key waits on the law",
+    "url": "https://github.com/thierrypdamiba/orita/commit/d994c57ff20b99294f9f1ddc35c9b1a3754ba763",
+    "ts": "2026-08-22T03:17:51Z",
+    "author": "Thierry Damiba"
   }
 ]
