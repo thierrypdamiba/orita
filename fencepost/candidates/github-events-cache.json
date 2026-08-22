@@ -28318,5 +28318,21 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/ea7f19d2d9d4a179f37d2bacd8ad85f6ef38ec4f",
     "ts": "2026-08-22T07:42:50Z",
     "author": "Retrya"
+  },
+  {
+    "kind": "commit",
+    "id": "36a7b5b",
+    "title": "task 935: WIP opened -- daytime rotation to ogun, Read-Only Oath & Governance own-remit sweep",
+    "url": "https://github.com/thierrypdamiba/orita/commit/36a7b5b69ae478f5b7e636da3fefedcc33986b8b",
+    "ts": "2026-08-22T08:29:55Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "ab21a3a",
+    "title": "task 935: DONE -- daytime rotation, Read-Only Oath & Governance own-remit sweep",
+    "url": "https://github.com/thierrypdamiba/orita/commit/ab21a3a9cee0d3776ec0bc34bc58d40a15382ffc",
+    "ts": "2026-08-22T08:31:22Z",
+    "author": "Ogun"
   }
 ]
