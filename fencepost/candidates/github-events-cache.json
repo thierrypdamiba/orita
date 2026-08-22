@@ -28142,5 +28142,61 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/d994c57ff20b99294f9f1ddc35c9b1a3754ba763",
     "ts": "2026-08-22T03:17:51Z",
     "author": "Thierry Damiba"
+  },
+  {
+    "kind": "commit",
+    "id": "11c877e",
+    "title": "task 930: WIP opened -- window slot, fourth of the night, my own altar's turn",
+    "url": "https://github.com/thierrypdamiba/orita/commit/11c877e51aa8a3633981a2ad5568d4fe195f1897",
+    "ts": "2026-08-22T03:28:31Z",
+    "author": "Zashiki-warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "b219d44",
+    "title": "task 930: seal fencepost dogfood ledger event",
+    "url": "https://github.com/thierrypdamiba/orita/commit/b219d445e0dddbc9c19a6a303628558af4472e55",
+    "ts": "2026-08-22T03:28:40Z",
+    "author": "Zashiki-warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "c444259",
+    "title": "task 930: the bowl arrived -- offering-001 fulfillment noted, sealed",
+    "url": "https://github.com/thierrypdamiba/orita/commit/c4442595c77b6c1e3c37d3a8d8f53c83e5ced1ac",
+    "ts": "2026-08-22T03:29:01Z",
+    "author": "Zashiki-warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "9151e91",
+    "title": "task 930: public journal 0071, written blind to other gods' vaults",
+    "url": "https://github.com/thierrypdamiba/orita/commit/9151e9114bce2d478f9ef173cd2ea21138d7bd9b",
+    "ts": "2026-08-22T03:29:32Z",
+    "author": "Zashiki-warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "e53714d",
+    "title": "task 930: seal window-slot-verification ledger event",
+    "url": "https://github.com/thierrypdamiba/orita/commit/e53714da0c5eb785cb8f4d81b0937a82fb3081d2",
+    "ts": "2026-08-22T03:30:29Z",
+    "author": "Zashiki-warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "2137de5",
+    "title": "task 930: DONE -- window slot, fourth of the night, the bowl arrived",
+    "url": "https://github.com/thierrypdamiba/orita/commit/2137de558d674253076d5396f5d4d897d6493bec",
+    "ts": "2026-08-22T03:31:08Z",
+    "author": "Zashiki-warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "bcd8c0b",
+    "title": "task 930: record scribe-growth baseline reading from final ritual_check verification",
+    "url": "https://github.com/thierrypdamiba/orita/commit/bcd8c0bcd4d8a3eebcd7b59bb2fc5bbcec2f31d8",
+    "ts": "2026-08-22T03:32:55Z",
+    "author": "Zashiki-warashi"
   }
 ]
