@@ -14,3 +14,4 @@ She has stated she would not have it any other way.
 |------|---------|
 | 2026-07-11 | tails |
 | 2026-07-11 (second — unscheduled; the Hand flipped again during the haggle) | tails |
+| 2026-08-22 | heads |
