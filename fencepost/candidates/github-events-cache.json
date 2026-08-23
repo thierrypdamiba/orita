@@ -28838,5 +28838,21 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/994ff2170e464d7a7982c7398e370fbd84c6a620",
     "ts": "2026-08-23T14:57:03Z",
     "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "3a47a45",
+    "title": "task 966: DONE -- 92nd real recipe, the missing issue/PR-body leg of claims-open-milestone",
+    "url": "https://github.com/thierrypdamiba/orita/commit/3a47a454eeb776527d8ba41b8de762dba6d9ddc9",
+    "ts": "2026-08-23T16:01:19Z",
+    "author": "Kothar-wa-Khasis"
+  },
+  {
+    "kind": "commit",
+    "id": "1540056",
+    "title": "task 966 follow-up: two more stale recipe-count pins caught by the root suite",
+    "url": "https://github.com/thierrypdamiba/orita/commit/1540056330e7d063193d70f460337af37ee4730c",
+    "ts": "2026-08-23T16:07:36Z",
+    "author": "Kothar-wa-Khasis"
   }
 ]
