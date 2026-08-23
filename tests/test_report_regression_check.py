@@ -9,6 +9,7 @@ with nothing in AUDIT.md or BUILDLOG.md explaining them.
 import importlib.util
 import os
 import sys
+import tempfile
 import unittest
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -119,6 +120,76 @@ class ReadReportCountsCase(unittest.TestCase):
         an unexplained lower count fails this exact assertion."""
         result = src.compute_report_regression(src.read_report_counts())
         self.assertTrue(result["clean"], result.get("reason"))
+
+
+def _sentence(count):
+    return f"{count} milestone commit(s) since 2026-07-12 (matching ['fencepost', 'flagship', 'strategy']), none echoed in a post."
+
+
+class PrecheckSealCase(unittest.TestCase):
+    """Task 964. 2026-08-23's real incident: the hourly hand-dogfood
+    ritual sealed that day's first entry at 250 (override-sourced), a
+    real regression from 2026-08-22's sealed 272, six minutes before
+    `seam-scan.yml`'s automatic cron overwrote it with the authoritative
+    273. `compute_report_regression` caught it in CI -- but only after it
+    was already committed. `precheck_seal` is the check moved BEFORE the
+    write, on a candidate that isn't on disk yet."""
+
+    def _fixture_dir(self, dated_texts):
+        d = tempfile.TemporaryDirectory()
+        for date, count in dated_texts:
+            with open(os.path.join(d.name, f"{date}.md"), "w", encoding="utf-8") as f:
+                f.write(_sentence(count))
+        return d
+
+    def test_new_day_lower_than_prior_sealed_day_is_flagged(self):
+        with self._fixture_dir([("2026-08-21", 260), ("2026-08-22", 272)]) as reports_dir:
+            result = src.precheck_seal(_sentence(250), "2026-08-23", reports_dir=reports_dir)
+        self.assertFalse(result["clean"])
+        self.assertEqual(result["regressions"][0]["from_date"], "2026-08-22")
+        self.assertEqual(result["regressions"][0]["to_date"], "2026-08-23")
+        self.assertEqual(result["regressions"][0]["from_count"], 272)
+        self.assertEqual(result["regressions"][0]["to_count"], 250)
+
+    def test_new_day_at_or_above_prior_sealed_day_is_clean(self):
+        with self._fixture_dir([("2026-08-21", 260), ("2026-08-22", 272)]) as reports_dir:
+            result = src.precheck_seal(_sentence(273), "2026-08-23", reports_dir=reports_dir)
+        self.assertTrue(result["clean"])
+
+    def test_reseal_of_an_already_sealed_day_compares_against_the_day_before_it_not_itself(self):
+        """An intra-day reseal (candidate_date already has a file on disk)
+        must replace that day's own entry, not double-count it against
+        itself -- the candidate is judged against the PRIOR day only."""
+        with self._fixture_dir([("2026-08-22", 272), ("2026-08-23", 250)]) as reports_dir:
+            result = src.precheck_seal(_sentence(273), "2026-08-23", reports_dir=reports_dir)
+        self.assertTrue(result["clean"])
+
+    def test_seeded_exception_pair_still_passes_through_precheck(self):
+        with self._fixture_dir([("2026-07-12", 13)]) as reports_dir:
+            result = src.precheck_seal(_sentence(11), "2026-07-13", reports_dir=reports_dir)
+        self.assertTrue(result["clean"])
+
+    def test_candidate_with_no_milestone_sentence_is_clean(self):
+        with self._fixture_dir([("2026-08-22", 272)]) as reports_dir:
+            result = src.precheck_seal(
+                "A different gap today, nothing to compare.", "2026-08-23", reports_dir=reports_dir
+            )
+        self.assertTrue(result["clean"])
+        self.assertNotIn("regressions", result)
+
+    def test_first_ever_report_has_nothing_to_regress_against(self):
+        with self._fixture_dir([]) as reports_dir:
+            result = src.precheck_seal(_sentence(1), "2026-07-12", reports_dir=reports_dir)
+        self.assertTrue(result["clean"])
+
+    def test_real_live_reports_dir_would_have_flagged_the_2026_08_23_incident(self):
+        """Not a fixture -- runs `precheck_seal` against this checkout's
+        own real `fencepost/REPORTS/` history with the actual candidate
+        text 2026-08-23's transient bad seal used, proving this would have
+        refused the write live, not just in a synthetic fixture."""
+        result = src.precheck_seal(_sentence(250), "2026-08-23")
+        self.assertFalse(result["clean"])
+        self.assertEqual(result["regressions"][0]["to_count"], 250)
 
 
 if __name__ == "__main__":

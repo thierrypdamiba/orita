@@ -138,8 +138,69 @@ def compute_report_regression(
     }
 
 
+def precheck_seal(
+    candidate_text: str,
+    candidate_date: str,
+    reports_dir: str = DEFAULT_REPORTS_DIR,
+    seeded_exceptions: frozenset[tuple[str, str]] = SEEDED_EXCEPTIONS,
+) -> dict[str, object]:
+    """Task 964. Off-By-One closes the one gap `compute_report_regression`
+    could only ever catch AFTER the fact: every regression this module has
+    ever explained -- the two seeded exceptions above, and the 2026-08-23
+    incident this function exists to stop recurring -- reached disk before
+    anything re-read `fencepost/REPORTS/` to notice. `read_report_counts`/
+    `compute_report_regression` are a smoke detector, sound only once the
+    room already burned; this is the hand on the stove, meant to be called
+    BEFORE `seam_engine.report --write` (or the ledger seal that precedes
+    it) commits a number to disk at all.
+
+    2026-08-23's own incident: the hourly hand-dogfood ritual sealed that
+    day's FIRST entry using `github_events_source: "override"` (this
+    sandbox's own accumulated `github-events-cache.json`, always a subset
+    of the real history -- `report_accuracy_check.py`'s own docstring
+    names this exact gap) at 250 -- a real regression from 2026-08-22's
+    sealed 272 -- six minutes before `seam-scan.yml`'s noon-UTC automatic
+    cron overwrote it for real with the authoritative direct-sourced 273
+    (272 -> 273, no regression). `compute_report_regression` caught the
+    transient 250 in CI exactly as designed (`dawn-run` failed on both
+    commits sealed in between), but only after it was already committed
+    and pushed; nothing had stopped it from being written in the first
+    place, and `seam_engine.report.main`'s own `--write` path carries no
+    such guard.
+
+    Takes the CANDIDATE report text about to be written for
+    `candidate_date` (not yet on disk) and asks: folded into every report
+    already sealed under `reports_dir`, does the resulting sequence
+    introduce an unseeded regression? Reuses `read_report_counts`/
+    `compute_report_regression` verbatim -- no new regex,
+    `duplicate_regex_check.py`'s own doctrine intact -- by building the
+    same `(date, count)` list a live seal would produce, with the
+    candidate replacing any already-sealed entry for the same date (an
+    intra-day reseal) or taking its place in order (a new day).
+    `report_accuracy_check.extract_milestone_count` returning `None` (the
+    candidate names a different gap, not `milestone-unannounced`) reads
+    clean -- nothing to compare, the same discipline
+    `compute_report_regression` already holds for a quiet day."""
+    count = report_accuracy_check.extract_milestone_count(candidate_text)
+    if count is None:
+        return {
+            "clean": True,
+            "reason": "candidate report names no milestone-commit sentence -- nothing to compare",
+        }
+    counts = [(d, c) for d, c in read_report_counts(reports_dir) if d != candidate_date]
+    counts.append((candidate_date, count))
+    counts.sort()
+    return compute_report_regression(counts, seeded_exceptions=seeded_exceptions)
+
+
 if __name__ == "__main__":
     argv = sys.argv[1:]
+    if len(argv) >= 3 and argv[0] == "precheck":
+        candidate_path, candidate_date = argv[1], argv[2]
+        text = sys.stdin.read() if candidate_path == "-" else open(candidate_path, encoding="utf-8").read()
+        result = precheck_seal(text, candidate_date)
+        print(result["reason"])
+        sys.exit(0 if result["clean"] else 1)
     if len(argv) < 1 or argv[0] != "check":
         print(__doc__)
         sys.exit(1)
