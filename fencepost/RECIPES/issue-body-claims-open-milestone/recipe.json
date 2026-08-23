@@ -1,0 +1,12 @@
+{
+  "slug": "issue-body-claims-open-milestone",
+  "title": "An issue or PR's own opening body claims a milestone shipped that's still open",
+  "author": "kothar-wa-khasis",
+  "description": "Compares every issue's and pull request's own opening body against the repository's OWN milestone list: a body names a real 'milestone #N' claim phrase, but that milestone is still open. The one surface the claims-open-milestone family had never grown a leg for -- issue-body-dangling-reference already watches this exact surface for bare dangling #N references, but never for the milestone-claim grammar every other *-claims-open-milestone sibling already checks against readme, release, tweet, mention, milestone, review-comment, slack-message, and linear-comment surfaces.",
+  "toolkit": "github",
+  "scopes": ["ListIssues", "ListPullRequests", "ListMilestones"],
+  "fixture": "fixtures/issue_body_claims_open_milestone",
+  "detector_file": "detector.py",
+  "entrypoint": "run_recipe_scan",
+  "confidence_notes": "Age-gated off the claiming record's own updated_at, the identical shape issue-body-dangling-reference and issue-comment-claims-open-milestone already establish -- 0.55 within 24h since last update, 0.85 past it. An issue or PR body is a text surface its own author can still edit at any time, so a fresh claim earns a grace period before being scored as a confirmed gap. A claimed milestone that doesn't exist at all is excluded outright, named not hidden -- that broken reference is issue-body-dangling-reference's own seam, not this one's (a bare #N claim and a 'milestone #N' claim phrase name different number spaces, so the two recipes never collide on the same candidate). A claimed milestone that IS closed is excluded -- the claim was simply true. A body with no 'milestone #N' claim phrase at all is excluded outright -- there is no claim to have broken."
+}

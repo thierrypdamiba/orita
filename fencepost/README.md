@@ -1695,6 +1695,31 @@ the same shape `locked-resolved-issue-still-open` established for this
 surface. Toolkit stays `github`-only, so the total recipe count climbs
 while the plus-joined count does not (28 of 90 → 28 of 91).
 
+[`RECIPES/issue-body-claims-open-milestone/`](RECIPES/issue-body-claims-open-milestone/)
+is the ninety-second (ROADMAP.md #966), and the one leg the claims-open-
+milestone family had never grown: an issue or pull request's own OPENING
+BODY. `readme-claims-open-milestone`, `release-claims-open-milestone`,
+`tweet-claims-open-milestone`, `mention-claims-open-milestone`,
+`milestone-claims-open-milestone`, `review-comment-claims-open-milestone`,
+`slack-message-claims-open-milestone`, and `linear-comment-claims-open-
+milestone` all already check the identical "milestone #N" claim grammar
+against eight other text surfaces; [`RECIPES/issue-body-dangling-
+reference/`](RECIPES/issue-body-dangling-reference/) (the twenty-fourth)
+already proved an issue/PR's own body is the single most common place a
+stray `#N` gets typed in this town's own history, but only for the
+dangling-reference leg — never for the milestone-claim one. This recipe
+closes it: a body claiming "milestone #N shipped" is checked against the
+milestone tracker's own real state, excluding a claim about a milestone
+that doesn't exist at all (that's `issue-body-dangling-reference`'s own
+seam, not this one's — a bare `#N` and a `milestone #N` claim phrase name
+different number spaces) or one that's already closed (the claim was
+simply true). `ListIssues`, `ListPullRequests`, and `ListMilestones` were
+all already cleared on `SCOPES.md`'s oath table — no new scope asked for
+anywhere in this recipe, and unlike `issue-comment-claims-open-milestone`'s
+own honest WIP marker, both list tools are real and live on the-hand
+gateway today; `"source": "fixture"` here is only CONTRIBUTING.md's MOCK
+ONLY law, not an availability gap.
+
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)
 (ROADMAP.md #111) is that second promise, kept: it runs `scan.py`'s own

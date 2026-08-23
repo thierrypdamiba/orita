@@ -1,0 +1,26 @@
+[
+  {
+    "number": 52,
+    "title": "Site refresh follow-up",
+    "state": "open",
+    "body": "Closes out milestone #6302 and also -- again -- milestone #6302 for good measure.",
+    "updated_at": "2026-08-22T09:30:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/pull/52"
+  },
+  {
+    "number": 53,
+    "title": "Ship the recipe-stocking sweep",
+    "state": "open",
+    "body": "This PR finishes milestone #6303 as well.",
+    "updated_at": "2026-08-23T12:30:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/pull/53"
+  },
+  {
+    "number": 55,
+    "title": "Cross-link cleanup",
+    "state": "open",
+    "body": "Related to milestone #6998 too.",
+    "updated_at": "2026-08-23T09:30:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/pull/55"
+  }
+]

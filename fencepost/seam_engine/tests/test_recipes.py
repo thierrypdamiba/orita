@@ -665,7 +665,7 @@ _CARDINAL_WORDS = {
     "seventy-nine": 79, "eighty": 80, "eighty-one": 81, "eighty-two": 82,
     "eighty-three": 83, "eighty-four": 84, "eighty-five": 85, "eighty-six": 86,
     "eighty-seven": 87, "eighty-eight": 88, "eighty-nine": 89, "ninety": 90,
-    "ninety-one": 91,
+    "ninety-one": 91, "ninety-two": 92,
 }
 
 _PLUS_JOINED_CLAIM_RE = re.compile(
@@ -717,17 +717,17 @@ def test_plus_joined_claim_missing_sentence_raises():
         claimed_plus_joined_counts("Nothing here about plus-joined toolkits.")
 
 
-def test_real_plus_joined_counts_are_currently_twenty_eight_of_ninety_one():
-    # Regression pin: today's real, live counts under RECIPES/. Was (28, 90)
-    # until locked-resolved-pr-still-open merged (the ninety-first
+def test_real_plus_joined_counts_are_currently_twenty_eight_of_ninety_two():
+    # Regression pin: today's real, live counts under RECIPES/. Was (28, 91)
+    # until issue-body-claims-open-milestone merged (the ninety-second
     # real recipe, toolkit "github" only -- NOT plus-joined, so only the
-    # total climbs this time: 28 of 91.
+    # total climbs this time: 28 of 92.
     # `real_plus_joined_counts` counts every recipe whose OWN toolkit
     # string contains "+" -- not distinct toolkit-pair strings. Verified
     # against the live tree, not assumed from a prior task's own note:
     # every one of today's plus-joined recipes was grepped by hand before
     # pinning this number.
-    assert real_plus_joined_counts(FENCEPOST_ROOT) == (28, 91)
+    assert real_plus_joined_counts(FENCEPOST_ROOT) == (28, 92)
 
 
 def test_oath_scopes_for_toolkit_docstring_matches_the_real_live_counts():

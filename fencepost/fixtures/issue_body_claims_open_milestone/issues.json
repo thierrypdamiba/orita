@@ -1,0 +1,50 @@
+[
+  {
+    "number": 70,
+    "title": "Wire the seam scan to the live cache",
+    "state": "open",
+    "body": "This also ships milestone #6301 while we're in here.",
+    "updated_at": "2026-08-21T15:30:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/issues/70"
+  },
+  {
+    "number": 71,
+    "title": "Refresh the static pages template",
+    "state": "open",
+    "body": "Already covered by milestone #6302, so closing this out.",
+    "updated_at": "2026-08-23T05:30:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/issues/71"
+  },
+  {
+    "number": 72,
+    "title": "Old tracker cleanup",
+    "state": "open",
+    "body": "Related to milestone #6999 from the old tracker.",
+    "updated_at": "2026-08-23T10:30:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/issues/72"
+  },
+  {
+    "number": 73,
+    "title": "Follow-up on the dangling-reference sweep",
+    "state": "open",
+    "body": "See #5 for context, same root cause.",
+    "updated_at": "2026-08-23T14:30:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/issues/73"
+  },
+  {
+    "number": 74,
+    "title": "Blank body, filed from the mobile app",
+    "state": "open",
+    "body": "",
+    "updated_at": "2026-08-23T14:30:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/issues/74"
+  },
+  {
+    "number": 75,
+    "title": "Second opinion on the v0.2 bridge",
+    "state": "open",
+    "body": "I think this finishes milestone #6301 too.",
+    "updated_at": "2026-08-23T13:30:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/issues/75"
+  }
+]

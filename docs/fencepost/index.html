@@ -70,7 +70,7 @@
     reviewed and merged like any PR. The read-only oath does not loosen for outside code:
     <a href="https://github.com/thierrypdamiba/orita/blob/main/fencepost/CONTRIBUTING.md">CONTRIBUTING.md</a>
     is the schema in prose, enforced in code before a human reviewer ever reads a stranger's
-    detector. Ninety-one real recipes stand today:</p>
+    detector. Ninety-two real recipes stand today:</p>
     <p><b><a href="https://github.com/thierrypdamiba/orita/tree/main/fencepost/RECIPES/example-release-vs-changelog">example-release-vs-changelog</a></b>
     — the reference: proof a first external recipe PR is mergeable at all.<br>
     <b><a href="https://github.com/thierrypdamiba/orita/tree/main/fencepost/RECIPES/merged-pr-issue-still-open">merged-pr-issue-still-open</a></b>
@@ -886,6 +886,24 @@
     (<code>ListPullRequests</code>, <code>GetPullRequest</code>) already sat on <code>SCOPES.md</code>'s cleared
     oath table — no new door opened; toolkit stays <code>github</code>-only, so the total recipe count climbs
     while the plus-joined count does not (28 of 90 → 28 of 91).</p>
+    <p><b><a href="https://github.com/thierrypdamiba/orita/tree/main/fencepost/RECIPES/issue-body-claims-open-milestone">issue-body-claims-open-milestone</a></b>
+    — the ninety-second (ROADMAP.md #966): the one leg the claims-open-milestone family had
+    never grown. <code>readme-claims-open-milestone</code>, <code>release-claims-open-milestone</code>,
+    <code>tweet-claims-open-milestone</code>, <code>mention-claims-open-milestone</code>,
+    <code>milestone-claims-open-milestone</code>, <code>review-comment-claims-open-milestone</code>,
+    <code>slack-message-claims-open-milestone</code>, and <code>linear-comment-claims-open-milestone</code>
+    all already check the identical "milestone #N" claim grammar against eight other text surfaces;
+    <code>issue-body-dangling-reference</code> (the twenty-fourth) already proved an issue or PR's own
+    opening body is the single most common place a stray <code>#N</code> gets typed in this town's own
+    history, but only for the dangling-reference leg, never the milestone-claim one. This recipe closes
+    it: a body claiming "milestone #N shipped" is checked against the milestone tracker's own real state,
+    excluding a claim about a milestone that doesn't exist at all (that's <code>issue-body-dangling-
+    reference</code>'s own seam, not this one's — a bare <code>#N</code> and a "milestone #N" claim
+    phrase name different number spaces) or one that's already closed (the claim was simply true).
+    <code>ListIssues</code>, <code>ListPullRequests</code>, and <code>ListMilestones</code> were all
+    already cleared on <code>SCOPES.md</code>'s oath table — no new scope asked for anywhere in this
+    recipe, and both list tools are real and live on the-hand gateway today; <code>"source": "fixture"</code>
+    here is only CONTRIBUTING.md's MOCK ONLY law, not an availability gap.</p>
     <p>Merging a recipe is one promise; letting it actually compete for the daily primary gap
     is another. <a href="https://github.com/thierrypdamiba/orita/blob/main/fencepost/seam_engine/src/seam_engine/combined_scan.py"><code>combined_scan.py</code></a>
     keeps the second: it pools a recipe's own candidates with <code>scan.py</code>'s, and ranks

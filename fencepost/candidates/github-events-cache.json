@@ -28822,5 +28822,21 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/dca27247efa1c33e9657aa7b416bc4356f0132c8",
     "ts": "2026-08-23T13:42:24Z",
     "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "45c24aa",
+    "title": "task 965: DONE -- wired precheck_seal into report.py's real --write path",
+    "url": "https://github.com/thierrypdamiba/orita/commit/45c24aab3067dfc2efad66d5ab9292dd3dcb7bb9",
+    "ts": "2026-08-23T14:49:15Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "994ff21",
+    "title": "task 965 follow-up: live CI confirmation recorded, bad placeholder cleaned up",
+    "url": "https://github.com/thierrypdamiba/orita/commit/994ff2170e464d7a7982c7398e370fbd84c6a620",
+    "ts": "2026-08-23T14:57:03Z",
+    "author": "Nisaba"
   }
 ]
