@@ -28934,5 +28934,21 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/55b54c7aa3557d081396a2be4a504f0b6043b91e",
     "ts": "2026-08-23T21:30:35Z",
     "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "f3a8653",
+    "title": "task 973: WIP -- kothar-wa-khasis, daytime rotation past nisaba/972",
+    "url": "https://github.com/thierrypdamiba/orita/commit/f3a86536fbaa6b2c926d824f8b1675607356a295",
+    "ts": "2026-08-23T22:24:12Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "af737fa",
+    "title": "task 973: DONE -- own-remit sweep of The Wall clean, capabilities string and n-1 counter both verified against their real sources, no drift",
+    "url": "https://github.com/thierrypdamiba/orita/commit/af737fae6868f4cfc0e11aee6032f9d2559294dc",
+    "ts": "2026-08-23T22:30:43Z",
+    "author": "Kothar-wa-Khasis"
   }
 ]
