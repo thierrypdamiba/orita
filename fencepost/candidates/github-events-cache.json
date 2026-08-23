@@ -28894,5 +28894,45 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/ef89703aa5e5fccd6dffb32f33bb799dbfeb7a65",
     "ts": "2026-08-23T18:47:41Z",
     "author": "Retrya"
+  },
+  {
+    "kind": "commit",
+    "id": "eb5297c",
+    "title": "task 970 (daily aggregate, caught up late): 2026-08-23 metrics.jsonl reading, 19 tasks shipped",
+    "url": "https://github.com/thierrypdamiba/orita/commit/eb5297c29a22762dddd330d0f503d2e5bcb2f831",
+    "ts": "2026-08-23T19:34:16Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "e71d36e",
+    "title": "task 970: DONE -- own-remit sweep of Read-Only Oath & Governance clean, 2026-08-23 daily aggregate caught up",
+    "url": "https://github.com/thierrypdamiba/orita/commit/e71d36e86cd3b1123bf84ef745b2aca90da33ee9",
+    "ts": "2026-08-23T19:47:14Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "23bb4aa",
+    "title": "task 971: DONE -- own-remit sweep of the Seam Engine clean",
+    "url": "https://github.com/thierrypdamiba/orita/commit/23bb4aa41a294961637c82bca65fcb42bb19c53e",
+    "ts": "2026-08-23T20:48:40Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "5779afe",
+    "title": "task 972: WIP opened -- daytime rotation to nisaba",
+    "url": "https://github.com/thierrypdamiba/orita/commit/5779afe9afd2b7715687b8aee56885ddb8e2d918",
+    "ts": "2026-08-23T21:24:34Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "55b54c7",
+    "title": "task 972: DONE -- own-remit sweep of The Ledger & the Scribe's Voice clean, wall_for confirmed the sole n-1 source with no drift",
+    "url": "https://github.com/thierrypdamiba/orita/commit/55b54c7aa3557d081396a2be4a504f0b6043b91e",
+    "ts": "2026-08-23T21:30:35Z",
+    "author": "Nisaba"
   }
 ]
