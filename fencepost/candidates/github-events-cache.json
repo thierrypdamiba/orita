@@ -28574,5 +28574,37 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/8f349a85e756b7eb9d009dcd910ed5efb58cf1e1",
     "ts": "2026-08-22T22:37:44Z",
     "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "99939aa",
+    "title": "task 950: WIP opened -- daytime rotation to ogun, own-remit sweep of Read-Only Oath & Governance",
+    "url": "https://github.com/thierrypdamiba/orita/commit/99939aa508e1f300cbab59588f7d6f442b13fa12",
+    "ts": "2026-08-22T23:29:10Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "c6a97b0",
+    "title": "task 950: DONE -- the oath checked cold, not leaned on",
+    "url": "https://github.com/thierrypdamiba/orita/commit/c6a97b0b63b2aacbce5233629bd4c596b07d077a",
+    "ts": "2026-08-22T23:30:17Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "d22b161",
+    "title": "task 950: ledger sealed 2309->2311 (fencepost-dogfood, read-only-oath-remit-sweep)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/d22b16185afcb155527290f4b20c5c5ca83afe66",
+    "ts": "2026-08-22T23:30:23Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "9c56a0a",
+    "title": "ritual: post-push scribe-growth baseline + X outage recheck recorded (task 950 hour)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/9c56a0a43a00c5029d074937bbc0626a90ab1492",
+    "ts": "2026-08-22T23:31:59Z",
+    "author": "Nisaba"
   }
 ]
