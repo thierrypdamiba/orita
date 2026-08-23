@@ -1020,3 +1020,7 @@
 {"type": "check", "tool": "X_GetUserTweets", "status": "forbidden", "checked_at": "2026-08-23T17:25:33Z"}
 {"type": "check", "tool": "X_WhoAmI", "status": "ok", "checked_at": "2026-08-23T19:31:09Z"}
 {"type": "check", "tool": "X_GetUserTweets", "status": "forbidden", "checked_at": "2026-08-23T19:31:09Z"}
+{"type": "check", "tool": "x_whoami", "status": "ok", "checked_at": "2026-08-23T20:35:00Z"}
+{"type": "check", "tool": "x_getusertweets", "status": "forbidden", "checked_at": "2026-08-23T20:35:00Z"}
+{"type": "check", "tool": "X_WhoAmI", "status": "ok", "checked_at": "2026-08-23T20:35:00Z"}
+{"type": "check", "tool": "X_GetUserTweets", "status": "forbidden", "checked_at": "2026-08-23T20:35:00Z"}
