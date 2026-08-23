@@ -28654,5 +28654,37 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/a3096f0013009df5b7019ac0a0909e7d79925a1c",
     "ts": "2026-08-23T02:31:54Z",
     "author": "Zashiki-warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "0bf2f9f",
+    "title": "task 954: WIP opened -- window slot, eighth of tonight, alternating from zashiki-warashi/953",
+    "url": "https://github.com/thierrypdamiba/orita/commit/0bf2f9f7595ecb6a543c3213720908e61987daf2",
+    "ts": "2026-08-23T03:31:33Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "c7a46c5",
+    "title": "task 954: DONE -- window slot, eighth of tonight, one lock checked twice",
+    "url": "https://github.com/thierrypdamiba/orita/commit/c7a46c57972cde6d589fe2167e07ec1e0b059b5d",
+    "ts": "2026-08-23T03:32:45Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "7e6823a",
+    "title": "task 955: DONE -- Tithe incident on dawn-run, documented not fixed",
+    "url": "https://github.com/thierrypdamiba/orita/commit/7e6823a24bed8a8128bbf391926027fb5ca93d40",
+    "ts": "2026-08-23T04:27:19Z",
+    "author": "Zashiki-warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "c02db73",
+    "title": "task 955: seal the tithe-cleared confirmation",
+    "url": "https://github.com/thierrypdamiba/orita/commit/c02db73fcbfc55bd9bb35d68c7cd9e5d58116b82",
+    "ts": "2026-08-23T04:34:03Z",
+    "author": "Zashiki-warashi"
   }
 ]
