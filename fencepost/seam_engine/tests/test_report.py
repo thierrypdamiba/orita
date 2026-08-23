@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import ast
 import inspect
+import json
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -25,7 +26,15 @@ from seam_engine import ledger, report
 # report.py's only real, already-audited local dependencies (their own modules
 # are pure-local file I/O, no network, no credential -- ledger.py/streak.py/
 # wall.py never import anything outside this same allow-list either).
-_ALLOWED_LOCAL_IMPORTS = frozenset({"seam_engine", "seam_engine.ledger", "seam_engine.streak", "seam_engine.wall"})
+# Task 965 adds `report_regression_check` (repo-root tools/, imported via a
+# local sys.path insert inside main()'s `--write` branch, not module scope):
+# it and its own single import (`report_accuracy_check`) are the same pure,
+# offline, file-reading kind -- no network, no credential, no subprocess --
+# wired in so a regressive candidate can be refused BEFORE it reaches disk,
+# not just caught after the fact.
+_ALLOWED_LOCAL_IMPORTS = frozenset(
+    {"seam_engine", "seam_engine.ledger", "seam_engine.streak", "seam_engine.wall", "report_regression_check"}
+)
 
 # Anything reaching a credential, the network, a subprocess, or an Arcade/MCP
 # tool call would be a violation of the claim -- named here once, checked
@@ -1165,6 +1174,67 @@ def test_no_recipe_gap_is_handed_a_calendar_or_reminder_move():
     assert checked_calendar_exception, (
         "expected milestone-deadline-no-calendar-event's own real fixture gap to be checked"
     )
+
+
+def _sealed_json(tmp_path: Path, *, date: str, count: int) -> Path:
+    sealed_path = tmp_path / f"sealed-{date}.json"
+    sealed_path.write_text(
+        json.dumps(
+            {
+                "date": date,
+                "repo": "x/orita",
+                "primary_gap": {
+                    "slug": "milestone-unannounced",
+                    "headline": "Milestone-level work shipped but never reached the sky",
+                    "detail": f"{count} milestone commit(s) since 2026-07-01 (matching ['fencepost']), none echoed in a post.",
+                    "confidence": 0.85,
+                    "evidence": ["https://github.com/x/orita/commit/0000001"],
+                },
+                "fenceposts_recorded_total": 0,
+            }
+        )
+    )
+    return sealed_path
+
+
+def test_main_write_refuses_a_regressive_candidate_and_leaves_no_file_on_disk(tmp_path: Path, capsys):
+    # Task 965: wires tools/report_regression_check.py's precheck_seal (task
+    # 964) into main()'s own `--write` branch -- the one place seam-scan.yml's
+    # real cron writes a report to disk, which 964 diagnosed but never
+    # actually guarded (precheck_seal existed only as a separate, hand-run
+    # CLI mode nothing called automatically). Proves the wiring end to end
+    # through `main()` itself, not just the standalone function task 964
+    # already covered in tests/test_report_regression_check.py.
+    reports_dir = tmp_path / "REPORTS"
+    reports_dir.mkdir()
+    (reports_dir / "2026-09-01.md").write_text(
+        "# Fencepost Report — 2026-09-01\n\n"
+        "10 milestone commit(s) since 2026-07-01 (matching ['fencepost']), none echoed in a post.\n"
+    )
+
+    sealed_path = _sealed_json(tmp_path, date="2026-09-02", count=5)
+    rc = report.main([str(sealed_path), "--out-base", str(tmp_path), "--write"])
+
+    assert rc == 1
+    assert "refusing to write" in capsys.readouterr().err
+    assert not (reports_dir / "2026-09-02.md").exists()
+
+
+def test_main_write_still_writes_a_non_regressive_candidate(tmp_path: Path, capsys):
+    reports_dir = tmp_path / "REPORTS"
+    reports_dir.mkdir()
+    (reports_dir / "2026-09-01.md").write_text(
+        "# Fencepost Report — 2026-09-01\n\n"
+        "5 milestone commit(s) since 2026-07-01 (matching ['fencepost']), none echoed in a post.\n"
+    )
+
+    sealed_path = _sealed_json(tmp_path, date="2026-09-02", count=10)
+    rc = report.main([str(sealed_path), "--out-base", str(tmp_path), "--write"])
+
+    assert rc == 0
+    written = reports_dir / "2026-09-02.md"
+    assert written.exists()
+    assert "10 milestone commit(s) since" in written.read_text()
 
 
 def test_your_move_line_reads_correctly_from_a_live_ledger(tmp_path: Path):

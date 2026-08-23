@@ -793,6 +793,27 @@ def main(argv: list[str] | None = None) -> int:
 
     if write:
         d = reports_dir(out_base)
+
+        # Task 964 named the real gap here and added `precheck_seal()` to
+        # tools/report_regression_check.py, but never called it from this
+        # path -- the one place seam-scan.yml's real cron writes a report
+        # to disk stayed unguarded, so the exact undercount-then-corrected
+        # sequence that motivated 964 could still reach disk silently on a
+        # future day. Wired in for real: refuse to write a candidate that
+        # regresses the sealed milestone-count sequence. `tools/` sits
+        # above this package in the repo layout (the doctrine-checker
+        # layer over the engine), so this reaches up for it explicitly
+        # rather than duplicating the regex/logic here --
+        # `duplicate_regex_check.py`'s doctrine, same as 964's own note.
+        _tools_dir = _FENCEPOST_ROOT.parent / "tools"
+        sys.path.insert(0, str(_tools_dir))
+        import report_regression_check  # noqa: E402
+
+        precheck = report_regression_check.precheck_seal(report, date, reports_dir=str(d))
+        if not precheck["clean"]:
+            print(f"refusing to write: {precheck['reason']}", file=sys.stderr)
+            return 1
+
         d.mkdir(parents=True, exist_ok=True)
         path = d / f"{date}.md"
         path.write_text(report, encoding="utf-8")

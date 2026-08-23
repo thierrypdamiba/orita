@@ -58,6 +58,17 @@ disallow_untyped_defs = false
 module = ["httpx", "arcade_mcp_server", "arcade_mcp_server.*"]
 ignore_missing_imports = true
 
+# report_regression_check is a real, typed, mypy --strict-clean module --
+# it just lives one level up, in the repo-root tools/ doctrine-checker
+# layer, which this project's own mypy run never puts on its search path
+# (this package is meant to stand alone; see `_FENCEPOST_ROOT`). Task 965
+# wires report.py's `--write` path to it via a runtime sys.path insert
+# (report.py's own docstring names why), the same real-but-unresolvable
+# shape as httpx/arcade_mcp_server above, not a hole in real type coverage.
+[[tool.mypy.overrides]]
+module = ["report_regression_check"]
+ignore_missing_imports = true
+
 [tool.pytest.ini_options]
 pythonpath = ["src"]
 testpaths = ["tests"]
