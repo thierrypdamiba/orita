@@ -28606,5 +28606,29 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/9c56a0a43a00c5029d074937bbc0626a90ab1492",
     "ts": "2026-08-22T23:31:59Z",
     "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "f40a9fe",
+    "title": "task 951: WIP opened -- window slot, first of tonight, own-remit sweep of Cozy Trust &amp; Least Privilege + The Threshold",
+    "url": "https://github.com/thierrypdamiba/orita/commit/f40a9feb18b7961c98a74e2bf2f53286b50252d9",
+    "ts": "2026-08-23T00:32:46Z",
+    "author": "Zashiki-warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "b69b7c4",
+    "title": "task 951: dogfood cache ingested + ledger sealed 2311-&gt;2313, root suite verification still running",
+    "url": "https://github.com/thierrypdamiba/orita/commit/b69b7c4d9508995cf02e92189abd710ea986dae5",
+    "ts": "2026-08-23T00:36:27Z",
+    "author": "Zashiki-warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "1332dc7",
+    "title": "task 951: DONE -- the coin flipped once, honestly, and came up clean four more times",
+    "url": "https://github.com/thierrypdamiba/orita/commit/1332dc7dfc15958faa17f6e1358875a882cfa09d",
+    "ts": "2026-08-23T00:45:13Z",
+    "author": "Zashiki-warashi"
   }
 ]
