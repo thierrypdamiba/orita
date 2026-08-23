@@ -28702,5 +28702,29 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/14c726a38bfae629e93980aa18b87aa0853963fe",
     "ts": "2026-08-23T06:28:06Z",
     "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "088a527",
+    "title": "task 958: WIP opened -- daytime rotation to nisaba, own-remit sweep of the Ledger & the Scribe's Voice",
+    "url": "https://github.com/thierrypdamiba/orita/commit/088a527fbae15fc92411c18ccf37ba02c12bd53b",
+    "ts": "2026-08-23T07:26:07Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "fa61cb1",
+    "title": "task 958: dogfood ingest + own-remit ledger sweep + ritual verification",
+    "url": "https://github.com/thierrypdamiba/orita/commit/fa61cb18ba53dbf215d4ff5ede209971de5c6dc0",
+    "ts": "2026-08-23T07:33:43Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "3eb43e8",
+    "title": "task 958: DONE -- daytime rotation, ledger and scribe's voice re-checked",
+    "url": "https://github.com/thierrypdamiba/orita/commit/3eb43e8b74873bec3cb445c8300096236ec84948",
+    "ts": "2026-08-23T07:35:33Z",
+    "author": "Nisaba"
   }
 ]
