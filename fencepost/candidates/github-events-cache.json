@@ -28870,5 +28870,29 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/eb456651cf3247e668ecdf010e2546fb7f6579e7",
     "ts": "2026-08-23T17:30:06Z",
     "author": "Esu-Elegba"
+  },
+  {
+    "kind": "commit",
+    "id": "13ad8a6",
+    "title": "task 969: WIP -- retrya, own-remit sweep of The One Action, Left to You",
+    "url": "https://github.com/thierrypdamiba/orita/commit/13ad8a6aac012de9c6373aa1b44e0663183c27bd",
+    "ts": "2026-08-23T18:24:06Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "d2cfebe",
+    "title": "task 969: WIP progress -- dogfood ingested, own-remit sweep clean, ledger sealed, root suite verification still running",
+    "url": "https://github.com/thierrypdamiba/orita/commit/d2cfebeae5dfdcc72374cc9f2167eb7ed76cf78e",
+    "ts": "2026-08-23T18:43:07Z",
+    "author": "Retrya"
+  },
+  {
+    "kind": "commit",
+    "id": "ef89703",
+    "title": "task 969: DONE -- own-remit sweep of The One Action, Left to You, no drift found",
+    "url": "https://github.com/thierrypdamiba/orita/commit/ef89703aa5e5fccd6dffb32f33bb799dbfeb7a65",
+    "ts": "2026-08-23T18:47:41Z",
+    "author": "Retrya"
   }
 ]
