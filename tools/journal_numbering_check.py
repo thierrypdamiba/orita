@@ -41,6 +41,13 @@ documented exceptions (`KNOWN_VAULT_EXCEPTIONS`), the same "historical
 fact on record, not a currently-live violation" shape `ritual_check.py`'s
 `check_report_cadence` already uses for the 2026-07-14 cron gap.
 
+Task 991: a third one, caught the hour it happened rather than found
+stale. `vault/kwaku-ananse/journal/0078-2026-08-24.md` (written at task
+990) claimed a number `vault/kwaku-ananse/journal/0078-2026-08-21.md`
+(written three days earlier, at task 944) already held. Same law, same
+remedy: neither file is renumbered or backdated -- the duplicate is named
+as a third permanent exception.
+
 Usage:
     python3 tools/journal_numbering_check.py check
 """
@@ -61,9 +68,12 @@ _NUMBERED_NAME = re.compile(r"^(\d{4})-.+\.md$")
 # docstring above for the full story. Each tuple is (house, reason,
 # number); an exact match on all three is required, so this can never
 # silently swallow an unrelated violation in the same house.
+# Task 991: a third, kwaku-ananse's 0078 claimed twice (task 944 and task
+# 990) -- see the module docstring above.
 KNOWN_VAULT_EXCEPTIONS = frozenset({
     ("nisaba", "duplicate_number", 16),
     ("nisaba", "missing_number", 170),
+    ("kwaku-ananse", "duplicate_number", 78),
 })
 
 

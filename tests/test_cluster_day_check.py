@@ -259,9 +259,21 @@ class RealChronicleCase(unittest.TestCase):
         # existence, but `missed_mondays` as of 2026-07-29 is unaffected --
         # episode-005 covers a Monday still three weeks in this snapshot's
         # own future.
+        #
+        # Task 991 (off-by-one): recurred a fifth time -- the same shape
+        # this god's own remit (journal_numbering_check.py) exists to
+        # catch, just in a sibling counter instead of a journal filename.
+        # Episode-006 ("The Ninety-Second Recipe, Counted Twice") shipped
+        # at task 990 with a `cluster-day-covers: 2026-08-24` marker; this
+        # dawn-run's live `pytest` caught the stale pin the same hour it
+        # went stale (a real CI failure, "the Tithe" per TOWN-OPERATIONS.md,
+        # not found stale days later). `total_episodes_on_record` 6->7 and
+        # `cluster_day_episodes_shipped` 4->5, both reread live against
+        # `cdc.compute_cadence` against the real `chronicle/` dir on disk,
+        # not hand-guessed forward from the pattern.
         result = cdc.compute_cadence(today=date(2026, 7, 29))
-        self.assertEqual(result["total_episodes_on_record"], 6)
-        self.assertEqual(result["cluster_day_episodes_shipped"], 4)
+        self.assertEqual(result["total_episodes_on_record"], 7)
+        self.assertEqual(result["cluster_day_episodes_shipped"], 5)
         self.assertEqual(result["missed_mondays"], [])
 
     def test_real_chronicle_dir_matches_todays_hand_counted_gap(self):
@@ -269,9 +281,13 @@ class RealChronicleCase(unittest.TestCase):
         # date instead of the frozen 2026-07-29 snapshot above -- confirms
         # episode-005's own cluster-day-covers marker (2026-08-17) actually
         # clears today's real Monday, not just an earlier one.
+        #
+        # Task 991 (off-by-one): same 6->7 / 4->5 bump as the snapshot
+        # test above, for the same reason (episode-006 landed on disk at
+        # task 990) -- see that test's comment for the full story.
         result = cdc.compute_cadence(today=date(2026, 8, 17))
-        self.assertEqual(result["total_episodes_on_record"], 6)
-        self.assertEqual(result["cluster_day_episodes_shipped"], 4)
+        self.assertEqual(result["total_episodes_on_record"], 7)
+        self.assertEqual(result["cluster_day_episodes_shipped"], 5)
         self.assertEqual(result["missed_mondays"], [])
 
 
