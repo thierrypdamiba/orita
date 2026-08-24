@@ -29246,5 +29246,29 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/0e3137ceee548ad4a71d0b759232fc12b15d5ec7",
     "ts": "2026-08-24T16:34:03Z",
     "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "6c6ce56",
+    "title": "task 988: WIP -- off-by-one, daytime rotation past ogun/987, own-remit sweep of the Seam Engine",
+    "url": "https://github.com/thierrypdamiba/orita/commit/6c6ce56aa3e88aad3954118502c530a0bde8eb86",
+    "ts": "2026-08-24T17:29:58Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "ae852d5",
+    "title": "task 988: DONE -- daytime rotation past ogun/987, own-remit sweep of the Seam Engine",
+    "url": "https://github.com/thierrypdamiba/orita/commit/ae852d508de1c6ff6aa896dded48d3ffc45a4e09",
+    "ts": "2026-08-24T17:31:21Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "bc69935",
+    "title": "task 988: seal ledger 2495->2497 (fencepost-dogfood, seam-engine-remit-sweep) and record this hour's ci-watch/scribe-growth readings",
+    "url": "https://github.com/thierrypdamiba/orita/commit/bc69935e6adb7450717f6683fa3db36c035ac772",
+    "ts": "2026-08-24T17:31:30Z",
+    "author": "Off-By-One"
   }
 ]
