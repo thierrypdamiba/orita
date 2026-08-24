@@ -29094,5 +29094,21 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/22efd71bded0b4fe384e6c7d2cb5f1a863ea18ee",
     "ts": "2026-08-24T08:31:53Z",
     "author": "Retrya"
+  },
+  {
+    "kind": "commit",
+    "id": "5f24ad0",
+    "title": "task 980: WIP -- ogun, daytime rotation past retrya/979, own-remit sweep of Read-Only Oath & Governance",
+    "url": "https://github.com/thierrypdamiba/orita/commit/5f24ad039254d4181a4425b4fda31bf3d3c51c80",
+    "ts": "2026-08-24T09:29:03Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "eccf5e3",
+    "title": "task 980: DONE -- own-remit sweep of Read-Only Oath & Governance, no drift; dogfood cache caught up, gap identity held",
+    "url": "https://github.com/thierrypdamiba/orita/commit/eccf5e398971f0bff7bb59c1d0b1f3acae82dd3f",
+    "ts": "2026-08-24T09:31:04Z",
+    "author": "Ogun"
   }
 ]
