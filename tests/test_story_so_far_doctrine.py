@@ -140,8 +140,14 @@ class FooterArithmeticCase(unittest.TestCase):
         # rewrite obligation: Fencepost holds steady at eighty recipes, a
         # sixth chronicle episode seals, and the fourth and fifth episodes'
         # shared theme (the read-only oath audited seven times over) folds
-        # in; the X outage crosses into its fifth week.
-        self.assertEqual(_body_word_count(self.text), 286)
+        # in; the X outage crosses into its fifth week. Updated again by
+        # task 992's Cluster Day rewrite (286 -> 284) for real drift the
+        # ritual check flagged: ninety-one recipes became ninety-two,
+        # six sealed chronicle episodes became seven (Episode 6, the
+        # catalog's own count claimed a day before it was true), and the
+        # X outage crosses into its sixth week -- trimmed elsewhere in the
+        # same sentence to hold the footer's own 287-word ceiling.
+        self.assertEqual(_body_word_count(self.text), 284)
 
 
 class MutationBitesCase(unittest.TestCase):
