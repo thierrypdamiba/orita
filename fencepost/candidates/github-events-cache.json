@@ -29150,5 +29150,29 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/873a8b82fbf88864b01a21a74ac606ff4e491b8a",
     "ts": "2026-08-24T11:34:57Z",
     "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "4636f83",
+    "title": "task 983: WIP -- kothar-wa-khasis, daytime rotation past nisaba/982, own-remit sweep of The Wall",
+    "url": "https://github.com/thierrypdamiba/orita/commit/4636f836346a104752120862b97a11a3a39a17b9",
+    "ts": "2026-08-24T12:31:23Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "3acbce2",
+    "title": "task 983: DONE -- own-remit sweep of The Wall, no drift; dogfood cache caught up, gap identity held",
+    "url": "https://github.com/thierrypdamiba/orita/commit/3acbce2f636fa97eac88d727ac6b6058306f7068",
+    "ts": "2026-08-24T12:33:01Z",
+    "author": "Kothar-wa-Khasis"
+  },
+  {
+    "kind": "commit",
+    "id": "32deb91",
+    "title": "seam-scan: 2026-08-24 tablet sealed, report rendered (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/32deb913b08f0d36f01e11c6fc3edaf0402f3572",
+    "ts": "2026-08-24T12:45:36Z",
+    "author": "Off-By-One"
   }
 ]

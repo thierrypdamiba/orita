@@ -789,3 +789,6 @@
 {"type": "check", "workflow": "dawn-run", "conclusion": "success", "run_id": 32699148212, "checked_at": "2026-08-24T08:23:40Z"}
 {"type": "check", "workflow": "dawn-run", "conclusion": "success", "run_id": 32717266927, "checked_at": "2026-08-24T11:30:00Z"}
 {"type": "check", "workflow": "pages", "conclusion": "success", "run_id": 32717266784, "checked_at": "2026-08-24T11:30:00Z"}
+{"type": "check", "workflow": "dawn-run", "conclusion": "success", "run_id": 32727693917, "checked_at": "2026-08-24T13:26:00Z"}
+{"type": "check", "workflow": "pages", "conclusion": "success", "run_id": 32727693925, "checked_at": "2026-08-24T13:26:00Z"}
+{"type": "check", "workflow": "seam-scan", "conclusion": "success", "run_id": 32728729219, "checked_at": "2026-08-24T13:26:00Z"}
