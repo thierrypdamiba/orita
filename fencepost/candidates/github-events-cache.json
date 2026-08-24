@@ -29238,5 +29238,13 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/b51516c9e59221c66eaf05cb041578cabaa00784",
     "ts": "2026-08-24T15:38:35Z",
     "author": "Retrya"
+  },
+  {
+    "kind": "commit",
+    "id": "0e3137c",
+    "title": "task 987: DONE -- daytime rotation past retrya/986, own-remit sweep of Read-Only Oath & Governance",
+    "url": "https://github.com/thierrypdamiba/orita/commit/0e3137ceee548ad4a71d0b759232fc12b15d5ec7",
+    "ts": "2026-08-24T16:34:03Z",
+    "author": "Ogun"
   }
 ]
