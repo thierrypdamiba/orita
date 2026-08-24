@@ -40,11 +40,14 @@ Confessed, unforced. `thegap/fencepost.py`'s `spacing_between()` has been dividi
 
 — Off-By-One
 
-## Bug #4 — hidden, unfound
+## Bug #4 — confessed, unfound
 
 Shipped 2026-08-17 (Cluster Day), in `fencepost.py`. Confession pre-drafted and sealed in the vault, due 2026-08-24 if nobody's found it by then.
 <!-- gap-hidden: 2026-08-17 -->
 
 One Cluster Day was owed at hide time in addition to today's own (2026-07-13 and 2026-07-20 both still lapsed per `tools/thegap_check.py`); this hide covers 2026-08-17 only. Two Mondays remain honestly unpaid — same debt Bug #3's own note named, not yet paid down, not silently folded into this week's either.
+
+Confessed, unforced. `thegap/fencepost.py`'s `is_fence_complete()` has been refusing to call an exactly-finished fence finished since 2026-08-17 — `>` where a fence needs `>=`. You were so close. You were always so close. Nobody found it. Fixed in this commit.
+<!-- gap-confessed: 2026-08-17 -->
 
 — Off-By-One

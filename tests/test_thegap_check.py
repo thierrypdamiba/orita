@@ -318,20 +318,27 @@ class RealVaultCase(unittest.TestCase):
         "orita-vault sibling checkout not present (expected in public CI, which checks out only orita)",
     )
     def test_real_live_readme_and_vault_today_reproduces_the_named_gap(self):
-        # Three real gap-hidden markers on record as of this reread
-        # (2026-07-30, 2026-08-03, 2026-08-10), all three now carrying
-        # real `gap-confessed` markers (2026-07-30 posted task 505,
-        # 2026-08-03 posted task 655, 2026-08-10 posted task 825). A
-        # `gap-confessed` marker is keyed to its bug's own HIDDEN date,
-        # not the hour the confession was actually posted (thegap_check's
-        # own doctrine, see its module docstring) -- so once a marker
-        # exists in the file it reads confessed even under an earlier
-        # simulated `today`, this 2026-08-03 read included.
+        # Four real gap-hidden markers on record as of this reread
+        # (2026-07-30, 2026-08-03, 2026-08-10, 2026-08-17), all four now
+        # carrying real `gap-confessed` markers (2026-07-30 posted task
+        # 505, 2026-08-03 posted task 655, 2026-08-10 posted task 825,
+        # 2026-08-17 posted task 993). A `gap-confessed` marker is keyed
+        # to its bug's own HIDDEN date, not the hour the confession was
+        # actually posted (thegap_check's own doctrine, see its module
+        # docstring) -- so once a marker exists in the file it reads
+        # confessed even under an earlier simulated `today`, this
+        # 2026-08-03 read included (task 991/825's own recurring-pin
+        # shape: a hand-typed snapshot of an append-only marker list goes
+        # stale the moment a new marker lands, corrected here the same
+        # way each prior recurrence was).
         real_readme = os.path.join(ROOT, "thegap", "README.md")
         result = tgc.compute_cadence(real_readme, VAULT_ROOT, today=date(2026, 8, 3))
         self.assertEqual(result["missing_predraft"], [])
         self.assertEqual(result["confession_due_now"], [])
-        self.assertEqual(result["confessed_on_record"], ["2026-07-30", "2026-08-03", "2026-08-10"])
+        self.assertEqual(
+            result["confessed_on_record"],
+            ["2026-07-30", "2026-08-03", "2026-08-10", "2026-08-17"],
+        )
 
     @unittest.skipUnless(
         _VAULT_CHECKED_OUT,
@@ -350,7 +357,10 @@ class RealVaultCase(unittest.TestCase):
         result = tgc.compute_cadence(real_readme, VAULT_ROOT, today=date(2026, 8, 10))
         self.assertEqual(result["missing_predraft"], [])
         self.assertEqual(result["confession_due_now"], [])
-        self.assertEqual(result["confessed_on_record"], ["2026-07-30", "2026-08-03", "2026-08-10"])
+        self.assertEqual(
+            result["confessed_on_record"],
+            ["2026-07-30", "2026-08-03", "2026-08-10", "2026-08-17"],
+        )
 
     @unittest.skipUnless(
         _VAULT_CHECKED_OUT,
@@ -367,7 +377,10 @@ class RealVaultCase(unittest.TestCase):
         result = tgc.compute_cadence(real_readme, VAULT_ROOT, today=date(2026, 8, 17))
         self.assertEqual(result["missing_predraft"], [])
         self.assertEqual(result["confession_due_now"], [])
-        self.assertEqual(result["confessed_on_record"], ["2026-07-30", "2026-08-03", "2026-08-10"])
+        self.assertEqual(
+            result["confessed_on_record"],
+            ["2026-07-30", "2026-08-03", "2026-08-10", "2026-08-17"],
+        )
 
 
 if __name__ == "__main__":

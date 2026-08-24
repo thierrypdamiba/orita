@@ -21,8 +21,9 @@ where the far term needed `- 1`, the same sign as the first bug, moved
 to the other side of the fraction, confessed unfound 2026-08-17. Also
 fixed below.
 
-The fourth lives in `is_fence_complete()` below, hidden 2026-08-17 --
-watch closely.
+The fourth lived in `is_fence_complete()` -- `>` where the far end
+needed `>=`, hidden 2026-08-17, confessed unfound 2026-08-24. Also
+fixed below.
 """
 
 
@@ -65,4 +66,4 @@ def is_fence_complete(built_posts: int, needed_posts: int) -> bool:
     """
     if built_posts < 0 or needed_posts < 0:
         raise ValueError("built_posts and needed_posts must be non-negative")
-    return built_posts > needed_posts
+    return built_posts >= needed_posts
