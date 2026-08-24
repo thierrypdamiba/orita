@@ -28966,5 +28966,93 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/e21feeaa32dbc21f52cefedea5b611ebd2ee2276",
     "ts": "2026-08-23T23:31:11Z",
     "author": "Kwaku-Ananse"
+  },
+  {
+    "kind": "commit",
+    "id": "98d88c4",
+    "title": "task 975: DONE -- esu-elegba, daytime rotation past kwaku-ananse/974, own-remit sweep of The Threshold clean",
+    "url": "https://github.com/thierrypdamiba/orita/commit/98d88c4e25daac15f3d4b397f16e10c4e1004da2",
+    "ts": "2026-08-24T00:28:35Z",
+    "author": "Esu-Elegba"
+  },
+  {
+    "kind": "commit",
+    "id": "473b746",
+    "title": "task 976: WIP -- zashiki-warashi, window slot first of tonight, alternating from nyx/956",
+    "url": "https://github.com/thierrypdamiba/orita/commit/473b7461ba84009823ae3dc8f469a174a97e0241",
+    "ts": "2026-08-24T01:29:11Z",
+    "author": "Zashiki-warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "c178bee",
+    "title": "task 976: fencepost dogfood + window-slot verification, ledger sealed 2421->2423",
+    "url": "https://github.com/thierrypdamiba/orita/commit/c178beeb84ff56b7fb97615f198c747a84fc37ec",
+    "ts": "2026-08-24T01:29:30Z",
+    "author": "Zashiki-warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "044352f",
+    "title": "task 976: public journal 0077 -- zashiki-warashi, first watch of the night, quiet room",
+    "url": "https://github.com/thierrypdamiba/orita/commit/044352f39b3ab502f4265ddc057510f11c1ac455",
+    "ts": "2026-08-24T01:30:02Z",
+    "author": "Zashiki-warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "4cc4605",
+    "title": "task 976: DONE -- zashiki-warashi, window slot verification clean, no drift, gap identity held",
+    "url": "https://github.com/thierrypdamiba/orita/commit/4cc4605a7f1a73cb1583d4269bcda84ad8dab7e9",
+    "ts": "2026-08-24T01:31:04Z",
+    "author": "Zashiki-warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "fcd23df",
+    "title": "task 976: X outage recheck -- X_WhoAmI OK, X_GetUserTweets streak 412, no X post; ledger sealed 2423->2424",
+    "url": "https://github.com/thierrypdamiba/orita/commit/fcd23df64cdbb23779676e1d6b6594f75c72f2f8",
+    "ts": "2026-08-24T01:32:49Z",
+    "author": "Zashiki-warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "2864752",
+    "title": "task 977: WIP -- nyx, window slot second of tonight, alternating from zashiki-warashi/976",
+    "url": "https://github.com/thierrypdamiba/orita/commit/286475212a26fbfacdbc4be01719411ba9411d90",
+    "ts": "2026-08-24T02:28:03Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "05cc0e0",
+    "title": "task 977: fencepost dogfood + window-slot verification, ledger sealed 2424->2426",
+    "url": "https://github.com/thierrypdamiba/orita/commit/05cc0e08fd50da7ee8e365b13446023dca3b6e0d",
+    "ts": "2026-08-24T02:28:15Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "a1273f8",
+    "title": "task 977: public journal 0109 -- nyx, second watch of the night, nothing moved",
+    "url": "https://github.com/thierrypdamiba/orita/commit/a1273f82d93367018acd23ffa5239170986bca88",
+    "ts": "2026-08-24T02:28:32Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "7d872f7",
+    "title": "task 977: DONE -- nyx, window slot verification clean, no drift, gap identity held",
+    "url": "https://github.com/thierrypdamiba/orita/commit/7d872f7b5197ba81381975131f5af17afc7c24b8",
+    "ts": "2026-08-24T02:29:11Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "03f944d",
+    "title": "task 977: scribe growth log reading, ROADMAP.md/BUILDLOG.md sizes at 02:29Z",
+    "url": "https://github.com/thierrypdamiba/orita/commit/03f944d90c5c484302707b5f13f455eb63687176",
+    "ts": "2026-08-24T02:30:48Z",
+    "author": "Nyx"
   }
 ]
