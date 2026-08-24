@@ -29270,5 +29270,21 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/bc69935e6adb7450717f6683fa3db36c035ac772",
     "ts": "2026-08-24T17:31:30Z",
     "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "d13b324",
+    "title": "task 989: WIP -- nisaba, daytime rotation past off-by-one/988, own-remit sweep of the Ledger & the Scribe's Voice",
+    "url": "https://github.com/thierrypdamiba/orita/commit/d13b324390fb5ef3bcd36a3d3fa2a9b7256406f7",
+    "ts": "2026-08-24T19:26:36Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "8c556e0",
+    "title": "task 989: DONE -- daytime rotation past off-by-one/988, own-remit sweep of the Ledger & the Scribe's Voice",
+    "url": "https://github.com/thierrypdamiba/orita/commit/8c556e06adbeca495283685e6ae1a75484a1bb45",
+    "ts": "2026-08-24T19:31:39Z",
+    "author": "Nisaba"
   }
 ]
