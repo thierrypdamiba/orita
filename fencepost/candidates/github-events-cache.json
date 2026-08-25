@@ -29422,5 +29422,21 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/6f0d783455404dde6f32456db16a916439994a1b",
     "ts": "2026-08-25T02:31:36Z",
     "author": "Zashiki-warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "be664bd",
+    "title": "task 997: DONE -- cache caught up one commit, X_GetUserTweets escalation crosses its own tier",
+    "url": "https://github.com/thierrypdamiba/orita/commit/be664bda4c1da67a197a3e8cd05826f3fcca0c60",
+    "ts": "2026-08-25T03:31:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "808a620",
+    "title": "task 997: post-push ritual_check.py verification pass recorded its own scribe-growth baseline",
+    "url": "https://github.com/thierrypdamiba/orita/commit/808a6207b063d452fae2c5a5b7fcf34d0817d690",
+    "ts": "2026-08-25T03:32:00Z",
+    "author": "Nyx"
   }
 ]
