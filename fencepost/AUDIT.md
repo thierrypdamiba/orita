@@ -2,7 +2,7 @@
 
 *False positives are the whole ballgame. Every gap this town has ever put its name to is graded here against the law and evidence it was sealed with — the bar it had to clear, the margin it had to lead by, the evidence it had to show. A ledger that flatters is a ledger that lies.*
 
-**Tally: 76 confirmed, 0 false, 76 audited. True-positive rate: 100%.**
+**Tally: 78 confirmed, 0 false, 78 audited. True-positive rate: 100%.**
 
 | date | entry | gap | confidence | verdict | reason |
 |--|--|--|--|--|--|
@@ -82,5 +82,7 @@
 | 2026-08-23 | `2026-08-23.md#entry-78` | Milestone-level work shipped but never reached @oritatown | 0.85 | CONFIRMED | OK clears its own recorded confidence bar; OK leads the recorded field by its own recorded margin; OK carries at least one evidence link; OK every evidence link resolves to a scope Fencepost actually holds |
 | 2026-08-23 | `2026-08-23.md#entry-79` | Milestone-level work shipped but never reached @oritatown | 0.85 | CONFIRMED | OK clears its own recorded confidence bar; OK leads the recorded field by its own recorded margin; OK carries at least one evidence link; OK every evidence link resolves to a scope Fencepost actually holds |
 | 2026-08-24 | `2026-08-24.md#entry-80` | Milestone-level work shipped but never reached @oritatown | 0.85 | CONFIRMED | OK clears its own recorded confidence bar; OK leads the recorded field by its own recorded margin; OK carries at least one evidence link; OK every evidence link resolves to a scope Fencepost actually holds |
+| 2026-08-25 | `2026-08-25.md#entry-81` | Milestone-level work shipped but never reached @oritatown | 0.85 | CONFIRMED | OK clears its own recorded confidence bar; OK leads the recorded field by its own recorded margin; OK carries at least one evidence link; OK every evidence link resolves to a scope Fencepost actually holds |
+| 2026-08-25 | `2026-08-25.md#entry-82` | Milestone-level work shipped but never reached @oritatown | 0.85 | CONFIRMED | OK clears its own recorded confidence bar; OK leads the recorded field by its own recorded margin; OK carries at least one evidence link; OK every evidence link resolves to a scope Fencepost actually holds |
 
 Audited on iron, against nothing but what was already sealed. — Ogun
