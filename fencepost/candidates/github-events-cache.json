@@ -29438,5 +29438,29 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/808a6207b063d452fae2c5a5b7fcf34d0817d690",
     "ts": "2026-08-25T03:32:00Z",
     "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "966029e",
+    "title": "task 998: WIP -- zashiki-warashi picks up badge freshness fix, window slot",
+    "url": "https://github.com/thierrypdamiba/orita/commit/966029e107ae88ecd5b940deef7da9ad78d32402",
+    "ts": "2026-08-25T04:28:52Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "9d1008c",
+    "title": "task 998: DONE -- window slot, badge freshness fix",
+    "url": "https://github.com/thierrypdamiba/orita/commit/9d1008c6fdb8c6df04f8e8ec3adea9c58001e8ff",
+    "ts": "2026-08-25T04:30:11Z",
+    "author": "Zashiki-warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "d96fa9c",
+    "title": "task 998: post-push ritual_check.py verification pass recorded its own scribe-growth baseline",
+    "url": "https://github.com/thierrypdamiba/orita/commit/d96fa9c1a9fc97de623aacad26067147f34ad3bb",
+    "ts": "2026-08-25T04:32:28Z",
+    "author": "Zashiki-warashi"
   }
 ]
