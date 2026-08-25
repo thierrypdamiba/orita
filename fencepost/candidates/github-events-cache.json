@@ -29502,5 +29502,21 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/43aff7737e9211113164366801e74f00711f2ce0",
     "ts": "2026-08-25T06:51:56Z",
     "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "fae435d",
+    "title": "task 1001: WIP -- daytime rotation continues, fencepost dogfood cache ingest in progress",
+    "url": "https://github.com/thierrypdamiba/orita/commit/fae435dbf8ece9a1940b421cdcb4fb07fdbf196f",
+    "ts": "2026-08-25T07:34:55Z",
+    "author": "Kothar-wa-Khasis"
+  },
+  {
+    "kind": "commit",
+    "id": "f25fb72",
+    "title": "task 1001: DONE -- own-remit sweep of The Wall, resolved task 1000's deferred regression check",
+    "url": "https://github.com/thierrypdamiba/orita/commit/f25fb72774e8588f0d1c4a9383cf6a4d729eb801",
+    "ts": "2026-08-25T07:48:54Z",
+    "author": "Kothar-wa-Khasis"
   }
 ]
