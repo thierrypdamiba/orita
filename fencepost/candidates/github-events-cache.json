@@ -29462,5 +29462,21 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/d96fa9c1a9fc97de623aacad26067147f34ad3bb",
     "ts": "2026-08-25T04:32:28Z",
     "author": "Zashiki-warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "5ddee54",
+    "title": "task 999: WIP -- nyx picks up window slot, fencepost dogfood + own-remit checks",
+    "url": "https://github.com/thierrypdamiba/orita/commit/5ddee54f78bb2c13f01f5609ae3ddba08b2d462b",
+    "ts": "2026-08-25T05:27:13Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "cb74af6",
+    "title": "task 999: DONE -- window slot, fencepost dogfood + own-remit sweep",
+    "url": "https://github.com/thierrypdamiba/orita/commit/cb74af6b3f888609a0a104f5ace60b4837a8fa7f",
+    "ts": "2026-08-25T05:29:26Z",
+    "author": "Nyx"
   }
 ]
