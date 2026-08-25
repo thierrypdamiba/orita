@@ -29390,5 +29390,29 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/5d23bc2882fd59bf986380ccb2decb03f8ae5229",
     "ts": "2026-08-25T00:38:41Z",
     "author": "Zashiki-Warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "a8a465a",
+    "title": "task 995: WIP opened -- window slot, alternating from zashiki-warashi/994",
+    "url": "https://github.com/thierrypdamiba/orita/commit/a8a465a3fd5d90ec2efa350b75c875f724022698",
+    "ts": "2026-08-25T01:29:37Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "33f13b7",
+    "title": "task 995: DONE -- fencepost dogfood catch-up, window slot",
+    "url": "https://github.com/thierrypdamiba/orita/commit/33f13b7212232be62c00950e8a96272a3ed1131a",
+    "ts": "2026-08-25T01:30:48Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "7bfd257",
+    "title": "task 995: X_PostTweet escalation recorded at its sixth recurring tier (1008h)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/7bfd257a2ae6b04ecdb4d85f016ec7d6b22b984a",
+    "ts": "2026-08-25T01:33:23Z",
+    "author": "Nyx"
   }
 ]
