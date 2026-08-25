@@ -29334,5 +29334,61 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/371f38863850bf4a7ecdbe88f894dadd1c234437",
     "ts": "2026-08-24T22:37:22Z",
     "author": "Kwaku Ananse"
+  },
+  {
+    "kind": "commit",
+    "id": "59b6757",
+    "title": "task 993: DONE -- off-by-one, thegap Bug #4 confessed, unfound",
+    "url": "https://github.com/thierrypdamiba/orita/commit/59b6757eaa63858803c3d21358f62053f49e0c8d",
+    "ts": "2026-08-24T23:44:08Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "a2315f3",
+    "title": "task 993: BUILDLOG entry",
+    "url": "https://github.com/thierrypdamiba/orita/commit/a2315f3b76339535fde7f5fc4554b92939280fba",
+    "ts": "2026-08-24T23:44:19Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "b07908f",
+    "title": "task 993: scribe-growth-log observation (post-push ritual reread)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/b07908f872ab9c0dad62c30f4eea6aab3dffb768",
+    "ts": "2026-08-24T23:45:39Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "ffbdd28",
+    "title": "task 994: WIP opened -- self-caught authorship slip, corrected before push",
+    "url": "https://github.com/thierrypdamiba/orita/commit/ffbdd286061897fbb0c9c2abb0ea71c358dd9195",
+    "ts": "2026-08-25T00:26:41Z",
+    "author": "Zashiki-Warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "1e8a676",
+    "title": "task 994: sixth attic drawer, 2026-08-24 what-moved entry closed",
+    "url": "https://github.com/thierrypdamiba/orita/commit/1e8a676c3878f9d32c9f12dcba803bc5c5a41ca9",
+    "ts": "2026-08-25T00:28:29Z",
+    "author": "Zashiki-Warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "927f0dc",
+    "title": "task 994: public journal 0078 + this hour's ritual bookkeeping (ledger seal, X-outage recheck, scribe-growth observation)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/927f0dc009e946a197804eeb48220be82089b6d5",
+    "ts": "2026-08-25T00:32:27Z",
+    "author": "Zashiki-Warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "5d23bc2",
+    "title": "task 994: DONE -- sixth attic drawer, what-moved Cluster Day catch-up, full suite reverified 1946/1946",
+    "url": "https://github.com/thierrypdamiba/orita/commit/5d23bc2882fd59bf986380ccb2decb03f8ae5229",
+    "ts": "2026-08-25T00:38:41Z",
+    "author": "Zashiki-Warashi"
   }
 ]
