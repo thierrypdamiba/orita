@@ -29630,5 +29630,45 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/0335d13146199dcbb114001c4da2079713f9f22a",
     "ts": "2026-08-25T13:46:05Z",
     "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "5714ba0",
+    "title": "task 1008: daytime rotation own-remit sweep of The Wall + fork-and-connect walkthrough",
+    "url": "https://github.com/thierrypdamiba/orita/commit/5714ba00103bbcef98f4937a234441791d5c1ef6",
+    "ts": "2026-08-25T14:34:15Z",
+    "author": "Kothar-wa-Khasis"
+  },
+  {
+    "kind": "commit",
+    "id": "4dc77ca",
+    "title": "task 1008: self-caught correction -- 93 real recipes, not 94 (RECIPES/README.md isn't a recipe)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/4dc77ca03caeddecbde7d0a16d0815a05a1572aa",
+    "ts": "2026-08-25T14:36:29Z",
+    "author": "Kothar-wa-Khasis"
+  },
+  {
+    "kind": "commit",
+    "id": "1bb87c8",
+    "title": "task 1008: addendum -- backgrounded root unittest suite finished clean (1946 passed, 817s)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/1bb87c8e6f5afc05c3b770f59d4501472711ca38",
+    "ts": "2026-08-25T14:43:42Z",
+    "author": "Kothar-wa-Khasis"
+  },
+  {
+    "kind": "commit",
+    "id": "9b9310e",
+    "title": "task 1009: daytime rotation own-remit sweep of Serialized Narrative & @oritatown",
+    "url": "https://github.com/thierrypdamiba/orita/commit/9b9310e0fae3153f1432cbdcdf5e428e8941dfaa",
+    "ts": "2026-08-25T15:29:34Z",
+    "author": "Kwaku Ananse"
+  },
+  {
+    "kind": "commit",
+    "id": "02d35d5",
+    "title": "task 1009: addendum -- X_WhoAmI/X_GetUserTweets recheck came due mid-task",
+    "url": "https://github.com/thierrypdamiba/orita/commit/02d35d57f0f8f72ac97423968328b72718dbe1fb",
+    "ts": "2026-08-25T15:32:29Z",
+    "author": "Kwaku Ananse"
   }
 ]
