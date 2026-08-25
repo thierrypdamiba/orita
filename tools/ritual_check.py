@@ -1269,11 +1269,41 @@ def check_report_regression(reports_dir: str | None = None) -> dict[str, object]
     reads LOWER than the previous sealed tablet's own claim and isn't
     already named in `report_regression_check.SEEDED_EXCEPTIONS`. Two
     historical drops (2026-07-12 -> 07-13, 2026-07-13 -> 07-18, both from
-    the town's first week, both documented in `fencepost/AUDIT.md`'s
-    "Known anomalies" section) are seeded; a THIRD, unseeded drop flips
-    `broken` -- caught the hour it happens, unlike the two that sat
-    silent for over a month before an Explore sweep of the narrative
-    remit found them."""
+    the town's first week) are seeded and explained in that module's own
+    docstring (task 1002 corrected this comment: they were never
+    documented in `fencepost/AUDIT.md` -- that file is fully regenerated
+    off the Ledger by `seam_engine.audit --write` every day and says so
+    itself, "never hand-edited", so a prose section there would not
+    survive the next cron run); a THIRD, unseeded drop flips `broken` --
+    caught the hour it happens, unlike the two that sat silent for over a
+    month before an Explore sweep of the narrative remit found them. (A
+    real third drop is sitting live and unseeded right now, task 1002:
+    `fencepost/GAPS/2026-08-24.md`'s tablet reads 274, sealed
+    2026-08-24T12:45:09Z -- the real `seam-scan.yml` cron's own direct,
+    unrestricted-network `fetch_github_activity` call, the town's most
+    authoritative count. Every session since (996 through 1001, then
+    1002) is a hand-run hourly session, sandboxed, no direct `httpx` to
+    api.github.com (the network boundary), reading the OVERRIDE path
+    instead: `fencepost/candidates/github-events-cache.json`, an
+    incrementally-MCP-fetched cache that (per its own module docstring)
+    is built forward one session's delta at a time and is not proven
+    complete. Task 996 sealed `fencepost/GAPS/2026-08-25.md` entry 81
+    off that override count (252) at 02:27Z, correctly refusing to write
+    a REPORTS file (regression guard doing its job) but sealing the
+    Ledger tablet anyway (only `report.py --write`'s precheck guards
+    that step, not `ledger append`) -- every hour since has re-confirmed
+    the same override count (252-256) without landing new information.
+    Task 1002 tried to force a fresh, real, direct count today by
+    triggering `seam-scan.yml` early via `workflow_dispatch`
+    (`actions_run_trigger run_workflow`) rather than waiting for
+    tomorrow's scheduled noon-UTC run -- refused live, 403 "Resource not
+    accessible by integration": this session's GitHub App token carries
+    no `workflows: write` scope. So the real fix -- a fresh direct scan,
+    which should read >= 274 if the override count is merely incomplete
+    rather than 274 being wrong -- has to wait for the cron's own next
+    scheduled firing; REPORTS/2026-08-25.md stays unwritten until then,
+    which is this guard doing its job, not a bug still open to guess
+    at.)"""
     mod = _report_regression_check()
     kwargs = {}
     if reports_dir is not None:

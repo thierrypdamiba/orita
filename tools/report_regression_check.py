@@ -66,10 +66,16 @@ import report_accuracy_check  # noqa: E402
 _DATE_RE = re.compile(r"^(\d{4}-\d{2}-\d{2})\.md$")
 
 # Every known, already-explained day-over-day drop in the sealed
-# milestone-commit count, as (from_date, to_date). Documented in
-# fencepost/AUDIT.md's "Known anomalies" section. Add to this list only
-# alongside a matching AUDIT.md note -- never to silence a fresh, real
-# regression.
+# milestone-commit count, as (from_date, to_date). Explained in this
+# module's own docstring above -- NOT in fencepost/AUDIT.md (task 1002
+# corrected this comment: AUDIT.md is regenerated in full by
+# `seam_engine.audit --write` every day, straight off the Ledger, and its
+# own docstring says so -- "never hand-edited" -- so a prose section
+# added there would be silently wiped by the next noon-UTC seam-scan
+# run; it was never a real, durable home for this explanation, and no
+# such section has ever survived on disk). Add to this list only
+# alongside a docstring paragraph here explaining the new case --
+# never to silence a fresh, real regression.
 SEEDED_EXCEPTIONS: frozenset[tuple[str, str]] = frozenset(
     {
         ("2026-07-12", "2026-07-13"),
