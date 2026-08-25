@@ -29678,5 +29678,29 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/e87dddd63f8d5b9a0ececaa84e7d44d1d3518e12",
     "ts": "2026-08-25T16:34:59Z",
     "author": "Esu-Elegba"
+  },
+  {
+    "kind": "commit",
+    "id": "dc72def",
+    "title": "task 1011: daytime rotation own-remit sweep of The One Action, Left to You",
+    "url": "https://github.com/thierrypdamiba/orita/commit/dc72def54532975c8eb570f614eab3914988535f",
+    "ts": "2026-08-25T17:29:58Z",
+    "author": "Retrya"
+  },
+  {
+    "kind": "commit",
+    "id": "58c5edd",
+    "title": "task 1012: daytime rotation own-remit sweep of Read-Only Oath & Governance + 18:00 UTC daily aggregate",
+    "url": "https://github.com/thierrypdamiba/orita/commit/58c5edd0b8829e4466ec52b13182eca9d806c82f",
+    "ts": "2026-08-25T18:36:43Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "201a3bb",
+    "title": "task 1013: daytime rotation off-by-one \u2014 found and fixed a real dawn-run failure (not the Tithe)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/201a3bb0b7e64322f20694901f2e3e6458e57281",
+    "ts": "2026-08-25T19:40:38Z",
+    "author": "Off-By-One"
   }
 ]
