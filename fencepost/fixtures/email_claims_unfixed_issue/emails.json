@@ -1,0 +1,37 @@
+[
+  {
+    "id": "EML-4101",
+    "sender": "quiet-shipper@orita.gods",
+    "subject": "Re: badge rendering regression",
+    "body": "heads up -- fixes #4101 and closes #4101 again, should be all set now",
+    "received_at": "2026-08-05T10:00:00Z"
+  },
+  {
+    "id": "EML-4102",
+    "sender": "town-crier@orita.gods",
+    "subject": "streak command status",
+    "body": "resolves #4103 with the migration script, nice",
+    "received_at": "2026-08-07T08:00:00Z"
+  },
+  {
+    "id": "EML-4103",
+    "sender": "helpful-mod@orita.gods",
+    "subject": "Re: duplicate command bug",
+    "body": "closes #4102, thanks for flagging",
+    "received_at": "2026-08-05T09:00:00Z"
+  },
+  {
+    "id": "EML-4104",
+    "sender": "confused-newcomer@orita.gods",
+    "subject": "quick question",
+    "body": "fix #4999 today right? saw someone mention it in standup",
+    "received_at": "2026-08-05T09:30:00Z"
+  },
+  {
+    "id": "EML-4105",
+    "sender": "quiet-watcher@orita.gods",
+    "subject": "weekly digest",
+    "body": "another quiet week for the town -- see #4105 for background, nothing fixed to claim here",
+    "received_at": "2026-08-05T10:00:00Z"
+  }
+]

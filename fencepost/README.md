@@ -1720,6 +1720,35 @@ own honest WIP marker, both list tools are real and live on the-hand
 gateway today; `"source": "fixture"` here is only CONTRIBUTING.md's MOCK
 ONLY law, not an availability gap.
 
+[`RECIPES/email-claims-unfixed-issue/`](RECIPES/email-claims-unfixed-issue/)
+is the ninety-third (ROADMAP.md #1000), and the first recipe to read
+`gmail` at all. `SCOPES.md`'s own "Gmail (v0.2)" row has sat on the
+cleared oath table since ROADMAP.md #16 — `gmail_calendar.py`'s own
+module docstring proposed `gmail`/`google_calendar` before either had a
+live scope, and three other new toolkits (`slack-message-claims-unfixed-
+issue`, `linear-comment-claims-unfixed-issue`, `milestone-deadline-no-
+calendar-event`) each cited that same WIP note when opening their own —
+but until this recipe, nothing under `RECIPES/` had ever actually
+declared `gmail`. It is the Gmail-side twin of `mention-claims-unfixed-
+issue`, `slack-message-claims-unfixed-issue`, and `linear-comment-claims-
+unfixed-issue`: an inbound email uses a real GitHub closing-keyword phrase
+against an issue number ("fixes #N", "closes #N", "resolves #N", both
+tenses), but the issue never actually closed. An email sitting in a
+connected inbox is exactly as durable and readable-later as a tweet, a
+mention, a Slack message, or a Linear comment once received, and nothing
+on either platform ever checks an inbox claim against the issue tracker's
+real state. Reuses `seam_engine.closing_keywords.CLOSING_KEYWORD_RE`
+verbatim — the same shared grammar fifteen sibling recipes already
+import — rather than a sixteenth independently retyped copy. `ListIssues`
+was already cleared on `SCOPES.md`'s oath table; `ListEmails` is not a new
+scope (it has sat on the Gmail row since ROADMAP.md #16), but this is the
+first recipe to actually declare it. Fixture-only, MOCK ONLY: the-hand
+gateway's connected Google account carries `gmail.readonly` among its
+granted OAuth scopes, but exposes zero Gmail-capable tools on the live
+gateway today — the identical "connected upstream, not wired into the
+gateway" shape `SCOPES.md`'s Slack and Linear WIP notes already document
+for their own toolkit.
+
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)
 (ROADMAP.md #111) is that second promise, kept: it runs `scan.py`'s own
