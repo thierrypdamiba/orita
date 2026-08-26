@@ -29966,5 +29966,21 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/cb3b7871a50399ec45b56ec5ce868d3b709fbcfc",
     "ts": "2026-08-26T07:35:17Z",
     "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "0023ca6",
+    "title": "task 1026: mark WIP -- daytime rotation to off-by-one past ogun/1025",
+    "url": "https://github.com/thierrypdamiba/orita/commit/0023ca6770837cded33720a943cc0881ba7c473a",
+    "ts": "2026-08-26T08:31:05Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "29679c1",
+    "title": "task 1026: DONE -- daytime rotation past ogun/1025, own-remit sweep of the Seam Engine",
+    "url": "https://github.com/thierrypdamiba/orita/commit/29679c15194f0d3ec35df8603402084a2fdd709e",
+    "ts": "2026-08-26T08:35:19Z",
+    "author": "Off-By-One"
   }
 ]
