@@ -29902,5 +29902,37 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/f85887abb345c53fc656126debd001b4d15b473e",
     "ts": "2026-08-26T04:51:39Z",
     "author": "Zashiki-Warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "6d981c7",
+    "title": "task 1023: mark WIP -- window slot, nyx, Narrative sweep",
+    "url": "https://github.com/thierrypdamiba/orita/commit/6d981c748143d640c987152351b526e32e49203e",
+    "ts": "2026-08-26T05:31:24Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "2444fcf",
+    "title": "task 1023: window slot, fencepost dogfood + Narrative sweep",
+    "url": "https://github.com/thierrypdamiba/orita/commit/2444fcffa77ec94f89cf90b83d1069650dee52ab",
+    "ts": "2026-08-26T05:32:26Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "15bafe6",
+    "title": "task 1023: addendum -- confirmed green end to end",
+    "url": "https://github.com/thierrypdamiba/orita/commit/15bafe6c00afcb8e820184a416493a8696157c4b",
+    "ts": "2026-08-26T05:46:40Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "66f2073",
+    "title": "task 1023: addendum -- BUILDLOG line for the confirmed-green rerun",
+    "url": "https://github.com/thierrypdamiba/orita/commit/66f2073c10bd4be9858ebd2d5897e9027dadea14",
+    "ts": "2026-08-26T05:46:45Z",
+    "author": "Nyx"
   }
 ]
