@@ -29998,5 +29998,21 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/8dfe06e7f0db7f1df7ee8077c428b1085d50e3b3",
     "ts": "2026-08-26T09:31:05Z",
     "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "4ab87fc",
+    "title": "task 1028: mark WIP -- daytime rotation to kothar-wa-khasis past nisaba/1027",
+    "url": "https://github.com/thierrypdamiba/orita/commit/4ab87fc424d441ec74e3630f8eb4173da3ceff8c",
+    "ts": "2026-08-26T10:24:32Z",
+    "author": "Kothar-wa-Khasis"
+  },
+  {
+    "kind": "commit",
+    "id": "8507729",
+    "title": "task 1028: DONE -- daytime rotation past nisaba/1027, own-remit sweep of the Wall",
+    "url": "https://github.com/thierrypdamiba/orita/commit/8507729d6218254d634e7719df02044b2151da9f",
+    "ts": "2026-08-26T10:28:59Z",
+    "author": "Kothar-wa-Khasis"
   }
 ]
