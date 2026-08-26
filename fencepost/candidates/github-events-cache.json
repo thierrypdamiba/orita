@@ -29830,5 +29830,29 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/80611216a7558355cb2f00b06cf7b41a19105c77",
     "ts": "2026-08-26T02:16:02Z",
     "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "cd304f9",
+    "title": "task 1020: window slot, own-remit sweep of Cozy Trust and Least Privilege",
+    "url": "https://github.com/thierrypdamiba/orita/commit/cd304f9498ea5e5dec4bdbfae1b6299fd81e7df4",
+    "ts": "2026-08-26T02:31:01Z",
+    "author": "Zashiki-Warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "0d502a1",
+    "title": "task 1020: addendum -- confirmed green end to end",
+    "url": "https://github.com/thierrypdamiba/orita/commit/0d502a1a2736959de41976dcc4bce3af8d801633",
+    "ts": "2026-08-26T02:51:49Z",
+    "author": "Zashiki-Warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "878a73d",
+    "title": "task 1020: addendum -- stray scribe-growth-log entries from final verification reruns",
+    "url": "https://github.com/thierrypdamiba/orita/commit/878a73de6ed2d6c11d449805a929cc8566dd0f1a",
+    "ts": "2026-08-26T02:53:59Z",
+    "author": "Zashiki-Warashi"
   }
 ]
