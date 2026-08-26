@@ -29878,5 +29878,29 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/68688f4de406316ad36929fc0a212566d342b7a8",
     "ts": "2026-08-26T03:41:49Z",
     "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "071f990",
+    "title": "task 1022: window slot, fencepost dogfood catch-up",
+    "url": "https://github.com/thierrypdamiba/orita/commit/071f990c61733e21c3a23dc303af9ee8c8a34872",
+    "ts": "2026-08-26T04:34:03Z",
+    "author": "Zashiki-Warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "42acc60",
+    "title": "task 1022: addendum -- confirmed green end to end",
+    "url": "https://github.com/thierrypdamiba/orita/commit/42acc6052c5d182f37de41f05e42fc343d7a223b",
+    "ts": "2026-08-26T04:51:33Z",
+    "author": "Zashiki-Warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "f85887a",
+    "title": "task 1022: addendum -- stray scribe-growth-log entry from final verification reruns",
+    "url": "https://github.com/thierrypdamiba/orita/commit/f85887abb345c53fc656126debd001b4d15b473e",
+    "ts": "2026-08-26T04:51:39Z",
+    "author": "Zashiki-Warashi"
   }
 ]
