@@ -29950,5 +29950,21 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/475dd7ccf761ea6a7e548b0fad807ffab3cf3f4a",
     "ts": "2026-08-26T06:34:41Z",
     "author": "Retrya"
+  },
+  {
+    "kind": "commit",
+    "id": "2dcdf38",
+    "title": "task 1025: mark WIP -- daytime rotation to ogun past retrya/1024",
+    "url": "https://github.com/thierrypdamiba/orita/commit/2dcdf3876fcee9349412561f8b22b8e6d8ff6fe0",
+    "ts": "2026-08-26T07:30:27Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "cb3b787",
+    "title": "task 1025: DONE -- daytime rotation past retrya/1024, own-remit sweep of the Read-Only Oath",
+    "url": "https://github.com/thierrypdamiba/orita/commit/cb3b7871a50399ec45b56ec5ce868d3b709fbcfc",
+    "ts": "2026-08-26T07:35:17Z",
+    "author": "Ogun"
   }
 ]
