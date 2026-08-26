@@ -2346,6 +2346,62 @@ class WipReclaimFoldCase(unittest.TestCase):
         self.assertTrue(result["wip_reclaim"]["clean"])
 
 
+class RoadmapBuildlogSyncFoldCase(unittest.TestCase):
+    """Task 1018: run_ritual_check() folds roadmap_buildlog_sync_check.py's
+    own cross-check of every numbered task BUILDLOG.md records shipping
+    against ROADMAP.md's own task table (live + archived) into the same
+    structured result -- clean against a fixture where every BUILDLOG task
+    has a matching row, BROKEN (and printed) when one is missing (the
+    exact shape task 1017 found and backfilled for rows 1015/1016), and
+    honestly clean against the real, live town state today."""
+
+    def setUp(self):
+        self.tmp = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.tmp, ignore_errors=True)
+        self.roadmap_path = os.path.join(self.tmp, "ROADMAP.md")
+        self.buildlog_path = os.path.join(self.tmp, "BUILDLOG.md")
+
+    def _write(self, path, content):
+        with open(path, "w", encoding="utf-8") as f:
+            f.write(content)
+
+    def test_every_buildlog_task_present_is_clean(self):
+        self._write(self.roadmap_path, "| 5 | DONE | off-by-one | do the thing | it is done |\n")
+        self._write(self.buildlog_path, "2026-08-25 01:29 UTC | off-by-one | 5 | did the thing\n")
+        result = rc.run_ritual_check(
+            roadmap_buildlog_sync_roadmap_path=self.roadmap_path,
+            roadmap_buildlog_sync_buildlog_path=self.buildlog_path,
+            roadmap_buildlog_sync_archive_dir=self.tmp,
+        )
+        self.assertTrue(result["roadmap_buildlog_sync"]["clean"])
+        self.assertFalse(result["broken"])
+        self.assertIn("roadmap/buildlog sync: clean", rc.format_ritual_check(result))
+
+    def test_a_missing_roadmap_row_flips_broken_and_prints(self):
+        self._write(self.roadmap_path, "| 1014 | DONE | nisaba | prior thing | it is done |\n")
+        self._write(
+            self.buildlog_path,
+            "2026-08-25 20:3x UTC | nisaba | 1014 | prior thing shipped\n"
+            "2026-08-25 21:2x UTC | kothar-wa-khasis | 1015 | shipped with no roadmap row\n",
+        )
+        result = rc.run_ritual_check(
+            roadmap_buildlog_sync_roadmap_path=self.roadmap_path,
+            roadmap_buildlog_sync_buildlog_path=self.buildlog_path,
+            roadmap_buildlog_sync_archive_dir=self.tmp,
+        )
+        self.assertFalse(result["roadmap_buildlog_sync"]["clean"])
+        self.assertTrue(result["broken"])
+        formatted = rc.format_ritual_check(result)
+        self.assertIn("roadmap/buildlog sync:", formatted)
+        self.assertIn("MISSING ROADMAP ROW", formatted)
+        self.assertIn("1015", formatted)
+
+    def test_default_path_reads_the_real_town_state_honestly_clean(self):
+        result = rc.run_ritual_check()
+        self.assertEqual(result["roadmap_buildlog_sync"]["missing"], [])
+        self.assertTrue(result["roadmap_buildlog_sync"]["clean"])
+
+
 class ToolkitsInUseFoldCase(unittest.TestCase):
     """Task 145: run_ritual_check() folds toolkits_in_use_check.py's own
     cross-check of records/metrics.jsonl's last distinct_toolkits_in_use

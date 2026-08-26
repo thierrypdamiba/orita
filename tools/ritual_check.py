@@ -367,6 +367,12 @@ def _wip_reclaim_check() -> ModuleType:
     return _load("_ritual_wip_reclaim_check", os.path.join(ROOT, "tools", "wip_reclaim_check.py"))
 
 
+def _roadmap_buildlog_sync_check() -> ModuleType:
+    return _load(
+        "_ritual_roadmap_buildlog_sync_check", os.path.join(ROOT, "tools", "roadmap_buildlog_sync_check.py")
+    )
+
+
 def _scopes_completeness_check() -> ModuleType:
     return _load("_ritual_scopes_completeness_check", os.path.join(ROOT, "tools", "scopes_completeness_check.py"))
 
@@ -1381,6 +1387,32 @@ def check_wip_reclaim(now: datetime, roadmap_path: str | None = None) -> dict[st
     return cast(dict[str, object], mod.find_stale(**kwargs))
 
 
+def check_roadmap_buildlog_sync(
+    roadmap_path: str | None = None,
+    buildlog_path: str | None = None,
+    archive_dir: str | None = None,
+) -> dict[str, object]:
+    """Task 1018: fold `roadmap_buildlog_sync_check.py`'s own cross-check
+    of every numbered task BUILDLOG.md records shipping against
+    ROADMAP.md's own task table (live + archived) into the one block.
+    Unconditional, local-filesystem-only, the same cheap always-on class
+    `check_wip_reclaim`/`check_journal_numbering` already hold. A real hit
+    here DOES flip `broken`: task 1017 found ROADMAP.md rows 1015/1016
+    missing entirely despite real, shipped, BUILDLOG-logged work under
+    those numbers -- a work queue silently dropping a row is a live
+    regression on the loop's own record, not an honest zero-state waiting
+    on the calendar."""
+    mod = _roadmap_buildlog_sync_check()
+    kwargs: dict[str, object] = {}
+    if roadmap_path is not None:
+        kwargs["roadmap_path"] = roadmap_path
+    if buildlog_path is not None:
+        kwargs["buildlog_path"] = buildlog_path
+    if archive_dir is not None:
+        kwargs["archive_dir"] = archive_dir
+    return cast(dict[str, object], mod.check_sync(**kwargs))
+
+
 def check_scopes_completeness(scopes_path: str | None = None, app_log_path: str | None = None) -> dict[str, object]:
     """Task 135: fold `scopes_completeness_check.py`'s own cross-check of
     `fencepost/SCOPES.md`'s `## Every connected app, accounted for`
@@ -2321,6 +2353,9 @@ def run_ritual_check(
     ritual_completeness_tools_dir: str | None = None,
     ritual_completeness_seam_engine_dir: str | None = None,
     wip_reclaim_path: str | None = None,
+    roadmap_buildlog_sync_roadmap_path: str | None = None,
+    roadmap_buildlog_sync_buildlog_path: str | None = None,
+    roadmap_buildlog_sync_archive_dir: str | None = None,
     arcade_apps_state: dict[str, object] | None = None,
     gateway_toolset_state: dict[str, object] | None = None,
     good_first_issues_state: list[dict[str, object]] | None = None,
@@ -2457,6 +2492,11 @@ def run_ritual_check(
         seam_engine_dir=ritual_completeness_seam_engine_dir,
     )
     wip_reclaim = check_wip_reclaim(now, roadmap_path=wip_reclaim_path)
+    roadmap_buildlog_sync = check_roadmap_buildlog_sync(
+        roadmap_path=roadmap_buildlog_sync_roadmap_path,
+        buildlog_path=roadmap_buildlog_sync_buildlog_path,
+        archive_dir=roadmap_buildlog_sync_archive_dir,
+    )
     scopes_completeness = check_scopes_completeness(scopes_path=scopes_path, app_log_path=app_log_path)
     toolkits_in_use = check_toolkits_in_use(
         metrics_path=toolkits_metrics_path, consent_log_path=toolkits_consent_log_path
@@ -2548,6 +2588,7 @@ def run_ritual_check(
         or (not journal_numbering["clean"])
         or (not ritual_completeness["clean"])
         or (not wip_reclaim["clean"])
+        or (not roadmap_buildlog_sync["clean"])
         or (not scopes_completeness["clean"])
         or (not toolkits_in_use["clean"])
         or (not connected_users["clean"])
@@ -2618,6 +2659,7 @@ def run_ritual_check(
         "shared_reports": shared_reports,
         "ritual_completeness": ritual_completeness,
         "wip_reclaim": wip_reclaim,
+        "roadmap_buildlog_sync": roadmap_buildlog_sync,
         "scopes_completeness": scopes_completeness,
         "toolkits_in_use": toolkits_in_use,
         "connected_users": connected_users,
@@ -2857,6 +2899,18 @@ def format_ritual_check(result: dict[str, Any]) -> str:
         lines.append(
             f"  wip reclaim: {len(wr['stale'])} STALE (>= {wr['threshold_hours']}h), "
             f"{len(wr['unknown'])} UNKNOWN-AGE -- reclaim now, escalate"
+        )
+    rbs = result["roadmap_buildlog_sync"]
+    if rbs["clean"]:
+        lines.append(
+            f"  roadmap/buildlog sync: clean ({rbs['buildlog_task_count']} BUILDLOG.md task(s), "
+            "all present in ROADMAP.md live+archived)"
+        )
+    else:
+        missing_nums = ", ".join(str(m["number"]) for m in rbs["missing"])
+        lines.append(
+            f"  roadmap/buildlog sync: {len(rbs['missing'])} MISSING ROADMAP ROW(S) -- "
+            f"task(s) {missing_nums} shipped per BUILDLOG.md with no ROADMAP.md row, backfill now, escalate"
         )
     sc = result["scopes_completeness"]
     if sc["stale_google_claim"]:
