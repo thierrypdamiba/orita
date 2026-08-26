@@ -569,8 +569,10 @@ class DocstringClaimDoctrineCase(unittest.TestCase):
         # updated in the same commit. Task 780's check_story_so_far_cadence
         # moved this from 68 to 69, docstring updated in the same commit.
         # Task 782's check_one_action_invariant moved this from 69 to 70,
-        # docstring updated in the same commit.
-        self.assertEqual(self._real_check_count(), 70)
+        # docstring updated in the same commit. Task 1018's
+        # check_roadmap_buildlog_sync moved this from 70 to 71, docstring
+        # updated in the same commit.
+        self.assertEqual(self._real_check_count(), 71)
 
     def test_stale_27_claim_would_have_been_flagged_against_todays_real_count(self):
         # Mutation-based hand-verification: reconstruct the module's own

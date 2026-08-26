@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Task 121. Off-By-One counts the tool that counts everything else.
 
-`tools/ritual_check.py` hand-wires 70 `check_*` functions into one hourly
+`tools/ritual_check.py` hand-wires 71 `check_*` functions into one hourly
 block: each is called inside `run_ritual_check`, its result assigned to a
 dict key, and that key printed as a line in `format_ritual_check`. Three
 separate places a single typo or a forgotten wire-up can silently drop a
@@ -353,7 +353,14 @@ nothing had ever checked the LIVE tablets structurally -- only
 generator function, never the artifact it actually writes to disk. The
 same "true by convention and unit-test coverage of the generator alone,
 never checked against what shipped" shape task 779's own Wall sweep
-found for `connect.html` against `gateway.py`.
+found for `connect.html` against `gateway.py`. **Updated to 71** the
+same hour task 1018's `check_roadmap_buildlog_sync` was wired in --
+zashiki-warashi's own window-slot build, closing task 1017's real find
+(ROADMAP.md rows silently missing despite real BUILDLOG-logged work)
+with a standing checker rather than leaving it a one-off backfill. This
+module's own live count caught the docstring drift the same hour it was
+introduced -- proof, not narration, that the promise in the paragraph
+above still holds.
 
 Usage:
     python3 tools/ritual_completeness_check.py check
