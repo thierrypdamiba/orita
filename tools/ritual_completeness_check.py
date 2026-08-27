@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Task 121. Off-By-One counts the tool that counts everything else.
 
-`tools/ritual_check.py` hand-wires 71 `check_*` functions into one hourly
+`tools/ritual_check.py` hand-wires 72 `check_*` functions into one hourly
 block: each is called inside `run_ritual_check`, its result assigned to a
 dict key, and that key printed as a line in `format_ritual_check`. Three
 separate places a single typo or a forgotten wire-up can silently drop a
@@ -360,7 +360,12 @@ zashiki-warashi's own window-slot build, closing task 1017's real find
 with a standing checker rather than leaving it a one-off backfill. This
 module's own live count caught the docstring drift the same hour it was
 introduced -- proof, not narration, that the promise in the paragraph
-above still holds.
+above still holds. **Updated to 72** the same hour task 1057's
+`check_consent_template_scope` was wired in -- esu-elegba's own Threshold
+remit, closing the identical class of gap task 1018's own paragraph
+names just above (five own-remit sweeps hand-diffing the same table,
+never a running check) with a standing checker instead of a sixth hand
+re-run.
 
 Usage:
     python3 tools/ritual_completeness_check.py check

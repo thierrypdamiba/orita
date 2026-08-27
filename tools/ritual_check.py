@@ -431,6 +431,12 @@ def _network_boundary_check() -> ModuleType:
     return _load_once("_ritual_network_boundary_check", os.path.join(ROOT, "tools", "network_boundary_check.py"))
 
 
+def _consent_template_scope_check() -> ModuleType:
+    return _load_once(
+        "_ritual_consent_template_scope_check", os.path.join(ROOT, "tools", "consent_template_scope_check.py")
+    )
+
+
 def _site_link_check() -> ModuleType:
     return _load_once("_ritual_site_link_check", os.path.join(ROOT, "tools", "site_link_check.py"))
 
@@ -1875,6 +1881,35 @@ def check_network_boundary(dirs: tuple[str, ...] | None = None) -> dict[str, obj
     return {"clean": not broken, "count": len(raw), "broken": broken}
 
 
+def check_consent_template_scope(template_path: str | None = None) -> dict[str, object]:
+    """Task 1057: fold `consent_template_scope_check.py`'s own drift check
+    into the one block. Five separate own-remit sweeps of The Threshold
+    (tasks 1010, 1017, 1030, 1037, 1050) each hand-diffed `consent.py`'s
+    `REQUIRED_SCOPES` against `.github/ISSUE_TEMPLATE/point-fencepost.md`'s
+    scope-confirm table and reported "byte-identical, no drift" -- true
+    every time, by construction-only assertion, never a running check,
+    the exact shape Iron Rule #1's own history already names as this
+    town's oldest recurring mistake. Built the same hour as the checker
+    it wires in, rather than left to sit built-and-unwired the way
+    `network_boundary_check.py`/`strategy_targets_check.py` both once did
+    (tasks 163/164, 159) -- `ritual_completeness_check.py` only ever
+    audits `check_*` functions already wired into this file, so an
+    unwired checker earns no protection from it.
+
+    Unconditional, local-filesystem-only (reads `consent.py`'s
+    `REQUIRED_SCOPES` dict and the issue template's own markdown, parses,
+    diffs -- no network, no write). Never edits anything; a real drift (a
+    scope added to one side and not the other) is a god-on-duty
+    escalation for whoever holds The Threshold that hour, not something
+    this check silently repairs."""
+    mod = _consent_template_scope_check()
+    kwargs = {}
+    if template_path is not None:
+        kwargs["template_path"] = template_path
+    ok, message = mod.check(**kwargs)
+    return {"clean": ok, "message": message}
+
+
 def check_site_links(docs_dir: str | None = None) -> dict[str, object]:
     """Task 423: fold site_link_check.py's own internal-link scan into the
     one block -- CHARTER.md Appendix B names Ogun's charter duty plainly
@@ -2378,6 +2413,7 @@ def run_ritual_check(
     story_so_far_today: date | None = None,
     strategy_targets_path: str | None = None,
     network_boundary_dirs: tuple[str, ...] | None = None,
+    consent_template_scope_path: str | None = None,
     site_link_docs_dir: str | None = None,
     house_links_houses_dir: str | None = None,
     fencepost_links_dir: str | None = None,
@@ -2517,6 +2553,7 @@ def run_ritual_check(
     )
     strategy_targets = check_strategy_targets(strategy_path=strategy_targets_path)
     network_boundary = check_network_boundary(dirs=network_boundary_dirs)
+    consent_template_scope = check_consent_template_scope(template_path=consent_template_scope_path)
     site_links = check_site_links(docs_dir=site_link_docs_dir)
     house_links = check_house_links(houses_dir=house_links_houses_dir)
     fencepost_links = check_fencepost_links(fencepost_dir=fencepost_links_dir)
@@ -2594,6 +2631,7 @@ def run_ritual_check(
         or (not connected_users["clean"])
         or (not strategy_targets["clean"])
         or (not network_boundary["clean"])
+        or (not consent_template_scope["clean"])
         or (not site_links["clean"])
         or (not house_links["clean"])
         or (not fencepost_links["clean"])
@@ -2670,6 +2708,7 @@ def run_ritual_check(
         "story_so_far": story_so_far,
         "strategy_targets": strategy_targets,
         "network_boundary": network_boundary,
+        "consent_template_scope": consent_template_scope,
         "site_links": site_links,
         "house_links": house_links,
         "fencepost_links": fencepost_links,
@@ -2972,6 +3011,8 @@ def format_ritual_check(result: dict[str, Any]) -> str:
             f"  network boundary: BROKEN -- {len(nb['broken'])} of {nb['count']} file(s) claim "
             f"\"no network\" but don't: {sorted(nb['broken'])}, escalate now"
         )
+    cts = result["consent_template_scope"]
+    lines.append(f"  consent template scope: {'clean' if cts['clean'] else 'BROKEN'} -- {cts['message']}")
     sl = result["site_links"]
     if sl["clean"]:
         lines.append("  site links: clean (every internal docs/ link resolves)")
