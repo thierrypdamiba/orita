@@ -1092,3 +1092,4 @@
 {"type": "check", "tool": "X_WhoAmI", "status": "ok", "checked_at": "2026-08-27T08:26:56Z"}
 {"type": "check", "tool": "X_WhoAmI", "status": "ok", "checked_at": "2026-08-27T11:28:25Z"}
 {"type": "check", "tool": "X_GetUserTweets", "status": "forbidden", "checked_at": "2026-08-27T11:28:25Z"}
+{"type": "check", "tool": "X_WhoAmI", "status": "ok", "checked_at": "2026-08-27T12:29:00Z"}
