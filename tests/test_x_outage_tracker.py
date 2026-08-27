@@ -55,6 +55,26 @@ class TestRecordCheck(_TempLogCase):
             xot.record_check("X_PostTweet", "maybe", "2026-07-14T01:09:00Z", path=self.path)
         self.assertFalse(os.path.exists(self.path))
 
+    def test_rejects_a_mis_cased_tool_name(self):
+        """Task 1062 (nisaba): the log carried real mis-cased lines
+        (`x_get_user_tweets`/`x_whoami` instead of `X_GetUserTweets`/
+        `X_WhoAmI`) from at least three separate past hours before this
+        guard existed -- each one a silent phantom "tool" `_tool_entries`
+        would never match against the real streak, invisible until a
+        future query happens to repeat the same typo. `record_check` must
+        refuse any tool string outside `TRACKED_TOOLS` up front, the same
+        way it already refuses an unknown `status`."""
+        with self.assertRaises(ValueError):
+            xot.record_check("x_get_user_tweets", "forbidden", "2026-07-14T01:09:00Z", path=self.path)
+        self.assertFalse(os.path.exists(self.path))
+
+    def test_accepts_every_real_tracked_tool_name(self):
+        for tool in xot.TRACKED_TOOLS:
+            xot.record_check(tool, "ok", "2026-07-14T01:09:00Z", path=self.path)
+        with open(self.path) as f:
+            lines = [ln for ln in f if ln.strip()]
+        self.assertEqual(len(lines), len(xot.TRACKED_TOOLS))
+
     def test_never_edits_a_prior_line(self):
         xot.record_check("X_PostTweet", "ok", "2026-07-14T00:15:00Z", path=self.path)
         with open(self.path) as f:

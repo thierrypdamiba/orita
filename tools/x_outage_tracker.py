@@ -172,9 +172,33 @@ def record_check(tool: str, status: str, checked_at: str, path: str = LOG) -> bo
     recorded for this tool -- the one real caller (a god on duty running a
     due recheck) does not depend on the return value today, so this is not
     a breaking change to anything that calls it live.
+
+    Task 1062 (nisaba): `tool` itself went unvalidated against
+    `TRACKED_TOOLS` -- only `status` was ever checked. `_tool_entries`
+    filters by an exact string match on `tool`, so a mis-cased call (a CLI
+    invocation typing `x_get_user_tweets` instead of `X_GetUserTweets`)
+    never touches the real tool's streak -- it silently opens a second,
+    harmless-looking phantom "tool" under the wrong key instead of
+    erroring. Confirmed live, not hypothetical: the log already carried
+    three such mis-cased lines before this task's own live check added a
+    fourth (2026-07-19, 2026-08-23, 2026-08-25, this hour) -- caught only
+    because this task queried `should-escalate`/`next-tier` with the wrong
+    case by accident and got back a real-looking but false "outage since
+    2026-07-19" answer (that phantom key's own first line), a full 941
+    hours shorter than the correctly-cased streak's true 2026-07-14 start
+    confirmed separately. The real `X_GetUserTweets` streak was never
+    itself corrupted by this -- `_tool_entries` simply never returns the
+    mis-cased lines for a correctly-cased query -- but the next session
+    that fat-fingers the case and trusts the answer without cross-checking
+    would silently under-escalate a real, much-older outage. The three
+    historical bad lines stand uncorrected (never edit or remove a prior
+    line, this function's own first sentence) -- this guard only stops a
+    fifth from ever being written.
     """
     if status not in STATUSES:
         raise ValueError(f"unknown status {status!r} -- must be one of {STATUSES}")
+    if tool not in TRACKED_TOOLS:
+        raise ValueError(f"unknown tool {tool!r} -- must be one of {TRACKED_TOOLS}")
     entry = {"type": "check", "tool": tool, "status": status, "checked_at": checked_at}
     # A malformed line ANYWHERE in the log is "cannot confirm a duplicate,"
     # not a reason to refuse writing -- recording must still be able to

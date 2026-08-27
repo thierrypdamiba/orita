@@ -1099,3 +1099,7 @@
 {"type": "check", "tool": "X_WhoAmI", "status": "ok", "checked_at": "2026-08-27T17:35:00Z"}
 {"type": "check", "tool": "X_GetUserTweets", "status": "forbidden", "checked_at": "2026-08-27T19:31:40Z"}
 {"type": "check", "tool": "X_WhoAmI", "status": "ok", "checked_at": "2026-08-27T19:27:56Z"}
+{"type": "check", "tool": "x_whoami", "status": "ok", "checked_at": "2026-08-27T20:42:30Z"}
+{"type": "check", "tool": "x_get_user_tweets", "status": "forbidden", "checked_at": "2026-08-27T20:42:30Z"}
+{"type": "check", "tool": "X_WhoAmI", "status": "ok", "checked_at": "2026-08-27T20:42:30Z"}
+{"type": "check", "tool": "X_GetUserTweets", "status": "forbidden", "checked_at": "2026-08-27T20:42:30Z"}
