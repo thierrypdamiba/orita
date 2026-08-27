@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "label": "read-only",
-  "message": "6/6 tools read-only \u00b7 0 writes fired across 85 sealed runs",
+  "message": "6/6 tools read-only \u00b7 0 writes fired across 86 sealed runs",
   "color": "brightgreen",
   "isError": false
 }
