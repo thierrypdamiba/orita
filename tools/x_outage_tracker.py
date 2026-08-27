@@ -184,8 +184,8 @@ def record_check(tool: str, status: str, checked_at: str, path: str = LOG) -> bo
     fourth (2026-07-19, 2026-08-23, 2026-08-25, this hour) -- caught only
     because this task queried `should-escalate`/`next-tier` with the wrong
     case by accident and got back a real-looking but false "outage since
-    2026-07-19" answer (that phantom key's own first line), a full 941
-    hours shorter than the correctly-cased streak's true 2026-07-14 start
+    2026-07-19" answer (that phantom key's own first line), ~133 hours
+    (5.5 days) after the correctly-cased streak's true 2026-07-14 start
     confirmed separately. The real `X_GetUserTweets` streak was never
     itself corrupted by this -- `_tool_entries` simply never returns the
     mis-cased lines for a correctly-cased query -- but the next session
