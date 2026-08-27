@@ -1,0 +1,47 @@
+[
+  {
+    "number": 401,
+    "title": "Add seam recipe for stale draft PRs",
+    "state": "open",
+    "merged": false,
+    "review_decision": "APPROVED",
+    "updated_at": "2026-08-01T09:00:00Z",
+    "url": "https://github.com/example/example-repo/pull/401"
+  },
+  {
+    "number": 402,
+    "title": "Bump lockfile pins",
+    "state": "open",
+    "merged": false,
+    "review_decision": "APPROVED",
+    "updated_at": "2026-08-06T20:00:00Z",
+    "url": "https://github.com/example/example-repo/pull/402"
+  },
+  {
+    "number": 403,
+    "title": "Refactor gap ranking margin",
+    "state": "open",
+    "merged": false,
+    "review_decision": "CHANGES_REQUESTED",
+    "updated_at": "2026-08-06T21:30:00Z",
+    "url": "https://github.com/example/example-repo/pull/403"
+  },
+  {
+    "number": 404,
+    "title": "Typo fix in README",
+    "state": "open",
+    "merged": false,
+    "review_decision": null,
+    "updated_at": "2026-08-06T22:00:00Z",
+    "url": "https://github.com/example/example-repo/pull/404"
+  },
+  {
+    "number": 405,
+    "title": "Wire combined_scan into seam-scan.yml",
+    "state": "closed",
+    "merged": true,
+    "review_decision": "APPROVED",
+    "updated_at": "2026-07-20T00:00:00Z",
+    "url": "https://github.com/example/example-repo/pull/405"
+  }
+]

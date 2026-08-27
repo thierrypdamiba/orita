@@ -1,0 +1,12 @@
+{
+  "slug": "approved-pr-still-unmerged",
+  "title": "A pull request has an approving review, but the PR itself never merged",
+  "author": "zashiki-warashi",
+  "description": "Reads the repository's own open pull requests against each PR's own live review decision, and surfaces a PR that already carries an APPROVED review while it sits open and unmerged. Structural, single-toolkit: GitHub's own review-decision field and a PR's own merged/state fields already carry both halves of the promise (a reviewer said yes; the door never opened), and nothing in the API ever compares them or reminds anyone the merge button is still there.",
+  "toolkit": "github",
+  "scopes": ["ListPullRequests"],
+  "fixture": "fixtures/approved_pr_still_unmerged",
+  "detector_file": "detector.py",
+  "entrypoint": "run_recipe_scan",
+  "confidence_notes": "Age-gated on how long the PR's own updated_at has sat still while its review_decision reads APPROVED -- 24 hours, the same bar pr-checklist-complete-still-open and issue-checklist-complete-still-open both already use, since a pull request carries no real 'went-approved-at' timestamp either; updated_at is the closest real signal the object exposes. Under 24h scores 0.5 (below the 0.70 confidence bar, weighed in the tail not hidden -- the author may simply not have gotten to the merge button yet). At or past 24h scores a flat 0.85 -- GitHub's own review_decision field is an unambiguous, non-fuzzy structural read, not a guess. A PR with review_decision of CHANGES_REQUESTED or REVIEW_REQUIRED (or null, no review yet) is excluded at confidence 0.0, named not hidden -- no approval promise was ever made. A PR that is already merged or closed is excluded at confidence 0.0 too -- the door already resolved, whatever its review decision says."
+}

@@ -1749,6 +1749,22 @@ gateway today — the identical "connected upstream, not wired into the
 gateway" shape `SCOPES.md`'s Slack and Linear WIP notes already document
 for their own toolkit.
 
+[`RECIPES/approved-pr-still-unmerged/`](RECIPES/approved-pr-still-unmerged/)
+is the ninety-fourth (ROADMAP.md #1046), and watches the seam from the
+other side of the room than `pr-checklist-complete-still-open` (the
+fifty-second) does: not what the author claimed complete, but what a
+reviewer already granted. GitHub renders a green "Approved" badge the
+instant a review lands, and does precisely nothing with that moment —
+merging is always a separate, human, forgettable step, the same
+"no trigger ever existed to fire" shape `overdue-milestone-still-open` and
+`stale-branch-no-pr` already proved for their own single-object seams. An
+approved PR left open is a common, mundane failure in real teams: the
+approval arrives, the author gets pulled onto something else, and the
+merge button just waits. Single toolkit, `github`-only, so the total
+recipe count climbs while the plus-joined count does not (29 of 93 → 29
+of 94). `ListPullRequests` was already cleared on `SCOPES.md`'s oath
+table — no new scope asked for anywhere in this recipe.
+
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)
 (ROADMAP.md #111) is that second promise, kept: it runs `scan.py`'s own
