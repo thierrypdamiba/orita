@@ -274,6 +274,123 @@ class MainCliCase(unittest.TestCase):
         )
         self.assertEqual(proc.returncode, 0)
         self.assertIn("one action invariant: clean", proc.stdout)
+        self.assertIn("one action draft invariant: clean", proc.stdout)
+
+
+_GOOD_NOTION_MOVE = "Your move: Post about it yourself — a single line linking it is enough."
+_TWO_NOTION_MOVES = _GOOD_NOTION_MOVE + "\n\n" + _GOOD_NOTION_MOVE
+_EXECUTED_NOTION_MOVE = "Your move: Fencepost has posted about it already."
+
+
+def _write_draft(dirpath: str, name: str, body: str) -> str:
+    path = os.path.join(dirpath, name)
+    with open(path, "w", encoding="utf-8") as f:
+        f.write(body)
+    return path
+
+
+class DraftPathsCase(unittest.TestCase):
+    def test_skips_readme(self):
+        with tempfile.TemporaryDirectory() as d:
+            _write_draft(d, "2026-07-12-email.md", _GOOD_MOVE)
+            _write_draft(d, "README.md", "not a preview")
+            paths = src._draft_paths(d)
+            self.assertEqual([os.path.basename(p) for p in paths], ["2026-07-12-email.md"])
+
+    def test_sorted(self):
+        with tempfile.TemporaryDirectory() as d:
+            _write_draft(d, "2026-07-12-notion.md", _GOOD_NOTION_MOVE)
+            _write_draft(d, "2026-07-12-email.md", _GOOD_MOVE)
+            paths = src._draft_paths(d)
+            self.assertEqual(
+                [os.path.basename(p) for p in paths],
+                ["2026-07-12-email.md", "2026-07-12-notion.md"],
+            )
+
+
+class DraftMoveLinesCase(unittest.TestCase):
+    def test_finds_the_markdown_email_marker(self):
+        self.assertEqual(len(src._draft_move_lines(_GOOD_MOVE)), 1)
+
+    def test_finds_the_plain_text_notion_marker(self):
+        lines = src._draft_move_lines(_GOOD_NOTION_MOVE)
+        self.assertEqual(len(lines), 1)
+        self.assertTrue(lines[0].startswith("Post about it yourself"))
+        self.assertNotIn("Your move:", lines[0])
+
+    def test_finds_no_move_line(self):
+        self.assertEqual(src._draft_move_lines(_NO_MOVE), [])
+
+    def test_finds_two_notion_move_lines(self):
+        self.assertEqual(len(src._draft_move_lines(_TWO_NOTION_MOVES)), 2)
+
+
+class CheckDraftOneActionInvariantCase(unittest.TestCase):
+    def test_empty_directory_reads_clean(self):
+        with tempfile.TemporaryDirectory() as d:
+            result = src.check_draft_one_action_invariant(d)
+            self.assertTrue(result["clean"])
+            self.assertEqual(result["checked"], 0)
+
+    def test_email_and_notion_drafts_both_reading_clean(self):
+        with tempfile.TemporaryDirectory() as d:
+            _write_draft(d, "2026-07-12-email.md", _GOOD_MOVE)
+            _write_draft(d, "2026-07-12-notion.md", _GOOD_NOTION_MOVE)
+            result = src.check_draft_one_action_invariant(d)
+            self.assertTrue(result["clean"], result["reason"])
+            self.assertEqual(result["checked"], 2)
+
+    def test_a_draft_with_no_move_line_flips_dirty(self):
+        with tempfile.TemporaryDirectory() as d:
+            _write_draft(d, "2026-07-12-email.md", _NO_MOVE)
+            result = src.check_draft_one_action_invariant(d)
+            self.assertFalse(result["clean"])
+            self.assertEqual(result["wrong_count"][0]["path"], "2026-07-12-email.md")
+            self.assertEqual(result["wrong_count"][0]["count"], 0)
+
+    def test_a_notion_draft_whose_move_reads_as_fencepost_s_own_action_flips_dirty(self):
+        with tempfile.TemporaryDirectory() as d:
+            _write_draft(d, "2026-07-12-notion.md", _EXECUTED_NOTION_MOVE)
+            result = src.check_draft_one_action_invariant(d)
+            self.assertFalse(result["clean"])
+            self.assertEqual(result["first_person"][0]["phrase"], "fencepost has posted")
+
+    def test_readme_is_ignored_entirely(self):
+        with tempfile.TemporaryDirectory() as d:
+            _write_draft(d, "2026-07-12-email.md", _GOOD_MOVE)
+            _write_draft(d, "README.md", "Some prose that never carries a move line at all.")
+            result = src.check_draft_one_action_invariant(d)
+            self.assertTrue(result["clean"])
+            self.assertEqual(result["checked"], 1)
+
+
+class FormatDraftResultCase(unittest.TestCase):
+    def test_clean_line_names_the_count(self):
+        result = {"clean": True, "reason": "2 draft preview(s), each carries exactly one reader-phrased 'Your move' line"}
+        line = src.format_draft_result(result)
+        self.assertIn("clean", line)
+        self.assertIn("2 draft preview", line)
+
+    def test_broken_line_names_broken(self):
+        result = {"clean": False, "reason": "1 draft with != 1 'Your move' line: 2026-07-12-email.md (0)"}
+        line = src.format_draft_result(result)
+        self.assertIn("BROKEN", line)
+        self.assertIn("2026-07-12-email.md", line)
+
+
+class LiveRealDraftsSweepCase(unittest.TestCase):
+    """The actual point: proves the real, already-committed
+    `fencepost/DRAFTS/*.md` previews in the live checkout hold the
+    invariant this checker exists to enforce."""
+
+    def test_real_drafts_directory_is_clean(self):
+        result = src.check_draft_one_action_invariant()
+        self.assertTrue(result["clean"], result["reason"])
+        self.assertEqual(result["checked"], 2)
+
+    def test_default_drafts_dir_points_at_the_real_directory(self):
+        self.assertTrue(src.DEFAULT_DRAFTS_DIR.endswith(os.path.join("fencepost", "DRAFTS")))
+        self.assertTrue(os.path.isdir(src.DEFAULT_DRAFTS_DIR))
 
 
 if __name__ == "__main__":

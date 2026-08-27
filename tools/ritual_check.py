@@ -1344,6 +1344,19 @@ def check_one_action_invariant(reports_dir: str | None = None) -> dict[str, obje
     return cast(dict[str, object], mod.check_one_action_invariant(**kwargs))
 
 
+def check_draft_one_action_invariant(drafts_dir: str | None = None) -> dict[str, object]:
+    """Sibling of `check_one_action_invariant` for `fencepost/DRAFTS/`:
+    folds `one_action_check.py`'s own sweep of the two illustrative
+    write-back previews (the email draft and the Notion draft named in
+    STRATEGY.md) into the same hourly block. Same unconditional treatment
+    -- a real hit here DOES flip `broken`, not an honest zero-state."""
+    mod = _one_action_check()
+    kwargs = {}
+    if drafts_dir is not None:
+        kwargs["drafts_dir"] = drafts_dir
+    return cast(dict[str, object], mod.check_draft_one_action_invariant(**kwargs))
+
+
 def check_ritual_completeness(
     source_path: str | None = None,
     tools_dir: str | None = None,
@@ -2435,6 +2448,7 @@ def run_ritual_check(
     metrics_field_completeness_metrics_path: str | None = None,
     metrics_field_completeness_tools_dir: str | None = None,
     one_action_reports_dir: str | None = None,
+    one_action_drafts_dir: str | None = None,
     strategy_true_positive_path: str | None = None,
     strategy_true_positive_ledger_base: str | None = None,
     gap_true_positive_metrics_path: str | None = None,
@@ -2477,6 +2491,7 @@ def run_ritual_check(
     report_accuracy = check_report_accuracy(report, live_scan)
     report_regression = check_report_regression()
     one_action = check_one_action_invariant(reports_dir=one_action_reports_dir)
+    one_action_draft = check_draft_one_action_invariant(drafts_dir=one_action_drafts_dir)
     recheck = check_x_recheck(now_iso)
     escalation = check_x_escalation(now_iso)
     square = check_square(square_state, now_iso)
@@ -2653,6 +2668,7 @@ def run_ritual_check(
         or (not metrics_field_completeness["clean"])
         or (not report_regression["clean"])
         or (not one_action["clean"])
+        or (not one_action_draft["clean"])
     )
     return {
         "now": now_iso,
@@ -2663,6 +2679,7 @@ def run_ritual_check(
         "report_accuracy": report_accuracy,
         "report_regression": report_regression,
         "one_action": one_action,
+        "one_action_draft": one_action_draft,
         "x_recheck": recheck,
         "x_escalation": escalation,
         "square": square,
@@ -2761,6 +2778,8 @@ def format_ritual_check(result: dict[str, Any]) -> str:
     lines.append(f"  report regression: {'clean' if rr['clean'] else 'REGRESSED'} -- {rr['reason']}")
     oa = result["one_action"]
     lines.append(f"  one action invariant: {'clean' if oa['clean'] else 'BROKEN'} -- {oa['reason']}")
+    oad = result["one_action_draft"]
+    lines.append(f"  one action draft invariant: {'clean' if oad['clean'] else 'BROKEN'} -- {oad['reason']}")
     for tool, info in result["x_recheck"].items():
         lines.append(f"  {tool}: {'due' if info['due'] else 'not due'} -- {info['status_line']}")
     for tool, info in result["x_escalation"].items():

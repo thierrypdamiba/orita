@@ -74,6 +74,7 @@ import text_patterns  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DEFAULT_REPORTS_DIR = os.path.join(ROOT, "fencepost", "REPORTS")
+DEFAULT_DRAFTS_DIR = os.path.join(ROOT, "fencepost", "DRAFTS")
 
 # The shared "YYYY-MM-DD.md" tablet-name pattern -- `report_cadence_check.py`
 # and `petition_cadence_check.py` already import this same constant rather
@@ -84,6 +85,17 @@ DEFAULT_REPORTS_DIR = os.path.join(ROOT, "fencepost", "REPORTS")
 # flagged the moment it existed).
 _DATE_NAME = text_patterns.DATE_NAME_MD
 _MOVE_LINE_RE = re.compile(r"^\*\*Your move\.\*\*\s*(.*)$", re.MULTILINE)
+
+# `fencepost/DRAFTS/*-notion.md` illustrates STRATEGY.md's OTHER named
+# write-back destination (a Notion page, alongside the email draft the
+# markdown marker above already covers) and renders the identical hand-off
+# as unstyled plain text -- no markdown survives a Notion paste -- so it
+# reads "Your move: ..." rather than "**Your move.** ...". Both are real,
+# on-disk illustrations of the same law; a checker that only knew the
+# email draft's markup would silently read the Notion draft as the "hand-
+# off dropped entirely" failure `check_draft_one_action_invariant` exists
+# to catch, which is exactly backwards.
+_NOTION_MOVE_LINE_RE = re.compile(r"^Your move:\s*(.*)$", re.MULTILINE)
 
 # A first-person-executed verb naming something Fencepost, "I", or "we"
 # already did or is about to do -- the exact thing STRATEGY.md's law
@@ -280,6 +292,88 @@ def format_result(result: dict[str, object]) -> str:
     return f"one action invariant: {status} -- {cast(str, result['reason'])}"
 
 
+def _draft_paths(drafts_dir: str) -> list[str]:
+    """Every real illustrative preview file in `fencepost/DRAFTS/`, sorted,
+    skipping `README.md` -- the identical "ignore what doesn't conform"
+    discipline `_sealed_report_dates_and_paths` already holds for
+    `REPORTS/`."""
+    return sorted(
+        p
+        for p in glob.glob(os.path.join(drafts_dir, "*.md"))
+        if os.path.basename(p) != "README.md"
+    )
+
+
+def _draft_move_lines(text: str) -> list[str]:
+    """Every move line's own trailing text in one draft, in document
+    order, across BOTH illustrated write-back formats: the email draft's
+    markdown `**Your move.**` and the Notion draft's plain-text
+    `Your move:`. A draft naming both markers at once (not expected on
+    disk today) would report both lines here, correctly tripping the
+    "!= 1 line" half of the invariant below rather than silently picking
+    one."""
+    return _move_lines(text) + [m.group(1).strip() for m in _NOTION_MOVE_LINE_RE.finditer(text)]
+
+
+def check_draft_one_action_invariant(drafts_dir: str = DEFAULT_DRAFTS_DIR) -> dict[str, object]:
+    """Sweep every real preview file in `fencepost/DRAFTS/` for the same
+    "The One Action, Left to You" law `check_one_action_invariant` already
+    proves against `fencepost/REPORTS/`. These two files are STRATEGY.md's
+    own named write-back destinations made concrete ("an email-to-self
+    draft or a Notion page") -- the exact artifact a real forked user's
+    Fencepost would write back to once connected -- and until this task
+    nothing had ever checked the promise held there either, only in the
+    daily-sealed Report tablets. Returns the same `clean`/`reason` shape,
+    never a bare pass/fail."""
+    paths = _draft_paths(drafts_dir)
+    wrong_count: list[dict[str, object]] = []
+    first_person: list[dict[str, object]] = []
+    for path in paths:
+        with open(path, encoding="utf-8") as f:
+            text = f.read()
+        moves = _draft_move_lines(text)
+        name = os.path.basename(path)
+        if len(moves) != 1:
+            wrong_count.append({"path": name, "count": len(moves)})
+            continue
+        phrase = _first_person_violation(moves[0])
+        if phrase is not None:
+            first_person.append({"path": name, "phrase": phrase, "line": moves[0]})
+    clean = not wrong_count and not first_person
+    if clean:
+        return {
+            "clean": True,
+            "reason": (
+                f"{len(paths)} draft preview(s), each carries exactly one "
+                f"reader-phrased 'Your move' line"
+            ),
+            "checked": len(paths),
+            "wrong_count": wrong_count,
+            "first_person": first_person,
+        }
+    parts = []
+    if wrong_count:
+        detail = ", ".join(f"{e['path']} ({e['count']})" for e in wrong_count)
+        plural = "" if len(wrong_count) == 1 else "s"
+        parts.append(f"{len(wrong_count)} draft{plural} with != 1 'Your move' line: {detail}")
+    if first_person:
+        detail = ", ".join(f"{e['path']} ({e['phrase']!r})" for e in first_person)
+        plural = "" if len(first_person) == 1 else "s"
+        parts.append(f"{len(first_person)} draft{plural} whose move line reads as Fencepost's own action: {detail}")
+    return {
+        "clean": False,
+        "reason": "; ".join(parts),
+        "checked": len(paths),
+        "wrong_count": wrong_count,
+        "first_person": first_person,
+    }
+
+
+def format_draft_result(result: dict[str, object]) -> str:
+    status = "clean" if result["clean"] else "BROKEN"
+    return f"one action draft invariant: {status} -- {cast(str, result['reason'])}"
+
+
 if __name__ == "__main__":
     argv = sys.argv[1:]
     if not argv or argv[0] != "check":
@@ -287,4 +381,6 @@ if __name__ == "__main__":
         sys.exit(1)
     out = check_one_action_invariant()
     print(format_result(out))
-    sys.exit(0 if out["clean"] else 1)
+    draft_out = check_draft_one_action_invariant()
+    print(format_draft_result(draft_out))
+    sys.exit(0 if out["clean"] and draft_out["clean"] else 1)

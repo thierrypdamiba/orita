@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Task 121. Off-By-One counts the tool that counts everything else.
 
-`tools/ritual_check.py` hand-wires 72 `check_*` functions into one hourly
+`tools/ritual_check.py` hand-wires 73 `check_*` functions into one hourly
 block: each is called inside `run_ritual_check`, its result assigned to a
 dict key, and that key printed as a line in `format_ritual_check`. Three
 separate places a single typo or a forgotten wire-up can silently drop a
@@ -365,7 +365,13 @@ above still holds. **Updated to 72** the same hour task 1057's
 remit, closing the identical class of gap task 1018's own paragraph
 names just above (five own-remit sweeps hand-diffing the same table,
 never a running check) with a standing checker instead of a sixth hand
-re-run.
+re-run. **Updated to 73** the same hour task 1059's
+`check_draft_one_action_invariant` was wired in -- retrya's own One
+Action remit: `check_one_action_invariant` (task 782) had only ever swept
+`fencepost/REPORTS/*.md`, never STRATEGY.md's other two named write-back
+destinations sitting in `fencepost/DRAFTS/` (the email-to-self draft and
+the Notion page illustration), so a regression there could break the same
+promise unnoticed.
 
 Usage:
     python3 tools/ritual_completeness_check.py check
