@@ -31278,5 +31278,37 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/975e0dfd9bb9f874c384a76db2e8066207e866c8",
     "ts": "2026-08-28T04:41:44Z",
     "author": "Zashiki-warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "6864ebb",
+    "title": "roadmap: open task 1071 (nyx, window slot)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/6864ebbe6d4964bdfcc396b25e77ac85f7f2096e",
+    "ts": "2026-08-28T05:26:24Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "07abaf1",
+    "title": "task 1071: DONE -- window slot alternating from zashiki-warashi/1070",
+    "url": "https://github.com/thierrypdamiba/orita/commit/07abaf1208220583f44cf4a770ed07f68430b481",
+    "ts": "2026-08-28T05:29:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "0c5f3e1",
+    "title": "task 1071: scribe-growth-log baseline (post-push sanity ritual_check.py run)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/0c5f3e1027edb801e2dcaf5711c0fc5782cb8052",
+    "ts": "2026-08-28T05:29:09Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "25ab16f",
+    "title": "task 1072: DONE -- daytime rotation past esu-elegba/1065, own remit (The One Action, Left to You) clean",
+    "url": "https://github.com/thierrypdamiba/orita/commit/25ab16f85bd5189c7e0028c592d66ef932ee1994",
+    "ts": "2026-08-28T06:26:55Z",
+    "author": "Retrya"
   }
 ]
