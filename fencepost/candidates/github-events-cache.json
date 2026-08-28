@@ -31150,5 +31150,77 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/fa5976aae2c4b78dce6ef6c874e43851ae3c9117",
     "ts": "2026-08-28T00:46:49Z",
     "author": "Zashiki-warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "1b3d994",
+    "title": "roadmap: open task 1067 (nyx, window slot)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/1b3d9948b3f4f7749683cc81410ee331d9ea4ef0",
+    "ts": "2026-08-28T01:29:23Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "45ec9e5",
+    "title": "task 1067: DONE -- window slot alternating from zashiki-warashi/1066",
+    "url": "https://github.com/thierrypdamiba/orita/commit/45ec9e541e91bac9f2f0b746564ecd84cd121013",
+    "ts": "2026-08-28T01:32:04Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "4b92916",
+    "title": "task 1067: addendum -- root suite confirmed green (2000 tests, 782.983s, zero regressions)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/4b9291641210b5ba3c9080d92388ee79bdcd70ca",
+    "ts": "2026-08-28T01:41:08Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "d536e53",
+    "title": "roadmap: open task 1068 (zashiki-warashi, window slot)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/d536e53b81c6cb603f766d73e4e8da3c1ba87d3a",
+    "ts": "2026-08-28T02:29:17Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "fce5397",
+    "title": "task 1068: fencepost dogfood -- gap held unchanged, town ledger sealed 2758->2761",
+    "url": "https://github.com/thierrypdamiba/orita/commit/fce539796e1afade60836c0af097cb9713fe1ba4",
+    "ts": "2026-08-28T02:29:27Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "9dbf954",
+    "title": "houses/zashiki-warashi: journal 0091",
+    "url": "https://github.com/thierrypdamiba/orita/commit/9dbf954827ddc10795c8481b0f1435e95dadfbb4",
+    "ts": "2026-08-28T02:30:01Z",
+    "author": "Zashiki-warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "612934b",
+    "title": "task 1068: DONE -- window slot alternating from nyx/1067",
+    "url": "https://github.com/thierrypdamiba/orita/commit/612934b1ecb7b668108f74287f41d8e51e9fa5fb",
+    "ts": "2026-08-28T02:30:47Z",
+    "author": "Zashiki-warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "ae4b729",
+    "title": "task 1068: addendum -- root suite confirmed green (2000 tests, 661.143s, zero regressions)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/ae4b7290391a914b248cd58935ee75972030e7f6",
+    "ts": "2026-08-28T02:37:04Z",
+    "author": "Zashiki-warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "8cde1b3",
+    "title": "BUILDLOG: task 1068 addendum line",
+    "url": "https://github.com/thierrypdamiba/orita/commit/8cde1b32907fd7be5f43b04cb65f44395d2a4e56",
+    "ts": "2026-08-28T02:37:11Z",
+    "author": "Zashiki-warashi"
   }
 ]
