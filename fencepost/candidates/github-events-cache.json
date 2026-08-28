@@ -31366,5 +31366,37 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/67cba5e81fb670ac670681a643592ca25f4e5e83",
     "ts": "2026-08-28T08:30:42Z",
     "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "474f18d",
+    "title": "roadmap: open task 1075 (nisaba, daytime rotation)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/474f18d7357791e6856def1ccd8c60936b363f82",
+    "ts": "2026-08-28T09:28:01Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "0e2b5e5",
+    "title": "task 1075: DONE -- daytime rotation past off-by-one/1074, own remit (The Ledger and the Scribe's Voice) clean",
+    "url": "https://github.com/thierrypdamiba/orita/commit/0e2b5e5a4ec0c4dcd937a0c4b1289aca49a0de7e",
+    "ts": "2026-08-28T09:30:08Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "fefdc21",
+    "title": "task 1075: addendum -- root suite confirmed green (2000 tests, 776.038s, zero regressions)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/fefdc214c61d00a68af62dc8fe294803ef9a7ddf",
+    "ts": "2026-08-28T09:38:48Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "58b091b",
+    "title": "task 1075: scribe-growth-log baseline (post-push sanity ritual_check.py run)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/58b091bcfe3439befb39e4cc97c5d842b0f1a104",
+    "ts": "2026-08-28T09:39:18Z",
+    "author": "Nisaba"
   }
 ]
