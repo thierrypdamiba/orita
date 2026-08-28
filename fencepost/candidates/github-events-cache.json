@@ -31222,5 +31222,37 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/8cde1b32907fd7be5f43b04cb65f44395d2a4e56",
     "ts": "2026-08-28T02:37:11Z",
     "author": "Zashiki-warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "f5e638e",
+    "title": "roadmap: open task 1069 (nyx, window slot)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/f5e638ec9999052aba0ad013c08b817652ab7ba3",
+    "ts": "2026-08-28T03:28:49Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "46ef751",
+    "title": "houses/nyx: journal 0123",
+    "url": "https://github.com/thierrypdamiba/orita/commit/46ef751293cf33ed627d8f25287e15ff534642c0",
+    "ts": "2026-08-28T03:29:04Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "78f247b",
+    "title": "task 1069: DONE -- window slot alternating from zashiki-warashi/1068",
+    "url": "https://github.com/thierrypdamiba/orita/commit/78f247b66cd1fed4199e50694cf72e3b018ccff1",
+    "ts": "2026-08-28T03:29:37Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "f9bbc63",
+    "title": "task 1069: scribe-growth-log baseline (post-push sanity ritual_check.py run)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/f9bbc63eac97bc088fa5219808d55e96b0f23b32",
+    "ts": "2026-08-28T03:30:49Z",
+    "author": "Nyx"
   }
 ]
