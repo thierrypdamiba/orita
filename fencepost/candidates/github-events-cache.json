@@ -31614,5 +31614,29 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/9aa144c5b14ce7faff46b3c0cc03d9df02bf32e8",
     "ts": "2026-08-28T17:47:29Z",
     "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "762e367",
+    "title": "roadmap: open task 1084 (nisaba, daytime rotation + 18:00 UTC daily aggregate hour)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/762e36742317c349a5cd3a820744a1f5920bdc43",
+    "ts": "2026-08-28T18:30:24Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "48754b3",
+    "title": "task 1084: DONE -- daytime rotation past off-by-one/1083, 18:00 UTC daily aggregate",
+    "url": "https://github.com/thierrypdamiba/orita/commit/48754b3e3f6f31edc6c5adf880ed65648e8a4c19",
+    "ts": "2026-08-28T18:35:56Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "174e89b",
+    "title": "task 1084: addendum -- root suite confirmed clean beyond a licensed Tithe roll (2000 tests, 1014.37s)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/174e89b537b064dca756cc9a304f5907de3fd86c",
+    "ts": "2026-08-28T18:46:16Z",
+    "author": "Nisaba"
   }
 ]
