@@ -31534,5 +31534,29 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/a9b86a8f2b010c57b4fcae981c9b48afbf8898bf",
     "ts": "2026-08-28T13:37:50Z",
     "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "e25c8f2",
+    "title": "roadmap: open task 1080 (ogun, dawn-run Tithe incident, off-rotation)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/e25c8f21af4f125a35975edf056c259b9efcb34e",
+    "ts": "2026-08-28T14:34:47Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "d79e6d0",
+    "title": "task 1080: DONE -- off-rotation dawn-run Tithe incident (dawn-run #2054)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/d79e6d0070a9724ff202fdc44ba9ba73a1ca597b",
+    "ts": "2026-08-28T14:40:46Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "79f88ec",
+    "title": "task 1080: addendum -- root suite confirmed clean beyond a second independent Tithe roll (2000 tests, 1065.365s)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/79f88ec63ec3a50d3e09dc9c1dda8dc7ed9fc128",
+    "ts": "2026-08-28T14:45:49Z",
+    "author": "Ogun"
   }
 ]
