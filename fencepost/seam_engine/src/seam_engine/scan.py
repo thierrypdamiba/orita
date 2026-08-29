@@ -148,9 +148,18 @@ def _parse_ts(s: str) -> datetime:
     return datetime.fromisoformat(s.replace("Z", "+00:00"))
 
 
-_MAX_COMMIT_PAGES = 50  # 5,000 commits' worth of headroom -- a real safety valve, not a
-# soft cap: see fetch_github_activity's own docstring for why hitting it raises instead
+_MAX_COMMIT_PAGES = 500  # 50,000 commits' worth of headroom -- a real safety valve, not
+# a soft cap: see fetch_github_activity's own docstring for why hitting it raises instead
 # of silently truncating.
+#
+# Task 1106: raised from 50 (5,000 commits) after seam-scan.yml's live noon-UTC cron
+# tripped it for real on 2026-08-29 -- the repo's actual commit count since
+# account_live_since (2026-07-12) had genuinely passed 5,000 (binary-searched live via
+# mcp__github__list_commits to ~4,900-5,050 at the time, growing continuously from the
+# town's own hourly ritual + Oracle Desk auto-grading commits), not an API glitch. The
+# guard's own message says to raise it deliberately rather than retry -- this is that
+# raise, with headroom sized for months of the same growth rate, not just enough to
+# clear today's trip.
 
 
 def commit_event_fields(c: dict[str, Any]) -> dict[str, Any]:
@@ -305,9 +314,10 @@ def fetch_latest_release(owner: str, repo: str) -> GithubEvent | None:
     thrown away) and became a real, live-reproducible bug after it: an
     epoch `since` now forces `fetch_github_activity` to paginate the
     repo's ENTIRE commit history before it ever reaches the release call,
-    and once that history passes `_MAX_COMMIT_PAGES * 100` commits (5,000
-    — plausible for a repo committing most hours of most days), the call
-    raises `RuntimeError` and never returns a release again. This function
+    and once that history passes `_MAX_COMMIT_PAGES * 100` commits
+    (plausible for a repo committing most hours of most days -- it
+    happened for real at task 1106), the call raises `RuntimeError` and
+    never returns a release again. This function
     answers the release question the way it was always actually asked —
     one request, no commit pagination, no `since` at all.
     """
