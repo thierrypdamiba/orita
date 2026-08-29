@@ -1,0 +1,18 @@
+[
+  {
+    "number": 56,
+    "title": "PR body claims the same real open milestone",
+    "state": "open",
+    "body": "Related to milestone #8301 as well.",
+    "updated_at": "2026-08-24T13:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/pull/56"
+  },
+  {
+    "number": 57,
+    "title": "PR body claims the same real closed milestone",
+    "state": "open",
+    "body": "Already covered by milestone #8302, so closing this out.",
+    "updated_at": "2026-08-24T13:30:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/pull/57"
+  }
+]

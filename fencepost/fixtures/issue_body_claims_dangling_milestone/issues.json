@@ -1,0 +1,42 @@
+[
+  {
+    "number": 80,
+    "title": "Body-side dangling milestone claim, filed twice",
+    "state": "open",
+    "body": "Milestone #8999 shipped as part of this. Milestone #8999 confirmed again -- still don't think it's real.",
+    "updated_at": "2026-08-24T09:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/issues/80"
+  },
+  {
+    "number": 81,
+    "title": "Claims a real, still-open milestone",
+    "state": "open",
+    "body": "This also finishes milestone #8301 while we're in here.",
+    "updated_at": "2026-08-24T10:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/issues/81"
+  },
+  {
+    "number": 82,
+    "title": "Claims a real, already-closed milestone",
+    "state": "open",
+    "body": "Already covered by milestone #8302, so closing this out.",
+    "updated_at": "2026-08-24T11:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/issues/82"
+  },
+  {
+    "number": 83,
+    "title": "Bare issue reference, no milestone claim phrase",
+    "state": "open",
+    "body": "See #5 for context, same root cause.",
+    "updated_at": "2026-08-24T12:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/issues/83"
+  },
+  {
+    "number": 84,
+    "title": "Blank body, filed from the mobile app",
+    "state": "open",
+    "body": "",
+    "updated_at": "2026-08-24T12:30:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/issues/84"
+  }
+]

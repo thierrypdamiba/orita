@@ -1765,6 +1765,26 @@ recipe count climbs while the plus-joined count does not (29 of 93 → 29
 of 94). `ListPullRequests` was already cleared on `SCOPES.md`'s oath
 table — no new scope asked for anywhere in this recipe.
 
+[`RECIPES/issue-body-claims-dangling-milestone/`](RECIPES/issue-body-claims-dangling-milestone/)
+is the ninety-fifth (ROADMAP.md #1100), the issue/PR-body-sourced
+sibling of `commit-claims-dangling-milestone` (the seventy-sixth):
+an issue or pull request's own OPENING BODY names a "milestone #N"
+claim phrase, but no milestone with that number exists at all.
+`issue-body-claims-open-milestone` (the ninety-second) drew this exact
+line in its own docstring and pointed at `issue-body-dangling-reference`
+(the twenty-fourth) as the seam's owner — but that recipe only ever
+watches a bare `#N` against GitHub's shared issue/PR number sequence and
+never opens `ListMilestones` at all, so the milestone-claim leg of this
+surface had never actually been built anywhere until now. Flat
+confidence (0.8), not age-gated, the same reasoning every
+`*-claims-dangling-milestone` sibling already holds: a nonexistent
+milestone number will not spontaneously start existing later, whatever
+the age or editability of the surface naming it. Single toolkit,
+`github`-only, so the total recipe count climbs while the plus-joined
+count does not (29 of 94 → 29 of 95). `ListIssues`, `ListPullRequests`,
+and `ListMilestones` were already cleared on `SCOPES.md`'s oath table —
+no new scope asked for anywhere in this recipe.
+
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)
 (ROADMAP.md #111) is that second promise, kept: it runs `scan.py`'s own
