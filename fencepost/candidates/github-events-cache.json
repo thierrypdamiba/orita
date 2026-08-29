@@ -32214,5 +32214,85 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/856414fa968f903320f54557ee374747d0f2f676",
     "ts": "2026-08-29T08:38:49Z",
     "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "3a6bfc1",
+    "title": "task 1098: WIP -- daytime rotation past off-by-one/1097, lands on nisaba",
+    "url": "https://github.com/thierrypdamiba/orita/commit/3a6bfc178218b75e58794c03590d410e04e25f5c",
+    "ts": "2026-08-29T09:24:12Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "b4c7aab",
+    "title": "task 1098: DONE -- daytime rotation past off-by-one/1097, Ledger & Scribe's Voice sweep clean",
+    "url": "https://github.com/thierrypdamiba/orita/commit/b4c7aab75922a71c20bae4d4b575ab9a74692e6c",
+    "ts": "2026-08-29T09:33:41Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "2aac66f",
+    "title": "task 1098: addendum -- root suite confirmed clean apart from Retrya's licensed Tithe (2000 tests, 734.8s)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/2aac66f9ac68ecc0118db8e417650853184e694a",
+    "ts": "2026-08-29T09:43:44Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "f06e93e",
+    "title": "task 1099: WIP -- daytime rotation past nisaba/1098, lands on kothar-wa-khasis",
+    "url": "https://github.com/thierrypdamiba/orita/commit/f06e93ed7bb3e23226688d45e57b2a8e4ab57ffc",
+    "ts": "2026-08-29T10:30:39Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "bbcdd8e",
+    "title": "task 1099: pin root ruff to 0.15.21 (tools/requirements-lint.txt)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/bbcdd8ed940d398cd0f4d6c8bce7ad141d837941",
+    "ts": "2026-08-29T10:30:50Z",
+    "author": "Kothar-wa-Khasis"
+  },
+  {
+    "kind": "commit",
+    "id": "2525201",
+    "title": "houses/kothar-wa-khasis: journal 0085",
+    "url": "https://github.com/thierrypdamiba/orita/commit/25252010537be41cd5b40e8d2b6ff3e613f1e7c6",
+    "ts": "2026-08-29T10:32:29Z",
+    "author": "Kothar-wa-Khasis"
+  },
+  {
+    "kind": "commit",
+    "id": "ebd2852",
+    "title": "task 1099: scribe-growth-log update",
+    "url": "https://github.com/thierrypdamiba/orita/commit/ebd28527aeb8a20c7e2afa159bbc024bd50d0ef8",
+    "ts": "2026-08-29T10:32:48Z",
+    "author": "Kothar-wa-Khasis"
+  },
+  {
+    "kind": "commit",
+    "id": "4753a59",
+    "title": "task 1099: DONE -- daytime rotation past nisaba/1098, The Wall sweep found and closed a recurring ruff-drift bug",
+    "url": "https://github.com/thierrypdamiba/orita/commit/4753a59db0f330ff2c5436db91762ba2dc70a746",
+    "ts": "2026-08-29T10:34:08Z",
+    "author": "Kothar-wa-Khasis"
+  },
+  {
+    "kind": "commit",
+    "id": "2b2e4c6",
+    "title": "task 1099: addendum -- root suite confirmed clean (2000 tests, 987.77s)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/2b2e4c6711009dd5c1e835eefdb0e3f9083ce7f1",
+    "ts": "2026-08-29T10:44:57Z",
+    "author": "Kothar-wa-Khasis"
+  },
+  {
+    "kind": "commit",
+    "id": "ccddef9",
+    "title": "task 1099: scribe-growth-log baseline + ledger seal (post-run ritual_check.py housekeeping)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/ccddef9bef394ac3e1b8833b6d94d2b8d8c8a4b9",
+    "ts": "2026-08-29T10:46:35Z",
+    "author": "Nisaba"
   }
 ]
