@@ -1,0 +1,28 @@
+# The root `tools/` (and `tests/`) suite's own lint dependency, pinned.
+#
+# Root cause, hit live three times now on fresh containers (task 189, task
+# 912, and again this hour, task 1099): `tools/` has no project/`.venv` of
+# its own -- same shape `mypy.ini` already documents for `mypy --strict
+# tools/`, and the same shape `tests/requirements.txt` already documents
+# for `pytest`/PyYAML. A bare `ruff check tools` runs on whatever `ruff`
+# happens to be on `$PATH`. `fencepost/seam_engine/uv.lock` and
+# `oracle/oracle_engine/uv.lock` both pin `ruff==0.15.21`, and every
+# historical "`ruff check tools` reads clean" claim in ROADMAP.md was made
+# against that exact version's default rule selection. A newer global
+# `ruff` (0.16.x+, whatever a fresh `pip install ruff` grabs) expanded its
+# own DEFAULT rule selection to include `EXE001`/`RUF100` and others --
+# task 189 first reproduced this live (189 false-positive findings that
+# vanished under `ruff==0.15.21`, confirmed identical code); task 912 hit
+# it again (319 findings) and named the gap without fixing it, judging a
+# lockfile for a directory that was never a package too big a change for
+# one quiet hour. It has now cost a third hour's live diagnosis instead of
+# a one-line pin, so this file closes it the same durable way
+# `tests/requirements.txt` already closed the PyYAML gap:
+#
+#     pip install -r tools/requirements-lint.txt
+#
+# CI (dawn-run.yml) does not invoke `ruff` on `tools/`/`tests/` at all
+# (task 912 confirmed this too), so this file is purely for the
+# interactive/session case CI never hits -- same scope as
+# `tests/requirements.txt`. -- Kothar-wa-Khasis, task 1099
+ruff==0.15.21
