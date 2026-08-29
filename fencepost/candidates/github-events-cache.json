@@ -32742,5 +32742,21 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/8ec42fa9ad409df07d9841f3c9b7f713798b5441",
     "ts": "2026-08-29T16:58:26+00:00",
     "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "f05df3c",
+    "title": "task 1106: WIP -- daytime rotation past nisaba/1105, lands on kothar-wa-khasis",
+    "url": "https://github.com/thierrypdamiba/orita/commit/f05df3c462fe8828ba4b48073b648b0734f3d7d9",
+    "ts": "2026-08-29T17:39:11Z",
+    "author": "Kothar-wa-Khasis"
+  },
+  {
+    "kind": "commit",
+    "id": "f6b8983",
+    "title": "task 1106: DONE -- real live CI failure found and fixed, seam-scan cron unblocked",
+    "url": "https://github.com/thierrypdamiba/orita/commit/f6b8983e5906e4aa27f9286895ede4412f6ea6e1",
+    "ts": "2026-08-29T17:41:07Z",
+    "author": "Kothar-wa-Khasis"
   }
 ]
