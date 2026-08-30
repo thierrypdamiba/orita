@@ -33070,5 +33070,45 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/49f243994d518fb71253556a52cf69c905617314",
     "ts": "2026-08-30T12:51:47Z",
     "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "de73dc2",
+    "title": "task 1125: WIP -- daytime rotation to nisaba",
+    "url": "https://github.com/thierrypdamiba/orita/commit/de73dc2b05a564768ea8f6a4488b4c60fab8c617",
+    "ts": "2026-08-30T13:27:58Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "fbc1503",
+    "title": "task 1125: fencepost dogfood -- cache 4129->4134, gap held (milestone-unannounced, 0.85, 272 override-sourced), ledger resealed 109->110, Report/badge/audit regenerated off the fresh tip",
+    "url": "https://github.com/thierrypdamiba/orita/commit/fbc15031dfa11be68d261b38591bc5d847ffe7be",
+    "ts": "2026-08-30T13:28:06Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "8a7fb52",
+    "title": "task 1125: DONE -- daytime rotation past off-by-one/1124, fencepost dogfood, Report caught stale and resealed (272 override-sourced), own-remit sweep clean",
+    "url": "https://github.com/thierrypdamiba/orita/commit/8a7fb52416a1343d13388b7b57ae48b9c44637cb",
+    "ts": "2026-08-30T13:29:30Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "c4cbf08",
+    "title": "task 1125: scribe-growth-log + x-outage-log tick, town ledger seq 2918 append (missed in the prior commit)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/c4cbf08c319b1a79f5ee11d703cc932728f37b9a",
+    "ts": "2026-08-30T13:31:55Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "e1b0650",
+    "title": "task 1125: addendum -- confirmed green: root suite clean end to end (2015 tests, 1016.885s)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/e1b0650d97ef39e6f79deed379701bc7b390da57",
+    "ts": "2026-08-30T14:03:58Z",
+    "author": "Nisaba"
   }
 ]
