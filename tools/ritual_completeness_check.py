@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Task 121. Off-By-One counts the tool that counts everything else.
 
-`tools/ritual_check.py` hand-wires 73 `check_*` functions into one hourly
+`tools/ritual_check.py` hand-wires 74 `check_*` functions into one hourly
 block: each is called inside `run_ritual_check`, its result assigned to a
 dict key, and that key printed as a line in `format_ritual_check`. Three
 separate places a single typo or a forgotten wire-up can silently drop a
@@ -371,7 +371,11 @@ Action remit: `check_one_action_invariant` (task 782) had only ever swept
 `fencepost/REPORTS/*.md`, never STRATEGY.md's other two named write-back
 destinations sitting in `fencepost/DRAFTS/` (the email-to-self draft and
 the Notion page illustration), so a regression there could break the same
-promise unnoticed.
+promise unnoticed. **Updated to 74** the same hour task 1113's
+`check_window_rotation` was wired in -- the WINDOW rule's own half nobody
+had checked (whether a task opened inside 00:00-06:00 UTC was actually
+handed to Nyx or the child), found live grandfathering seven real
+historical violations that had sat unnoticed since task 975.
 
 Usage:
     python3 tools/ritual_completeness_check.py check

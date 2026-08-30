@@ -367,6 +367,10 @@ def _wip_reclaim_check() -> ModuleType:
     return _load("_ritual_wip_reclaim_check", os.path.join(ROOT, "tools", "wip_reclaim_check.py"))
 
 
+def _window_rotation_check() -> ModuleType:
+    return _load("_ritual_window_rotation_check", os.path.join(ROOT, "tools", "window_rotation_check.py"))
+
+
 def _roadmap_buildlog_sync_check() -> ModuleType:
     return _load(
         "_ritual_roadmap_buildlog_sync_check", os.path.join(ROOT, "tools", "roadmap_buildlog_sync_check.py")
@@ -1406,6 +1410,25 @@ def check_wip_reclaim(now: datetime, roadmap_path: str | None = None) -> dict[st
     return cast(dict[str, object], mod.find_stale(**kwargs))
 
 
+def check_window_rotation(roadmap_path: str | None = None) -> dict[str, object]:
+    """Task 1113: fold `window_rotation_check.py`'s own scan of
+    `ROADMAP.md`'s `wip-opened` markers into the one block. Unconditional,
+    local-filesystem-only, the same cheap always-on class
+    `check_wip_reclaim`/`check_journal_numbering` already hold. A real
+    hit here DOES flip `broken`: a task whose open timestamp lands inside
+    the 00:00-06:00 UTC window but was handed to a god other than Nyx or
+    the child, opened at or after this check's own `FIX_LANDED_AT`, is a
+    live breach of the WINDOW rule ("No other gods commit in that
+    window") -- not an honest zero-state waiting on the calendar. Seven
+    pre-fix violations (task 975, tasks 1089-1094) are grandfathered,
+    sealed history, and never flip this to broken."""
+    mod = _window_rotation_check()
+    kwargs: dict[str, object] = {}
+    if roadmap_path is not None:
+        kwargs["roadmap_path"] = roadmap_path
+    return cast(dict[str, object], mod.find_window_violations(**kwargs))
+
+
 def check_roadmap_buildlog_sync(
     roadmap_path: str | None = None,
     buildlog_path: str | None = None,
@@ -2401,6 +2424,7 @@ def run_ritual_check(
     ritual_completeness_tools_dir: str | None = None,
     ritual_completeness_seam_engine_dir: str | None = None,
     wip_reclaim_path: str | None = None,
+    window_rotation_path: str | None = None,
     roadmap_buildlog_sync_roadmap_path: str | None = None,
     roadmap_buildlog_sync_buildlog_path: str | None = None,
     roadmap_buildlog_sync_archive_dir: str | None = None,
@@ -2543,6 +2567,7 @@ def run_ritual_check(
         seam_engine_dir=ritual_completeness_seam_engine_dir,
     )
     wip_reclaim = check_wip_reclaim(now, roadmap_path=wip_reclaim_path)
+    window_rotation = check_window_rotation(roadmap_path=window_rotation_path)
     roadmap_buildlog_sync = check_roadmap_buildlog_sync(
         roadmap_path=roadmap_buildlog_sync_roadmap_path,
         buildlog_path=roadmap_buildlog_sync_buildlog_path,
@@ -2640,6 +2665,7 @@ def run_ritual_check(
         or (not journal_numbering["clean"])
         or (not ritual_completeness["clean"])
         or (not wip_reclaim["clean"])
+        or (not window_rotation["clean"])
         or (not roadmap_buildlog_sync["clean"])
         or (not scopes_completeness["clean"])
         or (not toolkits_in_use["clean"])
@@ -2714,6 +2740,7 @@ def run_ritual_check(
         "shared_reports": shared_reports,
         "ritual_completeness": ritual_completeness,
         "wip_reclaim": wip_reclaim,
+        "window_rotation": window_rotation,
         "roadmap_buildlog_sync": roadmap_buildlog_sync,
         "scopes_completeness": scopes_completeness,
         "toolkits_in_use": toolkits_in_use,
@@ -2957,6 +2984,17 @@ def format_ritual_check(result: dict[str, Any]) -> str:
         lines.append(
             f"  wip reclaim: {len(wr['stale'])} STALE (>= {wr['threshold_hours']}h), "
             f"{len(wr['unknown'])} UNKNOWN-AGE -- reclaim now, escalate"
+        )
+    wro = result["window_rotation"]
+    if wro["clean"]:
+        lines.append(
+            f"  window rotation: clean ({len(wro['grandfathered'])} grandfathered pre-fix violation(s), "
+            "sealed history, not rewritten)"
+        )
+    else:
+        lines.append(
+            f"  window rotation: {len(wro['violations'])} LIVE VIOLATION(S) -- "
+            "task opened in the 00:00-06:00 UTC window went to a non-window god, escalate now"
         )
     rbs = result["roadmap_buildlog_sync"]
     if rbs["clean"]:
