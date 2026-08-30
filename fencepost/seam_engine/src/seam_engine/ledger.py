@@ -413,6 +413,23 @@ def append_scan(
 
     # The sealed payload — the typed record. Only these fields are under the
     # seal; the prose is free to be rewritten by a kinder scribe, the facts are not.
+    #
+    # Task 1115. `github_events_source`/`x_posts_source` (run_scan's own
+    # "override" vs "ledger"/"live" markers, see scan.py's run_scan
+    # docstring) were computed on every scan but never carried past the
+    # printed CLI text -- the one place a future regression investigation
+    # would need them, the sealed ledger record, dropped them silently.
+    # This hour's own hand-run rediscovered the same 285(2026-08-28) ->
+    # 265(2026-08-30) milestone-count regression `report_regression_check.py`
+    # (task 773) already knows about, and had no durable way to tell
+    # whether the drop came from a genuinely thinner override-sourced cache
+    # read versus a live direct-fetch discrepancy -- pure guesswork from
+    # context. Recording the source from here forward closes that gap for
+    # every future regression, without touching a single already-sealed
+    # byte (append-only; `verify()` recomputes each seal from whatever
+    # `sealed` dict is on disk, so old records with neither key still
+    # verify clean -- confirmed live against this repo's own 104-entry
+    # chain before this change shipped).
     sealed: dict[str, Any] = {
         "date": date,
         "generated_at": scan.get("generated_at", opened_at),
@@ -424,6 +441,8 @@ def append_scan(
         "tail": tail,
         "excluded_count": len(scan.get("excluded", [])),
         "fenceposts_recorded_total": fenceposts_recorded_total,
+        "github_events_source": scan.get("github_events_source"),
+        "x_posts_source": scan.get("x_posts_source"),
     }
     seal = _seal(prev, sealed)
 

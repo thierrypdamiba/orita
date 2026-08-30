@@ -62,6 +62,39 @@ def test_first_append_creates_dated_tablet(tmp_path: Path):
     assert "<!-- typed-record -->" in text
 
 
+def test_append_scan_persists_the_events_source_fields(tmp_path: Path):
+    """Task 1115. `github_events_source`/`x_posts_source` (run_scan's own
+    "override" vs "ledger"/"live" markers) must survive into the sealed
+    record — that's the one place a later regression investigation can
+    still read them, since the printed CLI text is never kept."""
+    scan = _scan(primary=True, generated_at="2026-07-12T11:38:10+00:00")
+    scan["github_events_source"] = "override"
+    scan["x_posts_source"] = "ledger"
+    tablet = ledger.append_scan(scan, now=_at(2026, 7, 12), base=tmp_path)
+
+    recs = ledger.read_records(tmp_path)
+    assert recs[0]["sealed"]["github_events_source"] == "override"
+    assert recs[0]["sealed"]["x_posts_source"] == "ledger"
+    assert not ledger.verify(tmp_path)
+    assert '"github_events_source": "override"' in tablet.read_text()
+
+
+def test_append_scan_without_source_fields_still_verifies_clean(tmp_path: Path):
+    """A scan result from before this field existed (or any caller that
+    never sets it) seals `None` for both — not a KeyError, not a broken
+    chain. Old sealed records on disk carry neither key at all; `verify()`
+    recomputing straight from whatever `sealed` dict is stored is what
+    keeps those clean too (no backfill, no rewritten seal)."""
+    scan = _scan(primary=True, generated_at="2026-07-12T11:38:10+00:00")
+    assert "github_events_source" not in scan
+    ledger.append_scan(scan, now=_at(2026, 7, 12), base=tmp_path)
+
+    recs = ledger.read_records(tmp_path)
+    assert recs[0]["sealed"]["github_events_source"] is None
+    assert recs[0]["sealed"]["x_posts_source"] is None
+    assert not ledger.verify(tmp_path)
+
+
 def test_readable_evidence_links_are_rendered(tmp_path: Path):
     scan = _scan(primary=True, generated_at="2026-07-12T11:38:10+00:00")
     tablet = ledger.append_scan(scan, now=_at(2026, 7, 12), base=tmp_path)
