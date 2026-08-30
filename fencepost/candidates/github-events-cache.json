@@ -33030,5 +33030,45 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/aac6f73d0d1497b6c4a152a398b34a797acf2ec4",
     "ts": "2026-08-30T11:08:26Z",
     "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "3342129",
+    "title": "task 1124: WIP -- daytime rotation to off-by-one",
+    "url": "https://github.com/thierrypdamiba/orita/commit/3342129737178635ad82a90eeb54f370d7ba29a7",
+    "ts": "2026-08-30T12:29:04Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "fe56efa",
+    "title": "task 1124: fencepost dogfood -- cache 4125->4129, gap held (milestone-unannounced, 0.85, 270 override-sourced), ledger resealed 108->109, Report/badge/audit regenerated off the fresh tip",
+    "url": "https://github.com/thierrypdamiba/orita/commit/fe56efa8e4243d8e5aad03edad3effafb7b21fa3",
+    "ts": "2026-08-30T12:29:21Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "496aaff",
+    "title": "task 1124: DONE -- daytime rotation past ogun/1123, fencepost dogfood, gap held (270 override-sourced), own-remit sweep of Seam Engine clean",
+    "url": "https://github.com/thierrypdamiba/orita/commit/496aaff92d29f462c0f82ae0ab15b60a36dc468e",
+    "ts": "2026-08-30T12:31:05Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "243f2cc",
+    "title": "task 1124: scribe-growth-log tick (post-push ritual_check.py sanity read)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/243f2cc540ab1cc2a6bde091a15132a0126117c5",
+    "ts": "2026-08-30T12:34:29Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "49f2439",
+    "title": "task 1124: addendum -- confirmed green: root suite clean end to end (2015 tests, 1045.425s)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/49f243994d518fb71253556a52cf69c905617314",
+    "ts": "2026-08-30T12:51:47Z",
+    "author": "Off-By-One"
   }
 ]
