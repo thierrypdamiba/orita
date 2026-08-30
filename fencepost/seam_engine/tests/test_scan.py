@@ -898,6 +898,48 @@ def test_milestone_keyword_glued_into_a_hyphenated_title_word_is_still_a_gap_whe
     )
 
 
+def test_milestone_excludes_quiet_voice_authors_even_on_keyword_match():
+    # Task 1118: `QUIET_VOICE_AUTHORS` (nyx, zashiki-warashi) had zero test
+    # coverage before this -- the one exclusion in this module nothing
+    # exercised. Both gods write "Fencepost dogfood: ..." into nearly every
+    # hourly window-slot commit, and a real fraction of their commit SUBJECT
+    # lines say "fencepost" too (routine shop talk, not a shipped pivot) --
+    # unfiltered, every one of those reads as an unannounced flagship gap,
+    # the exact crying-wolf false positive Ogun's law forbids. This pins the
+    # exclusion for both known quiet-voice authors, case-insensitively (the
+    # real cache carries both "Nyx" and "nyx", "Zashiki-Warashi" and
+    # "zashiki-warashi" byte-for-byte).
+    posts = [_post("unrelated chatter, no milestone keyword here")]
+    for author in ("nyx", "Nyx", "zashiki-warashi", "Zashiki-Warashi"):
+        commit = GithubEvent(
+            kind="commit", id=f"quiet-{author}", title="fencepost dogfood: routine ritual commit",
+            url=f"https://github.com/thierrypdamiba/orita/commit/quiet-{author}",
+            ts=datetime(2026, 7, 12, tzinfo=timezone.utc), author=author,
+        )
+        surfaced, _excluded = compute_candidates([commit], posts, _LIVE)
+        assert not any(g.slug == "milestone-unannounced" for g in surfaced), (
+            f"a quiet-voice author ({author!r}) writing 'fencepost' into a routine "
+            "commit title must never surface as an unannounced milestone gap"
+        )
+
+
+def test_milestone_still_counts_a_non_quiet_author_using_the_same_keyword():
+    # The exclusion above must be scoped to the two named authors only, not
+    # a blanket keyword carve-out -- the same commit title from any other
+    # god (or a mortal contributor) is still a real, surfaceable gap.
+    posts = [_post("unrelated chatter, no milestone keyword here")]
+    commit = GithubEvent(
+        kind="commit", id="not-quiet", title="fencepost dogfood: routine ritual commit",
+        url="https://github.com/thierrypdamiba/orita/commit/not-quiet",
+        ts=datetime(2026, 7, 12, tzinfo=timezone.utc), author="off-by-one",
+    )
+    surfaced, _excluded = compute_candidates([commit], posts, _LIVE)
+    assert any(g.slug == "milestone-unannounced" for g in surfaced), (
+        "the quiet-voice exclusion must not silently swallow the same gap "
+        "for an author it doesn't name"
+    )
+
+
 def _routine_commit(cid: str, ts: datetime, topic: str = "ledger") -> GithubEvent:
     return GithubEvent(
         kind="commit", id=cid, title=f"{topic} recorded entry {cid}",

@@ -492,6 +492,38 @@ def _keywords(text: str) -> set[str]:
 # instead of "any commit topic" keeps precision high at the cost of recall,
 # which is the right trade for a v0 whose whole job is not crying wolf.
 MILESTONE_KEYWORDS = {"flagship", "fencepost", "strategy"}
+
+# Task 1118: found live, undocumented and untested, while chasing the standing
+# "285-vs-265" milestone-count regression tasks 1115-1117 had diagnosed but never
+# named a mechanism for (task 1115 only made the two sources -- direct vs. the
+# incrementally-built override cache -- persist into the sealed record; neither
+# 1116 nor 1117 got further). Reconstructing why the number differs: `nyx` and
+# `zashiki-warashi` write a "Fencepost dogfood: cache N->M, ..." line into
+# nearly every hourly window-slot commit's own message body -- ordinary shop
+# talk about running the ritual, not a shipped product pivot -- and a real
+# fraction of their commit SUBJECT lines happen to say "fencepost" too (e.g.
+# "task 517: consolidate fencepost's duplicated _parse_ts"). Left unfiltered,
+# `_is_milestone` reads every one of those as a flagship-level gap needing an
+# X post, which is exactly the crying-wolf false positive Ogun's law forbids --
+# confirmed live against the real cache: 48 of 654 quiet-voice-authored commits
+# match `MILESTONE_KEYWORDS`, and 313 - 48 = 265, precisely the sealed override
+# count every hour since. So the filter's EFFECT is sound and matches the
+# codebase's own false-positive doctrine.
+#
+# What this paragraph is actually for: unlike everything else in this module,
+# the exclusion itself carries no task number, no ROADMAP row, and (until this
+# commit) no test — a single git pickaxe search across all of history for
+# `QUIET_VOICE_AUTHORS` turns up exactly one commit, a large synthetic merge
+# from the force-push/history-rewrite task 1086 already found live on
+# `/home/user/orita`'s own checkout ("origin/main force-updated around task
+# 1065/1066"). The real authorship and original justification did not survive
+# that rewrite. Rather than either trusting an unattributed line blindly or
+# reverting behavior a full three tasks (1115-1117) already built on without
+# reporting anything wrong, this restores the missing half: the reasoning
+# above (independently reconstructed and verified against live data, not
+# assumed), and `test_milestone_excludes_quiet_voice_authors_even_on_keyword_
+# match` below, so this is no longer the one undocumented, untested line in
+# the file.
 QUIET_VOICE_AUTHORS = {"nyx", "zashiki-warashi"}  # night-window lore; not announcement material
 
 

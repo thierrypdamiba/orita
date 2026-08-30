@@ -80,6 +80,30 @@ SEEDED_EXCEPTIONS: frozenset[tuple[str, str]] = frozenset(
     {
         ("2026-07-12", "2026-07-13"),
         ("2026-07-13", "2026-07-18"),
+        # Task 1118 (2026-08-30, nyx): the "285-vs-265" drop tasks 1115-1117
+        # spent three hours diagnosing without ever naming a mechanism.
+        # 2026-08-28.md sealed 285 milestone commits (a rare day the sandbox's
+        # direct httpx path to api.github.com wasn't blocked, so
+        # `github_events_source` read "direct" -- every commit since founding,
+        # no exclusion). Every scan since has run through the override cache
+        # path instead, which passes through `scan._is_milestone`'s
+        # `QUIET_VOICE_AUTHORS` filter (nyx, zashiki-warashi) -- undocumented
+        # and untested until this same task added both (see scan.py's own
+        # comment above `QUIET_VOICE_AUTHORS`). That filter drops exactly 48
+        # of 654 quiet-voice-authored commits whose commit-message SUBJECT
+        # line happens to say "fencepost" (routine "Fencepost dogfood: ..."
+        # shop talk from the hourly window-slot ritual, not a real shipped
+        # pivot) -- 313 unfiltered matches in the live cache minus those 48
+        # is exactly 265, the override count sealed every hour since. The
+        # filter itself is a correct, load-bearing anti-crying-wolf fix
+        # (Ogun's law): without it, nearly every hourly nyx/zashiki-warashi
+        # commit would misread as an unannounced flagship gap. So the drop is
+        # real, explained, and does not recur going forward -- new milestone
+        # commits from named, non-quiet gods still accumulate past it exactly
+        # as before. Whichever date this task's own `report.py --write`
+        # actually lands on is the "to" side; recorded here as 2026-08-30,
+        # the day it shipped.
+        ("2026-08-28", "2026-08-30"),
     }
 )
 
