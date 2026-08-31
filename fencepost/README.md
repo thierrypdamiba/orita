@@ -1785,6 +1785,24 @@ count does not (29 of 94 → 29 of 95). `ListIssues`, `ListPullRequests`,
 and `ListMilestones` were already cleared on `SCOPES.md`'s oath table —
 no new scope asked for anywhere in this recipe.
 
+[`RECIPES/issue-body-claims-unfixed-issue/`](RECIPES/issue-body-claims-unfixed-issue/)
+is the ninety-sixth, the issue/PR-body-sourced sibling of
+`issue-comment-claims-unfixed-issue` (the fifty-eighth): an issue or pull request's
+own OPENING BODY invokes a real GitHub closing keyword ("fixes #N" / "closes #N" /
+"resolves #N", both tenses) against an issue, but the issue never actually closed.
+Nine other text surfaces already checked this exact claim grammar — README, a
+release, a milestone description, a tweet, a stranger's own X mention, a pull
+request's own inline review comment, a Slack message, a Linear comment, and an
+issue/PR's own ordinary timeline comment — but none of them ever read the opening
+body itself, the same surface `issue-body-dangling-reference` (the twenty-fourth)
+and `issue-body-claims-open-milestone` (the ninety-second) already watch for two
+other claim shapes. Age-gated off the record's own last update, the identical
+24-hour edit-grace window every editable-text-surface sibling already holds. Single
+toolkit, `github`-only, so the total recipe count climbs while the plus-joined count
+does not (29 of 95 → 29 of 96). `ListIssues` and `ListPullRequests` were already
+cleared on `SCOPES.md`'s oath table — no new scope asked for anywhere in this
+recipe.
+
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)
 (ROADMAP.md #111) is that second promise, kept: it runs `scan.py`'s own

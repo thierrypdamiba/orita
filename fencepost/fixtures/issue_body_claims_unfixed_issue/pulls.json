@@ -1,0 +1,26 @@
+[
+  {
+    "number": 52,
+    "title": "Site refresh follow-up",
+    "state": "open",
+    "body": "Fixes #2201 and also -- again -- fixes #2201 for good measure.",
+    "updated_at": "2026-08-25T10:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/pull/52"
+  },
+  {
+    "number": 53,
+    "title": "Ship the recipe-stocking sweep",
+    "state": "open",
+    "body": "This PR closes #2205 as well.",
+    "updated_at": "2026-08-25T09:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/pull/53"
+  },
+  {
+    "number": 55,
+    "title": "Cross-link cleanup",
+    "state": "open",
+    "body": "Related to #2998, no closing keyword here at all.",
+    "updated_at": "2026-08-23T09:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/pull/55"
+  }
+]

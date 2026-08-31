@@ -1,0 +1,58 @@
+[
+  {
+    "number": 2201,
+    "title": "Badge cache invalidation bug",
+    "state": "open",
+    "body": "Filed to track the cache staleness. No claim about anything else here.",
+    "updated_at": "2026-08-18T09:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/issues/2201"
+  },
+  {
+    "number": 2202,
+    "title": "Streak status command feature request",
+    "state": "closed",
+    "body": "Requesting a streak status command.",
+    "updated_at": "2026-08-17T09:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/issues/2202"
+  },
+  {
+    "number": 2203,
+    "title": "Widen journal numbering check request",
+    "state": "open",
+    "body": "This also fixes #2201 while we're in here.",
+    "updated_at": "2026-08-23T14:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/issues/2203"
+  },
+  {
+    "number": 2204,
+    "title": "Ranking margin off-by-one",
+    "state": "open",
+    "body": "Closes #2202 for good, already merged upstream.",
+    "updated_at": "2026-08-21T11:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/issues/2204"
+  },
+  {
+    "number": 2205,
+    "title": "Old tracker cross-link",
+    "state": "open",
+    "body": "resolved #2999 from the old tracker, keeping for context.",
+    "updated_at": "2026-08-23T10:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/issues/2205"
+  },
+  {
+    "number": 2206,
+    "title": "Blank body, filed from the mobile app",
+    "state": "open",
+    "body": "",
+    "updated_at": "2026-08-23T14:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/issues/2206"
+  },
+  {
+    "number": 2207,
+    "title": "Fresh follow-up, still in its edit grace window",
+    "state": "open",
+    "body": "fixes #2201 too, opened moments ago",
+    "updated_at": "2026-08-25T08:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/issues/2207"
+  }
+]
