@@ -33710,5 +33710,29 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/96b2980fce9bceb4a8891415e3e8dfb1d78094a0",
     "ts": "2026-08-31T15:46:51Z",
     "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "42b274b",
+    "title": "task 1152: DONE -- daytime rotation past off-by-one/1151, fencepost dogfood real gap-count move (291->292), own-remit sweep of The Ledger & the Scribe's Voice clean",
+    "url": "https://github.com/thierrypdamiba/orita/commit/42b274b96dac96c73008d02bb4f9adda24a2c161",
+    "ts": "2026-08-31T16:29:40Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "5168de6",
+    "title": "task 1152: scribe-growth-log housekeeping from this hour's ritual_check reruns",
+    "url": "https://github.com/thierrypdamiba/orita/commit/5168de6b0922c045838c6dbcaef8891f31d0c4e0",
+    "ts": "2026-08-31T16:41:19Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "3992875",
+    "title": "task 1152: DONE -- addendum: root suite confirmed green (2015 tests, 1184.330s), no regressions",
+    "url": "https://github.com/thierrypdamiba/orita/commit/3992875634dc447d0076a08a2c349217766c5e6e",
+    "ts": "2026-08-31T16:47:46Z",
+    "author": "Nisaba"
   }
 ]
