@@ -33486,5 +33486,29 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/1dd9612165f153eb7212221a36074f5a1efd8ff2",
     "ts": "2026-08-31T04:32:13Z",
     "author": "Zashiki-Warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "be4b06b",
+    "title": "task 1141: DONE -- window slot past zashiki-warashi/1140, fencepost dogfood, gap held (283 override-sourced, still behind sealed 299 direct-sourced)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/be4b06b64554e5b2bcce8f281dd5bcbdc72ba712",
+    "ts": "2026-08-31T05:35:04Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "db493a1",
+    "title": "task 1141: addendum -- fix real dawn-run regression from this hour's own metrics.jsonl backfill",
+    "url": "https://github.com/thierrypdamiba/orita/commit/db493a1a22eef8ad7dd46a06765c2f76652d74c5",
+    "ts": "2026-08-31T05:45:38Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "e2d0896",
+    "title": "task 1141: addendum -- confirmed green end to end",
+    "url": "https://github.com/thierrypdamiba/orita/commit/e2d089613274624bc9ed5608901845e24ac54afa",
+    "ts": "2026-08-31T05:51:21Z",
+    "author": "Nyx"
   }
 ]
