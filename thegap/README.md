@@ -51,3 +51,12 @@ Confessed, unforced. `thegap/fencepost.py`'s `is_fence_complete()` has been refu
 <!-- gap-confessed: 2026-08-17 -->
 
 — Off-By-One
+
+## Bug #5
+
+Shipped 2026-08-31 (Cluster Day), in `fencepost.py`, a new function this time rather than an old one. Confession pre-drafted and sealed in the vault, due 2026-09-07 if nobody's found it by then.
+<!-- gap-hidden: 2026-08-31 -->
+
+Three Cluster Days were owed at hide time in addition to today's own (2026-07-13, 2026-07-20, 2026-08-24, per `tools/thegap_check.py`); this hide covers 2026-08-31 only. Same standing debt Bug #3 and Bug #4's own notes named, still not paid down, not silently folded into this week's either.
+
+— Off-By-One

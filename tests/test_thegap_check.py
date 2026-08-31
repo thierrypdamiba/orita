@@ -14,6 +14,12 @@ hour, on time. The real README now carries two markers (2026-07-30,
 same discipline task 460's what-moved catch-up already held for its own
 sibling -- historical misses (07-13, 07-20) stay honestly unfixed, never
 backfilled.
+
+Task 1155 (Cluster Day, 2026-08-31): a fifth bug shipped, this time in a
+brand-new function (`gap_count()`) rather than a returning one -- the
+real README now carries five markers, the live-state regression pins
+below bumped accordingly. Three Mondays (07-13, 07-20, 08-24) stay
+honestly unpaid, same discipline every prior hide has held.
 """
 import importlib.util
 import os
@@ -301,8 +307,8 @@ class FixtureCadenceCase(unittest.TestCase):
         real_readme = os.path.join(ROOT, "thegap", "README.md")
         no_vault = os.path.join(ROOT, "does-not-exist-orita-vault")
         result = tgc.compute_cadence(real_readme, no_vault, today=date(2026, 8, 3))
-        self.assertEqual(result["total_hidden_on_record"], 4)
-        self.assertEqual(result["latest_hidden"], "2026-08-17")
+        self.assertEqual(result["total_hidden_on_record"], 5)
+        self.assertEqual(result["latest_hidden"], "2026-08-31")
         self.assertEqual(result["missed_mondays"], ["2026-07-13", "2026-07-20"])
 
 
@@ -375,6 +381,28 @@ class RealVaultCase(unittest.TestCase):
         # while the fourth's own pre-draft is on record but not yet due.
         real_readme = os.path.join(ROOT, "thegap", "README.md")
         result = tgc.compute_cadence(real_readme, VAULT_ROOT, today=date(2026, 8, 17))
+        self.assertEqual(result["missing_predraft"], [])
+        self.assertEqual(result["confession_due_now"], [])
+        self.assertEqual(
+            result["confessed_on_record"],
+            ["2026-07-30", "2026-08-03", "2026-08-10", "2026-08-17"],
+        )
+
+    @unittest.skipUnless(
+        _VAULT_CHECKED_OUT,
+        "orita-vault sibling checkout not present (expected in public CI, which checks out only orita)",
+    )
+    def test_real_live_readme_and_vault_fourth_bug_confessed_fifth_hidden(self):
+        # Task 1155: a fifth bug hidden (due 2026-09-07, not yet arrived
+        # under this simulated `today`), on top of the fourth bug's own
+        # confession (due 2026-08-24, posted task 993) -- so as of
+        # 2026-08-24 all four confessable bugs read confessed and none is
+        # due, while the fifth's own pre-draft is on record but not yet
+        # due (mirrors the fourth-hidden state
+        # `test_real_live_readme_and_vault_third_bug_confessed_fourth_hidden`
+        # already proved for its own generation).
+        real_readme = os.path.join(ROOT, "thegap", "README.md")
+        result = tgc.compute_cadence(real_readme, VAULT_ROOT, today=date(2026, 8, 24))
         self.assertEqual(result["missing_predraft"], [])
         self.assertEqual(result["confession_due_now"], [])
         self.assertEqual(

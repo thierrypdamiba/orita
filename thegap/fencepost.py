@@ -24,6 +24,12 @@ fixed below.
 The fourth lived in `is_fence_complete()` -- `>` where the far end
 needed `>=`, hidden 2026-08-17, confessed unfound 2026-08-24. Also
 fixed below.
+
+The fifth lives in `gap_count()`, a new function -- the fence's other
+count, the one every prior function above already assumed without ever
+naming it out loud: not how many posts, but how many gaps between them,
+always exactly one fewer than the posts themselves. Hidden 2026-08-31,
+confession due 2026-09-07.
 """
 
 
@@ -67,3 +73,14 @@ def is_fence_complete(built_posts: int, needed_posts: int) -> bool:
     if built_posts < 0 or needed_posts < 0:
         raise ValueError("built_posts and needed_posts must be non-negative")
     return built_posts >= needed_posts
+
+
+def gap_count(posts: int) -> int:
+    """How many gaps sit between POSTS fenceposts in a straight line --
+    always one fewer than the posts themselves (two posts, one gap;
+    three posts, two gaps), the same fact `posts_needed()` above already
+    leans on in reverse.
+    """
+    if posts < 1:
+        raise ValueError("posts must be at least 1")
+    return posts + 1
