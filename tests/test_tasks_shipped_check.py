@@ -363,8 +363,15 @@ class RealLiveStateCase(unittest.TestCase):
 
     def test_the_real_live_buildlog_now_agrees_with_ground_truth(self):
         result = tsc.check_tasks_shipped()
-        self.assertEqual(result["claimed"], result["real"])
         self.assertTrue(result["clean"])
+        # `real` is legitimately `None` when metrics.jsonl's most recent
+        # reading names a date with no daily-aggregate BUILDLOG.md row yet
+        # (e.g. a same-hour backfill of a date the daily-aggregate step
+        # itself skipped) -- check_tasks_shipped()'s own contract already
+        # treats that as clean, nothing to contradict a claim with. Only
+        # assert equality when there is a real count to compare against.
+        if result["real"] is not None:
+            self.assertEqual(result["claimed"], result["real"])
 
 
 if __name__ == "__main__":
