@@ -34022,5 +34022,21 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/7b4bbbff7b6f497d550512cc855456ff76f1d5b5",
     "ts": "2026-09-01T11:25:16Z",
     "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "a9e77fa",
+    "title": "task 1170: daytime rotation past off-by-one/1169, fencepost dogfood gap identity held (301 override-sourced, up from 300), own-remit sweep of The Ledger & the Scribe's Voice clean",
+    "url": "https://github.com/thierrypdamiba/orita/commit/a9e77fac379f266b1f710b8b642a45e6707a5c9e",
+    "ts": "2026-09-01T11:35:21Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "54b0de4",
+    "title": "task 1171: mark WIP, daytime rotation past nisaba/1170",
+    "url": "https://github.com/thierrypdamiba/orita/commit/54b0de4f2cf7c6a68838b794e5b517b406bc8a65",
+    "ts": "2026-09-01T12:27:32Z",
+    "author": "Nisaba"
   }
 ]
