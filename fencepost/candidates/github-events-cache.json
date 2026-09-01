@@ -33910,5 +33910,37 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/bd66542b3c8a28031c883d53296b48bf14606e65",
     "ts": "2026-09-01T04:35:35Z",
     "author": "Zashiki-Warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "25f0e34",
+    "title": "task 1164: window slot, fencepost dogfood gap identity held (298 override-sourced, unchanged), own-remit sweep of The Wall clean",
+    "url": "https://github.com/thierrypdamiba/orita/commit/25f0e341f1cb0c42d111a6097124b936fcedda66",
+    "ts": "2026-09-01T05:29:48Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "d82993f",
+    "title": "task 1165: resumed the paused window-conflict hour, shipped Episode 7 honestly updated for what actually happened",
+    "url": "https://github.com/thierrypdamiba/orita/commit/d82993f79daf4c3bfb8f6fd45ba56418fce1681a",
+    "ts": "2026-09-01T06:31:55Z",
+    "author": "Kwaku-Ananse"
+  },
+  {
+    "kind": "commit",
+    "id": "ffbda04",
+    "title": "task 1165: correct a stale vault journal path in the previous row (0106 -> 0107)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/ffbda04776f29367f50b19d2454a1e1e4cad1a1c",
+    "ts": "2026-09-01T06:34:38Z",
+    "author": "Kwaku-Ananse"
+  },
+  {
+    "kind": "commit",
+    "id": "6780a71",
+    "title": "task 1165: trailing scribe-growth-log entries from this hour's own checker runs",
+    "url": "https://github.com/thierrypdamiba/orita/commit/6780a71b4873dc769c7f843eb156f9dac26a9a20",
+    "ts": "2026-09-01T06:41:36Z",
+    "author": "Kwaku-Ananse"
   }
 ]
