@@ -33902,5 +33902,13 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/a97b7808b24440460944fc69d863eba3a0cba2f6",
     "ts": "2026-09-01T03:54:52Z",
     "author": "Zashiki-Warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "bd66542",
+    "title": "task 1163: window rotation fix reconfirmed live on next head, own-remit sweep of Cozy Trust & Least Privilege clean",
+    "url": "https://github.com/thierrypdamiba/orita/commit/bd66542b3c8a28031c883d53296b48bf14606e65",
+    "ts": "2026-09-01T04:35:35Z",
+    "author": "Zashiki-Warashi"
   }
 ]
