@@ -90,6 +90,7 @@ Usage:
 import json
 import os
 import sys
+from datetime import datetime
 from typing import cast
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -199,6 +200,29 @@ def record_check(tool: str, status: str, checked_at: str, path: str = LOG) -> bo
         raise ValueError(f"unknown status {status!r} -- must be one of {STATUSES}")
     if tool not in TRACKED_TOOLS:
         raise ValueError(f"unknown tool {tool!r} -- must be one of {TRACKED_TOOLS}")
+    # Task 1167: checked_at went unvalidated the same way tool did before
+    # task 1062 -- a CLI call that passes `--checked-at` flag-style instead
+    # of positionally (this parser takes three bare positionals, no flags)
+    # writes the flag's own name as the value, and nothing caught it until
+    # `hours_since_last_check` blew up on it hours later with a cryptic
+    # `ValueError: Invalid isoformat string` deep inside iso_time.py, deep
+    # in a call chain nobody on duty in that moment could trace back to a
+    # CLI mistake. Confirmed live: 2026-09-01's log line 1177 carries
+    # exactly this, and it took dawn-run's the-oath job down (198 test
+    # errors, one root cause) the very next hour. Reject it here instead,
+    # at the one real boundary this value ever crosses from untrusted
+    # input into the log.
+    try:
+        iso_time.parse_iso_utc(checked_at)
+    except ValueError as exc:
+        hint = (
+            " (looks like a CLI flag, not a timestamp -- this parser takes "
+            "three bare positionals: record <tool> <status> <checked_at>, "
+            "no flags)"
+            if checked_at.startswith("-")
+            else ""
+        )
+        raise ValueError(f"unparseable checked_at {checked_at!r}{hint}: {exc}") from exc
     entry = {"type": "check", "tool": tool, "status": status, "checked_at": checked_at}
     # A malformed line ANYWHERE in the log is "cannot confirm a duplicate,"
     # not a reason to refuse writing -- recording must still be able to
@@ -265,12 +289,37 @@ def last_checked_at(entries: list[dict[str, object]], tool: str) -> str | None:
 _parse = iso_time.parse_iso_utc
 
 
+def _parse_logged(ts: str, tool: str, caller: str) -> datetime:
+    """`_parse` a checked_at value that came FROM the log (`last`/
+    `started`, not a caller-supplied `now`), converting a raw ValueError
+    into the same clear, tool-scoped XOutageTrackerTamperedError the
+    malformed-JSON guard in `_tool_entries` already raises for a line that
+    isn't valid JSON at all. Task 1167: a line can be valid JSON with
+    every expected key and still carry an unparseable checked_at (task
+    1166's own `--checked-at` CLI-flag mistake, live in the 2026-09-01
+    log, undetected until it took dawn-run's the-oath job down hours
+    later with this exact ValueError three frames deep inside
+    iso_time.py, uncaught). `record_check` now refuses to write one
+    (see its own checked_at validation); this catches any that already
+    made it in before that guard existed, without breaking every other
+    reader (`current_streak`, `streak_started_at`) that only orders and
+    filters entries and never itself needs a parseable timestamp."""
+    try:
+        return _parse(ts)
+    except ValueError as exc:
+        raise XOutageTrackerTamperedError(
+            f"{caller}({tool!r}): the log's last recorded checked_at for "
+            f"{tool} is unparseable ({ts!r}: {exc}) -- refusing to guess "
+            "the real time. Repair the log by hand, then rerun."
+        ) from exc
+
+
 def hours_since_last_check(entries: list[dict[str, object]], tool: str, now: str) -> float | None:
     """Hours between `tool`'s last recorded check and `now`, or None if never checked."""
     last = last_checked_at(entries, tool)
     if last is None:
         return None
-    return (_parse(now) - _parse(last)).total_seconds() / 3600.0
+    return (_parse(now) - _parse_logged(last, tool, "hours_since_last_check")).total_seconds() / 3600.0
 
 
 def should_recheck(entries: list[dict[str, object]], tool: str, now: str, cooldown_hours: float = DEFAULT_COOLDOWN_HOURS) -> bool:
@@ -394,7 +443,7 @@ def should_escalate(
     # "-O strips assert" lesson applies to a real invariant just as much as
     # a test guard.
     started = cast(str, streak_started_at(entries, tool, "forbidden"))
-    elapsed = (_parse(now) - _parse(started)).total_seconds() / 3600.0
+    elapsed = (_parse(now) - _parse_logged(started, tool, "should_escalate")).total_seconds() / 3600.0
     if elapsed < threshold_hours:
         return False, f"outage {elapsed:.1f}h old, below {threshold_hours}h threshold"
     if already_escalated_for_streak(escalation_entries, tool, started, threshold_hours):
@@ -457,7 +506,9 @@ def next_escalation_tier(
     streak = current_streak(entries, tool, "forbidden")
     if streak:
         started = cast(str, streak_started_at(entries, tool, "forbidden"))
-        elapsed = (_parse(now) - _parse(started)).total_seconds() / 3600.0
+        elapsed = (
+            _parse(now) - _parse_logged(started, tool, "next_escalation_tier")
+        ).total_seconds() / 3600.0
         effective_tiers = _extended_tiers(elapsed, tiers, recurring_interval)
     for threshold_hours in sorted(effective_tiers, reverse=True):
         due, reason = should_escalate(entries, tool, now, threshold_hours, escalation_entries)

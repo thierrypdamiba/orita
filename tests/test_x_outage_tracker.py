@@ -85,6 +85,26 @@ class TestRecordCheck(_TempLogCase):
         self.assertEqual(after[0], before[0])
         self.assertEqual(len(after), len(before) + 1)
 
+    def test_rejects_a_cli_flag_passed_as_checked_at(self):
+        """Task 1167: `record` takes three bare positionals -- a caller
+        that types `record X_WhoAmI ok --checked-at <value>` (flag-style,
+        as if `--checked-at` took the value after it) gets the literal
+        string `--checked-at` read into the checked_at slot instead, and
+        the real value after it is silently dropped -- confirmed live: the
+        2026-09-01 log's last line carried exactly this, undetected until
+        it took dawn-run's the-oath job down hours later with a cryptic
+        `ValueError: Invalid isoformat string` three frames deep in
+        iso_time.py. Reject it at write time instead, the same boundary
+        discipline as the unknown-tool/unknown-status guards above."""
+        with self.assertRaises(ValueError):
+            xot.record_check("X_WhoAmI", "ok", "--checked-at", path=self.path)
+        self.assertFalse(os.path.exists(self.path))
+
+    def test_rejects_any_unparseable_checked_at(self):
+        with self.assertRaises(ValueError):
+            xot.record_check("X_WhoAmI", "ok", "not-a-timestamp", path=self.path)
+        self.assertFalse(os.path.exists(self.path))
+
 
 class TestRecordCheckDedup(_TempLogCase):
     """Task 503: the one `record_*` sibling task 501 named live and left
@@ -711,6 +731,44 @@ class TestTamperedCheckLog(_TempLogCase):
         entries = xot._entries(self.path)
         with self.assertRaises(xot.XOutageTrackerTamperedError):
             xot.should_recheck(entries, "X_PostTweet", "2026-07-14T10:00:00Z")
+
+    def test_hours_since_last_check_raises_tampered_error_on_an_unparseable_checked_at(self):
+        """Task 1167: record_check now refuses to WRITE a line like this
+        (test_rejects_a_cli_flag_passed_as_checked_at above), but a line
+        that already made it in before that guard existed -- exactly the
+        2026-09-01 live case, valid JSON, every expected key present, just
+        a `checked_at` of the literal string `--checked-at` -- must not
+        crash `hours_since_last_check` with an uncaught ValueError three
+        frames deep inside iso_time.py (the real live dawn-run failure:
+        198 test errors sharing this one root cause). It must raise the
+        same clear, tool-scoped XOutageTrackerTamperedError the malformed-
+        JSON guard already raises for a line that isn't valid JSON at all.
+        `current_streak`/`streak_started_at` deliberately do NOT gain this
+        guard -- they only order and filter entries and never themselves
+        need a parseable timestamp (see TestCurrentStreak/TestStreakStartedAt's
+        own opaque placeholder checked_at values like "1"/"h3")."""
+        with open(self.path, "a", encoding="utf-8") as f:
+            f.write(
+                json.dumps(
+                    {"type": "check", "tool": "X_WhoAmI", "status": "ok", "checked_at": "--checked-at"}
+                )
+                + "\n"
+            )
+        entries = xot._entries(self.path)
+        with self.assertRaises(xot.XOutageTrackerTamperedError):
+            xot.hours_since_last_check(entries, "X_WhoAmI", "2026-09-01T08:00:00Z")
+
+    def test_should_recheck_raises_tampered_error_on_an_unparseable_checked_at(self):
+        with open(self.path, "a", encoding="utf-8") as f:
+            f.write(
+                json.dumps(
+                    {"type": "check", "tool": "X_WhoAmI", "status": "ok", "checked_at": "--checked-at"}
+                )
+                + "\n"
+            )
+        entries = xot._entries(self.path)
+        with self.assertRaises(xot.XOutageTrackerTamperedError):
+            xot.should_recheck(entries, "X_WhoAmI", "2026-09-01T08:00:00Z")
 
 
 class TestTamperedEscalationLog(_TempLogCase):
