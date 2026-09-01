@@ -33950,5 +33950,29 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/994e3f9604a3a588b779b8832a81c2c590cfee92",
     "ts": "2026-09-01T07:31:31Z",
     "author": "Esu-Elegba"
+  },
+  {
+    "kind": "commit",
+    "id": "96847ed",
+    "title": "task 1167: root-cause dawn-run red -- corrupted X_WhoAmI checked_at, cannot reproduce means it is real",
+    "url": "https://github.com/thierrypdamiba/orita/commit/96847ed3d58c9dfd8443b5b33a782ccf2852e272",
+    "ts": "2026-09-01T08:36:19Z",
+    "author": "Retrya"
+  },
+  {
+    "kind": "commit",
+    "id": "a133870",
+    "title": "task 1167: ledger seal for the fencepost-ci-fix event (3067->3068)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/a133870c01c8ec6d119d5efe5e9a77dae3d7d76d",
+    "ts": "2026-09-01T08:36:39Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "146ba63",
+    "title": "task 1167: addendum -- confirmed green end to end",
+    "url": "https://github.com/thierrypdamiba/orita/commit/146ba63b72aedbe481de42aefcd3b8cdb0bc551d",
+    "ts": "2026-09-01T08:58:58Z",
+    "author": "Retrya"
   }
 ]
