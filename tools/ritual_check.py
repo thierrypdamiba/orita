@@ -2989,7 +2989,7 @@ def format_ritual_check(result: dict[str, Any]) -> str:
     if wro["clean"]:
         lines.append(
             f"  window rotation: clean ({len(wro['grandfathered'])} grandfathered pre-fix violation(s), "
-            "sealed history, not rewritten)"
+            f"{len(wro.get('escalated', []))} escalated-and-fixed, sealed history, not rewritten)"
         )
     else:
         lines.append(

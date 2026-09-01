@@ -2346,6 +2346,71 @@ class WipReclaimFoldCase(unittest.TestCase):
         self.assertTrue(result["wip_reclaim"]["clean"])
 
 
+class WindowRotationFoldCase(unittest.TestCase):
+    """Task 1162: run_ritual_check() folds window_rotation_check.py's own
+    scan of ROADMAP.md's wip-opened markers into the same structured
+    result. Task 1161 shipped clean-suite locally but landed as a real,
+    unacknowledged live violation once pushed (dawn-run #2228, job
+    the-oath: 72 failures, every one of them some OTHER fold test's own
+    default `run_ritual_check()` call inheriting the live ROADMAP.md's
+    now-broken `window_rotation`, cascading through `broken` -- yet no
+    test anywhere asserted the fold itself: that a live violation here
+    actually flips `run_ritual_check()`'s own `broken` flag. This class
+    closes that gap directly, the same shape `WipReclaimFoldCase` already
+    gives its own sibling check."""
+
+    def setUp(self):
+        self.tmp = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.tmp, ignore_errors=True)
+        self.roadmap_path = os.path.join(self.tmp, "ROADMAP.md")
+
+    def _write(self, content):
+        with open(self.roadmap_path, "w", encoding="utf-8") as f:
+            f.write(content)
+
+    def test_no_window_task_is_clean(self):
+        self._write("| 5 | DONE | off-by-one | do the thing | it is done |\n")
+        result = rc.run_ritual_check(window_rotation_path=self.roadmap_path)
+        self.assertTrue(result["window_rotation"]["clean"])
+        self.assertFalse(result["broken"])
+        self.assertIn(
+            "window rotation: clean (0 grandfathered pre-fix violation(s), 0 escalated-and-fixed, "
+            "sealed history, not rewritten)",
+            rc.format_ritual_check(result),
+        )
+
+    def test_live_violation_flips_broken_and_prints(self):
+        self._write(
+            "| 9999 | DONE | ogun | did a thing | it is done |\n\n"
+            "<!-- wip-opened: 9999 2026-09-01T02:00:00+00:00 -->\n"
+        )
+        result = rc.run_ritual_check(window_rotation_path=self.roadmap_path)
+        self.assertFalse(result["window_rotation"]["clean"])
+        self.assertTrue(result["broken"])
+        formatted = rc.format_ritual_check(result)
+        self.assertIn("window rotation:", formatted)
+        self.assertIn("LIVE VIOLATION", formatted)
+
+    def test_pre_fix_violation_is_grandfathered_clean(self):
+        self._write(
+            "| 975 | DONE | esu-elegba | did a thing | it is done |\n\n"
+            "<!-- wip-opened: 975 2026-08-24T00:25:21+00:00 -->\n"
+        )
+        result = rc.run_ritual_check(window_rotation_path=self.roadmap_path)
+        self.assertTrue(result["window_rotation"]["clean"])
+        self.assertFalse(result["broken"])
+        self.assertIn("grandfathered pre-fix violation", rc.format_ritual_check(result))
+
+    def test_default_path_reads_the_real_roadmap_honestly_clean(self):
+        """No override: reads the real ROADMAP.md. Live at task 1162 this
+        includes task 1161's own violation, but escalated -- found and
+        answered by this same task's routing fix -- not a bare violation,
+        so `clean` (and `broken`) hold true against the real checkout."""
+        result = rc.run_ritual_check()
+        self.assertTrue(result["window_rotation"]["clean"])
+        self.assertEqual(result["window_rotation"]["violations"], [])
+
+
 class RoadmapBuildlogSyncFoldCase(unittest.TestCase):
     """Task 1018: run_ritual_check() folds roadmap_buildlog_sync_check.py's
     own cross-check of every numbered task BUILDLOG.md records shipping
