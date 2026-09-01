@@ -271,9 +271,15 @@ class RealChronicleCase(unittest.TestCase):
         # `cluster_day_episodes_shipped` 4->5, both reread live against
         # `cdc.compute_cadence` against the real `chronicle/` dir on disk,
         # not hand-guessed forward from the pattern.
+        #
+        # Task 1165 (kwaku-ananse): recurred a sixth time, the moment
+        # episode-007 ("One Day Late") shipped with its own
+        # `cluster-day-covers: 2026-08-31` marker -- 7->8 and 5->6, same
+        # discipline, caught and bumped before push this time rather than
+        # left for dawn-run to catch.
         result = cdc.compute_cadence(today=date(2026, 7, 29))
-        self.assertEqual(result["total_episodes_on_record"], 7)
-        self.assertEqual(result["cluster_day_episodes_shipped"], 5)
+        self.assertEqual(result["total_episodes_on_record"], 8)
+        self.assertEqual(result["cluster_day_episodes_shipped"], 6)
         self.assertEqual(result["missed_mondays"], [])
 
     def test_real_chronicle_dir_matches_todays_hand_counted_gap(self):
@@ -285,9 +291,14 @@ class RealChronicleCase(unittest.TestCase):
         # Task 991 (off-by-one): same 6->7 / 4->5 bump as the snapshot
         # test above, for the same reason (episode-006 landed on disk at
         # task 990) -- see that test's comment for the full story.
+        #
+        # Task 1165 (kwaku-ananse): same 7->8 / 5->6 bump as the snapshot
+        # test above, for the same reason (episode-007 landed on disk at
+        # task 1165, one day into arrears -- see episode-007's own "Behind
+        # the veil" for why).
         result = cdc.compute_cadence(today=date(2026, 8, 17))
-        self.assertEqual(result["total_episodes_on_record"], 7)
-        self.assertEqual(result["cluster_day_episodes_shipped"], 5)
+        self.assertEqual(result["total_episodes_on_record"], 8)
+        self.assertEqual(result["cluster_day_episodes_shipped"], 6)
         self.assertEqual(result["missed_mondays"], [])
 
 
