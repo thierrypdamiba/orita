@@ -81,6 +81,7 @@ _ORDINAL_WORDS = {
     "eighty-seventh": 87, "eighty-eighth": 88, "eighty-ninth": 89,
     "ninetieth": 90, "ninety-first": 91, "ninety-second": 92,
     "ninety-third": 93, "ninety-fourth": 94, "ninety-fifth": 95, "ninety-sixth": 96,
+    "ninety-seventh": 97,
 }
 
 # Matches right at the top of the docstring only (``re.match``, not
@@ -180,15 +181,15 @@ def test_all_claimed_ordinals_are_pairwise_distinct():
 
 
 def test_the_real_ordinal_claims_are_currently_clean():
-    """Regression pin against today's real, live tree: 96 real recipes,
-    the reference recipe unnumbered, the other 95 forming the unbroken
-    sequence 2..96 -- no duplicate, no gap. Was 95/94/2..95 until
-    issue-body-claims-unfixed-issue merged (the ninety-sixth real
+    """Regression pin against today's real, live tree: 97 real recipes,
+    the reference recipe unnumbered, the other 96 forming the unbroken
+    sequence 2..97 -- no duplicate, no gap. Was 96/95/2..96 until
+    issue-body-claims-unmerged-pr merged (the ninety-seventh real
     recipe)."""
     claims = live_ordinal_claims(FENCEPOST_ROOT)
     numbered = sorted(n for n in claims.values() if n is not None)
-    assert len(claims) == 96
-    assert numbered == list(range(2, 97))
+    assert len(claims) == 97
+    assert numbered == list(range(2, 98))
 
 
 def test_a_duplicate_ordinal_would_flip_this_check_red(tmp_path):

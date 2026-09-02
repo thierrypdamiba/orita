@@ -1,0 +1,58 @@
+[
+  {
+    "number": 40,
+    "title": "Badge cache follow-up notes",
+    "state": "open",
+    "body": "This also fixes #501 while we're in here.",
+    "updated_at": "2026-08-23T10:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/issues/40"
+  },
+  {
+    "number": 41,
+    "title": "Streak status tracker cross-link",
+    "state": "open",
+    "body": "closes #502 for good, already merged upstream.",
+    "updated_at": "2026-08-23T10:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/issues/41"
+  },
+  {
+    "number": 42,
+    "title": "Old tracker cross-link",
+    "state": "open",
+    "body": "resolved #999 from the old tracker, keeping for context.",
+    "updated_at": "2026-08-23T10:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/issues/42"
+  },
+  {
+    "number": 43,
+    "title": "Blank body, filed from the mobile app",
+    "state": "open",
+    "body": "",
+    "updated_at": "2026-08-23T10:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/issues/43"
+  },
+  {
+    "number": 44,
+    "title": "Same root cause, no claim here",
+    "state": "open",
+    "body": "Same root cause as #501, not touching here.",
+    "updated_at": "2026-08-23T10:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/issues/44"
+  },
+  {
+    "number": 45,
+    "title": "Fresh follow-up, still in its edit grace window",
+    "state": "open",
+    "body": "fixes #501 too, opened moments ago",
+    "updated_at": "2026-08-25T08:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/issues/45"
+  },
+  {
+    "number": 46,
+    "title": "Claims a real issue number, not a PR",
+    "state": "open",
+    "body": "Fixes #40, a real issue number in this repo.",
+    "updated_at": "2026-08-23T10:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/issues/46"
+  }
+]

@@ -1,0 +1,12 @@
+{
+  "slug": "issue-body-claims-unmerged-pr",
+  "title": "An issue or PR's own opening body claims a pull request closed that's still unmerged",
+  "author": "nyx",
+  "description": "Extracts every real GitHub closing-keyword claim ('fixes #N', 'closes #N', 'resolves #N', both tenses, the shared seam_engine.closing_keywords grammar) from an issue or pull request's own OPENING BODY and checks whether the named pull request is actually merged. issue-body-claims-unfixed-issue's own docstring drew this exact line and left it open on purpose: that recipe deliberately checks only the issue list, never the PR list, naming 'a closing-keyword claim naming a real pull request' as 'a future issue-body-claims-unmerged-pr's own remit, not this one's.' This recipe is that remit, kept -- the PR-side twin of issue-body-claims-unfixed-issue, built the same way commit-closes-keyword-pr-still-open was already built as commit-closes-keyword-issue-still-open's own twin. A closing keyword sitting in an issue's opening body never has a merge event to trigger on at all, and a still-open PR's own opening body is exactly as inert -- right up until the moment it merges. A claim naming a real issue number instead of a PR is out of remit and excluded as not-found, the mirror image of the issue-tracker-side sibling's own boundary, so the two recipes never collide on the same candidate.",
+  "toolkit": "github",
+  "scopes": ["ListIssues", "ListPullRequests"],
+  "fixture": "fixtures/issue_body_claims_unmerged_pr",
+  "detector_file": "detector.py",
+  "entrypoint": "run_recipe_scan",
+  "confidence_notes": "Age-gated off the claiming record's own updated_at, the identical shape issue-body-claims-unfixed-issue already establishes -- 0.55 within 24h since last update, 0.85 past it. An issue or PR body is a text surface its own author can still edit at any time, so a fresh claim earns a grace period before being scored as a confirmed gap. A claimed pull request that doesn't exist at all -- including a claim that happens to land on a real ISSUE number instead of a PR -- is excluded at confidence 0.0, named not hidden: out of this recipe's own remit either way. A claimed PR that IS resolved (merged, or closed without merging) is excluded too -- the claim was simply true or moot. A body with no closing-keyword claim phrase at all, or no body at all, produces no surfaced candidate -- there is no claim to have broken. Deliberately checks only the pull-request list, never the issue list -- the mirror image of issue-body-claims-unfixed-issue's own issue-only boundary."
+}

@@ -1803,6 +1803,29 @@ does not (29 of 95 → 29 of 96). `ListIssues` and `ListPullRequests` were alrea
 cleared on `SCOPES.md`'s oath table — no new scope asked for anywhere in this
 recipe.
 
+[`RECIPES/issue-body-claims-unmerged-pr/`](RECIPES/issue-body-claims-unmerged-pr/)
+is the ninety-seventh, the PR-side twin of `issue-body-claims-unfixed-issue`
+(the ninety-sixth), built the same way `commit-closes-keyword-pr-still-open`
+was already built as `commit-closes-keyword-issue-still-open`'s own twin:
+an issue or pull request's own OPENING BODY invokes a real GitHub
+closing-keyword claim against a PULL REQUEST, but the named pull request
+never actually merged. `issue-body-claims-unfixed-issue`'s own docstring
+drew this exact line and left it open on purpose, naming it "a future
+`issue-body-claims-unmerged-pr`'s own remit, not this one's" — this
+recipe is that remit, kept. Neither an issue's own opening body nor a
+still-open PR's own opening body ever has a merge event to trigger a
+closing keyword on, so a claim sitting in either stays broken for as
+long as the named PR stays open. Deliberately checks only the
+pull-request list, never the issue list — the mirror image of the
+issue-tracker-side sibling's own boundary, so a claim naming a real
+issue number instead of a PR is excluded as not-found on both recipes,
+and the two never collide on the same candidate. Age-gated on the same
+24-hour edit-grace window every editable-text-surface sibling already
+holds. Single toolkit, `github`-only, so the total recipe count climbs
+while the plus-joined count does not (29 of 96 → 29 of 97). `ListIssues`
+and `ListPullRequests` were already cleared on `SCOPES.md`'s oath table
+— no new scope asked for anywhere in this recipe.
+
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)
 (ROADMAP.md #111) is that second promise, kept: it runs `scan.py`'s own

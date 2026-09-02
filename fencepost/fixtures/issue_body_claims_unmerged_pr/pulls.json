@@ -1,0 +1,56 @@
+[
+  {
+    "number": 501,
+    "title": "Badge cache invalidation follow-up",
+    "state": "open",
+    "merged": false,
+    "body": "",
+    "updated_at": "2026-08-18T09:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/pull/501"
+  },
+  {
+    "number": 502,
+    "title": "Streak status command",
+    "state": "closed",
+    "merged": true,
+    "body": "",
+    "updated_at": "2026-08-17T09:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/pull/502"
+  },
+  {
+    "number": 503,
+    "title": "Old approach, abandoned without merging",
+    "state": "closed",
+    "merged": false,
+    "body": "",
+    "updated_at": "2026-08-16T09:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/pull/503"
+  },
+  {
+    "number": 60,
+    "title": "Site refresh follow-up",
+    "state": "open",
+    "merged": false,
+    "body": "Fixes #501 and also -- again -- fixes #501 for good measure.",
+    "updated_at": "2026-08-25T09:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/pull/60"
+  },
+  {
+    "number": 61,
+    "title": "Ship the recipe-stocking sweep",
+    "state": "open",
+    "merged": false,
+    "body": "This PR closes #503 as well.",
+    "updated_at": "2026-08-23T10:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/pull/61"
+  },
+  {
+    "number": 62,
+    "title": "Cross-link cleanup",
+    "state": "open",
+    "merged": false,
+    "body": "Related to #998, no closing keyword here at all.",
+    "updated_at": "2026-08-23T10:00:00Z",
+    "url": "https://github.com/thierrypdamiba/orita/pull/62"
+  }
+]
