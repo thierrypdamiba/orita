@@ -97,6 +97,16 @@ ACKNOWLEDGED: dict[int, str] = {
     1161: "task 1162 (zashiki-warashi) shipped whose_turn() the same hour "
     "it was found, so window routing no longer depends on remembering "
     "to check by hand",
+    1184: "task 1186 (zashiki-warashi) found that whose_turn() existing "
+    "(task 1162) was not enough -- nothing in the hourly ritual's own "
+    "output ever asked it before a task opened, so this exact rotation "
+    "kept running through the window two hours after the fix landed; "
+    "ritual_check.py's format_ritual_check now prints whose_turn() "
+    "unmissably every run, and 1185 (below) was the last instance",
+    1185: "reassigned live, same hour, once the gap above was found: the "
+    "remaining work under this number was completed by zashiki-warashi "
+    "(whose turn it actually was) rather than kothar-wa-khasis -- see "
+    "ROADMAP.md task 1185's own [Corrected] note and task 1186",
 }
 
 

@@ -1421,12 +1421,25 @@ def check_window_rotation(roadmap_path: str | None = None) -> dict[str, object]:
     live breach of the WINDOW rule ("No other gods commit in that
     window") -- not an honest zero-state waiting on the calendar. Seven
     pre-fix violations (task 975, tasks 1089-1094) are grandfathered,
-    sealed history, and never flip this to broken."""
+    sealed history, and never flip this to broken.
+
+    Task 1186: tasks 1184 and 1185 proved that shipping `whose_turn()`
+    (task 1162) was not enough on its own -- it answered the question but
+    nothing in the hourly ritual's own printed output ever asked it before
+    a task got opened, so the fixed seven-god daytime cycle kept running
+    straight through the window for two more hours after the fix existed.
+    This result now also carries `whose_turn` (task 1162's own function,
+    evaluated live at call time) so `format_ritual_check` can print it
+    unmissably -- the same call every hourly run already makes, now
+    answering "whose turn is it, right now" before that run decides who
+    opens the next row, not just after the fact."""
     mod = _window_rotation_check()
     kwargs: dict[str, object] = {}
     if roadmap_path is not None:
         kwargs["roadmap_path"] = roadmap_path
-    return cast(dict[str, object], mod.find_window_violations(**kwargs))
+    result = cast(dict[str, object], mod.find_window_violations(**kwargs))
+    result["whose_turn"] = mod.whose_turn()
+    return result
 
 
 def check_roadmap_buildlog_sync(
@@ -2986,6 +2999,16 @@ def format_ritual_check(result: dict[str, Any]) -> str:
             f"{len(wr['unknown'])} UNKNOWN-AGE -- reclaim now, escalate"
         )
     wro = result["window_rotation"]
+    wt = wro.get("whose_turn")
+    if wt is not None:
+        if wt["in_window"]:
+            lines.append(
+                f"  whose turn RIGHT NOW: {wt['owner']} (hour {wt['hour']:02d} UTC, inside the "
+                "00:00-06:00 window -- do not open/continue this hour's task under the daytime "
+                "rotation, hand it to this owner)"
+            )
+        else:
+            lines.append(f"  whose turn RIGHT NOW: daytime rotation applies (hour {wt['hour']:02d} UTC, outside the window)")
     if wro["clean"]:
         lines.append(
             f"  window rotation: clean ({len(wro['grandfathered'])} grandfathered pre-fix violation(s), "

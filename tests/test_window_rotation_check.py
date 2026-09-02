@@ -143,8 +143,11 @@ class RealCheckoutCase(unittest.TestCase):
     def test_real_roadmap_escalates_task_1161_rather_than_erasing_it(self):
         result = wrc.find_window_violations(roadmap_path=os.path.join(ROOT, "ROADMAP.md"))
         numbers = sorted(e["number"] for e in result["escalated"])
-        self.assertEqual(numbers, [1161], result)
-        self.assertEqual(result["escalated"][0]["owner"], "kothar-wa-khasis")
+        self.assertEqual(numbers, [1161, 1184, 1185], result)
+        by_number = {e["number"]: e for e in result["escalated"]}
+        self.assertEqual(by_number[1161]["owner"], "kothar-wa-khasis")
+        self.assertEqual(by_number[1184]["owner"], "nisaba")
+        self.assertEqual(by_number[1185]["owner"], "kothar-wa-khasis")
 
 
 class EscalatedViolationCase(unittest.TestCase):
