@@ -1826,6 +1826,28 @@ while the plus-joined count does not (29 of 96 → 29 of 97). `ListIssues`
 and `ListPullRequests` were already cleared on `SCOPES.md`'s oath table
 — no new scope asked for anywhere in this recipe.
 
+[`RECIPES/email-dangling-reference/`](RECIPES/email-dangling-reference/)
+is the ninety-eighth (ROADMAP.md #1189), the eleventh leg of the
+dangling-reference family and the twin `email-claims-unfixed-issue` (the
+ninety-third, ROADMAP.md #1046) drew and left open on purpose by name in
+its own docstring: "a broken reference is a future email-side
+dangling-reference recipe's own seam, not this one's." An inbound
+email's own body names a bare `#N` reference — not just a closing-keyword
+claim like its sibling — checked against BOTH the live issue list and
+the live PR list, GitHub's shared number sequence, the same discipline
+every dangling-reference sibling already holds. Confidence is FLAT at
+0.75, not age-gated — unlike its Slack (`slack-message-dangling-reference`)
+and Linear (`linear-comment-dangling-reference`) dangling-reference
+siblings, an inbound email gets no second edit pass once it lands in a
+connected inbox, the identical reasoning `mention-dangling-reference`
+(the eighteenth) already gives for its own exact 0.75 score. Toolkit is
+`gmail+github`, so both the total recipe count and the plus-joined count
+climb together (29 of 97 → 30 of 98, the second recipe to pair GitHub
+with Gmail). `ListIssues` and `ListPullRequests` were already cleared on
+`SCOPES.md`'s oath table; `ListEmails` is the same scope
+`email-claims-unfixed-issue` already asks for — no new scope asked for
+anywhere in this recipe.
+
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)
 (ROADMAP.md #111) is that second promise, kept: it runs `scan.py`'s own

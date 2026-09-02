@@ -1,0 +1,37 @@
+[
+  {
+    "id": "EML-5101",
+    "sender": "quiet-watcher@orita.gods",
+    "subject": "quick question about the ledger",
+    "body": "any movement on #4501? been meaning to ask for a week",
+    "received_at": "2026-08-06T09:00:00Z"
+  },
+  {
+    "id": "EML-5102",
+    "sender": "helpful-mod@orita.gods",
+    "subject": "Re: badge rendering regression",
+    "body": "glad #4102 finally landed, nice work",
+    "received_at": "2026-08-06T10:00:00Z"
+  },
+  {
+    "id": "EML-5103",
+    "sender": "curious-forker@orita.gods",
+    "subject": "is this the same as the arcade one?",
+    "body": "saw arcadeai/gasstation#42 mentioned elsewhere, is that related to this project at all?",
+    "received_at": "2026-08-06T11:00:00Z"
+  },
+  {
+    "id": "EML-5104",
+    "sender": "town-crier@orita.gods",
+    "subject": "weekly digest",
+    "body": "quiet week for the town this time, nothing to flag",
+    "received_at": "2026-08-06T12:00:00Z"
+  },
+  {
+    "id": "EML-5105",
+    "sender": "second-looker@orita.gods",
+    "subject": "Re: streak command status",
+    "body": "circling back -- #4103 got merged already right? saw it land in the changelog",
+    "received_at": "2026-08-06T13:00:00Z"
+  }
+]
