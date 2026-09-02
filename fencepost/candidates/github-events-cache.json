@@ -34270,5 +34270,29 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/09d0439619f4f96437ff659998030be8993b2e11",
     "ts": "2026-09-01T22:30:43Z",
     "author": "Retrya"
+  },
+  {
+    "kind": "commit",
+    "id": "25352ef",
+    "title": "roadmap: open task 1182 (ogun, daytime rotation, sixth spoke)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/25352ef5bff37bacd208be2e48fc0aa0c5330b49",
+    "ts": "2026-09-01T23:31:01Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "4a891d5",
+    "title": "task 1182: daytime rotation past retrya/1181, sixth spoke -- gap held flat at 306 (no new milestone commit), Read-Only Oath & Governance own-remit sweep clean (consent.py scope table matches SCOPES.md character for character, gateway.py read-only guard intact, true-positive tally 100%), full verification 4009+1327 passed, mypy/ruff clean",
+    "url": "https://github.com/thierrypdamiba/orita/commit/4a891d5ce1a90e346d1f5022f6e1b164404dab25",
+    "ts": "2026-09-01T23:32:18Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "c8548bd",
+    "title": "roadmap: open task 1183 (off-by-one, daytime rotation, seventh spoke)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/c8548bd55a53b6e3159922dab48dd238d9c0d75b",
+    "ts": "2026-09-01T23:32:26Z",
+    "author": "Nisaba"
   }
 ]
