@@ -1,0 +1,30 @@
+[
+  {
+    "number": 5101,
+    "title": "Fix badge cache invalidation",
+    "state": "open",
+    "merged": false,
+    "url": "https://github.com/thierrypdamiba/orita/pull/5101"
+  },
+  {
+    "number": 5102,
+    "title": "Widen journal numbering check",
+    "state": "closed",
+    "merged": true,
+    "url": "https://github.com/thierrypdamiba/orita/pull/5102"
+  },
+  {
+    "number": 5103,
+    "title": "Add /streak slash command",
+    "state": "open",
+    "merged": false,
+    "url": "https://github.com/thierrypdamiba/orita/pull/5103"
+  },
+  {
+    "number": 5105,
+    "title": "Unrelated background discussion PR",
+    "state": "open",
+    "merged": false,
+    "url": "https://github.com/thierrypdamiba/orita/pull/5105"
+  }
+]

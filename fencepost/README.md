@@ -1848,6 +1848,29 @@ with Gmail). `ListIssues` and `ListPullRequests` were already cleared on
 `email-claims-unfixed-issue` already asks for — no new scope asked for
 anywhere in this recipe.
 
+[`RECIPES/email-claims-unmerged-pr/`](RECIPES/email-claims-unmerged-pr/)
+is the ninety-ninth (ROADMAP.md #1194), the twelfth leg of the
+claims-unmerged-pr family and the third recipe to read `gmail` — the
+Gmail-side twin of `mention-claims-unmerged-pr`, `slack-message-claims-
+unmerged-pr`, and `linear-comment-claims-unmerged-pr`, the three inbound
+legs of that family the town does not control (eight other siblings check
+a "shipped it" claim the town made about ITSELF; none of the eleven ever
+read an inbound email). An inbound email's own body names a pull request
+by a "ships/includes/merges/via #N" claim, but the named PR never
+actually merged — checked against BOTH the PR's own live `state` and
+`merged` fields via `ListPullRequests`, the same objective check every
+claims-unmerged-pr sibling already makes; a named PR that does not exist
+at all is `email-dangling-reference`'s own seam, not this one's.
+Confidence is age-gated on the same 24-hour edit-grace window every
+claims-unmerged-pr sibling already holds (0.85 stale, 0.5 fresh) — not an
+independently re-reasoned number just because the toolkit is new. Toolkit
+stays `gmail+github`, so both the total recipe count and the plus-joined
+count climb together (30 of 98 → 31 of 99, the third recipe to pair
+GitHub with Gmail). `ListPullRequests` was already cleared on
+`SCOPES.md`'s oath table; `ListEmails` is the same scope
+`email-claims-unfixed-issue`/`email-dangling-reference` already ask for —
+no new scope asked for anywhere in this recipe.
+
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)
 (ROADMAP.md #111) is that second promise, kept: it runs `scan.py`'s own
