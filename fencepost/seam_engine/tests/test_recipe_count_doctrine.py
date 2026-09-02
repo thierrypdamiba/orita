@@ -60,10 +60,16 @@ _CARDINAL_WORDS = {
     "eighty-seven": 87, "eighty-eight": 88, "eighty-nine": 89, "ninety": 90,
     "ninety-one": 91, "ninety-two": 92, "ninety-three": 93, "ninety-four": 94,
     "ninety-five": 95, "ninety-six": 96, "ninety-seven": 97, "ninety-eight": 98,
-    "ninety-nine": 99,
+    "ninety-nine": 99, "one hundred": 100,
 }
 
-_CLAIM_RE = re.compile(r"([A-Za-z-]+) real recipes stand today")
+# The cardinal word itself may be a single hyphenated token ("ninety-nine")
+# or two separate words ("one hundred") -- task 1195's own fix, the first
+# time this doctrine file's claim ever needed a second word: every count
+# through 99 fits one hyphenated token, but 100 is "one hundred" in
+# ordinary English prose, not "onehundred". The old `[A-Za-z-]+` shape
+# could never have matched that second word at all.
+_CLAIM_RE = re.compile(r"([A-Za-z]+(?:[ -][A-Za-z]+)?) real recipes stand today")
 
 
 def claimed_recipe_count(site_text: str) -> int:
@@ -107,13 +113,13 @@ def test_unrecognized_cardinal_word_raises():
         claimed_recipe_count("Several real recipes stand today:")
 
 
-def test_real_recipe_count_is_currently_ninety_nine():
-    """Regression pin: today's real, live count under RECIPES/. Was 98 until
-    RECIPES/email-claims-unmerged-pr/ merged (the ninety-ninth
+def test_real_recipe_count_is_currently_one_hundred():
+    """Regression pin: today's real, live count under RECIPES/. Was 99 until
+    RECIPES/email-claims-open-milestone/ merged (the hundredth
     real recipe) -- the exact drift this whole doctrine file exists to
     catch, now caught once for real instead of only rehearsed by the
     mutation test below."""
-    assert real_recipe_count(FENCEPOST_ROOT) == 99
+    assert real_recipe_count(FENCEPOST_ROOT) == 100
 
 
 def test_site_claim_matches_the_real_live_count():

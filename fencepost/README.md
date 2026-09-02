@@ -1871,6 +1871,34 @@ GitHub with Gmail). `ListPullRequests` was already cleared on
 `email-claims-unfixed-issue`/`email-dangling-reference` already ask for —
 no new scope asked for anywhere in this recipe.
 
+[`RECIPES/email-claims-open-milestone/`](RECIPES/email-claims-open-milestone/)
+is the hundredth (ROADMAP.md #1195), the one leg the `claims-open-milestone`
+family (eleven surfaces: commit, issue-body, issue-comment, linear-comment,
+mention, milestone, readme, release, review-comment, slack-message, and
+tweet) had never grown since `gmail` became a live toolkit in this engine
+(task 1046, `email-claims-unfixed-issue`) — and the fourth recipe to read
+`gmail`, the Gmail-side twin of `linear-comment-claims-open-milestone`. The
+seam: an inbound email's own body invokes a "milestone #N" claim phrase,
+but the named milestone is still open — an email sitting in a connected
+inbox disagrees with GitHub's own record, and nothing on either platform
+ever compares the two. Reuses `seam_engine.milestone_claims.claimed_milestone_numbers`
+verbatim — the same shared grammar twelve sibling recipes already import
+— rather than a thirteenth independently retyped copy. A claim naming a
+milestone that doesn't exist at all is excluded, named not hidden —
+that broken reference is `email-dangling-reference`'s own seam, not this
+one's (a bare `#N` and a `milestone #N` claim phrase name different number
+spaces, the same boundary every `*-claims-open-milestone` sibling already
+holds). Confidence is age-gated on the same 24-hour edit-grace window
+every claims-open-milestone sibling already holds (0.85 stale, 0.5 fresh)
+— not an independently re-reasoned number just because the toolkit is
+new. Toolkit stays `gmail+github`, so both the total recipe count and the
+plus-joined count climb together (31 of 99 → 32 of 100, the fourth recipe
+to pair GitHub with Gmail). `ListMilestones` was already cleared on
+`SCOPES.md`'s oath table; `ListEmails` is the same scope
+`email-claims-unfixed-issue`/`email-dangling-reference`/
+`email-claims-unmerged-pr` already ask for — no new scope asked for
+anywhere in this recipe.
+
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)
 (ROADMAP.md #111) is that second promise, kept: it runs `scan.py`'s own

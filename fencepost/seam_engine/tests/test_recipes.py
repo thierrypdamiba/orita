@@ -667,11 +667,14 @@ _CARDINAL_WORDS = {
     "eighty-seven": 87, "eighty-eight": 88, "eighty-nine": 89, "ninety": 90,
     "ninety-one": 91, "ninety-two": 92, "ninety-three": 93, "ninety-four": 94,
     "ninety-five": 95, "ninety-six": 96, "ninety-seven": 97, "ninety-eight": 98,
-    "ninety-nine": 99,
+    "ninety-nine": 99, "one hundred": 100,
 }
 
+# The total-count word may be a single hyphenated token ("ninety-nine") or
+# two separate words ("one hundred") -- task 1195's own fix, the first time
+# either half of this claim ever needed a second word.
 _PLUS_JOINED_CLAIM_RE = re.compile(
-    r"but ([a-z-]+) of the ([a-z-]+) real recipes today name a plus-joined pair"
+    r"but ([a-z-]+) of the ([a-z]+(?:[ -][a-z]+)?) real recipes today name a plus-joined pair"
 )
 
 
@@ -719,17 +722,17 @@ def test_plus_joined_claim_missing_sentence_raises():
         claimed_plus_joined_counts("Nothing here about plus-joined toolkits.")
 
 
-def test_real_plus_joined_counts_are_currently_thirty_one_of_ninety_nine():
-    # Regression pin: today's real, live counts under RECIPES/. Was (30, 98)
-    # until email-claims-unmerged-pr merged (the ninety-ninth real
+def test_real_plus_joined_counts_are_currently_thirty_two_of_one_hundred():
+    # Regression pin: today's real, live counts under RECIPES/. Was (31, 99)
+    # until email-claims-open-milestone merged (the hundredth real
     # recipe, toolkit "gmail+github" -- plus-joined, so both counts climb
-    # together this time: 31 of 99.
+    # together this time: 32 of 100.
     # `real_plus_joined_counts` counts every recipe whose OWN toolkit
     # string contains "+" -- not distinct toolkit-pair strings. Verified
     # against the live tree, not assumed from a prior task's own note:
     # every one of today's plus-joined recipes was grepped by hand before
     # pinning this number.
-    assert real_plus_joined_counts(FENCEPOST_ROOT) == (31, 99)
+    assert real_plus_joined_counts(FENCEPOST_ROOT) == (32, 100)
 
 
 def test_oath_scopes_for_toolkit_docstring_matches_the_real_live_counts():
