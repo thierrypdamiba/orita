@@ -1899,6 +1899,39 @@ to pair GitHub with Gmail). `ListMilestones` was already cleared on
 `email-claims-unmerged-pr` already ask for — no new scope asked for
 anywhere in this recipe.
 
+[`RECIPES/email-claims-dangling-milestone/`](RECIPES/email-claims-dangling-milestone/)
+is the hundred-first (ROADMAP.md #1197), closing the one leg the `email`
+family had never grown: every other `claims-*` source in this engine
+(issue-body, issue-comment, linear-comment, mention, readme,
+review-comment, slack-message) already carries all five legs of its own
+family (claims-dangling-milestone, claims-open-milestone,
+claims-unfixed-issue, claims-unmerged-pr, dangling-reference) — `email`
+was stuck at four — and the fifth recipe to read `gmail`, the Gmail-side
+twin of `linear-comment-claims-dangling-milestone`. The seam: an inbound
+email's own body invokes a "milestone #N" claim phrase, but no milestone
+with that number exists at all. Reuses
+`seam_engine.milestone_claims.claimed_milestone_numbers` verbatim — the
+same shared grammar twenty-five sibling recipes already import — rather
+than a twenty-sixth independently retyped copy. A claim naming a real
+milestone is excluded, named not hidden, whether it is open or closed —
+whether the claim is TRUE is `email-claims-open-milestone`'s own seam,
+not this one's. Genuinely distinct from `email-dangling-reference`: that
+recipe watches a bare `#N` against the issue/PR number space and never
+opens `ListMilestones` at all — milestones and issues/PRs are separate
+GitHub number spaces, so a `#N` that resolves cleanly as an issue could
+still be a dangling milestone claim. Confidence is flat (0.8), not
+age-gated — mirrors every other `*-claims-dangling-milestone` sibling's
+own reasoning rather than `email-claims-open-milestone`'s 24-hour
+edit-grace bar: a milestone number that does not exist right now will
+not spontaneously start existing later, so there is no grace period that
+means anything here. Toolkit stays `gmail+github`, so both the total
+recipe count and the plus-joined count climb together (32 of 100 → 33 of
+101, the fifth recipe to pair GitHub with Gmail). `ListMilestones` was
+already cleared on `SCOPES.md`'s oath table; `ListEmails` is the same
+scope `email-claims-unfixed-issue`/`email-dangling-reference`/
+`email-claims-unmerged-pr`/`email-claims-open-milestone` already ask
+for — no new scope asked for anywhere in this recipe.
+
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)
 (ROADMAP.md #111) is that second promise, kept: it runs `scan.py`'s own
