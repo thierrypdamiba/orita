@@ -418,11 +418,14 @@ _CARDINAL_WORDS = {
     "eighty-seven": 87, "eighty-eight": 88, "eighty-nine": 89, "ninety": 90,
     "ninety-one": 91, "ninety-two": 92, "ninety-three": 93, "ninety-four": 94,
     "ninety-five": 95, "ninety-six": 96, "ninety-seven": 97, "ninety-eight": 98,
-    "ninety-nine": 99,
+    "ninety-nine": 99, "one hundred": 100,
 }
 
+# The cardinal word itself may be a single hyphenated token ("ninety-nine")
+# or two separate words ("one hundred") -- task 1195's own fix, the first
+# time this doctrine file's claim ever needed a second word.
 _SECTION_COUNT_CLAIM_RE = re.compile(
-    r"never mistaken for one of the ([a-z-]+) community\n?\s*recipes this section actually enumerates"
+    r"never mistaken for one of the ([a-z]+(?:[ -][a-z]+)?) community\n?\s*recipes this section actually enumerates"
 )
 
 
@@ -471,14 +474,14 @@ class DocstringCountDoctrineCase(unittest.TestCase):
         with self.assertRaises(AssertionError):
             claimed_section_count("Nothing here about a recipe count.")
 
-    def test_real_live_section_count_is_currently_ninety_nine(self):
-        # Regression pin: today's real, live linked-recipe count. Was 98
-        # until email-claims-unmerged-pr merged (the
-        # ninety-ninth real recipe).
+    def test_real_live_section_count_is_currently_one_hundred(self):
+        # Regression pin: today's real, live linked-recipe count. Was 99
+        # until email-claims-open-milestone merged (the
+        # hundredth real recipe).
         with open(rrc.DEFAULT_README_PATH, encoding="utf-8") as f:
             text = f.read()
         section = rrc._community_recipes_section(text)
-        self.assertEqual(len(rrc._linked_recipes(section)), 99)
+        self.assertEqual(len(rrc._linked_recipes(section)), 100)
 
     def test_docstring_matches_the_real_live_count(self):
         with open(rrc.DEFAULT_README_PATH, encoding="utf-8") as f:
