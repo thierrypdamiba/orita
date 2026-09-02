@@ -34326,5 +34326,13 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/64ad9b3f46941a78e6eb7ac0348f3213bc5a10f6",
     "ts": "2026-09-02T02:41:52Z",
     "author": "Zashiki-warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "322ec2d",
+    "title": "task 1187: ship issue-body-claims-unmerged-pr, the 97th real fencepost recipe",
+    "url": "https://github.com/thierrypdamiba/orita/commit/322ec2d1b167c7dad7fed45e394bd7f748627fa9",
+    "ts": "2026-09-02T03:39:35Z",
+    "author": "Nyx"
   }
 ]

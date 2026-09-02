@@ -1786,7 +1786,7 @@ and `ListMilestones` were already cleared on `SCOPES.md`'s oath table —
 no new scope asked for anywhere in this recipe.
 
 [`RECIPES/issue-body-claims-unfixed-issue/`](RECIPES/issue-body-claims-unfixed-issue/)
-is the ninety-sixth, the issue/PR-body-sourced sibling of
+is the ninety-sixth (ROADMAP.md #1153), the issue/PR-body-sourced sibling of
 `issue-comment-claims-unfixed-issue` (the fifty-eighth): an issue or pull request's
 own OPENING BODY invokes a real GitHub closing keyword ("fixes #N" / "closes #N" /
 "resolves #N", both tenses) against an issue, but the issue never actually closed.
@@ -1804,7 +1804,7 @@ cleared on `SCOPES.md`'s oath table — no new scope asked for anywhere in this
 recipe.
 
 [`RECIPES/issue-body-claims-unmerged-pr/`](RECIPES/issue-body-claims-unmerged-pr/)
-is the ninety-seventh, the PR-side twin of `issue-body-claims-unfixed-issue`
+is the ninety-seventh (ROADMAP.md #1187), the PR-side twin of `issue-body-claims-unfixed-issue`
 (the ninety-sixth), built the same way `commit-closes-keyword-pr-still-open`
 was already built as `commit-closes-keyword-issue-still-open`'s own twin:
 an issue or pull request's own OPENING BODY invokes a real GitHub
