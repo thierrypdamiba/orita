@@ -1205,34 +1205,46 @@ def test_main_write_refuses_a_regressive_candidate_and_leaves_no_file_on_disk(tm
     # CLI mode nothing called automatically). Proves the wiring end to end
     # through `main()` itself, not just the standalone function task 964
     # already covered in tests/test_report_regression_check.py.
+    #
+    # Task 1192: dates before `account_live_since` (2026-07-12) on purpose --
+    # this precheck runs against the real, hardcoded
+    # `report_regression_check.SEEDED_EXCEPTIONS` (never a caller-supplied
+    # fake set), so a fixture reusing an in-project real calendar date pair
+    # can silently collide with a genuine seeded exception added later for
+    # an actual sealed regression (task 1192 itself added
+    # `("2026-09-01", "2026-09-02")` -- the exact pair this test used to
+    # use -- which made this test's "regressive" candidate read as seeded
+    # and stopped asserting anything real). Dates that predate the
+    # account's own founding can never appear in a real `REPORTS/*.md`
+    # filename or a real seeded exception, so this collision can't recur.
     reports_dir = tmp_path / "REPORTS"
     reports_dir.mkdir()
-    (reports_dir / "2026-09-01.md").write_text(
-        "# Fencepost Report — 2026-09-01\n\n"
+    (reports_dir / "2020-01-01.md").write_text(
+        "# Fencepost Report — 2020-01-01\n\n"
         "10 milestone commit(s) since 2026-07-01 (matching ['fencepost']), none echoed in a post.\n"
     )
 
-    sealed_path = _sealed_json(tmp_path, date="2026-09-02", count=5)
+    sealed_path = _sealed_json(tmp_path, date="2020-01-02", count=5)
     rc = report.main([str(sealed_path), "--out-base", str(tmp_path), "--write"])
 
     assert rc == 1
     assert "refusing to write" in capsys.readouterr().err
-    assert not (reports_dir / "2026-09-02.md").exists()
+    assert not (reports_dir / "2020-01-02.md").exists()
 
 
 def test_main_write_still_writes_a_non_regressive_candidate(tmp_path: Path, capsys):
     reports_dir = tmp_path / "REPORTS"
     reports_dir.mkdir()
-    (reports_dir / "2026-09-01.md").write_text(
-        "# Fencepost Report — 2026-09-01\n\n"
+    (reports_dir / "2020-01-01.md").write_text(
+        "# Fencepost Report — 2020-01-01\n\n"
         "5 milestone commit(s) since 2026-07-01 (matching ['fencepost']), none echoed in a post.\n"
     )
 
-    sealed_path = _sealed_json(tmp_path, date="2026-09-02", count=10)
+    sealed_path = _sealed_json(tmp_path, date="2020-01-02", count=10)
     rc = report.main([str(sealed_path), "--out-base", str(tmp_path), "--write"])
 
     assert rc == 0
-    written = reports_dir / "2026-09-02.md"
+    written = reports_dir / "2020-01-02.md"
     assert written.exists()
     assert "10 milestone commit(s) since" in written.read_text()
 

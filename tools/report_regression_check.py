@@ -104,6 +104,36 @@ SEEDED_EXCEPTIONS: frozenset[tuple[str, str]] = frozenset(
         # actually lands on is the "to" side; recorded here as 2026-08-30,
         # the day it shipped.
         ("2026-08-28", "2026-08-30"),
+        # Task 1192 (2026-09-02, retrya): a DIFFERENT mechanism from the
+        # 1118 case above, confirmed live rather than assumed by analogy.
+        # `_is_milestone` (scan.py) applies `QUIET_VOICE_AUTHORS` uniformly
+        # to both the direct-fetch and override-cache paths now -- that
+        # filter is not the cause here. `REPORTS/2026-09-01.md` sealed 331
+        # milestone commits on a rare hour the sandbox's direct httpx path
+        # to api.github.com got through (`github_events_source: "direct"`);
+        # every hour since (including this one) runs the override cache
+        # path instead, sourced from `fencepost/candidates/
+        # github-events-cache.json`. A live `mcp__github__list_commits`
+        # page-probe this hour (binary search on `page` at `perPage=1`,
+        # `since=2026-07-12`) found real commits still returned at page
+        # 5200 and none at page 6000 -- the true total since
+        # `account_live_since` is at least 5200, while the override cache
+        # held only 4302 total events (commits + releases) at scan time.
+        # The cache is built by each hour's own small delta ingest
+        # (`github_events_cache.py ingest-raw` since the cache's last-seen
+        # timestamp) and has never been fully backfilled against live
+        # history -- some real historical commits were never captured by
+        # any hour's delta ingest and are permanently missing until a
+        # dedicated backfill runs. That backfill is deliberately NOT done
+        # by this task: fetching >=5200 commits' full message bodies
+        # through the MCP `list_commits` tool would spend an hour's entire
+        # context budget on one line of one report. Filed instead as its
+        # own ROADMAP row (task 1193) so the gap gets a real fix on a
+        # future hour with room for it, not a silent non-fix here. The
+        # override count (308) is therefore an undercount of the true
+        # milestone-commit total, not a wrong or reversed announcement --
+        # nothing was un-shipped, un-committed, or newly filtered.
+        ("2026-09-01", "2026-09-02"),
     }
 )
 
