@@ -900,3 +900,6 @@
 {"type": "check", "workflow": "pages", "conclusion": "success", "run_id": 33728674171, "checked_at": "2026-09-03T08:22:00Z"}
 {"type": "check", "workflow": "dawn-run", "conclusion": "success", "run_id": 33762388879, "checked_at": "2026-09-03T14:24:00Z"}
 {"type": "check", "workflow": "pages", "conclusion": "success", "run_id": 33762388880, "checked_at": "2026-09-03T14:24:00Z"}
+{"type": "check", "workflow": "seam-scan", "conclusion": "success", "run_id": 33774736692, "checked_at": "2026-09-03T16:23:00Z"}
+{"type": "check", "workflow": "pages", "conclusion": "success", "run_id": 33773433414, "checked_at": "2026-09-03T16:23:00Z"}
+{"type": "check", "workflow": "dawn-run", "conclusion": "success", "run_id": 33773433395, "checked_at": "2026-09-03T16:23:00Z"}
