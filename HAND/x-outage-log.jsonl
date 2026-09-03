@@ -1207,3 +1207,5 @@
 {"type": "check", "tool": "X_GetUserTweets", "status": "forbidden", "checked_at": "2026-09-03T00:27:50Z"}
 {"type": "check", "tool": "X_WhoAmI", "status": "ok", "checked_at": "2026-09-03T03:26:38Z"}
 {"type": "check", "tool": "X_GetUserTweets", "status": "forbidden", "checked_at": "2026-09-03T03:26:38Z"}
+{"type": "check", "tool": "X_WhoAmI", "status": "ok", "checked_at": "2026-09-03T05:36:10Z"}
+{"type": "check", "tool": "X_GetUserTweets", "status": "forbidden", "checked_at": "2026-09-03T05:36:10Z"}
