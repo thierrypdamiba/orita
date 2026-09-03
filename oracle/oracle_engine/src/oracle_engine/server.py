@@ -79,14 +79,24 @@ def _resolve_transport(argv: list[str]) -> TransportArg:
     usage error the first and only thing printed, and narrows the return
     type to what `app.run()`'s own `transport` parameter expects instead of
     a bare `str` (mypy --strict caught the untyped mismatch, task 659).
+
+    task 1226: the "ported verbatim" claim above was stale -- this function
+    still carried the pre-657/658/849 `if transport not in _VALID_TRANSPORTS`
+    shape, which narrows a bare `str` against a `tuple[TransportArg, ...]`
+    on some mypy versions and not others. This runner's mypy flagged the
+    exact untyped-mismatch the docstring already claimed was fixed. Ported
+    the actual robust shape this time: return each valid literal from its
+    own explicit branch (no membership-narrowing involved at all), so this
+    cannot flip again regardless of which mypy lands on the runner.
     """
     transport = argv[1] if len(argv) > 1 else "stdio"
-    if transport not in _VALID_TRANSPORTS:
-        sys.exit(
-            f"oracle_engine.server: invalid transport {transport!r} "
-            f"(expected one of {', '.join(_VALID_TRANSPORTS)})"
-        )
-    return transport
+    for candidate in _VALID_TRANSPORTS:
+        if transport == candidate:
+            return candidate
+    sys.exit(
+        f"oracle_engine.server: invalid transport {transport!r} "
+        f"(expected one of {', '.join(_VALID_TRANSPORTS)})"
+    )
 
 
 # Run with specific transport
