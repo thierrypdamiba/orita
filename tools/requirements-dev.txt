@@ -1,0 +1,26 @@
+# tools/'s own lint dependency, pinned to match fencepost/oracle_engine's
+# locked dev ruff (both pin 0.15.21 via their own uv.lock).
+#
+# Root cause, found live this hour (task 1239): `tools/` has no
+# project/`.venv` of its own -- the identical "runs on whatever interpreter
+# happens to be on $PATH" shape tests/requirements.txt (task 888) already
+# diagnosed for `tests/`. A fresh container's `pip install ruff` pulled
+# 0.16.6, whose default rule selection differs from 0.15.21's (it newly
+# flags EXE001 on every non-executable file carrying a shebang, and RUF100
+# on every `# noqa: E402` since E402 moved out of that version's default
+# set) -- 197 false "errors" across files this exact tree has run clean on,
+# hour after hour, for months. Every prior "root tools ... ruff clean"
+# BUILDLOG.md line was true only by the luck of whichever ruff a fresh
+# session's `pip install ruff` happened to resolve that hour, the same
+# unpinned-drift risk task 887/888 already fixed for `tests/` and the
+# fencepost/oracle_engine `pyproject.toml` comments (task 660) already
+# fixed for mypy in those two trees. This file is that same durable answer,
+# ported to the one tree that never got it:
+#
+#     pip install -r tools/requirements-dev.txt
+#
+# mypy needs no pin here -- this hour's fresh-container `mypy 2.3.1` (no
+# pin at all) already read `tools/` --strict clean, the same as every
+# prior hour's claim; only ruff's default-ruleset drift was real.
+# -- Ogun, task 1239
+ruff==0.15.21
