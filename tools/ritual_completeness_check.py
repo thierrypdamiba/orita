@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Task 121. Off-By-One counts the tool that counts everything else.
 
-`tools/ritual_check.py` hand-wires 74 `check_*` functions into one hourly
+`tools/ritual_check.py` hand-wires 75 `check_*` functions into one hourly
 block: each is called inside `run_ritual_check`, its result assigned to a
 dict key, and that key printed as a line in `format_ritual_check`. Three
 separate places a single typo or a forgotten wire-up can silently drop a
@@ -375,7 +375,13 @@ promise unnoticed. **Updated to 74** the same hour task 1113's
 `check_window_rotation` was wired in -- the WINDOW rule's own half nobody
 had checked (whether a task opened inside 00:00-06:00 UTC was actually
 handed to Nyx or the child), found live grandfathering seven real
-historical violations that had sat unnoticed since task 975.
+historical violations that had sat unnoticed since task 975. **Updated to
+75** the same hour task 1244's `check_book_of_the_gate` was wired in --
+turning the "nobody entered in the Book of the Gate" line every quiet-
+square hour had hand-typed since the town's founding into a real
+comparison against this hour's live issue/PR authors, the same
+claim-into-a-check shape task 1057's `check_consent_template_scope`
+already gave the Threshold's other hand-eyeballed line.
 
 Usage:
     python3 tools/ritual_completeness_check.py check

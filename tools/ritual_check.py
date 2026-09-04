@@ -165,6 +165,16 @@ Informational only, the same class `report_cadence`/`cluster_day`/
 `thegap` already hold for their own real-but-not-fatal cadence gaps --
 never flips `broken`.
 
+Task 1244 folds `book_of_the_gate_check.py`: the same `--square-state`
+JSON the god on duty already gathers for `check_square` carries each
+issue/PR's `user.login` on every item GitHub's own API ever returns --
+this was simply never read a field deeper. No new flag: `--square-state`
+now also derives `book_of_the_gate_issue_authors`/`_pr_authors` (plain
+login lists) from the identical payload, so a god who already gathers the
+square read for the usual reason gets this check for free. `None` unless
+that payload was actually handed in -- the same optional-input,
+never-`broken`-blocking shape `good_first_issues`/`square` itself holds.
+
 Usage:
     python3 tools/ritual_check.py [--now ISO_TS] [--fencepost-base DIR] [--square-state PATH] [--arcade-apps-state PATH] [--gateway-toolset PATH] [--good-first-issues PATH] [--ci-checks PATH] [--cron-checks PATH] [--child-files PATH] [--voice-window-commits PATH] [--github-stars COUNT] [--live-scan PATH] [--json]
 """
@@ -438,6 +448,12 @@ def _network_boundary_check() -> ModuleType:
 def _consent_template_scope_check() -> ModuleType:
     return _load_once(
         "_ritual_consent_template_scope_check", os.path.join(ROOT, "tools", "consent_template_scope_check.py")
+    )
+
+
+def _book_of_the_gate_check() -> ModuleType:
+    return _load_once(
+        "_ritual_book_of_the_gate_check", os.path.join(ROOT, "tools", "book_of_the_gate_check.py")
     )
 
 
@@ -1959,6 +1975,39 @@ def check_consent_template_scope(template_path: str | None = None) -> dict[str, 
     return {"clean": ok, "message": message}
 
 
+def check_book_of_the_gate(
+    issue_authors: list[str] | None,
+    pr_authors: list[str] | None,
+    book_path: str | None = None,
+) -> dict[str, object] | None:
+    """Task 1244: fold `book_of_the_gate_check.py`'s own claim-into-a-check
+    into the one block. Every quiet-square hour since the town's founding
+    has closed the same hand-typed way -- "no first-timer to greet",
+    "nobody entered in the Book of the Gate" -- a god recognizing every
+    live issue/PR author as `thierrypdamiba` and writing that recognition
+    into prose, never a comparison a test can pin down. The same
+    construction-only-assertion shape `check_consent_template_scope`
+    (task 1057) already closed for the Threshold's other hand-eyeballed
+    claim.
+
+    Returns None if the caller didn't hold a live `list_issues`/
+    `list_pull_requests` author read this hour -- informational-input-
+    optional, the same shape `check_good_first_issues`/`check_square`
+    already hold; a missing live read is not itself a violation, it is
+    simply nothing to check this particular hour. `issue_authors`/
+    `pr_authors` are the plain login strings the caller's own live square
+    read already carries on each item's `user.login` -- no second network
+    call, no new live-read boundary."""
+    if issue_authors is None and pr_authors is None:
+        return None
+    mod = _book_of_the_gate_check()
+    kwargs = {}
+    if book_path is not None:
+        kwargs["book_path"] = book_path
+    ok, message = mod.check(issue_authors or [], pr_authors or [], **kwargs)
+    return {"clean": ok, "message": message}
+
+
 def check_site_links(docs_dir: str | None = None) -> dict[str, object]:
     """Task 423: fold site_link_check.py's own internal-link scan into the
     one block -- CHARTER.md Appendix B names Ogun's charter duty plainly
@@ -2464,6 +2513,9 @@ def run_ritual_check(
     strategy_targets_path: str | None = None,
     network_boundary_dirs: tuple[str, ...] | None = None,
     consent_template_scope_path: str | None = None,
+    book_of_the_gate_issue_authors: list[str] | None = None,
+    book_of_the_gate_pr_authors: list[str] | None = None,
+    book_of_the_gate_path: str | None = None,
     site_link_docs_dir: str | None = None,
     house_links_houses_dir: str | None = None,
     fencepost_links_dir: str | None = None,
@@ -2607,6 +2659,9 @@ def run_ritual_check(
     strategy_targets = check_strategy_targets(strategy_path=strategy_targets_path)
     network_boundary = check_network_boundary(dirs=network_boundary_dirs)
     consent_template_scope = check_consent_template_scope(template_path=consent_template_scope_path)
+    book_of_the_gate = check_book_of_the_gate(
+        book_of_the_gate_issue_authors, book_of_the_gate_pr_authors, book_path=book_of_the_gate_path
+    )
     site_links = check_site_links(docs_dir=site_link_docs_dir)
     house_links = check_house_links(houses_dir=house_links_houses_dir)
     fencepost_links = check_fencepost_links(fencepost_dir=fencepost_links_dir)
@@ -2766,6 +2821,7 @@ def run_ritual_check(
         "strategy_targets": strategy_targets,
         "network_boundary": network_boundary,
         "consent_template_scope": consent_template_scope,
+        "book_of_the_gate": book_of_the_gate,
         "site_links": site_links,
         "house_links": house_links,
         "fencepost_links": fencepost_links,
@@ -3093,6 +3149,11 @@ def format_ritual_check(result: dict[str, Any]) -> str:
         )
     cts = result["consent_template_scope"]
     lines.append(f"  consent template scope: {'clean' if cts['clean'] else 'BROKEN'} -- {cts['message']}")
+    bog = result["book_of_the_gate"]
+    if bog is None:
+        lines.append("  book of the gate: not read this hour (no live issue/PR authors held)")
+    else:
+        lines.append(f"  book of the gate: {'clean' if bog['clean'] else 'BROKEN'} -- {bog['message']}")
     sl = result["site_links"]
     if sl["clean"]:
         lines.append("  site links: clean (every internal docs/ link resolves)")
@@ -3272,10 +3333,38 @@ def _load_json_arg(path: str, flag: str, expected: str) -> dict[str, object] | l
     return cast(dict[str, object] | list[object], raw)
 
 
+def _extract_author_logins(items: object) -> list[str]:
+    """Pull `user.login` (or a bare `user` string) off each item of a live
+    `list_issues`/`list_pull_requests`-shaped list -- the same `--square-
+    state` JSON blob already handed to `compute_square_state`, just read
+    one field deeper. Skips any item missing a usable login rather than
+    raising; a square-state payload the god on duty gathered without a
+    `user` field on each entry (an older `fields=[...]` selection, say)
+    should degrade to an empty author list for this one extra check, not
+    break the whole `--square-state` read every other check already
+    depends on."""
+    if not isinstance(items, list):
+        return []
+    logins: list[str] = []
+    for item in items:
+        if not isinstance(item, dict):
+            continue
+        user = item.get("user")
+        if isinstance(user, dict):
+            login = user.get("login")
+            if isinstance(login, str) and login:
+                logins.append(login)
+        elif isinstance(user, str) and user:
+            logins.append(user)
+    return logins
+
+
 def main(argv: list[str]) -> int:
     now = None
     base = DEFAULT_FENCEPOST_BASE
     square_state = None
+    book_of_the_gate_issue_authors = None
+    book_of_the_gate_pr_authors = None
     arcade_apps_state = None
     gateway_toolset_state = None
     good_first_issues_state = None
@@ -3297,6 +3386,8 @@ def main(argv: list[str]) -> int:
             raw = cast(dict[str, object], _load_json_arg(argv[i + 1], "square-state", "dict"))
             sq = _square_check()
             square_state = sq.compute_square_state(raw.get("issues", []), raw.get("prs", []))
+            book_of_the_gate_issue_authors = _extract_author_logins(raw.get("issues", []))
+            book_of_the_gate_pr_authors = _extract_author_logins(raw.get("prs", []))
             i += 2
         elif argv[i] == "--arcade-apps-state" and i + 1 < len(argv):
             raw = cast(dict[str, object], _load_json_arg(argv[i + 1], "arcade-apps-state", "dict"))
@@ -3338,6 +3429,8 @@ def main(argv: list[str]) -> int:
         now=now,
         fencepost_base=base,
         square_state=square_state,
+        book_of_the_gate_issue_authors=book_of_the_gate_issue_authors,
+        book_of_the_gate_pr_authors=book_of_the_gate_pr_authors,
         arcade_apps_state=arcade_apps_state,
         gateway_toolset_state=gateway_toolset_state,
         good_first_issues_state=good_first_issues_state,

@@ -575,8 +575,13 @@ class DocstringClaimDoctrineCase(unittest.TestCase):
         # check_consent_template_scope moved this from 71 to 72, docstring
         # updated in the same commit. Task 1059's
         # check_draft_one_action_invariant moved this from 72 to 73,
-        # docstring updated in the same commit.
-        self.assertEqual(self._real_check_count(), 74)
+        # docstring updated in the same commit. Task 1113's
+        # check_window_rotation moved this from 73 to 74 (its own docstring
+        # narrative landed, this comment trail's own entry did not -- found
+        # here by task 1244's live rerun, not chased further since the
+        # count itself was never wrong). Task 1244's check_book_of_the_gate
+        # moved this from 74 to 75, docstring updated in the same commit.
+        self.assertEqual(self._real_check_count(), 75)
 
     def test_stale_27_claim_would_have_been_flagged_against_todays_real_count(self):
         # Mutation-based hand-verification: reconstruct the module's own
