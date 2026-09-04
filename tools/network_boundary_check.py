@@ -2,16 +2,17 @@
 """Task 163. Zashiki-Warashi's first real module.
 
 A phrase ran through eighteen files in `tools/` when this module first
-swept them at task 163; thirty-two carry it today -- fourteen more `tools/
+swept them at task 163; thirty-three carry it today -- fifteen more `tools/
 *_check.py` files (`duplicate_regex_check.py`, `gateway_toolset_check.py`,
 `good_first_issue_check.py`, `metrics_field_completeness_check.py`,
 `nyx_traffic_check.py`, `recipe_readme_check.py`, `site_link_check.py`,
 `chronicle_readme_check.py`, `proclamation_count_check.py`,
 `site_recipe_check.py`, `duplicate_function_check.py`, `tithe_check.py`,
-`one_action_check.py`, `consent_template_scope_check.py`) have
-independently repeated the same "no network" claim since, each caught by
-this module's own live discovery with no docstring edit required --
-which is the whole point of never hand-typing the list below.
+`one_action_check.py`, `consent_template_scope_check.py`,
+`book_of_the_gate_check.py`) have independently repeated the same "no
+network" claim since, each caught by this module's own live discovery
+with no docstring edit required -- which is the whole point of never
+hand-typing the list below.
 The original eighteen's genealogy is almost
 identical in shape to task 147's `DEFAULT_ACTOR` chain: `vault_leak_check.
 py` claims to mirror `check_checkout`'s "boundary" exactly ("no network");

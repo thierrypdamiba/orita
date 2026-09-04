@@ -253,6 +253,7 @@ class RealToolsDirCase(unittest.TestCase):
         "verdict_provenance_check.py",
         "wip_reclaim_check.py",
         "word_watch.py",
+        "book_of_the_gate_check.py",
     }
 
     def test_live_discovery_matches_todays_real_set(self):
@@ -633,6 +634,7 @@ _CARDINAL_WORDS = {
     "twenty-one": 21, "twenty-two": 22, "twenty-three": 23, "twenty-four": 24,
     "twenty-five": 25, "twenty-six": 26, "twenty-seven": 27, "twenty-eight": 28,
     "twenty-nine": 29, "thirty": 30, "thirty-one": 31, "thirty-two": 32,
+    "thirty-three": 33,
 }
 
 _TODAY_COUNT_CLAIM_RE = re.compile(r"([a-z-]+) carry it today")
@@ -671,7 +673,7 @@ class DocstringCountDoctrineCase(unittest.TestCase):
         with self.assertRaises(AssertionError):
             claimed_today_count("Nothing here about a file count.")
 
-    def test_real_live_claiming_file_count_is_currently_thirty_two(self):
+    def test_real_live_claiming_file_count_is_currently_thirty_three(self):
         # Regression pin: today's real, live tools/*.py claiming-file count.
         # Task 547's proclamation_count_check.py moved this from 26 to 27.
         # Task 554's site_recipe_check.py moved this from 27 to 28.
@@ -681,8 +683,12 @@ class DocstringCountDoctrineCase(unittest.TestCase):
         # "local-filesystem-only ... no network call of its own" claim,
         # true the same way every sibling's is), docstring updated in the
         # same commit. Task 1057's consent_template_scope_check.py moved
-        # this from 31 to 32, docstring updated in the same commit.
-        self.assertEqual(len(nbc.find_claiming_files()), 32)
+        # this from 31 to 32, docstring updated in the same commit. Task
+        # 1244's book_of_the_gate_check.py moved this from 32 to 33 (its
+        # own "makes no network call of its own" claim) but that commit's
+        # docstring/test update missed this pin and EXPECTED_TODAY above --
+        # closed the same hour, this task.
+        self.assertEqual(len(nbc.find_claiming_files()), 33)
 
     def test_docstring_matches_the_real_live_count(self):
         real_count = len(nbc.find_claiming_files())
@@ -701,7 +707,7 @@ class DocstringCountDoctrineCase(unittest.TestCase):
         not just that it happens to pass today."""
         real_count = len(nbc.find_claiming_files())
         wrong_word = _word_for(real_count - 1)
-        wrong_doc = nbc.__doc__.replace("thirty-two carry it today", f"{wrong_word} carry it today")
+        wrong_doc = nbc.__doc__.replace("thirty-three carry it today", f"{wrong_word} carry it today")
         claimed = claimed_today_count(wrong_doc)
         self.assertNotEqual(claimed, real_count)
 
