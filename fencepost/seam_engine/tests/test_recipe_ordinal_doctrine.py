@@ -82,7 +82,7 @@ _ORDINAL_WORDS = {
     "ninetieth": 90, "ninety-first": 91, "ninety-second": 92,
     "ninety-third": 93, "ninety-fourth": 94, "ninety-fifth": 95, "ninety-sixth": 96,
     "ninety-seventh": 97, "ninety-eighth": 98, "ninety-ninth": 99,
-    "hundredth": 100, "hundred-first": 101,
+    "hundredth": 100, "hundred-first": 101, "hundred-second": 102,
 }
 
 # Matches right at the top of the docstring only (``re.match``, not
@@ -182,15 +182,15 @@ def test_all_claimed_ordinals_are_pairwise_distinct():
 
 
 def test_the_real_ordinal_claims_are_currently_clean():
-    """Regression pin against today's real, live tree: 101 real recipes,
-    the reference recipe unnumbered, the other 100 forming the unbroken
-    sequence 2..101 -- no duplicate, no gap. Was 100/99/2..100 until
-    email-claims-dangling-milestone merged (the hundred-first real
+    """Regression pin against today's real, live tree: 102 real recipes,
+    the reference recipe unnumbered, the other 101 forming the unbroken
+    sequence 2..102 -- no duplicate, no gap. Was 101/100/2..101 until
+    calendar-event-claims-unfixed-issue merged (the hundred-second real
     recipe)."""
     claims = live_ordinal_claims(FENCEPOST_ROOT)
     numbered = sorted(n for n in claims.values() if n is not None)
-    assert len(claims) == 101
-    assert numbered == list(range(2, 102))
+    assert len(claims) == 102
+    assert numbered == list(range(2, 103))
 
 
 def test_a_duplicate_ordinal_would_flip_this_check_red(tmp_path):

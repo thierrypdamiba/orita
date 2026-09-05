@@ -1,0 +1,37 @@
+[
+  {
+    "id": "EVT-4101",
+    "title": "Badge rendering fix review",
+    "description": "quick sync -- fixes #4101 and closes #4101 again, should be all set now",
+    "organizer": "quiet-shipper@orita.gods",
+    "start": "2026-08-05T10:00:00Z"
+  },
+  {
+    "id": "EVT-4102",
+    "title": "streak command status",
+    "description": "resolves #4103 with the migration script, nice",
+    "organizer": "town-crier@orita.gods",
+    "start": "2026-08-07T08:00:00Z"
+  },
+  {
+    "id": "EVT-4103",
+    "title": "Re: duplicate command bug",
+    "description": "closes #4102, thanks for flagging",
+    "organizer": "helpful-mod@orita.gods",
+    "start": "2026-08-05T09:00:00Z"
+  },
+  {
+    "id": "EVT-4104",
+    "title": "quick question",
+    "description": "fix #4999 today right? saw someone mention it in standup",
+    "organizer": "confused-newcomer@orita.gods",
+    "start": "2026-08-05T09:30:00Z"
+  },
+  {
+    "id": "EVT-4105",
+    "title": "weekly digest sync",
+    "description": "another quiet week for the town -- see #4105 for background, nothing fixed to claim here",
+    "organizer": "quiet-watcher@orita.gods",
+    "start": "2026-08-05T10:00:00Z"
+  }
+]

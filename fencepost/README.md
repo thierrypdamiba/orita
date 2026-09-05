@@ -1932,6 +1932,40 @@ scope `email-claims-unfixed-issue`/`email-dangling-reference`/
 `email-claims-unmerged-pr`/`email-claims-open-milestone` already ask
 for — no new scope asked for anywhere in this recipe.
 
+[`RECIPES/calendar-event-claims-unfixed-issue/`](RECIPES/calendar-event-claims-unfixed-issue/)
+is the hundred-second (ROADMAP.md #1258), and the first recipe to read a Google Calendar
+event's own title/description as a claim-bearing text surface. Grepped
+every one of the 101 existing recipes' own `recipe.json` `toolkit` field
+before writing this one: `google_calendar` appears in exactly one place —
+[`RECIPES/milestone-deadline-no-calendar-event/`](RECIPES/milestone-deadline-no-calendar-event/)'s
+own `github+google_calendar` — and that recipe never parses an event's own
+free text at all; it only matches an event's title against a milestone's
+`due_on` date by keyword-overlap and a time window. The Calendar-side twin
+of `mention-claims-unfixed-issue`, `slack-message-claims-unfixed-issue`,
+`linear-comment-claims-unfixed-issue`, and `email-claims-unfixed-issue`: a
+calendar event's own title or description uses a real GitHub
+closing-keyword phrase against an issue number ("fixes #N", "closes #N",
+"resolves #N", both tenses), but the issue never actually closed. A
+meeting note or agenda line sitting on a connected calendar is exactly as
+durable and readable-later as a tweet, a mention, a Slack message, a
+Linear comment, or an email once created, and nothing on Calendar's side
+(or GitHub's) ever checks it against the issue tracker's real state.
+Reuses `seam_engine.closing_keywords.CLOSING_KEYWORD_RE` verbatim — the
+same shared grammar `email-claims-unfixed-issue` and its siblings already
+import. Confidence holds the identical 0.85/0.5 age-gated bar every
+`claims-unfixed-issue` sibling already uses, keyed off the event's own
+`start` time — not an independently re-reasoned number just because the
+toolkit's text-reading door is new. A claimed issue that doesn't exist at
+all is excluded, named not hidden — that broken reference is a future
+calendar-side dangling-reference recipe's own seam, not this one's.
+Toolkit is `google_calendar+github`, so both the total recipe count and
+the plus-joined count climb together (33 of 101 → 34 of 102, the second
+recipe to pair GitHub with Google Calendar). `ListIssues` was already
+cleared on `SCOPES.md`'s oath table; `ListEvents` is the same scope
+`milestone-deadline-no-calendar-event` already asks for — no new scope
+asked for anywhere in this recipe, though zero Google Calendar tools are
+exposed on the-hand gateway today.
+
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)
 (ROADMAP.md #111) is that second promise, kept: it runs `scan.py`'s own
