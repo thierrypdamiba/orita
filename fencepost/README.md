@@ -1937,7 +1937,7 @@ is the hundred-second (ROADMAP.md #1258), and the first recipe to read a Google 
 event's own title/description as a claim-bearing text surface. Grepped
 every one of the 101 existing recipes' own `recipe.json` `toolkit` field
 before writing this one: `google_calendar` appears in exactly one place —
-[`RECIPES/milestone-deadline-no-calendar-event/`](RECIPES/milestone-deadline-no-calendar-event/)'s
+`milestone-deadline-no-calendar-event`'s
 own `github+google_calendar` — and that recipe never parses an event's own
 free text at all; it only matches an event's title against a milestone's
 `due_on` date by keyword-overlap and a time window. The Calendar-side twin

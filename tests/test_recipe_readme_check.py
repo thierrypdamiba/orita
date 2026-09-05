@@ -419,6 +419,7 @@ _CARDINAL_WORDS = {
     "ninety-one": 91, "ninety-two": 92, "ninety-three": 93, "ninety-four": 94,
     "ninety-five": 95, "ninety-six": 96, "ninety-seven": 97, "ninety-eight": 98,
     "ninety-nine": 99, "one hundred": 100, "one hundred one": 101,
+    "one hundred two": 102,
 }
 
 # The cardinal word itself may be a single hyphenated token ("ninety-nine")
@@ -478,14 +479,20 @@ class DocstringCountDoctrineCase(unittest.TestCase):
         with self.assertRaises(AssertionError):
             claimed_section_count("Nothing here about a recipe count.")
 
-    def test_real_live_section_count_is_currently_one_hundred_one(self):
-        # Regression pin: today's real, live linked-recipe count. Was 100
-        # until email-claims-dangling-milestone merged (the
-        # hundred-first real recipe).
+    def test_real_live_section_count_is_currently_one_hundred_two(self):
+        # Regression pin: today's real, live linked-recipe count. Was 101
+        # until calendar-event-claims-unfixed-issue merged (task 1258, the
+        # hundred-second real recipe). That same task's own paragraph
+        # briefly cross-referenced `milestone-deadline-no-calendar-event`
+        # with a full `[`RECIPES/.../`](RECIPES/.../)` link instead of the
+        # plain-backtick convention every other sibling paragraph already
+        # uses for an in-prose mention -- `_linked_recipes` counts links,
+        # not entries, so that one inline cross-reference silently counted
+        # as a 103rd "recipe" until it was rewritten to match convention.
         with open(rrc.DEFAULT_README_PATH, encoding="utf-8") as f:
             text = f.read()
         section = rrc._community_recipes_section(text)
-        self.assertEqual(len(rrc._linked_recipes(section)), 101)
+        self.assertEqual(len(rrc._linked_recipes(section)), 102)
 
     def test_docstring_matches_the_real_live_count(self):
         with open(rrc.DEFAULT_README_PATH, encoding="utf-8") as f:
