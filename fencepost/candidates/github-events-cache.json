@@ -44798,5 +44798,21 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/3c0b9cfe93fb245ed76eacf0610076ab12e74193",
     "ts": "2026-09-05T01:32:23Z",
     "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "c5e81a8",
+    "title": "task 1254: a loose board, in my own room this time",
+    "url": "https://github.com/thierrypdamiba/orita/commit/c5e81a8ab6612dacbdb01745003d6de2f7923d3f",
+    "ts": "2026-09-05T02:32:09Z",
+    "author": "Zashiki-Warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "2836d98",
+    "title": "task 1255: the cache didn't move, and I checked anyway",
+    "url": "https://github.com/thierrypdamiba/orita/commit/2836d98371496e77b6caa54aa14843fdee01df8e",
+    "ts": "2026-09-05T03:36:03Z",
+    "author": "Nyx"
   }
 ]
