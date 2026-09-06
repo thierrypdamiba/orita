@@ -377,6 +377,10 @@ def _wip_reclaim_check() -> ModuleType:
     return _load("_ritual_wip_reclaim_check", os.path.join(ROOT, "tools", "wip_reclaim_check.py"))
 
 
+def _ranking_replay_check() -> ModuleType:
+    return _load("_ritual_ranking_replay_check", os.path.join(ROOT, "tools", "ranking_replay_check.py"))
+
+
 def _window_rotation_check() -> ModuleType:
     return _load("_ritual_window_rotation_check", os.path.join(ROOT, "tools", "window_rotation_check.py"))
 
@@ -1101,6 +1105,27 @@ def check_child_work(
     mod = _child_work_check()
     kwargs = {"path": path or mod.LOG, "repo_root": repo_root or mod.ROOT}
     return cast(dict[str, object], mod.check(child_files=child_files, now_iso=now_iso, **kwargs))
+
+
+def check_ranking_replay(candidates_dir: str | None = None) -> dict[str, object]:
+    """Task 1294: fold `ranking_replay_check.py`'s own replay of
+    `seam_engine.ranking.rank()` against every sealed `fencepost/
+    candidates/*.json` snapshot into the one block. Unconditional,
+    local-filesystem-only (reads the checkout already on disk plus
+    `fencepost/seam_engine/src` for the pure `ranking`/`scan.GapCandidate`
+    import, no network) -- the same cheap class `check_verdict_provenance`/
+    `check_report_regression` already hold. A mismatch means the ranking
+    law and the sealed history it produced have drifted apart -- a live
+    bug, a hand edit, or a silent constant change to `CONFIDENCE_BAR`/
+    `SEPARATION_MARGIN` -- and is a god-on-duty escalation, never something
+    this check silently repairs."""
+    mod = _ranking_replay_check()
+    kwargs = {}
+    if candidates_dir is not None:
+        kwargs["candidates_dir"] = candidates_dir
+    mismatches = mod.find_mismatches(**kwargs)
+    files = mod._iter_candidate_files(candidates_dir or mod.DEFAULT_CANDIDATES_DIR)
+    return {"clean": not mismatches, "count": len(files), "mismatches": mismatches}
 
 
 def check_verdict_provenance(orita_dir: str | None = None) -> dict[str, object]:
@@ -2538,6 +2563,7 @@ def run_ritual_check(
     metrics_field_completeness_tools_dir: str | None = None,
     one_action_reports_dir: str | None = None,
     one_action_drafts_dir: str | None = None,
+    ranking_replay_candidates_dir: str | None = None,
     strategy_true_positive_path: str | None = None,
     strategy_true_positive_ledger_base: str | None = None,
     gap_true_positive_metrics_path: str | None = None,
@@ -2614,6 +2640,7 @@ def run_ritual_check(
     petition_limits = check_petition_limits(orita_dir=petition_limits_dir)
     child_work = check_child_work(child_files, now_iso, path=child_work_log, repo_root=child_work_repo)
     verdict_provenance = check_verdict_provenance(orita_dir=verdict_provenance_dir)
+    ranking_replay = check_ranking_replay(candidates_dir=ranking_replay_candidates_dir)
     voice_window = check_voice_window(voice_window_commits, now_iso, path=voice_window_log)
     petition_cadence = check_petition_cadence(orita_dir=petition_cadence_dir)
     if journal_numbering_dirs is not None:
@@ -2728,6 +2755,7 @@ def run_ritual_check(
         or (not petition_limits["clean"])
         or (not child_work["clean"])
         or (not verdict_provenance["clean"])
+        or (not ranking_replay["clean"])
         or (not voice_window["clean"])
         or (not petition_cadence["clean"])
         or (not journal_numbering["clean"])
@@ -2799,6 +2827,7 @@ def run_ritual_check(
         "petition_limits": petition_limits,
         "child_work": child_work,
         "verdict_provenance": verdict_provenance,
+        "ranking_replay": ranking_replay,
         "voice_window": voice_window,
         "petition_cadence": petition_cadence,
         "journal_numbering": journal_numbering,
@@ -2979,6 +3008,11 @@ def format_ritual_check(result: dict[str, Any]) -> str:
         lines.append("  verdict provenance: clean (every public verdict backed, Iron Rule #3 holds)")
     else:
         lines.append(f"  verdict provenance: {vp['count']} MISMATCH(ES) -- Iron Rule #3 at risk, escalate now")
+    rr2 = result["ranking_replay"]
+    if rr2["clean"]:
+        lines.append(f"  ranking replay: clean ({rr2['count']} sealed candidate snapshot(s), ranking law replays identically)")
+    else:
+        lines.append(f"  ranking replay: {len(rr2['mismatches'])} MISMATCH(ES) -- ranking law drifted from sealed history, escalate now")
     vw = result["voice_window"]
     if vw["clean"]:
         historical = f", {vw['violation_count']} historical" if vw["violation_count"] else ""

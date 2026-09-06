@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Task 121. Off-By-One counts the tool that counts everything else.
 
-`tools/ritual_check.py` hand-wires 75 `check_*` functions into one hourly
+`tools/ritual_check.py` hand-wires 76 `check_*` functions into one hourly
 block: each is called inside `run_ritual_check`, its result assigned to a
 dict key, and that key printed as a line in `format_ritual_check`. Three
 separate places a single typo or a forgotten wire-up can silently drop a
@@ -381,7 +381,15 @@ turning the "nobody entered in the Book of the Gate" line every quiet-
 square hour had hand-typed since the town's founding into a real
 comparison against this hour's live issue/PR authors, the same
 claim-into-a-check shape task 1057's `check_consent_template_scope`
-already gave the Threshold's other hand-eyeballed line.
+already gave the Threshold's other hand-eyeballed line. **Updated to 76**
+the same hour task 1294's `check_ranking_replay` was wired in -- the Seam
+Engine's own ranked-candidate-list half of off-by-one's remit had never
+been checked at all (confirmed live: no `tools/*.py` file named
+`ranking.py` or read `fencepost/candidates/` before this hour), replaying
+`seam_engine.ranking.rank()` against every sealed `fencepost/
+candidates/*.json` snapshot so a future drift between the ranking law's
+code and the history it already produced fails loud instead of sitting
+unwatched the way the Book of the Gate line did.
 
 Usage:
     python3 tools/ritual_completeness_check.py check
