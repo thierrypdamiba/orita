@@ -58,6 +58,35 @@ Two checks, per sealed tablet:
    already fails check 1 has no single line to check here, so it is
    skipped for this half rather than double-counted.)
 
+Task 1299 (Retrya): both checks above prove the promise holds in the
+SOURCE markdown a god writes. Neither one ever asked what a mortal's
+BROWSER actually shows. `docs/fencepost/index.html` fetches the latest
+sealed tablet live off `raw.githubusercontent.com` and renders it
+client-side with its own tiny `renderMarkdownish()` (blank-line-delimited
+paragraphs, each wrapped in its own `<p>`) -- code nothing in this tree
+had ever run a single sealed report through. A "Your move" line that
+sits on its own source line but shares a PARAGRAPH with neighboring text
+(no blank line on one side) would still pass both checks above and still
+read as one clean line in a text editor, while rendering fused into the
+same `<p>` as whatever sentence sits next to it on the live page -- the
+exact place a real reader meets the hand-off, silently diluted. This is
+`test_connect_doctrine.py`'s own shape (task 779: doc strings vs. the
+code constant they claim to quote) turned on the OTHER named write-back
+surface STRATEGY.md calls out -- the public site, not just the repo
+tablet.
+
+`check_render_one_action_invariant` below ports `renderMarkdownish()`
+verbatim (same two regexes, same trim, same single non-global heading
+strip) and sweeps every sealed report through it, asserting the move
+line's own paragraph, once rendered, is both singular (exactly one `<p>`
+carries it) and unmixed (no other `**bold**` marker rides along in that
+same paragraph -- the signature of two sentences having fused). A live
+sweep of all 55 sealed tablets on disk the hour this shipped found the
+invariant already holding everywhere, by the accident of `report.py`
+always blank-line-separating its own hand-off sentence -- true, but
+never before asked, and nothing stood between a future hand-stitched or
+regressed tablet and this breaking unnoticed on the live page.
+
 Usage:
     python3 tools/one_action_check.py check
 """
@@ -292,6 +321,109 @@ def format_result(result: dict[str, object]) -> str:
     return f"one action invariant: {status} -- {cast(str, result['reason'])}"
 
 
+_ESC_RE = re.compile(r"[&<>]")
+_ESC_MAP = {"&": "&amp;", "<": "&lt;", ">": "&gt;"}
+_HEADING_RE = re.compile(r"^#.*$", re.MULTILINE)
+_PARAGRAPH_SPLIT_RE = re.compile(r"\n\s*\n")
+_BOLD_RE = re.compile(r"\*\*([^*]+)\*\*")
+_ITALIC_RE = re.compile(r"\*([^*]+)\*")
+_LINK_RE = re.compile(r"\[([^\]]+)\]\(([^)]+)\)")
+
+
+def _esc(s: str) -> str:
+    """Verbatim port of `docs/fencepost/index.html`'s own `esc()`."""
+    return _ESC_RE.sub(lambda m: _ESC_MAP[m.group(0)], s)
+
+
+def _render_paragraphs(text: str) -> list[str]:
+    """Verbatim port of `docs/fencepost/index.html`'s own
+    `renderMarkdownish()`: strip the first `#`-heading line (JS's
+    non-global `/^#.*$/m` replaces only the first match, hence `count=1`
+    here), trim, split on blank-line boundaries, then per paragraph:
+    escape, bold, italic, link -- same order, same regexes. Returns the
+    rendered `<p>...</p>` strings the live site would actually produce,
+    not the raw markdown paragraphs -- so a check against this list is a
+    check against what a mortal's browser shows, not a proxy for it."""
+    body = _HEADING_RE.sub("", text, count=1).strip()
+    out = []
+    for p in _PARAGRAPH_SPLIT_RE.split(body):
+        rendered = _esc(p)
+        rendered = _BOLD_RE.sub(r"<b>\1</b>", rendered)
+        rendered = _ITALIC_RE.sub(r"<i>\1</i>", rendered)
+        rendered = _LINK_RE.sub(r'<a href="\2">\1</a>', rendered)
+        out.append(f"<p>{rendered}</p>")
+    return out
+
+
+def check_render_one_action_invariant(reports_dir: str = DEFAULT_REPORTS_DIR) -> dict[str, object]:
+    """Sweep every sealed report through the SITE'S OWN rendering code
+    (ported verbatim above), not just its source markdown, and confirm
+    the "Your move" hand-off survives as its own isolated `<p>` -- exactly
+    one paragraph carries it, and that paragraph carries no OTHER
+    `**bold**` marker (the signature of a second sentence having fused in
+    because a blank line was missing on one side). A tablet that already
+    fails `check_one_action_invariant`'s own count check is skipped here
+    (nothing single to render-check), same discipline as the first-person
+    check above. Returns the same `clean`/`reason` shape."""
+    dated_paths = _sealed_report_dates_and_paths(reports_dir)
+    not_isolated: list[dict[str, object]] = []
+    fused: list[dict[str, object]] = []
+    checked = 0
+    for date, path in dated_paths:
+        with open(path, encoding="utf-8") as f:
+            text = f.read()
+        if len(_move_lines(text)) != 1:
+            continue
+        checked += 1
+        # Paragraph boundaries are identical pre- and post-render (bold/
+        # italic/link substitution never crosses a blank-line split), so
+        # the rendered `<p>` list and the raw-markdown paragraph list name
+        # the exact same groupings -- checked against the real rendered
+        # output (proving `_render_paragraphs` -- the ported site code --
+        # actually agrees), then inspected on the raw side for content.
+        rendered = _render_paragraphs(text)
+        move_rendered = [p for p in rendered if "<b>Your move.</b>" in p]
+        if len(move_rendered) != 1:
+            not_isolated.append({"date": date, "count": len(move_rendered)})
+            continue
+        raw_paragraphs = _PARAGRAPH_SPLIT_RE.split(_HEADING_RE.sub("", text, count=1).strip())
+        raw_move_paragraph = next(p for p in raw_paragraphs if "**Your move.**" in p)
+        markers_in_paragraph = _BOLD_RE.findall(raw_move_paragraph)
+        if len(markers_in_paragraph) != 1:
+            fused.append({"date": date, "markers": markers_in_paragraph})
+    clean = not not_isolated and not fused
+    if clean:
+        return {
+            "clean": True,
+            "reason": (
+                f"{checked} sealed report(s), the rendered 'Your move' paragraph "
+                f"is isolated and unmixed in every one"
+            ),
+            "checked": checked,
+            "not_isolated": not_isolated,
+            "fused": fused,
+        }
+    parts = []
+    if not_isolated:
+        detail = ", ".join(f"{e['date']} ({e['count']})" for e in not_isolated)
+        parts.append(f"{len(not_isolated)} report(s) whose rendered move paragraph count != 1: {detail}")
+    if fused:
+        detail = ", ".join(f"{e['date']} {e['markers']!r}" for e in fused)
+        parts.append(f"{len(fused)} report(s) whose move paragraph fused with other bolded text: {detail}")
+    return {
+        "clean": False,
+        "reason": "; ".join(parts),
+        "checked": checked,
+        "not_isolated": not_isolated,
+        "fused": fused,
+    }
+
+
+def format_render_result(result: dict[str, object]) -> str:
+    status = "clean" if result["clean"] else "BROKEN"
+    return f"one action render invariant: {status} -- {cast(str, result['reason'])}"
+
+
 def _draft_paths(drafts_dir: str) -> list[str]:
     """Every real illustrative preview file in `fencepost/DRAFTS/`, sorted,
     skipping `README.md` -- the identical "ignore what doesn't conform"
@@ -381,6 +513,8 @@ if __name__ == "__main__":
         sys.exit(1)
     out = check_one_action_invariant()
     print(format_result(out))
+    render_out = check_render_one_action_invariant()
+    print(format_render_result(render_out))
     draft_out = check_draft_one_action_invariant()
     print(format_draft_result(draft_out))
-    sys.exit(0 if out["clean"] and draft_out["clean"] else 1)
+    sys.exit(0 if out["clean"] and render_out["clean"] and draft_out["clean"] else 1)

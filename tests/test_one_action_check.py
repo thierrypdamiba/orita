@@ -252,6 +252,96 @@ class LiveRealReportsSweepCase(unittest.TestCase):
         self.assertTrue(os.path.isdir(src.DEFAULT_REPORTS_DIR))
 
 
+class RenderParagraphsCase(unittest.TestCase):
+    """`_render_paragraphs` is a verbatim port of
+    `docs/fencepost/index.html`'s own `renderMarkdownish()` -- these prove
+    the port agrees with the live site's actual regex behavior, not just
+    with itself."""
+
+    def test_splits_on_a_blank_line(self):
+        paras = src._render_paragraphs("# T\n\nfirst\n\nsecond")
+        self.assertEqual(paras, ["<p>first</p>", "<p>second</p>"])
+
+    def test_splits_on_a_whitespace_only_blank_line(self):
+        # JS's `\n\s*\n` treats a line of only spaces/tabs between two
+        # newlines as blank too, not just a truly empty line.
+        paras = src._render_paragraphs("# T\n\nfirst\n   \nsecond")
+        self.assertEqual(paras, ["<p>first</p>", "<p>second</p>"])
+
+    def test_strips_only_the_first_heading_line(self):
+        # JS's `/^#.*$/m` (no `g` flag) replaces only the first match.
+        paras = src._render_paragraphs("# T\n\nfirst\n\n# not a real heading, just text")
+        self.assertEqual(paras, ["<p>first</p>", "<p># not a real heading, just text</p>"])
+
+    def test_escapes_bold_italic_and_link(self):
+        paras = src._render_paragraphs("# T\n\n**bold** & *italic* & [text](https://x)")
+        self.assertEqual(paras, ['<p><b>bold</b> &amp; <i>italic</i> &amp; <a href="https://x">text</a></p>'])
+
+
+class CheckRenderOneActionInvariantCase(unittest.TestCase):
+    def test_isolated_move_line_is_clean(self):
+        with tempfile.TemporaryDirectory() as d:
+            _write_report(d, "2026-07-12", "# T\n\nintro\n\n" + _GOOD_MOVE + "\n\nfooter")
+            result = src.check_render_one_action_invariant(d)
+            self.assertTrue(result["clean"], result["reason"])
+            self.assertEqual(result["checked"], 1)
+
+    def test_move_line_sharing_its_paragraph_with_another_bold_sentence_is_broken(self):
+        # Same source line (no blank-line split at all), so the raw-text
+        # move count is still exactly 1 -- but it renders fused with a
+        # second bolded sentence in the same `<p>` on the live page.
+        fused = "**Your move.** Post about it yourself. **The count.** 5 named."
+        with tempfile.TemporaryDirectory() as d:
+            _write_report(d, "2026-07-12", "# T\n\nintro\n\n" + fused + "\n\nfooter")
+            result = src.check_render_one_action_invariant(d)
+            self.assertFalse(result["clean"])
+            self.assertEqual(len(result["fused"]), 1)
+            self.assertEqual(result["fused"][0]["date"], "2026-07-12")
+
+    def test_missing_blank_line_before_move_fuses_with_a_bolded_prior_sentence(self):
+        # The move line is real and alone on its own source LINE, but
+        # with no blank line separating it from a bolded sentence above,
+        # the site's paragraph split fuses both into one `<p>`.
+        text = "# T\n\n**The count.** 5 named.\n" + _GOOD_MOVE + "\n\nfooter"
+        with tempfile.TemporaryDirectory() as d:
+            _write_report(d, "2026-07-12", text)
+            result = src.check_render_one_action_invariant(d)
+            self.assertFalse(result["clean"])
+            self.assertEqual(len(result["fused"]), 1)
+
+    def test_skips_reports_that_already_fail_the_source_count_check(self):
+        with tempfile.TemporaryDirectory() as d:
+            _write_report(d, "2026-07-12", _NO_MOVE)
+            result = src.check_render_one_action_invariant(d)
+            self.assertTrue(result["clean"], result["reason"])
+            self.assertEqual(result["checked"], 0)
+
+
+class FormatRenderResultCase(unittest.TestCase):
+    def test_clean_line_names_the_count(self):
+        result = {"clean": True, "reason": "34 sealed report(s), the rendered 'Your move' paragraph is isolated and unmixed in every one"}
+        line = src.format_render_result(result)
+        self.assertIn("clean", line)
+        self.assertIn("34 sealed report", line)
+
+    def test_broken_line_names_broken(self):
+        result = {"clean": False, "reason": "1 report(s) whose move paragraph fused with other bolded text: 2026-07-13 ['The count.']"}
+        line = src.format_render_result(result)
+        self.assertIn("BROKEN", line)
+        self.assertIn("2026-07-13", line)
+
+
+class LiveRealReportsRenderSweepCase(unittest.TestCase):
+    """The actual point: proves every real, already-sealed
+    `fencepost/REPORTS/*.md` tablet renders its hand-off through the
+    live site's own paragraph logic as one isolated, unmixed `<p>`."""
+
+    def test_real_sealed_reports_directory_is_clean(self):
+        result = src.check_render_one_action_invariant()
+        self.assertTrue(result["clean"], result["reason"])
+        self.assertGreater(result["checked"], 20)
+
+
 class MainCliCase(unittest.TestCase):
     def test_no_args_prints_docstring_and_exits_1(self):
         import subprocess
@@ -274,6 +364,7 @@ class MainCliCase(unittest.TestCase):
         )
         self.assertEqual(proc.returncode, 0)
         self.assertIn("one action invariant: clean", proc.stdout)
+        self.assertIn("one action render invariant: clean", proc.stdout)
         self.assertIn("one action draft invariant: clean", proc.stdout)
 
 

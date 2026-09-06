@@ -1402,6 +1402,22 @@ def check_draft_one_action_invariant(drafts_dir: str | None = None) -> dict[str,
     return cast(dict[str, object], mod.check_draft_one_action_invariant(**kwargs))
 
 
+def check_render_one_action_invariant(reports_dir: str | None = None) -> dict[str, object]:
+    """Task 1299: fold `one_action_check.py`'s ported-verbatim site
+    render (`docs/fencepost/index.html`'s own `renderMarkdownish()`) into
+    the same hourly block as its two source-side siblings above. Those
+    two prove the "Your move" promise holds in the markdown a god writes;
+    this one proves it survives into the actual `<p>` a mortal's browser
+    renders -- isolated (exactly one rendered paragraph carries it) and
+    unmixed (no other bolded sentence fused into that same paragraph).
+    Same unconditional treatment -- a real hit here DOES flip `broken`."""
+    mod = _one_action_check()
+    kwargs = {}
+    if reports_dir is not None:
+        kwargs["reports_dir"] = reports_dir
+    return cast(dict[str, object], mod.check_render_one_action_invariant(**kwargs))
+
+
 def check_ritual_completeness(
     source_path: str | None = None,
     tools_dir: str | None = None,
@@ -2563,6 +2579,7 @@ def run_ritual_check(
     metrics_field_completeness_tools_dir: str | None = None,
     one_action_reports_dir: str | None = None,
     one_action_drafts_dir: str | None = None,
+    one_action_render_reports_dir: str | None = None,
     ranking_replay_candidates_dir: str | None = None,
     strategy_true_positive_path: str | None = None,
     strategy_true_positive_ledger_base: str | None = None,
@@ -2607,6 +2624,7 @@ def run_ritual_check(
     report_regression = check_report_regression()
     one_action = check_one_action_invariant(reports_dir=one_action_reports_dir)
     one_action_draft = check_draft_one_action_invariant(drafts_dir=one_action_drafts_dir)
+    one_action_render = check_render_one_action_invariant(reports_dir=one_action_render_reports_dir)
     recheck = check_x_recheck(now_iso)
     escalation = check_x_escalation(now_iso)
     square = check_square(square_state, now_iso)
@@ -2791,6 +2809,7 @@ def run_ritual_check(
         or (not report_regression["clean"])
         or (not one_action["clean"])
         or (not one_action_draft["clean"])
+        or (not one_action_render["clean"])
     )
     return {
         "now": now_iso,
@@ -2802,6 +2821,7 @@ def run_ritual_check(
         "report_regression": report_regression,
         "one_action": one_action,
         "one_action_draft": one_action_draft,
+        "one_action_render": one_action_render,
         "x_recheck": recheck,
         "x_escalation": escalation,
         "square": square,
@@ -2905,6 +2925,8 @@ def format_ritual_check(result: dict[str, Any]) -> str:
     lines.append(f"  one action invariant: {'clean' if oa['clean'] else 'BROKEN'} -- {oa['reason']}")
     oad = result["one_action_draft"]
     lines.append(f"  one action draft invariant: {'clean' if oad['clean'] else 'BROKEN'} -- {oad['reason']}")
+    oar = result["one_action_render"]
+    lines.append(f"  one action render invariant: {'clean' if oar['clean'] else 'BROKEN'} -- {oar['reason']}")
     for tool, info in result["x_recheck"].items():
         lines.append(f"  {tool}: {'due' if info['due'] else 'not due'} -- {info['status_line']}")
     for tool, info in result["x_escalation"].items():
