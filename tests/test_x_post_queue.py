@@ -422,5 +422,28 @@ class CliArgvBoundsCase(unittest.TestCase):
         self.assertNotIn("Traceback", result.stderr, result)
 
 
+class TestRealBacklogHasNoPermanentlyBlockedTask(unittest.TestCase):
+    """Task 1290. Tasks 185 and 188 sat in the real `HAND/x-post-queue.jsonl`
+    for seven weeks (queued 2026-07-20/21) with topic strings too long for
+    `next_post_plan` to ever post -- `blocked_tasks` named them every single
+    hour, and the module's own docstring says the remedy is "shorten and
+    re-queue", but nothing ever checked that anyone actually had. Fixed live
+    (task 1290) by appending a second, shorter `queued` line for each task --
+    `pending_entries()`'s own by-task dict keeps the last one it reads, so
+    the corrected topic wins without editing or removing the original,
+    append-only line. This test reads the real file so a future over-length
+    topic queued the normal way gets caught the same hour, not seven weeks
+    later."""
+
+    def test_no_task_in_the_real_queue_is_permanently_unpostable(self):
+        entries = xpq.pending_entries(xpq.QUEUE)
+        plan = xpq.next_post_plan(entries)
+        self.assertEqual(
+            plan["blocked_tasks"], [],
+            "a queued topic is too long for any tweet to ever carry it -- "
+            "shorten it and append a corrected 'queued' line for the same task",
+        )
+
+
 if __name__ == "__main__":
     unittest.main()
