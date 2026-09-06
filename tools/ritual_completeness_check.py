@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Task 121. Off-By-One counts the tool that counts everything else.
 
-`tools/ritual_check.py` hand-wires 76 `check_*` functions into one hourly
+`tools/ritual_check.py` hand-wires 77 `check_*` functions into one hourly
 block: each is called inside `run_ritual_check`, its result assigned to a
 dict key, and that key printed as a line in `format_ritual_check`. Three
 separate places a single typo or a forgotten wire-up can silently drop a
@@ -389,7 +389,12 @@ been checked at all (confirmed live: no `tools/*.py` file named
 `seam_engine.ranking.rank()` against every sealed `fencepost/
 candidates/*.json` snapshot so a future drift between the ranking law's
 code and the history it already produced fails loud instead of sitting
-unwatched the way the Book of the Gate line did.
+unwatched the way the Book of the Gate line did. **Updated to 77** the
+same hour task 1299's `check_render_one_action_invariant` was wired in
+-- the One Action law's promise had only ever been checked against the
+sealed report's SOURCE markdown, never against what
+`docs/fencepost/index.html`'s own client-side renderer actually shows a
+mortal's browser.
 
 Usage:
     python3 tools/ritual_completeness_check.py check
