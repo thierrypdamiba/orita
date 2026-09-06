@@ -16,7 +16,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: install test deps
-        run: pip install 'PyYAML>=6.0,<7.0'
+        run: pip install 'PyYAML>=6.0,<7.0' 'httpx>=0.28.0,<1.0.0'
       - name: LEDGER HOLDS OR NOTHING DOES
         run: python3 tools/ledger.py verify
       - name: THE SUITE. INCLUDING HER TITHE.
