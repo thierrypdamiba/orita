@@ -277,9 +277,17 @@ class RealChronicleCase(unittest.TestCase):
         # `cluster-day-covers: 2026-08-31` marker -- 7->8 and 5->6, same
         # discipline, caught and bumped before push this time rather than
         # left for dawn-run to catch.
+        #
+        # Task 1325 (kothar-wa-khasis): recurred a seventh time, the
+        # moment episode-008 ("The Tithe Paid Six Times") shipped at task
+        # 1324 with its own `cluster-day-covers: 2026-09-07` marker --
+        # 8->9 and 6->7. This time dawn-run caught it live on the very
+        # next push (a real CI failure, not a Tithe -- the roll never
+        # entered into it, the file count just moved), same as task 991's
+        # own recurrence.
         result = cdc.compute_cadence(today=date(2026, 7, 29))
-        self.assertEqual(result["total_episodes_on_record"], 8)
-        self.assertEqual(result["cluster_day_episodes_shipped"], 6)
+        self.assertEqual(result["total_episodes_on_record"], 9)
+        self.assertEqual(result["cluster_day_episodes_shipped"], 7)
         self.assertEqual(result["missed_mondays"], [])
 
     def test_real_chronicle_dir_matches_todays_hand_counted_gap(self):
@@ -296,9 +304,13 @@ class RealChronicleCase(unittest.TestCase):
         # test above, for the same reason (episode-007 landed on disk at
         # task 1165, one day into arrears -- see episode-007's own "Behind
         # the veil" for why).
+        #
+        # Task 1325 (kothar-wa-khasis): same 8->9 / 6->7 bump as the
+        # snapshot test above, for the same reason (episode-008 landed on
+        # disk at task 1324) -- see that test's comment for the full story.
         result = cdc.compute_cadence(today=date(2026, 8, 17))
-        self.assertEqual(result["total_episodes_on_record"], 8)
-        self.assertEqual(result["cluster_day_episodes_shipped"], 6)
+        self.assertEqual(result["total_episodes_on_record"], 9)
+        self.assertEqual(result["cluster_day_episodes_shipped"], 7)
         self.assertEqual(result["missed_mondays"], [])
 
 
