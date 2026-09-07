@@ -466,6 +466,12 @@ def _consent_template_scope_check() -> ModuleType:
     )
 
 
+def _scopes_md_consent_sync_check() -> ModuleType:
+    return _load_once(
+        "_ritual_scopes_md_consent_sync_check", os.path.join(ROOT, "tools", "scopes_md_consent_sync_check.py")
+    )
+
+
 def _book_of_the_gate_check() -> ModuleType:
     return _load_once(
         "_ritual_book_of_the_gate_check", os.path.join(ROOT, "tools", "book_of_the_gate_check.py")
@@ -2056,6 +2062,34 @@ def check_consent_template_scope(template_path: str | None = None) -> dict[str, 
     return {"clean": ok, "message": message}
 
 
+def check_scopes_md_consent_sync(scopes_path: str | None = None) -> dict[str, object]:
+    """Task 1311: fold `scopes_md_consent_sync_check.py`'s own drift check
+    into the one block, the same hour it was built (`check_consent_template_scope`'s
+    own precedent, task 1057, for not leaving a fresh checker unwired).
+    `check_consent_template_scope` above already guards the SECOND lock
+    the consent gate's docstring names (`consent.py`'s `REQUIRED_SCOPES`
+    against the issue template a petitioner types their confirm back
+    against). It never guarded the FIRST: `REQUIRED_SCOPES`'s own comment
+    says it is "mirrored verbatim from SCOPES.md's 'Fencepost uses'
+    column" -- the Oath itself -- and six own-remit sweeps (tasks
+    1010-1057) hand-diffed that exact claim without ever wiring a running
+    check for it. Template and `REQUIRED_SCOPES` could drift together,
+    away from the Oath both claim to mirror, and this file's own
+    `broken` verdict would stay green.
+
+    Unconditional, local-filesystem-only (reads `consent.py`'s
+    `REQUIRED_SCOPES` dict and `SCOPES.md`'s own markdown table, parses,
+    diffs both directions -- no network, no write). Never edits anything;
+    a real drift is a god-on-duty escalation for whoever holds The
+    Threshold that hour, the same as `check_consent_template_scope`."""
+    mod = _scopes_md_consent_sync_check()
+    kwargs = {}
+    if scopes_path is not None:
+        kwargs["scopes_path"] = scopes_path
+    ok, message = mod.check(**kwargs)
+    return {"clean": ok, "message": message}
+
+
 def check_book_of_the_gate(
     issue_authors: list[str] | None,
     pr_authors: list[str] | None,
@@ -2623,6 +2657,7 @@ def run_ritual_check(
     strategy_targets_path: str | None = None,
     network_boundary_dirs: tuple[str, ...] | None = None,
     consent_template_scope_path: str | None = None,
+    scopes_md_consent_sync_path: str | None = None,
     book_of_the_gate_issue_authors: list[str] | None = None,
     book_of_the_gate_pr_authors: list[str] | None = None,
     book_of_the_gate_path: str | None = None,
@@ -2778,6 +2813,7 @@ def run_ritual_check(
     strategy_targets = check_strategy_targets(strategy_path=strategy_targets_path)
     network_boundary = check_network_boundary(dirs=network_boundary_dirs)
     consent_template_scope = check_consent_template_scope(template_path=consent_template_scope_path)
+    scopes_md_consent_sync = check_scopes_md_consent_sync(scopes_path=scopes_md_consent_sync_path)
     book_of_the_gate = check_book_of_the_gate(
         book_of_the_gate_issue_authors, book_of_the_gate_pr_authors, book_path=book_of_the_gate_path
     )
@@ -2862,6 +2898,7 @@ def run_ritual_check(
         or (not strategy_targets["clean"])
         or (not network_boundary["clean"])
         or (not consent_template_scope["clean"])
+        or (not scopes_md_consent_sync["clean"])
         or (not site_links["clean"])
         or (not house_links["clean"])
         or (not fencepost_links["clean"])
@@ -2946,6 +2983,7 @@ def run_ritual_check(
         "strategy_targets": strategy_targets,
         "network_boundary": network_boundary,
         "consent_template_scope": consent_template_scope,
+        "scopes_md_consent_sync": scopes_md_consent_sync,
         "book_of_the_gate": book_of_the_gate,
         "site_links": site_links,
         "house_links": house_links,
@@ -3294,6 +3332,8 @@ def format_ritual_check(result: dict[str, Any]) -> str:
         )
     cts = result["consent_template_scope"]
     lines.append(f"  consent template scope: {'clean' if cts['clean'] else 'BROKEN'} -- {cts['message']}")
+    smcs = result["scopes_md_consent_sync"]
+    lines.append(f"  scopes.md consent sync: {'clean' if smcs['clean'] else 'BROKEN'} -- {smcs['message']}")
     bog = result["book_of_the_gate"]
     if bog is None:
         lines.append("  book of the gate: not read this hour (no live issue/PR authors held)")

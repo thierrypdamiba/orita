@@ -57,16 +57,21 @@ DEFAULT_TEMPLATE_PATH = os.path.join(
 # silently shift which rows this parses.
 _ROW_RE = re.compile(r"^\|\s*([^|`]+?)\s*\|\s*`([^`]+)`\s*\|\s*$", re.MULTILINE)
 
-_PROPOSED_SUFFIX = re.compile(r"\s*\(proposed\)\s*\Z", re.IGNORECASE)
+# Any single trailing parenthetical marker -- "(proposed)", "(v0.2)",
+# whatever the next one turns out to be spelled -- not just the one word
+# this module happened to need first. Task 1311: SCOPES.md's own table
+# carries "Gmail (v0.2)" and "Google Calendar (v0.2)" rows this narrower
+# proposed-only version couldn't have normalized correctly.
+_TRAILING_PAREN_SUFFIX = re.compile(r"\s*\([^()]*\)\s*\Z")
 
 
 def normalize_display_name(display: str) -> str:
     """'Google Calendar' -> 'google_calendar', 'Slack (proposed)' ->
-    'slack' -- structural, not a hand-typed lookup table, so a template row
-    for a toolkit this function has never seen still normalizes correctly
-    the same day it's added.
+    'slack', 'Gmail (v0.2)' -> 'gmail' -- structural, not a hand-typed
+    lookup table, so a template row for a toolkit this function has never
+    seen still normalizes correctly the same day it's added.
     """
-    stripped = _PROPOSED_SUFFIX.sub("", display).strip()
+    stripped = _TRAILING_PAREN_SUFFIX.sub("", display).strip()
     return stripped.lower().replace(" ", "_")
 
 
