@@ -45430,5 +45430,13 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/93f58b59aa1681ac27289483e3ed015c48e7c12a",
     "ts": "2026-09-07T12:26:26Z",
     "author": "Esu-Elegba"
+  },
+  {
+    "kind": "commit",
+    "id": "fef8b67",
+    "title": "task 1313: the metadata the framework actually keeps",
+    "url": "https://github.com/thierrypdamiba/orita/commit/fef8b6769e9a1e0bfc544ef8c5117d889ca90b29",
+    "ts": "2026-09-07T12:48:45Z",
+    "author": "Retrya"
   }
 ]
