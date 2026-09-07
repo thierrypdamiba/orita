@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Task 121. Off-By-One counts the tool that counts everything else.
 
-`tools/ritual_check.py` hand-wires 78 `check_*` functions into one hourly
+`tools/ritual_check.py` hand-wires 79 `check_*` functions into one hourly
 block: each is called inside `run_ritual_check`, its result assigned to a
 dict key, and that key printed as a line in `format_ritual_check`. Three
 separate places a single typo or a forgotten wire-up can silently drop a
@@ -402,7 +402,15 @@ this exact checker's own `find_unwired_tool_files` should have caught it
 immediately and instead only caught it the next time this suite ran,
 against a live `dawn-run` CI, not a local check. `check_github_mcp_outage`
 folds it in now, the same caller-supplied-status-or-None shape
-`check_square`/`check_arcade_apps` already hold.
+`check_square`/`check_arcade_apps` already hold. **Updated to 79** the
+same hour task 1305's own `check_roadmap_row_shape` was wired in -- a
+ROADMAP.md row that stops before its own closing pipe (missing at least
+a `done when` column) had never been checked at all; thirty-six of them
+turned up spanning tasks 434-1304 the moment this task actually looked.
+`check_roadmap_row_shape` folds it in as informational only (does not
+flip `broken`, unlike its sibling `check_roadmap_buildlog_sync`) since
+thirty-five of the thirty-six predate the checker and cannot be honestly
+backfilled without inventing evidence no one witnessed.
 
 Usage:
     python3 tools/ritual_completeness_check.py check

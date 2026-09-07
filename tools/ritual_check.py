@@ -398,6 +398,10 @@ def _roadmap_buildlog_sync_check() -> ModuleType:
     )
 
 
+def _roadmap_row_shape_check() -> ModuleType:
+    return _load("_ritual_roadmap_row_shape_check", os.path.join(ROOT, "tools", "roadmap_row_shape_check.py"))
+
+
 def _scopes_completeness_check() -> ModuleType:
     return _load("_ritual_scopes_completeness_check", os.path.join(ROOT, "tools", "scopes_completeness_check.py"))
 
@@ -1532,6 +1536,35 @@ def check_roadmap_buildlog_sync(
     return cast(dict[str, object], mod.check_sync(**kwargs))
 
 
+def check_roadmap_row_shape(
+    roadmap_path: str | None = None,
+    archive_dir: str | None = None,
+) -> dict[str, object]:
+    """Task 1305: fold `roadmap_row_shape_check.py`'s own scan for a
+    ROADMAP.md row that stops before its own closing pipe (missing at
+    least a `done when` column) into the one block. Unconditional,
+    local-filesystem-only, the same cheap always-on class
+    `check_wip_reclaim`/`check_roadmap_buildlog_sync` already hold. Unlike
+    those two, a non-clean result here does NOT by itself mean a live
+    regression: task 1305 found thirty-six rows already in this shape
+    (tasks 434-1304), thirty-five of which predate this checker and
+    cannot be honestly backfilled without inventing "done when" evidence
+    no one actually witnessed (Ogun's law) -- see the module's own
+    docstring. `run_ritual_check` folds this in as INFORMATIONAL ONLY,
+    the same treatment `check_github_mcp_outage`/`x_outage_tracker`
+    already give a standing, already-known condition; `format_ritual_check`
+    still prints the live count every hour so it stays visible, and
+    `tests/test_roadmap_row_shape_check.py` pins today's count as a
+    ceiling that must never grow."""
+    mod = _roadmap_row_shape_check()
+    kwargs: dict[str, object] = {}
+    if roadmap_path is not None:
+        kwargs["roadmap_path"] = roadmap_path
+    if archive_dir is not None:
+        kwargs["archive_dir"] = archive_dir
+    return cast(dict[str, object], mod.check_shape(**kwargs))
+
+
 def check_scopes_completeness(scopes_path: str | None = None, app_log_path: str | None = None) -> dict[str, object]:
     """Task 135: fold `scopes_completeness_check.py`'s own cross-check of
     `fencepost/SCOPES.md`'s `## Every connected app, accounted for`
@@ -2565,6 +2598,8 @@ def run_ritual_check(
     roadmap_buildlog_sync_roadmap_path: str | None = None,
     roadmap_buildlog_sync_buildlog_path: str | None = None,
     roadmap_buildlog_sync_archive_dir: str | None = None,
+    roadmap_row_shape_roadmap_path: str | None = None,
+    roadmap_row_shape_archive_dir: str | None = None,
     arcade_apps_state: dict[str, object] | None = None,
     gateway_toolset_state: dict[str, object] | None = None,
     good_first_issues_state: list[dict[str, object]] | None = None,
@@ -2717,6 +2752,10 @@ def run_ritual_check(
         roadmap_path=roadmap_buildlog_sync_roadmap_path,
         buildlog_path=roadmap_buildlog_sync_buildlog_path,
         archive_dir=roadmap_buildlog_sync_archive_dir,
+    )
+    roadmap_row_shape = check_roadmap_row_shape(
+        roadmap_path=roadmap_row_shape_roadmap_path,
+        archive_dir=roadmap_row_shape_archive_dir,
     )
     scopes_completeness = check_scopes_completeness(scopes_path=scopes_path, app_log_path=app_log_path)
     toolkits_in_use = check_toolkits_in_use(
@@ -2895,6 +2934,7 @@ def run_ritual_check(
         "wip_reclaim": wip_reclaim,
         "window_rotation": window_rotation,
         "roadmap_buildlog_sync": roadmap_buildlog_sync,
+        "roadmap_row_shape": roadmap_row_shape,
         "scopes_completeness": scopes_completeness,
         "toolkits_in_use": toolkits_in_use,
         "connected_users": connected_users,
@@ -3182,6 +3222,15 @@ def format_ritual_check(result: dict[str, Any]) -> str:
         lines.append(
             f"  roadmap/buildlog sync: {len(rbs['missing'])} MISSING ROADMAP ROW(S) -- "
             f"task(s) {missing_nums} shipped per BUILDLOG.md with no ROADMAP.md row, backfill now, escalate"
+        )
+    rrs = result["roadmap_row_shape"]
+    if rrs["clean"]:
+        lines.append("  roadmap row shape: clean (every row reaches its own closing pipe)")
+    else:
+        lines.append(
+            f"  roadmap row shape: {rrs['count']} incomplete row(s) missing a `done when` column "
+            "-- informational, tracked legacy debt (task 1305), not a live break unless this count "
+            "grows past its pinned ceiling"
         )
     sc = result["scopes_completeness"]
     if sc["stale_google_claim"]:
