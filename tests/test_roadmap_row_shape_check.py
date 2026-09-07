@@ -25,13 +25,24 @@ def _load(name, path):
 
 rrsc = _load("roadmap_row_shape_check", os.path.join(ROOT, "tools", "roadmap_row_shape_check.py"))
 
-# The live, known legacy-debt count as of task 1305 (task 1304 itself
-# backfilled and removed from the list this same task). A future hour
-# that honestly backfills one more row (from THAT row's own commit
-# message, per this checker's own docstring) should lower this ceiling
-# in the same commit that closes it; a rise past it means a fresh row got
-# cut off mid-write and nobody noticed.
-KNOWN_LEGACY_INCOMPLETE_CEILING = 35
+# The live, known legacy-debt count as of task 1306 (task 1305's own 35
+# included twenty rows that were never actually missing content: their
+# `done when` column existed all along, just split across blank-line
+# paragraph breaks into several physical lines, so the shape check's
+# line-at-a-time regex only ever saw the row's FIRST line -- which never
+# itself ends in "|" -- and flagged the whole row as cut off. Task 1306
+# reflowed those twenty (847, 965, 1043, 1044, 1045, 1047, 1077, 1098,
+# 1099, 1108, 1211, 1281, 1282, 1283, 1284, 1285, 1286, 1290 in
+# ROADMAP.md; 679, 687 in ROADMAP-ARCHIVE-004-482-797.md) into single
+# physical lines -- a whitespace-only join verified byte-identical to the
+# original once all runs of whitespace are collapsed, no prose invented
+# or lost -- leaving 15 rows that are genuinely incomplete (no closing
+# pipe anywhere in their own block, real content never written past that
+# point). A future hour that honestly backfills one of those 15 (from
+# THAT row's own commit message, per this checker's own docstring) should
+# lower this ceiling in the same commit that closes it; a rise past it
+# means a fresh row got cut off mid-write and nobody noticed.
+KNOWN_LEGACY_INCOMPLETE_CEILING = 15
 
 
 class FindIncompleteRowsCase(unittest.TestCase):
@@ -184,6 +195,22 @@ class RealLiveStateCase(unittest.TestCase):
         result = rrsc.check_shape()
         numbers = {r["number"] for r in result["incomplete"]}
         self.assertNotIn(1304, numbers)
+
+    def test_task_1306_reflowed_rows_are_no_longer_in_the_live_incomplete_list(self):
+        # The twenty rows task 1306 proved were never actually missing
+        # content (just split across blank-line paragraph breaks) --
+        # proves the reflow landed for real, not just that the ceiling
+        # number was edited down.
+        result = rrsc.check_shape()
+        numbers = {r["number"] for r in result["incomplete"]}
+        reflowed = {
+            847, 965, 1043, 1044, 1045, 1047, 1077, 1098, 1099, 1108,
+            1211, 1281, 1282, 1283, 1284, 1285, 1286, 1290, 679, 687,
+        }
+        self.assertFalse(
+            reflowed & numbers,
+            f"reflowed row(s) still flagged incomplete: {reflowed & numbers}",
+        )
 
 
 if __name__ == "__main__":

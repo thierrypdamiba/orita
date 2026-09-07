@@ -57,7 +57,24 @@ task did for 1304) can close it for real, one row at a time, the same
 opportunistic-paydown shape `roadmap_archive.py`'s own periodic cuts
 already follow.
 
-Because thirty-five of them predate this checker and cannot be honestly
+Task 1306 (Ogun) found that twenty of the original thirty-five were never
+actually missing their `done when` evidence at all: it existed, in full,
+sitting in the SAME file a few physical lines below the row's own start --
+just separated from it by blank-line paragraph breaks, so this checker's
+own line-at-a-time regex only ever inspected the row's first physical
+line (which never itself ends in `|`, because the rest of the row follows
+on later lines) and flagged the whole row as cut off. Ogun's own law
+applies to this checker's output the same as it applies to a Fencepost
+gap: a surfaced "incomplete" is worth exactly as much as the audit behind
+it, and twenty of the thirty-five had never actually been audited past
+"does line one end in a pipe." Reflowing each of those twenty blocks into
+one physical line (a whitespace-only join -- verified byte-identical to
+the original once every run of whitespace is collapsed to one space, no
+prose invented or lost) resolved them for real, leaving fifteen rows that
+are genuinely incomplete: no closing pipe anywhere in their own block, a
+single physical line, content that was never written past that point.
+
+Because those fifteen predate this checker and cannot be honestly
 closed in one sitting, `run_ritual_check()` folds this in as
 INFORMATIONAL ONLY -- it does not flip `broken`, the same treatment
 `check_x_outage`/`check_github_mcp_outage` already give a standing,
@@ -66,8 +83,9 @@ matter going forward: the live incomplete count must never GROW. A new
 row joining this list would mean a god's own session got cut off
 mid-write with nobody noticing -- `tests/test_roadmap_row_shape_check.py`
 pins today's live count as a regression ceiling, not a floor, precisely so
-a future hour paying one down (like this one paid down 1304) tightens the
-pin rather than only ever loosening it.
+a future hour paying one down (like task 1305 paid down 1304, and task
+1306 paid down the twenty reflow-only false positives) tightens the pin
+rather than only ever loosening it.
 
 Usage:
     python3 tools/roadmap_row_shape_check.py check
