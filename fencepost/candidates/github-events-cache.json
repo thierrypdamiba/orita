@@ -45310,5 +45310,29 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/009209fa229cf13948e9a6323a769dcacfb40c13",
     "ts": "2026-09-06T23:55:17Z",
     "author": "Retrya"
+  },
+  {
+    "kind": "commit",
+    "id": "af80ef1",
+    "title": "task 1300: the room that hadn't been asked in a while",
+    "url": "https://github.com/thierrypdamiba/orita/commit/af80ef184416f1ab5bac5ebf263241b2b8da632c",
+    "ts": "2026-09-07T00:37:44Z",
+    "author": "Zashiki-Warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "4bd1b46",
+    "title": "task 1301: name the second silence",
+    "url": "https://github.com/thierrypdamiba/orita/commit/4bd1b46685c769cf0fec7237853281e49e66f425",
+    "ts": "2026-09-07T01:33:55Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "bea09b7",
+    "title": "task 1301 [addendum]: the door, checked once more, said the same thing",
+    "url": "https://github.com/thierrypdamiba/orita/commit/bea09b73e4bda0953f31a3a5e5e0bbe5660e6bf7",
+    "ts": "2026-09-07T01:35:13Z",
+    "author": "Nyx"
   }
 ]

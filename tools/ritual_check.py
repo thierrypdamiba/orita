@@ -176,7 +176,7 @@ that payload was actually handed in -- the same optional-input,
 never-`broken`-blocking shape `good_first_issues`/`square` itself holds.
 
 Usage:
-    python3 tools/ritual_check.py [--now ISO_TS] [--fencepost-base DIR] [--square-state PATH] [--arcade-apps-state PATH] [--gateway-toolset PATH] [--good-first-issues PATH] [--ci-checks PATH] [--cron-checks PATH] [--child-files PATH] [--voice-window-commits PATH] [--github-stars COUNT] [--live-scan PATH] [--json]
+    python3 tools/ritual_check.py [--now ISO_TS] [--fencepost-base DIR] [--square-state PATH] [--arcade-apps-state PATH] [--gateway-toolset PATH] [--good-first-issues PATH] [--ci-checks PATH] [--cron-checks PATH] [--child-files PATH] [--voice-window-commits PATH] [--github-stars COUNT] [--github-mcp-status ok|invalid_session] [--live-scan PATH] [--json]
 """
 from __future__ import annotations
 
@@ -243,6 +243,13 @@ def _outage_tracker() -> ModuleType:
 
 def _square_check() -> ModuleType:
     return _load("_ritual_square_check", os.path.join(ROOT, "tools", "square_check.py"))
+
+
+def _github_mcp_outage_check() -> ModuleType:
+    return _load(
+        "_ritual_github_mcp_outage_check",
+        os.path.join(ROOT, "tools", "github_mcp_outage_check.py"),
+    )
 
 
 def _ci_watch() -> ModuleType:
@@ -2489,6 +2496,33 @@ def check_change_gate(report_info: dict[str, str | None]) -> dict[str, object] |
     return {"due": due, "reason": reason}
 
 
+def check_github_mcp_outage(
+    github_mcp_status: str | None, now_iso: str
+) -> dict[str, object] | None:
+    """Fold a caller-supplied observation of this hour's plain GitHub MCP
+    session (`"ok"` or `"invalid_session"` -- task 1301's
+    `github_mcp_outage_check.py`) the same "nothing to check" shape
+    `check_square`/`check_arcade_apps` already hold: `github_mcp_status` is
+    None unless the god on duty actually tried an `mcp__github__*` call
+    this hour and has a real result to record, never guessed. Records via
+    `record_check` (idempotent -- a resubmission of the same observation is
+    a no-op) then reads back the live streak, informational only, like
+    `square`/`good_first_issues` -- a GitHub-MCP outage is a real thing to
+    note in the hour's own row, not itself a violation of any Iron Rule, so
+    it never joins `broken`."""
+    if github_mcp_status is None:
+        return None
+    mod = _github_mcp_outage_check()
+    mod.record_check(github_mcp_status, now_iso, path=mod.LOG)
+    entries = mod._entries(mod.LOG)
+    streak = mod.current_streak(entries, "invalid_session")
+    return {
+        "status": github_mcp_status,
+        "streak": streak,
+        "status_line": mod._status_report(mod.LOG),
+    }
+
+
 def run_ritual_check(
     now: datetime | None = None,
     fencepost_base: str = DEFAULT_FENCEPOST_BASE,
@@ -2592,6 +2626,7 @@ def run_ritual_check(
     github_stars_count: int | None = None,
     github_stars_metrics_path: str | None = None,
     github_stars_log_path: str | None = None,
+    github_mcp_status: str | None = None,
     record_scribe_growth: bool = False,
     record_words: bool = False,
     record_github_stars: bool = False,
@@ -2758,6 +2793,7 @@ def run_ritual_check(
         log_path=github_stars_log_path,
         record=record_github_stars,
     )
+    github_mcp_outage = check_github_mcp_outage(github_mcp_status, now_iso)
     broken = (
         (not town["ok"])
         or (not fencepost["ok"])
@@ -2888,6 +2924,7 @@ def run_ritual_check(
         "report_shipped": report_shipped,
         "tasks_shipped": tasks_shipped,
         "github_stars": github_stars,
+        "github_mcp_outage": github_mcp_outage,
         "escape_sequences": escape_sequences,
         "metrics_field_completeness": metrics_field_completeness,
         "broken": broken,
@@ -2940,6 +2977,9 @@ def format_ritual_check(result: dict[str, Any]) -> str:
     if result["gateway_toolset"] is not None:
         gt = result["gateway_toolset"]
         lines.append(f"  gateway toolset (gmail/calendar): {'changed' if gt['changed'] else 'unchanged'} -- {gt['reason']}")
+    if result["github_mcp_outage"] is not None:
+        gm = result["github_mcp_outage"]
+        lines.append(f"  github mcp: {gm['status_line']}")
     lines.append("  " + _gateway_toolset_check().format_toolset_freshness(result["gateway_toolset_freshness"]))
     lines.append("  " + _good_first_issue_check().format_good_first_issues(result["good_first_issues"]))
     sg = result["scribe_growth"]
@@ -3429,6 +3469,7 @@ def main(argv: list[str]) -> int:
     child_files = None
     voice_window_commits = None
     github_stars_count = None
+    github_mcp_status = None
     live_scan = None
     i = 0
     while i < len(argv):
@@ -3473,6 +3514,9 @@ def main(argv: list[str]) -> int:
         elif argv[i] == "--github-stars" and i + 1 < len(argv):
             github_stars_count = int(argv[i + 1])
             i += 2
+        elif argv[i] == "--github-mcp-status" and i + 1 < len(argv):
+            github_mcp_status = argv[i + 1]
+            i += 2
         elif argv[i] == "--live-scan" and i + 1 < len(argv):
             live_scan = cast(dict[str, object], _load_json_arg(argv[i + 1], "live-scan", "dict"))
             i += 2
@@ -3496,6 +3540,7 @@ def main(argv: list[str]) -> int:
         child_files=child_files,
         voice_window_commits=voice_window_commits,
         github_stars_count=github_stars_count,
+        github_mcp_status=github_mcp_status,
         # Task 374: this is the one real hourly CLI entrypoint -- the only
         # caller that should durably record this hour's real scribe sizes.
         record_scribe_growth=True,

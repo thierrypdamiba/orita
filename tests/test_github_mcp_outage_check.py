@@ -148,8 +148,22 @@ class TestCli(_TempLogCase):
         )
 
     def test_status_with_no_checks(self):
-        result = self._run("status")
-        self.assertIn("no checks recorded", result.stdout)
+        # Task 1302: this used to shell out to the real CLI's own default
+        # LOG (the production HAND/github-mcp-outage-log.jsonl), the exact
+        # subprocess-against-real-state shape test_x_outage_tracker.py's own
+        # CliArgvBoundsCase deliberately avoids (it only ever subprocess-
+        # tests argv-bounds/usage-error paths, never a real status/record
+        # read) -- passed only by accident, while the real log happened to
+        # be empty. The first real `record` call this town ever made against
+        # it (task 1301's own live occurrence, committed the same hour)
+        # broke this test the moment the production log stopped being
+        # empty, invisibly, since nothing before this task had reason to
+        # rerun it against real data. Fixed at the root: calls
+        # `_status_report` directly against this case's own isolated
+        # `self.path` (empty, per `_TempLogCase.setUp`), the same in-process
+        # shape every other test in this file already uses, never touching
+        # the real production log.
+        self.assertIn("no checks recorded", gmo._status_report(path=self.path))
 
     def test_unknown_command_errors(self):
         result = self._run("bogus")
