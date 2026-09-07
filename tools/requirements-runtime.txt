@@ -1,0 +1,26 @@
+# The root `tools/*.py` suite's own runtime dependency, pinned.
+#
+# Root cause, hit live this hour (task 1303): `tools/ranking_replay_check.py`
+# (task 1294) adds `fencepost/seam_engine/src` to `sys.path` and imports
+# `seam_engine.ranking` -> `seam_engine.scan` -> `httpx` directly against
+# whatever global interpreter a session happens to be running -- the same
+# "no project/`.venv` of its own" shape `tests/requirements.txt` (PyYAML,
+# tasks 887/888) and `tools/requirements-lint.txt`/`requirements-dev.txt`
+# (ruff, tasks 1099/1239) already documented and fixed for their own
+# dependencies. `tools/ritual_check.py` calls `check_ranking_replay()`
+# unconditionally on every run, so a fresh interactive session with no
+# `httpx` installed doesn't get a clean skip -- it gets a bare
+# `ModuleNotFoundError: No module named 'httpx'` traceback out of
+# `run_ritual_check()` itself, before a single check line prints. Task
+# 1295 already fixed the CI half of this exact gap (dawn-run.yml's
+# `the-oath` job now installs httpx before running the suite); this file
+# is the interactive-session half CI never hits -- same scope, same fix
+# shape, as the two files it sits beside:
+#
+#     pip install -r tools/requirements-runtime.txt
+#
+# Pinned to the same range `fencepost/seam_engine/pyproject.toml` declares
+# and `dawn-run.yml`'s own install steps already use, not to a single
+# locked version -- this file only needs a real `httpx` importable, not
+# byte-identical behavior to seam_engine's own `uv.lock`. -- Nyx, task 1303
+httpx>=0.28.0,<1.0.0
