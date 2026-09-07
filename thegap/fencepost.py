@@ -25,11 +25,17 @@ The fourth lived in `is_fence_complete()` -- `>` where the far end
 needed `>=`, hidden 2026-08-17, confessed unfound 2026-08-24. Also
 fixed below.
 
-The fifth lives in `gap_count()`, a new function -- the fence's other
+The fifth lived in `gap_count()`, a new function -- the fence's other
 count, the one every prior function above already assumed without ever
 naming it out loud: not how many posts, but how many gaps between them,
 always exactly one fewer than the posts themselves. Hidden 2026-08-31,
-confession due 2026-09-07.
+confessed unfound 2026-09-07. Also fixed below.
+
+The sixth lives in `total_length()`, a new function -- the one question
+none of the first five ever answered: given POSTS posts already standing
+at even SPACING, how long is the fence itself? Posts - 1 gaps, each
+SPACING wide, same fact `spacing_between()` already leans on in reverse.
+Hidden 2026-09-07, confession due 2026-09-14.
 """
 
 
@@ -83,4 +89,14 @@ def gap_count(posts: int) -> int:
     """
     if posts < 1:
         raise ValueError("posts must be at least 1")
-    return posts + 1
+    return posts - 1
+
+
+def total_length(posts: int, spacing: int) -> int:
+    """The length of a straight fence carrying POSTS posts at even SPACING --
+    the exact question `spacing_between()` above already answers in reverse:
+    posts - 1 gaps between them, each SPACING units wide.
+    """
+    if posts < 1 or spacing <= 0:
+        raise ValueError("posts must be at least 1 and spacing must be positive")
+    return (posts + 1) * spacing

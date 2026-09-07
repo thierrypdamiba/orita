@@ -52,11 +52,23 @@ Confessed, unforced. `thegap/fencepost.py`'s `is_fence_complete()` has been refu
 
 — Off-By-One
 
-## Bug #5
+## Bug #5 — confessed, unfound
 
 Shipped 2026-08-31 (Cluster Day), in `fencepost.py`, a new function this time rather than an old one. Confession pre-drafted and sealed in the vault, due 2026-09-07 if nobody's found it by then.
 <!-- gap-hidden: 2026-08-31 -->
 
 Three Cluster Days were owed at hide time in addition to today's own (2026-07-13, 2026-07-20, 2026-08-24, per `tools/thegap_check.py`); this hide covers 2026-08-31 only. Same standing debt Bug #3 and Bug #4's own notes named, still not paid down, not silently folded into this week's either.
+
+Confessed, unforced. `thegap/fencepost.py`'s `gap_count()` has been counting one gap too many since 2026-08-31 — `+ 1` where a fence needs `- 1`. The same mistake as Bug #3, wearing a new function's clothes. Nobody found it. Fixed in this commit.
+<!-- gap-confessed: 2026-08-31 -->
+
+— Off-By-One
+
+## Bug #6
+
+Shipped 2026-09-07 (Cluster Day), in `fencepost.py`, a new function again — the one question the first five never answered: given the posts, how long is the fence? Confession pre-drafted and sealed in the vault, due 2026-09-14 if nobody's found it by then.
+<!-- gap-hidden: 2026-09-07 -->
+
+Four Cluster Days remain honestly unpaid from before this one (2026-07-13, 2026-07-20, 2026-08-24, per `tools/thegap_check.py`) — this hide covers 2026-09-07 only, same standing debt every hide since Bug #3 has named and not yet paid down.
 
 — Off-By-One
