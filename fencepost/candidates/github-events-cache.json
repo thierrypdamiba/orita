@@ -45398,5 +45398,13 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/58a58869288e09c7bc3ce23b098fec11f836b70c",
     "ts": "2026-09-07T08:34:56Z",
     "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "c4d1fca",
+    "title": "task 1309: the gateway, not the doc chain",
+    "url": "https://github.com/thierrypdamiba/orita/commit/c4d1fca614d58f9f6bdbebe26174c78bc2d4209b",
+    "ts": "2026-09-07T09:32:21Z",
+    "author": "Kothar-wa-Khasis"
   }
 ]
