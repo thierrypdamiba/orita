@@ -62,12 +62,32 @@ violation already found, surfaced, and answered by a routing fix (task
 addressed, the same shape `grandfathered` already gave to pre-fix
 history. An un-acknowledged live violation still flips `clean=False`.
 
+Task 1333 (nisaba): the cut that moved tasks 798-1332 out of `ROADMAP.md`
+into `ROADMAP-ARCHIVE-005-798-1332.md` silently dropped this check's own
+7 grandfathered + 3 escalated entries to 0/0 -- every one of them was a
+row in the range that just got archived, and `find_window_violations`
+below only ever read `roadmap_path` itself, never a sibling archive file.
+The exact same "silently-empty scan after a scalpel cut" shape
+`tithe_check.py`'s `_roadmap_and_archive_roll_lines` (task 798) already
+named and fixed for its own domain -- caught here live, in the same hour
+the cut that exposed it landed, rather than left for a future hour to
+notice the count had quietly gone to zero. Fixed the same way: read
+`roadmap_path` plus every sibling `ROADMAP-ARCHIVE-*.md` in sorted
+(chronological) order, concatenated before parsing -- `wip_reclaim_check`'s
+`parse_table_rows`/`parse_wip_open_times` are plain `re.finditer` scans
+with no cross-file state, so concatenating archive text ahead of the live
+tail reconstructs exactly the same stream those functions would have seen
+before any cut ever happened. A fixture `roadmap_path` in an isolated
+tmpdir (every existing test) finds no `ROADMAP-ARCHIVE-*.md` siblings and
+behaves exactly as before this widening.
+
 Usage:
     python3 tools/window_rotation_check.py check
     python3 tools/window_rotation_check.py whose-turn [ISO-timestamp]
 """
 from __future__ import annotations
 
+import glob
 import os
 import sys
 from datetime import datetime, timezone
@@ -132,6 +152,23 @@ def whose_turn(now: datetime | None = None) -> dict[str, object]:
     return {"in_window": True, "owner": owner, "hour": now.hour}
 
 
+def _roadmap_and_archive_text(roadmap_path: str) -> str:
+    """`roadmap_path`'s own text, preceded by every sibling
+    `ROADMAP-ARCHIVE-*.md` file's text in sorted (chronological) order --
+    the same reconstruction `tithe_check._roadmap_and_archive_roll_lines`
+    (task 798) already performs for its own domain, applied here so a
+    roadmap-archive cut can never again silently zero out this check's
+    historical window-violation count."""
+    archive_dir = os.path.dirname(roadmap_path) or "."
+    parts: list[str] = []
+    for path in sorted(glob.glob(os.path.join(archive_dir, "ROADMAP-ARCHIVE-*.md"))):
+        with open(path, encoding="utf-8") as f:
+            parts.append(f.read())
+    with open(roadmap_path, encoding="utf-8") as f:
+        parts.append(f.read())
+    return "\n".join(parts)
+
+
 def find_window_violations(
     text: str | None = None,
     roadmap_path: str = DEFAULT_ROADMAP_PATH,
@@ -139,8 +176,7 @@ def find_window_violations(
     acknowledged: dict[int, str] | None = None,
 ) -> dict[str, object]:
     if text is None:
-        with open(roadmap_path, encoding="utf-8") as f:
-            text = f.read()
+        text = _roadmap_and_archive_text(roadmap_path)
     if acknowledged is None:
         acknowledged = ACKNOWLEDGED
     rows = wip_reclaim_check.parse_table_rows(text)

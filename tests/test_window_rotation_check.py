@@ -3,12 +3,30 @@ wip-opened marker lands inside the 00:00-06:00 UTC window but was handed
 to a god other than Nyx or the child, stays clean when the owner is one
 of them, correctly grandfathers sealed pre-fix history rather than
 flagging it live, and -- the real point -- confirms the live ROADMAP.md's
-seven known historical violations (task 975, tasks 1089-1094) are found
-and grandfathered, with zero live violations after the fix.
+known historical violations are found and grandfathered, with zero live
+violations after the fix.
+
+Task 1333 (nisaba): the count of "known" historical violations was never
+117 by nature -- it was 7, hardcoded when this module was written (task
+1113), because `ROADMAP.md` at that time only ever held the live tail;
+everything before task 798's archive cut was already invisible to a
+scanner that read only `roadmap_path`. Task 1333's own roadmap cut
+(798-1332 -> `ROADMAP-ARCHIVE-005-798-1332.md`) exposed that blind spot
+live: `find_window_violations` widened to also read every sibling
+`ROADMAP-ARCHIVE-*.md`, and the true count of historical window-routing
+violations back to founding turned out to be 117, not 7 -- the other 110
+were always real, just never visible to this checker. `RealCheckoutCase`
+below is updated to the true count (with two fixture tests proving the
+archive-widening itself, mirroring `tithe_check.py`'s own
+`_roadmap_and_archive_roll_lines` test pattern); nothing about the
+routing violations themselves changed, only this checker's ability to
+see the ones that already happened.
 """
 import importlib.util
 import os
+import shutil
 import sys
+import tempfile
 import unittest
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -135,10 +153,24 @@ class RealCheckoutCase(unittest.TestCase):
         self.assertTrue(result["clean"], result)
         self.assertEqual(result["violations"], [], result)
 
-    def test_real_roadmap_grandfathers_the_seven_known_historical_violations(self):
+    def test_real_roadmap_grandfathers_the_known_historical_violations(self):
         result = wrc.find_window_violations(roadmap_path=os.path.join(ROOT, "ROADMAP.md"))
         numbers = sorted(g["number"] for g in result["grandfathered"])
-        self.assertEqual(numbers, [975, 1089, 1090, 1091, 1092, 1093, 1094], result)
+        # 117 total once ROADMAP-ARCHIVE-*.md siblings are scanned too (task
+        # 1333) -- the original 7 (task 975, tasks 1089-1094) were only ever
+        # the subset still live in ROADMAP.md itself at task 1113.
+        self.assertEqual(len(numbers), 117, result)
+        for known in (975, 1089, 1090, 1091, 1092, 1093, 1094):
+            self.assertIn(known, numbers)
+
+    def test_real_roadmap_scan_is_archive_aware(self):
+        """The live scan must actually reach ROADMAP-ARCHIVE-*.md, not just
+        report a plausible-looking number -- proves at least one grandfathered
+        violation comes from strictly before task 798 (deep in archived
+        history no longer reachable from ROADMAP.md alone)."""
+        result = wrc.find_window_violations(roadmap_path=os.path.join(ROOT, "ROADMAP.md"))
+        numbers = {g["number"] for g in result["grandfathered"]}
+        self.assertIn(121, numbers, result)
 
     def test_real_roadmap_escalates_task_1161_rather_than_erasing_it(self):
         result = wrc.find_window_violations(roadmap_path=os.path.join(ROOT, "ROADMAP.md"))
@@ -148,6 +180,50 @@ class RealCheckoutCase(unittest.TestCase):
         self.assertEqual(by_number[1161]["owner"], "kothar-wa-khasis")
         self.assertEqual(by_number[1184]["owner"], "nisaba")
         self.assertEqual(by_number[1185]["owner"], "kothar-wa-khasis")
+
+
+class ArchiveWideningCase(unittest.TestCase):
+    """Fixture-isolated proof of `_roadmap_and_archive_text` itself (task
+    1333), independent of the live repo's real numbers -- mirrors
+    `tithe_check.py`'s own `test_sibling_roadmap_archive_file_is_also_scanned`
+    / `test_archive_sibling_with_no_violation_stays_clean` pair."""
+
+    def setUp(self):
+        self.tmpdir = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.tmpdir, ignore_errors=True)
+        self.roadmap_path = os.path.join(self.tmpdir, "ROADMAP.md")
+
+    def test_sibling_roadmap_archive_file_is_also_scanned(self):
+        archived_violation = (
+            "| 42 | DONE | ogun | archived thing | done |\n\n"
+            "<!-- wip-opened: 42 2026-07-15T02:00:00Z -->\n"
+        )
+        with open(os.path.join(self.tmpdir, "ROADMAP-ARCHIVE-001-1-100.md"), "w") as f:
+            f.write(archived_violation)
+        with open(self.roadmap_path, "w") as f:
+            f.write("| 500 | DONE | nyx | live thing | done |\n\n<!-- wip-opened: 500 2026-09-01T01:00:00Z -->\n")
+        result = wrc.find_window_violations(roadmap_path=self.roadmap_path)
+        numbers = {g["number"] for g in result["grandfathered"]}
+        self.assertIn(42, numbers, result)
+
+    def test_archive_sibling_with_no_violation_stays_clean(self):
+        with open(os.path.join(self.tmpdir, "ROADMAP-ARCHIVE-001-1-100.md"), "w") as f:
+            f.write("| 42 | DONE | nyx | archived thing, correctly routed | done |\n\n")
+        with open(self.roadmap_path, "w") as f:
+            f.write("| 500 | DONE | ogun | live thing outside the window | done |\n\n")
+        result = wrc.find_window_violations(roadmap_path=self.roadmap_path)
+        self.assertTrue(result["clean"], result)
+        self.assertEqual(result["violations"], [])
+        self.assertEqual(result["grandfathered"], [])
+
+    def test_no_archive_siblings_behaves_exactly_as_before(self):
+        with open(self.roadmap_path, "w") as f:
+            f.write("| 9001 | DONE | ogun | live thing | done |\n\n<!-- wip-opened: 9001 2026-09-01T02:00:00Z -->\n")
+        result = wrc.find_window_violations(
+            roadmap_path=self.roadmap_path, fix_landed_at="2026-08-30T00:26:53+00:00"
+        )
+        self.assertFalse(result["clean"], result)
+        self.assertEqual([v["number"] for v in result["violations"]], [9001])
 
 
 class EscalatedViolationCase(unittest.TestCase):
@@ -229,8 +305,10 @@ class WhoseTurnCase(unittest.TestCase):
         rule is a reasonable, not arbitrary, default for future hours."""
         from datetime import datetime, timezone
 
-        with open(os.path.join(ROOT, "ROADMAP.md"), encoding="utf-8") as f:
-            text = f.read()
+        # Task 1333: read via `_roadmap_and_archive_text` (not a bare
+        # `ROADMAP.md` open) so this historical check survives the next
+        # `roadmap_archive.py` cut instead of quietly seeing zero rows.
+        text = wrc._roadmap_and_archive_text(os.path.join(ROOT, "ROADMAP.md"))
         rows = wrc.wip_reclaim_check.parse_table_rows(text)
         opens = wrc.wip_reclaim_check.parse_wip_open_times(text)
         owner_by_number = {row["number"]: row["owner"] for row in rows}
