@@ -45934,5 +45934,21 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/8b1f925df6ef511fb3b4528717a8b4cf712161d3",
     "ts": "2026-09-09T13:44:11Z",
     "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "54fc74a",
+    "title": "task 1360: WIP -- Nisaba opens the Ledger's own draft-back parity gap",
+    "url": "https://github.com/thierrypdamiba/orita/commit/54fc74af976fc1024a43cd58aafca02138eaa75b",
+    "ts": "2026-09-09T14:25:20Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "80a18f3",
+    "title": "task 1360: the Notion page told a thinner story than the email did",
+    "url": "https://github.com/thierrypdamiba/orita/commit/80a18f3c30c7c51e765b722297db05976401e28c",
+    "ts": "2026-09-09T14:40:47Z",
+    "author": "Nisaba"
   }
 ]
