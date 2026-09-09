@@ -496,6 +496,12 @@ def _draftback_freshness_check() -> ModuleType:
     )
 
 
+def _report_card_freshness_check() -> ModuleType:
+    return _load_once(
+        "_ritual_report_card_freshness_check", os.path.join(ROOT, "tools", "report_card_freshness_check.py")
+    )
+
+
 def _recipe_readme_check() -> ModuleType:
     return _load_once("_ritual_recipe_readme_check", os.path.join(ROOT, "tools", "recipe_readme_check.py"))
 
@@ -2464,6 +2470,31 @@ def check_draftback_freshness(drafts_dir: str | None = None) -> dict[str, object
     return cast(dict[str, object], mod.check_draftback_freshness(**kwargs))
 
 
+def check_report_card_freshness(
+    reports_dir: str | None = None, cards_dir: str | None = None
+) -> dict[str, object]:
+    """Task 1369: fold report_card_freshness_check.py's own live-recompute-
+    vs-committed-card cross-check into the one block. `seam-scan.yml`'s
+    daily cron reseals the Ledger, rewrites the Report, reruns the audit,
+    repaints the badge, and (as of this same task) builds today's share
+    card -- but before this task never called `report_card.py` at all, so
+    `docs/fencepost/index.html`'s own "share today's report" link 404'd
+    every day past the tool's founding one. Same restraint as
+    `check_draftback_freshness`: `status: "unavailable"` only ever means no
+    report has ever sealed, never an environment gap (both `report_card`
+    and the reports directory are pure-filesystem, no external dependency
+    to go missing). Never edits anything; a real drift is a god-on-duty
+    escalation (`python3 tools/report_card.py latest`, commit the fresh
+    file), not something this check silently repairs."""
+    mod = _report_card_freshness_check()
+    kwargs = {}
+    if reports_dir is not None:
+        kwargs["reports_dir"] = reports_dir
+    if cards_dir is not None:
+        kwargs["cards_dir"] = cards_dir
+    return cast(dict[str, object], mod.check_report_card_freshness(**kwargs))
+
+
 def check_recipe_readme(readme_path: str | None = None, recipe_fencepost_root: str | None = None) -> dict[str, object]:
     """Task 426: fold `recipe_readme_check.py`'s own two-way cross-check of
     `fencepost/README.md`'s Community recipes section against the live
@@ -2737,6 +2768,8 @@ def run_ritual_check(
     proclamation_count_proclamations_dir: str | None = None,
     badge_path: str | None = None,
     draftback_freshness_drafts_dir: str | None = None,
+    report_card_freshness_reports_dir: str | None = None,
+    report_card_freshness_cards_dir: str | None = None,
     recipe_readme_path: str | None = None,
     recipe_readme_fencepost_root: str | None = None,
     site_recipe_path: str | None = None,
@@ -2899,6 +2932,9 @@ def run_ritual_check(
     )
     badge_freshness = check_badge_freshness(badge_path=badge_path)
     draftback_freshness = check_draftback_freshness(drafts_dir=draftback_freshness_drafts_dir)
+    report_card_freshness = check_report_card_freshness(
+        reports_dir=report_card_freshness_reports_dir, cards_dir=report_card_freshness_cards_dir
+    )
     recipe_readme = check_recipe_readme(
         readme_path=recipe_readme_path, recipe_fencepost_root=recipe_readme_fencepost_root
     )
@@ -2979,6 +3015,7 @@ def run_ritual_check(
         or (not proclamation_count["clean"])
         or (not badge_freshness["clean"])
         or (not draftback_freshness["clean"])
+        or (not report_card_freshness["clean"])
         or (not recipe_readme["clean"])
         or (not site_recipe_readme["clean"])
         or (not recipe_commands["clean"])
@@ -3067,6 +3104,7 @@ def run_ritual_check(
         "proclamation_count": proclamation_count,
         "badge_freshness": badge_freshness,
         "draftback_freshness": draftback_freshness,
+        "report_card_freshness": report_card_freshness,
         "recipe_readme": recipe_readme,
         "site_recipe_readme": site_recipe_readme,
         "recipe_commands": recipe_commands,
@@ -3469,6 +3507,9 @@ def format_ritual_check(result: dict[str, Any]) -> str:
     lines.append("  " + _badge_freshness_check().format_badge_freshness(result["badge_freshness"]))
     lines.append(
         "  " + _draftback_freshness_check().format_draftback_freshness(result["draftback_freshness"])
+    )
+    lines.append(
+        "  " + _report_card_freshness_check().format_report_card_freshness(result["report_card_freshness"])
     )
     lines.append("  " + _recipe_readme_check().format_result(result["recipe_readme"]))
     lines.append("  " + _site_recipe_check().format_result(result["site_recipe_readme"]))

@@ -73,12 +73,15 @@ jobs:
           PYTHONPATH: seam_engine/src
         run: python3 -m seam_engine.badge --write || true
 
+      - name: build today's share card (Kwaku-Ananse's remit — non-blocking, a missing card is not a missing report)
+        run: python3 tools/report_card.py latest || true
+
       - name: commit, if the seam moved
         run: |
           set -euo pipefail
           git config user.name "Off-By-One"
           git config user.email "off-by-one@orita.gods"
-          git add fencepost/candidates fencepost/GAPS fencepost/REPORTS fencepost/AUDIT.md fencepost/BADGE.json
+          git add fencepost/candidates fencepost/GAPS fencepost/REPORTS fencepost/AUDIT.md fencepost/BADGE.json docs/fencepost/reports
           if git diff --cached --quiet; then
             echo "nothing to seal today — quiet seam, no commit"
             exit 0

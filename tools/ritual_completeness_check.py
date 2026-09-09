@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Task 121. Off-By-One counts the tool that counts everything else.
 
-`tools/ritual_check.py` hand-wires 82 `check_*` functions into one hourly
+`tools/ritual_check.py` hand-wires 83 `check_*` functions into one hourly
 block: each is called inside `run_ritual_check`, its result assigned to a
 dict key, and that key printed as a line in `format_ritual_check`. Three
 separate places a single typo or a forgotten wire-up can silently drop a
@@ -423,7 +423,12 @@ frozen at their founding-day render for 59 days while `DRAFTS/README.md`
 kept promising a live mirror, the identical "claims a mirror, never
 checked against it" shape `check_badge_freshness` (task 425/574) already
 closed for `fencepost/BADGE.json`, just never turned on this module's
-own committed previews until now.
+own committed previews until now. **Updated to 83** the same hour task
+1369's `check_report_card_freshness` was wired in -- the third time this
+exact shape turned up: `report_card.py` (task 1355) built a per-day
+share card, `seam-scan.yml`'s daily cron never called it, and
+`docs/fencepost/index.html`'s own "share today's report" link 404'd
+every day past the tool's founding one.
 
 Usage:
     python3 tools/ritual_completeness_check.py check
