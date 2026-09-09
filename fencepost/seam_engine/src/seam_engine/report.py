@@ -495,6 +495,38 @@ _MOVE_RULES: tuple[tuple[str, str], ...] = (
         "as its blocker, which already",
         "Revisit it yourself — the blocker it named already cleared. Fencepost only found the seam; it does not cross it.",
     ),
+    # Task 1357 (retrya, own-remit sweep of The One Action, Left to You):
+    # walked all 103 real recipes' own fixture-generated primary gap through
+    # `suggest_move` live (the same sweep 537/550/557/586/605/708/775/914/949
+    # already established). 18 fall to `_DEFAULT_MOVE` today; 17 are genuine
+    # closes, confirmed by name against the same `*-still-open`/duplicate
+    # shapes 914's own docstring already accounts for. The 18th,
+    # `issue-body-claims-unmerged-pr` (the ninety-seventh recipe, the PR-side
+    # twin of `issue-body-claims-unfixed-issue`), is not: its real headline
+    # reads "Issue #{n} claims #{n2} closed, but #{n2} is still open,
+    # unmerged" — the identical "claims something is done that isn't" shape
+    # its own issue-side sibling already gets right ("Issue #{n} claims
+    # #{n2} fixed, but #{n2} is still open" -> matches the "fixed, but"
+    # needle above), but phrased "closed, but" for a PR target instead of
+    # "fixed, but" for an issue target, so it never matched either existing
+    # "shipped, but"/"fixed, but" needle and fell through to "Close it
+    # yourself" -- wrong for the same reason 914 named: the false claim is
+    # what needs fixing, there is nothing on record to close. Confirmed live
+    # pre-fix: `suggest_move` on this recipe's own real fixture gap returned
+    # `_DEFAULT_MOVE`. Keyed on "is still open, unmerged" rather than a bare
+    # "closed, but" -- grep-confirmed that three OTHER recipes'
+    # (`issue-closed-never-released`, `milestone-closed-never-released`,
+    # `milestone-closed-not-tweeted`) real headline templates also contain
+    # "closed, but", each already matched correctly by an earlier, more
+    # specific needle in this same tuple (first match wins) -- a bare
+    # "closed, but" needle placed here would never reach any of the three
+    # ahead of it, but the narrower phrase is the honest fix regardless of
+    # order, and "is still open, unmerged" is grep-confirmed to appear in no
+    # other recipe's headline template tree-wide.
+    (
+        "is still open, unmerged",
+        "Finish it, or correct the claim yourself — the record says something is done that isn't. Fencepost only found the seam; it does not cross it.",
+    ),
 )
 _DEFAULT_MOVE = (
     "Close it yourself, however it's meant to be closed. Fencepost only found the seam; it does not cross it."

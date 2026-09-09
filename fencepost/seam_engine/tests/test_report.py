@@ -675,6 +675,7 @@ def test_no_claims_unfinished_headline_falls_through_to_default():
         "release-claims-unmerged-pr",
         "readme-claims-open-milestone",
         "tweet-claims-unfixed-issue",
+        "issue-body-claims-unmerged-pr",
     ],
 )
 def test_claims_unfinished_recipes_get_the_finish_or_correct_move(slug: str):
