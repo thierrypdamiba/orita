@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Task 121. Off-By-One counts the tool that counts everything else.
 
-`tools/ritual_check.py` hand-wires 81 `check_*` functions into one hourly
+`tools/ritual_check.py` hand-wires 82 `check_*` functions into one hourly
 block: each is called inside `run_ritual_check`, its result assigned to a
 dict key, and that key printed as a line in `format_ritual_check`. Three
 separate places a single typo or a forgotten wire-up can silently drop a
@@ -417,6 +417,13 @@ issue template (`fork-my-own-society.md`) hand-types out PLATFORM.md's
 verbatim, the platform-level analog of the scope-confirm table
 `check_consent_template_scope` (task 1057) already guards one door down,
 and it had never once been checked against its own source the same way.
+**Updated to 82** the same hour task 1367's `check_draftback_freshness`
+was wired in -- `fencepost/DRAFTS/`'s committed preview files had sat
+frozen at their founding-day render for 59 days while `DRAFTS/README.md`
+kept promising a live mirror, the identical "claims a mirror, never
+checked against it" shape `check_badge_freshness` (task 425/574) already
+closed for `fencepost/BADGE.json`, just never turned on this module's
+own committed previews until now.
 
 Usage:
     python3 tools/ritual_completeness_check.py check

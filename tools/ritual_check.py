@@ -490,6 +490,12 @@ def _badge_freshness_check() -> ModuleType:
     return _load_once("_ritual_badge_freshness_check", os.path.join(ROOT, "tools", "badge_freshness_check.py"))
 
 
+def _draftback_freshness_check() -> ModuleType:
+    return _load_once(
+        "_ritual_draftback_freshness_check", os.path.join(ROOT, "tools", "draftback_freshness_check.py")
+    )
+
+
 def _recipe_readme_check() -> ModuleType:
     return _load_once("_ritual_recipe_readme_check", os.path.join(ROOT, "tools", "recipe_readme_check.py"))
 
@@ -2436,6 +2442,28 @@ def check_badge_freshness(badge_path: str | None = None) -> dict[str, object]:
     return cast(dict[str, object], mod.check_badge_freshness(**kwargs))
 
 
+def check_draftback_freshness(drafts_dir: str | None = None) -> dict[str, object]:
+    """Task 1367: fold draftback_freshness_check.py's own live-recompute-vs-
+    committed-preview cross-check into the one block. `seam-scan.yml`'s
+    daily cron reseals the Ledger, rewrites the Report, reruns the audit,
+    and repaints the badge -- but never once calls `draftback.py`, so
+    `fencepost/DRAFTS/`'s committed previews had sat frozen at their
+    2026-07-12 founding-day render for 59 days, silently breaking
+    `DRAFTS/README.md`'s own present-tense promise ("read, byte for byte,
+    what the draft-back will say"). Unlike `check_badge_freshness`, the
+    live half here has no external dependency to go missing -- `ledger`
+    and `draftback` are both pure-Python, internal-only modules -- so
+    `status: "unavailable"` only ever means a genuinely empty ledger, not
+    an environment gap. Never edits anything; a real drift is a
+    god-on-duty escalation (regenerate via the CLI, commit the fresh
+    bytes), not something this check silently repairs."""
+    mod = _draftback_freshness_check()
+    kwargs = {}
+    if drafts_dir is not None:
+        kwargs["drafts_dir"] = drafts_dir
+    return cast(dict[str, object], mod.check_draftback_freshness(**kwargs))
+
+
 def check_recipe_readme(readme_path: str | None = None, recipe_fencepost_root: str | None = None) -> dict[str, object]:
     """Task 426: fold `recipe_readme_check.py`'s own two-way cross-check of
     `fencepost/README.md`'s Community recipes section against the live
@@ -2708,6 +2736,7 @@ def run_ritual_check(
     proclamation_count_readme_path: str | None = None,
     proclamation_count_proclamations_dir: str | None = None,
     badge_path: str | None = None,
+    draftback_freshness_drafts_dir: str | None = None,
     recipe_readme_path: str | None = None,
     recipe_readme_fencepost_root: str | None = None,
     site_recipe_path: str | None = None,
@@ -2869,6 +2898,7 @@ def run_ritual_check(
         readme_path=proclamation_count_readme_path, proclamations_dir=proclamation_count_proclamations_dir
     )
     badge_freshness = check_badge_freshness(badge_path=badge_path)
+    draftback_freshness = check_draftback_freshness(drafts_dir=draftback_freshness_drafts_dir)
     recipe_readme = check_recipe_readme(
         readme_path=recipe_readme_path, recipe_fencepost_root=recipe_readme_fencepost_root
     )
@@ -2948,6 +2978,7 @@ def run_ritual_check(
         or (not chronicle_readme["clean"])
         or (not proclamation_count["clean"])
         or (not badge_freshness["clean"])
+        or (not draftback_freshness["clean"])
         or (not recipe_readme["clean"])
         or (not site_recipe_readme["clean"])
         or (not recipe_commands["clean"])
@@ -3035,6 +3066,7 @@ def run_ritual_check(
         "chronicle_readme": chronicle_readme,
         "proclamation_count": proclamation_count,
         "badge_freshness": badge_freshness,
+        "draftback_freshness": draftback_freshness,
         "recipe_readme": recipe_readme,
         "site_recipe_readme": site_recipe_readme,
         "recipe_commands": recipe_commands,
@@ -3435,6 +3467,9 @@ def format_ritual_check(result: dict[str, Any]) -> str:
     lines.append("  " + _chronicle_readme_check().format_result(result["chronicle_readme"]))
     lines.append("  " + _proclamation_count_check().format_result(result["proclamation_count"]))
     lines.append("  " + _badge_freshness_check().format_badge_freshness(result["badge_freshness"]))
+    lines.append(
+        "  " + _draftback_freshness_check().format_draftback_freshness(result["draftback_freshness"])
+    )
     lines.append("  " + _recipe_readme_check().format_result(result["recipe_readme"]))
     lines.append("  " + _site_recipe_check().format_result(result["site_recipe_readme"]))
     lines.append("  " + _recipe_command_check().format_result(result["recipe_commands"]))
