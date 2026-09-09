@@ -792,6 +792,84 @@ def test_no_cleared_blocker_headline_falls_through_to_default():
     )
 
 
+# Task 1364 (retrya, own-remit sweep of The One Action, Left to You): every
+# guard above this line checks a NAMED family of slugs it already knows about
+# -- it asks "do these thirteen still get the right move", not "does anything
+# NEW fall to _DEFAULT_MOVE at all". Ten hours across this file's own history
+# (537/550/557/586/605/708/775/914/949/1357) each re-ran the same manual sweep
+# by hand -- walk every real recipe's own fixture gap through `suggest_move`
+# live, eyeball which ones hit `_DEFAULT_MOVE`, decide by reading the
+# recipe's own docstring whether "close it yourself" is honest for that
+# headline -- and each time, whatever fell through *unreviewed* only got
+# caught because a god happened to pick this remit and run the sweep again.
+# Nothing forces the sweep; a new recipe landing between sweeps with a wrong
+# default-fallthrough would ship silently and stay silent until the next one.
+#
+# Confirmed live, this hour, walking all 103 real recipes via
+# `discover_recipes`/`load_detector` (the exact method every prior sweep
+# used): exactly 17 fall to `_DEFAULT_MOVE` today, and all 17 are the
+# `*-still-open` family task 914's own docstring already named as genuine
+# closes (task 1357's own re-sweep confirmed the same 17 after fixing the
+# 18th). This test freezes that live-confirmed set as `_KNOWN_GENUINE_
+# DEFAULT_CLOSES` and asserts the sweep's result exactly matches it --
+# turning ten hours of manual, optional re-checking into one permanent,
+# unconditional CI guard, the same "construction-only assertion into a
+# running check" move Iron Rule #1 named for `vault_leak_check.py`. A future
+# 104th recipe whose fixture gap falls to `_DEFAULT_MOVE` now fails THIS
+# test immediately, by name, whether or not a god ever picks this remit
+# again -- read this test's own failure message, decide (as every prior
+# sweep did) whether the close is genuine or needs a `_MOVE_RULES` needle,
+# and only then add the slug to the frozen set below.
+_KNOWN_GENUINE_DEFAULT_CLOSES = frozenset(
+    {
+        "commit-closes-keyword-issue-still-open",
+        "commit-closes-keyword-pr-still-open",
+        "deleted-branch-pr-still-open",
+        "duplicate-issue-still-open",
+        "duplicate-milestone-still-open",
+        "duplicate-pr-still-open",
+        "issue-checklist-complete-still-open",
+        "issue-closed-pr-still-open",
+        "issue-closed-subissue-still-open",
+        "locked-resolved-issue-still-open",
+        "locked-resolved-pr-still-open",
+        "merged-pr-issue-still-open",
+        "merged-pr-pr-still-open",
+        "milestone-closed-issue-still-open",
+        "milestone-closed-pr-still-open",
+        "milestone-complete-still-open",
+        "overdue-milestone-still-open",
+    }
+)
+
+
+def test_default_move_fallthrough_is_a_closed_frozen_set():
+    from seam_engine.recipes import discover_recipes, load_detector
+
+    fencepost_root = Path(__file__).resolve().parents[2]
+    fell_to_default = set()
+    for manifest in discover_recipes(fencepost_root):
+        result = load_detector(manifest)()
+        gap = result.get("primary_gap") or (result.get("tail") or [None])[0]
+        if gap is None:
+            continue
+        move = report.suggest_move(gap)
+        if move == report._DEFAULT_MOVE:
+            fell_to_default.add(manifest.slug)
+    assert fell_to_default == _KNOWN_GENUINE_DEFAULT_CLOSES, (
+        f"the set of recipes whose real fixture gap falls to _DEFAULT_MOVE changed: "
+        f"new {fell_to_default - _KNOWN_GENUINE_DEFAULT_CLOSES or '{}'}, "
+        f"missing {_KNOWN_GENUINE_DEFAULT_CLOSES - fell_to_default or '{}'}. "
+        "A NEW slug here means an unreviewed recipe just started telling its reader "
+        "to close something -- read its own docstring (the same sweep 537/550/557/"
+        "586/605/708/775/914/949/1357 already ran by hand) and decide: genuinely a "
+        "close (add the slug to _KNOWN_GENUINE_DEFAULT_CLOSES above), or the wrong "
+        "verb (add a needle to report._MOVE_RULES instead, the same fix every prior "
+        "sweep applied). A MISSING slug means a genuine close started matching some "
+        "other needle by coincidence -- confirm the new move is still honest for it."
+    )
+
+
 @pytest.mark.parametrize(
     "slug,expected_phrase",
     [
