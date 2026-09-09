@@ -70,6 +70,27 @@ class TestChecklistTargets:
             (" ", "1"), ("x", "2"), ("X", "3"),
         ]
 
+    def test_extracts_a_reference_with_a_label_in_front_of_it(self) -> None:
+        # Task 1359: the original grammar required "#N" immediately after
+        # the checkbox mark and silently dropped a real, labeled task-list
+        # item -- a common GitHub shape, not an edge case.
+        assert checklist_targets("- [ ] Fix the login bug #12\n") == [12]
+
+    def test_extracts_a_reference_after_a_label_and_colon(self) -> None:
+        assert checklist_targets("- [ ] Sub-task: #12\n") == [12]
+
+    def test_extracts_a_reference_followed_by_trailing_text(self) -> None:
+        assert checklist_targets("- [x] #12 done\n") == [12]
+
+    def test_excludes_a_cross_repo_reference_even_with_a_checkbox(self) -> None:
+        # Widening the line-level match must not start treating a
+        # different repo's own number space as a same-repo target --
+        # references.REF_RE's negative lookbehind still governs this.
+        assert checklist_targets("- [ ] owner/repo#12\n") == []
+
+    def test_extracts_two_references_named_on_one_checklist_line(self) -> None:
+        assert checklist_targets("- [ ] Fix #12 before #13\n") == [12, 13]
+
 
 class TestBothDetectorsShareTheLaw:
     """The regression test -- see module docstring."""
