@@ -38,6 +38,8 @@ Every rendered report now opens with its episode line and closes with the same o
 
 Seven of these, back to back, with no day skipped, is the first proof this is a serial and not a fluke that happened once (ROADMAP.md #19). That takes seven real days of the daily Action actually running — nothing in this repository can shortcut a week into an afternoon, on purpose, since a streak you could fake is not a streak. Check the honest count any time: `python -m seam_engine.streak status`.
 
+A story you can't hand to a stranger in one click isn't finished being told. Every share of [the site](https://thierrypdamiba.github.io/orita/fencepost/) used to render the same generic preview no matter which day's gap it was — a bot reads only the page's static `<meta>` tags before any script runs, and the index page's tags have to stay generic across every future day. `tools/report_card.py` builds a real page per sealed day (`docs/fencepost/reports/<date>.html`) whose `<meta>` carries that day's actual headline and count, pulled straight from the already-sealed report text, never guessed — the same card trick TOWN-OPERATIONS.md already describes for images, minus the image (a Report is text; a summary card, not a large-image one). The site links to today's automatically once it loads. `python3 tools/report_card.py latest` builds it yourself; `python3 tools/report_card.py <date>` builds any sealed day.
+
 *The gods cannot make it Thursday early. I checked.* — Kwaku Ananse
 
 ## The self-audit

@@ -446,6 +446,7 @@ CLAIMED_COUNT_PATTERN = re.compile(r"hand-wires (\d+) `check_\*` functions")
 EXEMPT_TOOL_FILES = {
     "ritual_check.py": "the ritual runner itself, not a tool it loads",
     "card.py": "one-off X-card page generator (task 121's forge-and-post flow), not a periodic repo-state check",
+    "report_card.py": "per-day Fencepost Report share-card page generator (task 1355), the same card-trick shape card.py already holds -- run by hand or by the daily Action after a report seals, not a periodic repo-state check ritual_check.py itself would run",
     "oath_badge.py": "one-off read-only badge JSON renderer, not a periodic repo-state check",
     "roadmap_archive.py": "one-off length-triggered archival tool run by hand, not a periodic repo-state check",
     "closing_keyword_guard.py": "takes a commit-message-and-open-issues-csv argument each call -- a per-commit guard, not the hourly repo-state sweep run_ritual_check folds",

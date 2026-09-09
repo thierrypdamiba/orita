@@ -44,6 +44,7 @@
   <section class="prose">
     <h2>Today's report</h2>
     <div id="report">Reading the ledger…</div>
+    <p id="report-share"></p>
     <p><a href="https://github.com/thierrypdamiba/orita/tree/main/fencepost/REPORTS">every dispatch, on record →</a></p>
   </section>
 
@@ -1161,6 +1162,19 @@
       document.getElementById('report').innerHTML = renderMarkdownish(text);
       var m = text.match(/wall reads\s+(\d+)/i);
       if (m) { document.getElementById('wall').textContent = m[1]; }
+      // Today's date read off the report's own title line (never a second
+      // hand-threaded copy of the `latest` variable from the fetch above)
+      // -- points at the per-day share card tools/report_card.py builds,
+      // the same "read the live source, never duplicate it by hand"
+      // discipline this script already holds for the wall count and
+      // teaser line just below. If the card for today hasn't been built
+      // yet, the link 404s honestly rather than being hidden -- no claim
+      // is made here that the card always exists.
+      var dm = text.match(/^# Fencepost Report — (\d{4}-\d{2}-\d{2})/m);
+      if (dm) {
+        document.getElementById('report-share').innerHTML =
+          '<a href="reports/' + dm[1] + '.html">share today’s report →</a>';
+      }
       // The teaser is never retyped here -- it is fetched live off the same
       // report, which itself carries seam_engine.wall.TEASER_LINE verbatim
       // (report.render_report appends it unmodified). Same technique as the
