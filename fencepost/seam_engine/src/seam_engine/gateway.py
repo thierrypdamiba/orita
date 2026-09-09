@@ -284,7 +284,62 @@ def _verb_pattern(verb: str) -> str:
     suffix, e.g. "er"/"ers" for "send") excludes only a match that
     terminates there -- "sending"/"sends"/"sent" (real conjugations) still
     match every bit as before; only the standalone noun itself is excluded.
-    No verb without an entry in `_NON_VERB_FORMS` is affected at all."""
+    No verb without an entry in `_NON_VERB_FORMS` is affected at all.
+
+    Task 1358 (Ogun): task 709's own docstring above (last paragraph) claimed
+    "No verb without an entry in `_NON_VERB_FORMS` is affected at all" as
+    if that were reassurance rather than an open question -- it names what
+    the fix does, not whether any OTHER `_WRITE_VERBS` entry needed the
+    same fix. Nothing had ever swept the rest of the vocabulary; the "send"
+    fix was true by construction but never shown to be the only case. It
+    was not. Live, by-hand testing of one plausible agent-noun sentence per
+    verb found the identical bare-prefix collision on twelve more of the
+    seventeen `_WRITE_VERBS` -- every one of them a real, unremarkable
+    English word, not a strained coinage:
+
+    ```
+    is_read_only_capabilities("Read the list of shareholders on record.")            # share  -> shareholder(s)
+    is_read_only_capabilities("Read every poster pinned to the community board.")     # post   -> poster(s)
+    is_read_only_capabilities("Read a summary of the corporate merger.")              # merge  -> merger(s)
+    is_read_only_capabilities("Read the updater bundled with the release assets.")    # update -> updater(s)
+    is_read_only_capabilities("Read the deleter role assigned to the account.")       # delete -> deleter(s)
+    is_read_only_capabilities("Read the writer field of every commit.")               # write  -> writer(s)
+    is_read_only_capabilities("Read the stain remover instructions on the label.")    # remove -> remover(s)
+    is_read_only_capabilities("Read the labeler configuration used by the pipeline.") # label  -> labeler(s)
+    is_read_only_capabilities("Read the drafter named on the legal document.")        # draft  -> drafter(s)
+    is_read_only_capabilities("Read the inviter listed on the calendar event.")       # invite -> inviter(s)
+    is_read_only_capabilities("Read the revoker named in the access log.")            # revoke -> revoker(s)
+    is_read_only_capabilities("Read the publisher of the latest release.")            # publish -> publisher(s)
+    ```
+
+    Every one of these returned `False` pre-fix -- twelve more genuinely
+    read-only sentences wrongly judged as write asks, on top of the one
+    "send" already fixed. "Publisher" is the most concretely live of the
+    twelve: `GetLatestRelease`/`ListReleases` (both already in
+    `REQUIRED_SCOPES["github"]`) read exactly the kind of release metadata
+    a real capabilities string would naturally describe as "the publisher
+    of a release" -- the same "the day that wording lands in
+    `READ_ONLY_CAPABILITIES` itself" argument task 709 made for "sender".
+    `create`, `reply`, `modify`, and `trash` were checked and correctly
+    left alone: "creator"/"replier"/"modifier" are not literal prefix
+    matches of their verbs at all (the consonant-y swap and the
+    non-suffix "-or" spelling of "creator" both break the prefix, the same
+    reason `_IRREGULAR_FORMS` already had to name `reply`/`modify`
+    separately for the PAST-TENSE direction), and "trasher" is not an
+    established English word the way the other twelve are, so adding it
+    would be guessing at a collision nobody would ever actually type --
+    exactly the guessing the comment above `_NON_VERB_FORMS` already warns
+    against. The twelve real ones are added below, each carrying its own
+    negative-control test (`tests/test_gateway.py`) proving the fix is
+    exactly as narrow as "send"'s was: every genuine conjugation of all
+    twelve verbs still fails the law precisely as before.
+
+    The comment above `_NON_VERB_FORMS` claiming "most `_WRITE_VERBS` have
+    no real agent-noun collision at all" was itself an unverified
+    assertion of exactly the kind this town's own doctrine keeps catching
+    elsewhere -- twelve out of seventeen is not "most... have none"; it is
+    the opposite. Corrected in the same commit as this fix, not left to
+    mislead the next reader."""
     extra = _IRREGULAR_FORMS.get(verb, ())
     excluded = _NON_VERB_FORMS.get(verb, ())
     if excluded:
@@ -327,15 +382,32 @@ _IRREGULAR_FORMS: dict[str, tuple[str, ...]] = {
 # `verb + r"\w*"` would otherwise match but which are NOT a conjugation of
 # `verb` at all -- an agent noun ("one who [verb]s") that only happens to
 # share the verb as a literal prefix. See `_verb_pattern`'s own docstring
-# (task 709) for the live repro. Named explicitly, one verb at a time, the
-# same "Add a verb here only when a real ... case genuinely needs it"
-# discipline `recipes._PLURAL_NOUN_VERBS` already holds for the identical
-# shape of exception on `recipes.py`'s own independent oath gate -- not a
-# blanket suffix rule, since most _WRITE_VERBS have no real agent-noun
-# collision at all and a rule that excluded "-er"/"-or" endings everywhere
-# would be guessing at words nobody has ever actually hit.
+# (tasks 709, 1358) for the live repro of each entry below. Named
+# explicitly, one verb at a time, the same "Add a verb here only when a
+# real ... case genuinely needs it" discipline `recipes._PLURAL_NOUN_VERBS`
+# already holds for the identical shape of exception on `recipes.py`'s own
+# independent oath gate -- not a blanket suffix rule (English productively
+# forms "-er" agent nouns from almost any verb; a rule that excluded every
+# such ending everywhere would be guessing at words nobody has typed), but
+# NOT a rare shape either: task 1358's own sweep of the full `_WRITE_VERBS`
+# vocabulary found this exact collision on twelve of seventeen verbs, only
+# `create`/`reply`/`modify`/`trash` genuinely needing no entry (see the
+# docstring above for why each of those four is different in kind, not
+# merely unchecked).
 _NON_VERB_FORMS: dict[str, tuple[str, ...]] = {
     "send": ("sender", "senders"),
+    "share": ("shareholder", "shareholders"),
+    "post": ("poster", "posters"),
+    "merge": ("merger", "mergers"),
+    "update": ("updater", "updaters"),
+    "delete": ("deleter", "deleters"),
+    "write": ("writer", "writers"),
+    "remove": ("remover", "removers"),
+    "label": ("labeler", "labelers"),
+    "draft": ("drafter", "drafters"),
+    "invite": ("inviter", "inviters"),
+    "revoke": ("revoker", "revokers"),
+    "publish": ("publisher", "publishers"),
 }
 
 

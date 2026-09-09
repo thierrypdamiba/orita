@@ -21,6 +21,7 @@ from seam_engine.consent import REQUIRED_SCOPES
 from seam_engine.gateway import (
     READ_ONLY_CAPABILITIES,
     _IRREGULAR_FORMS,
+    _NON_VERB_FORMS,
     _WRITE_VERBS,
     gateway_url,
     is_read_only_capabilities,
@@ -363,6 +364,72 @@ def test_the_send_agent_noun_is_not_mistaken_for_the_verb(text: str):
 )
 def test_the_send_agent_noun_fix_does_not_narrow_real_send_detection(text: str):
     assert not is_read_only_capabilities(text)
+
+
+# Task 1358 (Ogun): task 709 fixed exactly one verb ("send") for the
+# agent-noun false-positive, and every test above it named "send" by hand.
+# Nothing ever swept the rest of `_WRITE_VERBS` for the identical
+# collision -- a by-hand sentence per verb found the same bare-prefix
+# false positive on twelve more real English words (shareholder, poster,
+# merger, updater, deleter, writer, remover, labeler, drafter, inviter,
+# revoker, publisher). Fixed by adding all twelve to `_NON_VERB_FORMS`
+# alongside "send"; this table names one genuinely read-only sentence per
+# verb, keyed by the exact noun that used to false-positive, so this test
+# (unlike the hand-picked `test_the_send_agent_noun_*` pair above) is
+# data-driven off `_NON_VERB_FORMS` itself -- a future verb added there
+# with no matching entry here fails immediately with a clear message,
+# instead of silently shipping an unverified exception the way "send"'s
+# own fix went twelve verbs uncompanioned for this long.
+_AGENT_NOUN_SENTENCES: dict[str, str] = {
+    "send": "Read the sender field of every email in the connected inbox.",
+    "share": "Read the list of shareholders on record.",
+    "post": "Read every poster pinned to the community board.",
+    "merge": "Read a summary of the corporate merger announced last quarter.",
+    "update": "Read the updater bundled with the release assets.",
+    "delete": "Read the deleter role assigned to the connected account.",
+    "write": "Read the writer field of every commit in the repository.",
+    "remove": "Read the remover tool listed in the toolkit catalog.",
+    "label": "Read the labeler configuration used by the data pipeline.",
+    "draft": "Read the drafter named on the legal document.",
+    "invite": "Read the inviter listed on the calendar event.",
+    "revoke": "Read the revoker named in the access log.",
+    "publish": "Read the publisher of the latest release.",
+}
+
+
+def test_every_non_verb_forms_entry_has_a_covering_agent_noun_sentence():
+    # Structural guard, the fail-closed mirror of task 894's
+    # `test_every_write_verb_and_its_productive_forms_fail_the_law`: proves
+    # this test file cannot silently fall behind `_NON_VERB_FORMS` itself.
+    assert set(_AGENT_NOUN_SENTENCES) == set(_NON_VERB_FORMS)
+
+
+@pytest.mark.parametrize("verb", sorted(_AGENT_NOUN_SENTENCES))
+def test_the_agent_noun_is_not_mistaken_for_the_verb(verb: str):
+    text = _AGENT_NOUN_SENTENCES[verb]
+    assert is_read_only_capabilities(text), (
+        f"{text!r} names no write ask at all -- only the agent noun for "
+        f"{verb!r} -- but was judged unsafe"
+    )
+    for excluded_form in _NON_VERB_FORMS[verb]:
+        assert is_read_only_capabilities(excluded_form), (
+            f"the bare excluded word {excluded_form!r} for verb {verb!r} "
+            "must read as safe on its own too"
+        )
+
+
+@pytest.mark.parametrize("verb", sorted(_AGENT_NOUN_SENTENCES))
+def test_the_agent_noun_fix_does_not_narrow_real_detection(verb: str):
+    # Every genuine conjugation of a verb with a `_NON_VERB_FORMS` entry
+    # must still fail the law exactly as before -- the fix excludes only
+    # the named whole words, never the verb's own real forms.
+    for form in (verb, verb + "s", _gerund(verb)):
+        text = f"The agent will {form} things on every connected account."
+        assert not is_read_only_capabilities(text), (
+            f"'{form}' (a real conjugation of write verb {verb!r}) was "
+            "judged read-only-safe after the agent-noun fix -- the fix "
+            "narrowed real detection, which it must never do"
+        )
 
 
 def _gerund(verb: str) -> str:
