@@ -42,12 +42,12 @@ is not yet a gap; past the window with still no match, it is.
 from __future__ import annotations
 
 import json
-import re
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from seam_engine.mention_number import number_mentioned
 from seam_engine.scan import GapCandidate
 
 _HERE = Path(__file__).resolve().parent
@@ -116,12 +116,11 @@ def load_tweets(path: Path | None = None) -> list[Tweet]:
 
 def _find_announcing_tweet(number: int, tweets: list[Tweet]) -> Tweet | None:
     # Digit-boundary match on both sides -- "#12" must not be considered
-    # mentioned by a tweet naming the unrelated, longer "#123", the same
-    # short-inside-long collision release-not-tweeted's own tag matcher (and
-    # merged-pr-not-tweeted's own numeral-form copy) already guards against.
-    pattern = re.compile(r"(?<!\d)#" + re.escape(str(number)) + r"(?!\d)")
+    # mentioned by a tweet naming the unrelated, longer "#123". Shared with
+    # merged-pr-not-tweeted's own identical seam via seam_engine.mention_
+    # number (task 1362) rather than each retyping the same pattern.
     for tweet in tweets:
-        if pattern.search(tweet.text):
+        if number_mentioned(tweet.text, number):
             return tweet
     return None
 
