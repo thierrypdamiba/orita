@@ -8,6 +8,7 @@ fixture/live-sweep shape for the identical `fencepost/REPORTS/` directory.
 """
 from __future__ import annotations
 
+import glob
 import importlib.util
 import os
 import sys
@@ -475,9 +476,20 @@ class LiveRealDraftsSweepCase(unittest.TestCase):
     invariant this checker exists to enforce."""
 
     def test_real_drafts_directory_is_clean(self):
+        # `checked` grows every time `draftback.py --write` regenerates a
+        # channel's preview for a new date (task 1367: DRAFTS/ moved from
+        # its founding-day 2 files to 4 once the 2026-07-12 pair got a
+        # 2026-09-09 sibling) -- a hardcoded literal here would go stale
+        # the same way DRAFTS/ itself did before draftback_freshness_check.py
+        # existed. Derive the expectation from the real directory instead
+        # of re-typing a number that changes underneath this test.
+        expected = len(
+            [p for p in glob.glob(os.path.join(src.DEFAULT_DRAFTS_DIR, "*.md")) if os.path.basename(p) != "README.md"]
+        )
         result = src.check_draft_one_action_invariant()
         self.assertTrue(result["clean"], result["reason"])
-        self.assertEqual(result["checked"], 2)
+        self.assertEqual(result["checked"], expected)
+        self.assertGreaterEqual(result["checked"], 2)
 
     def test_default_drafts_dir_points_at_the_real_directory(self):
         self.assertTrue(src.DEFAULT_DRAFTS_DIR.endswith(os.path.join("fencepost", "DRAFTS")))
