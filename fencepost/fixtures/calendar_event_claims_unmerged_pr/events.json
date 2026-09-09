@@ -1,0 +1,37 @@
+[
+  {
+    "id": "EVT-4201",
+    "title": "Wall counter formatting review",
+    "description": "quick sync -- ships #601 finally, and via #601 again for good measure",
+    "organizer": "quiet-shipper@orita.gods",
+    "start": "2026-08-05T10:00:00Z"
+  },
+  {
+    "id": "EVT-4202",
+    "title": "ledger rebasing status",
+    "description": "heard this merges #603, nice fix",
+    "organizer": "town-crier@orita.gods",
+    "start": "2026-08-07T08:00:00Z"
+  },
+  {
+    "id": "EVT-4203",
+    "title": "Re: onboarding copy pass",
+    "description": "includes #602, thanks for confirming",
+    "organizer": "helpful-mod@orita.gods",
+    "start": "2026-08-05T09:00:00Z"
+  },
+  {
+    "id": "EVT-4204",
+    "title": "quick question",
+    "description": "ships #999 today right? guess it landed while nobody was watching",
+    "organizer": "confused-newcomer@orita.gods",
+    "start": "2026-08-05T09:30:00Z"
+  },
+  {
+    "id": "EVT-4205",
+    "title": "weekly digest sync",
+    "description": "another quiet week for the town -- see #605 for background, nothing shipped to claim here",
+    "organizer": "quiet-watcher@orita.gods",
+    "start": "2026-08-05T10:00:00Z"
+  }
+]

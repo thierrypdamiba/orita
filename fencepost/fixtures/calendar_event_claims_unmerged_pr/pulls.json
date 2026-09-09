@@ -1,0 +1,23 @@
+[
+  {
+    "number": 601,
+    "title": "Wall counter formatting fix",
+    "state": "open",
+    "merged": false,
+    "url": "https://github.com/thierrypdamiba/orita/pull/601"
+  },
+  {
+    "number": 602,
+    "title": "Onboarding walkthrough copy pass",
+    "state": "closed",
+    "merged": true,
+    "url": "https://github.com/thierrypdamiba/orita/pull/602"
+  },
+  {
+    "number": 603,
+    "title": "Ledger seq rebasing helper",
+    "state": "open",
+    "merged": false,
+    "url": "https://github.com/thierrypdamiba/orita/pull/603"
+  }
+]

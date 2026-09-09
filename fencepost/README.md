@@ -1966,6 +1966,33 @@ cleared on `SCOPES.md`'s oath table; `ListEvents` is the same scope
 asked for anywhere in this recipe, though zero Google Calendar tools are
 exposed on the-hand gateway today.
 
+[`RECIPES/calendar-event-claims-unmerged-pr/`](RECIPES/calendar-event-claims-unmerged-pr/)
+is the hundred-third (ROADMAP.md #1353), the second leg the Calendar
+toolkit's own `claims-X` grid has grown: the recipe above watches a
+closing-keyword claim against the issue tracker, this one watches a
+`ships`/`includes`/`merges`/`via #N` claim against the PR tracker — two
+separate GitHub number spaces, two separate claim grammars. The
+Calendar-side twin of `mention-claims-unmerged-pr`,
+`slack-message-claims-unmerged-pr`, and `linear-comment-claims-unmerged-pr`:
+a calendar event's own title or description claims a pull request
+shipped, but the named PR is not actually merged. Reuses
+`seam_engine.pr_claims.claimed_pr_numbers` verbatim — the same shared
+grammar every `claims-unmerged-pr` sibling already imports. Confidence
+holds `calendar-event-claims-unfixed-issue`'s own 0.85/0.5 age-gated bar
+exactly, keyed off the event's own `start` time — not an independently
+re-reasoned number just because the target changed from an issue to a
+PR. A claimed PR that doesn't exist at all is excluded, named not hidden
+— that broken reference is a future calendar-side dangling-reference
+recipe's own seam, not this one's; a claimed PR that IS merged is
+excluded too, the claim was simply true. Toolkit is
+`google_calendar+github`, so both the total recipe count and the
+plus-joined count climb together (34 of 102 → 35 of 103, the third
+recipe to pair GitHub with Google Calendar). `ListPullRequests` was
+already cleared on `SCOPES.md`'s oath table; `ListEvents` is the same
+scope `calendar-event-claims-unfixed-issue` already asks for — no new
+scope asked for anywhere in this recipe, though zero Google Calendar
+tools are exposed on the-hand gateway today.
+
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)
 (ROADMAP.md #111) is that second promise, kept: it runs `scan.py`'s own
