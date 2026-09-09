@@ -19,7 +19,7 @@ from pathlib import Path
 
 import pytest
 
-from seam_engine import draftback
+from seam_engine import draftback, report
 
 FIXTURE_SEALED_WITH_GAP: dict = {
     "date": "2026-07-12",
@@ -116,6 +116,54 @@ def test_render_notion_page_never_shows_the_coincidence_tail():
     page = draftback.render_notion_page(FIXTURE_SEALED_WITH_GAP)
     text = "\n".join(b.text for b in page.blocks)
     assert "commit-burst" not in text
+
+
+# --- task 1360: the Notion page must not drift from the public Report ------
+#
+# Confirmed live pre-fix: `render_notion_page` re-implemented `render_report`'s
+# primary-gap section by hand instead of reusing it the way `render_email_draft`
+# does, and had drifted on three counts -- unlabeled, uncapped evidence links,
+# and two missing mandatory blocks (`wall.TEASER_LINE`, `report.CONNECT_YOUR_OWN`).
+# See `render_notion_page`'s own docstring for the full live repro.
+
+
+def test_render_notion_page_labels_evidence_links_like_the_report_does():
+    page = draftback.render_notion_page(FIXTURE_SEALED_WITH_GAP)
+    bullets = [b.text for b in page.blocks if b.kind == "bulleted_list_item"]
+    assert bullets == ["[v0.3](https://github.com/thierrypdamiba/orita/releases/tag/v0.3)"]
+
+
+def test_render_notion_page_caps_evidence_at_the_same_limit_the_report_uses():
+    sealed = {
+        **FIXTURE_SEALED_WITH_GAP,
+        "primary_gap": {
+            **FIXTURE_SEALED_WITH_GAP["primary_gap"],
+            "evidence": [f"https://github.com/thierrypdamiba/orita/issues/{n}" for n in range(1, 6)],
+        },
+    }
+    page = draftback.render_notion_page(sealed)
+    bullets = [b for b in page.blocks if b.kind == "bulleted_list_item"]
+    assert len(bullets) == report.EVIDENCE_LIMIT == 3
+
+
+def test_render_notion_page_carries_the_wall_teaser_line():
+    page = draftback.render_notion_page(FIXTURE_SEALED_WITH_GAP)
+    assert any(b.text == report.TEASER_LINE for b in page.blocks)
+
+
+def test_render_notion_page_carries_the_connect_your_own_ad():
+    page = draftback.render_notion_page(FIXTURE_SEALED_WITH_GAP)
+    assert any(b.text == report.CONNECT_YOUR_OWN for b in page.blocks)
+
+
+def test_render_notion_page_never_shows_the_coincidence_tail_via_the_wall_or_move_blocks():
+    # The two new blocks (teaser, connect-your-own) are report.py constants,
+    # not derived from `sealed` -- confirm neither can carry tail content for
+    # a differently-shaped record.
+    page = draftback.render_notion_page(FIXTURE_SEALED_WITH_GAP)
+    text = "\n".join(b.text for b in page.blocks)
+    assert text.count(report.CONNECT_YOUR_OWN) == 1
+    assert text.count(report.TEASER_LINE) == 1
 
 
 # --- a draft is never addressed anywhere but the caller's own account ------

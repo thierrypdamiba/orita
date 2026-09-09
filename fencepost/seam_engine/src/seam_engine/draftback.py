@@ -78,6 +78,7 @@ from pathlib import Path
 from typing import Any, Callable
 
 from seam_engine import ledger, report
+from seam_engine.wall import TEASER_LINE
 from seam_engine.wall import wall_for
 
 # fencepost/  (…/fencepost/seam_engine/src/seam_engine/draftback.py → parents[3])
@@ -179,6 +180,45 @@ def render_notion_page(sealed: dict[str, Any]) -> NotionPageDraft:
     a plain, adapter-agnostic shape (`NotionBlock`) — a caller's live adapter
     is responsible for turning these into the real Notion API's block JSON,
     keeping this module free of any Notion SDK or network dependency.
+
+    Task 1360 (nisaba, own-remit sweep of The Ledger & the Scribe's Voice):
+    this function re-implements `report.render_report`'s own primary-gap
+    section by hand instead of reusing it (`render_email_draft` above DOES
+    reuse `render_report` for its body, "so the draft and the public
+    dispatch never drift into two different tellings of the same day" — this
+    module's own docstring, point-blank). The Notion path never got that
+    reuse, and had drifted on three counts, confirmed live before this fix
+    by rendering both a report and a Notion page off the identical sealed
+    record and diffing them field by field:
+      1. Every evidence URL was emitted as a raw, unlabeled
+         `bulleted_list_item` (`https://github.com/.../commit/abc123...`)
+         instead of the short `[tail](url)` label
+         `ledger.evidence_url_tail` + `report._fmt_evidence` already render
+         for the same evidence in the public Report and the Ledger tablet
+         itself — a materially less legible artifact for the exact promise
+         STRATEGY.md makes for it ("one legible, timestamped artifact").
+      2. Evidence was unbounded — a gap carrying five evidence links showed
+         all five, where `report._fmt_evidence`'s own `limit=3` caps the
+         public Report to the "thirty-second read" this module's own
+         docstring quotes ("the reader came for the one thing, not the
+         ranking").
+      3. Two of the report's own mandatory blocks were simply absent:
+         `wall.TEASER_LINE` (ROADMAP.md #21, Off-By-One — "every report now
+         carries" it, imported everywhere the wall's arithmetic is shown so
+         the tease can never say something the count doesn't back) and
+         `report.CONNECT_YOUR_OWN` (STRATEGY.md, "How stars are earned" —
+         "every report carries this line, gap or no gap... the CTA is never
+         'please star' — it is 'connect your own and we'll find yours'").
+         A reader whose morning artifact is a Notion page, rather than
+         email, was silently getting a page that broke both standing
+         promises — not a hypothetical, since STRATEGY.md names the Notion
+         page by name as one of the two intended delivery channels.
+    Fixed by importing the same formatting this module's own email path
+    already trusts (`ledger.evidence_url_tail`, `report.EVIDENCE_LIMIT`)
+    rather than retyping a fourth copy, and appending the two missing
+    blocks in the same order `render_report` renders them (count → teaser →
+    move → connect → the line → signature), so a future edit to either
+    line's wording only has to happen in `report.py` to reach both channels.
     """
     date = sealed.get("date") or sealed.get("generated_at", "")[:10]
     repo = sealed.get("repo", "unknown")
@@ -203,8 +243,8 @@ def render_notion_page(sealed: dict[str, Any]) -> NotionPageDraft:
         detail = (primary.get("detail") or "").strip()
         if detail:
             blocks.append(NotionBlock("paragraph", detail))
-        for ev in primary.get("evidence", []):
-            blocks.append(NotionBlock("bulleted_list_item", ev))
+        for ev in primary.get("evidence", [])[: report.EVIDENCE_LIMIT]:
+            blocks.append(NotionBlock("bulleted_list_item", f"[{ledger.evidence_url_tail(ev)}]({ev})"))
     elif has_contender:
         blocks.append(
             NotionBlock(
@@ -218,8 +258,11 @@ def render_notion_page(sealed: dict[str, Any]) -> NotionPageDraft:
 
     plural = "" if recorded == 1 else "s"
     blocks.append(NotionBlock("paragraph", f"{recorded} fencepost{plural} named to date. The wall reads {wall}."))
+    blocks.append(NotionBlock("paragraph", TEASER_LINE))
     blocks.append(NotionBlock("paragraph", f"Your move: {report.suggest_move(primary, has_contender=has_contender)}"))
+    blocks.append(NotionBlock("paragraph", report.CONNECT_YOUR_OWN))
     blocks.append(NotionBlock("paragraph", report.THE_LINE))
+    blocks.append(NotionBlock("paragraph", "Recorded. — Nisaba"))
 
     return NotionPageDraft(title=f"Fencepost — {date}", blocks=blocks)
 

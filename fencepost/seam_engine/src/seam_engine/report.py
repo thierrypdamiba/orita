@@ -627,7 +627,18 @@ def reports_dir(base: Path | None = None) -> Path:
     return (base if base is not None else _FENCEPOST_ROOT) / "REPORTS"
 
 
-def _fmt_evidence(urls: list[str], limit: int = 3) -> str:
+# How many evidence links a dispatch shows for the primary gap. The reader
+# came for the one thing, not the ranking that produced it (module
+# docstring) -- capped, not unbounded. Task 1360 (nisaba): promoted from a
+# bare default-parameter literal on `_fmt_evidence` to a named module
+# constant so `draftback.render_notion_page` (the other channel that must
+# never show the coincidence tail, or more evidence than the public Report
+# does) can import the same number instead of retyping `3` a second time
+# with nothing to keep the two in sync if this one is ever tuned.
+EVIDENCE_LIMIT = 3
+
+
+def _fmt_evidence(urls: list[str], limit: int = EVIDENCE_LIMIT) -> str:
     if not urls:
         return ""
     lines = []
