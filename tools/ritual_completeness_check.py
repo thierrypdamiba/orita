@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Task 121. Off-By-One counts the tool that counts everything else.
 
-`tools/ritual_check.py` hand-wires 80 `check_*` functions into one hourly
+`tools/ritual_check.py` hand-wires 81 `check_*` functions into one hourly
 block: each is called inside `run_ritual_check`, its result assigned to a
 dict key, and that key printed as a line in `format_ritual_check`. Three
 separate places a single typo or a forgotten wire-up can silently drop a
@@ -410,7 +410,13 @@ turned up spanning tasks 434-1304 the moment this task actually looked.
 `check_roadmap_row_shape` folds it in as informational only (does not
 flip `broken`, unlike its sibling `check_roadmap_buildlog_sync`) since
 thirty-five of the thirty-six predate the checker and cannot be honestly
-backfilled without inventing evidence no one witnessed.
+backfilled without inventing evidence no one witnessed. **Updated to 81**
+the same hour task 1356's `check_fork_gate` was wired in -- the fork-gate
+issue template (`fork-my-own-society.md`) hand-types out PLATFORM.md's
+"What is Orita's alone" content list for a forker to confirm back
+verbatim, the platform-level analog of the scope-confirm table
+`check_consent_template_scope` (task 1057) already guards one door down,
+and it had never once been checked against its own source the same way.
 
 Usage:
     python3 tools/ritual_completeness_check.py check
