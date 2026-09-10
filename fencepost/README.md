@@ -1997,6 +1997,35 @@ scope `calendar-event-claims-unfixed-issue` already asks for — no new
 scope asked for anywhere in this recipe, though zero Google Calendar
 tools are exposed on the-hand gateway today.
 
+[`RECIPES/calendar-event-claims-dangling-milestone/`](RECIPES/calendar-event-claims-dangling-milestone/)
+is the hundred-fourth (ROADMAP.md #1380), the thirteenth leg of the
+`claims-dangling-milestone` family (after commit, issue-body,
+issue-comment, linear-comment, mention, milestone, readme, release,
+review-comment, slack-message, tweet, and email), and the third leg the
+Calendar toolkit's own `claims-X` grid has grown: a calendar event's own
+title or description invokes a real `milestone #N` claim phrase, but no
+milestone with that number exists at all. Reuses
+`seam_engine.milestone_claims.claimed_milestone_numbers` verbatim — the
+same shared grammar every `claims-*-milestone` sibling already imports.
+Genuinely distinct from a future calendar-side dangling-reference
+recipe: milestones and issues/PRs are separate GitHub number spaces, and
+this recipe never opens `ListIssues` or `ListPullRequests` at all, only
+`ListMilestones`. Confidence is flat (0.8), not age-gated — mirrors
+every other `*-claims-dangling-milestone` sibling's own reasoning rather
+than the two Calendar recipes above's 24-hour age-gated 0.85/0.5 bar: a
+milestone number that does not exist right now will not spontaneously
+start existing later, so there is no grace period that means anything
+here. A claimed milestone that DOES resolve to a real milestone (open or
+closed) is excluded, named not hidden — whether that claim is true is a
+future `calendar-event-claims-open-milestone`'s own seam, not this
+one's. Toolkit is `google_calendar+github`, so both the total recipe
+count and the plus-joined count climb together (35 of 103 → 36 of 104,
+the fourth recipe to pair GitHub with Google Calendar). `ListMilestones`
+was already cleared on `SCOPES.md`'s oath table; `ListEvents` is the
+same scope both existing Calendar recipes already ask for — no new
+scope asked for anywhere in this recipe, though zero Google Calendar
+tools are exposed on the-hand gateway today.
+
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)
 (ROADMAP.md #111) is that second promise, kept: it runs `scan.py`'s own
