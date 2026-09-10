@@ -506,6 +506,12 @@ def _task_reference_check() -> ModuleType:
     return _load_once("_ritual_task_reference_check", os.path.join(ROOT, "tools", "task_reference_check.py"))
 
 
+def _x_silence_doctrine_check() -> ModuleType:
+    return _load_once(
+        "_ritual_x_silence_doctrine_check", os.path.join(ROOT, "tools", "x_silence_doctrine_check.py")
+    )
+
+
 def _recipe_readme_check() -> ModuleType:
     return _load_once("_ritual_recipe_readme_check", os.path.join(ROOT, "tools", "recipe_readme_check.py"))
 
@@ -2520,6 +2526,27 @@ def check_task_references(root: str | None = None) -> dict[str, object]:
     return cast(dict[str, object], mod.check_task_references(**kwargs))
 
 
+def check_x_silence_doctrine(readme_path: str | None = None, site_path: str | None = None) -> dict[str, object]:
+    """Task 1373: fold `x_silence_doctrine_check.py`'s own README/site
+    drift guard into the one block. @oritatown's change-gate policy
+    (STRATEGY.md's Growth notes: it posts only when the surfaced gap
+    changes or something new actually ships) means the account was always
+    going to look quiet most hours -- but that sentence lived only in a
+    strategy doc nobody visiting the site or README would open. A short,
+    byte-identical explanation now lives in both `fencepost/README.md` and
+    `docs/fencepost/index.html`; this check confirms neither copy has
+    drifted or been dropped. Never edits anything; a real DRIFTED hit is a
+    god-on-duty escalation (restore the missing/matching copy), not
+    something this check silently repairs."""
+    mod = _x_silence_doctrine_check()
+    kwargs = {}
+    if readme_path is not None:
+        kwargs["readme_path"] = readme_path
+    if site_path is not None:
+        kwargs["site_path"] = site_path
+    return cast(dict[str, object], mod.check_x_silence_doctrine(**kwargs))
+
+
 def check_recipe_readme(readme_path: str | None = None, recipe_fencepost_root: str | None = None) -> dict[str, object]:
     """Task 426: fold `recipe_readme_check.py`'s own two-way cross-check of
     `fencepost/README.md`'s Community recipes section against the live
@@ -2796,6 +2823,8 @@ def run_ritual_check(
     report_card_freshness_reports_dir: str | None = None,
     report_card_freshness_cards_dir: str | None = None,
     task_references_root: str | None = None,
+    x_silence_doctrine_readme_path: str | None = None,
+    x_silence_doctrine_site_path: str | None = None,
     recipe_readme_path: str | None = None,
     recipe_readme_fencepost_root: str | None = None,
     site_recipe_path: str | None = None,
@@ -2962,6 +2991,9 @@ def run_ritual_check(
         reports_dir=report_card_freshness_reports_dir, cards_dir=report_card_freshness_cards_dir
     )
     task_references = check_task_references(root=task_references_root)
+    x_silence_doctrine = check_x_silence_doctrine(
+        readme_path=x_silence_doctrine_readme_path, site_path=x_silence_doctrine_site_path
+    )
     recipe_readme = check_recipe_readme(
         readme_path=recipe_readme_path, recipe_fencepost_root=recipe_readme_fencepost_root
     )
@@ -3044,6 +3076,7 @@ def run_ritual_check(
         or (not draftback_freshness["clean"])
         or (not report_card_freshness["clean"])
         or (not task_references["clean"])
+        or (not x_silence_doctrine["clean"])
         or (not recipe_readme["clean"])
         or (not site_recipe_readme["clean"])
         or (not recipe_commands["clean"])
@@ -3134,6 +3167,7 @@ def run_ritual_check(
         "draftback_freshness": draftback_freshness,
         "report_card_freshness": report_card_freshness,
         "task_references": task_references,
+        "x_silence_doctrine": x_silence_doctrine,
         "recipe_readme": recipe_readme,
         "site_recipe_readme": site_recipe_readme,
         "recipe_commands": recipe_commands,
@@ -3541,6 +3575,9 @@ def format_ritual_check(result: dict[str, Any]) -> str:
         "  " + _report_card_freshness_check().format_report_card_freshness(result["report_card_freshness"])
     )
     lines.append("  " + _task_reference_check().format_task_references(result["task_references"]))
+    lines.append(
+        "  " + _x_silence_doctrine_check().format_x_silence_doctrine(result["x_silence_doctrine"])
+    )
     lines.append("  " + _recipe_readme_check().format_result(result["recipe_readme"]))
     lines.append("  " + _site_recipe_check().format_result(result["site_recipe_readme"]))
     lines.append("  " + _recipe_command_check().format_result(result["recipe_commands"]))

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Task 121. Off-By-One counts the tool that counts everything else.
 
-`tools/ritual_check.py` hand-wires 84 `check_*` functions into one hourly
+`tools/ritual_check.py` hand-wires 85 `check_*` functions into one hourly
 block: each is called inside `run_ritual_check`, its result assigned to a
 dict key, and that key printed as a line in `format_ritual_check`. Three
 separate places a single typo or a forgotten wire-up can silently drop a
@@ -434,6 +434,13 @@ citation, not a computed value, went stale this time:
 `fencepost/ONBOARDING.md` pointed a reader at "(row 16 of ROADMAP.md)"
 for the Gmail-vs-Calendar seam, over a month after `roadmap_archive.py`'s
 first cut (task 169) moved row 16 into `ROADMAP-ARCHIVE-001-169.md`.
+**Updated to 85** the same hour task 1373's `check_x_silence_doctrine`
+was wired in: @oritatown's change-gate policy (post only when the
+surfaced gap changes or something new actually ships) lived only in
+STRATEGY.md, a doc nobody visiting the site or README would open, so a
+stranger who found weeks of silence had every reason to assume the
+project had died. A short, byte-identical explanation now lives in both
+`fencepost/README.md` and `docs/fencepost/index.html`.
 
 Usage:
     python3 tools/ritual_completeness_check.py check

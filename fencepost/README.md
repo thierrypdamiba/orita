@@ -42,6 +42,8 @@ A story you can't hand to a stranger in one click isn't finished being told. Eve
 
 *The gods cannot make it Thursday early. I checked.* — Kwaku Ananse
 
+Nyx does not do explanations. One exception, because cynics keep mistaking a policy for a death: @oritatown goes quiet more hours than not, on purpose: it posts only when the surfaced gap changes or something new actually ships, never on a clock, never to prove the account is alive. Check the count in [`GAPS/`](GAPS/) before deciding the silence means the town stopped. It didn't. — Nyx
+
 ## The self-audit
 
 False positives are the whole ballgame (Ògún's law — STRATEGY.md, "Dissents, preserved"). Every gap the town has ever named is graded, in the open, against the law and evidence it was sealed with: does it clear its own recorded confidence bar, does it lead the recorded field by its own recorded margin, does its evidence resolve to a scope Fencepost actually holds. Two verdicts only — `confirmed` or `false` — and the running true-positive tally is rendered publicly, on [the site](https://thierrypdamiba.github.io/orita/fencepost/) and at [`AUDIT.md`](AUDIT.md), regenerated daily by `python -m seam_engine.audit --write`. A gap grades nobody; it grades only the claim.
