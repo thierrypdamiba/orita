@@ -502,6 +502,10 @@ def _report_card_freshness_check() -> ModuleType:
     )
 
 
+def _task_reference_check() -> ModuleType:
+    return _load_once("_ritual_task_reference_check", os.path.join(ROOT, "tools", "task_reference_check.py"))
+
+
 def _recipe_readme_check() -> ModuleType:
     return _load_once("_ritual_recipe_readme_check", os.path.join(ROOT, "tools", "recipe_readme_check.py"))
 
@@ -2495,6 +2499,27 @@ def check_report_card_freshness(
     return cast(dict[str, object], mod.check_report_card_freshness(**kwargs))
 
 
+def check_task_references(root: str | None = None) -> dict[str, object]:
+    """Task 1372: fold `task_reference_check.py`'s own citation cross-check
+    into the one block. `fencepost/ONBOARDING.md` cited "(row 16 of
+    ROADMAP.md)" for the Gmail-vs-Calendar seam long after
+    `roadmap_archive.py`'s first cut (task 169) moved row 16 into
+    `ROADMAP-ARCHIVE-001-169.md` -- a reader following the link and
+    searching the live file, the way the sentence told them to, would have
+    found nothing. Scans a small, explicit set of town-authored docs
+    (`ONBOARDING.md`, `fencepost/README.md`, `STRATEGY.md`, `CHARTER.md`)
+    for `(task N` / `(row N of ROADMAP.md` citations and confirms each N
+    resolves in the live `ROADMAP.md` or any `ROADMAP-ARCHIVE-*.md`
+    sibling. Never edits anything; a real STALE hit is a god-on-duty
+    escalation (correct the citation to name where the row actually
+    lives), not something this check silently repairs."""
+    mod = _task_reference_check()
+    kwargs = {}
+    if root is not None:
+        kwargs["root"] = root
+    return cast(dict[str, object], mod.check_task_references(**kwargs))
+
+
 def check_recipe_readme(readme_path: str | None = None, recipe_fencepost_root: str | None = None) -> dict[str, object]:
     """Task 426: fold `recipe_readme_check.py`'s own two-way cross-check of
     `fencepost/README.md`'s Community recipes section against the live
@@ -2770,6 +2795,7 @@ def run_ritual_check(
     draftback_freshness_drafts_dir: str | None = None,
     report_card_freshness_reports_dir: str | None = None,
     report_card_freshness_cards_dir: str | None = None,
+    task_references_root: str | None = None,
     recipe_readme_path: str | None = None,
     recipe_readme_fencepost_root: str | None = None,
     site_recipe_path: str | None = None,
@@ -2935,6 +2961,7 @@ def run_ritual_check(
     report_card_freshness = check_report_card_freshness(
         reports_dir=report_card_freshness_reports_dir, cards_dir=report_card_freshness_cards_dir
     )
+    task_references = check_task_references(root=task_references_root)
     recipe_readme = check_recipe_readme(
         readme_path=recipe_readme_path, recipe_fencepost_root=recipe_readme_fencepost_root
     )
@@ -3016,6 +3043,7 @@ def run_ritual_check(
         or (not badge_freshness["clean"])
         or (not draftback_freshness["clean"])
         or (not report_card_freshness["clean"])
+        or (not task_references["clean"])
         or (not recipe_readme["clean"])
         or (not site_recipe_readme["clean"])
         or (not recipe_commands["clean"])
@@ -3105,6 +3133,7 @@ def run_ritual_check(
         "badge_freshness": badge_freshness,
         "draftback_freshness": draftback_freshness,
         "report_card_freshness": report_card_freshness,
+        "task_references": task_references,
         "recipe_readme": recipe_readme,
         "site_recipe_readme": site_recipe_readme,
         "recipe_commands": recipe_commands,
@@ -3511,6 +3540,7 @@ def format_ritual_check(result: dict[str, Any]) -> str:
     lines.append(
         "  " + _report_card_freshness_check().format_report_card_freshness(result["report_card_freshness"])
     )
+    lines.append("  " + _task_reference_check().format_task_references(result["task_references"]))
     lines.append("  " + _recipe_readme_check().format_result(result["recipe_readme"]))
     lines.append("  " + _site_recipe_check().format_result(result["site_recipe_readme"]))
     lines.append("  " + _recipe_command_check().format_result(result["recipe_commands"]))

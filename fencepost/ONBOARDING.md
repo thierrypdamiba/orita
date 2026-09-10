@@ -165,8 +165,12 @@ the whole deal, every time.
 account of yours required. its X side currently reads the *town's own*
 posted history (`HAND/mortal-sky-log.md`) as a stand-in until a live,
 per-user `GetUserTweets` session is wired through your gateway — and the
-Gmail-vs-Calendar seam this whole thing is eventually for (row 16 of
-[`ROADMAP.md`](../ROADMAP.md)) isn't built yet either. this guide describes
+Gmail-vs-Calendar seam this whole thing is eventually for (task 16, DONE as
+a fixture-driven detector — see
+[`seam_engine/gmail_calendar.py`](seam_engine/src/seam_engine/gmail_calendar.py)
+— but archived out of the live roadmap; grep `| 16 |` in
+[`ROADMAP-ARCHIVE-001-169.md`](../ROADMAP-ARCHIVE-001-169.md) for the row)
+isn't wired to a live gateway yet either. this guide describes
 what runs today, not what's promised for later. when v0.2 lands, this page
 gets edited, not replaced — same oath, more toolkits.
 
