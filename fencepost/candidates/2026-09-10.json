@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-10T08:34:02.609237+00:00",
+  "generated_at": "2026-09-10T09:31:17.451033+00:00",
   "repo": "thierrypdamiba/orita",
   "window_hours": 24,
   "account_live_since": "2026-07-12T00:00:00+00:00",
@@ -10,7 +10,7 @@
   "primary_gap": {
     "slug": "milestone-unannounced",
     "headline": "Milestone-level work shipped but never reached @oritatown",
-    "detail": "332 milestone commit(s) since 2026-07-12 (matching ['fencepost', 'flagship', 'strategy']), none echoed in a post.",
+    "detail": "333 milestone commit(s) since 2026-07-12 (matching ['fencepost', 'flagship', 'strategy']), none echoed in a post.",
     "confidence": 0.85,
     "evidence": [
       "https://github.com/thierrypdamiba/orita/commit/bb325b78b943ee84978cf6042c320283dd79bc5b",
