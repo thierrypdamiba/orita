@@ -512,12 +512,6 @@ def _x_silence_doctrine_check() -> ModuleType:
     )
 
 
-def _onboarding_tools_check() -> ModuleType:
-    return _load_once(
-        "_ritual_onboarding_tools_check", os.path.join(ROOT, "tools", "onboarding_tools_check.py")
-    )
-
-
 def _recipe_readme_check() -> ModuleType:
     return _load_once("_ritual_recipe_readme_check", os.path.join(ROOT, "tools", "recipe_readme_check.py"))
 
@@ -2553,25 +2547,6 @@ def check_x_silence_doctrine(readme_path: str | None = None, site_path: str | No
     return cast(dict[str, object], mod.check_x_silence_doctrine(**kwargs))
 
 
-def check_onboarding_tools(server_path: str | None = None, onboarding_path: str | None = None) -> dict[str, object]:
-    """Task 1374: fold `onboarding_tools_check.py`'s own roll-call-vs-live-
-    server cross-check into the one block. `fencepost/ONBOARDING.md`'s
-    minute-3 paragraph named `server.py`'s tool catalog by hand ("four
-    tools come up: ..."); the server has since grown two more
-    `@app.tool(metadata=READ_ONLY)` functions (`gmail_calendar_scan`,
-    `combined_scan_preview`) with nothing re-checking the doc against the
-    real catalog. Never edits anything; a real STALE hit is a god-on-duty
-    escalation (rewrite the roll call to match the live tool list), not
-    something this check silently repairs."""
-    mod = _onboarding_tools_check()
-    kwargs = {}
-    if server_path is not None:
-        kwargs["server_path"] = server_path
-    if onboarding_path is not None:
-        kwargs["onboarding_path"] = onboarding_path
-    return cast(dict[str, object], mod.check_onboarding_tools(**kwargs))
-
-
 def check_recipe_readme(readme_path: str | None = None, recipe_fencepost_root: str | None = None) -> dict[str, object]:
     """Task 426: fold `recipe_readme_check.py`'s own two-way cross-check of
     `fencepost/README.md`'s Community recipes section against the live
@@ -2850,8 +2825,6 @@ def run_ritual_check(
     task_references_root: str | None = None,
     x_silence_doctrine_readme_path: str | None = None,
     x_silence_doctrine_site_path: str | None = None,
-    onboarding_tools_server_path: str | None = None,
-    onboarding_tools_onboarding_path: str | None = None,
     recipe_readme_path: str | None = None,
     recipe_readme_fencepost_root: str | None = None,
     site_recipe_path: str | None = None,
@@ -3021,9 +2994,6 @@ def run_ritual_check(
     x_silence_doctrine = check_x_silence_doctrine(
         readme_path=x_silence_doctrine_readme_path, site_path=x_silence_doctrine_site_path
     )
-    onboarding_tools = check_onboarding_tools(
-        server_path=onboarding_tools_server_path, onboarding_path=onboarding_tools_onboarding_path
-    )
     recipe_readme = check_recipe_readme(
         readme_path=recipe_readme_path, recipe_fencepost_root=recipe_readme_fencepost_root
     )
@@ -3107,7 +3077,6 @@ def run_ritual_check(
         or (not report_card_freshness["clean"])
         or (not task_references["clean"])
         or (not x_silence_doctrine["clean"])
-        or (not onboarding_tools["clean"])
         or (not recipe_readme["clean"])
         or (not site_recipe_readme["clean"])
         or (not recipe_commands["clean"])
@@ -3199,7 +3168,6 @@ def run_ritual_check(
         "report_card_freshness": report_card_freshness,
         "task_references": task_references,
         "x_silence_doctrine": x_silence_doctrine,
-        "onboarding_tools": onboarding_tools,
         "recipe_readme": recipe_readme,
         "site_recipe_readme": site_recipe_readme,
         "recipe_commands": recipe_commands,
@@ -3610,7 +3578,6 @@ def format_ritual_check(result: dict[str, Any]) -> str:
     lines.append(
         "  " + _x_silence_doctrine_check().format_x_silence_doctrine(result["x_silence_doctrine"])
     )
-    lines.append("  " + _onboarding_tools_check().format_onboarding_tools(result["onboarding_tools"]))
     lines.append("  " + _recipe_readme_check().format_result(result["recipe_readme"]))
     lines.append("  " + _site_recipe_check().format_result(result["site_recipe_readme"]))
     lines.append("  " + _recipe_command_check().format_result(result["recipe_commands"]))

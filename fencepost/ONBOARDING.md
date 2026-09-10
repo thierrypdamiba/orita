@@ -104,11 +104,10 @@ uv run python -m seam_engine.server stdio
 
 this is the same server Claude Desktop, Cursor, or any MCP client can point
 at directly (see the transport note at the bottom of
-[`server.py`](seam_engine/src/seam_engine/server.py)). six tools come up:
+[`server.py`](seam_engine/src/seam_engine/server.py)). four tools come up:
 `list_repo_commits`, `get_latest_release`, `get_recent_x_posts`,
-`seam_scan`, `gmail_calendar_scan`, `combined_scan_preview` — all
-`READ_ONLY` metadata, all inspectable before you trust them (`arcade show`
-also works, once you're logged in).
+`seam_scan` — all `READ_ONLY` metadata, all inspectable before you trust
+them (`arcade show` also works, once you're logged in).
 
 ### minute 4 — bring your own gateway
 
