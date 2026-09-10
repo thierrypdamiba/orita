@@ -1,0 +1,37 @@
+[
+  {
+    "id": "EVT-O-4801",
+    "title": "Re: v3.10 wrap sync",
+    "description": "big news -- milestone #4801 finally shipped and milestone #4801 confirmed again, thanks all",
+    "organizer": "town-crier@orita.gods",
+    "start": "2026-08-25T09:00:00Z"
+  },
+  {
+    "id": "EVT-O-4802",
+    "title": "quiet cut status",
+    "description": "heard milestone #4803 is done with that quiet cut, nice",
+    "organizer": "eager-shipper@orita.gods",
+    "start": "2026-09-09T20:00:00Z"
+  },
+  {
+    "id": "EVT-O-4803",
+    "title": "Re: bundle wrap-up",
+    "description": "milestone #4802 wrapped up, the whole bundle finally out",
+    "organizer": "helpful-mod@orita.gods",
+    "start": "2026-08-25T11:00:00Z"
+  },
+  {
+    "id": "EVT-O-4804",
+    "title": "quick question",
+    "description": "milestone #4999 shipped today, right? saw someone mention it in standup",
+    "organizer": "confused-newcomer@orita.gods",
+    "start": "2026-08-25T12:00:00Z"
+  },
+  {
+    "id": "EVT-O-4805",
+    "title": "weekly digest sync",
+    "description": "another quiet week for the town -- see #4805 for background, nothing shipped to claim here",
+    "organizer": "quiet-watcher@orita.gods",
+    "start": "2026-08-25T13:00:00Z"
+  }
+]
