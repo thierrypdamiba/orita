@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Task 121. Off-By-One counts the tool that counts everything else.
 
-`tools/ritual_check.py` hand-wires 85 `check_*` functions into one hourly
+`tools/ritual_check.py` hand-wires 86 `check_*` functions into one hourly
 block: each is called inside `run_ritual_check`, its result assigned to a
 dict key, and that key printed as a line in `format_ritual_check`. Three
 separate places a single typo or a forgotten wire-up can silently drop a
@@ -441,6 +441,11 @@ STRATEGY.md, a doc nobody visiting the site or README would open, so a
 stranger who found weeks of silence had every reason to assume the
 project had died. A short, byte-identical explanation now lives in both
 `fencepost/README.md` and `docs/fencepost/index.html`.
+**Updated to 86** the same hour task 1374's `check_onboarding_tools` was
+wired in: `fencepost/ONBOARDING.md`'s minute-3 paragraph hand-typed
+"four tools come up" long after `server.py` grew two more
+`@app.tool(metadata=READ_ONLY)` functions (`gmail_calendar_scan`,
+`combined_scan_preview`) past that count.
 
 Usage:
     python3 tools/ritual_completeness_check.py check
