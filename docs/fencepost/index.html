@@ -72,7 +72,7 @@
     reviewed and merged like any PR. The read-only oath does not loosen for outside code:
     <a href="https://github.com/thierrypdamiba/orita/blob/main/fencepost/CONTRIBUTING.md">CONTRIBUTING.md</a>
     is the schema in prose, enforced in code before a human reviewer ever reads a stranger's
-    detector. One hundred five real recipes stand today:</p>
+    detector. One hundred six real recipes stand today:</p>
     <p><b><a href="https://github.com/thierrypdamiba/orita/tree/main/fencepost/RECIPES/example-release-vs-changelog">example-release-vs-changelog</a></b>
     — the reference: proof a first external recipe PR is mergeable at all.<br>
     <b><a href="https://github.com/thierrypdamiba/orita/tree/main/fencepost/RECIPES/merged-pr-issue-still-open">merged-pr-issue-still-open</a></b>
@@ -1125,6 +1125,23 @@
     already cleared on <code>SCOPES.md</code>'s oath table; <code>ListEvents</code> is the same
     scope all three existing Calendar recipes already ask for — no new scope asked for anywhere
     in this recipe, though zero Google Calendar tools are exposed on the-hand gateway today.</p>
+    <p><b><a href="https://github.com/thierrypdamiba/orita/tree/main/fencepost/RECIPES/calendar-event-dangling-reference">calendar-event-dangling-reference</a></b>
+    — the hundred-sixth, the twelfth leg of the <code>dangling-reference</code> family (after
+    commit, mention, release-note, issue-body, milestone-body, own-tweet, review-comment,
+    issue-comment, linear-comment, slack-message, and email), and the fifth leg the Calendar
+    toolkit's own grid has grown — the exact recipe <code>calendar-event-claims-unfixed-issue</code>'s
+    own README named by name as a future recipe's open seam: every bare <code>#N</code> reference
+    inside a calendar event's own title or description, checked against BOTH the live issue list
+    and the live PR list (GitHub shares one number space between the two). With this recipe, the
+    Calendar toolkit's own <code>claims-X</code>/dangling-reference grid names all three seams
+    <code>calendar-event-claims-dangling-milestone</code>'s own README left open. Reuses
+    <code>seam_engine.references.referenced_numbers</code> verbatim — the same shared grammar
+    every dangling-reference sibling already imports. Confidence is flat (0.75) —
+    <code>email-dangling-reference</code>'s own exact score: an organizer's own free text may
+    simply be numbering a different tracker in their own head. Neither <code>ListIssues</code>
+    nor <code>ListPullRequests</code> is a new scope; <code>ListEvents</code> is the same scope
+    all four existing Calendar recipes already ask for — no new scope asked for anywhere in this
+    recipe, though zero Google Calendar tools are exposed on the-hand gateway today.</p>
     <p>Merging a recipe is one promise; letting it actually compete for the daily primary gap
     is another. <a href="https://github.com/thierrypdamiba/orita/blob/main/fencepost/seam_engine/src/seam_engine/combined_scan.py"><code>combined_scan.py</code></a>
     keeps the second: it pools a recipe's own candidates with <code>scan.py</code>'s, and ranks

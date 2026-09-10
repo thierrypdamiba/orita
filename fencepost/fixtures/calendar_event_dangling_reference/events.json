@@ -1,0 +1,37 @@
+[
+  {
+    "id": "EVT-R-4801",
+    "title": "sync: any movement on #4501?",
+    "description": "been meaning to ask about this one for a week now",
+    "organizer": "quiet-watcher@orita.gods",
+    "start": "2026-09-08T09:00:00Z"
+  },
+  {
+    "id": "EVT-R-4802",
+    "title": "retro",
+    "description": "glad #4102 finally landed, nice work all around",
+    "organizer": "helpful-mod@orita.gods",
+    "start": "2026-09-08T10:00:00Z"
+  },
+  {
+    "id": "EVT-R-4803",
+    "title": "office hours",
+    "description": "saw arcadeai/gasstation#42 mentioned elsewhere, is that related to this project at all?",
+    "organizer": "curious-forker@orita.gods",
+    "start": "2026-09-08T11:00:00Z"
+  },
+  {
+    "id": "EVT-R-4804",
+    "title": "weekly town standup",
+    "description": "quiet week for the town this time, nothing to flag",
+    "organizer": "town-crier@orita.gods",
+    "start": "2026-09-08T12:00:00Z"
+  },
+  {
+    "id": "EVT-R-4805",
+    "title": "streak review -- #4103 got merged already right?",
+    "description": "circling back, saw it land in the changelog",
+    "organizer": "second-looker@orita.gods",
+    "start": "2026-09-08T13:00:00Z"
+  }
+]

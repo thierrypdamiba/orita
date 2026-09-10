@@ -669,7 +669,7 @@ _CARDINAL_WORDS = {
     "ninety-five": 95, "ninety-six": 96, "ninety-seven": 97, "ninety-eight": 98,
     "ninety-nine": 99, "one hundred": 100, "one hundred one": 101,
     "one hundred two": 102, "one hundred three": 103, "one hundred four": 104,
-    "one hundred five": 105,
+    "one hundred five": 105, "one hundred six": 106,
 }
 
 # The total-count word may be a single hyphenated token ("ninety-nine") or
@@ -728,17 +728,17 @@ def test_plus_joined_claim_missing_sentence_raises():
         claimed_plus_joined_counts("Nothing here about plus-joined toolkits.")
 
 
-def test_real_plus_joined_counts_are_currently_thirty_seven_of_one_hundred_five():
-    # Regression pin: today's real, live counts under RECIPES/. Was (36, 104)
-    # until calendar-event-claims-open-milestone merged (the
-    # hundred-fifth real recipe, toolkit "google_calendar+github" --
-    # plus-joined, so both counts climb together this time: 37 of 105.
+def test_real_plus_joined_counts_are_currently_thirty_eight_of_one_hundred_six():
+    # Regression pin: today's real, live counts under RECIPES/. Was (37, 105)
+    # until calendar-event-dangling-reference merged (the hundred-sixth
+    # real recipe, toolkit "google_calendar+github" -- plus-joined, so
+    # both counts climb together this time: 38 of 106.
     # `real_plus_joined_counts` counts every recipe whose OWN toolkit
     # string contains "+" -- not distinct toolkit-pair strings. Verified
     # against the live tree, not assumed from a prior task's own note:
     # every one of today's plus-joined recipes was grepped by hand before
     # pinning this number.
-    assert real_plus_joined_counts(FENCEPOST_ROOT) == (37, 105)
+    assert real_plus_joined_counts(FENCEPOST_ROOT) == (38, 106)
 
 
 def test_oath_scopes_for_toolkit_docstring_matches_the_real_live_counts():

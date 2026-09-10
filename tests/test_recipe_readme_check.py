@@ -420,7 +420,7 @@ _CARDINAL_WORDS = {
     "ninety-five": 95, "ninety-six": 96, "ninety-seven": 97, "ninety-eight": 98,
     "ninety-nine": 99, "one hundred": 100, "one hundred one": 101,
     "one hundred two": 102, "one hundred three": 103, "one hundred four": 104,
-    "one hundred five": 105,
+    "one hundred five": 105, "one hundred six": 106,
 }
 
 # The cardinal word itself may be a single hyphenated token ("ninety-nine")
@@ -480,10 +480,10 @@ class DocstringCountDoctrineCase(unittest.TestCase):
         with self.assertRaises(AssertionError):
             claimed_section_count("Nothing here about a recipe count.")
 
-    def test_real_live_section_count_is_currently_one_hundred_five(self):
-        # Regression pin: today's real, live linked-recipe count. Was 104
-        # until calendar-event-claims-open-milestone merged (task 1382,
-        # the hundred-fifth real recipe). Task 1380's own addendum named
+    def test_real_live_section_count_is_currently_one_hundred_six(self):
+        # Regression pin: today's real, live linked-recipe count. Was 105
+        # until calendar-event-dangling-reference merged (task 1383,
+        # the hundred-sixth real recipe). Task 1380's own addendum named
         # this exact repo-root pin (distinct from the fencepost-side ones
         # in test_recipe_count_doctrine.py etc.) as the one dawn-run itself
         # has now caught missing three separate times (101->102 task 1259,
@@ -493,7 +493,7 @@ class DocstringCountDoctrineCase(unittest.TestCase):
         with open(rrc.DEFAULT_README_PATH, encoding="utf-8") as f:
             text = f.read()
         section = rrc._community_recipes_section(text)
-        self.assertEqual(len(rrc._linked_recipes(section)), 105)
+        self.assertEqual(len(rrc._linked_recipes(section)), 106)
 
     def test_docstring_matches_the_real_live_count(self):
         with open(rrc.DEFAULT_README_PATH, encoding="utf-8") as f:

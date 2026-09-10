@@ -420,12 +420,12 @@ def _check_scope_is_read_only(scope: str, *, where: str) -> None:
 def _oath_scopes_for_toolkit(toolkit: str) -> frozenset[str]:
     """The union of `consent.REQUIRED_SCOPES` for one recipe's `toolkit`
     field. A recipe's toolkit is usually a single Arcade toolkit ("github"),
-    but thirty-seven of the one hundred five real recipes today name a plus-joined pair
+    but thirty-eight of the one hundred six real recipes today name a plus-joined pair
     spanning two ("github+x", "x+github" -- both directions appear, cosmetic
     either way -- plus "slack+github" (five recipes), "linear+github" (five
-    recipes), "github+google_calendar"/"google_calendar+github" (five
+    recipes), "github+google_calendar"/"google_calendar+github" (six
     recipes, both directions, cosmetic either way, the first, second,
-    third, fourth, and fifth to pair GitHub with Google Calendar), and "gmail+github" (five recipes, the
+    third, fourth, fifth, and sixth to pair GitHub with Google Calendar), and "gmail+github" (five recipes, the
     first, second, third, fourth, and fifth to pair GitHub with Gmail)) because their seam compares
     a GitHub timeline against a second toolkit's own timeline (or, for the
     five newest, a second toolkit's own dated records or inbox). Splitting on "+" and unioning is the one place

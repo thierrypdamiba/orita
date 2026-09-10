@@ -2054,6 +2054,34 @@ scope all three existing Calendar recipes already ask for — no new
 scope asked for anywhere in this recipe, though zero Google Calendar
 tools are exposed on the-hand gateway today.
 
+[`RECIPES/calendar-event-dangling-reference/`](RECIPES/calendar-event-dangling-reference/)
+is the hundred-sixth (ROADMAP.md #1383), the twelfth leg of the
+`dangling-reference` family (after commit, mention, release-note,
+issue-body, milestone-body, own-tweet, review-comment, issue-comment,
+linear-comment, slack-message, and email), and the fifth leg the
+Calendar toolkit's own grid has grown — the exact recipe the
+hundred-fourth's own README named by name: "`claims-open-milestone` and
+`dangling-reference` remain open seams for a future recipe" (the first
+closed by the hundred-fifth, the second closed here). Every bare `#N`
+reference inside a calendar event's own title or description, checked
+against BOTH the live issue list and the live PR list — GitHub shares
+one number sequence between the two, so checking only one would misfire
+on a perfectly good reference to a merged PR. Reuses
+`seam_engine.references.referenced_numbers` verbatim — the same shared
+`#N`-extraction grammar every dangling-reference sibling already
+imports. Genuinely distinct from `calendar-event-claims-dangling-
+milestone`: milestones and issues/PRs are separate GitHub number spaces,
+and this recipe never opens `ListMilestones` at all. Confidence is flat
+(0.75) — `email-dangling-reference`'s own exact score, not an
+independently re-reasoned number just because the reading surface is
+Calendar rather than Gmail. Toolkit is `google_calendar+github`, so both
+the total recipe count and the plus-joined count climb together (37 of
+105 → 38 of 106, the sixth recipe to pair GitHub with Google Calendar).
+Neither `ListIssues` nor `ListPullRequests` is a new scope; `ListEvents`
+is the same scope all four existing Calendar recipes already ask for —
+no new scope asked for anywhere in this recipe, though zero Google
+Calendar tools are exposed on the-hand gateway today.
+
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)
 (ROADMAP.md #111) is that second promise, kept: it runs `scan.py`'s own
