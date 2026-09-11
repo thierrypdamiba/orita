@@ -46614,5 +46614,29 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/a1f3d971335d991bacfc0f6bcced41410506ab16",
     "ts": "2026-09-11T09:38:30Z",
     "author": "Kwaku Ananse"
+  },
+  {
+    "kind": "commit",
+    "id": "872ae05",
+    "title": "task 1403: the addendum that broke dawn-run, and the row it should have been",
+    "url": "https://github.com/thierrypdamiba/orita/commit/872ae05070908b65a31e619251e914d7ed403cee",
+    "ts": "2026-09-11T10:42:46Z",
+    "author": "Esu-Elegba"
+  },
+  {
+    "kind": "commit",
+    "id": "af98131",
+    "title": "task 1404: the dogfood cycle that broke its own drafts, and caught it live",
+    "url": "https://github.com/thierrypdamiba/orita/commit/af9813198803de8057d60b8d2bcc890569a7f5e7",
+    "ts": "2026-09-11T11:53:58Z",
+    "author": "Retrya"
+  },
+  {
+    "kind": "commit",
+    "id": "3ac041c",
+    "title": "task 1404 addendum: post-push ritual_check probe left one scribe-growth line uncommitted",
+    "url": "https://github.com/thierrypdamiba/orita/commit/3ac041cc354a7cac491768dcad40226eafaaab2b",
+    "ts": "2026-09-11T12:04:09Z",
+    "author": "Retrya"
   }
 ]

@@ -2082,6 +2082,33 @@ is the same scope all four existing Calendar recipes already ask for —
 no new scope asked for anywhere in this recipe, though zero Google
 Calendar tools are exposed on the-hand gateway today.
 
+[`RECIPES/repo-description-claims-unfixed-issue/`](RECIPES/repo-description-claims-unfixed-issue/)
+is the hundred-seventh (ROADMAP.md #1405), the issue-side twin of
+`repo-description-dangling-reference` (the tenth leg of the
+`dangling-reference` family), applied to the
+sibling `claims-unfixed-issue` shape instead: the repository's own
+one-line description — the text every visitor sees in search results and
+on the repo's own GitHub homepage before README ever loads — names a
+real closing keyword against an issue ("fixes #N", "closes #N", "resolves
+#N", both tenses), but the named issue is still open. Every other
+permanent public text surface already carries this leg (README, a
+release body, a tweet, a milestone description, an issue/PR body, a
+timeline comment, an inline review comment, an X mention, a Slack
+message, a Linear comment, an inbound email, a calendar event); the repo
+description had only ever been checked for a dangling reference, never
+for this claim shape. Reuses `seam_engine.closing_keywords.
+closing_keyword_numbers` verbatim — the same shared grammar every
+`claims-unfixed-issue` sibling already imports. Confidence is flat
+(0.85), mirroring `repo-description-dangling-reference`'s own bar and
+reasoning exactly: a live `GetRepository` read carries no staleness
+uncertainty, so there is no timestamp to weigh an age-gate against,
+unlike `milestone-claims-unfixed-issue`'s own age-gate off a milestone
+object's real `updated_at` field. A claimed issue that does not exist at
+all is excluded — `repo-description-dangling-reference`'s own seam, not
+this one's; a claimed issue that IS closed is excluded too, the claim was
+simply true. Neither `GetRepository` nor `ListIssues` is a new scope — no
+scope asked for anywhere in this recipe.
+
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)
 (ROADMAP.md #111) is that second promise, kept: it runs `scan.py`'s own

@@ -1,0 +1,12 @@
+{
+  "slug": "repo-description-claims-unfixed-issue",
+  "title": "The repo description claims an issue fixed that's still open",
+  "author": "off-by-one",
+  "description": "The issue-side twin of repo-description-dangling-reference (the tenth leg of the dangling-reference family), applied to the sibling claims-unfixed-issue shape instead: the repository's own one-line description names a real GitHub closing keyword against an issue ('fixes #N', 'closes #N', 'resolves #N', both tenses), but the named issue is still open. Every other permanent public text surface (README, a release body, a tweet, a milestone description, an issue/PR body, a timeline comment, an inline review comment, an X mention, a Slack message, a Linear comment, an inbound email, a calendar event) already carries this leg; the repo description -- the one text every visitor sees in search results and on the repo's own GitHub homepage before README ever loads -- had only ever been checked for a dangling reference, never for this claim shape.",
+  "toolkit": "github",
+  "scopes": ["GetRepository", "ListIssues"],
+  "fixture": "fixtures/repo_description_claims_unfixed_issue",
+  "detector_file": "detector.py",
+  "entrypoint": "run_recipe_scan",
+  "confidence_notes": "Deliberately NOT age-gated, the same reasoning repo-description-dangling-reference's own docstring already gave for this exact same field: a GetRepository call returns the description CURRENT right now, not a change history, so there is no per-claim timestamp to weigh a staleness window against, and no race either -- the description is read live, so a claim it currently makes and the issue's currently-open state are both true at the same instant the scan runs. Flat 0.85 on every surfaced claim. A claimed issue that does not exist at all is excluded at confidence 0.0, named not hidden -- that broken reference is repo-description-dangling-reference's own seam, not this one's. A claimed issue that IS closed is excluded too -- the claim was simply true. A repository carrying no description at all is excluded outright -- there is no claim to have broken."
+}

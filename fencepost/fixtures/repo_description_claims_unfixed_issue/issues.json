@@ -1,0 +1,14 @@
+[
+  {
+    "number": 4,
+    "title": "Founding plan issue",
+    "state": "open",
+    "url": "https://github.com/thierrypdamiba/example-repo/issues/4"
+  },
+  {
+    "number": 201,
+    "title": "Old bug, already fixed",
+    "state": "closed",
+    "url": "https://github.com/thierrypdamiba/example-repo/issues/201"
+  }
+]
