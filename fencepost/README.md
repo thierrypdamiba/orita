@@ -2155,6 +2155,32 @@ this one's; a claimed milestone that IS closed is excluded too, the claim
 was simply true. Neither `GetRepository` nor `ListMilestones` is a new
 scope — no scope asked for anywhere in this recipe.
 
+[`RECIPES/repo-description-claims-unmerged-pr/`](RECIPES/repo-description-claims-unmerged-pr/)
+is the hundred-tenth (ROADMAP.md #1408), the fifth and last leg opened on
+this surface, alongside `repo-description-dangling-reference`,
+`repo-description-claims-unfixed-issue`, `repo-description-claims-
+dangling-milestone`, and `repo-description-claims-open-milestone`. The
+repository's own one-line description names a ships/includes/merges/via
+#N claim about a pull request, but the named PR never actually merged.
+Fourteen other permanent public text surfaces already carry this exact
+`claims-unmerged-pr` leg (README, a release body, a tweet, an issue/PR
+body, a timeline comment, an inline review comment, an X mention, a
+Slack message, a Linear comment, an inbound email, a calendar event, a
+commit message); the repo description had never been checked for this
+claim shape. Reuses `seam_engine.pr_claims.claimed_pr_numbers` verbatim —
+the same shared grammar every other `claims-unmerged-pr` sibling already
+imports. Confidence is flat (0.85), mirroring `repo-description-claims-
+open-milestone`'s own bar and reasoning exactly: a live `GetRepository`
+read carries no staleness uncertainty and no race, so a claim it
+currently makes and the PR's currently-unmerged state are both true at
+the same instant the scan runs. A claimed PR that does not exist at all
+is excluded — `repo-description-dangling-reference`'s own seam, not this
+one's; a claimed PR that IS merged is excluded too, the claim was simply
+true. Neither `GetRepository` nor `ListPullRequests` is a new scope — no
+scope asked for anywhere in this recipe. With this recipe shipped,
+`repo-description` now carries every `claims-X` leg the `readme`,
+`release`, and `tweet` surfaces already carry.
+
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)
 (ROADMAP.md #111) is that second promise, kept: it runs `scan.py`'s own

@@ -421,7 +421,7 @@ _CARDINAL_WORDS = {
     "ninety-nine": 99, "one hundred": 100, "one hundred one": 101,
     "one hundred two": 102, "one hundred three": 103, "one hundred four": 104,
     "one hundred five": 105, "one hundred six": 106, "one hundred seven": 107,
-    "one hundred eight": 108, "one hundred nine": 109,
+    "one hundred eight": 108, "one hundred nine": 109, "one hundred ten": 110,
 }
 
 # The cardinal word itself may be a single hyphenated token ("ninety-nine")
@@ -500,7 +500,7 @@ class DocstringCountDoctrineCase(unittest.TestCase):
         with open(rrc.DEFAULT_README_PATH, encoding="utf-8") as f:
             text = f.read()
         section = rrc._community_recipes_section(text)
-        self.assertEqual(len(rrc._linked_recipes(section)), 109)
+        self.assertEqual(len(rrc._linked_recipes(section)), 110)
 
     def test_docstring_matches_the_real_live_count(self):
         with open(rrc.DEFAULT_README_PATH, encoding="utf-8") as f:
