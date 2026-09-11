@@ -63,7 +63,7 @@ _CARDINAL_WORDS = {
     "ninety-nine": 99, "one hundred": 100, "one hundred one": 101,
     "one hundred two": 102, "one hundred three": 103, "one hundred four": 104,
     "one hundred five": 105, "one hundred six": 106, "one hundred seven": 107,
-    "one hundred eight": 108,
+    "one hundred eight": 108, "one hundred nine": 109,
 }
 
 # The cardinal word itself may be a single hyphenated token ("ninety-nine")
@@ -120,16 +120,17 @@ def test_unrecognized_cardinal_word_raises():
         claimed_recipe_count("Several real recipes stand today:")
 
 
-def test_real_recipe_count_is_currently_one_hundred_eight():
+def test_real_recipe_count_is_currently_one_hundred_nine():
     """Regression pin: today's real, live count under RECIPES/. Was 105
     until RECIPES/calendar-event-dangling-reference/ merged (the
     hundred-sixth real recipe), then 106 until RECIPES/repo-description-
     claims-unfixed-issue/ merged (the hundred-seventh), then 107 until
     RECIPES/repo-description-claims-dangling-milestone/ merged (the
-    hundred-eighth) -- the exact drift this whole doctrine file exists to
-    catch, now caught once for real instead of only rehearsed by the
-    mutation test below."""
-    assert real_recipe_count(FENCEPOST_ROOT) == 108
+    hundred-eighth), then 108 until RECIPES/repo-description-claims-open-
+    milestone/ merged (the hundred-ninth) -- the exact drift this whole
+    doctrine file exists to catch, now caught once for real instead of
+    only rehearsed by the mutation test below."""
+    assert real_recipe_count(FENCEPOST_ROOT) == 109
 
 
 def test_site_claim_matches_the_real_live_count():

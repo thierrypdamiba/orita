@@ -2131,6 +2131,30 @@ real milestone is excluded, open or closed alike — the claim holds.
 Neither `GetRepository` nor `ListMilestones` is a new scope — no scope
 asked for anywhere in this recipe.
 
+[`RECIPES/repo-description-claims-open-milestone/`](RECIPES/repo-description-claims-open-milestone/)
+is the hundred-ninth (ROADMAP.md #1407), the fourth leg opened on this
+surface, alongside `repo-description-dangling-reference`,
+`repo-description-claims-unfixed-issue`, and `repo-description-claims-
+dangling-milestone`. The repository's own one-line description names a
+"milestone #N shipped" claim phrase, but the named milestone is still
+open. Thirteen other permanent public text surfaces already carry this
+exact `claims-open-milestone` leg (README, a release body, a tweet, a
+milestone description, an issue/PR body, a timeline comment, an inline
+review comment, an X mention, a Slack message, a Linear comment, an
+inbound email, a calendar event, a commit message); the repo description
+had never been checked for this claim shape. Reuses `seam_engine.
+milestone_claims.claimed_milestone_numbers` verbatim — the same shared
+grammar `repo-description-claims-dangling-milestone` already imports.
+Confidence is flat (0.85), mirroring `repo-description-claims-unfixed-
+issue`'s own bar and reasoning exactly: a live `GetRepository` read
+carries no staleness uncertainty and no race, so a claim it currently
+makes and the milestone's currently-open state are both true at the same
+instant the scan runs. A claimed milestone that does not exist at all is
+excluded — `repo-description-claims-dangling-milestone`'s own seam, not
+this one's; a claimed milestone that IS closed is excluded too, the claim
+was simply true. Neither `GetRepository` nor `ListMilestones` is a new
+scope — no scope asked for anywhere in this recipe.
+
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)
 (ROADMAP.md #111) is that second promise, kept: it runs `scan.py`'s own

@@ -421,7 +421,7 @@ _CARDINAL_WORDS = {
     "ninety-nine": 99, "one hundred": 100, "one hundred one": 101,
     "one hundred two": 102, "one hundred three": 103, "one hundred four": 104,
     "one hundred five": 105, "one hundred six": 106, "one hundred seven": 107,
-    "one hundred eight": 108,
+    "one hundred eight": 108, "one hundred nine": 109,
 }
 
 # The cardinal word itself may be a single hyphenated token ("ninety-nine")
@@ -481,13 +481,15 @@ class DocstringCountDoctrineCase(unittest.TestCase):
         with self.assertRaises(AssertionError):
             claimed_section_count("Nothing here about a recipe count.")
 
-    def test_real_live_section_count_is_currently_one_hundred_eight(self):
+    def test_real_live_section_count_is_currently_one_hundred_nine(self):
         # Regression pin: today's real, live linked-recipe count. Was 105
         # until calendar-event-dangling-reference merged (task 1383, the
         # hundred-sixth real recipe), then 106 until repo-description-
         # claims-unfixed-issue merged (task 1405, the hundred-seventh),
         # then 107 until repo-description-claims-dangling-milestone
-        # merged (task 1406, the hundred-eighth).
+        # merged (task 1406, the hundred-eighth), then 108 until
+        # repo-description-claims-open-milestone merged (task 1407, the
+        # hundred-ninth).
         # Task 1380's own addendum named this exact repo-root pin
         # (distinct from the fencepost-side ones in
         # test_recipe_count_doctrine.py etc.) as the one dawn-run itself
@@ -498,7 +500,7 @@ class DocstringCountDoctrineCase(unittest.TestCase):
         with open(rrc.DEFAULT_README_PATH, encoding="utf-8") as f:
             text = f.read()
         section = rrc._community_recipes_section(text)
-        self.assertEqual(len(rrc._linked_recipes(section)), 108)
+        self.assertEqual(len(rrc._linked_recipes(section)), 109)
 
     def test_docstring_matches_the_real_live_count(self):
         with open(rrc.DEFAULT_README_PATH, encoding="utf-8") as f:
