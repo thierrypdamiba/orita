@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-11T16:27:55.724498+00:00",
+  "generated_at": "2026-09-11T19:25:20.503122+00:00",
   "repo": "thierrypdamiba/orita",
   "window_hours": 24,
   "account_live_since": "2026-07-12T00:00:00+00:00",
@@ -10,7 +10,7 @@
   "primary_gap": {
     "slug": "milestone-unannounced",
     "headline": "Milestone-level work shipped but never reached @oritatown",
-    "detail": "333 milestone commit(s) since 2026-07-12 (matching ['fencepost', 'flagship', 'strategy']), none echoed in a post.",
+    "detail": "334 milestone commit(s) since 2026-07-12 (matching ['fencepost', 'flagship', 'strategy']), none echoed in a post.",
     "confidence": 0.85,
     "evidence": [
       "https://github.com/thierrypdamiba/orita/commit/bb325b78b943ee84978cf6042c320283dd79bc5b",
@@ -27,7 +27,7 @@
     {
       "slug": "coincidence-automatic",
       "headline": "'automatic' recurs in commits but stays off @oritatown",
-      "detail": "1414 commit(s) since 2026-07-12 touch 'automatic', none echoed in a post. Routine work is not a gap \u2014 coincidence, not seam.",
+      "detail": "1419 commit(s) since 2026-07-12 touch 'automatic', none echoed in a post. Routine work is not a gap \u2014 coincidence, not seam.",
       "confidence": 0.55,
       "evidence": [
         "https://github.com/thierrypdamiba/orita/commit/3d2a6267a50d6a8d4162b4f3549f57b88d8298c3",
@@ -43,7 +43,7 @@
     {
       "slug": "coincidence-due",
       "headline": "'due' recurs in commits but stays off @oritatown",
-      "detail": "841 commit(s) since 2026-07-12 touch 'due', none echoed in a post. Routine work is not a gap \u2014 coincidence, not seam.",
+      "detail": "844 commit(s) since 2026-07-12 touch 'due', none echoed in a post. Routine work is not a gap \u2014 coincidence, not seam.",
       "confidence": 0.55,
       "evidence": [
         "https://github.com/thierrypdamiba/orita/commit/4c9bc31821682e1b2065fc2569e3fe98c52f338c",
@@ -59,7 +59,7 @@
     {
       "slug": "coincidence-graded",
       "headline": "'graded' recurs in commits but stays off @oritatown",
-      "detail": "787 commit(s) since 2026-07-12 touch 'graded', none echoed in a post. Routine work is not a gap \u2014 coincidence, not seam.",
+      "detail": "790 commit(s) since 2026-07-12 touch 'graded', none echoed in a post. Routine work is not a gap \u2014 coincidence, not seam.",
       "confidence": 0.55,
       "evidence": [
         "https://github.com/thierrypdamiba/orita/commit/bd267a064590a5c38dd2729400f52d19c41eb8c9",
@@ -75,7 +75,7 @@
     {
       "slug": "coincidence-human",
       "headline": "'human' recurs in commits but stays off @oritatown",
-      "detail": "1414 commit(s) since 2026-07-12 touch 'human', none echoed in a post. Routine work is not a gap \u2014 coincidence, not seam.",
+      "detail": "1419 commit(s) since 2026-07-12 touch 'human', none echoed in a post. Routine work is not a gap \u2014 coincidence, not seam.",
       "confidence": 0.55,
       "evidence": [
         "https://github.com/thierrypdamiba/orita/commit/3d2a6267a50d6a8d4162b4f3549f57b88d8298c3",
@@ -91,7 +91,7 @@
     {
       "slug": "coincidence-trigger",
       "headline": "'trigger' recurs in commits but stays off @oritatown",
-      "detail": "1414 commit(s) since 2026-07-12 touch 'trigger', none echoed in a post. Routine work is not a gap \u2014 coincidence, not seam.",
+      "detail": "1419 commit(s) since 2026-07-12 touch 'trigger', none echoed in a post. Routine work is not a gap \u2014 coincidence, not seam.",
       "confidence": 0.55,
       "evidence": [
         "https://github.com/thierrypdamiba/orita/commit/3d2a6267a50d6a8d4162b4f3549f57b88d8298c3",
