@@ -2109,6 +2109,28 @@ this one's; a claimed issue that IS closed is excluded too, the claim was
 simply true. Neither `GetRepository` nor `ListIssues` is a new scope — no
 scope asked for anywhere in this recipe.
 
+[`RECIPES/repo-description-claims-dangling-milestone/`](RECIPES/repo-description-claims-dangling-milestone/)
+is the hundred-eighth (ROADMAP.md #1406), the milestone-side twin of
+`repo-description-claims-unfixed-issue` and the third leg opened on this
+surface, alongside `repo-description-dangling-reference` (a different
+number space entirely). The repository's own one-line description names
+a "milestone #N" claim phrase, but no milestone with that number exists
+at all. Every other permanent public text surface that carries a
+`claims-dangling-milestone` sibling already has thirteen (README, a
+release body, a tweet, a milestone description, an issue/PR body, a
+timeline comment, an inline review comment, an X mention, a Slack
+message, a Linear comment, an inbound email, a calendar event, a commit
+message); the repo description had never been checked for this claim
+shape. Reuses `seam_engine.milestone_claims.claimed_milestone_numbers`
+verbatim — the same shared grammar every `claims-dangling-milestone`
+sibling already imports. Confidence is flat (0.8), mirroring every prior
+sibling's own bar and reasoning exactly, and the same no-staleness-window
+reasoning `repo-description-claims-unfixed-issue`'s own docstring already
+gave for this exact field. A claimed milestone number that resolves to a
+real milestone is excluded, open or closed alike — the claim holds.
+Neither `GetRepository` nor `ListMilestones` is a new scope — no scope
+asked for anywhere in this recipe.
+
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)
 (ROADMAP.md #111) is that second promise, kept: it runs `scan.py`'s own

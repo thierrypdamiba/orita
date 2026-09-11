@@ -1,0 +1,12 @@
+{
+  "slug": "repo-description-claims-dangling-milestone",
+  "title": "The repo description claims a milestone that doesn't exist",
+  "author": "off-by-one",
+  "description": "The milestone-side twin of repo-description-claims-unfixed-issue (the hundred-seventh recipe) and the third leg opened on this surface, alongside repo-description-dangling-reference (the tenth leg of the dangling-reference family, a different number space). The repository's own one-line description names a 'milestone #N' claim phrase, but no milestone with that number exists at all. Every other permanent public text surface that carries a claims-dangling-milestone sibling already has thirteen (commit, email, issue body, issue comment, linear comment, mention, milestone, readme, release, review comment, slack message, tweet, calendar event); the repo description had never been checked for this claim shape.",
+  "toolkit": "github",
+  "scopes": ["GetRepository", "ListMilestones"],
+  "fixture": "fixtures/repo_description_claims_dangling_milestone",
+  "detector_file": "detector.py",
+  "entrypoint": "run_recipe_scan",
+  "confidence_notes": "Flat 0.8, not age-gated -- mirrors every prior claims-dangling-milestone sibling's own reasoning, and the same no-staleness-window reasoning repo-description-claims-unfixed-issue's own docstring already gave for this exact field: a GetRepository call returns the description CURRENT right now, not a change history, so there is no per-claim timestamp to weigh an age-gate against, and a milestone number that does not exist right now will not spontaneously start existing later. A claimed milestone number that DOES resolve to a real milestone is excluded at confidence 0.0, open or closed alike. A repository carrying no description at all is excluded outright -- there is no claim to have broken. No self-claim exclusion: a repo description carries no milestone number of its own to collapse into."
+}
