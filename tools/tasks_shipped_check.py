@@ -99,12 +99,37 @@ _last_metrics_entry = metrics_reader.last_metrics_entry
 # the middle of an unrelated row's prose.
 _AGGREGATE_ROW_PREFIX_CHARS = 100
 
+# Task 1458: a task-field cell can carry a second, same-hour addendum on
+# top of the ordinary "<task#> addendum" shape -- BUILDLOG.md's own
+# 2026-09-13 04:58 UTC row spells its second addendum on task 1444 as
+# "1444 addendum 2". A bare `_NUM_RE.findall` over the whole cell reads
+# that trailing "2" as a SECOND task number shipped that day (task #2,
+# real, but from the town's founding week, not today) -- inflating a
+# real 18-task day's ground truth to 19 and turning this checker's own
+# live cross-check red against an honest metrics.jsonl reading. The
+# addendum counter is never a task number; only digits BEFORE the word
+# "addendum" ever are, in every real row on record.
+_ADDENDUM_RE = re.compile(r"addendum", re.IGNORECASE)
+
+
+def _task_field_numbers(cell: str) -> set[int]:
+    """Task numbers in a BUILDLOG.md task-field cell: every digit run
+    before the first `addendum` (case-insensitive), so a same-hour
+    addendum's own ordinal ("addendum 2") is never mistaken for a second
+    task number. Handles plain numbers and multi-task cells (`360/361`)
+    the same as before; only the addendum-ordinal shape is now excluded."""
+    m = _ADDENDUM_RE.search(cell)
+    head = cell[: m.start()] if m else cell
+    return {int(n) for n in _NUM_RE.findall(head)}
+
 
 def _buildlog_task_rows(buildlog_path: str, date: str) -> list[tuple[set[int], str]]:
     """`(task_numbers, description)` for every real dated BUILDLOG.md row
     matching `date`, in file order. `task_numbers` is every run of digits
-    found in that row's task-field cell (handles both plain numbers and
-    multi-task cells like `360/361`); non-numeric cells (`ritual`,
+    found in that row's task-field cell BEFORE the word "addendum", if
+    any (handles both plain numbers and multi-task cells like `360/361`,
+    while never counting a same-hour addendum's own ordinal as a task
+    number -- see `_task_field_numbers`); non-numeric cells (`ritual`,
     `roadmap`, `<task#>` the header's own literal, etc.) yield an empty
     set and are skipped by callers that only want real numbered tasks.
     `description` is everything after the row's third `|` (the free-text
@@ -118,7 +143,7 @@ def _buildlog_task_rows(buildlog_path: str, date: str) -> list[tuple[set[int], s
             m = _ROW_RE.match(line)
             if not m or m.group(1) != date:
                 continue
-            nums = {int(n) for n in _NUM_RE.findall(m.group(3))}
+            nums = _task_field_numbers(m.group(3))
             rows.append((nums, line[m.end():]))
     return rows
 

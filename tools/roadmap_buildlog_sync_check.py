@@ -50,6 +50,12 @@ docstring prescribes: import the real, already-defined pattern objects
 from the files that own them (`roadmap_archive.ROW_RE`,
 `tasks_shipped_check._ROW_RE`/`_NUM_RE`) instead of retyping their text.
 
+Task 1458: `_NUM_RE` alone over-reads a same-hour addendum's own ordinal
+("1444 addendum 2") as a second task number; this file now imports
+`tasks_shipped_check._task_field_numbers` (built for that same bug)
+instead of calling `_NUM_RE.findall` directly, so the two files can never
+drift back onto two different notions of "the task numbers in this cell".
+
 Usage:
     python3 tools/roadmap_buildlog_sync_check.py check
 """
@@ -75,7 +81,12 @@ _ROADMAP_ROW_RE = roadmap_archive.ROW_RE
 # task-field cell, which may hold a plain number, a multi-task cell, or a
 # non-numeric housekeeping marker.
 _BUILDLOG_ROW_RE = tasks_shipped_check._ROW_RE
-_NUM_RE = tasks_shipped_check._NUM_RE
+# Task 1458: shares tasks_shipped_check's own fix for a same-hour
+# addendum's ordinal ("1444 addendum 2") never being read as a second
+# task number -- the identical cell shape this file's own `_NUM_RE`
+# used to feed on unfiltered before this line existed, imported rather
+# than re-typed per this file's own duplicate-regex doctrine.
+_task_field_numbers = tasks_shipped_check._task_field_numbers
 
 
 def roadmap_task_numbers(
@@ -117,8 +128,7 @@ def buildlog_task_numbers(buildlog_path: str = DEFAULT_BUILDLOG_PATH) -> dict[in
             m = _BUILDLOG_ROW_RE.match(line)
             if not m:
                 continue
-            for n in _NUM_RE.findall(m.group(3)):
-                num = int(n)
+            for num in _task_field_numbers(m.group(3)):
                 if num not in numbers:
                     numbers[num] = line.rstrip("\n")
     return numbers
