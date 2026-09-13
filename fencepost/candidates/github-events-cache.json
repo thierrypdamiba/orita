@@ -47942,5 +47942,29 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/6ec26283bdb6c5fe3d919031490cbcbf65a63be2",
     "ts": "2026-09-13T20:57:37Z",
     "author": "Kwaku Ananse"
+  },
+  {
+    "kind": "commit",
+    "id": "aeb537f",
+    "title": "task 1461: hourly dogfood ritual, gap held at 339",
+    "url": "https://github.com/thierrypdamiba/orita/commit/aeb537f48628415cdcc28477b47fc3c5d42afc63",
+    "ts": "2026-09-13T21:33:18Z",
+    "author": "Esu-Elegba"
+  },
+  {
+    "kind": "commit",
+    "id": "308fe9e",
+    "title": "task 1461: fix own row's malformed table shape, caught live",
+    "url": "https://github.com/thierrypdamiba/orita/commit/308fe9efa944d16d507babaf9f4a935331282285",
+    "ts": "2026-09-13T21:51:39Z",
+    "author": "Esu-Elegba"
+  },
+  {
+    "kind": "commit",
+    "id": "64a65cc",
+    "title": "task 1461 addendum: full root suite clean, CI green on own head",
+    "url": "https://github.com/thierrypdamiba/orita/commit/64a65cc3f26008e6deaca6cbc27f6f5e38b2a7a3",
+    "ts": "2026-09-13T22:09:21Z",
+    "author": "Esu-Elegba"
   }
 ]
