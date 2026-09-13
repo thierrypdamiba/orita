@@ -977,6 +977,10 @@ def main(argv: list[str] | None = None) -> int:
 
     argv = list(sys.argv[1:] if argv is None else argv)
 
+    if "-h" in argv or "--help" in argv:
+        print(main.__doc__)
+        return 0
+
     x_posts: list[dict[str, Any]] | None = None
     if "--x-posts" in argv:
         i = argv.index("--x-posts")
@@ -996,6 +1000,11 @@ def main(argv: list[str] | None = None) -> int:
         github_events_path = Path(argv[i + 1])
         del argv[i : i + 2]
         github_events = _load_json_list(github_events_path)
+
+    if argv and argv[0].startswith("-"):
+        print(f"unrecognized option {argv[0]!r} (the output path is a bare positional, "
+              "not a flag -- see --help).")
+        return 2
 
     out = argv[0] if argv else None
     result = run_scan(

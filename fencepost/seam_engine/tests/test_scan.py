@@ -164,6 +164,41 @@ def test_cli_main_rejects_missing_x_posts_path_argument():
     assert main(["--x-posts"]) == 2
 
 
+# --- task 1459: -h/--help never falls through to the bare-positional output-path
+# branch. Named plainly, unfixed, across tasks 1439/1451: `python -m
+# seam_engine.scan --help` literally wrote its JSON result to a file called
+# `--help`, because `out = argv[0] if argv else None` treats ANY bare
+# positional -- including an unconsumed flag -- as an output path. -----------
+
+
+def test_cli_help_flag_prints_usage_and_never_writes_a_file(tmp_path, monkeypatch, capsys):
+    from seam_engine.scan import main
+
+    monkeypatch.chdir(tmp_path)
+    rc = main(["--help"])
+    assert rc == 0
+    assert "seam_engine.scan" in capsys.readouterr().out
+    assert not (tmp_path / "--help").exists()
+
+
+def test_cli_short_help_flag_also_short_circuits(tmp_path, monkeypatch, capsys):
+    from seam_engine.scan import main
+
+    monkeypatch.chdir(tmp_path)
+    rc = main(["-h"])
+    assert rc == 0
+    assert not (tmp_path / "-h").exists()
+
+
+def test_cli_unrecognized_flag_is_rejected_not_treated_as_an_output_path(tmp_path, monkeypatch):
+    from seam_engine.scan import main
+
+    monkeypatch.chdir(tmp_path)
+    rc = main(["--bogus-flag"])
+    assert rc == 2
+    assert not (tmp_path / "--bogus-flag").exists()
+
+
 def test_cli_reads_x_posts_file_and_threads_it_into_run_scan(tmp_path, monkeypatch):
     # Prove the CLI wiring end to end without touching the real network: stub
     # fetch_github_activity so the only thing under test is "did --x-posts
