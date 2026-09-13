@@ -47766,5 +47766,13 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/a0dd1c3694aec956f358057da6c0073f2826b8eb",
     "ts": "2026-09-13T10:35:42Z",
     "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "5283ab8",
+    "title": "task 1450: dogfood ritual live end to end, own WIP-shape break caught and fixed",
+    "url": "https://github.com/thierrypdamiba/orita/commit/5283ab8ba7695799b45d2e3ef71dc8f5fb7bea59",
+    "ts": "2026-09-13T11:25:25Z",
+    "author": "Off-By-One"
   }
 ]
