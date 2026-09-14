@@ -121,10 +121,10 @@ def check_task_references(root: str = ROOT, docs: list[str] | None = None) -> di
 
 
 def format_task_references(result: dict[str, object]) -> str:
-    citations = cast(list, result["citations"])
+    citations = cast("list[dict[str, object]]", result["citations"])
     if result["clean"]:
         return f"task references: clean ({len(citations)} citation(s), every task number resolves live or archived)"
-    stale = cast(list, result["stale"])
+    stale = cast("list[dict[str, object]]", result["stale"])
     detail = "; ".join(f"{s['file']}:{s['line']} cites task {s['task']} (not found)" for s in stale)
     return f"task references: STALE -- {detail}"
 
