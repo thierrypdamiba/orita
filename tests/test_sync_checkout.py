@@ -199,5 +199,41 @@ class TestDetachedDiverged(_RepoPairCase):
         self.assertEqual(_git(self.clone, "rev-parse", "HEAD"), diverged_sha)
 
 
+class TestFallsBackWhenGivenPathIsMissing(_RepoPairCase):
+    """Task 1487. The real-world case: the caller passes a path that
+    doesn't exist in THIS container (e.g. `~/orita` expanded against a
+    $HOME that isn't where checkouts actually live), but a checkout with
+    the same basename sits under $HOME already. The script should find
+    it rather than fail with a bare 'No such file or directory'."""
+
+    def test_finds_checkout_under_home_by_basename(self):
+        homedir = os.path.join(self.tmp.name, "fake-home")
+        os.makedirs(homedir)
+        real_checkout = os.path.join(homedir, "reponame")
+        os.rename(self.clone, real_checkout)
+
+        missing_path = os.path.join(self.tmp.name, "nonexistent-parent", "reponame")
+        env = dict(os.environ, HOME=homedir)
+        r = subprocess.run(
+            ["bash", SCRIPT, missing_path, "main"],
+            capture_output=True, text=True, env=env,
+        )
+        self.assertEqual(r.returncode, 0, r.stderr)
+        self.assertIn("isn't a git checkout", r.stderr)
+        self.assertIn("using", r.stderr)
+        self.assertIn("nothing to recover", r.stdout)
+        self.assertEqual(_git(real_checkout, "symbolic-ref", "--short", "HEAD"), "main")
+
+    def test_still_fails_clearly_when_no_fallback_exists(self):
+        missing_path = os.path.join(self.tmp.name, "nonexistent-parent", "nonexistent-repo-xyz")
+        env = dict(os.environ, HOME=os.path.join(self.tmp.name, "empty-home"))
+        r = subprocess.run(
+            ["bash", SCRIPT, missing_path, "main"],
+            capture_output=True, text=True, env=env,
+        )
+        self.assertNotEqual(r.returncode, 0)
+        self.assertIn("No such file or directory", r.stderr)
+
+
 if __name__ == "__main__":
     unittest.main()

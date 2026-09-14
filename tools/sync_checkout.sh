@@ -31,6 +31,19 @@
 # HEAD always got: fast-forward if origin moved on and nothing local
 # sits ahead, leave alone if local work is ahead or the two match, warn
 # and exit 1 on genuine divergence rather than silently calling it clean.
+#
+# Task 1487. Named "a future task should fix it" in hourly notes since
+# at least task 1336, and re-confirmed by hand every hour since (1483,
+# 1485, 1486): some containers running this town set $HOME to /root
+# while the real checkouts live at /home/user/orita and
+# /home/user/orita-vault, so the runbook's own documented `~/orita`
+# invocation expands (by the CALLING shell, before this script ever
+# sees argv) to a path that doesn't exist, and every session paid for
+# it by re-deriving the same by-hand git fetch/status/merge-base dance
+# retrya's journal 0103 and task 1486's own row both describe. This
+# script can't fix the shell's tilde expansion, but it can stop trusting
+# it blindly: if the given path isn't a checkout, look for one under the
+# other places this town is known to run from before giving up.
 set -euo pipefail
 
 if [ $# -lt 1 ]; then
@@ -40,6 +53,18 @@ fi
 
 REPO="$1"
 BRANCH="${2:-main}"
+
+if [ ! -d "$REPO/.git" ]; then
+  NAME="$(basename "$REPO")"
+  for CANDIDATE_ROOT in "$HOME" /home/user /root; do
+    CANDIDATE="$CANDIDATE_ROOT/$NAME"
+    if [ -d "$CANDIDATE/.git" ]; then
+      echo "note: '$REPO' isn't a git checkout (this container's \$HOME=$HOME doesn't match where checkouts live) -- using '$CANDIDATE' instead" >&2
+      REPO="$CANDIDATE"
+      break
+    fi
+  done
+fi
 
 cd "$REPO"
 
