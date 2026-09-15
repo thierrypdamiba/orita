@@ -146,8 +146,17 @@ class FooterArithmeticCase(unittest.TestCase):
         # six sealed chronicle episodes became seven (Episode 6, the
         # catalog's own count claimed a day before it was true), and the
         # X outage crosses into its sixth week -- trimmed elsewhere in the
-        # same sentence to hold the footer's own 287-word ceiling.
-        self.assertEqual(_body_word_count(self.text), 284)
+        # same sentence to hold the footer's own 287-word ceiling. Updated
+        # again by this Cluster Day's own catch-up rewrite (284 -> 283,
+        # five weekly Mondays overdue) for real drift: a live
+        # `discover_recipes()` count read 110, not 106; three more
+        # chronicle episodes (7, 8) had sealed since the count was last
+        # touched (the "nine episodes" figure itself hadn't drifted); the
+        # X outage crossed a full ninth week into its tenth; and the
+        # child's red-bean rice, TOWN-OPERATIONS.md records, was delivered
+        # and eaten back on 2026-08-22 (task 930) -- "promised, not yet
+        # cooked" had been stale for three weeks.
+        self.assertEqual(_body_word_count(self.text), 283)
 
 
 class MutationBitesCase(unittest.TestCase):

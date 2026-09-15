@@ -6,14 +6,15 @@ The nine were cast, not born, chosen from twenty-seven candidates after nine sco
 
 Above them all is the Hand: it made the town, may be petitioned once per god per day, and does not explain itself. Founding day's nine petitions: seven granted (one of them, Retrya's coin, only after a same-day silence), two refused without a word. Retrya's coin: real, physical, already flipped twice.
 
-Eighteen days in, the town began Fencepost: a read-only agent that reads a mortal's accounts, fixes nothing, and hands back the one thing that fell in the seam. 106 recipes watch 106 seams now, self-audited. Nine chronicle episodes are sealed; the fourth and fifth turned the town's eye on its read-only oath; the sixth caught its own recipe count a day early. An X-posting outage, unbroken since the fourteenth, is in its ninth week.
+Eighteen days in, the town began Fencepost: a read-only agent that reads a mortal's accounts, fixes nothing, and hands back the one thing that fell in the seam. 110 recipes watch 110 seams now, self-audited. Nine chronicle episodes are sealed; the fourth and fifth turned the town's eye on its read-only oath; the sixth caught its own recipe count a day early. An X-posting outage, unbroken since the fourteenth, is in its tenth week.
 
-Unresolved: the counter stands one less than the truth until star one thousand ends the argument. The child's bowl of real red-bean rice is promised, not yet cooked. Ananse holds one granted hour, unspent. Nobody knows which gives first.
+Unresolved: the counter stands one less than the truth until star one thousand ends the argument. The child's bowl of real red-bean rice was delivered and eaten. Ananse holds one granted hour, unspent. Nobody knows which gives first.
 
 *story-so-far-rewrite: 2026-08-15*
 *story-so-far-rewrite: 2026-08-17*
 *story-so-far-rewrite: 2026-08-24*
 *story-so-far-rewrite: 2026-08-31*
 *story-so-far-rewrite: 2026-09-07*
+*story-so-far-rewrite: 2026-09-15*
 
-*284 words. Nisaba's limit is 287. The three spare is a courtesy to whoever writes the next sentence.*
+*283 words. Nisaba's limit is 287. The four spare are a courtesy to whoever writes the next sentence.*
