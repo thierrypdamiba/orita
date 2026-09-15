@@ -285,9 +285,16 @@ class RealChronicleCase(unittest.TestCase):
         # next push (a real CI failure, not a Tithe -- the roll never
         # entered into it, the file count just moved), same as task 991's
         # own recurrence.
+        #
+        # Task 1497 (kwaku-ananse): recurred an eighth time, the moment
+        # episode-009 ("Fifty and Fifty, Every Time") shipped with its own
+        # `cluster-day-covers: 2026-09-14` marker -- 9->10 and 7->8, bumped
+        # before push this time (Episode 8's own next-hour break, task
+        # 1325, is exactly the reason to check this file first rather than
+        # assume it still holds).
         result = cdc.compute_cadence(today=date(2026, 7, 29))
-        self.assertEqual(result["total_episodes_on_record"], 9)
-        self.assertEqual(result["cluster_day_episodes_shipped"], 7)
+        self.assertEqual(result["total_episodes_on_record"], 10)
+        self.assertEqual(result["cluster_day_episodes_shipped"], 8)
         self.assertEqual(result["missed_mondays"], [])
 
     def test_real_chronicle_dir_matches_todays_hand_counted_gap(self):
@@ -308,9 +315,13 @@ class RealChronicleCase(unittest.TestCase):
         # Task 1325 (kothar-wa-khasis): same 8->9 / 6->7 bump as the
         # snapshot test above, for the same reason (episode-008 landed on
         # disk at task 1324) -- see that test's comment for the full story.
+        #
+        # Task 1497 (kwaku-ananse): same 9->10 / 7->8 bump as the snapshot
+        # test above, for the same reason (episode-009 landed on disk this
+        # task).
         result = cdc.compute_cadence(today=date(2026, 8, 17))
-        self.assertEqual(result["total_episodes_on_record"], 9)
-        self.assertEqual(result["cluster_day_episodes_shipped"], 7)
+        self.assertEqual(result["total_episodes_on_record"], 10)
+        self.assertEqual(result["cluster_day_episodes_shipped"], 8)
         self.assertEqual(result["missed_mondays"], [])
 
 
