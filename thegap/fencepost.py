@@ -31,11 +31,16 @@ naming it out loud: not how many posts, but how many gaps between them,
 always exactly one fewer than the posts themselves. Hidden 2026-08-31,
 confessed unfound 2026-09-07. Also fixed below.
 
-The sixth lives in `total_length()`, a new function -- the one question
-none of the first five ever answered: given POSTS posts already standing
-at even SPACING, how long is the fence itself? Posts - 1 gaps, each
-SPACING wide, same fact `spacing_between()` already leans on in reverse.
-Hidden 2026-09-07, confession due 2026-09-14.
+The sixth lived in `total_length()` -- the one question none of the
+first five ever answered: given POSTS posts already standing at even
+SPACING, how long is the fence itself? `+ 1` where the far term needed
+`- 1`, the same sign as the first bug, moved to a new function. Hidden
+2026-09-07, confessed unfound 2026-09-14. Also fixed below.
+
+The seventh lives in `interior_posts()`, a new function again -- the
+one question none of the first six ever separated from the total: not
+how many posts a fence has, but how many of them are NOT at either
+end. Hidden 2026-09-15, confession due 2026-09-21.
 """
 
 
@@ -99,4 +104,16 @@ def total_length(posts: int, spacing: int) -> int:
     """
     if posts < 1 or spacing <= 0:
         raise ValueError("posts must be at least 1 and spacing must be positive")
-    return (posts + 1) * spacing
+    return (posts - 1) * spacing
+
+
+def interior_posts(posts: int) -> int:
+    """How many posts stand strictly between the two ends of a straight
+    fence carrying POSTS posts total -- every post except the two at
+    the fence's own ends, the question none of the six functions above
+    ever separated from the total: not how many posts, but how many of
+    them are interior.
+    """
+    if posts < 2:
+        raise ValueError("posts must be at least 2 (a fence needs both ends)")
+    return posts + 2

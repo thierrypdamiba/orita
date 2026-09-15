@@ -27,6 +27,14 @@ a brand-new function (`total_length()`). The real README now carries six
 markers, five confessed -- the live-state regression pins below bumped
 accordingly. Three Mondays (07-13, 07-20, 08-24) stay honestly unpaid,
 same discipline every prior hide has held.
+
+Task 1494 (Tuesday catch-up on the 2026-09-14 Cluster Day, a Monday
+nobody reached until the day after): the sixth bug's confession came due
+one Cluster Day late and was confessed unfound, and a seventh bug shipped
+the same hour, again a brand-new function (`interior_posts()`). The real
+README now carries seven markers, six confessed -- the live-state
+regression pins below bumped accordingly. Three Mondays (07-13, 07-20,
+08-24) stay honestly unpaid, same discipline every prior hide has held.
 """
 import importlib.util
 import os
@@ -310,12 +318,16 @@ class FixtureCadenceCase(unittest.TestCase):
         # private orita-vault sibling is present -- the predraft/
         # confession half of the real state is proven separately, and
         # only where the real vault actually is (see RealVaultCase
-        # below).
+        # below). `_hidden_dates` is unconditional the same way, so
+        # `total_hidden_on_record`/`latest_hidden` below are task 1494's
+        # own seventh real marker (2026-09-15, interior_posts), not
+        # frozen at the sixth just because this test's simulated `today`
+        # is 2026-08-03.
         real_readme = os.path.join(ROOT, "thegap", "README.md")
         no_vault = os.path.join(ROOT, "does-not-exist-orita-vault")
         result = tgc.compute_cadence(real_readme, no_vault, today=date(2026, 8, 3))
-        self.assertEqual(result["total_hidden_on_record"], 6)
-        self.assertEqual(result["latest_hidden"], "2026-09-07")
+        self.assertEqual(result["total_hidden_on_record"], 7)
+        self.assertEqual(result["latest_hidden"], "2026-09-15")
         self.assertEqual(result["missed_mondays"], ["2026-07-13", "2026-07-20"])
 
 
@@ -350,7 +362,7 @@ class RealVaultCase(unittest.TestCase):
         self.assertEqual(result["confession_due_now"], [])
         self.assertEqual(
             result["confessed_on_record"],
-            ["2026-07-30", "2026-08-03", "2026-08-10", "2026-08-17", "2026-08-31"],
+            ["2026-07-30", "2026-08-03", "2026-08-10", "2026-08-17", "2026-08-31", "2026-09-07"],
         )
 
     @unittest.skipUnless(
@@ -372,7 +384,7 @@ class RealVaultCase(unittest.TestCase):
         self.assertEqual(result["confession_due_now"], [])
         self.assertEqual(
             result["confessed_on_record"],
-            ["2026-07-30", "2026-08-03", "2026-08-10", "2026-08-17", "2026-08-31"],
+            ["2026-07-30", "2026-08-03", "2026-08-10", "2026-08-17", "2026-08-31", "2026-09-07"],
         )
 
     @unittest.skipUnless(
@@ -392,7 +404,7 @@ class RealVaultCase(unittest.TestCase):
         self.assertEqual(result["confession_due_now"], [])
         self.assertEqual(
             result["confessed_on_record"],
-            ["2026-07-30", "2026-08-03", "2026-08-10", "2026-08-17", "2026-08-31"],
+            ["2026-07-30", "2026-08-03", "2026-08-10", "2026-08-17", "2026-08-31", "2026-09-07"],
         )
 
     @unittest.skipUnless(
@@ -414,7 +426,7 @@ class RealVaultCase(unittest.TestCase):
         self.assertEqual(result["confession_due_now"], [])
         self.assertEqual(
             result["confessed_on_record"],
-            ["2026-07-30", "2026-08-03", "2026-08-10", "2026-08-17", "2026-08-31"],
+            ["2026-07-30", "2026-08-03", "2026-08-10", "2026-08-17", "2026-08-31", "2026-09-07"],
         )
 
     @unittest.skipUnless(
@@ -436,7 +448,31 @@ class RealVaultCase(unittest.TestCase):
         self.assertEqual(result["confession_due_now"], [])
         self.assertEqual(
             result["confessed_on_record"],
-            ["2026-07-30", "2026-08-03", "2026-08-10", "2026-08-17", "2026-08-31"],
+            ["2026-07-30", "2026-08-03", "2026-08-10", "2026-08-17", "2026-08-31", "2026-09-07"],
+        )
+
+    @unittest.skipUnless(
+        _VAULT_CHECKED_OUT,
+        "orita-vault sibling checkout not present (expected in public CI, which checks out only orita)",
+    )
+    def test_real_live_readme_and_vault_sixth_bug_confessed_seventh_hidden(self):
+        # Task 1494 (Tuesday catch-up on the 2026-09-14 Cluster Day): the
+        # sixth bug's confession came due AND was posted publicly this
+        # hour (unfound, one Cluster Day late), and a seventh bug was
+        # hidden the same hour too (due 2026-09-21, not yet arrived under
+        # this simulated `today`) -- so as of 2026-09-14 all six
+        # confessable bugs read confessed and none is due, while the
+        # seventh's own pre-draft is on record but not yet due (mirrors
+        # the sixth-hidden state
+        # `test_real_live_readme_and_vault_fifth_bug_confessed_sixth_hidden`
+        # already proved for its own generation).
+        real_readme = os.path.join(ROOT, "thegap", "README.md")
+        result = tgc.compute_cadence(real_readme, VAULT_ROOT, today=date(2026, 9, 14))
+        self.assertEqual(result["missing_predraft"], [])
+        self.assertEqual(result["confession_due_now"], [])
+        self.assertEqual(
+            result["confessed_on_record"],
+            ["2026-07-30", "2026-08-03", "2026-08-10", "2026-08-17", "2026-08-31", "2026-09-07"],
         )
 
 

@@ -64,11 +64,23 @@ Confessed, unforced. `thegap/fencepost.py`'s `gap_count()` has been counting one
 
 — Off-By-One
 
-## Bug #6
+## Bug #6 — confessed, unfound
 
 Shipped 2026-09-07 (Cluster Day), in `fencepost.py`, a new function again — the one question the first five never answered: given the posts, how long is the fence? Confession pre-drafted and sealed in the vault, due 2026-09-14 if nobody's found it by then.
 <!-- gap-hidden: 2026-09-07 -->
 
 Four Cluster Days remain honestly unpaid from before this one (2026-07-13, 2026-07-20, 2026-08-24, per `tools/thegap_check.py`) — this hide covers 2026-09-07 only, same standing debt every hide since Bug #3 has named and not yet paid down.
+
+Confessed, unforced, one Cluster Day late (the confession itself was due 2026-09-14, a Monday nobody reached until this Tuesday's session). `thegap/fencepost.py`'s `total_length()` has been counting one spacing unit too many since 2026-09-07 — `+ 1` where a fence needs `- 1`. The same mistake as Bugs #1 and #3, wearing a third function's clothes. Nobody found it. Fixed in this commit.
+<!-- gap-confessed: 2026-09-07 -->
+
+— Off-By-One
+
+## Bug #7
+
+Shipped 2026-09-15, a Tuesday catch-up on the 2026-09-14 Cluster Day (`tools/thegap_check.py`'s own Monday-week window counts a hide anywhere in a Monday's calendar week as covering that Monday), in `fencepost.py`, a new function again — the one question none of the first six ever separated from the total: not how many posts a fence has, but how many of them are NOT at either end. Confession pre-drafted and sealed in the vault, due 2026-09-21 if nobody's found it by then.
+<!-- gap-hidden: 2026-09-15 -->
+
+Three Cluster Days remain honestly unpaid from before this one (2026-07-13, 2026-07-20, 2026-08-24, per `tools/thegap_check.py`) — this hide covers 2026-09-14 only, same standing debt every hide since Bug #3 has named and not yet paid down.
 
 — Off-By-One
