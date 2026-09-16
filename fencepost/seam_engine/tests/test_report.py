@@ -805,13 +805,24 @@ def test_no_cleared_blocker_headline_falls_through_to_default():
 # Nothing forces the sweep; a new recipe landing between sweeps with a wrong
 # default-fallthrough would ship silently and stay silent until the next one.
 #
-# Confirmed live, this hour, walking all 103 real recipes via
+# Confirmed live, that hour (task 1364), walking all 103 real recipes via
 # `discover_recipes`/`load_detector` (the exact method every prior sweep
-# used): exactly 17 fall to `_DEFAULT_MOVE` today, and all 17 are the
+# used): exactly 17 fell to `_DEFAULT_MOVE`, and all 17 were the
 # `*-still-open` family task 914's own docstring already named as genuine
 # closes (task 1357's own re-sweep confirmed the same 17 after fixing the
 # 18th). This test freezes that live-confirmed set as `_KNOWN_GENUINE_
 # DEFAULT_CLOSES` and asserts the sweep's result exactly matches it --
+#
+# Task 1519 (retrya) re-ran the same sweep live: `RECIPES/` had grown from
+# 103 to 110 real, discoverable recipes with no sweep in between, and this
+# test's own unconditional CI guard is exactly why that drift shipped
+# safely anyway -- it still passed every run in between, because none of
+# the 7 new recipes' fixtures fell to `_DEFAULT_MOVE` outside this frozen
+# set. Confirmed live at 110: still exactly these same 17 slugs, nothing
+# added, nothing removed. The frozen set below is unchanged; only the
+# stale "103" above (now corrected to name the task-1364 count it always
+# was) needed fixing, so the next sweep starts from an honest history of
+# each count rather than a single perpetually-stale number --
 # turning ten hours of manual, optional re-checking into one permanent,
 # unconditional CI guard, the same "construction-only assertion into a
 # running check" move Iron Rule #1 named for `vault_leak_check.py`. A future

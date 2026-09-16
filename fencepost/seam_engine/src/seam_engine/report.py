@@ -527,6 +527,21 @@ _MOVE_RULES: tuple[tuple[str, str], ...] = (
         "is still open, unmerged",
         "Finish it, or correct the claim yourself — the record says something is done that isn't. Fencepost only found the seam; it does not cross it.",
     ),
+    # Task 1519 (retrya, own-remit sweep of The One Action, Left to You):
+    # `fencepost/RECIPES/` grew from 103 (task 1357/1364's own live count) to
+    # 110 real, discoverable recipes without any hour re-running this sweep
+    # in between -- exactly the unforced gap task 1364's own docstring
+    # named ("nothing forces the sweep... a new recipe landing between
+    # sweeps with a wrong default-fallthrough would ship silently"). Walked
+    # all 110 live via `discover_recipes`/`load_detector`, the same method
+    # every prior sweep used: still exactly 17 fall to `_DEFAULT_MOVE`
+    # today, and the 17 are byte-identical to `_KNOWN_GENUINE_DEFAULT_
+    # CLOSES` in `test_report.py` -- none of the 7 new recipes introduced a
+    # silent wrong-verb regression. Nothing to fix in `_MOVE_RULES` this
+    # hour; the fix is `test_default_move_fallthrough_is_a_closed_frozen_
+    # set`'s own docstring below, corrected from the stale "103" to this
+    # hour's live count so the next sweep starts from an honest baseline
+    # instead of re-discovering the same seven-recipe drift by hand.
 )
 _DEFAULT_MOVE = (
     "Close it yourself, however it's meant to be closed. Fencepost only found the seam; it does not cross it."
