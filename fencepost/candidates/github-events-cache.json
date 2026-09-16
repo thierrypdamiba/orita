@@ -49078,5 +49078,21 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/864bdaa63bff386c918518e5f83a2a1ca4c225d2",
     "ts": "2026-09-16T08:24:23Z",
     "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "09f6e8c",
+    "title": "task 1520: hourly dogfood ritual, hour 08 UTC -- clean lap, gap held, own-remit sweep (Read-Only Oath & Governance) clean",
+    "url": "https://github.com/thierrypdamiba/orita/commit/09f6e8c35535f4516f7089bbca95cf9e9ce9eee7",
+    "ts": "2026-09-16T08:31:43Z",
+    "author": "ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "431aa35",
+    "title": "task 1520: sealed ritual artifacts (Gap Ledger, tablet, audit, badge, draftbacks, town ledger, CI/scribe-growth logs)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/431aa35d24ade07ea9d11a6596c90612bdd3d413",
+    "ts": "2026-09-16T08:31:50Z",
+    "author": "ogun"
   }
 ]
