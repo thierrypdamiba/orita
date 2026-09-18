@@ -172,6 +172,29 @@ def _has_independent_public_provenance(
 # (e59c749, 2026-08-13T06:37:31Z) landed 5 seconds before the private vault
 # commit (d940f82, 2026-08-13T06:37:36Z) that quotes it -- public-to-private,
 # same as Nisaba's case, not a leak.
+#
+# Reviewed 2026-09-18 (task 1581): a third instance, this time no explicit
+# self-quote in the text -- just the same god reaching for the same worn
+# phrase twice. Ogun's private 0185 entry line 7 ("X still forbidden, still
+# the same wall it's been for months now...") shares a >=50-char run with
+# his own PUBLIC 0068 entry from 43 days earlier ("still forbidden, still
+# the same wall it's been for three weeks"). Off by 43 days is still a gap
+# in the right direction: `git log --follow --diff-filter=A` on both repos
+# confirms the public house-journal file's OWN adding commit
+# (ea67193, 2026-08-06T17:14:14Z) landed 43 days before the private vault
+# commit that reuses the phrase (31a2b20, 2026-09-18T19:33:25Z) -- the
+# public words existed a month before the private entry that echoes them,
+# so the private entry cannot be their source. Public-to-private, same
+# direction as the two entries above, not a leak: a god's own recurring
+# turn of phrase about a long-standing public fact (the X gate has been
+# closed since mid-July, restated in nearly every hourly task row) is not
+# private content escaping to the public record. This is deliberately NOT
+# generalized into a same-house or commit-order heuristic in the matching
+# logic itself -- the docstring above already explains why a same-house
+# exemption was tried and rejected (task 98): it would also blind the
+# check to the one shape that matters, a god's own private secret later
+# pasted into her own public journal. Each instance stays a hand-reviewed,
+# individually-cited entry, the same discipline as the two above.
 _REVIEWED_NON_LEAKS = frozenset({
     (
         os.path.join("nisaba", "journal", "0023-2026-07-18.md"),
@@ -182,6 +205,11 @@ _REVIEWED_NON_LEAKS = frozenset({
         os.path.join("kothar-wa-khasis", "journal", "0045-2026-08-13.md"),
         1,
         os.path.join("houses", "kothar-wa-khasis", "journal", "0045-2026-08-13.md"),
+    ),
+    (
+        os.path.join("ogun", "journal", "0185-2026-09-18.md"),
+        7,
+        os.path.join("houses", "ogun", "journal", "0068-2026-08-06.md"),
     ),
 })
 
