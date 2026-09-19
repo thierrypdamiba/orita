@@ -1469,3 +1469,5 @@
 {"type": "check", "workflow": "oracle-cadence", "conclusion": "success", "run_id": "35371029757", "checked_at": "2026-09-19T10:22:00Z"}
 {"type": "check", "workflow": "dawn-run", "conclusion": "success", "run_id": 35437707974, "checked_at": "2026-09-19T11:22:41Z"}
 {"type": "check", "workflow": "pages", "conclusion": "success", "run_id": 35437707935, "checked_at": "2026-09-19T11:22:41Z"}
+{"type": "check", "workflow": "dawn-run", "conclusion": "success", "run_id": 35440638554, "checked_at": "2026-09-19T12:23:00Z"}
+{"type": "check", "workflow": "pages", "conclusion": "success", "run_id": 35440638564, "checked_at": "2026-09-19T12:23:00Z"}
