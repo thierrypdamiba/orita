@@ -671,6 +671,7 @@ _CARDINAL_WORDS = {
     "one hundred two": 102, "one hundred three": 103, "one hundred four": 104,
     "one hundred five": 105, "one hundred six": 106, "one hundred seven": 107,
     "one hundred eight": 108, "one hundred nine": 109, "one hundred ten": 110,
+    "one hundred eleven": 111,
 }
 
 # The total-count word may be a single hyphenated token ("ninety-nine") or
@@ -729,7 +730,7 @@ def test_plus_joined_claim_missing_sentence_raises():
         claimed_plus_joined_counts("Nothing here about plus-joined toolkits.")
 
 
-def test_real_plus_joined_counts_are_currently_thirty_eight_of_one_hundred_ten():
+def test_real_plus_joined_counts_are_currently_thirty_eight_of_one_hundred_eleven():
     # Regression pin: today's real, live counts under RECIPES/. Was (37, 105)
     # until calendar-event-dangling-reference merged (the hundred-sixth
     # real recipe, toolkit "google_calendar+github" -- plus-joined, so
@@ -743,14 +744,16 @@ def test_real_plus_joined_counts_are_currently_thirty_eight_of_one_hundred_ten()
     # hundred-ninth real recipe, toolkit "github" -- NOT plus-joined), so
     # only the total climbed again that time: 38 of 109. Then
     # repo-description-claims-unmerged-pr merged (the hundred-tenth real
-    # recipe, toolkit "github" -- NOT plus-joined), so only the total
-    # climbs again this time: 38 of 110.
+    # recipe, toolkit "github" -- NOT plus-joined), so the total climbed
+    # again that time: 38 of 110. Then manifest-version-never-tagged
+    # merged (the hundred-eleventh real recipe, toolkit "github" -- NOT
+    # plus-joined), so only the total climbs again this time: 38 of 111.
     # `real_plus_joined_counts` counts every recipe whose OWN toolkit
     # string contains "+" -- not distinct toolkit-pair strings. Verified
     # against the live tree, not assumed from a prior task's own note:
     # every one of today's plus-joined recipes was grepped by hand before
     # pinning this number.
-    assert real_plus_joined_counts(FENCEPOST_ROOT) == (38, 110)
+    assert real_plus_joined_counts(FENCEPOST_ROOT) == (38, 111)
 
 
 def test_oath_scopes_for_toolkit_docstring_matches_the_real_live_counts():

@@ -1,0 +1,12 @@
+{
+  "slug": "manifest-version-never-tagged",
+  "title": "The version manifest was bumped, but no git tag was ever pushed for it",
+  "author": "retrya",
+  "description": "Reads the project's own version manifest (pyproject.toml, package.json, Cargo.toml, or any sibling file carrying a version field) and cross-checks its declared version, normalized against a leading v/V, against every pushed git tag. A version with no matching tag is the gap: it shipped in a committed file but never became a release. A version carrying its own pre-release/build-metadata suffix (-rc, -alpha, -beta, -dev, -SNAPSHOT, +build) is excluded outright -- the author already said, in the string itself, that it isn't released yet.",
+  "toolkit": "github",
+  "scopes": ["GetFileContents", "ListTags"],
+  "fixture": "fixtures/manifest_version_never_tagged",
+  "detector_file": "detector.py",
+  "entrypoint": "run_recipe_scan",
+  "confidence_notes": "Flat 0.75 on a surfaced gap -- lower than tag-never-released's 0.85 on purpose: that recipe's seam starts from a tag that already, unambiguously, exists; this one starts one level further upstream, at a version string a human typed into a file, which can honestly outrun its own tag by a short, ordinary window (a manifest bumped as part of the same commit that will be tagged moments later) with no dishonesty involved. The confidence is capped below tag-never-released's own bar to reflect that extra, real uncertainty, never inflated to match it. A version carrying a pre-release/build-metadata suffix is excluded at 0.0, named not hidden, before the tag comparison ever runs -- the author's own suffix already answers the question. A version with a normalized-exact tag match is excluded at 0.0 as well -- the claim was simply true."
+}

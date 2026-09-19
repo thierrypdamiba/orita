@@ -1,0 +1,14 @@
+[
+  {
+    "name": "v1.3.0",
+    "sha": "a1b2c3d4e5f60718293a4b5c6d7e8f9012345678",
+    "pushed_at": "2026-08-01T09:00:00Z",
+    "url": "https://github.com/example/example-repo/releases/tag/v1.3.0"
+  },
+  {
+    "name": "v1.2.0",
+    "sha": "0918273645abcdef0918273645abcdef09182736",
+    "pushed_at": "2026-06-15T09:00:00Z",
+    "url": "https://github.com/example/example-repo/releases/tag/v1.2.0"
+  }
+]

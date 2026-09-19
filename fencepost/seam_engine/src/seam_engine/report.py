@@ -435,6 +435,20 @@ _MOVE_RULES: tuple[tuple[str, str], ...] = (
         "no github release was ever published",
         "Publish the release yourself — the tag is already there. Fencepost only found the seam; it does not cross it.",
     ),
+    # Task 1607 (retrya, RECIPES/manifest-version-never-tagged/, the
+    # hundred-eleventh real recipe): its own headline template ("declares
+    # {version}, but no git tag was ever pushed for it") shares the same
+    # "already resolved in spirit, a close is the wrong verb" defect class
+    # task 914's own sweep already named for its closest sibling,
+    # `tag-never-released` ("no github release was ever published", the
+    # needle just above this one) -- a version bump sitting in a committed
+    # manifest is not something to CLOSE, it needs a tag PUSHED for it.
+    # Grep-confirmed unique against every other recipe's own headline
+    # template before adding, the same discipline every needle above holds.
+    (
+        "no git tag was ever pushed",
+        "Push the tag yourself — the version is already committed. Fencepost only found the seam; it does not cross it.",
+    ),
     (
         "was never deleted",
         "Delete the branch yourself — the PR already merged. Fencepost only found the seam; it does not cross it.",

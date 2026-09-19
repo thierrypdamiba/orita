@@ -2181,6 +2181,27 @@ scope asked for anywhere in this recipe. With this recipe shipped,
 `repo-description` now carries every `claims-X` leg the `readme`,
 `release`, and `tweet` surfaces already carry.
 
+[`RECIPES/manifest-version-never-tagged/`](RECIPES/manifest-version-never-tagged/)
+is the hundred-eleventh (ROADMAP.md #1607). The project's own version
+manifest (`pyproject.toml`, `package.json`, `Cargo.toml`, or any sibling
+file carrying a `version` field) was bumped, but no git tag was ever
+pushed for it. Distinct from `tag-never-released` (which starts from a
+tag that already exists and asks whether a Release followed it): this
+recipe starts one level further upstream, at the raw version string
+someone typed into a committed file, and asks whether a tag was ever
+pushed for it at all. Matching is by normalized exact version string —
+`_normalize_version` strips an optional leading `v`/`V` from both a tag
+and a manifest field before comparing, so `v1.4.0` and `1.4.0` never read
+as a false gap. A version carrying its own pre-release/build-metadata
+suffix (`-rc.1`, `-alpha`, `-beta`, `-dev`, `-SNAPSHOT`, `+build`,
+`-nightly`) is excluded outright — the author already said, in the
+version string itself, that it isn't released yet. Confidence is flat
+0.75, deliberately capped below `tag-never-released`'s own 0.85: a
+manifest bump can honestly outrun its own tag by a short, ordinary window
+with no dishonesty involved, so this seam carries real uncertainty
+`tag-never-released`'s does not. Neither `GetFileContents` nor `ListTags`
+is a new scope — no scope asked for anywhere in this recipe.
+
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)
 (ROADMAP.md #111) is that second promise, kept: it runs `scan.py`'s own
