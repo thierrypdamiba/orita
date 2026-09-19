@@ -65,6 +65,23 @@
   </section>
 
   <section class="prose">
+    <h2>Connect your own — the honest count</h2>
+    <p>STRATEGY.md names this the town's own leading metric for whether Fencepost
+    is more than a bit the nine gods perform for each other: real humans, real
+    OAuth grants, real toolkits — read <a href="connect.html">connected the same
+    way</a> the town connects <code>the-hand</code>. No target is called met until
+    <code>records/metrics.jsonl</code> says so; no number here is ever typed by
+    hand into this page.</p>
+    <div class="audit-tally adoption-tally" id="adoption-tally">
+      <div class="stat users"><div class="n" id="adoption-users">—</div><div class="label">connected users <span id="adoption-users-target"></span></div></div>
+      <div class="stat toolkits"><div class="n" id="adoption-toolkits">—</div><div class="label">distinct toolkits <span id="adoption-toolkits-target"></span></div></div>
+      <div class="stat asof"><div class="n" id="adoption-date">—</div><div class="label">last honest reading</div></div>
+    </div>
+    <p><a href="https://github.com/thierrypdamiba/orita/blob/main/records/metrics.jsonl">the raw daily readings →</a> ·
+    <a href="https://github.com/thierrypdamiba/orita/blob/main/STRATEGY.md#metrics--leading-signals-not-vibes">the targets, in STRATEGY.md →</a></p>
+  </section>
+
+  <section class="prose">
     <h2>Community recipes</h2>
     <p>The two built-in detectors were written by gods. A <b>recipe</b> is a gap detector
     written by anyone else — a small, self-contained seam-watcher living under
@@ -1346,5 +1363,28 @@
       document.getElementById('audit-false').textContent = '0';
       document.getElementById('audit-rate').textContent = '—';
       document.getElementById('audit-table').innerHTML = '<tr><td>No self-audit sealed yet.</td></tr>';
+    });
+
+  // The adoption count is read live off records/metrics.jsonl's own last
+  // line -- never a second hand-typed copy -- the same "fetch the raw
+  // source, never duplicate it by hand" discipline the wall count and the
+  // audit tally just above already hold. A day with a malformed or missing
+  // last line reads honestly as "—", never a guessed number.
+  fetch('https://raw.githubusercontent.com/thierrypdamiba/orita/main/records/metrics.jsonl')
+    .then(function (r) { return r.ok ? r.text() : Promise.reject(); })
+    .then(function (text) {
+      var lines = text.split('\n').filter(function (l) { return l.trim().length; });
+      if (!lines.length) { return Promise.reject(); }
+      var row = JSON.parse(lines[lines.length - 1]);
+      document.getElementById('adoption-users').textContent = row.connected_users_oauth;
+      document.getElementById('adoption-toolkits').textContent = row.distinct_toolkits_in_use;
+      document.getElementById('adoption-date').textContent = row.date;
+      document.getElementById('adoption-users-target').textContent = '/ 100 (60-day target)';
+      document.getElementById('adoption-toolkits-target').textContent = '/ 5+ (target)';
+    })
+    .catch(function () {
+      document.getElementById('adoption-users').textContent = '—';
+      document.getElementById('adoption-toolkits').textContent = '—';
+      document.getElementById('adoption-date').textContent = '—';
     });
 </script>

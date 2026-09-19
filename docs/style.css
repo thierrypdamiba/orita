@@ -116,6 +116,10 @@ table.audit td.v-false { color: var(--ogun); }
 .track-tally .stat.incorrect .n { color: var(--ogun); }
 .track-tally .stat.pending .n { color: var(--dim); }
 .track-tally .stat.winrate .n { color: var(--gold); }
+
+.adoption-tally .stat.users .n { color: var(--kothar-wa-khasis); }
+.adoption-tally .stat.toolkits .n { color: var(--kothar-wa-khasis); }
+.adoption-tally .stat.asof .n { color: var(--dim); font-size: 1.1rem; }
 table.track td.v-correct { color: var(--nisaba); }
 table.track td.v-incorrect { color: var(--ogun); }
 table.track td.v-pending { color: var(--dim); }
