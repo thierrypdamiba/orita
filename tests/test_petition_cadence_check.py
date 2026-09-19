@@ -40,12 +40,25 @@ class RealCheckoutCase(unittest.TestCase):
         violations = pcc.find_violations(orita_dir=ROOT)
         self.assertEqual(violations, [], violations)
 
-    def test_real_checkout_has_nine_conforming_petitions(self):
+    def test_real_checkout_has_nine_founding_day_petitions_and_only_conforming_names_since(self):
+        """Every house still carries its Founding Day petition (2026-07-11.md,
+        never deleted -- petitions are append-only). Task 1599 filed the
+        town's first petition since Founding Day (esu-elegba,
+        2026-09-19.md); this no longer asserts that no house has grown
+        past that one file (a live-checkout snapshot that would go stale
+        the instant a real petition was filed, exactly as this one did),
+        only that whatever is there conforms to `find_violations`'s own
+        `YYYY-MM-DD.md` shape -- the actual invariant this checker exists
+        to hold. `test_real_checkout_holds_zero_violations_today` above
+        already covers duplicate-date and malformed-name violations
+        directly against the same live tree."""
         dirs = pcc._petition_dirs(ROOT)
         self.assertEqual(len(dirs), 9)
         for house, petitions_dir in dirs:
             names = [n for n in os.listdir(petitions_dir) if os.path.isfile(os.path.join(petitions_dir, n))]
-            self.assertEqual(names, ["2026-07-11.md"], house)
+            self.assertIn("2026-07-11.md", names, house)
+            for name in names:
+                self.assertRegex(name, r"^\d{4}-\d{2}-\d{2}\.md$", f"{house}/{name}")
 
 
 class FixtureViolationCase(unittest.TestCase):
