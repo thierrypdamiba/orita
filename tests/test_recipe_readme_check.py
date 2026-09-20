@@ -495,9 +495,10 @@ class DocstringCountDoctrineCase(unittest.TestCase):
         # test_recipe_count_doctrine.py etc.) as the one dawn-run itself
         # has now caught missing five separate times (101->102 task 1259,
         # 102->103 task 1353, 103->104 task 1380's own addendum, 110->111
-        # task 1607, 111->112 task 1613 -- this fix) -- the sixth time
-        # this exact pin has been the thing dawn-run catches, still not
-        # caught proactively before a push.
+        # task 1608 (catching task 1607's own miss), 111->112 task 1613's
+        # own addendum -- this fix) -- the sixth time this exact pin has
+        # been the thing dawn-run catches, still not caught proactively
+        # before a push.
         with open(rrc.DEFAULT_README_PATH, encoding="utf-8") as f:
             text = f.read()
         section = rrc._community_recipes_section(text)
