@@ -392,6 +392,10 @@ def _window_rotation_check() -> ModuleType:
     return _load("_ritual_window_rotation_check", os.path.join(ROOT, "tools", "window_rotation_check.py"))
 
 
+def _daytime_rotation_check() -> ModuleType:
+    return _load("_ritual_daytime_rotation_check", os.path.join(ROOT, "tools", "daytime_rotation_check.py"))
+
+
 def _roadmap_buildlog_sync_check() -> ModuleType:
     return _load(
         "_ritual_roadmap_buildlog_sync_check", os.path.join(ROOT, "tools", "roadmap_buildlog_sync_check.py")
@@ -1539,6 +1543,33 @@ def check_window_rotation(roadmap_path: str | None = None) -> dict[str, object]:
         kwargs["roadmap_path"] = roadmap_path
     result = cast(dict[str, object], mod.find_window_violations(**kwargs))
     result["whose_turn"] = mod.whose_turn()
+    return result
+
+
+def check_daytime_rotation(roadmap_path: str | None = None) -> dict[str, object]:
+    """Task 1625: `window_rotation_check.py`'s own sibling for the OTHER
+    half of the rotation doctrine -- outside the 00:00-06:00 UTC window,
+    TOWN-OPERATIONS.md and every recent row both call it "the fixed
+    seven-god cycle", but until this task nothing had ever checked a
+    daytime owner-to-owner transition against that cycle; it lived only
+    in each row's own free-text hand-off sentence. Task 1624's own
+    sentence broke the pattern for the first time ("Forward to esu-elegba
+    next" -- skipping kwaku-ananse's actual turn) and was caught here,
+    this same hour, before any row was ever opened in the wrong name.
+    Unconditional, local-filesystem-only, the same cheap always-on class
+    `check_window_rotation` already holds. Also carries `whose_turn`
+    (`daytime_rotation_check.whose_turn_daytime`, evaluated live) so
+    `format_ritual_check` can print the deterministic next owner
+    unmissably, the same reason task 1186 gave `check_window_rotation`
+    its own `whose_turn` field -- a future hour should never again have
+    to trust a hand-off sentence that might, like task 1624's, simply be
+    wrong."""
+    mod = _daytime_rotation_check()
+    kwargs: dict[str, object] = {}
+    if roadmap_path is not None:
+        kwargs["roadmap_path"] = roadmap_path
+    result = cast(dict[str, object], mod.find_daytime_rotation_violations(**kwargs))
+    result["whose_turn"] = mod.whose_turn_daytime(**kwargs)
     return result
 
 
@@ -2774,6 +2805,7 @@ def run_ritual_check(
     ritual_completeness_seam_engine_dir: str | None = None,
     wip_reclaim_path: str | None = None,
     window_rotation_path: str | None = None,
+    daytime_rotation_path: str | None = None,
     roadmap_buildlog_sync_roadmap_path: str | None = None,
     roadmap_buildlog_sync_buildlog_path: str | None = None,
     roadmap_buildlog_sync_archive_dir: str | None = None,
@@ -2936,6 +2968,7 @@ def run_ritual_check(
     )
     wip_reclaim = check_wip_reclaim(now, roadmap_path=wip_reclaim_path)
     window_rotation = check_window_rotation(roadmap_path=window_rotation_path)
+    daytime_rotation = check_daytime_rotation(roadmap_path=daytime_rotation_path)
     roadmap_buildlog_sync = check_roadmap_buildlog_sync(
         roadmap_path=roadmap_buildlog_sync_roadmap_path,
         buildlog_path=roadmap_buildlog_sync_buildlog_path,
@@ -3055,6 +3088,7 @@ def run_ritual_check(
         or (not ritual_completeness["clean"])
         or (not wip_reclaim["clean"])
         or (not window_rotation["clean"])
+        or (not daytime_rotation["clean"])
         or (not roadmap_buildlog_sync["clean"])
         or (not scopes_completeness["clean"])
         or (not toolkits_in_use["clean"])
@@ -3139,6 +3173,7 @@ def run_ritual_check(
         "ritual_completeness": ritual_completeness,
         "wip_reclaim": wip_reclaim,
         "window_rotation": window_rotation,
+        "daytime_rotation": daytime_rotation,
         "roadmap_buildlog_sync": roadmap_buildlog_sync,
         "roadmap_row_shape": roadmap_row_shape,
         "scopes_completeness": scopes_completeness,
@@ -3422,6 +3457,24 @@ def format_ritual_check(result: dict[str, Any]) -> str:
         lines.append(
             f"  window rotation: {len(wro['violations'])} LIVE VIOLATION(S) -- "
             "task opened in the 00:00-06:00 UTC window went to a non-window god, escalate now"
+        )
+    dro = result["daytime_rotation"]
+    dwt = dro.get("whose_turn")
+    if dwt is not None and dwt.get("owner") is not None:
+        lines.append(
+            f"  whose turn (daytime cycle): {dwt['owner']} next, per the fixed seven-god cycle "
+            f"(after task {dwt['last_number']}, {dwt['last_owner']}) -- read this, don't trust a "
+            "hand-off sentence"
+        )
+    if dro["clean"]:
+        lines.append(
+            f"  daytime rotation: clean ({len(dro['grandfathered'])} grandfathered pre-fix mismatch(es), "
+            f"{len(dro.get('escalated', []))} escalated-and-fixed, sealed history, not rewritten)"
+        )
+    else:
+        lines.append(
+            f"  daytime rotation: {len(dro['violations'])} LIVE VIOLATION(S) -- "
+            "a daytime owner-to-owner transition broke the fixed seven-god cycle, escalate now"
         )
     rbs = result["roadmap_buildlog_sync"]
     if rbs["clean"]:
