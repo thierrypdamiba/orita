@@ -136,11 +136,27 @@ class RealCheckoutCase(unittest.TestCase):
         late = [e for e in result["grandfathered"] if e["number"] >= 1595]
         self.assertEqual(late, [], late)
 
-    def test_real_next_turn_after_task_1625_is_esu_elegba(self):
+    def test_real_next_turn_is_internally_consistent_with_the_live_table(self):
+        # Not a hand-typed pin: task 1626 found that shape breaks dawn-run
+        # every single hour by construction, since every task opens a new
+        # ROADMAP.md row and moves "the last daytime row" along with it --
+        # exactly the "claims a number, never rechecked against the live
+        # thing it describes" pattern this whole doctrine-test genre
+        # exists to catch, just self-inflicted on a one-hour half-life
+        # instead of a one-feature one. Checked live and structurally
+        # instead: whose_turn_daytime()'s own last_number/last_owner must
+        # match the real last daytime-owner row parsed straight out of
+        # ROADMAP.md (plus archives), and owner must be exactly
+        # next_in_cycle(last_owner) -- proving the function answers its
+        # own contract against today's live table, not a snapshot of it.
+        text = drc.window_rotation_check._roadmap_and_archive_text(drc.DEFAULT_ROADMAP_PATH)
+        rows = drc._daytime_owner_rows(drc.wip_reclaim_check.parse_table_rows(text))
+        self.assertTrue(rows, "no daytime-owner row found in the live table")
+        last = rows[-1]
         turn = drc.whose_turn_daytime()
-        self.assertEqual(turn["last_number"], 1625)
-        self.assertEqual(turn["last_owner"], "kwaku-ananse")
-        self.assertEqual(turn["owner"], "esu-elegba")
+        self.assertEqual(turn["last_number"], last["number"])
+        self.assertEqual(turn["last_owner"], last["owner"])
+        self.assertEqual(turn["owner"], drc.next_in_cycle(last["owner"]))
 
 
 if __name__ == "__main__":
