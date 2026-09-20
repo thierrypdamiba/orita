@@ -1,0 +1,38 @@
+[
+  {
+    "number": 214,
+    "title": "Swap the retry backoff to exponential",
+    "state": "closed",
+    "merged": true,
+    "review_decision": "CHANGES_REQUESTED",
+    "merged_at": "2026-09-12T16:04:00Z",
+    "url": "https://github.com/example/example-repo/pull/214"
+  },
+  {
+    "number": 221,
+    "title": "Add the seam-scan cron doc",
+    "state": "closed",
+    "merged": true,
+    "review_decision": "APPROVED",
+    "merged_at": "2026-09-14T09:30:00Z",
+    "url": "https://github.com/example/example-repo/pull/221"
+  },
+  {
+    "number": 229,
+    "title": "Draft: rework the ledger append path",
+    "state": "open",
+    "merged": false,
+    "review_decision": "CHANGES_REQUESTED",
+    "merged_at": null,
+    "url": "https://github.com/example/example-repo/pull/229"
+  },
+  {
+    "number": 233,
+    "title": "Bump the pinned ruff version",
+    "state": "closed",
+    "merged": true,
+    "review_decision": null,
+    "merged_at": "2026-09-17T11:12:00Z",
+    "url": "https://github.com/example/example-repo/pull/233"
+  }
+]

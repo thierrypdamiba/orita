@@ -2202,6 +2202,27 @@ with no dishonesty involved, so this seam carries real uncertainty
 `tag-never-released`'s does not. Neither `GetFileContents` nor `ListTags`
 is a new scope — no scope asked for anywhere in this recipe.
 
+[`RECIPES/merged-pr-changes-requested-not-addressed/`](RECIPES/merged-pr-changes-requested-not-addressed/)
+is the hundred-twelfth (ROADMAP.md #1613). A pull request reached
+`merged=true` while its own live GitHub `review_decision` still read
+`CHANGES_REQUESTED` — a reviewer's objection that was never superseded by
+a later APPROVED review, a dismissal, or a re-review before the merge
+button was pressed anyway. The opposite silence from
+`approved-pr-still-unmerged` (which watches an approval that never got
+its own merge): this recipe watches an objection that never got its own
+resolution, yet merged anyway. `review_decision` is trusted as GitHub's
+own live aggregate, the identical field and the identical trust
+`approved-pr-still-unmerged` already places in it. Confidence is flat
+0.8, a notch below `tag-never-released`'s own 0.85: a repository admin
+merging over a required review with an explicit override is a real,
+legitimate path to this exact state that this recipe cannot see or
+second-guess, so the confidence stays capped to reflect that one
+irreducible blind spot rather than reading as an accusation. A pull
+request that never merged, or whose review_decision is not
+CHANGES_REQUESTED, is excluded — no promise was made or kept open to
+have missed. `ListPullRequests` is not a new scope — no scope asked for
+anywhere in this recipe.
+
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)
 (ROADMAP.md #111) is that second promise, kept: it runs `scan.py`'s own

@@ -64,7 +64,7 @@ _CARDINAL_WORDS = {
     "one hundred two": 102, "one hundred three": 103, "one hundred four": 104,
     "one hundred five": 105, "one hundred six": 106, "one hundred seven": 107,
     "one hundred eight": 108, "one hundred nine": 109, "one hundred ten": 110,
-    "one hundred eleven": 111,
+    "one hundred eleven": 111, "one hundred twelve": 112,
 }
 
 # The cardinal word itself may be a single hyphenated token ("ninety-nine")
@@ -131,10 +131,11 @@ def test_real_recipe_count_is_currently_one_hundred_eleven():
     milestone/ merged (the hundred-ninth), then 109 until RECIPES/repo-
     description-claims-unmerged-pr/ merged (the hundred-tenth), then 110
     until RECIPES/manifest-version-never-tagged/ merged (the
-    hundred-eleventh) -- the exact drift this whole doctrine file exists
-    to catch, now caught once for real instead of only rehearsed by the
-    mutation test below."""
-    assert real_recipe_count(FENCEPOST_ROOT) == 111
+    hundred-eleventh), then 111 until RECIPES/merged-pr-changes-requested-
+    not-addressed/ merged (the hundred-twelfth) -- the exact drift this
+    whole doctrine file exists to catch, now caught once for real instead
+    of only rehearsed by the mutation test below."""
+    assert real_recipe_count(FENCEPOST_ROOT) == 112
 
 
 def test_site_claim_matches_the_real_live_count():

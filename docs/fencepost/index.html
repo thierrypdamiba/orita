@@ -89,7 +89,7 @@
     reviewed and merged like any PR. The read-only oath does not loosen for outside code:
     <a href="https://github.com/thierrypdamiba/orita/blob/main/fencepost/CONTRIBUTING.md">CONTRIBUTING.md</a>
     is the schema in prose, enforced in code before a human reviewer ever reads a stranger's
-    detector. One hundred eleven real recipes stand today:</p>
+    detector. One hundred twelve real recipes stand today:</p>
     <p><b><a href="https://github.com/thierrypdamiba/orita/tree/main/fencepost/RECIPES/example-release-vs-changelog">example-release-vs-changelog</a></b>
     — the reference: proof a first external recipe PR is mergeable at all.<br>
     <b><a href="https://github.com/thierrypdamiba/orita/tree/main/fencepost/RECIPES/merged-pr-issue-still-open">merged-pr-issue-still-open</a></b>
@@ -1231,6 +1231,17 @@
     <code>+build</code>) is excluded outright: the author already said, in the string itself, that
     it isn't released yet. Neither <code>GetFileContents</code> nor <code>ListTags</code> is a new
     scope.</p>
+    <p><b><a href="https://github.com/thierrypdamiba/orita/tree/main/fencepost/RECIPES/merged-pr-changes-requested-not-addressed">merged-pr-changes-requested-not-addressed</a></b>
+    — the hundred-twelfth: a pull request reached <code>merged=true</code> while its own live
+    GitHub <code>review_decision</code> still read <code>CHANGES_REQUESTED</code> — a reviewer's
+    objection that was never superseded by a later approval, a dismissal, or a re-review before
+    the merge button was pressed anyway. The opposite silence from <code>approved-pr-still-unmerged</code>:
+    that recipe watches an approval that never got its own merge; this one watches an objection
+    that never got its own resolution, yet merged anyway. Confidence is capped at 0.8, a notch
+    below <code>tag-never-released</code>'s 0.85, to honestly reflect one real blind spot: an admin
+    can legitimately merge over a required review with an explicit override, and this recipe
+    cannot tell that apart from a plain oversight. <code>ListPullRequests</code> is not a new
+    scope — <code>approved-pr-still-unmerged</code> already reads the identical field.</p>
     <p>Merging a recipe is one promise; letting it actually compete for the daily primary gap
     is another. <a href="https://github.com/thierrypdamiba/orita/blob/main/fencepost/seam_engine/src/seam_engine/combined_scan.py"><code>combined_scan.py</code></a>
     keeps the second: it pools a recipe's own candidates with <code>scan.py</code>'s, and ranks

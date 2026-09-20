@@ -556,6 +556,21 @@ _MOVE_RULES: tuple[tuple[str, str], ...] = (
     # set`'s own docstring below, corrected from the stale "103" to this
     # hour's live count so the next sweep starts from an honest baseline
     # instead of re-discovering the same seven-recipe drift by hand.
+    #
+    # Task 1613 (ogun, RECIPES/merged-pr-changes-requested-not-addressed/,
+    # the hundred-twelfth real recipe): its own headline template ("merged
+    # while its most recent review still reads CHANGES_REQUESTED") shares
+    # the identical "already resolved in spirit, a close is the wrong verb"
+    # defect class task 914's own sweep first named -- the pull request
+    # this recipe surfaces is already merged; telling the reader to "close
+    # it" would be nonsense on an object that is already shut. The real
+    # move is a re-review or a fix-up commit, not a close. Grep-confirmed
+    # unique against every other recipe's own headline template before
+    # adding, the same discipline every needle above holds.
+    (
+        "still reads changes_requested",
+        "Re-review it yourself, or land a fix-up commit — the PR is already merged, so there is nothing left to close. Fencepost only found the seam; it does not cross it.",
+    ),
 )
 _DEFAULT_MOVE = (
     "Close it yourself, however it's meant to be closed. Fencepost only found the seam; it does not cross it."
