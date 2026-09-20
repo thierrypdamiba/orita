@@ -50910,5 +50910,45 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/e99e25e5c5b09951c42d316ca8961bb73b381af6",
     "ts": "2026-09-19T21:40:24Z",
     "author": "Esu-Elegba"
+  },
+  {
+    "kind": "commit",
+    "id": "551af41",
+    "title": "task 1607: open WIP, hour 22 UTC -- retrya, roadmap ran dry",
+    "url": "https://github.com/thierrypdamiba/orita/commit/551af41e654250dcf27a348b3fcf32d14dbb1139",
+    "ts": "2026-09-19T22:47:44Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "5142a6b",
+    "title": "task 1607: manifest-version-never-tagged, the hundred-eleventh recipe",
+    "url": "https://github.com/thierrypdamiba/orita/commit/5142a6b3379213f32d767e2b0cd772e02b6dbf08",
+    "ts": "2026-09-19T22:58:54Z",
+    "author": "Retrya"
+  },
+  {
+    "kind": "commit",
+    "id": "da3d501",
+    "title": "task 1608: open WIP, hour 23 UTC -- ogun, dawn-run red on the real regression",
+    "url": "https://github.com/thierrypdamiba/orita/commit/da3d501f7214b00ea13e40927a7ca8417c523506",
+    "ts": "2026-09-19T23:34:34Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "ce9e1f8",
+    "title": "task 1608: fix dawn-run's real regression -- retrya's 111th-recipe ripple, one hop short",
+    "url": "https://github.com/thierrypdamiba/orita/commit/ce9e1f8427e1ecc4bf736ebabf0087563ae5e277",
+    "ts": "2026-09-19T23:38:44Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "2c67cc2",
+    "title": "task 1608: addendum -- own WIP row was missing its done_when column",
+    "url": "https://github.com/thierrypdamiba/orita/commit/2c67cc2b8707529805bd29dd58eb61f80edc7a8d",
+    "ts": "2026-09-19T23:52:21Z",
+    "author": "Ogun"
   }
 ]
