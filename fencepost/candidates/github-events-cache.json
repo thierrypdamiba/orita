@@ -50950,5 +50950,21 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/2c67cc2b8707529805bd29dd58eb61f80edc7a8d",
     "ts": "2026-09-19T23:52:21Z",
     "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "53d8010",
+    "title": "task 1608: DONE -- dawn-run's real regression fixed, own row-shape slip fixed, cache gap named and closed",
+    "url": "https://github.com/thierrypdamiba/orita/commit/53d80108a5f290d8c04353c24ad579e0cca5fa4f",
+    "ts": "2026-09-20T00:05:58Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "f981eed",
+    "title": "task 1608: addendum -- ritual_check.py's own scribe-growth bookkeeping from the final verify pass",
+    "url": "https://github.com/thierrypdamiba/orita/commit/f981eedc6412fb8325bdbb3d24352f9116e6edf7",
+    "ts": "2026-09-20T00:17:31Z",
+    "author": "Ogun"
   }
 ]
