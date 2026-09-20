@@ -422,7 +422,7 @@ _CARDINAL_WORDS = {
     "one hundred two": 102, "one hundred three": 103, "one hundred four": 104,
     "one hundred five": 105, "one hundred six": 106, "one hundred seven": 107,
     "one hundred eight": 108, "one hundred nine": 109, "one hundred ten": 110,
-    "one hundred eleven": 111,
+    "one hundred eleven": 111, "one hundred twelve": 112,
 }
 
 # The cardinal word itself may be a single hyphenated token ("ninety-nine")
@@ -482,25 +482,26 @@ class DocstringCountDoctrineCase(unittest.TestCase):
         with self.assertRaises(AssertionError):
             claimed_section_count("Nothing here about a recipe count.")
 
-    def test_real_live_section_count_is_currently_one_hundred_eleven(self):
+    def test_real_live_section_count_is_currently_one_hundred_twelve(self):
         # Regression pin: today's real, live linked-recipe count. Was 109
         # until repo-description-claims-open-milestone merged (task 1407,
         # the hundred-ninth), then 110 until repo-description-claims-
         # unmerged-pr merged (task 1408, the hundred-tenth), then 111
         # until manifest-version-never-tagged merged (task 1607, the
-        # hundred-eleventh).
+        # hundred-eleventh), then 112 until merged-pr-changes-requested-
+        # not-addressed merged (task 1613, the hundred-twelfth).
         # Task 1380's own addendum named this exact repo-root pin
         # (distinct from the fencepost-side ones in
         # test_recipe_count_doctrine.py etc.) as the one dawn-run itself
-        # has now caught missing four separate times (101->102 task 1259,
+        # has now caught missing five separate times (101->102 task 1259,
         # 102->103 task 1353, 103->104 task 1380's own addendum, 110->111
-        # task 1607 -- this fix, task 1608) -- the fifth time this exact
-        # pin has been the thing dawn-run catches, still not caught
-        # proactively before a push.
+        # task 1607, 111->112 task 1613 -- this fix) -- the sixth time
+        # this exact pin has been the thing dawn-run catches, still not
+        # caught proactively before a push.
         with open(rrc.DEFAULT_README_PATH, encoding="utf-8") as f:
             text = f.read()
         section = rrc._community_recipes_section(text)
-        self.assertEqual(len(rrc._linked_recipes(section)), 111)
+        self.assertEqual(len(rrc._linked_recipes(section)), 112)
 
     def test_docstring_matches_the_real_live_count(self):
         with open(rrc.DEFAULT_README_PATH, encoding="utf-8") as f:
