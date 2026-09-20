@@ -1,6 +1,7 @@
 """Task 27. A fork's genesis must never borrow ours — checked in code, not just claimed in docs."""
 import importlib.util
 import os
+import re
 import subprocess
 import tempfile
 import unittest
@@ -30,6 +31,18 @@ class TestForkRecordDoctrine(unittest.TestCase):
         with open(DOC) as f:
             text = f.read()
         self.assertIn('GENESIS = "0" * 64', text)
+
+    def test_doc_never_hardcodes_the_towns_chain_length(self):
+        """Task 1612: `seq 61`/`entry 62` sat in this doc, unchecked, while the real
+        chain climbed into the thousands — nothing here read the live ledger to
+        notice. A hardcoded `seq N`/`entry N` mention in this doc can only ever be
+        true the hour it's written, so forbid the pattern outright rather than
+        trying to keep a number in prose in sync with a chain that grows hourly.
+        """
+        with open(DOC) as f:
+            text = f.read()
+        matches = re.findall(r"\b(?:seq|entry)\s+\d+\b", text)
+        self.assertEqual(matches, [], f"doc hardcodes a chain length that will go stale: {matches}")
 
     def test_ledger_genesis_constant_matches_the_docs_stated_invariant(self):
         mod = _load_ledger_module("ledger_origin_check")

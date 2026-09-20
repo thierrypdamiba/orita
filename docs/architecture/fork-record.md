@@ -16,14 +16,14 @@ That line is not a shared starting *point*. It is a shared starting *rule*: the 
 
 What this means in practice:
 
-- **This town's chain** currently runs to `seq 61` (and climbing), each entry's `prev` pointing at the hash before it, all the way back to one entry whose `prev` is `GENESIS`.
+- **This town's chain** climbs by one `seq` per sealed event, each entry's `prev` pointing at the hash before it, all the way back to one entry whose `prev` is `GENESIS`. Its real current length is never worth hardcoding here — a fixed number in this file goes stale the hour after it's written and nothing but a reader's own eyes would ever catch it. Read it live instead: `tail -1 records/ledger.jsonl` (the `seq` field) or `python3 tools/ledger.py verify` (which prints the count).
 - **A forked town's chain**, scaffolded by `tools/bootstrap.sh`, starts from a zero-byte `records/ledger.jsonl`. Its first `append()` call also produces `prev = GENESIS` — the identical constant — but that entry's `hash` is computed over *that fork's* actor, act, detail, and timestamp. It is a different entry that happens to share a starting rule, not a continuation of ours.
 
 ## Why this can't be faked into false continuity
 
 A chain's hash-links prove custody, not history. Verifying `mod.verify()` on a fork's ledger only proves that fork's entries are internally consistent from *its own* `GENESIS` forward. It says nothing, and can say nothing, about this town — there is no hash in a fork's chain that depends on any byte this town ever wrote. Two towns sharing the literal string `"0"*64` as their starting constant is exactly as meaningful as two books both starting at page 1: it is a convention, not a shared spine.
 
-So a fork cannot claim "we're entry 62 of Orita's chain" — there is no cryptographic path from a fork's first entry back into this town's `seq 61`, because none was ever computed. The only way to fake that claim is to lie in prose next to a chain that disproves it, which is precisely what this doc exists to make embarrassing.
+So a fork cannot claim "we're the next entry after Orita's chain" — there is no cryptographic path from a fork's first entry back into this town's chain at any length it has ever reached, because none was ever computed. The only way to fake that claim is to lie in prose next to a chain that disproves it, which is precisely what this doc exists to make embarrassing. (This section itself used to name a fixed chain-length pair as the example — stale within hours and unnoticed for weeks, since nothing checked it against the live chain. Fixed by task 1612: the doctrine never needs the town's current length, only that no path back into it exists at any length, so the example no longer names one.)
 
 ## What a fork inherits vs. starts fresh
 
@@ -35,7 +35,7 @@ So a fork cannot claim "we're entry 62 of Orita's chain" — there is no cryptog
 | chain length claimed | its real `seq` count | its own real `seq` count, starting at 0 |
 | continuity with the other town | none | none |
 
-`PLATFORM.md` already says it plainly: "Your first entry is your genesis, not our seq 413." This doc is the doctrine underneath that sentence — the *why*, checked in code, not just claimed in README prose.
+`PLATFORM.md` already says it plainly, in its own words: your first entry is your genesis, not any fixed number carried over from ours. This doc is the doctrine underneath that line — the *why*, checked in code, not just claimed in README prose.
 
 ## The test that holds it
 
