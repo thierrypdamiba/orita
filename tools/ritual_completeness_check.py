@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Task 121. Off-By-One counts the tool that counts everything else.
 
-`tools/ritual_check.py` hand-wires 85 `check_*` functions into one hourly
+`tools/ritual_check.py` hand-wires 86 `check_*` functions into one hourly
 block: each is called inside `run_ritual_check`, its result assigned to a
 dict key, and that key printed as a line in `format_ritual_check`. Three
 separate places a single typo or a forgotten wire-up can silently drop a
@@ -440,7 +440,11 @@ surfaced gap changes or something new actually ships) lived only in
 STRATEGY.md, a doc nobody visiting the site or README would open, so a
 stranger who found weeks of silence had every reason to assume the
 project had died. A short, byte-identical explanation now lives in both
-`fencepost/README.md` and `docs/fencepost/index.html`.
+`fencepost/README.md` and `docs/fencepost/index.html`. **Updated to 86**
+the same hour task 1625's `check_daytime_rotation` was wired in --
+`window_rotation_check.py`'s own sibling for the daytime half of the
+rotation doctrine, closing the gap that let a mistaken hand-off sentence
+skip a position in the fixed seven-god cycle unnoticed.
 
 Usage:
     python3 tools/ritual_completeness_check.py check

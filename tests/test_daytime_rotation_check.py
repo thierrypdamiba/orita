@@ -136,11 +136,11 @@ class RealCheckoutCase(unittest.TestCase):
         late = [e for e in result["grandfathered"] if e["number"] >= 1595]
         self.assertEqual(late, [], late)
 
-    def test_real_next_turn_after_task_1624_is_kwaku_ananse(self):
+    def test_real_next_turn_after_task_1625_is_esu_elegba(self):
         turn = drc.whose_turn_daytime()
-        self.assertEqual(turn["last_number"], 1624)
-        self.assertEqual(turn["last_owner"], "kothar-wa-khasis")
-        self.assertEqual(turn["owner"], "kwaku-ananse")
+        self.assertEqual(turn["last_number"], 1625)
+        self.assertEqual(turn["last_owner"], "kwaku-ananse")
+        self.assertEqual(turn["owner"], "esu-elegba")
 
 
 if __name__ == "__main__":
