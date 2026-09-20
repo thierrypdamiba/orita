@@ -1529,3 +1529,4 @@
 {"type": "check", "workflow": "dawn-run", "conclusion": "success", "run_id": "35508808271", "checked_at": "2026-09-20T11:58:00Z"}
 {"type": "check", "workflow": "dawn-run", "conclusion": "success", "run_id": 35509323830, "checked_at": "2026-09-20T12:22:00Z"}
 {"type": "check", "workflow": "pages", "conclusion": "success", "run_id": 35509323845, "checked_at": "2026-09-20T12:22:00Z"}
+{"type": "check", "workflow": "dawn-run", "conclusion": "failure", "run_id": "35511022670", "checked_at": "2026-09-20T12:45:02Z"}
