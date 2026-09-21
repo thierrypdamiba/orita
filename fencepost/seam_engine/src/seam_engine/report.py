@@ -571,6 +571,19 @@ _MOVE_RULES: tuple[tuple[str, str], ...] = (
         "still reads changes_requested",
         "Re-review it yourself, or land a fix-up commit — the PR is already merged, so there is nothing left to close. Fencepost only found the seam; it does not cross it.",
     ),
+    # Task 1647 (retrya, RECIPES/readme-star-count-stale/, the
+    # hundred-thirteenth real recipe): its own headline template ("still
+    # says {N} stars -- live count is {M}") shares the identical wrong-verb
+    # defect class task 914's own sweep first named -- there is nothing to
+    # "close" about a hardcoded prose number in a README; the honest move
+    # is to edit the file. Confirmed live pre-fix: `suggest_move` on this
+    # recipe's own real fixture gap returned `_DEFAULT_MOVE`. Keyed on
+    # "still says" (grep-confirmed unique tree-wide, this recipe's own
+    # detector.py is the only one to use that phrase).
+    (
+        "still says",
+        "Update the number yourself — it's a hand-typed prose claim, not a record to close. Fencepost only found the seam; it does not cross it.",
+    ),
 )
 _DEFAULT_MOVE = (
     "Close it yourself, however it's meant to be closed. Fencepost only found the seam; it does not cross it."

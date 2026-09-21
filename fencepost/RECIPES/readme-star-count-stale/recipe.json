@@ -1,0 +1,12 @@
+{
+  "slug": "readme-star-count-stale",
+  "title": "The README states a star count in prose, but the live count has moved past it",
+  "author": "retrya",
+  "description": "Reads the README's own hardcoded prose star-count claim (\"900+ stars\", \"⭐ 900 GitHub stars\") and cross-checks it against a live CountStargazers read. A claim the live count has since moved meaningfully past -- and that isn't saved by its own trailing '+' as still technically true -- is the gap: a number a human typed by hand once, that nothing on either platform ever comes back to update.",
+  "toolkit": "github",
+  "scopes": ["GetFileContents", "CountStargazers"],
+  "fixture": "fixtures/readme_star_count_stale",
+  "detector_file": "detector.py",
+  "entrypoint": "run_recipe_scan",
+  "confidence_notes": "Flat 0.7 on a surfaced gap. Two exclusions guard against a false positive: (1) a claim written with a trailing '+' (\"900+ stars\") reads as an at-least claim, not an exact one, so it is only surfaced if the live count has moved past it by the same real margin as a bare claim -- the '+' does not exempt a claim that has gone genuinely stale, but it does mean a live count only slightly above the claimed floor is still a true statement, not a gap; (2) the gap is only surfaced once the live count exceeds the claimed number by at least max(25, 5% of the claimed number) -- a one- or two-star drift between a README edit and a live re-read is normal clock skew, not a real staleness gap Ogun's law would want surfaced. A claim that already matches or exceeds the live count is excluded at confidence 0.0 -- named, not scored -- since either the claim is still true or it overclaims, and this recipe's own seam is understatement drift, not overclaiming (a different, separate gap this recipe does not attempt to judge)."
+}

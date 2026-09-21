@@ -2223,6 +2223,26 @@ CHANGES_REQUESTED, is excluded — no promise was made or kept open to
 have missed. `ListPullRequests` is not a new scope — no scope asked for
 anywhere in this recipe.
 
+[`RECIPES/readme-star-count-stale/`](RECIPES/readme-star-count-stale/)
+is the hundred-thirteenth (ROADMAP.md #1647). The README's own hardcoded
+prose star-count claim ("900+ stars", "⭐ 900 GitHub stars") has fallen
+behind the live count — a number typed by hand once, that nothing on
+either platform ever comes back to update. Distinct from
+`star-milestone-not-announced` (which watches whether a crossed
+round-number threshold ever got announced in a tweet — an EVENT that may
+or may not have been spoken): this recipe watches a STATEMENT that used
+to be true and quietly stopped being, already sitting in the README
+itself. A trailing `+` on a claimed number reads as an at-least claim,
+not exempted outright — it only buys more room before the drift counts
+as stale, never immunity from a real gap. The staleness floor is
+`max(25, 5%)` of the claimed number, so ordinary clock-skew drift is
+never surfaced as a false gap. Confidence is flat 0.7 — a real drift is
+unambiguous past the floor, but a hand-typed prose number carries more
+ordinary slack than a structured field like a tag or a manifest version,
+so it sits below `manifest-version-never-tagged`'s own 0.75. Neither
+`GetFileContents` nor `CountStargazers` is a new scope — no scope asked
+for anywhere in this recipe.
+
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)
 (ROADMAP.md #111) is that second promise, kept: it runs `scan.py`'s own

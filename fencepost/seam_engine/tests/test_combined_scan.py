@@ -347,6 +347,7 @@ def test_runs_all_real_recipes_in_the_actual_repo_without_error(monkeypatch):
         "repo-description-claims-unmerged-pr",
         "manifest-version-never-tagged",
         "merged-pr-changes-requested-not-addressed",
+        "readme-star-count-stale",
     }
 
 

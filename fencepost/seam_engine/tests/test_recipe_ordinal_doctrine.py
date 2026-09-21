@@ -86,7 +86,7 @@ _ORDINAL_WORDS = {
     "hundred-third": 103, "hundred-fourth": 104, "hundred-fifth": 105,
     "hundred-sixth": 106, "hundred-seventh": 107, "hundred-eighth": 108,
     "hundred-ninth": 109, "hundred-tenth": 110, "hundred-eleventh": 111,
-    "hundred-twelfth": 112,
+    "hundred-twelfth": 112, "hundred-thirteenth": 113,
 }
 
 # Matches right at the top of the docstring only (``re.match``, not
@@ -186,9 +186,9 @@ def test_all_claimed_ordinals_are_pairwise_distinct():
 
 
 def test_the_real_ordinal_claims_are_currently_clean():
-    """Regression pin against today's real, live tree: 112 real recipes,
-    the reference recipe unnumbered, the other 111 forming the unbroken
-    sequence 2..112 -- no duplicate, no gap. Was 105/104/2..105 until
+    """Regression pin against today's real, live tree: 113 real recipes,
+    the reference recipe unnumbered, the other 112 forming the unbroken
+    sequence 2..113 -- no duplicate, no gap. Was 105/104/2..105 until
     calendar-event-dangling-reference merged (the hundred-sixth real
     recipe), then 106/2..106 until repo-description-claims-unfixed-issue
     merged (the hundred-seventh real recipe), then 107/2..107 until
@@ -199,11 +199,12 @@ def test_the_real_ordinal_claims_are_currently_clean():
     real recipe), then 110/2..110 until manifest-version-never-tagged
     merged (the hundred-eleventh real recipe), then 111/2..111 until
     merged-pr-changes-requested-not-addressed merged (the hundred-twelfth
-    real recipe)."""
+    real recipe), then 112/2..112 until readme-star-count-stale merged
+    (the hundred-thirteenth real recipe)."""
     claims = live_ordinal_claims(FENCEPOST_ROOT)
     numbered = sorted(n for n in claims.values() if n is not None)
-    assert len(claims) == 112
-    assert numbered == list(range(2, 113))
+    assert len(claims) == 113
+    assert numbered == list(range(2, 114))
 
 
 def test_a_duplicate_ordinal_would_flip_this_check_red(tmp_path):

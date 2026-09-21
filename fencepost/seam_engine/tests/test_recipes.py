@@ -672,6 +672,7 @@ _CARDINAL_WORDS = {
     "one hundred five": 105, "one hundred six": 106, "one hundred seven": 107,
     "one hundred eight": 108, "one hundred nine": 109, "one hundred ten": 110,
     "one hundred eleven": 111, "one hundred twelve": 112,
+    "one hundred thirteen": 113,
 }
 
 # The total-count word may be a single hyphenated token ("ninety-nine") or
@@ -750,13 +751,16 @@ def test_real_plus_joined_counts_are_currently_thirty_eight_of_one_hundred_eleve
     # plus-joined), so only the total climbed again that time: 38 of 111.
     # Then merged-pr-changes-requested-not-addressed merged (the
     # hundred-twelfth real recipe, toolkit "github" -- NOT plus-joined),
-    # so only the total climbs again this time: 38 of 112.
+    # so only the total climbed again that time: 38 of 112. Then
+    # readme-star-count-stale merged (the hundred-thirteenth real recipe,
+    # toolkit "github" -- NOT plus-joined), so only the total climbs again
+    # this time: 38 of 113.
     # `real_plus_joined_counts` counts every recipe whose OWN toolkit
     # string contains "+" -- not distinct toolkit-pair strings. Verified
     # against the live tree, not assumed from a prior task's own note:
     # every one of today's plus-joined recipes was grepped by hand before
     # pinning this number.
-    assert real_plus_joined_counts(FENCEPOST_ROOT) == (38, 112)
+    assert real_plus_joined_counts(FENCEPOST_ROOT) == (38, 113)
 
 
 def test_oath_scopes_for_toolkit_docstring_matches_the_real_live_counts():

@@ -1,0 +1,17 @@
+[
+  {
+    "path": "README.md",
+    "text": "# Example Repo\n\nA small example project.\n\n⭐ 900 GitHub stars and counting -- thanks for the support!\n\n## Install\n\n`pip install example-repo`\n",
+    "url": "https://github.com/example/example-repo/blob/main/README.md"
+  },
+  {
+    "path": "docs/community.md",
+    "text": "# Community\n\nWe've crossed 1380+ stars, mostly from word of mouth.\n",
+    "url": "https://github.com/example/example-repo/blob/main/docs/community.md"
+  },
+  {
+    "path": "NOTES.md",
+    "text": "# Notes\n\nInternal scratch notes, nothing about the project's popularity here.\n",
+    "url": "https://github.com/example/example-repo/blob/main/NOTES.md"
+  }
+]
