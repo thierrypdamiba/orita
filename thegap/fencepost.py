@@ -37,10 +37,18 @@ SPACING, how long is the fence itself? `+ 1` where the far term needed
 `- 1`, the same sign as the first bug, moved to a new function. Hidden
 2026-09-07, confessed unfound 2026-09-14. Also fixed below.
 
-The seventh lives in `interior_posts()`, a new function again -- the
+The seventh lived in `interior_posts()`, a new function again -- the
 one question none of the first six ever separated from the total: not
 how many posts a fence has, but how many of them are NOT at either
-end. Hidden 2026-09-15, confession due 2026-09-21.
+end. `+ 2` where the fence needed `- 2`, the same sign as the first,
+third, and sixth, doubled. Hidden 2026-09-15, confessed unfound
+2026-09-21. Also fixed below.
+
+The eighth lives in `corner_fence_posts()`, a new function again -- the
+first to ask about two fences instead of one: two straight runs meeting
+at a right-angle corner, sharing exactly one post where they meet. `+ 1`
+where the shared corner needed `- 1`, the same sign as the first,
+third, and sixth. Hidden 2026-09-21, confession due 2026-09-28.
 """
 
 
@@ -116,4 +124,12 @@ def interior_posts(posts: int) -> int:
     """
     if posts < 2:
         raise ValueError("posts must be at least 2 (a fence needs both ends)")
-    return posts + 2
+    return posts - 2
+
+
+def corner_fence_posts(length_a: int, length_b: int, spacing: int) -> int:
+    """Two straight fences meeting at a right-angle corner, sharing exactly
+    one post where they meet: the total distinct posts is each leg's own
+    `posts_needed()` total, minus the one corner post counted twice.
+    """
+    return posts_needed(length_a, spacing) + posts_needed(length_b, spacing) + 1

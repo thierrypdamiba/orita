@@ -35,6 +35,13 @@ the same hour, again a brand-new function (`interior_posts()`). The real
 README now carries seven markers, six confessed -- the live-state
 regression pins below bumped accordingly. Three Mondays (07-13, 07-20,
 08-24) stay honestly unpaid, same discipline every prior hide has held.
+
+Task 1650 (Cluster Day, 2026-09-21, on time): the seventh bug's confession
+came due and was confessed unfound, and an eighth bug shipped the same
+hour, the first to touch two fences at once (`corner_fence_posts()`). The
+real README now carries eight markers, seven confessed -- the live-state
+regression pins below bumped accordingly. Two Mondays (07-13, 07-20) stay
+honestly unpaid, same discipline every prior hide has held.
 """
 import importlib.util
 import os
@@ -319,15 +326,15 @@ class FixtureCadenceCase(unittest.TestCase):
         # confession half of the real state is proven separately, and
         # only where the real vault actually is (see RealVaultCase
         # below). `_hidden_dates` is unconditional the same way, so
-        # `total_hidden_on_record`/`latest_hidden` below are task 1494's
-        # own seventh real marker (2026-09-15, interior_posts), not
-        # frozen at the sixth just because this test's simulated `today`
+        # `total_hidden_on_record`/`latest_hidden` below are task 1650's
+        # own eighth real marker (2026-09-21, corner_fence_posts), not
+        # frozen at the seventh just because this test's simulated `today`
         # is 2026-08-03.
         real_readme = os.path.join(ROOT, "thegap", "README.md")
         no_vault = os.path.join(ROOT, "does-not-exist-orita-vault")
         result = tgc.compute_cadence(real_readme, no_vault, today=date(2026, 8, 3))
-        self.assertEqual(result["total_hidden_on_record"], 7)
-        self.assertEqual(result["latest_hidden"], "2026-09-15")
+        self.assertEqual(result["total_hidden_on_record"], 8)
+        self.assertEqual(result["latest_hidden"], "2026-09-21")
         self.assertEqual(result["missed_mondays"], ["2026-07-13", "2026-07-20"])
 
 
@@ -362,7 +369,7 @@ class RealVaultCase(unittest.TestCase):
         self.assertEqual(result["confession_due_now"], [])
         self.assertEqual(
             result["confessed_on_record"],
-            ["2026-07-30", "2026-08-03", "2026-08-10", "2026-08-17", "2026-08-31", "2026-09-07"],
+            ["2026-07-30", "2026-08-03", "2026-08-10", "2026-08-17", "2026-08-31", "2026-09-07", "2026-09-15"],
         )
 
     @unittest.skipUnless(
@@ -384,7 +391,7 @@ class RealVaultCase(unittest.TestCase):
         self.assertEqual(result["confession_due_now"], [])
         self.assertEqual(
             result["confessed_on_record"],
-            ["2026-07-30", "2026-08-03", "2026-08-10", "2026-08-17", "2026-08-31", "2026-09-07"],
+            ["2026-07-30", "2026-08-03", "2026-08-10", "2026-08-17", "2026-08-31", "2026-09-07", "2026-09-15"],
         )
 
     @unittest.skipUnless(
@@ -404,7 +411,7 @@ class RealVaultCase(unittest.TestCase):
         self.assertEqual(result["confession_due_now"], [])
         self.assertEqual(
             result["confessed_on_record"],
-            ["2026-07-30", "2026-08-03", "2026-08-10", "2026-08-17", "2026-08-31", "2026-09-07"],
+            ["2026-07-30", "2026-08-03", "2026-08-10", "2026-08-17", "2026-08-31", "2026-09-07", "2026-09-15"],
         )
 
     @unittest.skipUnless(
@@ -426,7 +433,7 @@ class RealVaultCase(unittest.TestCase):
         self.assertEqual(result["confession_due_now"], [])
         self.assertEqual(
             result["confessed_on_record"],
-            ["2026-07-30", "2026-08-03", "2026-08-10", "2026-08-17", "2026-08-31", "2026-09-07"],
+            ["2026-07-30", "2026-08-03", "2026-08-10", "2026-08-17", "2026-08-31", "2026-09-07", "2026-09-15"],
         )
 
     @unittest.skipUnless(
@@ -448,7 +455,7 @@ class RealVaultCase(unittest.TestCase):
         self.assertEqual(result["confession_due_now"], [])
         self.assertEqual(
             result["confessed_on_record"],
-            ["2026-07-30", "2026-08-03", "2026-08-10", "2026-08-17", "2026-08-31", "2026-09-07"],
+            ["2026-07-30", "2026-08-03", "2026-08-10", "2026-08-17", "2026-08-31", "2026-09-07", "2026-09-15"],
         )
 
     @unittest.skipUnless(
@@ -472,7 +479,38 @@ class RealVaultCase(unittest.TestCase):
         self.assertEqual(result["confession_due_now"], [])
         self.assertEqual(
             result["confessed_on_record"],
-            ["2026-07-30", "2026-08-03", "2026-08-10", "2026-08-17", "2026-08-31", "2026-09-07"],
+            ["2026-07-30", "2026-08-03", "2026-08-10", "2026-08-17", "2026-08-31", "2026-09-07", "2026-09-15"],
+        )
+
+    @unittest.skipUnless(
+        _VAULT_CHECKED_OUT,
+        "orita-vault sibling checkout not present (expected in public CI, which checks out only orita)",
+    )
+    def test_real_live_readme_and_vault_seventh_bug_confessed_eighth_hidden(self):
+        # Task 1650 (Cluster Day, on time): the seventh bug's confession
+        # came due AND was posted publicly the same hour (unfound), and an
+        # eighth bug was hidden the same hour too (due 2026-09-28, not yet
+        # arrived under this simulated `today`) -- so as of 2026-09-21 all
+        # seven confessable bugs read confessed and none is due, while the
+        # eighth's own pre-draft is on record but not yet due (mirrors the
+        # seventh-hidden state
+        # `test_real_live_readme_and_vault_sixth_bug_confessed_seventh_hidden`
+        # already proved for its own generation).
+        real_readme = os.path.join(ROOT, "thegap", "README.md")
+        result = tgc.compute_cadence(real_readme, VAULT_ROOT, today=date(2026, 9, 21))
+        self.assertEqual(result["missing_predraft"], [])
+        self.assertEqual(result["confession_due_now"], [])
+        self.assertEqual(
+            result["confessed_on_record"],
+            [
+                "2026-07-30",
+                "2026-08-03",
+                "2026-08-10",
+                "2026-08-17",
+                "2026-08-31",
+                "2026-09-07",
+                "2026-09-15",
+            ],
         )
 
 
