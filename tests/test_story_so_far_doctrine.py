@@ -155,8 +155,12 @@ class FooterArithmeticCase(unittest.TestCase):
         # X outage crossed a full ninth week into its tenth; and the
         # child's red-bean rice, TOWN-OPERATIONS.md records, was delivered
         # and eaten back on 2026-08-22 (task 930) -- "promised, not yet
-        # cooked" had been stale for three weeks.
-        self.assertEqual(_body_word_count(self.text), 283)
+        # cooked" had been stale for three weeks. Updated again by task
+        # 1650's Cluster Day rewrite (283 -> 285): a live recipe count read
+        # 113, not 110; a tenth chronicle episode sealed (the "nine
+        # episodes" figure hadn't drifted until this one); and the X
+        # outage crossed a full tenth week (69 real days since 2026-07-14).
+        self.assertEqual(_body_word_count(self.text), 285)
 
 
 class MutationBitesCase(unittest.TestCase):

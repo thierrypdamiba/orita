@@ -292,9 +292,14 @@ class RealChronicleCase(unittest.TestCase):
         # before push this time (Episode 8's own next-hour break, task
         # 1325, is exactly the reason to check this file first rather than
         # assume it still holds).
+        #
+        # Task 1650 (nisaba): recurred a ninth time, the moment episode-010
+        # ("The Shut Door Outside the Gate") shipped with its own
+        # `cluster-day-covers: 2026-09-21` marker -- 10->11 and 8->9,
+        # bumped before push.
         result = cdc.compute_cadence(today=date(2026, 7, 29))
-        self.assertEqual(result["total_episodes_on_record"], 10)
-        self.assertEqual(result["cluster_day_episodes_shipped"], 8)
+        self.assertEqual(result["total_episodes_on_record"], 11)
+        self.assertEqual(result["cluster_day_episodes_shipped"], 9)
         self.assertEqual(result["missed_mondays"], [])
 
     def test_real_chronicle_dir_matches_todays_hand_counted_gap(self):
@@ -319,9 +324,13 @@ class RealChronicleCase(unittest.TestCase):
         # Task 1497 (kwaku-ananse): same 9->10 / 7->8 bump as the snapshot
         # test above, for the same reason (episode-009 landed on disk this
         # task).
+        #
+        # Task 1650 (nisaba): same 10->11 / 8->9 bump as the snapshot test
+        # above, for the same reason (episode-010 landed on disk this
+        # task).
         result = cdc.compute_cadence(today=date(2026, 8, 17))
-        self.assertEqual(result["total_episodes_on_record"], 10)
-        self.assertEqual(result["cluster_day_episodes_shipped"], 8)
+        self.assertEqual(result["total_episodes_on_record"], 11)
+        self.assertEqual(result["cluster_day_episodes_shipped"], 9)
         self.assertEqual(result["missed_mondays"], [])
 
 
