@@ -79,7 +79,22 @@ WINDOW_GODS = frozenset({"nyx", "zashiki-warashi"})
 # it), one at or after is live unless separately acknowledged.
 FIX_LANDED_AT = "2026-09-20T17:41:00+00:00"
 
-ACKNOWLEDGED: dict[int, str] = {}
+ACKNOWLEDGED: dict[int, str] = {
+    1651: (
+        "kothar-wa-khasis's own hour-19 row reused task number 1650 "
+        "(named plainly in task 1651's own commit) instead of opening "
+        "its own row -- invisible to this table, so the transition "
+        "reads nisaba(1650)->kwaku-ananse(1651) directly and misses "
+        "the real off-cycle hop sitting between them. Not rewriting "
+        "kothar-wa-khasis's pushed history to fix a table; acknowledged "
+        "here instead, task 1652 (esu-elegba), the hour this cascaded "
+        "into a live dawn-run break -- every FoldCase test in "
+        "test_ritual_check.py that overrides only its own fixture "
+        "still calls run_ritual_check() with every other check, this "
+        "one included, reading the real live ROADMAP, so one genuine "
+        "violation here flipped `broken` for 74 unrelated tests at once."
+    ),
+}
 
 
 def next_in_cycle(god: str) -> str | None:
