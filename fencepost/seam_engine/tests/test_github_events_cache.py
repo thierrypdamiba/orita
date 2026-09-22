@@ -368,3 +368,43 @@ def test_seeded_cache_is_real_and_scan_compatible_shape() -> None:
         assert set(gec._REQUIRED_KEYS) <= set(entry.keys())
     ids = [e["id"] for e in cache]
     assert len(ids) == len(set(ids)) or len({(e["kind"], e["id"]) for e in cache}) == len(cache)
+
+
+def test_seeded_cache_never_truncates_a_milestone_keyword_out_of_a_title() -> None:
+    """Task 1654 (ogun): a live direct-fetch scan against the real repo read
+    349 milestone commits (`scan.MILESTONE_KEYWORDS` — 'fencepost', 'flagship',
+    'strategy' — matched against the commit message's first line); the same
+    hour's cache-backed `--github-events` scan, run against this exact seeded
+    cache, read only 345. `merge_events` dedupes first-seen-wins by `(kind,
+    id)`, so once a wrong entry lands under a real sha it is permanent unless
+    someone edits the file directly -- and four real, on-main commits
+    (eebcf33/68b3f5d/2a80458/8e5cb0d, 2026-08-17 through 2026-09-02) had been
+    seeded with a hand-shortened `title` at some point in this cache's
+    history that happened to cut the message before the one word
+    (`_is_milestone`'s substring match) that made each of them a real
+    milestone commit -- silent under-count, not over-count, so no false gap
+    ever shipped (`_is_milestone`'s confidence formula is `min(0.85, 0.35 +
+    0.1*len(milestones))`, already pegged at its 0.85 ceiling past 5
+    milestones either way) but a real, live-verified break in the
+    cache-vs-direct byte-for-byte invariant `scan.py`'s own module docstring
+    promises. Fixed by restoring each title to the commit's real, complete
+    message (verified live, this hour, against a fresh `fetch_github_activity`
+    call against the real repo). Pinned here so a future re-seed or manual
+    edit that truncates one of these four again fails loudly instead of
+    silently re-opening the same four-commit undercount.
+    """
+    cache = gec.load_cache()
+    by_id = {e["id"]: e for e in cache if e["kind"] == "commit"}
+    known_milestone_commits = {
+        "eebcf33": "fencepost",
+        "68b3f5d": "fencepost",
+        "2a80458": "fencepost",
+        "8e5cb0d": "fencepost",
+    }
+    for commit_id, keyword in known_milestone_commits.items():
+        assert commit_id in by_id, f"{commit_id} missing from the seeded cache entirely"
+        title = by_id[commit_id]["title"].lower()
+        assert keyword in title, (
+            f"{commit_id}'s cached title lost its '{keyword}' keyword again "
+            f"(title: {by_id[commit_id]['title']!r})"
+        )

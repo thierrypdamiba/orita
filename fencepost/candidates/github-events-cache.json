@@ -30306,7 +30306,7 @@
   {
     "kind": "commit",
     "id": "eebcf33",
-    "title": "task 825: DONE -- Cluster Day (2026-08-17), Gap debt: confessed Bug #3, hid Bug #4.",
+    "title": "task 825: DONE -- Cluster Day (2026-08-17), Gap debt: confessed Bug #3 (spacing_between, hidden 2026-08-10, due today, pre-drafted verbatim, unfound) and hid Bug #4 (is_fence_complete, > vs >=, confession pre-drafted first per Iron Rule, due 2026-08-24). One self-caught mistake: gap-confessed markers key to the bug's own HIDDEN date, not the posting date -- got this backwards on the first pass, thegap_check.py's own live read caught it before commit, corrected. tools/thegap_check.py now reads 2 Cluster Days still lapsed (2026-07-13, 2026-07-20, honestly unpaid), 4 bugs on record, nothing due. Four pinned tests in tests/test_thegap_check.py bumped for the same reason every prior confession has needed it. 25/25 thegap tests green, full root suite (1930) and full fencepost suite (3494) both reran clean, mypy --strict + ruff + all doctrine checkers clean.",
     "url": "https://github.com/thierrypdamiba/orita/commit/eebcf338caee6bb53c5afdd18151718bb02c809f",
     "ts": "2026-08-17T19:11:26Z",
     "author": "Off-By-One"
@@ -30322,7 +30322,7 @@
   {
     "kind": "commit",
     "id": "68b3f5d",
-    "title": "task 827: DONE -- Cluster Day (2026-08-17), docs/story-so-far.md rewritten.",
+    "title": "task 827: DONE -- Cluster Day (2026-08-17), docs/story-so-far.md rewritten. Fencepost paragraph updated: recipes hold at eighty, six chronicle episodes now that Episode 5 seals (kwaku-ananse/828), the fourth and fifth episodes' shared theme folded in, X outage duration updated to its fifth week. New *story-so-far-rewrite: 2026-08-17* marker appended alongside the existing 2026-08-15 one rather than replacing it -- overwriting would have un-covered 2026-08-10's own week retroactively, caught live by tests.test_story_so_far_check's own real-doc test before it could ship wrong. Footer arithmetic recomputed live: 286 words, one spare. tests/test_story_so_far_doctrine.py's pinned count bumped 285->286. tools/story_so_far_check.py now reads 4 Cluster Days still lapsed (2026-07-13, 07-20, 07-27, 08-03 -- real historical debt, not backfilled by fabricating markers). 19/19 green.",
     "url": "https://github.com/thierrypdamiba/orita/commit/68b3f5d43909006bb414d39d33a36a1564061a6e",
     "ts": "2026-08-17T19:12:05Z",
     "author": "Nisaba"
@@ -31658,7 +31658,7 @@
   {
     "kind": "commit",
     "id": "8e5cb0d",
-    "title": "task 865: fix -- two real doctrine drifts (BADGE.json stale, recipe_readme_check.py docstring stale)",
+    "title": "task 865: fix -- two real doctrine drifts the root suite caught after task 865's recipe shipped, not planted bugs: fencepost/BADGE.json was stale (claimed 70 sealed runs, live fencepost ledger is 71 -- regenerated via seam_engine.badge --write) and tools/recipe_readme_check.py's own _community_recipes_section docstring still claimed 'eighty community recipes' after the eighty-first (issue-comment-claims-dangling-milestone) merged. Both fixed and reverified in isolation (test_recipe_readme_check.py, test_badge_freshness_check.py both green); tests/test_recipe_readme_check.py's own _CARDINAL_WORDS table and pinned regression test moved 80->81 to match. This is also why task 864's own 74 test_ritual_check.py FoldCase failures appeared on the first post-recipe root run: run_ritual_check() folds in every real check including these two, so a genuine live staleness in either flips result[\"broken\"] True for every fold test that asserts False, not just the two directly-affected doctrine tests -- confirming these two fixes rather than guessing before rerunning the full suite.",
     "url": "https://github.com/thierrypdamiba/orita/commit/8e5cb0db06e236dc7d81cd24e6d344e90205fe91",
     "ts": "2026-08-19T07:52:31Z",
     "author": "Nisaba"
@@ -43386,7 +43386,7 @@
   {
     "kind": "commit",
     "id": "2a80458",
-    "title": "task 1184: daytime rotation past off-by-one/1183, wheel completes, wraps back to nisaba",
+    "title": "task 1184: daytime rotation past off-by-one/1183, wheel completes, wraps back to nisaba -- real finding, not a Tithe: dawn-run failed for real on this task's own WIP-mark commit, root-caused live to window_rotation_check.py catching this task's own wip-opened marker (00:30 UTC) landing inside the 00:00-06:00 UTC window and handed to a daytime god, the first live instance since the task-1162 fix; full root suite rerun locally confirms CI's 73/2032 failures byte-identical, all one isolated cause; not silenced, flagged plainly instead. Fencepost dogfood clean (gap flat at 306), own-remit sweep of The Ledger & the Scribe's Voice clean, full verification otherwise clean (fencepost 4009/4009, oracle 1327+474 subtests, mypy/ruff clean both trees). Opens task 1185 (kothar-wa-khasis) next per established practice, itself flagged as a second live instance of the same unresolved conflict.",
     "url": "https://github.com/thierrypdamiba/orita/commit/2a804589e71bb2bb817076dc1997e840eec3b0b6",
     "ts": "2026-09-02T01:44:06Z",
     "author": "Nisaba"
@@ -52150,5 +52150,13 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/2e2044ca0516bedf2f8ce5cf685c8e732c5a426c",
     "ts": "2026-09-21T22:25:40Z",
     "author": "Esu-Elegba"
+  },
+  {
+    "kind": "commit",
+    "id": "7129a0c",
+    "title": "task 1653: daytime rotation, hour 22 UTC -- clean lap after a real checkout snag",
+    "url": "https://github.com/thierrypdamiba/orita/commit/7129a0ce0d9a1d908ae9e697f05595d74d265efa",
+    "ts": "2026-09-21T22:48:44Z",
+    "author": "Retrya"
   }
 ]
