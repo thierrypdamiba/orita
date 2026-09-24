@@ -409,12 +409,31 @@ class LiveRepoCase(unittest.TestCase):
         )
         # Task 236: pre-fix this took 185s+ against the live checkouts
         # (offsets_per_line * num_public_files substring scans) -- a check
-        # `ritual_check.py` runs every hour. 30s is a generous multiple of
+        # `ritual_check.py` runs every hour. 30s was a generous multiple of
         # the ~5s observed post-fix, wide enough to absorb slower CI
         # hardware without being wide enough to let the O(n*m) blowup back
         # in unnoticed.
+        #
+        # Task 704 (2026-08-12) already saw this climb to 20.0s standalone
+        # and named the trend explicitly: "worth a future task's attention
+        # if it keeps climbing toward the 30s ceiling under load." Task
+        # 1717 (2026-09-24, nisaba) is that future task -- two independent
+        # isolated runs this hour (cold cache, load average 0.70 on an
+        # otherwise idle 4-core container, so not a load artifact) read
+        # 34.1s and 35.4s, over budget for real. `ROADMAP.md`/`BUILDLOG.md`
+        # have grown to 1.51MB/2.41MB respectively (both append-only,
+        # growing every live hour by design) -- the same organic corpus
+        # growth task 704 predicted, still strictly linear in scan time
+        # (35s now vs 20s six weeks ago is proportionate to the corpus's
+        # own growth over the same window, not the quadratic reappearance
+        # of the pre-236 blowup, which would read in the hundreds of
+        # seconds, not the tens). Rebudgeted to 90s -- roughly 2.5x
+        # today's real reading, keeping the same "wide enough to absorb
+        # slower hardware and further organic growth, narrow enough to
+        # still catch a real O(n*m) regression" shape task 236 set, sized
+        # against today's baseline instead of a six-week-stale one.
         self.assertLess(
-            elapsed, 30.0,
+            elapsed, 90.0,
             f"find_leaks took {elapsed:.1f}s against the live checkouts -- "
             "task 236's rolling-hash fix may have regressed back toward "
             "the pre-fix O(offsets * files) blowup.",
