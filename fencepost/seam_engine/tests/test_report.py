@@ -120,6 +120,21 @@ def test_report_never_shows_the_coincidence_tail():
     assert "coincidence-1" not in text
 
 
+def test_report_refuses_a_payload_missing_recorded_total():
+    # Task 1726: `render_report` used to read `sealed.get(
+    # "fenceposts_recorded_total", 0)`, the same silent-zero footgun fixed
+    # in `seam_engine.ledger.required_recorded_total` and
+    # `seam_engine.draftback` (see `test_draftback.
+    # test_render_email_draft_refuses_a_payload_missing_recorded_total`).
+    # `render_email_draft` reuses this function for its body, so the same
+    # live incident (a candidates-shaped payload silently rendering "0
+    # fenceposts named to date") ran through here too.
+    sealed = _sealed(primary=True, recorded=1)
+    del sealed["fenceposts_recorded_total"]
+    with pytest.raises(KeyError, match="fenceposts_recorded_total"):
+        report.render_report(sealed)
+
+
 def test_report_caps_evidence_at_three_links():
     text = report.render_report(_sealed(primary=True, recorded=1))
     assert text.count("github.com/x/orita/commit") <= 3

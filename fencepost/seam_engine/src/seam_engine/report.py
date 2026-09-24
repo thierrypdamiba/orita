@@ -729,7 +729,7 @@ def render_report(
     date = sealed.get("date") or sealed.get("generated_at", "")[:10]
     repo = sealed.get("repo", "unknown")
     primary = sealed.get("primary_gap")
-    recorded = sealed.get("fenceposts_recorded_total", 0)
+    recorded = ledger.required_recorded_total(sealed)
     # The wall's law lives in exactly one place now (seam_engine.wall,
     # ROADMAP.md #21), imported and checked here rather than inlined — see
     # ledger._entry_prose for the other caller, and seam_engine/wall.py for

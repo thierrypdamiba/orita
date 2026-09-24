@@ -208,6 +208,44 @@ def tip_sealed(records: list[dict[str, Any]]) -> dict[str, Any]:
     return cast("dict[str, Any]", tip["sealed"])
 
 
+def required_recorded_total(sealed: dict[str, Any]) -> int:
+    """Guarded accessor for `sealed["fenceposts_recorded_total"]`.
+
+    Every real sealed record carries this field -- `append_scan` seals it
+    into every tablet entry (below) and `_entry_prose` already reads it as
+    a bare `sealed["fenceposts_recorded_total"]`, the same "a real sealed
+    record always has this" assumption `tip_sealed`'s own docstring holds
+    for `"sealed"` itself. `seam_engine.draftback`'s `render_notion_page`/
+    `render_email_draft` (via `report.render_report`) and `report.py`'s
+    `render_report` used to each read it as `sealed.get(...,  0)` instead --
+    silently permissive, and silently WRONG the one time it matters: a
+    caller who hands either renderer something that merely resembles a
+    sealed record (a scan's own `candidates/<date>.json`, say, which
+    carries `primary_gap` but never `fenceposts_recorded_total`) got a
+    draft that named the correct gap and evidence and then quietly claimed
+    "0 fenceposts named to date, the wall reads 0" -- a real, live incident
+    (task 1726): the committed `DRAFTS/2026-09-24-{email,notion}.md`
+    matched a fresh re-render byte for byte on every field except this one,
+    because whatever produced them read a payload missing this key. A
+    missing key is never a legitimate zero -- the wall's own floor is `max(
+    recorded - 1, 0)`, so a genuinely fresh ledger's real first entry still
+    seals `fenceposts_recorded_total: 0` explicitly, distinguishable from
+    "not sealed at all" only by this raising instead of guessing. One
+    guarded accessor, both renderers import it, the same `tip_sealed`-shaped
+    fix for the same class of silent default.
+    """
+    if "fenceposts_recorded_total" not in sealed:
+        raise KeyError(
+            "sealed record has no 'fenceposts_recorded_total' -- this is not "
+            "a real sealed ledger record (every one gets this field from "
+            "append_scan). Did you pass a scan/candidates file instead of "
+            "the ledger tip? Use `ledger.tip_sealed(ledger.read_records())`, "
+            "not a hand-picked JSON file, unless you mean to render a "
+            "synthetic fixture that also sets this key explicitly."
+        )
+    return cast(int, sealed["fenceposts_recorded_total"])
+
+
 def _count_fenceposts(records: list[dict[str, Any]]) -> int:
     """The one predicate for 'this sealed record named a real fencepost'.
 

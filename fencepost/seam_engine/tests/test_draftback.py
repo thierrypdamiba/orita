@@ -69,6 +69,24 @@ def test_render_email_draft_is_deterministic():
     assert a == b
 
 
+def test_render_email_draft_refuses_a_payload_missing_recorded_total():
+    # Task 1726: a live incident. A scan/candidates-shaped payload (has
+    # `primary_gap`, never `fenceposts_recorded_total`) used to render a
+    # plausible-looking draft that silently claimed "0 fenceposts named to
+    # date, the wall reads 0" instead of failing loudly. See
+    # `test_ledger.test_required_recorded_total_raises_not_zero_when_the_field_is_missing`
+    # for the guarded accessor this now goes through.
+    candidates_shaped = {k: v for k, v in FIXTURE_SEALED_WITH_GAP.items() if k != "fenceposts_recorded_total"}
+    with pytest.raises(KeyError, match="fenceposts_recorded_total"):
+        draftback.render_email_draft(candidates_shaped)
+
+
+def test_render_notion_page_refuses_a_payload_missing_recorded_total():
+    candidates_shaped = {k: v for k, v in FIXTURE_SEALED_WITH_GAP.items() if k != "fenceposts_recorded_total"}
+    with pytest.raises(KeyError, match="fenceposts_recorded_total"):
+        draftback.render_notion_page(candidates_shaped)
+
+
 def test_render_notion_page_is_deterministic():
     a = draftback.render_notion_page(FIXTURE_SEALED_WITH_GAP)
     b = draftback.render_notion_page(FIXTURE_SEALED_WITH_GAP)

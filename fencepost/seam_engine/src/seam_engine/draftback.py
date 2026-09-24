@@ -223,7 +223,7 @@ def render_notion_page(sealed: dict[str, Any]) -> NotionPageDraft:
     date = sealed.get("date") or sealed.get("generated_at", "")[:10]
     repo = sealed.get("repo", "unknown")
     primary = sealed.get("primary_gap")
-    recorded = sealed.get("fenceposts_recorded_total", 0)
+    recorded = ledger.required_recorded_total(sealed)
     wall = wall_for(recorded)
 
     blocks: list[NotionBlock] = [

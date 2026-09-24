@@ -322,6 +322,30 @@ def test_tip_sealed_returns_the_real_payload_when_the_tip_is_intact(tmp_path: Pa
     assert ledger.tip_sealed(records) == records[-1]["sealed"]
 
 
+def test_required_recorded_total_reads_a_real_sealed_record(tmp_path: Path):
+    ledger.append_scan(_scan(primary=True, generated_at="honest"), now=_at(2026, 7, 12), base=tmp_path)
+    sealed = ledger.tip_sealed(ledger.read_records(tmp_path))
+    assert ledger.required_recorded_total(sealed) == 1
+
+
+def test_required_recorded_total_raises_not_zero_when_the_field_is_missing():
+    # Task 1726: a live incident. Something rendered `DRAFTS/2026-09-24-
+    # {email,notion}.md` off a payload shaped like `candidates/<date>.json`
+    # (has `primary_gap`, never `fenceposts_recorded_total`) instead of the
+    # real ledger tip. `sealed.get("fenceposts_recorded_total", 0)` silently
+    # took the bait: the committed draft named the correct gap and evidence
+    # and then claimed "0 fenceposts named to date, the wall reads 0" --
+    # `draftback_freshness_check.py` only catches this because a fresh
+    # re-render off the real tip disagreed byte for byte. A missing key must
+    # never be read as a legitimate zero.
+    candidates_shaped = {"generated_at": "2026-09-24T00:00:00Z", "repo": "x", "primary_gap": {"headline": "h"}}
+    try:
+        ledger.required_recorded_total(candidates_shaped)
+        raise AssertionError("required_recorded_total() must not silently default a missing field to 0")
+    except KeyError as e:
+        assert "fenceposts_recorded_total" in str(e)
+
+
 # --- the count is honest -----------------------------------------------------
 
 
