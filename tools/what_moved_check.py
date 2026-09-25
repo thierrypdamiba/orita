@@ -27,11 +27,10 @@ been edited past its founding-day placeholder ("nothing moved
 yesterday... the town is one day old") despite three real Mondays
 having passed. Task 460 closed one of those honestly: a real
 `what-moved-entry: 2026-08-01` marker now covers the week of 07-27.
-2026-07-13 and 2026-07-20 remain genuinely missed, still not
-backfilled. Writing the actual catch-up content is dedicated narrative
-work for a future Cluster Day hour (the same way
-`chronicle/002-eighteen-days.md` was), not something a checker can or
-should manufacture.
+Task 1727 closed the remaining two the same honest way (real
+`what-moved-entry: 2026-07-13` / `2026-07-20` markers, appended without
+touching or renumbering any already-sealed entry) -- as of task 1728 the
+live page carries no missed Mondays.
 
 Does NOT attempt Off-By-One's Gap-bug cadence (a different god's
 domain, a different shape of evidence -- `/thegap/`'s own file

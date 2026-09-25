@@ -5,8 +5,11 @@ own shape for the sibling cadence it's built alongside, and proving the
 live, real gap this module surfaces: as of task 449, the real page carried
 zero markers and missed every real Monday since founding. Task 460 closed
 one of those for real (a `what-moved-entry: 2026-08-01` marker now covers
-the week of 07-27); 2026-07-13 and 2026-07-20 remain genuinely missed, per
-`test_real_live_page_today_reproduces_the_named_gap` below.
+the week of 07-27); task 1727 closed the remaining two honestly as well
+(`what-moved-entry: 2026-07-13` and `2026-07-20`, appended without
+touching any already-sealed entry) -- as of task 1728,
+`test_real_live_page_today_reproduces_the_named_gap` below proves the live
+page carries no missed Mondays at all, not the old named gap.
 """
 import importlib.util
 import os
@@ -150,14 +153,16 @@ class FixtureCadenceCase(unittest.TestCase):
         # Task 460 closed the 07-27 gap for real: one honest
         # `what-moved-entry: 2026-08-01` marker landed on the live page,
         # covering that week (`_monday_of(2026-08-01)` == 2026-07-27).
-        # The two earlier Mondays are NOT backfilled -- they never shipped
-        # their own ritual and this suite keeps naming that honestly,
-        # same discipline task 391's chronicle catch-up held for the
-        # identical shape of debt. Proves the live page, not just a
-        # fixture.
+        # Task 1727 closed the remaining two the same way: honest
+        # `what-moved-entry: 2026-07-13` / `2026-07-20` markers, appended
+        # without touching or renumbering any of Zashiki's nine
+        # already-sealed drawer-count entries (Iron Rule #6). `today` is
+        # pinned to the most recent marker on record so this stays
+        # deterministic rather than drifting with a future, not-yet-shipped
+        # Monday. Proves the live page, not just a fixture.
         real_page = os.path.join(ROOT, "docs", "what-moved.html")
-        result = wmc.compute_cadence(real_page, today=date(2026, 7, 29))
-        self.assertEqual(result["missed_mondays"], ["2026-07-13", "2026-07-20"])
+        result = wmc.compute_cadence(real_page, today=date(2026, 9, 21))
+        self.assertEqual(result["missed_mondays"], [])
 
 
 if __name__ == "__main__":
