@@ -103,6 +103,73 @@ class TestGitPushRetry(unittest.TestCase):
         result = self._run_retry(self.clone_b)
         self.assertNotEqual(result.returncode, 0)
 
+    def test_rebuild_script_recovers_from_a_real_conflict_on_regenerable_files(self):
+        # Task 1744: seam-scan's noon cron lost its own push outright to
+        # this exact shape -- both sides regenerate the SAME derived file
+        # (fencepost/GAPS/<today>.md in the live break), so the rebase hits
+        # a genuine content conflict a plain retry can't resolve. A caller
+        # that knows its committed files are fully regenerable can hand in
+        # a rebuild script instead of dying loud.
+        with open(os.path.join(self.clone_a, "shared.txt"), "w") as f:
+            f.write("base\nclone_a wins this line\n")
+        _git_quiet(self.clone_a, "add", "shared.txt")
+        _git_quiet(self.clone_a, "commit", "-m", "clone_a conflicting change")
+        _git_quiet(self.clone_a, "push")
+
+        with open(os.path.join(self.clone_b, "shared.txt"), "w") as f:
+            f.write("base\nclone_b wins this line\n")
+        _git_quiet(self.clone_b, "add", "shared.txt")
+        _git_quiet(self.clone_b, "commit", "-m", "clone_b conflicting change")
+
+        rebuild = os.path.join(self.clone_b, "rebuild.sh")
+        with open(rebuild, "w") as f:
+            f.write(
+                "#!/usr/bin/env bash\n"
+                "set -euo pipefail\n"
+                'echo "rebuilt by clone_b" > shared.txt\n'
+                "git add shared.txt\n"
+                "git commit -m 'clone_b change, rebuilt after conflict'\n"
+            )
+        os.chmod(rebuild, 0o755)
+
+        result = subprocess.run(
+            ["bash", SCRIPT, "rebuild.sh"],
+            cwd=self.clone_b, capture_output=True, text=True,
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+
+        # Both the original conflicting commit and the rebuilt recovery
+        # commit landed on origin/main -- nothing silently dropped.
+        log = _git(self.origin, "log", "--oneline", "main")
+        self.assertIn("clone_a conflicting change", log)
+        self.assertIn("rebuilt after conflict", log)
+        content = _git(self.origin, "show", "main:shared.txt")
+        self.assertEqual(content, "rebuilt by clone_b")
+
+    def test_conflict_without_rebuild_script_still_fails_loud(self):
+        # Backward compatibility: every existing call site (seam-scan's
+        # other commit step, both oracle-cadence commit steps) calls this
+        # script with no argument. That path must keep failing loud on a
+        # real conflict rather than silently doing nothing, exactly as
+        # test_fails_loudly_on_a_real_conflict_instead_of_looping_forever
+        # already covers -- this just pins that the new optional argument
+        # is opt-in, not a change of default behavior.
+        with open(os.path.join(self.clone_a, "shared.txt"), "w") as f:
+            f.write("base\nclone_a wins this line\n")
+        _git_quiet(self.clone_a, "add", "shared.txt")
+        _git_quiet(self.clone_a, "commit", "-m", "clone_a conflicting change")
+        _git_quiet(self.clone_a, "push")
+
+        with open(os.path.join(self.clone_b, "shared.txt"), "w") as f:
+            f.write("base\nclone_b wins this line\n")
+        _git_quiet(self.clone_b, "add", "shared.txt")
+        _git_quiet(self.clone_b, "commit", "-m", "clone_b conflicting change")
+
+        result = self._run_retry(self.clone_b)
+        self.assertNotEqual(result.returncode, 0)
+        log = _git(self.origin, "log", "--oneline", "main")
+        self.assertNotIn("clone_b conflicting change", log)
+
     def test_succeeds_immediately_with_no_retry_needed(self):
         with open(os.path.join(self.clone_a, "solo.txt"), "w") as f:
             f.write("solo\n")
