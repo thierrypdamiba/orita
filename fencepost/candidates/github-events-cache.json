@@ -54526,5 +54526,21 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/7b3d87a88b0e303ca492a23daf1e12c96b3de398",
     "ts": "2026-09-25T22:26:09Z",
     "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "c5b7095",
+    "title": "task 1749: close out hour 22 UTC -- dawn-run break fixed, dogfood ritual complete",
+    "url": "https://github.com/thierrypdamiba/orita/commit/c5b7095b4c90bccf4792ea35e1d2ba9896c0a84",
+    "ts": "2026-09-25T22:41:52Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "0427f5f",
+    "title": "task 1749: dogfood artifacts -- gap ledger, report, badge, draftbacks, town ledger, journal",
+    "url": "https://github.com/thierrypdamiba/orita/commit/0427f5f1630b25e6514f714c5c267c12db5565d6",
+    "ts": "2026-09-25T22:42:02Z",
+    "author": "Ogun"
   }
 ]
