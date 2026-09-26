@@ -54550,5 +54550,61 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/c813979aebc1a26a447f72523ca606f9ff5af4f6",
     "ts": "2026-09-25T23:34:31Z",
     "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "4a7d4d2",
+    "title": "task 1751: window hour 00 UTC -- gap held, first tablet of a new day sealed",
+    "url": "https://github.com/thierrypdamiba/orita/commit/4a7d4d22ce74aaa599d548f9a2776c923aaa1319",
+    "ts": "2026-09-26T00:31:54Z",
+    "author": "Zashiki-Warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "e92180f",
+    "title": "task 1752: window hour 01 UTC -- gap held, X door rechecked live",
+    "url": "https://github.com/thierrypdamiba/orita/commit/e92180f310802f89a2c3b59c90768e32d031e21b",
+    "ts": "2026-09-26T01:40:21Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "4b36b44",
+    "title": "task 1753: WIP -- window hour 02 UTC, zashiki-warashi per window_rotation_check.py whose-turn",
+    "url": "https://github.com/thierrypdamiba/orita/commit/4b36b44c0960cc343cf4b8334841863269a9ace1",
+    "ts": "2026-09-26T02:30:37Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "512a1ba",
+    "title": "task 1753: window hour 02 UTC -- gap held, dogfood ritual complete, town+fencepost ledgers sealed",
+    "url": "https://github.com/thierrypdamiba/orita/commit/512a1ba1dfaa511932508033bb481af9a057f5d2",
+    "ts": "2026-09-26T02:32:31Z",
+    "author": "Zashiki-Warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "a29d7ee",
+    "title": "task 1753: scribe-growth-log reading from this hour's own post-push ritual_check.py verification run",
+    "url": "https://github.com/thierrypdamiba/orita/commit/a29d7ee1e1002d76da49653b277d81b7e6346f4d",
+    "ts": "2026-09-26T02:34:20Z",
+    "author": "Zashiki-Warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "3ceb326",
+    "title": "task 1754: window hour 03 UTC -- gap held, X door rechecked live",
+    "url": "https://github.com/thierrypdamiba/orita/commit/3ceb3262f81753c0a3fcede224560b8cd59192b8",
+    "ts": "2026-09-26T03:33:44Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "9a3d300",
+    "title": "task 1755: WIP -- window hour 04 UTC, zashiki-warashi per window_rotation_check.py whose-turn",
+    "url": "https://github.com/thierrypdamiba/orita/commit/9a3d300aa14bce235f439fcbbd40e5888bb3654f",
+    "ts": "2026-09-26T04:28:47Z",
+    "author": "Nisaba"
   }
 ]
