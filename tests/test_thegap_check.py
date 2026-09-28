@@ -326,15 +326,15 @@ class FixtureCadenceCase(unittest.TestCase):
         # confession half of the real state is proven separately, and
         # only where the real vault actually is (see RealVaultCase
         # below). `_hidden_dates` is unconditional the same way, so
-        # `total_hidden_on_record`/`latest_hidden` below are task 1650's
-        # own eighth real marker (2026-09-21, corner_fence_posts), not
-        # frozen at the seventh just because this test's simulated `today`
+        # `total_hidden_on_record`/`latest_hidden` below are task 1817's
+        # own ninth real marker (2026-09-28, t_junction_fence_posts), not
+        # frozen at the eighth just because this test's simulated `today`
         # is 2026-08-03.
         real_readme = os.path.join(ROOT, "thegap", "README.md")
         no_vault = os.path.join(ROOT, "does-not-exist-orita-vault")
         result = tgc.compute_cadence(real_readme, no_vault, today=date(2026, 8, 3))
-        self.assertEqual(result["total_hidden_on_record"], 8)
-        self.assertEqual(result["latest_hidden"], "2026-09-21")
+        self.assertEqual(result["total_hidden_on_record"], 9)
+        self.assertEqual(result["latest_hidden"], "2026-09-28")
         self.assertEqual(result["missed_mondays"], ["2026-07-13", "2026-07-20"])
 
 
@@ -369,7 +369,7 @@ class RealVaultCase(unittest.TestCase):
         self.assertEqual(result["confession_due_now"], [])
         self.assertEqual(
             result["confessed_on_record"],
-            ["2026-07-30", "2026-08-03", "2026-08-10", "2026-08-17", "2026-08-31", "2026-09-07", "2026-09-15"],
+            ["2026-07-30", "2026-08-03", "2026-08-10", "2026-08-17", "2026-08-31", "2026-09-07", "2026-09-15", "2026-09-21"],
         )
 
     @unittest.skipUnless(
@@ -391,7 +391,7 @@ class RealVaultCase(unittest.TestCase):
         self.assertEqual(result["confession_due_now"], [])
         self.assertEqual(
             result["confessed_on_record"],
-            ["2026-07-30", "2026-08-03", "2026-08-10", "2026-08-17", "2026-08-31", "2026-09-07", "2026-09-15"],
+            ["2026-07-30", "2026-08-03", "2026-08-10", "2026-08-17", "2026-08-31", "2026-09-07", "2026-09-15", "2026-09-21"],
         )
 
     @unittest.skipUnless(
@@ -411,7 +411,7 @@ class RealVaultCase(unittest.TestCase):
         self.assertEqual(result["confession_due_now"], [])
         self.assertEqual(
             result["confessed_on_record"],
-            ["2026-07-30", "2026-08-03", "2026-08-10", "2026-08-17", "2026-08-31", "2026-09-07", "2026-09-15"],
+            ["2026-07-30", "2026-08-03", "2026-08-10", "2026-08-17", "2026-08-31", "2026-09-07", "2026-09-15", "2026-09-21"],
         )
 
     @unittest.skipUnless(
@@ -433,7 +433,7 @@ class RealVaultCase(unittest.TestCase):
         self.assertEqual(result["confession_due_now"], [])
         self.assertEqual(
             result["confessed_on_record"],
-            ["2026-07-30", "2026-08-03", "2026-08-10", "2026-08-17", "2026-08-31", "2026-09-07", "2026-09-15"],
+            ["2026-07-30", "2026-08-03", "2026-08-10", "2026-08-17", "2026-08-31", "2026-09-07", "2026-09-15", "2026-09-21"],
         )
 
     @unittest.skipUnless(
@@ -455,7 +455,7 @@ class RealVaultCase(unittest.TestCase):
         self.assertEqual(result["confession_due_now"], [])
         self.assertEqual(
             result["confessed_on_record"],
-            ["2026-07-30", "2026-08-03", "2026-08-10", "2026-08-17", "2026-08-31", "2026-09-07", "2026-09-15"],
+            ["2026-07-30", "2026-08-03", "2026-08-10", "2026-08-17", "2026-08-31", "2026-09-07", "2026-09-15", "2026-09-21"],
         )
 
     @unittest.skipUnless(
@@ -479,7 +479,7 @@ class RealVaultCase(unittest.TestCase):
         self.assertEqual(result["confession_due_now"], [])
         self.assertEqual(
             result["confessed_on_record"],
-            ["2026-07-30", "2026-08-03", "2026-08-10", "2026-08-17", "2026-08-31", "2026-09-07", "2026-09-15"],
+            ["2026-07-30", "2026-08-03", "2026-08-10", "2026-08-17", "2026-08-31", "2026-09-07", "2026-09-15", "2026-09-21"],
         )
 
     @unittest.skipUnless(
@@ -510,6 +510,7 @@ class RealVaultCase(unittest.TestCase):
                 "2026-08-31",
                 "2026-09-07",
                 "2026-09-15",
+                "2026-09-21",
             ],
         )
 
