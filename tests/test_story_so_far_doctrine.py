@@ -160,7 +160,13 @@ class FooterArithmeticCase(unittest.TestCase):
         # 113, not 110; a tenth chronicle episode sealed (the "nine
         # episodes" figure hadn't drifted until this one); and the X
         # outage crossed a full tenth week (69 real days since 2026-07-14).
-        self.assertEqual(_body_word_count(self.text), 285)
+        # Updated again by task 1821's Cluster Day rewrite (285 -> 287,
+        # landing exactly on Nisaba's own limit): the recipe count held
+        # flat at 113 for the first time since counting began (worth
+        # naming, not a drift); an eleventh chronicle episode sealed; the
+        # tenth's own petition (Episode 10) is named as still unanswered;
+        # and the X outage crossed a full eleventh week.
+        self.assertEqual(_body_word_count(self.text), 287)
 
 
 class MutationBitesCase(unittest.TestCase):
