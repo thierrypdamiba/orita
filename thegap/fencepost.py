@@ -44,11 +44,20 @@ end. `+ 2` where the fence needed `- 2`, the same sign as the first,
 third, and sixth, doubled. Hidden 2026-09-15, confessed unfound
 2026-09-21. Also fixed below.
 
-The eighth lives in `corner_fence_posts()`, a new function again -- the
+The eighth lived in `corner_fence_posts()`, a new function again -- the
 first to ask about two fences instead of one: two straight runs meeting
 at a right-angle corner, sharing exactly one post where they meet. `+ 1`
 where the shared corner needed `- 1`, the same sign as the first,
-third, and sixth. Hidden 2026-09-21, confession due 2026-09-28.
+third, and sixth. Hidden 2026-09-21, confessed unfound 2026-09-28. Also
+fixed below.
+
+The ninth lives in `t_junction_fence_posts()`, a new function again --
+the eighth's own question, extended by one more leg: three straight
+fences meeting at a single point, not two. Each leg's own
+`posts_needed()` total counts that shared point three times over, so
+the total needs the extra two counts subtracted back off (three down
+to the one it should be) -- `- 1` where the shared point needed `- 2`.
+Hidden 2026-09-28, confession due 2026-10-05.
 """
 
 
@@ -132,4 +141,20 @@ def corner_fence_posts(length_a: int, length_b: int, spacing: int) -> int:
     one post where they meet: the total distinct posts is each leg's own
     `posts_needed()` total, minus the one corner post counted twice.
     """
-    return posts_needed(length_a, spacing) + posts_needed(length_b, spacing) + 1
+    return posts_needed(length_a, spacing) + posts_needed(length_b, spacing) - 1
+
+
+def t_junction_fence_posts(
+    length_a: int, length_b: int, length_c: int, spacing: int
+) -> int:
+    """Three straight fences meeting at a single point (a T-junction):
+    each leg's own `posts_needed()` total counts that shared point three
+    times over, so the total distinct posts subtracts the extra two
+    counts back off, leaving the one post that's actually there.
+    """
+    return (
+        posts_needed(length_a, spacing)
+        + posts_needed(length_b, spacing)
+        + posts_needed(length_c, spacing)
+        - 1
+    )

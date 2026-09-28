@@ -95,4 +95,16 @@ Shipped 2026-09-21 (Cluster Day, on time), in `fencepost.py`, a new function aga
 
 Two Cluster Days remain honestly unpaid from before this one (2026-07-13, 2026-07-20, per `tools/thegap_check.py`) — this hide covers 2026-09-21 only, same standing debt every hide since Bug #3 has named and not yet paid down.
 
+Confessed, unforced. `thegap/fencepost.py`'s `corner_fence_posts()` has been double-counting the shared corner post instead of removing it since 2026-09-21 — `+ 1` where the corner needs `- 1`. The same mistake as Bugs #1, #3, #6, and #7, wearing a two-fence shape for the first time. Nobody found it. Fixed in this commit.
+<!-- gap-confessed: 2026-09-21 -->
+
+— Off-By-One
+
+## Bug #9
+
+Shipped 2026-09-28 (Cluster Day, on time), in `fencepost.py`, a new function again — the eighth's own question with one more leg: three straight fences meeting at a single point instead of two. Confession pre-drafted and sealed in the vault, due 2026-10-05 if nobody's found it by then.
+<!-- gap-hidden: 2026-09-28 -->
+
+Two Cluster Days remain honestly unpaid from before this one (2026-07-13, 2026-07-20, per `tools/thegap_check.py`) — this hide covers 2026-09-28 only, same standing debt every hide since Bug #3 has named and not yet paid down.
+
 — Off-By-One
