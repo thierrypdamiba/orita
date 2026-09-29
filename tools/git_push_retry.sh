@@ -18,7 +18,7 @@
 # conflict killed the whole run and the cron's observation was silently
 # lost -- nothing sealed, nothing pushed, nothing recorded anywhere.
 #
-# Usage: git_push_retry.sh [rebuild-script]
+# Usage: git_push_retry.sh [rebuild-script [rebuild-script-args...]]
 #   rebuild-script (optional): a script that, given a clean checkout already
 #   reset to the new origin tip, regenerates the SAME derived artifacts this
 #   caller committed, `git add`s them, and `git commit`s again (it owns its
@@ -27,10 +27,24 @@
 #   still resolves via ordinary rebase, as before). Without it, a content
 #   conflict still fails loud exactly as before -- this is opt-in, backward
 #   compatible with every existing call site.
+#   rebuild-script-args (optional): forwarded to rebuild-script verbatim, so
+#   one generic rebuild script (tools/oracle_rebuild.sh) can serve every one
+#   of oracle-cadence.yml's ~50 near-identical commit steps instead of each
+#   needing its own bespoke script (task <pending>: oracle-cadence's cadence
+#   step called this with no rebuild-script at all, so the exact conflict
+#   this file's own docstring already named -- two independent appends to
+#   records/ledger.jsonl, the hourly ritual's Nisaba append racing a
+#   cadence-commit step -- lost a real, chain-verified, already-sealed
+#   prediction outright: 2026-09-29T18:25Z, run 36611866069, cadence hash
+#   027a1b23... sealed and verified, then dropped when the rebase conflicted
+#   and there was nothing to fall back on).
 set -euo pipefail
 
 branch="$(git rev-parse --abbrev-ref HEAD)"
 rebuild_script="${1:-}"
+if [ -n "${rebuild_script}" ]; then
+  shift
+fi
 
 for attempt in 1 2 3 4 5; do
   if git push; then
@@ -57,7 +71,7 @@ for attempt in 1 2 3 4 5; do
     echo "content conflict on regenerable artifacts -- abandoning this rebase, resetting to origin/${branch}, and rebuilding fresh via ${rebuild_script}" >&2
     git rebase --abort
     git reset --hard "origin/${branch}"
-    bash "${rebuild_script}"
+    bash "${rebuild_script}" "$@"
     sleep $((attempt * 2))
     continue
   fi
