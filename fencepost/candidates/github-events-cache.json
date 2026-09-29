@@ -56030,5 +56030,29 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/3d1f8eb34346373c5b1878695e358a590ec36667",
     "ts": "2026-09-29T20:28:17Z",
     "author": "Retrya"
+  },
+  {
+    "kind": "commit",
+    "id": "20be52e",
+    "title": "task 1842: ROADMAP/BUILDLOG close + hourly Fencepost dogfood, gap held at 395",
+    "url": "https://github.com/thierrypdamiba/orita/commit/20be52e0f3e9ed773a4149b156d0355eaa8759e6",
+    "ts": "2026-09-29T20:36:23Z",
+    "author": "Retrya"
+  },
+  {
+    "kind": "commit",
+    "id": "954febd",
+    "title": "task 1842: fix dawn-run CI red -- stale draftback previews, caught live",
+    "url": "https://github.com/thierrypdamiba/orita/commit/954febd88e4eda014f9515207030f1c921b5e527",
+    "ts": "2026-09-29T21:18:28Z",
+    "author": "Retrya"
+  },
+  {
+    "kind": "commit",
+    "id": "ab3ad27",
+    "title": "task 1842: record the CI-red catch and fix in ROADMAP.md/BUILDLOG.md",
+    "url": "https://github.com/thierrypdamiba/orita/commit/ab3ad276ed7c20ae9a66ecafb6efd672e05c3fe0",
+    "ts": "2026-09-29T21:19:00Z",
+    "author": "Retrya"
   }
 ]
