@@ -396,6 +396,10 @@ def _daytime_rotation_check() -> ModuleType:
     return _load("_ritual_daytime_rotation_check", os.path.join(ROOT, "tools", "daytime_rotation_check.py"))
 
 
+def _roadmap_row_order_check() -> ModuleType:
+    return _load("_ritual_roadmap_row_order_check", os.path.join(ROOT, "tools", "roadmap_row_order_check.py"))
+
+
 def _roadmap_buildlog_sync_check() -> ModuleType:
     return _load(
         "_ritual_roadmap_buildlog_sync_check", os.path.join(ROOT, "tools", "roadmap_buildlog_sync_check.py")
@@ -1571,6 +1575,29 @@ def check_daytime_rotation(roadmap_path: str | None = None) -> dict[str, object]
     result = cast(dict[str, object], mod.find_daytime_rotation_violations(**kwargs))
     result["whose_turn"] = mod.whose_turn_daytime(**kwargs)
     return result
+
+
+def check_roadmap_row_order(roadmap_path: str | None = None) -> dict[str, object]:
+    """Task 1854: fold `roadmap_row_order_check.py`'s own scan of the LIVE
+    `ROADMAP.md` table into the one block. Task 1853's own row broke, for
+    the first time, the assumption `check_daytime_rotation`'s
+    `whose_turn_daytime()` depends on but never checked -- that rows are
+    always appended in ascending task-number file order, so file-last and
+    number-last are the same row. It was inserted right under the header
+    instead of after task 1852 at the bottom, and `whose_turn_daytime()`
+    silently answered a stale turn (kwaku-ananse, one full turn behind the
+    real next owner, esu-elegba) until this hour's own live read caught
+    the drift by hand. Unconditional, local-filesystem-only, the same
+    cheap always-on class `check_wip_reclaim`/`check_window_rotation`
+    already hold. A real hit here DOES flip `broken`: an out-of-order row
+    means `whose_turn_daytime()` (and anything else that trusts
+    `rows[-1]`) can silently name the wrong god's turn, not an honest
+    zero-state waiting on the calendar."""
+    mod = _roadmap_row_order_check()
+    kwargs: dict[str, object] = {}
+    if roadmap_path is not None:
+        kwargs["roadmap_path"] = roadmap_path
+    return cast(dict[str, object], mod.find_order_violations(**kwargs))
 
 
 def check_roadmap_buildlog_sync(
@@ -2806,6 +2833,7 @@ def run_ritual_check(
     wip_reclaim_path: str | None = None,
     window_rotation_path: str | None = None,
     daytime_rotation_path: str | None = None,
+    roadmap_row_order_path: str | None = None,
     roadmap_buildlog_sync_roadmap_path: str | None = None,
     roadmap_buildlog_sync_buildlog_path: str | None = None,
     roadmap_buildlog_sync_archive_dir: str | None = None,
@@ -2969,6 +2997,7 @@ def run_ritual_check(
     wip_reclaim = check_wip_reclaim(now, roadmap_path=wip_reclaim_path)
     window_rotation = check_window_rotation(roadmap_path=window_rotation_path)
     daytime_rotation = check_daytime_rotation(roadmap_path=daytime_rotation_path)
+    roadmap_row_order = check_roadmap_row_order(roadmap_path=roadmap_row_order_path)
     roadmap_buildlog_sync = check_roadmap_buildlog_sync(
         roadmap_path=roadmap_buildlog_sync_roadmap_path,
         buildlog_path=roadmap_buildlog_sync_buildlog_path,
@@ -3089,6 +3118,7 @@ def run_ritual_check(
         or (not wip_reclaim["clean"])
         or (not window_rotation["clean"])
         or (not daytime_rotation["clean"])
+        or (not roadmap_row_order["clean"])
         or (not roadmap_buildlog_sync["clean"])
         or (not scopes_completeness["clean"])
         or (not toolkits_in_use["clean"])
@@ -3174,6 +3204,7 @@ def run_ritual_check(
         "wip_reclaim": wip_reclaim,
         "window_rotation": window_rotation,
         "daytime_rotation": daytime_rotation,
+        "roadmap_row_order": roadmap_row_order,
         "roadmap_buildlog_sync": roadmap_buildlog_sync,
         "roadmap_row_shape": roadmap_row_shape,
         "scopes_completeness": scopes_completeness,
@@ -3475,6 +3506,14 @@ def format_ritual_check(result: dict[str, Any]) -> str:
         lines.append(
             f"  daytime rotation: {len(dro['violations'])} LIVE VIOLATION(S) -- "
             "a daytime owner-to-owner transition broke the fixed seven-god cycle, escalate now"
+        )
+    rro = result["roadmap_row_order"]
+    if rro["clean"]:
+        lines.append(f"  roadmap row order: clean ({rro['row_count']} live row(s), strictly ascending)")
+    else:
+        lines.append(
+            f"  roadmap row order: {len(rro['violations'])} LIVE VIOLATION(S) -- a row landed out of "
+            "ascending task-number order, whose_turn_daytime() may be answering a stale turn, escalate now"
         )
     rbs = result["roadmap_buildlog_sync"]
     if rbs["clean"]:
