@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Task 121. Off-By-One counts the tool that counts everything else.
 
-`tools/ritual_check.py` hand-wires 86 `check_*` functions into one hourly
+`tools/ritual_check.py` hand-wires 87 `check_*` functions into one hourly
 block: each is called inside `run_ritual_check`, its result assigned to a
 dict key, and that key printed as a line in `format_ritual_check`. Three
 separate places a single typo or a forgotten wire-up can silently drop a
@@ -444,7 +444,14 @@ project had died. A short, byte-identical explanation now lives in both
 the same hour task 1625's `check_daytime_rotation` was wired in --
 `window_rotation_check.py`'s own sibling for the daytime half of the
 rotation doctrine, closing the gap that let a mistaken hand-off sentence
-skip a position in the fixed seven-god cycle unnoticed.
+skip a position in the fixed seven-god cycle unnoticed. **Updated to 87**
+the same hour task 1854's `check_roadmap_row_order` was wired in --
+`check_daytime_rotation`'s own sibling, catching the one assumption that
+check never checked: that `ROADMAP.md`'s rows are always appended in
+ascending task-number order, so `rows[-1]` really is the most recent one.
+Task 1853's own row broke that assumption for the first time, silently
+naming a stale next-owner and failing `dawn-run` live until this hour's
+fix.
 
 Usage:
     python3 tools/ritual_completeness_check.py check
