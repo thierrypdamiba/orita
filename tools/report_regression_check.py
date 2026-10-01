@@ -134,6 +134,31 @@ SEEDED_EXCEPTIONS: frozenset[tuple[str, str]] = frozenset(
         # milestone-commit total, not a wrong or reversed announcement --
         # nothing was un-shipped, un-committed, or newly filtered.
         ("2026-09-01", "2026-09-02"),
+        # Task 1870 (2026-10-01, zashiki-warashi): the same mechanism as
+        # 1192's case above, confirmed live rather than assumed by analogy.
+        # `REPORTS/2026-09-30.md` sealed 429 milestone commits on task
+        # 1869's hour -- its own sealed `candidates/2026-09-30.json` reads
+        # `github_events_source: "direct"`, meaning that hour's sandbox had
+        # a rare working direct httpx path to api.github.com and scanned
+        # the complete live history unfiltered by the override cache's
+        # incompleteness. This hour's own attempt at a direct scan
+        # (`python -m seam_engine.scan`, no `--github-events`) timed out
+        # after 25s with no response -- the direct path is blocked again,
+        # the normal case -- so this hour correctly fell back to the
+        # override cache (`github_events_cache.json`, 7104 events after
+        # ingesting this hour's own 3 new commits). A live page-probe this
+        # hour (`mcp__github__list_commits since=2026-07-12 perPage=1
+        # page=7200`) still returned a real commit, so the true total
+        # commit count since founding is at least 7200 while the cache
+        # holds only 7103 commit events -- the same permanent backfill gap
+        # task 1192 already named and filed (task 1193), not a new one.
+        # Re-deriving the override count by hand against the committed
+        # cache (filtering `QUIET_VOICE_AUTHORS`, matching
+        # `MILESTONE_KEYWORDS`, `ts >= account_live_since`) independently
+        # reproduces exactly 428, matching `scan.py`'s own live output --
+        # the lower number is a correct read of an incomplete source, not
+        # a miscomputation, a reversed announcement, or anything un-shipped.
+        ("2026-09-30", "2026-10-01"),
     }
 )
 
