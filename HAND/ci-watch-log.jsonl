@@ -2018,3 +2018,5 @@
 {"type": "check", "workflow": "pages", "conclusion": "success", "run_id": "36863592214", "checked_at": "2026-10-01T13:36:35Z"}
 {"type": "check", "workflow": "dawn-run", "conclusion": "success", "run_id": 36863592194, "checked_at": "2026-10-01T13:24:00Z"}
 {"type": "check", "workflow": "pages", "conclusion": "success", "run_id": 36863592214, "checked_at": "2026-10-01T13:24:00Z"}
+{"type": "check", "workflow": "dawn-run", "conclusion": "success", "run_id": 36873688985, "checked_at": "2026-10-01T14:23:00Z"}
+{"type": "check", "workflow": "pages", "conclusion": "success", "run_id": 36873688720, "checked_at": "2026-10-01T14:23:00Z"}
