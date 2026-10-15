@@ -199,6 +199,54 @@ class TestDetachedDiverged(_RepoPairCase):
         self.assertEqual(_git(self.clone, "rev-parse", "HEAD"), diverged_sha)
 
 
+class TestShallowCloneFalseDivergence(_RepoPairCase):
+    """Task 1944. Hit live this hour: a shallow clone whose local branch
+    sits at an old commit and whose most recent `git fetch --depth 1`
+    only pulled the new tip in isolation can leave the two commits with
+    no common ancestor anywhere in the local object store -- an entirely
+    ordinary fast-forward then misreads as the genuine-divergence case,
+    and the old script refused to touch it ("resolve by hand") even
+    though nothing had actually diverged. Reproduces that exact
+    disconnected-shallow-islands shape by hand (two separate
+    `--depth 1` fetches, one at the old commit, one at the new tip,
+    with no shared history fetched in between) rather than trusting
+    that any single clone invocation always reproduces it."""
+
+    def test_recovers_instead_of_refusing(self):
+        old_sha = _git(self.clone, "rev-parse", "HEAD")
+        for i in range(3):
+            self._commit_on_origin(f"origin moved on, commit {i}")
+
+        shallow = os.path.join(self.tmp.name, "shallow-clone")
+        _git_quiet(self.tmp.name, "init", shallow)
+        _git_quiet(shallow, "remote", "add", "origin", self.origin)
+        _git_quiet(shallow, "fetch", "--depth", "1", "origin", old_sha)
+        _git_quiet(shallow, "branch", "main", old_sha)
+        _git_quiet(shallow, "checkout", "main")
+        _git_quiet(shallow, "fetch", "--depth", "1", "origin", "main")
+
+        self.assertEqual(_git(shallow, "rev-parse", "--is-shallow-repository"), "true")
+        # Confirm the disconnected-islands shape actually landed before
+        # trusting the script's recovery of it: both ancestor checks
+        # must fail here, exactly the false-divergence precondition.
+        is_ancestor_either_way = subprocess.run(
+            ["git", "-C", shallow, "merge-base", "--is-ancestor", "origin/main", "HEAD"],
+            capture_output=True,
+        ).returncode == 0 or subprocess.run(
+            ["git", "-C", shallow, "merge-base", "--is-ancestor", "HEAD", "origin/main"],
+            capture_output=True,
+        ).returncode == 0
+        self.assertFalse(is_ancestor_either_way, "fixture didn't reproduce disconnected shallow islands")
+
+        r = _run(shallow, "main")
+        self.assertEqual(r.returncode, 0, r.stderr)
+        self.assertNotIn("diverged", r.stderr)
+        self.assertIn("fast-forwarded", r.stdout)
+        self.assertEqual(_git(shallow, "rev-parse", "--is-shallow-repository"), "false")
+        _git_quiet(shallow, "fetch", "origin", "main")
+        self.assertEqual(_git(shallow, "rev-parse", "main"), _git(shallow, "rev-parse", "origin/main"))
+
+
 class TestFallsBackWhenGivenPathIsMissing(_RepoPairCase):
     """Task 1487. The real-world case: the caller passes a path that
     doesn't exist in THIS container (e.g. `~/orita` expanded against a

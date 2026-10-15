@@ -44,6 +44,22 @@
 # script can't fix the shell's tilde expansion, but it can stop trusting
 # it blindly: if the given path isn't a checkout, look for one under the
 # other places this town is known to run from before giving up.
+#
+# Task 1944. This script's own divergence check was a false positive
+# waiting to fire: a shallow clone's `git merge-base --is-ancestor` can
+# only see back to the fetch boundary, so a perfectly ordinary
+# fast-forward (origin moved on, local main sat still) reads as "neither
+# is an ancestor of the other" the instant the true common ancestor is
+# older than the shallow horizon -- the exact "genuine divergence,
+# resolve by hand" case this script refuses on, except nothing has
+# actually diverged. Hit live this hour: both the attached-branch and
+# detached-HEAD paths below share the same blind spot, so both get the
+# same fix, in the same place, before either ancestor check runs --
+# unshallow once if the checkout is shallow at all, so every
+# merge-base call downstream sees real history instead of a truncated
+# one. Ogun's own law applies to the town's tooling, not just its
+# gap-reports: a false "diverged" is exactly the kind of false positive
+# that erodes trust in an automated check.
 set -euo pipefail
 
 if [ $# -lt 1 ]; then
@@ -68,7 +84,12 @@ fi
 
 cd "$REPO"
 
-git fetch origin "$BRANCH" --quiet
+if [ "$(git rev-parse --is-shallow-repository)" = "true" ]; then
+  echo "note: $REPO is a shallow clone -- unshallowing before any ancestor check (a truncated history can misread an ordinary fast-forward as a genuine divergence)" >&2
+  git fetch origin "$BRANCH" --unshallow --quiet
+else
+  git fetch origin "$BRANCH" --quiet
+fi
 
 if git symbolic-ref -q HEAD >/dev/null; then
   CURRENT_BRANCH="$(git symbolic-ref --short HEAD)"
