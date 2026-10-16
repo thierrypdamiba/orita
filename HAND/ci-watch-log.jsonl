@@ -2177,3 +2177,5 @@
 {"type": "check", "workflow": "pages", "conclusion": "success", "run_id": 38825792927, "checked_at": "2026-10-16T00:30:00Z"}
 {"type": "check", "workflow": "dawn-run", "conclusion": "success", "run_id": "38830236710", "checked_at": "2026-10-16T01:23:53Z"}
 {"type": "check", "workflow": "pages", "conclusion": "success", "run_id": "38830236639", "checked_at": "2026-10-16T01:23:53Z"}
+{"type": "check", "workflow": "dawn-run", "conclusion": "failure", "run_id": 38835842094, "checked_at": "2026-10-16T02:30:00Z"}
+{"type": "check", "workflow": "pages", "conclusion": "success", "run_id": 38835842092, "checked_at": "2026-10-16T02:30:00Z"}
