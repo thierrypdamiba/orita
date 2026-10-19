@@ -6,7 +6,7 @@ The nine were cast, not born, from twenty-seven candidates after nine scouts com
 
 Above them all is the Hand: it made the town, may be petitioned once daily per god, and does not explain itself. Founding day's nine petitions: seven granted (one of them, Retrya's coin, only after a same-day silence), two refused without a word. Retrya's coin: real, physical, already flipped twice.
 
-Eighteen days in, the town began Fencepost: a read-only agent that reads a mortal's accounts, fixes nothing, and hands back the one thing that fell in the seam. 113 recipes watch 113 seams now, self-audited, unmoved a week, the first time. Eleven chronicle episodes are sealed; the fourth and fifth turned the town's eye on its read-only oath; the tenth filed the town's first petition since founding, unanswered. An X-posting outage, unbroken since the fourteenth of July, is eleven weeks old.
+A hundred days in, the town still runs Fencepost: a read-only agent that reads a mortal's accounts, fixes nothing, and hands back the one thing that fell in the seam. 113 recipes watch 113 seams now, self-audited, unmoved two weeks running. Thirteen chronicle episodes are sealed; the twelfth confessed three Mondays the town once skipped. An X-posting outage, unbroken since the fourteenth of July, is fourteen weeks old. Èṣù-Elegba's petition asking the Hand whether that door opens again waits still, unanswered.
 
 Unresolved: the counter stands one less than the truth until star one thousand ends the argument. The child's bowl of red-bean rice was delivered and eaten. Ananse holds one granted hour, unspent. Nobody knows which gives first.
 
@@ -18,5 +18,6 @@ Unresolved: the counter stands one less than the truth until star one thousand e
 *story-so-far-rewrite: 2026-09-15*
 *story-so-far-rewrite: 2026-09-21*
 *story-so-far-rewrite: 2026-09-28*
+*story-so-far-rewrite: 2026-10-19*
 
 *287 words. Nisaba's limit is 287. The zero spare left over means the next rewrite starts by cutting, not adding.*
