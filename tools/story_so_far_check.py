@@ -41,6 +41,42 @@ real" discipline `what_moved_check.py`'s own docstring held. The one
 real marker on record as of this task is the one task 780 itself adds
 when it rewrites the doc's content to match the live repo.
 
+Task 2044: `cluster_day_check.py`'s own `cluster-day-covers` marker
+(task 406) lets one chronicle episode retroactively credit several
+Mondays when a single real backlog catch-up event legitimately spans
+more than one -- task 2041's episode-012 used it to cover
+2026-10-05/10-12/10-19 in one real episode. This module had no
+equivalent: task 2043's own live rewrite closed only the exact
+calendar week its `story-so-far-rewrite: 2026-10-19` marker landed in,
+leaving 2026-10-05 and 2026-10-12 honestly (not fabricated) but
+*unnecessarily* lapsed -- the same unbroken, no-rewrite-in-between
+backlog episode-012 had already named for the sibling cadence.
+
+Fixed the same way, adapted to this file's single-document, `*`-line
+convention (chronicle has one file per episode; this doc accumulates
+every `story-so-far-rewrite` marker in the same file over time, so a
+covers declaration has to name which Mondays it credits on its own
+line rather than being implicit to "the one file it lives in"):
+
+    *story-so-far-covers: 2026-10-05, 2026-10-12, 2026-10-19*
+
+Every date in a `story-so-far-covers` marker must be a real Monday
+strictly after founding, strictly ascending, no duplicates within the
+same marker -- `MalformedCoversMarkerError` names the file and the bad
+value loudly rather than silently trusting or silently dropping it,
+mirroring `cluster_day_check.MalformedCoversMarkerError`. Unlike
+chronicle's per-episode marker (which, when present, REPLACES that
+episode's implicit one-Monday credit), this module's covers dates are
+additive: they UNION with whatever the ordinary `story-so-far-rewrite`
+markers already credit by date. That is the honest shape for a
+single accumulating file -- every existing, already-true credit stays
+true, and a covers marker only ever adds explicit credit for Mondays a
+real rewrite event also genuinely spoke for, never takes any away.
+Still does NOT backfill the isolated, non-contiguous older gaps
+(2026-07-13/07-20/07-27/08-03) -- those predate this task's own rewrite
+event by months, so crediting them here would be exactly the
+fabrication this module's docstring already refuses.
+
 Usage:
     python3 tools/story_so_far_check.py check
 """
@@ -59,6 +95,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DEFAULT_STORY_SO_FAR_PATH = os.path.join(ROOT, "docs", "story-so-far.md")
 
 _ENTRY_MARKER = re.compile(r"\*story-so-far-rewrite:\s*(?P<date>[^*]*?)\s*\*")
+_COVERS_MARKER = re.compile(r"\*story-so-far-covers:\s*(?P<dates>[^*]*?)\s*\*")
 
 
 class MalformedRewriteMarkerError(ValueError):
@@ -67,6 +104,14 @@ class MalformedRewriteMarkerError(ValueError):
     the same discipline `what_moved_check.MalformedEntryMarkerError` and
     `cluster_day_check.MalformedCoversMarkerError` already hold for their
     own markers."""
+
+
+class MalformedCoversMarkerError(ValueError):
+    """A `story-so-far-covers` marker names a date that isn't a real
+    Monday after founding, isn't ascending, or repeats one already named
+    in the same marker -- named loudly here rather than silently
+    mis-crediting (or silently ignoring) the file, mirroring
+    `cluster_day_check.MalformedCoversMarkerError`."""
 
 
 def _entry_dates(path: str) -> list[date]:
@@ -90,6 +135,51 @@ def _entry_dates(path: str) -> list[date]:
     return sorted(dates)
 
 
+def _covers_dates(path: str) -> list[date]:
+    """Every Monday explicitly declared across every `story-so-far-covers`
+    marker found in `path`, ascending, deduplicated. An absent file or
+    one with no covers markers returns an empty list. Each marker's own
+    dates must individually be real Mondays strictly after
+    `cluster_day_check.FOUNDING_DATE`, strictly ascending, and
+    duplicate-free within that one marker; a violation raises
+    `MalformedCoversMarkerError` naming the file and the bad value."""
+    if not os.path.isfile(path):
+        return []
+    with open(path, encoding="utf-8") as f:
+        text = f.read()
+    all_dates: set[date] = set()
+    for m in _COVERS_MARKER.finditer(text):
+        raw = m.group("dates")
+        marker_dates: list[date] = []
+        for piece in raw.split(","):
+            piece = piece.strip()
+            if not piece:
+                continue
+            try:
+                d = date.fromisoformat(piece)
+            except ValueError as e:
+                raise MalformedCoversMarkerError(
+                    f"{path}: story-so-far-covers names {piece!r}, not a valid YYYY-MM-DD date"
+                ) from e
+            if d <= cluster_day_check.FOUNDING_DATE:
+                raise MalformedCoversMarkerError(
+                    f"{path}: story-so-far-covers names {d.isoformat()}, on or before founding "
+                    f"({cluster_day_check.FOUNDING_DATE.isoformat()}) -- no Cluster Day obligation "
+                    "exists that early"
+                )
+            if d.weekday() != 0:
+                raise MalformedCoversMarkerError(
+                    f"{path}: story-so-far-covers names {d.isoformat()}, which is not a Monday"
+                )
+            marker_dates.append(d)
+        if marker_dates != sorted(marker_dates):
+            raise MalformedCoversMarkerError(f"{path}: story-so-far-covers dates must be ascending")
+        if len(marker_dates) != len(set(marker_dates)):
+            raise MalformedCoversMarkerError(f"{path}: story-so-far-covers repeats a date")
+        all_dates.update(marker_dates)
+    return sorted(all_dates)
+
+
 def compute_cadence(path: str | None = None, today: date | None = None) -> dict[str, Any]:
     """The real numbers behind Kwaku-Ananse's own fifth of TOWN-OPERATIONS.md's
     weekly Cluster Day ritual -- named as missing mechanism, never
@@ -103,7 +193,9 @@ def compute_cadence(path: str | None = None, today: date | None = None) -> dict[
       than a second, driftable copy of the same constant/logic).
     - missed_mondays: every Monday in `mondays_due` with no marker dated
       inside that Monday's own calendar week (Monday through the
-      following Sunday) -- named plainly, never silently absorbed.
+      following Sunday), UNIONED with every Monday any
+      `story-so-far-covers` marker explicitly declares (see
+      `_covers_dates`) -- named plainly, never silently absorbed.
     """
     path = path or DEFAULT_STORY_SO_FAR_PATH
     today = today or datetime.now(timezone.utc).date()
@@ -112,6 +204,7 @@ def compute_cadence(path: str | None = None, today: date | None = None) -> dict[
     mondays_due_set = set(mondays_due)
 
     covered = {cluster_day_check._monday_of(d) for d in entries} & mondays_due_set
+    covered |= set(_covers_dates(path)) & mondays_due_set
     missed = [d for d in mondays_due if d not in covered]
 
     return {

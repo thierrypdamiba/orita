@@ -150,6 +150,82 @@ class FixtureCadenceCase(unittest.TestCase):
         self.assertIn("last marked rewritten 2026-08-01", line)
         self.assertIn("2 Cluster Days lapsed", line)
 
+    def test_covers_marker_credits_additional_mondays(self):
+        _write(
+            self.doc,
+            "*story-so-far-rewrite: 2026-10-19*\n"
+            "*story-so-far-covers: 2026-10-05, 2026-10-12, 2026-10-19*\n",
+        )
+        result = ssc.compute_cadence(self.doc, today=date(2026, 10, 19))
+        self.assertEqual(result["mondays_due"][-3:], ["2026-10-05", "2026-10-12", "2026-10-19"])
+        self.assertEqual([d for d in result["missed_mondays"] if d >= "2026-10-05"], [])
+
+    def test_covers_marker_is_additive_not_a_replacement(self):
+        # An ordinary rewrite marker still credits its own week even
+        # with no covers marker present at all -- the new mechanism only
+        # ever adds credit, never takes the old implicit credit away.
+        _write(self.doc, "*story-so-far-rewrite: 2026-07-14*\n")
+        result = ssc.compute_cadence(self.doc, today=date(2026, 7, 19))
+        self.assertEqual(result["missed_mondays"], [])
+
+    def test_covers_marker_does_not_credit_dates_outside_mondays_due(self):
+        # A covers date beyond `today` is still validated as a real
+        # Monday, but it cannot excuse a Monday that was never due --
+        # the `& mondays_due_set` intersection keeps the window honest.
+        _write(
+            self.doc,
+            "*story-so-far-rewrite: 2026-07-14*\n"
+            "*story-so-far-covers: 2026-07-13, 2026-07-20, 2026-07-27*\n",
+        )
+        result = ssc.compute_cadence(self.doc, today=date(2026, 7, 20))
+        self.assertEqual(result["missed_mondays"], [])
+        self.assertNotIn("2026-07-27", result["mondays_due"])
+
+    def test_covers_marker_rejects_non_monday(self):
+        _write(self.doc, "*story-so-far-covers: 2026-07-14*\n")
+        with self.assertRaises(ssc.MalformedCoversMarkerError):
+            ssc.compute_cadence(self.doc, today=date(2026, 7, 20))
+
+    def test_covers_marker_rejects_date_on_or_before_founding(self):
+        _write(self.doc, "*story-so-far-covers: 2026-07-06*\n")
+        with self.assertRaises(ssc.MalformedCoversMarkerError):
+            ssc.compute_cadence(self.doc, today=date(2026, 7, 20))
+
+    def test_covers_marker_rejects_non_ascending_dates(self):
+        _write(self.doc, "*story-so-far-covers: 2026-07-20, 2026-07-13*\n")
+        with self.assertRaises(ssc.MalformedCoversMarkerError):
+            ssc.compute_cadence(self.doc, today=date(2026, 7, 20))
+
+    def test_covers_marker_rejects_duplicate_dates(self):
+        _write(self.doc, "*story-so-far-covers: 2026-07-13, 2026-07-13*\n")
+        with self.assertRaises(ssc.MalformedCoversMarkerError):
+            ssc.compute_cadence(self.doc, today=date(2026, 7, 20))
+
+    def test_covers_marker_line_is_not_counted_as_body_prose(self):
+        sys.path.insert(0, os.path.join(ROOT, "tests"))
+        import test_story_so_far_doctrine as doctrine
+
+        body_without_marker = "Some real prose here, four words.\n"
+        body_with_marker = body_without_marker + "*story-so-far-covers: 2026-08-10*\n"
+        self.assertEqual(
+            doctrine._body_word_count(body_without_marker),
+            doctrine._body_word_count(body_with_marker),
+        )
+
+    def test_real_live_doc_credits_the_covers_marker_it_just_landed(self):
+        # This task's own live change: docs/story-so-far.md now carries
+        # a `story-so-far-covers: 2026-10-05, 2026-10-12, 2026-10-19`
+        # marker alongside its 2026-10-19 rewrite marker, closing the
+        # unbroken, no-rewrite-in-between backlog task 2043 named but
+        # could not itself close (no mechanism existed yet).
+        real_doc = os.path.join(ROOT, "docs", "story-so-far.md")
+        result = ssc.compute_cadence(real_doc, today=date(2026, 10, 19))
+        for d in ("2026-10-05", "2026-10-12", "2026-10-19"):
+            self.assertIn(d, result["mondays_due"])
+            self.assertNotIn(d, result["missed_mondays"])
+        # The older, non-contiguous gaps stay honestly lapsed.
+        self.assertIn("2026-08-03", result["missed_mondays"])
+
     def test_real_live_doc_today_carries_its_own_first_marker(self):
         # Task 780 both rewrote docs/story-so-far.md's content AND landed
         # its own first `story-so-far-rewrite: 2026-08-15` marker in the

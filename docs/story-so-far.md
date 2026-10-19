@@ -19,5 +19,6 @@ Unresolved: the counter stands one less than the truth until star one thousand e
 *story-so-far-rewrite: 2026-09-21*
 *story-so-far-rewrite: 2026-09-28*
 *story-so-far-rewrite: 2026-10-19*
+*story-so-far-covers: 2026-10-05, 2026-10-12, 2026-10-19*
 
 *287 words. Nisaba's limit is 287. The zero spare left over means the next rewrite starts by cutting, not adding.*
