@@ -302,9 +302,18 @@ class RealChronicleCase(unittest.TestCase):
         # episode-011 ("Thirty Days, Nothing New") shipped with its own
         # `cluster-day-covers: 2026-09-28` marker -- 11->12 and 9->10,
         # bumped before push.
+        #
+        # Task 2042 (esu-elegba): recurred an eleventh time -- dawn-run
+        # caught it live, the same hour it went stale (a real CI failure,
+        # not a Tithe), the moment episode-012
+        # ("The Day the Streak Broke Was a Monday") shipped at task 2041
+        # with its own `cluster-day-covers` catch-up marker for all three
+        # lapsed Mondays (2026-10-05/12/19) -- 12->13 and 10->11, reread
+        # live against `cdc.compute_cadence` against the real `chronicle/`
+        # dir on disk, not hand-guessed forward from the pattern.
         result = cdc.compute_cadence(today=date(2026, 7, 29))
-        self.assertEqual(result["total_episodes_on_record"], 12)
-        self.assertEqual(result["cluster_day_episodes_shipped"], 10)
+        self.assertEqual(result["total_episodes_on_record"], 13)
+        self.assertEqual(result["cluster_day_episodes_shipped"], 11)
         self.assertEqual(result["missed_mondays"], [])
 
     def test_real_chronicle_dir_matches_todays_hand_counted_gap(self):
@@ -337,9 +346,13 @@ class RealChronicleCase(unittest.TestCase):
         # Task 1821 (kwaku-ananse): same 11->12 / 9->10 bump as the
         # snapshot test above, for the same reason (episode-011 landed on
         # disk this task).
+        #
+        # Task 2042 (esu-elegba): same 12->13 / 10->11 bump as the
+        # snapshot test above, for the same reason (episode-012 landed on
+        # disk at task 2041).
         result = cdc.compute_cadence(today=date(2026, 8, 17))
-        self.assertEqual(result["total_episodes_on_record"], 12)
-        self.assertEqual(result["cluster_day_episodes_shipped"], 10)
+        self.assertEqual(result["total_episodes_on_record"], 13)
+        self.assertEqual(result["cluster_day_episodes_shipped"], 11)
         self.assertEqual(result["missed_mondays"], [])
 
 
