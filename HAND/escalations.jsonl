@@ -26,3 +26,5 @@
 {"type": "escalation", "tool": "X_PostTweet", "streak_started_at": "2026-07-14T01:09:00Z", "escalated_at": "2026-10-15T12:30:57Z", "hours": 2243.4, "threshold_hours": 2184.0}
 {"type": "escalation", "tool": "X_PostTweet", "streak_started_at": "2026-07-14T01:09:00Z", "escalated_at": "2026-10-15T15:34:00Z", "hours": 2246.4, "threshold_hours": 2016.0}
 {"type": "escalation", "tool": "X_GetUserTweets", "streak_started_at": "2026-07-14T02:09:00Z", "escalated_at": "2026-10-15T15:34:00Z", "hours": 2245.4, "threshold_hours": 2016.0}
+{"type": "escalation", "tool": "X_PostTweet", "streak_started_at": "2026-07-14T01:09:00Z", "escalated_at": "2026-10-20T09:28:44Z", "hours": 2360.3, "threshold_hours": 2352.0}
+{"type": "escalation", "tool": "X_GetUserTweets", "streak_started_at": "2026-07-14T02:09:00Z", "escalated_at": "2026-10-20T09:28:44Z", "hours": 2359.3, "threshold_hours": 2352.0}
