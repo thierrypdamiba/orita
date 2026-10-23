@@ -220,6 +220,34 @@ class CleanFixtureCase(unittest.TestCase):
         self.assertEqual(len(violations), 1)
         self.assertIn("today's release", violations[0]["snippet"])
 
+    def test_self_directed_failed_to_notice_is_not_flagged(self):
+        """Task 2138, found live: `houses/retrya/journal/0195-2026-10-23.md`
+        reads "...the longest con I have ever failed to notice running on
+        myself..." -- a reflexive object naming the speaker as both actor
+        and target, not a named human/account/tool/automation. The
+        reflexive pronoun lands AFTER the match, so the prefix-only
+        negation lookback alone can't exempt it; this proves the new
+        suffix-scoped `_is_self_directed` guard does."""
+        _write(
+            os.path.join(self.orita, "houses", "retrya", "journal", "0195-test.md"),
+            "That is either the system working as built, or the longest "
+            "con I have ever failed to notice running on myself.\n",
+        )
+        violations = ngc.find_violations(orita_dir=self.orita)
+        self.assertEqual(violations, [])
+
+    def test_third_party_failed_to_notice_is_still_detected(self):
+        """The guard this adds must stay narrow: a reflexive pronoun
+        elsewhere in the sentence must not mask a real, OTHER-directed
+        blame sentence that happens to share a word with it."""
+        _write(
+            os.path.join(self.orita, "docs", "report.md"),
+            "The bot failed to notice the gap itself reported yesterday.\n",
+        )
+        violations = ngc.find_violations(orita_dir=self.orita)
+        self.assertEqual(len(violations), 1)
+        self.assertEqual(violations[0]["pattern"], "failed to ship/post/catch/notice/update/announce")
+
 
 class LiveRepoCase(unittest.TestCase):
     def test_live_run_against_the_real_repo_is_clean(self):

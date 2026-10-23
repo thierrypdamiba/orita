@@ -113,6 +113,44 @@ _NEGATION_CUES = re.compile(
     re.IGNORECASE,
 )
 
+# Task 2138: every pattern above names a shape that only reads as the
+# ROADMAP constraint #2 violation ("name and rank no one") when it blames
+# a human, account, tool, or automation OTHER than the speaker. A reflexive
+# object -- "failed to notice ... running on myself", "no one to blame but
+# myself" -- names the speaker as both the actor and the target, which is
+# self-doubt, not other-blame; the town's own journals use exactly this
+# shape honestly (houses/retrya/journal/0195-2026-10-23.md: "the longest
+# con I have ever failed to notice running on myself"). The reflexive
+# pronoun can land AFTER the match ("failed to notice ... myself"), outside
+# `_is_negated_or_predictive`'s prefix-only lookback window, so this is a
+# separate, suffix-scoped guard over the same sentence, found live when
+# that exact journal line tripped the "failed to ... notice" pattern and
+# broke dawn-run (task 2138).
+#
+# Deliberately FIRST-PERSON ONLY ("myself"/"ourselves"), not the full
+# reflexive set: "myself"/"ourselves" can only ever refer back to the
+# speaker ("I"/"we"), so the match is unambiguous. A third-person
+# reflexive ("itself", "himself", "themselves") can corefer with ANY noun
+# phrase earlier in the sentence -- "the bot failed to notice the gap
+# itself reported yesterday" uses "itself" for "the gap," not for "the
+# bot" -- so including those would silently swallow real other-directed
+# violations rather than only self-directed ones.
+_SELF_REFERENCE = re.compile(r"\b(myself|ourselves)\b", re.IGNORECASE)
+
+
+def _is_self_directed(text: str, match_start: int) -> bool:
+    """Same sentence-boundary as `_is_negated_or_predictive`, but scanning
+    the suffix (from `match_start` to the next sentence boundary) rather
+    than the prefix -- a reflexive pronoun naming the match's own target as
+    the speaker, anywhere later in the same sentence, means the blame shape
+    lands on the speaker, not on a named third party."""
+    window_end = len(text)
+    for boundary in _SENTENCE_BOUNDARY.finditer(text, match_start):
+        window_end = boundary.start()
+        break
+    sentence_rest = text[match_start:window_end]
+    return bool(_SELF_REFERENCE.search(sentence_rest))
+
 
 def _iter_scan_files(base_dir: str) -> Iterator[str]:
     if not os.path.isdir(base_dir):
@@ -151,8 +189,15 @@ def _is_negated_or_predictive(text: str, match_start: int) -> bool:
     `_NEGATION_CUES` (task 467's documented on-purpose divergence from
     `star_covenant_check.py`/`arcade_hero_check.py`'s own word lists),
     the same shape `_is_quoted_citation` already delegates in (task
-    548)."""
-    return sentence_negation.is_negated_or_predictive(text, match_start, _SENTENCE_BOUNDARY, _NEGATION_CUES)
+    548).
+
+    Task 2138: now also exempts a same-sentence reflexive self-reference
+    (see `_is_self_directed`) -- the one guard shape this file's prefix-
+    only lookback cannot cover on its own, since the reflexive pronoun
+    typically lands AFTER the match, in the sentence's suffix."""
+    return sentence_negation.is_negated_or_predictive(
+        text, match_start, _SENTENCE_BOUNDARY, _NEGATION_CUES
+    ) or _is_self_directed(text, match_start)
 
 
 # Task 548: consolidated into tools/quoted_citation.py -- five sibling
