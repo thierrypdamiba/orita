@@ -2002,3 +2002,4 @@
 {"type": "check", "tool": "X_GetUserTweets", "status": "forbidden", "checked_at": "2026-10-24T21:33:38Z"}
 {"type": "check", "tool": "X_WhoAmI", "status": "ok", "checked_at": "2026-10-24T21:33:38Z"}
 {"type": "check", "tool": "X_GetUserTweets", "status": "forbidden", "checked_at": "2026-10-24T22:29:36Z"}
+{"type": "check", "tool": "X_GetUserTweets", "status": "forbidden", "checked_at": "2026-10-24T23:30:33Z"}
