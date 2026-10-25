@@ -2564,3 +2564,5 @@
 {"type": "check", "workflow": "pages", "conclusion": "success", "run_id": 40226898065, "checked_at": "2026-10-25T20:23:00Z"}
 {"type": "check", "workflow": "dawn-run", "conclusion": "success", "run_id": 40231906380, "checked_at": "2026-10-25T21:30:00Z"}
 {"type": "check", "workflow": "pages", "conclusion": "success", "run_id": 40231906395, "checked_at": "2026-10-25T21:30:00Z"}
+{"type": "check", "workflow": "dawn-run", "conclusion": "success", "run_id": 40241207901, "checked_at": "2026-10-25T23:23:00Z"}
+{"type": "check", "workflow": "pages", "conclusion": "success", "run_id": 40241207902, "checked_at": "2026-10-25T23:23:00Z"}
