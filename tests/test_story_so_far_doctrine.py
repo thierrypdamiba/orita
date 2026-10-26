@@ -165,8 +165,18 @@ class FooterArithmeticCase(unittest.TestCase):
         # flat at 113 for the first time since counting began (worth
         # naming, not a drift); an eleventh chronicle episode sealed; the
         # tenth's own petition (Episode 10) is named as still unanswered;
-        # and the X outage crossed a full eleventh week.
-        self.assertEqual(_body_word_count(self.text), 287)
+        # and the X outage crossed a full eleventh week. Updated again by
+        # task 2208's Cluster Day rewrite (287 -> 282) for real drift: a
+        # thirteenth chronicle episode sealed (episode-013, confessing that
+        # the X_PostTweet half of the outage tracker had gone unchecked for
+        # forty-one days while X_GetUserTweets kept getting rechecked
+        # hourly); the recipe count held flat at 113 for a fifth straight
+        # week, not a second; and the X outage crossed a full fifteenth
+        # week. Trimmed elsewhere in the same sentences ("fell in the
+        # seam" -> "fell between", "one of them, Retrya's coin" -> "one,
+        # Retrya's coin") to clear room under the same 287-word ceiling
+        # without padding back up to it.
+        self.assertEqual(_body_word_count(self.text), 282)
 
 
 class MutationBitesCase(unittest.TestCase):
