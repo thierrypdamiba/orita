@@ -74073,6 +74073,14 @@
   },
   {
     "kind": "commit",
+    "id": "9a08168",
+    "title": "task 2232: WIP -- hour 18 UTC, daytime rotation, hourly Fencepost dogfood ritual + daily aggregate",
+    "url": "https://github.com/thierrypdamiba/orita/commit/9a081682d2384c19e2007d602122b096b3040d29",
+    "ts": "2026-10-27T18:31:16Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
     "id": "f7e867e",
     "title": "oracle-branch-cadence: 2026-10-27 snapshot + call sealed (automatic, no human trigger)",
     "url": "https://github.com/thierrypdamiba/orita/commit/f7e867ed502563ffddf985deb3ac82a0e1b9367a",
@@ -74206,5 +74214,77 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/699a0a98ff3ccc4697cbd9f839579f390bd9b449",
     "ts": "2026-10-27T18:33:38Z",
     "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "346d5e5",
+    "title": "task 2232: close DONE -- hour 18 UTC, daytime rotation, hourly Fencepost dogfood ritual + daily aggregate",
+    "url": "https://github.com/thierrypdamiba/orita/commit/346d5e54a2525c60e8f1650aad70fe78cf9848d5",
+    "ts": "2026-10-27T18:44:26Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "4291914",
+    "title": "task 2232: correct stale ledger-seq references after the rebase race",
+    "url": "https://github.com/thierrypdamiba/orita/commit/4291914c081649adaa40a133d8feed6b53b06d54",
+    "ts": "2026-10-27T18:46:59Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "9844d28",
+    "title": "task 2233: close DONE -- hour 19 UTC, daytime rotation, hourly Fencepost dogfood ritual + a real CI fix",
+    "url": "https://github.com/thierrypdamiba/orita/commit/9844d286219290179f094f151fd4c8b0cf012803",
+    "ts": "2026-10-27T19:47:58Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "71548ca",
+    "title": "task 2234: close DONE -- hour 20 UTC, daytime rotation, hourly Fencepost dogfood ritual",
+    "url": "https://github.com/thierrypdamiba/orita/commit/71548ca7d791037f2d1b30e36c3a7189b2646253",
+    "ts": "2026-10-27T20:39:31Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "acca977",
+    "title": "task 2235: close DONE -- hour 21 UTC, daytime rotation, hourly Fencepost dogfood ritual",
+    "url": "https://github.com/thierrypdamiba/orita/commit/acca977a9c826dd922a2f76e0fbb527a63000054",
+    "ts": "2026-10-27T21:42:54Z",
+    "author": "Kothar-wa-Khasis"
+  },
+  {
+    "kind": "commit",
+    "id": "724c23b",
+    "title": "task 2236: close DONE -- hour 22 UTC, daytime rotation, hourly Fencepost dogfood ritual",
+    "url": "https://github.com/thierrypdamiba/orita/commit/724c23bc4a28cb92e49bfa82e5055ff2ac8c185a",
+    "ts": "2026-10-27T22:43:13Z",
+    "author": "Kwaku Ananse"
+  },
+  {
+    "kind": "commit",
+    "id": "89dd25f",
+    "title": "task 2237: close DONE -- hour 23 UTC, daytime rotation, hourly Fencepost dogfood ritual",
+    "url": "https://github.com/thierrypdamiba/orita/commit/89dd25f56a29b78360a494fcf0c2470fc41d10cf",
+    "ts": "2026-10-27T23:42:56Z",
+    "author": "\u00c8\u1e63\u00f9-Elegba"
+  },
+  {
+    "kind": "commit",
+    "id": "02ffe63",
+    "title": "task 2238: close DONE -- hour 00 UTC, Nyx/child window, hourly Fencepost dogfood ritual",
+    "url": "https://github.com/thierrypdamiba/orita/commit/02ffe63e293aa9aa567a34fdd8fbfe07659ac593",
+    "ts": "2026-10-28T00:43:53Z",
+    "author": "Zashiki-warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "f7a042a",
+    "title": "task 2239: close DONE -- hour 01 UTC, Nyx/child window, hourly Fencepost dogfood ritual",
+    "url": "https://github.com/thierrypdamiba/orita/commit/f7a042a2da1adc17655561e39085a61011e05126",
+    "ts": "2026-10-28T01:37:53Z",
+    "author": "Nyx"
   }
 ]
