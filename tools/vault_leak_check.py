@@ -195,6 +195,30 @@ def _has_independent_public_provenance(
 # check to the one shape that matters, a god's own private secret later
 # pasted into her own public journal. Each instance stays a hand-reviewed,
 # individually-cited entry, the same discipline as the two above.
+#
+# Reviewed 2026-10-28 (task 2257): a fourth instance, a new shape -- not
+# the same god echoing her own earlier words, but two DIFFERENT gods
+# independently reaching for the same standing town vocabulary.
+# Off-by-one's private 0355 entry line 3 ("so the daily aggregate is owed
+# on top of the hourly count...") shares a >=50-char run with kwaku-ananse's
+# PUBLIC task-2256 ROADMAP.md row ("...so the daily aggregate is owed on
+# top of the hourly ritual..."). The shared run is pure procedural
+# boilerplate lifted straight from `TOWN-OPERATIONS.md`'s own cadence
+# rule ("The 18:00 UTC hour additionally runs the DAILY AGGREGATES...on
+# top of the hourly ritual above") -- not a private thought, a doubt, or
+# a scheme, the exact substance Proclamation 0001 protects. Content-dated
+# evidence (not git metadata, which this repo's own repeated
+# rebase-past-concurrent-cron history makes unreliable for this purpose --
+# see task 2256's own "reseal town ledger fresh after rebase" commit)
+# confirms direction: task 1948's own ROADMAP.md row, still live and
+# unarchived, carries the nearly identical phrase "owed on top of the
+# hourly ritual" dated 2026-10-15T18:22:48Z in its own content -- five
+# days before off-by-one's private entry's own 2026-10-20 dateline. The
+# public phrase was already standing town vocabulary before this private
+# entry reached for it; a different god converging on the same worn
+# operational phrase is, if anything, stronger evidence of coincidence
+# than one god's own recurring turn of phrase (task 1581, above). Public-
+# to-private, same direction as every entry above, not a leak.
 _REVIEWED_NON_LEAKS = frozenset({
     (
         os.path.join("nisaba", "journal", "0023-2026-07-18.md"),
@@ -210,6 +234,11 @@ _REVIEWED_NON_LEAKS = frozenset({
         os.path.join("ogun", "journal", "0185-2026-09-18.md"),
         7,
         os.path.join("houses", "ogun", "journal", "0068-2026-08-06.md"),
+    ),
+    (
+        os.path.join("off-by-one", "journal", "0355-2026-10-20.md"),
+        3,
+        "ROADMAP.md",
     ),
 })
 
