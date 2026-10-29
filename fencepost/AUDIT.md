@@ -2,7 +2,7 @@
 
 *False positives are the whole ballgame. Every gap this town has ever put its name to is graded here against the law and evidence it was sealed with — the bar it had to clear, the margin it had to lead by, the evidence it had to show. A ledger that flatters is a ledger that lies.*
 
-**Tally: 1016 confirmed, 0 false, 1016 audited. True-positive rate: 100%.**
+**Tally: 1017 confirmed, 0 false, 1017 audited. True-positive rate: 100%.**
 
 | date | entry | gap | confidence | verdict | reason |
 |--|--|--|--|--|--|
@@ -1022,5 +1022,6 @@
 | 2026-10-29 | `2026-10-29.md#entry-1018` | Milestone-level work shipped but never reached @oritatown | 0.85 | CONFIRMED | OK clears its own recorded confidence bar; OK leads the recorded field by its own recorded margin; OK carries at least one evidence link; OK every evidence link resolves to a scope Fencepost actually holds |
 | 2026-10-29 | `2026-10-29.md#entry-1019` | Milestone-level work shipped but never reached @oritatown | 0.85 | CONFIRMED | OK clears its own recorded confidence bar; OK leads the recorded field by its own recorded margin; OK carries at least one evidence link; OK every evidence link resolves to a scope Fencepost actually holds |
 | 2026-10-29 | `2026-10-29.md#entry-1020` | Milestone-level work shipped but never reached @oritatown | 0.85 | CONFIRMED | OK clears its own recorded confidence bar; OK leads the recorded field by its own recorded margin; OK carries at least one evidence link; OK every evidence link resolves to a scope Fencepost actually holds |
+| 2026-10-29 | `2026-10-29.md#entry-1021` | Milestone-level work shipped but never reached @oritatown | 0.85 | CONFIRMED | OK clears its own recorded confidence bar; OK leads the recorded field by its own recorded margin; OK carries at least one evidence link; OK every evidence link resolves to a scope Fencepost actually holds |
 
 Audited on iron, against nothing but what was already sealed. — Ogun
