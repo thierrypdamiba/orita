@@ -396,6 +396,10 @@ def _daytime_rotation_check() -> ModuleType:
     return _load("_ritual_daytime_rotation_check", os.path.join(ROOT, "tools", "daytime_rotation_check.py"))
 
 
+def _roadmap_dry_streak() -> ModuleType:
+    return _load("_ritual_roadmap_dry_streak", os.path.join(ROOT, "tools", "roadmap_dry_streak.py"))
+
+
 def _roadmap_row_order_check() -> ModuleType:
     return _load("_ritual_roadmap_row_order_check", os.path.join(ROOT, "tools", "roadmap_row_order_check.py"))
 
@@ -1575,6 +1579,36 @@ def check_daytime_rotation(roadmap_path: str | None = None) -> dict[str, object]
     result = cast(dict[str, object], mod.find_daytime_rotation_violations(**kwargs))
     result["whose_turn"] = mod.whose_turn_daytime(**kwargs)
     return result
+
+
+def check_roadmap_dry_streak(
+    now: datetime, roadmap_path: str | None = None, task: int | None = None
+) -> dict[str, object]:
+    """Task 2283: wires `roadmap_dry_streak.py` (task 2282) into the one
+    fold instead of leaving it sitting unused in `tools/` -- the exact
+    "built but never wired in" gap `find_unwired_tool_files()` exists to
+    catch, caught live the same hour by `dawn-run`'s own suite failing
+    for real (`test_real_ritual_check_has_zero_violations`/
+    `test_real_tools_dir_has_zero_unwired_files` on `35012959`, task
+    2282's own close). Reads the real `wip-opened` marker for the
+    roadmap's last-dry anchor task (default 1911) and computes the real
+    elapsed hours against `now`, so the next hour's own commit/journal
+    prose can quote this fold instead of hand-estimating the streak the
+    way every hour since task 1911 had (see `roadmap_dry_streak.py`'s own
+    module docstring for that history). Never flips `broken`: a dry
+    roadmap is a standing fact worth surfacing every hour, not a live law
+    violation, the same distinction `check_metrics_freshness` already
+    draws for its own always-true reading."""
+    mod = _roadmap_dry_streak()
+    kwargs: dict[str, object] = {}
+    if roadmap_path is not None:
+        kwargs["roadmap_path"] = roadmap_path
+    anchor_task = task if task is not None else mod.DEFAULT_ANCHOR_TASK
+    try:
+        hours = mod.hours_since(anchor_task, now, **kwargs)
+        return {"clean": True, "task": anchor_task, "hours": hours, "error": None}
+    except mod.AnchorNotFoundError as exc:
+        return {"clean": True, "task": anchor_task, "hours": None, "error": str(exc)}
 
 
 def check_roadmap_row_order(roadmap_path: str | None = None) -> dict[str, object]:
@@ -2833,6 +2867,8 @@ def run_ritual_check(
     wip_reclaim_path: str | None = None,
     window_rotation_path: str | None = None,
     daytime_rotation_path: str | None = None,
+    roadmap_dry_streak_path: str | None = None,
+    roadmap_dry_streak_task: int | None = None,
     roadmap_row_order_path: str | None = None,
     roadmap_buildlog_sync_roadmap_path: str | None = None,
     roadmap_buildlog_sync_buildlog_path: str | None = None,
@@ -2997,6 +3033,9 @@ def run_ritual_check(
     wip_reclaim = check_wip_reclaim(now, roadmap_path=wip_reclaim_path)
     window_rotation = check_window_rotation(roadmap_path=window_rotation_path)
     daytime_rotation = check_daytime_rotation(roadmap_path=daytime_rotation_path)
+    roadmap_dry_streak = check_roadmap_dry_streak(
+        now, roadmap_path=roadmap_dry_streak_path, task=roadmap_dry_streak_task
+    )
     roadmap_row_order = check_roadmap_row_order(roadmap_path=roadmap_row_order_path)
     roadmap_buildlog_sync = check_roadmap_buildlog_sync(
         roadmap_path=roadmap_buildlog_sync_roadmap_path,
@@ -3204,6 +3243,7 @@ def run_ritual_check(
         "wip_reclaim": wip_reclaim,
         "window_rotation": window_rotation,
         "daytime_rotation": daytime_rotation,
+        "roadmap_dry_streak": roadmap_dry_streak,
         "roadmap_row_order": roadmap_row_order,
         "roadmap_buildlog_sync": roadmap_buildlog_sync,
         "roadmap_row_shape": roadmap_row_shape,
@@ -3506,6 +3546,15 @@ def format_ritual_check(result: dict[str, Any]) -> str:
         lines.append(
             f"  daytime rotation: {len(dro['violations'])} LIVE VIOLATION(S) -- "
             "a daytime owner-to-owner transition broke the fixed seven-god cycle, escalate now"
+        )
+    rds = result["roadmap_dry_streak"]
+    if rds["error"] is not None:
+        lines.append(f"  roadmap dry streak: error -- {rds['error']}")
+    else:
+        lines.append(
+            f"  roadmap dry streak: {rds['hours']:.1f} real hours since task {rds['task']} opened WIP "
+            "(the hour the roadmap last ran dry) -- computed from the live wip-opened marker, not "
+            "hand-estimated"
         )
     rro = result["roadmap_row_order"]
     if rro["clean"]:
