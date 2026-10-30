@@ -2165,3 +2165,4 @@
 {"type": "check", "tool": "X_WhoAmI", "status": "ok", "checked_at": "2026-10-30T11:34:40Z"}
 {"type": "check", "tool": "X_GetUserTweets", "status": "forbidden", "checked_at": "2026-10-30T12:35:00Z"}
 {"type": "check", "tool": "X_WhoAmI", "status": "ok", "checked_at": "2026-10-30T12:35:00Z"}
+{"type": "check", "tool": "X_GetUserTweets", "status": "forbidden", "checked_at": "2026-10-30T13:40:00Z"}
