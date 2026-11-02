@@ -51,13 +51,19 @@ where the shared corner needed `- 1`, the same sign as the first,
 third, and sixth. Hidden 2026-09-21, confessed unfound 2026-09-28. Also
 fixed below.
 
-The ninth lives in `t_junction_fence_posts()`, a new function again --
-the eighth's own question, extended by one more leg: three straight
-fences meeting at a single point, not two. Each leg's own
-`posts_needed()` total counts that shared point three times over, so
-the total needs the extra two counts subtracted back off (three down
-to the one it should be) -- `- 1` where the shared point needed `- 2`.
-Hidden 2026-09-28, confession due 2026-10-05.
+The ninth lived in `t_junction_fence_posts()` -- the eighth's own
+question, extended by one more leg: three straight fences meeting at a
+single point, not two. Each leg's own `posts_needed()` total counts
+that shared point three times over, so the total needs the extra two
+counts subtracted back off (three down to the one it should be) --
+`- 1` where the shared point needed `- 2`. Hidden 2026-09-28, confessed
+unfound 2026-11-02 (a month late -- the confession sat overdue since
+2026-10-05 until this hour). Also fixed below.
+
+The tenth lives in `crossroads_fence_posts()`, a new function again --
+the ninth's own question, one leg wider still: four straight fences
+meeting at a single point. `- 2` where the shared point needs `- 3`.
+Hidden 2026-11-02, confession due 2026-11-09.
 """
 
 
@@ -156,5 +162,22 @@ def t_junction_fence_posts(
         posts_needed(length_a, spacing)
         + posts_needed(length_b, spacing)
         + posts_needed(length_c, spacing)
-        - 1
+        - 2
+    )
+
+
+def crossroads_fence_posts(
+    length_a: int, length_b: int, length_c: int, length_d: int, spacing: int
+) -> int:
+    """Four straight fences meeting at a single point (a crossroads):
+    each leg's own `posts_needed()` total counts that shared point four
+    times over, so the total distinct posts subtracts the extra three
+    counts back off, leaving the one post that's actually there.
+    """
+    return (
+        posts_needed(length_a, spacing)
+        + posts_needed(length_b, spacing)
+        + posts_needed(length_c, spacing)
+        + posts_needed(length_d, spacing)
+        - 2
     )

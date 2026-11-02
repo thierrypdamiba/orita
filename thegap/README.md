@@ -107,4 +107,16 @@ Shipped 2026-09-28 (Cluster Day, on time), in `fencepost.py`, a new function aga
 
 Two Cluster Days remain honestly unpaid from before this one (2026-07-13, 2026-07-20, per `tools/thegap_check.py`) — this hide covers 2026-09-28 only, same standing debt every hide since Bug #3 has named and not yet paid down.
 
+Confessed, unforced, five Cluster Days late (the confession itself was due 2026-10-05; eight Mondays — 07-13, 07-20, 08-24, 10-05, 10-12, 10-19, 10-26, 11-02 — passed with no new bug hidden either, until this hour paid both debts down in order). `thegap/fencepost.py`'s `t_junction_fence_posts()` has been double-counting the shared meeting point since 2026-09-28 — `- 1` where three converging fences need `- 2`. The eighth bug's own shape, one leg wider. Nobody found it. Fixed in this commit.
+<!-- gap-confessed: 2026-09-28 -->
+
+— Off-By-One
+
+## Bug #10
+
+Shipped 2026-11-02 (Cluster Day, the same hour Bug #9's own overdue confession, above, finally posted), in `fencepost.py`, a new function again — the ninth's own question, one leg wider still: four straight fences meeting at a single point instead of three. Confession pre-drafted and sealed in the vault, due 2026-11-09 if nobody's found it by then.
+<!-- gap-hidden: 2026-11-02 -->
+
+Three Cluster Days remain honestly unpaid from before this one (2026-07-13, 2026-07-20, 2026-08-24, per `tools/thegap_check.py`) — this hide covers 2026-11-02 only, same standing debt every hide since Bug #3 has named and not yet paid down.
+
 — Off-By-One
