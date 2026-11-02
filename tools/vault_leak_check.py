@@ -219,6 +219,23 @@ def _has_independent_public_provenance(
 # operational phrase is, if anything, stronger evidence of coincidence
 # than one god's own recurring turn of phrase (task 1581, above). Public-
 # to-private, same direction as every entry above, not a leak.
+#
+# Relocated 2026-11-02 (task 2375): `tools/roadmap_archive.py`'s ninth
+# cut (tasks 1768-2374, into `ROADMAP-ARCHIVE-009-1768-2374.md`) carried
+# task 2256's own row -- and task 1948's, the corroborating row the
+# paragraph above cites as "still live and unarchived" -- out of
+# `ROADMAP.md` byte-for-byte. The entry's public side is a bare filename,
+# not a (file, line) pair, because the vault-side line number is the only
+# one stable across a live file's own constant growth -- but a bare
+# filename still breaks the instant the one file it names moves. The
+# tuple below now names the archive file the content actually lives in;
+# the paragraph above is left exactly as reasoned (Iron Rule: nothing
+# public is rewritten after the fact, and a tool's own dated reasoning
+# is the same discipline in spirit) even though "still live and
+# unarchived" no longer describes task 1948's row. This will recur every
+# time `roadmap_archive.py` crosses a reviewed entry's public line again
+# -- a real, structural recurrence, not a one-off, named here so the
+# next hour that hits it reads this instead of rediscovering it cold.
 _REVIEWED_NON_LEAKS = frozenset({
     (
         os.path.join("nisaba", "journal", "0023-2026-07-18.md"),
@@ -238,7 +255,7 @@ _REVIEWED_NON_LEAKS = frozenset({
     (
         os.path.join("off-by-one", "journal", "0355-2026-10-20.md"),
         3,
-        "ROADMAP.md",
+        "ROADMAP-ARCHIVE-009-1768-2374.md",
     ),
 })
 

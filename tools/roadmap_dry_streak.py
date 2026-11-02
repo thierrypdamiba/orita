@@ -30,12 +30,31 @@ off the live ROADMAP.md, computes the real elapsed hours against the
 caller's own `now`, and prints it -- so the next hour that wants to name
 the streak quotes this instead of eyeballing the last hour's prose.
 
+Task 2375 (nisaba): the anchor task this module defaults to (1911) was
+always going to age out of the live file the same way every other row
+does -- `tools/roadmap_archive.py` (task 169) exists precisely to cut
+fully-DONE spans out of `ROADMAP.md` into a dated `ROADMAP-ARCHIVE-*.md`
+sibling once the live file gets too long to re-read every hour, and this
+hour's own archive run (tasks 1768-2374, into
+`ROADMAP-ARCHIVE-009-1768-2374.md`) carried task 1911 with it. This
+module's `find_wip_opened` only ever read `roadmap_path` itself, so the
+first archive cut to cross the anchor broke it outright: `status`
+started raising `AnchorNotFoundError` instead of reading a real number,
+live, the same hour the cut landed. Fixed at the source, the same way
+`task_reference_check.py`'s `known_task_numbers` and
+`roadmap_buildlog_sync_check.py`'s own reader already treat "the live
+file plus every `ROADMAP-ARCHIVE-*.md` sibling" as the one true set of
+rows that ever existed: `find_wip_opened` now falls back to that same
+glob when the anchor isn't in `roadmap_path`, rather than assuming the
+anchor must always stay live forever.
+
 Usage:
     python3 tools/roadmap_dry_streak.py status [--task N] [--roadmap PATH]
 """
 from __future__ import annotations
 
 import datetime
+import glob
 import os
 import re
 import sys
@@ -49,24 +68,40 @@ _WIP_OPENED = re.compile(r"<!--\s*wip-opened:\s*(\d+)\s+([0-9T:+-]+Z)\s*-->")
 
 class AnchorNotFoundError(ValueError):
     """Raised when the requested anchor task carries no `wip-opened` marker
-    on its own ROADMAP.md row -- the anchor must be verifiable from the
-    live file, never assumed."""
+    in `roadmap_path` or any `ROADMAP-ARCHIVE-*.md` sibling in the same
+    directory -- the anchor must be verifiable from a real file, never
+    assumed."""
+
+
+def _candidate_paths(roadmap_path: str) -> list[str]:
+    """`roadmap_path` itself, plus every `ROADMAP-ARCHIVE-*.md` sibling in
+    its directory, in sorted (oldest-archive-first) order -- an anchor task
+    cut out of the live file by `roadmap_archive.py` still lives in exactly
+    one of these, never nowhere."""
+    directory = os.path.dirname(os.path.abspath(roadmap_path))
+    archives = sorted(glob.glob(os.path.join(directory, "ROADMAP-ARCHIVE-*.md")))
+    return [roadmap_path] + archives
 
 
 def find_wip_opened(task: int, roadmap_path: str = DEFAULT_ROADMAP) -> datetime.datetime:
     """Returns the real `wip-opened` timestamp recorded on `task`'s own
-    ROADMAP.md row. Raises `AnchorNotFoundError` if that task carries no
-    such marker (never silently falls back to a guess)."""
-    with open(roadmap_path, encoding="utf-8") as f:
-        text = f.read()
-    for match in _WIP_OPENED.finditer(text):
-        if int(match.group(1)) == task:
-            ts = match.group(2)
-            return datetime.datetime.strptime(ts, "%Y-%m-%dT%H:%M:%SZ").replace(
-                tzinfo=datetime.timezone.utc
-            )
+    row, read from `roadmap_path` if it is still live there, or from
+    whichever `ROADMAP-ARCHIVE-*.md` sibling carried it off. Raises
+    `AnchorNotFoundError` if no candidate file carries that marker."""
+    for path in _candidate_paths(roadmap_path):
+        if not os.path.isfile(path):
+            continue
+        with open(path, encoding="utf-8") as f:
+            text = f.read()
+        for match in _WIP_OPENED.finditer(text):
+            if int(match.group(1)) == task:
+                ts = match.group(2)
+                return datetime.datetime.strptime(ts, "%Y-%m-%dT%H:%M:%SZ").replace(
+                    tzinfo=datetime.timezone.utc
+                )
     raise AnchorNotFoundError(
-        f"task {task} carries no <!-- wip-opened: {task} ... --> marker in {roadmap_path!r}"
+        f"task {task} carries no <!-- wip-opened: {task} ... --> marker in "
+        f"{roadmap_path!r} or any ROADMAP-ARCHIVE-*.md sibling"
     )
 
 
