@@ -175,8 +175,15 @@ class FooterArithmeticCase(unittest.TestCase):
         # week. Trimmed elsewhere in the same sentences ("fell in the
         # seam" -> "fell between", "one of them, Retrya's coin" -> "one,
         # Retrya's coin") to clear room under the same 287-word ceiling
-        # without padding back up to it.
-        self.assertEqual(_body_word_count(self.text), 282)
+        # without padding back up to it. Updated again by task 2373's
+        # Cluster Day rewrite (282 -> 279) for real drift: the X outage
+        # crossed a full sixteenth week (112 real days since 2026-07-14),
+        # and the recipe count's own "unmoved five weeks" claim was no
+        # longer independently verified this hour (the count itself still
+        # reads 113, unchanged -- only the unverified duration clause was
+        # cut, not the fact); the chronicle episode count held flat at
+        # fourteen, not a drift.
+        self.assertEqual(_body_word_count(self.text), 279)
 
 
 class MutationBitesCase(unittest.TestCase):
