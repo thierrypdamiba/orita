@@ -56,6 +56,13 @@ def gaps_dir(base: Path | None = None) -> Path:
     return (base if base is not None else _FENCEPOST_ROOT) / "GAPS"
 
 
+def candidates_dir(base: Path | None = None) -> Path:
+    """Where each day's full scan snapshot lives. Defaults to
+    fencepost/candidates/, the same directory `report_accuracy_check.py`'s
+    `_sibling_candidates_source` and `ranking_replay_check.py` already read."""
+    return (base if base is not None else _FENCEPOST_ROOT) / "candidates"
+
+
 def _canonical(payload: dict[str, Any]) -> str:
     """The one canonical byte-form a seal is taken over. Order-independent."""
     return json.dumps(payload, sort_keys=True, ensure_ascii=False, separators=(",", ":"))
@@ -497,6 +504,25 @@ def append_scan(
     else:
         header = _tablet_header(date, opened_at, prev)
         tablet.write_text(f"{header}\n---\n\n{entry_md}", encoding="utf-8")
+
+    # Task 2388. The exact scan this entry was sealed from, kept whole
+    # (unlike `sealed` above, which trims every tail candidate down to
+    # slug/confidence/label). `report_accuracy_check.py`'s
+    # `_sibling_candidates_source` and `ranking_replay_check.py` both read
+    # this file by the same `<date>.json` naming convention `sealed`'s own
+    # `date` already uses -- writing it here, at the one place a scan is
+    # ever sealed, means the file can no longer go missing the way it did
+    # for 2026-11-03 (tasks 2386-2387: the sibling was never written when
+    # that day's report was first sealed, and a later reconstruction from
+    # the trimmed `sealed` record broke `ranking_replay_check` for lack of
+    # the dropped headline/detail fields). Overwritten, not appended: this
+    # is a cache of "the scan behind today's latest sealed entry," not an
+    # append-only record like the tablet above.
+    cd = candidates_dir(base)
+    cd.mkdir(parents=True, exist_ok=True)
+    (cd / f"{date}.json").write_text(
+        json.dumps(scan, indent=2, default=str), encoding="utf-8"
+    )
 
     return tablet
 

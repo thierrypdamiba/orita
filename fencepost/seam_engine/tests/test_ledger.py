@@ -6,6 +6,7 @@ tablet. A test that cannot fail is a broken oath.
 """
 from __future__ import annotations
 
+import json
 import re
 from datetime import datetime, timezone
 from pathlib import Path
@@ -77,6 +78,48 @@ def test_append_scan_persists_the_events_source_fields(tmp_path: Path):
     assert recs[0]["sealed"]["x_posts_source"] == "ledger"
     assert not ledger.verify(tmp_path)
     assert '"github_events_source": "override"' in tablet.read_text()
+
+
+def test_append_scan_writes_the_full_candidates_sibling(tmp_path: Path):
+    """Task 2388. Every candidate's full headline/detail/evidence must
+    survive to disk, not just the trimmed slug/confidence/label `sealed`
+    keeps for the tail -- this is what `ranking_replay_check.py` replays
+    and what `report_accuracy_check.py`'s `_sibling_candidates_source`
+    reads `github_events_source` off of, keyed by the exact same
+    `<date>.json` name `append_scan` just sealed."""
+    scan = _scan(primary=True, generated_at="2026-07-12T11:38:10+00:00")
+    scan["tail"][0]["headline"] = "a tail candidate's own headline"
+    scan["tail"][0]["detail"] = "a tail candidate's own detail"
+    scan["tail"][0]["evidence"] = ["https://github.com/x/orita/commit/deadbeef"]
+    scan["github_events_source"] = "direct"
+    ledger.append_scan(scan, now=_at(2026, 7, 12), base=tmp_path)
+
+    sibling = ledger.candidates_dir(tmp_path) / "2026-07-12.json"
+    assert sibling.exists()
+    on_disk = json.loads(sibling.read_text())
+    assert on_disk["github_events_source"] == "direct"
+    assert on_disk["primary_gap"]["headline"] == scan["primary_gap"]["headline"]
+    assert on_disk["tail"][0]["headline"] == "a tail candidate's own headline"
+    assert on_disk["tail"][0]["evidence"] == ["https://github.com/x/orita/commit/deadbeef"]
+
+
+def test_append_scan_candidates_sibling_is_overwritten_not_appended(tmp_path: Path):
+    """Not append-only like the tablet above: a second scan sealed the
+    same UTC day (a later hourly session, or the automatic cron firing
+    mid-hour) must leave the sibling reading the LATEST scan, matching
+    what `report.py`'s `render_latest` will render for that date from the
+    Ledger's own tip -- not a stale first-scan snapshot."""
+    first = _scan(primary=True, generated_at="2026-07-12T11:00:00+00:00")
+    first["primary_gap"]["detail"] = "3 milestone commit(s), none echoed in a post."
+    ledger.append_scan(first, now=_at(2026, 7, 12, 11), base=tmp_path)
+
+    second = _scan(primary=True, generated_at="2026-07-12T15:00:00+00:00")
+    second["primary_gap"]["detail"] = "4 milestone commit(s), none echoed in a post."
+    ledger.append_scan(second, now=_at(2026, 7, 12, 15), base=tmp_path)
+
+    sibling = ledger.candidates_dir(tmp_path) / "2026-07-12.json"
+    on_disk = json.loads(sibling.read_text())
+    assert on_disk["primary_gap"]["detail"] == "4 milestone commit(s), none echoed in a post."
 
 
 def test_append_scan_without_source_fields_still_verifies_clean(tmp_path: Path):
