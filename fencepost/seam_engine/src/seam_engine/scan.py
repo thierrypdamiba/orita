@@ -97,6 +97,7 @@ from __future__ import annotations
 
 import json
 import re
+import time
 from dataclasses import asdict, dataclass, field
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -146,6 +147,36 @@ class GapCandidate:
 
 def _parse_ts(s: str) -> datetime:
     return datetime.fromisoformat(s.replace("Z", "+00:00"))
+
+
+_MAX_TRANSIENT_RETRIES = 3  # retries for a 5xx GitHub API response, not for a page-count
+# cap (that's _MAX_COMMIT_PAGES below, which raises instead of retrying). Task 2392: a
+# live hourly dogfood run hit a bare 500 mid-pagination (page 33 of this exact call,
+# GitHub's own API, not this town's proxy) that vanished on a second, unmodified attempt
+# -- Retrya's own domain, the bug that disappears when observed. One un-retried 500 used
+# to fail the whole scan outright (`commits.raise_for_status()` had nothing between it
+# and the caller); now a transient 5xx gets up to `_MAX_TRANSIENT_RETRIES` short-backoff
+# retries before it's allowed to raise for real.
+_TRANSIENT_STATUS_CODES = frozenset({500, 502, 503, 504})
+
+
+def _get_with_retry(client: httpx.Client, url: str, *, params: dict[str, Any] | None = None) -> httpx.Response:
+    """GET with `_MAX_TRANSIENT_RETRIES` retries on a transient 5xx, brief linear
+    backoff between attempts. A persistent failure (5xx on every attempt, or any
+    other status) still raises via `raise_for_status()` -- this only buys back the
+    attempts that would have passed on a bare retry, it never masks a real outage."""
+    last_response: httpx.Response | None = None
+    for attempt in range(_MAX_TRANSIENT_RETRIES + 1):
+        response = client.get(url, params=params)
+        if response.status_code not in _TRANSIENT_STATUS_CODES:
+            response.raise_for_status()
+            return response
+        last_response = response
+        if attempt < _MAX_TRANSIENT_RETRIES:
+            time.sleep(0.5 * (attempt + 1))
+    assert last_response is not None
+    last_response.raise_for_status()
+    return last_response
 
 
 _MAX_COMMIT_PAGES = 500  # 50,000 commits' worth of headroom -- a real safety valve, not
@@ -249,11 +280,11 @@ def fetch_github_activity(owner: str, repo: str, since: datetime) -> list[Github
     with httpx.Client(timeout=15.0, headers=headers) as client:
         page = 1
         while True:
-            commits = client.get(
+            commits = _get_with_retry(
+                client,
                 f"{GITHUB_API}/repos/{owner}/{repo}/commits",
                 params={"since": since.isoformat(), "per_page": 100, "page": page},
             )
-            commits.raise_for_status()
             batch = commits.json()
             for c in batch:
                 fields = commit_event_fields(c)

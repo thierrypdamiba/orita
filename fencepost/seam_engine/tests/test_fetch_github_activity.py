@@ -21,7 +21,8 @@ from datetime import datetime, timezone
 import httpx
 import pytest
 
-from seam_engine.scan import _MAX_COMMIT_PAGES, fetch_github_activity
+from seam_engine import scan as scan_mod
+from seam_engine.scan import _MAX_COMMIT_PAGES, _MAX_TRANSIENT_RETRIES, fetch_github_activity
 
 SINCE = datetime(2026, 7, 12, 0, 0, tzinfo=timezone.utc)
 
@@ -222,3 +223,88 @@ def test_mutation_the_real_pre_fix_single_page_shape_would_have_dropped_old_comm
     )
     fixed = fetch_github_activity("thierrypdamiba", "orita", SINCE)
     assert len(fixed) == 114
+
+
+def test_fetch_github_activity_retries_a_transient_500_and_succeeds(monkeypatch):
+    """Task 2392: a live hourly dogfood run hit exactly this shape -- a bare
+    500 mid-pagination that vanished on an unmodified retry. Before the fix,
+    `raise_for_status()` had nothing between it and the caller, so this would
+    have failed the whole scan outright on the first 500 rather than trying
+    again."""
+    monkeypatch.setattr(scan_mod.time, "sleep", lambda _seconds: None)
+    page_1 = [_commit(1)]
+    attempts: list[int] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        if request.url.path.endswith("/releases/latest"):
+            return _no_release_response(request)
+        attempts.append(1)
+        if len(attempts) == 1:
+            return httpx.Response(500, json={"message": "Internal Server Error"})
+        return httpx.Response(200, json=page_1)
+
+    real_client = httpx.Client
+
+    def fake_client(*args, **kwargs):
+        kwargs["transport"] = httpx.MockTransport(handler)
+        return real_client(*args, **kwargs)
+
+    monkeypatch.setattr(httpx, "Client", fake_client)
+
+    events = fetch_github_activity("thierrypdamiba", "orita", SINCE)
+
+    assert len(attempts) == 2  # one 500, one real retry -- not masked, not wasted
+    assert len(events) == 1
+
+
+def test_fetch_github_activity_raises_after_exhausting_retries_on_a_persistent_500(monkeypatch):
+    """A 500 on every attempt is a real outage, not a flake -- Retrya's own
+    receipts discipline: the retry buys back a vanishing bug, it never hides
+    a standing one. Must still raise once `_MAX_TRANSIENT_RETRIES` is spent."""
+    monkeypatch.setattr(scan_mod.time, "sleep", lambda _seconds: None)
+    attempts: list[int] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        if request.url.path.endswith("/releases/latest"):
+            return _no_release_response(request)
+        attempts.append(1)
+        return httpx.Response(500, json={"message": "Internal Server Error"})
+
+    real_client = httpx.Client
+
+    def fake_client(*args, **kwargs):
+        kwargs["transport"] = httpx.MockTransport(handler)
+        return real_client(*args, **kwargs)
+
+    monkeypatch.setattr(httpx, "Client", fake_client)
+
+    with pytest.raises(httpx.HTTPStatusError):
+        fetch_github_activity("thierrypdamiba", "orita", SINCE)
+
+    assert len(attempts) == _MAX_TRANSIENT_RETRIES + 1  # the original try + every retry, no more
+
+
+def test_fetch_github_activity_does_not_retry_a_non_transient_error(monkeypatch):
+    """A 404/401/etc. is not a flake to wait out -- it must raise on the
+    first attempt, same as before this fix, never silently retried."""
+    monkeypatch.setattr(scan_mod.time, "sleep", lambda _seconds: None)
+    attempts: list[int] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        if request.url.path.endswith("/releases/latest"):
+            return _no_release_response(request)
+        attempts.append(1)
+        return httpx.Response(404, json={"message": "Not Found"})
+
+    real_client = httpx.Client
+
+    def fake_client(*args, **kwargs):
+        kwargs["transport"] = httpx.MockTransport(handler)
+        return real_client(*args, **kwargs)
+
+    monkeypatch.setattr(httpx, "Client", fake_client)
+
+    with pytest.raises(httpx.HTTPStatusError):
+        fetch_github_activity("thierrypdamiba", "orita", SINCE)
+
+    assert len(attempts) == 1
