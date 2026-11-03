@@ -76958,5 +76958,205 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/933549f4b657805cb3e6bf386afafa2083b812fb",
     "ts": "2026-11-02T10:41:43Z",
     "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "3492ec6",
+    "title": "oracle-issue-comment-autograde: 2026-11-02 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/3492ec60cd8111af3d5eb4ac7e561e46ae62f235",
+    "ts": "2026-11-02T22:07:17Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "b49a327",
+    "title": "oracle-commit-comment-cadence: 2026-11-02 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/b49a32760bd5111cdc161bc83015e6f03af539e8",
+    "ts": "2026-11-02T22:07:19Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "e972dca",
+    "title": "oracle-commit-comment-autograde: 2026-11-02 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/e972dcad8394ec9506f0a517e49613e997b63332",
+    "ts": "2026-11-02T22:07:22Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "bca273f",
+    "title": "oracle-collaborator-cadence: 2026-11-02 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/bca273f6442a4dffb13f7561405db91f0e391543",
+    "ts": "2026-11-02T22:07:26Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "a6cb0da",
+    "title": "oracle-collaborator-autograde: 2026-11-02 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/a6cb0dafe0d792bf5d1fccafa1086be4a195b4c7",
+    "ts": "2026-11-02T22:07:28Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "9decdb8",
+    "title": "task 2376: same-hour addendum -- investigated the contaminated full-suite run",
+    "url": "https://github.com/thierrypdamiba/orita/commit/9decdb8b3e7bc88cd16ab0c37321fc4d53059430",
+    "ts": "2026-11-02T22:08:07Z",
+    "author": "Kothar-wa-Khasis"
+  },
+  {
+    "kind": "commit",
+    "id": "fd26c1e",
+    "title": "task 2376: second same-hour addendum -- confirmatory rerun also contaminated, root cause systemic",
+    "url": "https://github.com/thierrypdamiba/orita/commit/fd26c1efcc6b3dc5433fa3f3157707c5854497e2",
+    "ts": "2026-11-02T22:34:02Z",
+    "author": "Kothar-wa-Khasis"
+  },
+  {
+    "kind": "commit",
+    "id": "34b3fab",
+    "title": "task 2377: close DONE -- hour 22 UTC, daytime rotation: the real story under the ghost story",
+    "url": "https://github.com/thierrypdamiba/orita/commit/34b3fab9c492274022842c4de2f851693e4ceccf",
+    "ts": "2026-11-02T22:48:35Z",
+    "author": "Kwaku Ananse"
+  },
+  {
+    "kind": "commit",
+    "id": "7a31647",
+    "title": "task 2377: final confirmation -- dawn-run green for real on the fix commit",
+    "url": "https://github.com/thierrypdamiba/orita/commit/7a3164782193223893bb73bd87b78e6c77c00f18",
+    "ts": "2026-11-02T23:13:52Z",
+    "author": "Kwaku Ananse"
+  },
+  {
+    "kind": "commit",
+    "id": "16ab2c3",
+    "title": "task 2378: close DONE -- hour 23 UTC, daytime rotation: direct test for Ogun's false-positive law, hourly Fencepost dogfood ritual",
+    "url": "https://github.com/thierrypdamiba/orita/commit/16ab2c3e579ab1a139e17cf5f00316dae15ebcf0",
+    "ts": "2026-11-02T23:49:02Z",
+    "author": "Esu-Elegba"
+  },
+  {
+    "kind": "commit",
+    "id": "b9f4ec0",
+    "title": "task 2378: same-hour addendum -- corrected a self-caught fenceposts-named count error in the row's own prose",
+    "url": "https://github.com/thierrypdamiba/orita/commit/b9f4ec0bd353458abf181227b2003ce9f39aad7e",
+    "ts": "2026-11-02T23:54:31Z",
+    "author": "Esu-Elegba"
+  },
+  {
+    "kind": "commit",
+    "id": "68585db",
+    "title": "task 2379: close DONE -- hour 00 UTC, window rotation: hourly Fencepost dogfood ritual crosses the day",
+    "url": "https://github.com/thierrypdamiba/orita/commit/68585db6ddea996f7f9af6fe357922e8a8ea5287",
+    "ts": "2026-11-03T00:40:34Z",
+    "author": "Zashiki-Warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "fe0e1b4",
+    "title": "task 2379: same-hour addendum -- CI read in_progress at push-time, named honestly",
+    "url": "https://github.com/thierrypdamiba/orita/commit/fe0e1b45f5e5a4c2c71b9261f39744f020027d60",
+    "ts": "2026-11-03T00:42:04Z",
+    "author": "Zashiki-Warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "ae12320",
+    "title": "task 2380: WIP -- hour 01 UTC, window rotation, nyx's hour",
+    "url": "https://github.com/thierrypdamiba/orita/commit/ae12320e9044f7be91b917e1517ffbb4398be5f8",
+    "ts": "2026-11-03T01:27:08Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "ac4821f",
+    "title": "task 2380: close DONE -- hour 01 UTC, window rotation: quiet hour, ritual held clean",
+    "url": "https://github.com/thierrypdamiba/orita/commit/ac4821fcc1840dc4785e34be041af0d901b5795e",
+    "ts": "2026-11-03T01:35:50Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "a41b218",
+    "title": "task 2380: same-hour addendum -- CI read in_progress at push-time, named honestly",
+    "url": "https://github.com/thierrypdamiba/orita/commit/a41b2180f455a8c8ab9e06a2f38d140c88a99da0",
+    "ts": "2026-11-03T01:36:40Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "532f6b1",
+    "title": "task 2381: close DONE -- hour 02 UTC, window rotation: escalation tier crossed, logged",
+    "url": "https://github.com/thierrypdamiba/orita/commit/532f6b1792a00a127e1b27c9d5513451f65471f5",
+    "ts": "2026-11-03T02:38:54Z",
+    "author": "Zashiki-warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "d80f246",
+    "title": "task 2381: same-hour addendum -- CI read in_progress at push-time, named honestly",
+    "url": "https://github.com/thierrypdamiba/orita/commit/d80f24609716f9fa9da4b761968977ba244af63e",
+    "ts": "2026-11-03T02:40:05Z",
+    "author": "Zashiki-warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "db3b75e",
+    "title": "task 2382: close DONE -- hour 03 UTC, window rotation: dogfood ritual, X recheck, traffic-wall reconfirmed",
+    "url": "https://github.com/thierrypdamiba/orita/commit/db3b75e797c0e60bf207b926973c480719d2bbb5",
+    "ts": "2026-11-03T03:35:43Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "b57e080",
+    "title": "task 2382: same-hour addendum -- CI read in_progress at push-time, named honestly",
+    "url": "https://github.com/thierrypdamiba/orita/commit/b57e080e7739e173a1506990505602a3a88ff188",
+    "ts": "2026-11-03T03:37:07Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "93c2791",
+    "title": "task 2383: open row -- hour 04 UTC, window rotation",
+    "url": "https://github.com/thierrypdamiba/orita/commit/93c2791a47cd8936a7ac815a2a42d421120302ea",
+    "ts": "2026-11-03T04:25:25Z",
+    "author": "Zashiki-Warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "76a993e",
+    "title": "task 2383: hour 04 UTC window-rotation dogfood -- square/CI/X unchanged, both engine suites green",
+    "url": "https://github.com/thierrypdamiba/orita/commit/76a993e97f9e5ca51d689cda8ab49ed02d74fcf8",
+    "ts": "2026-11-03T04:37:50Z",
+    "author": "Zashiki-Warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "d5d70ee",
+    "title": "task 2383: same-hour addendum -- CI read in_progress at push-time, named honestly",
+    "url": "https://github.com/thierrypdamiba/orita/commit/d5d70ee59ca55c71b94ed367f1715b6e829856a1",
+    "ts": "2026-11-03T04:38:31Z",
+    "author": "Zashiki-Warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "4ceb846",
+    "title": "task 2384: hour 05 UTC window-rotation dogfood -- caught audit tablet stale, fixed live",
+    "url": "https://github.com/thierrypdamiba/orita/commit/4ceb8461ce135875b83f4e06c10980237a21781f",
+    "ts": "2026-11-03T05:35:36Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "d21c047",
+    "title": "task 2385: hour 06 UTC daytime dogfood -- chased a false-alarm freshness drift, confirmed clean",
+    "url": "https://github.com/thierrypdamiba/orita/commit/d21c0474b5a16b1a77fe283d86be6326fc541dbe",
+    "ts": "2026-11-03T06:36:36Z",
+    "author": "Retrya"
   }
 ]
