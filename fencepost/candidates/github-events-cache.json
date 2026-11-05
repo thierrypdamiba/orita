@@ -72041,6 +72041,86 @@
   },
   {
     "kind": "commit",
+    "id": "b7455fe",
+    "title": "oracle-issue-comment-cadence: 2026-10-23 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/b7455feb0e406ca6ffe28e9abd6dbd5e43a305ee",
+    "ts": "2026-10-23T03:00:00Z",
+    "author": "Zashiki-Warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "174a40d",
+    "title": "oracle-comment-cadence: 2026-10-23 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/174a40d9786f990e487d759654a316f028970770",
+    "ts": "2026-10-23T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "e4d71d5",
+    "title": "oracle-run-cadence: 2026-10-23 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/e4d71d56da97d51dd8df3f68a7ebe3682c9b4df0",
+    "ts": "2026-10-23T03:00:00Z",
+    "author": "Zashiki-Warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "5af3bff",
+    "title": "oracle-milestone-cadence: 2026-10-23 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/5af3bffa03f00ee29e8008ff57767216afd597bc",
+    "ts": "2026-10-23T03:00:00Z",
+    "author": "Zashiki-Warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "6a20459",
+    "title": "oracle-pr-cadence: 2026-10-23 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/6a20459f72b7ba039f928bf02534f8ae477bfb3e",
+    "ts": "2026-10-23T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "f4d5661",
+    "title": "oracle-topic-cadence: 2026-10-23 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/f4d56613714fcabc8fffdd276ba66c8282316f3c",
+    "ts": "2026-10-23T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "bea74ca",
+    "title": "oracle-label-cadence: 2026-10-23 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/bea74ca5724d24edcf94af2e059e284a81b24d16",
+    "ts": "2026-10-23T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "8f690ed",
+    "title": "oracle-tag-cadence: 2026-10-23 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/8f690edf33e5b9df7d8ec8e1945c8ddc80f6bef6",
+    "ts": "2026-10-23T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "b369414",
+    "title": "oracle-subscriber-cadence: 2026-10-23 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/b3694148e577d9a9b9378c943f7bf0b4357a7ab4",
+    "ts": "2026-10-23T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "652fb79",
+    "title": "oracle-commit-cadence: 2026-10-23 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/652fb791d7b3d763bb16e193a10941d6422d6ebd",
+    "ts": "2026-10-23T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
     "id": "41d192e",
     "title": "task 2122: close DONE -- hour 03 UTC, inside the 00:00-06:00 UTC window, hourly Fencepost dogfood ritual",
     "url": "https://github.com/thierrypdamiba/orita/commit/41d192ede565606923efdba6f05c2d3b418ab929",
@@ -72174,6 +72254,190 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/e3a57f7f8cb5d08803b89eb7b98363f6d7e2d8b6",
     "ts": "2026-10-23T16:38:11Z",
     "author": "Claude"
+  },
+  {
+    "kind": "commit",
+    "id": "b37ff00",
+    "title": "oracle-cadence: 2026-10-23 call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/b37ff00c64207268aa232928020fc27573dad549",
+    "ts": "2026-10-23T17:39:15Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "a74560a",
+    "title": "oracle-autograde: 2026-10-23 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/a74560a4ace16216c2f491d4ab9a1f6fc8ebf0f3",
+    "ts": "2026-10-23T17:39:18Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "32dcfe5",
+    "title": "oracle-star-cadence: 2026-10-23 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/32dcfe51e5d1de7cf6f07cb718edf97531deeb2b",
+    "ts": "2026-10-23T17:39:21Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "6f8d76b",
+    "title": "oracle-star-autograde: 2026-10-23 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/6f8d76b8df4c31001c6952a5cafcd49ed56353b4",
+    "ts": "2026-10-23T17:39:24Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "dc4ad8b",
+    "title": "oracle-fork-cadence: 2026-10-23 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/dc4ad8b818fe7df6e37af5f24db16119b4711978",
+    "ts": "2026-10-23T17:39:26Z",
+    "author": "Kothar-wa-Khasis"
+  },
+  {
+    "kind": "commit",
+    "id": "ef0c23b",
+    "title": "oracle-fork-autograde: 2026-10-23 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/ef0c23b5b92d3c1a47fc3eef61420b2f7713f3e3",
+    "ts": "2026-10-23T17:39:29Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "49553c8",
+    "title": "oracle-issue-cadence: 2026-10-23 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/49553c80942839046413f86606af3025d602f653",
+    "ts": "2026-10-23T17:39:32Z",
+    "author": "Esu-Elegba"
+  },
+  {
+    "kind": "commit",
+    "id": "c7dd4f1",
+    "title": "oracle-issue-autograde: 2026-10-23 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/c7dd4f17761e1ddcd7205adba0ae9b63584a701e",
+    "ts": "2026-10-23T17:39:34Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "0d12013",
+    "title": "oracle-release-cadence: 2026-10-23 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/0d120130aff4206eecd10d231fb195723e0b4124",
+    "ts": "2026-10-23T17:39:37Z",
+    "author": "Kwaku-Ananse"
+  },
+  {
+    "kind": "commit",
+    "id": "0072380",
+    "title": "oracle-release-autograde: 2026-10-23 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/0072380314f1d54be54951a78a5580b70f4aa80e",
+    "ts": "2026-10-23T17:39:40Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "78ab87d",
+    "title": "oracle-contributor-cadence: 2026-10-23 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/78ab87d01f3831822df1d3daf1dfc03d3a13d82f",
+    "ts": "2026-10-23T17:39:45Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "2fb2e07",
+    "title": "oracle-contributor-autograde: 2026-10-23 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/2fb2e073c5ba01c12efa942a0429cebdfda30c38",
+    "ts": "2026-10-23T17:39:47Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "fb959ae",
+    "title": "oracle-branch-cadence: 2026-10-23 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/fb959aea2a939ee6363727b05542bd0b2289d5b3",
+    "ts": "2026-10-23T17:39:50Z",
+    "author": "Esu-Elegba"
+  },
+  {
+    "kind": "commit",
+    "id": "9d36885",
+    "title": "oracle-branch-autograde: 2026-10-23 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/9d368854caf989b48710626ca856a1e7bc81f14f",
+    "ts": "2026-10-23T17:39:53Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "66d1d10",
+    "title": "oracle-commit-autograde: 2026-10-23 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/66d1d106fbca6ff9c3d942d3b4698df0c157364c",
+    "ts": "2026-10-23T17:41:02Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "93a09be",
+    "title": "oracle-subscriber-autograde: 2026-10-23 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/93a09be4e9d49aa852a6cf11854a47b76588622c",
+    "ts": "2026-10-23T17:41:07Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "ac8f988",
+    "title": "oracle-tag-autograde: 2026-10-23 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/ac8f9889a51175b0ab6df3cb94d67ce3a5c18488",
+    "ts": "2026-10-23T17:41:13Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "4c4683a",
+    "title": "oracle-label-autograde: 2026-10-23 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/4c4683a9d3d307052535e529e10610eacc8cefde",
+    "ts": "2026-10-23T17:41:19Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "1614fc8",
+    "title": "oracle-topic-autograde: 2026-10-23 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/1614fc84909da7aa1b9298680f9b17d25b4de544",
+    "ts": "2026-10-23T17:41:24Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "fc7fad1",
+    "title": "oracle-pr-autograde: 2026-10-23 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/fc7fad13a04aeef4e3949cb904a7a86ec5a36250",
+    "ts": "2026-10-23T17:41:29Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "a871d10",
+    "title": "oracle-workflow-cadence: 2026-10-23 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/a871d107076af1450ac1bd32fc5fe70ac88c3e7f",
+    "ts": "2026-10-23T17:41:32Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "0d1ed91",
+    "title": "oracle-workflow-autograde: 2026-10-23 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/0d1ed91a6fa550f93936c3fc0979af0042ab010e",
+    "ts": "2026-10-23T17:41:34Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "9db3f04",
+    "title": "oracle-milestone-autograde: 2026-10-23 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/9db3f04a7a500290dfcc5333c435efcb353150c8",
+    "ts": "2026-10-23T17:41:40Z",
+    "author": "Ogun"
   },
   {
     "kind": "commit",
@@ -72321,6 +72585,102 @@
   },
   {
     "kind": "commit",
+    "id": "f3761af",
+    "title": "task 2143: close DONE -- hour 01 UTC, inside the 00:00-06:00 UTC window, hourly Fencepost dogfood ritual",
+    "url": "https://github.com/thierrypdamiba/orita/commit/f3761af107caf3cc2cd6ecfe283f865fe1ace7ad",
+    "ts": "2026-10-24T01:44:42Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "3c22361",
+    "title": "task 2144: close DONE -- hour 02 UTC, inside the 00:00-06:00 UTC window, hourly Fencepost dogfood ritual",
+    "url": "https://github.com/thierrypdamiba/orita/commit/3c22361c0b20339be6b000239e36e4106ec9b45f",
+    "ts": "2026-10-24T02:36:19Z",
+    "author": "Zashiki-warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "ea7c79a",
+    "title": "oracle-issue-comment-cadence: 2026-10-24 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/ea7c79a53b490e2d4a8f9525e278e29f02f0588c",
+    "ts": "2026-10-24T03:00:00Z",
+    "author": "Zashiki-Warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "f401c9e",
+    "title": "oracle-comment-cadence: 2026-10-24 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/f401c9ef6d4cde72b961ba91b2458555afb4695e",
+    "ts": "2026-10-24T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "72d7e74",
+    "title": "oracle-run-cadence: 2026-10-24 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/72d7e7456275fce08dafb629d35873c964bfb545",
+    "ts": "2026-10-24T03:00:00Z",
+    "author": "Zashiki-Warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "d096aef",
+    "title": "oracle-milestone-cadence: 2026-10-24 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/d096aef73780a5417812290c823b9c3feb57a5ce",
+    "ts": "2026-10-24T03:00:00Z",
+    "author": "Zashiki-Warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "26f51f7",
+    "title": "oracle-pr-cadence: 2026-10-24 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/26f51f7248032906bbf6e432b2e0138aa6f31e31",
+    "ts": "2026-10-24T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "3663ff7",
+    "title": "oracle-topic-cadence: 2026-10-24 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/3663ff71662082412f9e9155373123ba4be307dd",
+    "ts": "2026-10-24T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "13a3007",
+    "title": "oracle-label-cadence: 2026-10-24 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/13a30077a70ce4f68000f16670e0f41867c0172b",
+    "ts": "2026-10-24T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "dfbed46",
+    "title": "oracle-tag-cadence: 2026-10-24 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/dfbed464b2b8aec6add8ffba1a26fd6e25245b07",
+    "ts": "2026-10-24T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "a558c05",
+    "title": "oracle-subscriber-cadence: 2026-10-24 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/a558c0592aabfcf7b7517af69fcd94b20906a923",
+    "ts": "2026-10-24T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "88348e0",
+    "title": "oracle-commit-cadence: 2026-10-24 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/88348e003abe8108cbe190fed8d94ee56ed2bbd4",
+    "ts": "2026-10-24T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
     "id": "c805451",
     "title": "task 2145: close DONE -- hour 03 UTC, inside the 00:00-06:00 UTC window, hourly Fencepost dogfood ritual",
     "url": "https://github.com/thierrypdamiba/orita/commit/c805451b6c08574099e2716fd1cca72017eba9b1",
@@ -72390,6 +72750,246 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/d3df8b1829b79c19dbff67a42551523c13fbb38d",
     "ts": "2026-10-24T11:39:12Z",
     "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "751dbb8",
+    "title": "task 2154: close DONE -- hour 12 UTC, daytime rotation, hourly Fencepost dogfood ritual",
+    "url": "https://github.com/thierrypdamiba/orita/commit/751dbb83797b0296bebf5d7015bb0c897da408bf",
+    "ts": "2026-10-24T12:38:37Z",
+    "author": "Kothar-wa-Khasis"
+  },
+  {
+    "kind": "commit",
+    "id": "2c9757e",
+    "title": "task 2155: close DONE -- hour 13 UTC, daytime rotation, hourly Fencepost dogfood ritual",
+    "url": "https://github.com/thierrypdamiba/orita/commit/2c9757e160c5a92507a7c15cd2e5218465f6de77",
+    "ts": "2026-10-24T13:39:36Z",
+    "author": "Kwaku Ananse"
+  },
+  {
+    "kind": "commit",
+    "id": "8350a0d",
+    "title": "task 2156: close DONE -- hour 14 UTC, daytime rotation, hourly Fencepost dogfood ritual",
+    "url": "https://github.com/thierrypdamiba/orita/commit/8350a0dfaf940ee6621f24cc5fa3efafd9e062c1",
+    "ts": "2026-10-24T14:36:08Z",
+    "author": "Esu-Elegba"
+  },
+  {
+    "kind": "commit",
+    "id": "94de28d",
+    "title": "seam-scan: 2026-10-24 tablet sealed, report rendered (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/94de28dcd8753b2e61ebf42bacccb408eb1394b5",
+    "ts": "2026-10-24T15:25:07Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "786007f",
+    "title": "task 2157: close DONE -- hour 15 UTC, daytime rotation, hourly Fencepost dogfood ritual",
+    "url": "https://github.com/thierrypdamiba/orita/commit/786007f70497d38c0028d08f9a6ba30a37ba7913",
+    "ts": "2026-10-24T15:48:05Z",
+    "author": "Retrya"
+  },
+  {
+    "kind": "commit",
+    "id": "27cac8d",
+    "title": "oracle-cadence: 2026-10-24 call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/27cac8dd22b5317c58708d88ba6e424df0b24416",
+    "ts": "2026-10-24T16:24:30Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "58a5af5",
+    "title": "oracle-autograde: 2026-10-24 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/58a5af581ad37b48969ff6c28ae322f61cd6ede0",
+    "ts": "2026-10-24T16:24:32Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "ed9362a",
+    "title": "oracle-star-cadence: 2026-10-24 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/ed9362ad33881dd3b2f0aaef6ed49ede4d857465",
+    "ts": "2026-10-24T16:24:34Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "744f5d5",
+    "title": "oracle-star-autograde: 2026-10-24 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/744f5d5b036320bdf9f46d55e0f55abd01d9104c",
+    "ts": "2026-10-24T16:24:37Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "a5bd2da",
+    "title": "oracle-fork-cadence: 2026-10-24 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/a5bd2dad813aa5299728619503273912c07dc05d",
+    "ts": "2026-10-24T16:24:39Z",
+    "author": "Kothar-wa-Khasis"
+  },
+  {
+    "kind": "commit",
+    "id": "d3710fc",
+    "title": "oracle-fork-autograde: 2026-10-24 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/d3710fcb3428bcca67e0861b6805731349dc1c31",
+    "ts": "2026-10-24T16:24:41Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "958f380",
+    "title": "oracle-issue-cadence: 2026-10-24 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/958f380e7dc644a8f2ab6a3acaece7565048a8f4",
+    "ts": "2026-10-24T16:24:44Z",
+    "author": "Esu-Elegba"
+  },
+  {
+    "kind": "commit",
+    "id": "fa8f762",
+    "title": "oracle-issue-autograde: 2026-10-24 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/fa8f762b155475f55abdcb22abc3db1096ab50ac",
+    "ts": "2026-10-24T16:24:46Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "2d91da7",
+    "title": "oracle-release-cadence: 2026-10-24 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/2d91da78780f5bf81a91118e3674d5cf00a1f6ef",
+    "ts": "2026-10-24T16:24:49Z",
+    "author": "Kwaku-Ananse"
+  },
+  {
+    "kind": "commit",
+    "id": "6f14df7",
+    "title": "oracle-release-autograde: 2026-10-24 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/6f14df70bedfe9fc26547071992f480fcc956442",
+    "ts": "2026-10-24T16:24:51Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "4b6c951",
+    "title": "oracle-contributor-cadence: 2026-10-24 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/4b6c951ba8ec82a2d19cf79baaf56baea3820145",
+    "ts": "2026-10-24T16:24:56Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "ea2b26b",
+    "title": "oracle-contributor-autograde: 2026-10-24 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/ea2b26bfda69afc9cd0306543c590dadeb05cc8b",
+    "ts": "2026-10-24T16:24:59Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "f8f6691",
+    "title": "oracle-branch-cadence: 2026-10-24 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/f8f669134be3eb0e7f9dd78370c7f52bf94d7998",
+    "ts": "2026-10-24T16:25:01Z",
+    "author": "Esu-Elegba"
+  },
+  {
+    "kind": "commit",
+    "id": "d1094c8",
+    "title": "oracle-branch-autograde: 2026-10-24 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/d1094c8b5188280c21734676dc8e7a96debdb013",
+    "ts": "2026-10-24T16:25:04Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "a9602a4",
+    "title": "oracle-commit-autograde: 2026-10-24 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/a9602a4b82141c727f4a6418189a2f26296a96ee",
+    "ts": "2026-10-24T16:25:48Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "ab675ef",
+    "title": "oracle-subscriber-autograde: 2026-10-24 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/ab675efc36b8bff46bfcac77e80aad671f2f46ff",
+    "ts": "2026-10-24T16:25:53Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "0f8f2af",
+    "title": "oracle-tag-autograde: 2026-10-24 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/0f8f2afb3a435e1c89f71443cdf13abea6084127",
+    "ts": "2026-10-24T16:25:57Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "4b98033",
+    "title": "oracle-label-autograde: 2026-10-24 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/4b98033229f650dadb1140396ef3998aaef208be",
+    "ts": "2026-10-24T16:26:02Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "9c406b4",
+    "title": "oracle-topic-autograde: 2026-10-24 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/9c406b42c6a43a4a29459b830b2553b4d6d55269",
+    "ts": "2026-10-24T16:26:07Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "0d6b92c",
+    "title": "oracle-pr-autograde: 2026-10-24 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/0d6b92c3a4cbe27007e0be219d04ef8b1062e4b3",
+    "ts": "2026-10-24T16:26:12Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "82635cb",
+    "title": "oracle-workflow-cadence: 2026-10-24 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/82635cb62e7a2a8caf35842b95b9b2ca8ed64b00",
+    "ts": "2026-10-24T16:26:14Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "30a4d2e",
+    "title": "oracle-workflow-autograde: 2026-10-24 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/30a4d2e66b7a137d6c174eeb813666b342be12b5",
+    "ts": "2026-10-24T16:26:17Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "3358cb2",
+    "title": "oracle-milestone-autograde: 2026-10-24 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/3358cb2861c36b7e7e4891295e72f0449c9474d4",
+    "ts": "2026-10-24T16:26:21Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "38e3802",
+    "title": "oracle-run-autograde: 2026-10-24 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/38e38028bf1327f49e7d800df36e7947d23d009a",
+    "ts": "2026-10-24T16:26:41Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "6fe2651",
+    "title": "oracle-comment-autograde: 2026-10-24 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/6fe2651d8073e94e22467668d613affa878223e6",
+    "ts": "2026-10-24T16:26:45Z",
+    "author": "Ogun"
   },
   {
     "kind": "commit",
@@ -74297,6 +74897,86 @@
   },
   {
     "kind": "commit",
+    "id": "db09324",
+    "title": "oracle-issue-comment-cadence: 2026-10-28 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/db09324ca28a4aa4150ae8023d199870b501b55d",
+    "ts": "2026-10-28T03:00:00Z",
+    "author": "Zashiki-Warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "69ec0af",
+    "title": "oracle-comment-cadence: 2026-10-28 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/69ec0afa3c7933655eadc5d5076bcaf2518083f5",
+    "ts": "2026-10-28T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "dad3bd7",
+    "title": "oracle-run-cadence: 2026-10-28 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/dad3bd73420ddb3f2f84e67844484f490fc38868",
+    "ts": "2026-10-28T03:00:00Z",
+    "author": "Zashiki-Warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "93b7f9e",
+    "title": "oracle-milestone-cadence: 2026-10-28 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/93b7f9e3751c5742db4e744aeebd898760f57491",
+    "ts": "2026-10-28T03:00:00Z",
+    "author": "Zashiki-Warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "3c74ab6",
+    "title": "oracle-pr-cadence: 2026-10-28 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/3c74ab6153222867ee6308171b9d2e181b0c743a",
+    "ts": "2026-10-28T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "4d0fe80",
+    "title": "oracle-topic-cadence: 2026-10-28 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/4d0fe80dda382e6524c58c4b2f64330b631b7c89",
+    "ts": "2026-10-28T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "087e81d",
+    "title": "oracle-label-cadence: 2026-10-28 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/087e81d2ba849b77d7fb7f2e5d3e3bc988549706",
+    "ts": "2026-10-28T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "baf97b3",
+    "title": "oracle-tag-cadence: 2026-10-28 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/baf97b3b8ca0e6432034b77c6377a20e029f1bb7",
+    "ts": "2026-10-28T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "612d502",
+    "title": "oracle-subscriber-cadence: 2026-10-28 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/612d502cab75fdfad7a70c51c90a0d826f44c65b",
+    "ts": "2026-10-28T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "05e4c26",
+    "title": "oracle-commit-cadence: 2026-10-28 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/05e4c261f5f80ef0d4ef7fb267a8e52aba3e2d9b",
+    "ts": "2026-10-28T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
     "id": "f09bced",
     "title": "task 2241: close DONE -- hour 03 UTC, Nyx/child window, hourly Fencepost dogfood ritual",
     "url": "https://github.com/thierrypdamiba/orita/commit/f09bced31e90e403c642c191ecc95deb07ae2bb6",
@@ -74382,6 +75062,278 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/4b3162a0444fd7fc5b19b14e1158874747ae7a06",
     "ts": "2026-10-28T12:49:07Z",
     "author": "Esu-Elegba"
+  },
+  {
+    "kind": "commit",
+    "id": "5f5e5da",
+    "title": "task 2251: mark WIP -- hour 13 UTC, daytime rotation, retrya's hourly Fencepost dogfood ritual",
+    "url": "https://github.com/thierrypdamiba/orita/commit/5f5e5da8e3ac602badc66751f82261e53fe537b1",
+    "ts": "2026-10-28T13:59:09Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "2343346",
+    "title": "task 2251: close DONE -- hour 13 UTC, daytime rotation, hourly Fencepost dogfood ritual",
+    "url": "https://github.com/thierrypdamiba/orita/commit/23433467ce7f9f5a7ca5b84b0226f5ccfcdbdd9d",
+    "ts": "2026-10-28T14:02:45Z",
+    "author": "Retrya"
+  },
+  {
+    "kind": "commit",
+    "id": "39c07a6",
+    "title": "task 2252: mark WIP -- hour 14 UTC, daytime rotation, ogun's hourly Fencepost dogfood ritual",
+    "url": "https://github.com/thierrypdamiba/orita/commit/39c07a6c1d4e1e97d8b09ea56dcf243e87f5de61",
+    "ts": "2026-10-28T14:33:34Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "5474da3",
+    "title": "task 2252: close DONE -- hour 14 UTC, daytime rotation, hourly Fencepost dogfood ritual",
+    "url": "https://github.com/thierrypdamiba/orita/commit/5474da37da87b28ce75f8b606830d51ef53b7832",
+    "ts": "2026-10-28T14:42:54Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "7886ef1",
+    "title": "task 2252: fold in scribe-growth-log reading from hour 14 UTC ritual",
+    "url": "https://github.com/thierrypdamiba/orita/commit/7886ef1a1bdeb1c7140dfe9676d203f97cb2bf21",
+    "ts": "2026-10-28T14:45:51Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "4b008f6",
+    "title": "task 2253: close DONE -- hour 15 UTC, daytime rotation, hourly Fencepost dogfood ritual",
+    "url": "https://github.com/thierrypdamiba/orita/commit/4b008f60655eb577fb7fa708f5100ed77b85cfb7",
+    "ts": "2026-10-28T15:40:03Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "325c7a3",
+    "title": "task 2254: close DONE -- hour 16 UTC, daytime rotation, hourly Fencepost dogfood ritual",
+    "url": "https://github.com/thierrypdamiba/orita/commit/325c7a38b6d99dec849c0b78d3f8198a15bf56e5",
+    "ts": "2026-10-28T16:36:59Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "5cdcaf5",
+    "title": "task 2255: close DONE -- hour 17 UTC, daytime rotation, hourly Fencepost dogfood ritual",
+    "url": "https://github.com/thierrypdamiba/orita/commit/5cdcaf51ebb47e1f57b779807c4941bcd06fc890",
+    "ts": "2026-10-28T17:33:10Z",
+    "author": "Kothar-wa-Khasis"
+  },
+  {
+    "kind": "commit",
+    "id": "1aa4d2e",
+    "title": "seam-scan: 2026-10-28 tablet sealed, report rendered (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/1aa4d2ee83b87b71b262a7d4d1baa5f38a846cba",
+    "ts": "2026-10-28T17:55:20Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "13962fd",
+    "title": "oracle-cadence: 2026-10-28 call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/13962fd96341476cb5311bb814f27ab1eb9e63fe",
+    "ts": "2026-10-28T18:37:03Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "7aa05a5",
+    "title": "oracle-autograde: 2026-10-28 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/7aa05a5b9a7a4006fa006eef4f791ec16eb7d64f",
+    "ts": "2026-10-28T18:37:07Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "2bc3696",
+    "title": "oracle-star-cadence: 2026-10-28 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/2bc3696f22bd05a363530621d16abf95cc3a0d47",
+    "ts": "2026-10-28T18:37:11Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "7f42b51",
+    "title": "oracle-star-autograde: 2026-10-28 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/7f42b51085f0c00182f73711159e229fdde72eeb",
+    "ts": "2026-10-28T18:37:15Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "bbed5f9",
+    "title": "oracle-fork-cadence: 2026-10-28 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/bbed5f9b0b68ebe106bd2945678bf922f4a3cb7a",
+    "ts": "2026-10-28T18:37:19Z",
+    "author": "Kothar-wa-Khasis"
+  },
+  {
+    "kind": "commit",
+    "id": "a7c95b2",
+    "title": "oracle-fork-autograde: 2026-10-28 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/a7c95b22cdd4c5a09e41c806573ee6ed3b40b473",
+    "ts": "2026-10-28T18:37:22Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "44ab7e1",
+    "title": "oracle-issue-cadence: 2026-10-28 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/44ab7e15f727cd48723ac9f37e517ce3ffa7d136",
+    "ts": "2026-10-28T18:37:25Z",
+    "author": "Esu-Elegba"
+  },
+  {
+    "kind": "commit",
+    "id": "1698ba7",
+    "title": "oracle-issue-autograde: 2026-10-28 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/1698ba7522614391e8c24d9f06b7cf373c43b66d",
+    "ts": "2026-10-28T18:37:28Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "eb5362e",
+    "title": "oracle-release-cadence: 2026-10-28 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/eb5362e01f9b14b8b4f9c9dedbce305d1e0f985e",
+    "ts": "2026-10-28T18:37:31Z",
+    "author": "Kwaku-Ananse"
+  },
+  {
+    "kind": "commit",
+    "id": "79949ea",
+    "title": "oracle-release-autograde: 2026-10-28 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/79949ea611d17f23b7cc744f8f483bfd751a6167",
+    "ts": "2026-10-28T18:37:34Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "9a460ca",
+    "title": "oracle-contributor-cadence: 2026-10-28 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/9a460cabd2e061966d92c40de07b0356d720bf73",
+    "ts": "2026-10-28T18:37:39Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "6837faf",
+    "title": "oracle-contributor-autograde: 2026-10-28 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/6837fafaac811aeea89f05b592710213a5b62084",
+    "ts": "2026-10-28T18:37:42Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "97b1f34",
+    "title": "oracle-branch-cadence: 2026-10-28 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/97b1f34fb15c937ba2f15f929d848fb406fd4f13",
+    "ts": "2026-10-28T18:37:45Z",
+    "author": "Esu-Elegba"
+  },
+  {
+    "kind": "commit",
+    "id": "606121a",
+    "title": "oracle-branch-autograde: 2026-10-28 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/606121acbf37091c3c9e0f679b4a5ee39096da56",
+    "ts": "2026-10-28T18:37:48Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "50e59cb",
+    "title": "oracle-commit-autograde: 2026-10-28 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/50e59cb371091a34ef75497da8b84449dced50b3",
+    "ts": "2026-10-28T18:38:49Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "16f80b1",
+    "title": "oracle-subscriber-autograde: 2026-10-28 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/16f80b134488d47a74900d3993fc1de2bfee8e1d",
+    "ts": "2026-10-28T18:38:55Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "505d9cd",
+    "title": "oracle-tag-autograde: 2026-10-28 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/505d9cde9b7d882421bc41a1681f6cb2ab51dd98",
+    "ts": "2026-10-28T18:39:02Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "03d135a",
+    "title": "oracle-label-autograde: 2026-10-28 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/03d135a08b711feab1722e5513763e1e6d76664b",
+    "ts": "2026-10-28T18:39:07Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "aeeb760",
+    "title": "oracle-topic-autograde: 2026-10-28 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/aeeb760ba120d4dceb3640f908841767b70e0646",
+    "ts": "2026-10-28T18:39:13Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "355de35",
+    "title": "oracle-pr-autograde: 2026-10-28 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/355de351a727a6f65c69b432ddb5f847fcafc899",
+    "ts": "2026-10-28T18:39:20Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "c4e4dad",
+    "title": "oracle-workflow-cadence: 2026-10-28 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/c4e4dad55c18f2e116c776f1d12f35b57d207b43",
+    "ts": "2026-10-28T18:39:23Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "82b2902",
+    "title": "oracle-workflow-autograde: 2026-10-28 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/82b2902dfa4ef74161fb96bbf87ad598be0c679d",
+    "ts": "2026-10-28T18:39:26Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "97b786b",
+    "title": "oracle-milestone-autograde: 2026-10-28 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/97b786bee74559e9c948d3f832370c57fc929967",
+    "ts": "2026-10-28T18:39:32Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "00f7440",
+    "title": "oracle-run-autograde: 2026-10-28 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/00f744077a954d5512d9ff3e196ffe16aabc84cc",
+    "ts": "2026-10-28T18:39:55Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "29753d0",
+    "title": "oracle-comment-autograde: 2026-10-28 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/29753d05c61ab6806c0ca5f2dd98a788d4a48b81",
+    "ts": "2026-10-28T18:40:01Z",
+    "author": "Ogun"
   },
   {
     "kind": "commit",
@@ -76513,6 +77465,86 @@
   },
   {
     "kind": "commit",
+    "id": "eee6c70",
+    "title": "oracle-issue-comment-cadence: 2026-11-01 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/eee6c70a8c02675c7d4e7c7a181cd6e67bba4f7e",
+    "ts": "2026-11-01T03:00:00Z",
+    "author": "Zashiki-Warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "55f1575",
+    "title": "oracle-comment-cadence: 2026-11-01 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/55f15753ec3345153ff02f948f4cf62f15283b43",
+    "ts": "2026-11-01T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "61a72f0",
+    "title": "oracle-run-cadence: 2026-11-01 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/61a72f049cec1bc5ed0f92fc883d04f5d1f8dfc3",
+    "ts": "2026-11-01T03:00:00Z",
+    "author": "Zashiki-Warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "6319b25",
+    "title": "oracle-milestone-cadence: 2026-11-01 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/6319b25b651180ee9d8dfbf8b815459a9535131e",
+    "ts": "2026-11-01T03:00:00Z",
+    "author": "Zashiki-Warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "e93d81c",
+    "title": "oracle-pr-cadence: 2026-11-01 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/e93d81c1a1f17eb6f8a9e542e80144ca63c9cf0e",
+    "ts": "2026-11-01T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "3d55863",
+    "title": "oracle-topic-cadence: 2026-11-01 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/3d5586387798215b4d2af83b4eaab463869ff86e",
+    "ts": "2026-11-01T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "576fc33",
+    "title": "oracle-label-cadence: 2026-11-01 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/576fc335c793baa85d8683ea2614f9dda786e096",
+    "ts": "2026-11-01T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "87e5669",
+    "title": "oracle-tag-cadence: 2026-11-01 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/87e566917297a49f4fe0e3d818dd6b0455076261",
+    "ts": "2026-11-01T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "1afad8b",
+    "title": "oracle-subscriber-cadence: 2026-11-01 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/1afad8b8624ebdff1ae469d1da817a10ec5c80b7",
+    "ts": "2026-11-01T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "56db1dd",
+    "title": "oracle-commit-cadence: 2026-11-01 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/56db1ddf7ee361a4cceb0c5b031791ded100bccc",
+    "ts": "2026-11-01T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
     "id": "e9b4b0b",
     "title": "task 2335: close DONE -- hour 03 UTC, Nyx/child window, hourly Fencepost dogfood ritual",
     "url": "https://github.com/thierrypdamiba/orita/commit/e9b4b0bcc942e185f33015f7c3f062419847e396",
@@ -76670,6 +77702,238 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/48a8d05a581ea559581637020ab2d3309e541045",
     "ts": "2026-11-01T15:36:16Z",
     "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "4c9f685",
+    "title": "task 2348: open WIP -- hour 16 UTC, daytime rotation, hourly Fencepost dogfood ritual",
+    "url": "https://github.com/thierrypdamiba/orita/commit/4c9f6851978d3ddee320f26ae0585efb7d83bf9a",
+    "ts": "2026-11-01T16:38:07Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "9cdcb2b",
+    "title": "task 2348: close DONE -- hour 16 UTC, daytime rotation, hourly Fencepost dogfood ritual",
+    "url": "https://github.com/thierrypdamiba/orita/commit/9cdcb2bc8932a89e68be232d890df4947561d791",
+    "ts": "2026-11-01T16:39:44Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "55a5a3e",
+    "title": "seam-scan: 2026-11-01 tablet sealed, report rendered (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/55a5a3e9757a2ab123b906f9651d25ad3295fb88",
+    "ts": "2026-11-01T17:40:14Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "e57eb02",
+    "title": "task 2349: close DONE -- hour 17 UTC, daytime rotation, hourly Fencepost dogfood ritual",
+    "url": "https://github.com/thierrypdamiba/orita/commit/e57eb02b41784c45c6b9c034c9bfd6ac82eaa2fb",
+    "ts": "2026-11-01T17:49:49Z",
+    "author": "Kothar-wa-Khasis"
+  },
+  {
+    "kind": "commit",
+    "id": "38e7379",
+    "title": "oracle-cadence: 2026-11-01 call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/38e73796eb7e8a99be726506653b32c525a0c9e9",
+    "ts": "2026-11-01T18:13:57Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "562c0b5",
+    "title": "oracle-autograde: 2026-11-01 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/562c0b58e75ae43e78803b71eea501c167c2262a",
+    "ts": "2026-11-01T18:14:00Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "0860972",
+    "title": "oracle-star-cadence: 2026-11-01 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/08609729876e2700840b82c8b901b9c132c2f0b5",
+    "ts": "2026-11-01T18:14:02Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "b507778",
+    "title": "oracle-star-autograde: 2026-11-01 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/b507778ff901ba30cdd2d538968122714fd1fc30",
+    "ts": "2026-11-01T18:14:05Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "91914df",
+    "title": "oracle-fork-cadence: 2026-11-01 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/91914df0193b1d77394fdcedcc3178971a186b76",
+    "ts": "2026-11-01T18:14:08Z",
+    "author": "Kothar-wa-Khasis"
+  },
+  {
+    "kind": "commit",
+    "id": "6cc1b4a",
+    "title": "oracle-fork-autograde: 2026-11-01 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/6cc1b4adaca4470993905bce49a395fa7f2380ba",
+    "ts": "2026-11-01T18:14:11Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "a840977",
+    "title": "oracle-issue-cadence: 2026-11-01 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/a84097791486325ffd10bdcf5268e343e2b063f3",
+    "ts": "2026-11-01T18:14:13Z",
+    "author": "Esu-Elegba"
+  },
+  {
+    "kind": "commit",
+    "id": "0547965",
+    "title": "oracle-issue-autograde: 2026-11-01 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/0547965ffcdba6f457d532a754cdffa7aae385c2",
+    "ts": "2026-11-01T18:14:16Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "e229fc5",
+    "title": "oracle-release-cadence: 2026-11-01 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/e229fc5c13d7c32fafc02e33d7d95880eca135ce",
+    "ts": "2026-11-01T18:14:20Z",
+    "author": "Kwaku-Ananse"
+  },
+  {
+    "kind": "commit",
+    "id": "a82e602",
+    "title": "oracle-release-autograde: 2026-11-01 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/a82e602ec85978f5acd855e8da342dc8c4a6b5f7",
+    "ts": "2026-11-01T18:14:22Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "587f220",
+    "title": "oracle-contributor-cadence: 2026-11-01 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/587f2206a19e51f647f9a5a5e60e81f63d8a0b5b",
+    "ts": "2026-11-01T18:14:27Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "2652d89",
+    "title": "oracle-contributor-autograde: 2026-11-01 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/2652d896677889ace485fe87d803c5ec9170894e",
+    "ts": "2026-11-01T18:14:30Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "faafeea",
+    "title": "oracle-branch-cadence: 2026-11-01 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/faafeea20b329ac894482afb42049261a0b20b32",
+    "ts": "2026-11-01T18:14:32Z",
+    "author": "Esu-Elegba"
+  },
+  {
+    "kind": "commit",
+    "id": "34ebb35",
+    "title": "oracle-branch-autograde: 2026-11-01 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/34ebb35bb645e92c5cde3492b0bf47a90ddb0d39",
+    "ts": "2026-11-01T18:14:35Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "b2cba77",
+    "title": "oracle-commit-autograde: 2026-11-01 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/b2cba77504dffba768550a068a70f415b86131f1",
+    "ts": "2026-11-01T18:15:29Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "ae4efad",
+    "title": "oracle-subscriber-autograde: 2026-11-01 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/ae4efad5d17fdf09b10946d140a7eab692480ab0",
+    "ts": "2026-11-01T18:15:34Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "e513077",
+    "title": "oracle-tag-autograde: 2026-11-01 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/e5130773e4fad887145dfc42e4a477a205056eb5",
+    "ts": "2026-11-01T18:15:39Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "54a3b33",
+    "title": "oracle-label-autograde: 2026-11-01 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/54a3b330d374c06ba3aea269421cabfa82e5c9a9",
+    "ts": "2026-11-01T18:15:45Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "01279cd",
+    "title": "oracle-topic-autograde: 2026-11-01 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/01279cd5af4441463b5d757db71087d7e537dd79",
+    "ts": "2026-11-01T18:15:50Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "911016b",
+    "title": "oracle-pr-autograde: 2026-11-01 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/911016b94af408fc436a372435f51f61949926f4",
+    "ts": "2026-11-01T18:15:55Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "baf79ea",
+    "title": "oracle-workflow-cadence: 2026-11-01 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/baf79ea0fd3106b5c5dd72cc7fdec1beffab6caa",
+    "ts": "2026-11-01T18:15:57Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "5b74c5c",
+    "title": "oracle-workflow-autograde: 2026-11-01 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/5b74c5c8752208d7f6c7b55f36cda75be77379b3",
+    "ts": "2026-11-01T18:15:59Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "902b9d6",
+    "title": "oracle-milestone-autograde: 2026-11-01 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/902b9d6f1111ef736f01b248842ba6535b8b3ac5",
+    "ts": "2026-11-01T18:16:04Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "9dc41b7",
+    "title": "oracle-run-autograde: 2026-11-01 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/9dc41b76255fb1d0f20e99b214de4a31b9bd52b7",
+    "ts": "2026-11-01T18:16:25Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "c8536ec",
+    "title": "oracle-comment-autograde: 2026-11-01 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/c8536ecd248eff693253f003a0df145fb909f0a8",
+    "ts": "2026-11-01T18:16:30Z",
+    "author": "Ogun"
   },
   {
     "kind": "commit",
@@ -76833,6 +78097,86 @@
   },
   {
     "kind": "commit",
+    "id": "bd80a67",
+    "title": "oracle-issue-comment-cadence: 2026-11-02 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/bd80a67d487b7a793cda218aad08383371573685",
+    "ts": "2026-11-02T03:00:00Z",
+    "author": "Zashiki-Warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "a7bee39",
+    "title": "oracle-comment-cadence: 2026-11-02 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/a7bee39d3d1023d27ae79289008e948994020d2d",
+    "ts": "2026-11-02T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "daf0a0b",
+    "title": "oracle-run-cadence: 2026-11-02 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/daf0a0b5440e35b6dd4f08c68e8e5949fd3fb4e5",
+    "ts": "2026-11-02T03:00:00Z",
+    "author": "Zashiki-Warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "32ead23",
+    "title": "oracle-milestone-cadence: 2026-11-02 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/32ead23387133814d8713f16854e16931c6d7c82",
+    "ts": "2026-11-02T03:00:00Z",
+    "author": "Zashiki-Warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "9ef4f1e",
+    "title": "oracle-pr-cadence: 2026-11-02 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/9ef4f1ed63709edaa9c55364bd6ea107952f84ff",
+    "ts": "2026-11-02T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "d69492f",
+    "title": "oracle-topic-cadence: 2026-11-02 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/d69492fdcd8ab556e4e96b155c3e425ae9515079",
+    "ts": "2026-11-02T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "bbdc9ea",
+    "title": "oracle-label-cadence: 2026-11-02 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/bbdc9eabe7b8a91e956115c033fe6c7f9a296060",
+    "ts": "2026-11-02T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "fbdfdaa",
+    "title": "oracle-tag-cadence: 2026-11-02 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/fbdfdaaa22e84a184205e600b930bbb3815b0319",
+    "ts": "2026-11-02T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "fdff982",
+    "title": "oracle-subscriber-cadence: 2026-11-02 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/fdff9828a2254e1681217aff1681638e321a8c4c",
+    "ts": "2026-11-02T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "17acbc3",
+    "title": "oracle-commit-cadence: 2026-11-02 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/17acbc30c9a03d60915201371afd2952db3c4182",
+    "ts": "2026-11-02T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
     "id": "3b801f9",
     "title": "task 2359: open WIP -- hour 03 UTC, inside the 00:00-06:00 UTC window, nyx's turn",
     "url": "https://github.com/thierrypdamiba/orita/commit/3b801f942b1d3c0a29e9f12b68de90f71b347d26",
@@ -76957,6 +78301,390 @@
     "title": "task 2366: close DONE -- hour 10 UTC, daytime rotation, hourly Fencepost dogfood ritual",
     "url": "https://github.com/thierrypdamiba/orita/commit/933549f4b657805cb3e6bf386afafa2083b812fb",
     "ts": "2026-11-02T10:41:43Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "80ddd0f",
+    "title": "task 2367: open WIP -- hour 11 UTC, daytime rotation, off-by-one's turn",
+    "url": "https://github.com/thierrypdamiba/orita/commit/80ddd0f4736d94a083318bd189520040a6530d7d",
+    "ts": "2026-11-02T11:47:30Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "cffee76",
+    "title": "task 2367: close DONE -- hour 11 UTC, daytime rotation, hourly Fencepost dogfood ritual",
+    "url": "https://github.com/thierrypdamiba/orita/commit/cffee76bd0f88aa96f88378440271bf708950369",
+    "ts": "2026-11-02T11:51:47Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "4927290",
+    "title": "task 2367: record this hour's live CI/scribe-growth observations",
+    "url": "https://github.com/thierrypdamiba/orita/commit/4927290d9ec5f4228d1aaa1c5f1adb36cf39663b",
+    "ts": "2026-11-02T11:51:59Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "d3cfa67",
+    "title": "task 2368: open WIP -- hour 12 UTC, daytime rotation, nisaba's turn",
+    "url": "https://github.com/thierrypdamiba/orita/commit/d3cfa67a7e93617738ad782b92d046fa74114e86",
+    "ts": "2026-11-02T12:44:20Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "bec7a4c",
+    "title": "task 2368: close DONE -- hour 12 UTC, daytime rotation, hourly Fencepost dogfood ritual",
+    "url": "https://github.com/thierrypdamiba/orita/commit/bec7a4c507978f0a9241d43eb3f1b4e67027e7d5",
+    "ts": "2026-11-02T12:46:40Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "e973e48",
+    "title": "task 2369: open WIP -- hour 13 UTC, daytime rotation, kothar-wa-khasis's turn",
+    "url": "https://github.com/thierrypdamiba/orita/commit/e973e480f7fc53b9d0ef7d8d4215b50bf47db696",
+    "ts": "2026-11-02T13:58:40Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "e8240f2",
+    "title": "task 2369: close DONE -- hour 13 UTC, daytime rotation, hourly Fencepost dogfood ritual",
+    "url": "https://github.com/thierrypdamiba/orita/commit/e8240f2b8049da84d03a46033774655826710cae",
+    "ts": "2026-11-02T14:09:12Z",
+    "author": "Kothar-wa-Khasis"
+  },
+  {
+    "kind": "commit",
+    "id": "a10d01f",
+    "title": "task 2370: open WIP -- hour 15 UTC, daytime rotation, kwaku-ananse's turn",
+    "url": "https://github.com/thierrypdamiba/orita/commit/a10d01f1d63f6b944fdf64774a62ea2c8019753b",
+    "ts": "2026-11-02T15:22:06Z",
+    "author": "Kwaku Ananse"
+  },
+  {
+    "kind": "commit",
+    "id": "e4e6ce8",
+    "title": "task 2370: close DONE -- hour 15 UTC, daytime rotation, hourly Fencepost dogfood ritual",
+    "url": "https://github.com/thierrypdamiba/orita/commit/e4e6ce80067907ea5febe1877b44180589fd721d",
+    "ts": "2026-11-02T15:25:35Z",
+    "author": "Kwaku Ananse"
+  },
+  {
+    "kind": "commit",
+    "id": "57973b0",
+    "title": "task 2371: open WIP -- hour 16 UTC, daytime rotation, esu-elegba's turn",
+    "url": "https://github.com/thierrypdamiba/orita/commit/57973b08e06748c1c48a8e7cce24bd7fe0b4dbf7",
+    "ts": "2026-11-02T16:31:49Z",
+    "author": "Esu-Elegba"
+  },
+  {
+    "kind": "commit",
+    "id": "c0f55ac",
+    "title": "task 2371: close DONE -- hour 16 UTC, daytime rotation, hourly Fencepost dogfood ritual",
+    "url": "https://github.com/thierrypdamiba/orita/commit/c0f55ac9c40fa7a7c2c39301fe8a7722926ee7a3",
+    "ts": "2026-11-02T16:33:48Z",
+    "author": "Esu-Elegba"
+  },
+  {
+    "kind": "commit",
+    "id": "96c9153",
+    "title": "task 2372: open WIP -- hour 17 UTC, daytime rotation, retrya's turn",
+    "url": "https://github.com/thierrypdamiba/orita/commit/96c91531883ec3ee70ee78c4b9d040014d975f1f",
+    "ts": "2026-11-02T17:20:35Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "4291f6a",
+    "title": "task 2372: close DONE -- hour 17 UTC, daytime rotation, hourly Fencepost dogfood ritual",
+    "url": "https://github.com/thierrypdamiba/orita/commit/4291f6a26b44d0b1afb6c99d843bb24eae81b714",
+    "ts": "2026-11-02T17:30:28Z",
+    "author": "Retrya"
+  },
+  {
+    "kind": "commit",
+    "id": "8caf089",
+    "title": "task 2373: open WIP -- hour 18 UTC, daily-aggregate + Monday Cluster Day, ogun's turn",
+    "url": "https://github.com/thierrypdamiba/orita/commit/8caf0897ec5ee5d6aff193ec1297f0dab59c3d2b",
+    "ts": "2026-11-02T19:03:32Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "d1c600b",
+    "title": "task 2373: close DONE -- hour 18 UTC, daily-aggregate + Monday Cluster Day",
+    "url": "https://github.com/thierrypdamiba/orita/commit/d1c600b3ee6fbcf2e8a17d63dbe21cc258049c0e",
+    "ts": "2026-11-02T19:04:07Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "fce81f7",
+    "title": "task 2373: record live scribe-growth observation from this hour's closing ritual_check.py rerun",
+    "url": "https://github.com/thierrypdamiba/orita/commit/fce81f7a3f69ec087417ebadb518879f7531d7ba",
+    "ts": "2026-11-02T19:08:02Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "8a61590",
+    "title": "task 2374: open WIP -- hour 19 UTC, daytime rotation, off-by-one's turn",
+    "url": "https://github.com/thierrypdamiba/orita/commit/8a61590d171010e82bb39f33157b53739a4c3016",
+    "ts": "2026-11-02T19:32:58Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "522e358",
+    "title": "task 2374: close DONE -- hour 19 UTC, daytime rotation, off-by-one's turn",
+    "url": "https://github.com/thierrypdamiba/orita/commit/522e358f7ea118c5b6299dd877072e8cd6678472",
+    "ts": "2026-11-02T19:47:10Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "120e657",
+    "title": "task 2375: close DONE -- hour 20 UTC, daytime rotation",
+    "url": "https://github.com/thierrypdamiba/orita/commit/120e65726c35efdc3aaee75494683945b8c835e2",
+    "ts": "2026-11-02T20:50:58Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "080ad15",
+    "title": "seam-scan: 2026-11-02 tablet sealed, report rendered (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/080ad15158521b3a58c4342ca53f1d3b9e6718fc",
+    "ts": "2026-11-02T21:25:30Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "34eab4a",
+    "title": "task 2375: record live full-suite verification from this hour's closing rerun",
+    "url": "https://github.com/thierrypdamiba/orita/commit/34eab4adc5a770ed2edc225a5d761d77313295a5",
+    "ts": "2026-11-02T21:27:07Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "914c228",
+    "title": "task 2376: close DONE -- hour 21 UTC, daytime rotation, hourly Fencepost dogfood ritual",
+    "url": "https://github.com/thierrypdamiba/orita/commit/914c2289089727fcae241087dd8a98623588f3b1",
+    "ts": "2026-11-02T21:44:40Z",
+    "author": "Kothar-wa-Khasis"
+  },
+  {
+    "kind": "commit",
+    "id": "cc8373c",
+    "title": "oracle-cadence: 2026-11-02 call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/cc8373c995cb6efa86764056e8e5a0ec73b07418",
+    "ts": "2026-11-02T22:04:12Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "117df5b",
+    "title": "oracle-autograde: 2026-11-02 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/117df5b5166d5d41f8fd3ca463ff590549edff66",
+    "ts": "2026-11-02T22:04:15Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "0c33b21",
+    "title": "oracle-star-cadence: 2026-11-02 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/0c33b21e9b018bd507f5f720954ff4e071c3149d",
+    "ts": "2026-11-02T22:04:17Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "8c9b7a5",
+    "title": "oracle-star-autograde: 2026-11-02 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/8c9b7a59c7f3078208be572b011775688c141a41",
+    "ts": "2026-11-02T22:04:20Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "ced4465",
+    "title": "oracle-fork-cadence: 2026-11-02 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/ced4465138d28d3dca05a2a37218ccbc9f98d7b7",
+    "ts": "2026-11-02T22:04:23Z",
+    "author": "Kothar-wa-Khasis"
+  },
+  {
+    "kind": "commit",
+    "id": "4573da2",
+    "title": "oracle-fork-autograde: 2026-11-02 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/4573da2ab414068ef8154ee7bf38eb287f03b568",
+    "ts": "2026-11-02T22:04:26Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "7c913a1",
+    "title": "oracle-issue-cadence: 2026-11-02 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/7c913a1e62325b44bdbe300a122758c8875b52e4",
+    "ts": "2026-11-02T22:04:29Z",
+    "author": "Esu-Elegba"
+  },
+  {
+    "kind": "commit",
+    "id": "c34f2a1",
+    "title": "oracle-issue-autograde: 2026-11-02 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/c34f2a13e34bb9453c5309cf3f022a2c9e4a4816",
+    "ts": "2026-11-02T22:04:33Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "2777add",
+    "title": "oracle-release-cadence: 2026-11-02 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/2777addb434743af623025d2107013428361d084",
+    "ts": "2026-11-02T22:04:36Z",
+    "author": "Kwaku-Ananse"
+  },
+  {
+    "kind": "commit",
+    "id": "60a4570",
+    "title": "oracle-release-autograde: 2026-11-02 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/60a4570de12aab62204e67bb5f49ddcbea031370",
+    "ts": "2026-11-02T22:04:38Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "48376c3",
+    "title": "oracle-contributor-cadence: 2026-11-02 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/48376c30c031550be6f4c55d32b6f7b4255d5fdd",
+    "ts": "2026-11-02T22:04:44Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "31d42f5",
+    "title": "oracle-contributor-autograde: 2026-11-02 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/31d42f578bb6856c11f8b84455de6e6264e13b8e",
+    "ts": "2026-11-02T22:04:46Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "6a0a391",
+    "title": "oracle-branch-cadence: 2026-11-02 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/6a0a3910a03c5b57e8df70b55b0b70a5a3d1f30c",
+    "ts": "2026-11-02T22:04:50Z",
+    "author": "Esu-Elegba"
+  },
+  {
+    "kind": "commit",
+    "id": "c160748",
+    "title": "oracle-branch-autograde: 2026-11-02 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/c160748eac1f0162cebd13214eb675f2b294eb08",
+    "ts": "2026-11-02T22:04:52Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "e2c4ab0",
+    "title": "task 2376: same-hour addendum -- real scribe-growth reading from the rerun checkout",
+    "url": "https://github.com/thierrypdamiba/orita/commit/e2c4ab0c1ef531ef3a8cda557e9fb624cf3219b2",
+    "ts": "2026-11-02T22:05:39Z",
+    "author": "Kothar-wa-Khasis"
+  },
+  {
+    "kind": "commit",
+    "id": "1583be6",
+    "title": "oracle-commit-autograde: 2026-11-02 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/1583be63c99d0c41a70f3f23467f5fa09d27bca7",
+    "ts": "2026-11-02T22:05:55Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "541c1d6",
+    "title": "oracle-subscriber-autograde: 2026-11-02 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/541c1d64ecef97b34053fb7042536d7ae66c8363",
+    "ts": "2026-11-02T22:06:01Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "33fc83d",
+    "title": "oracle-tag-autograde: 2026-11-02 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/33fc83d8d22e9432e551c0da1657462c7183c659",
+    "ts": "2026-11-02T22:06:08Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "c670e38",
+    "title": "oracle-label-autograde: 2026-11-02 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/c670e38cd1231d46bdfb8761701870e9046ef87a",
+    "ts": "2026-11-02T22:06:14Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "725f1d2",
+    "title": "oracle-topic-autograde: 2026-11-02 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/725f1d263d09084458ff12d3339789a878d490d1",
+    "ts": "2026-11-02T22:06:19Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "145927e",
+    "title": "oracle-pr-autograde: 2026-11-02 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/145927edbe76c76c6c9b25651dfee74dd58f9c7b",
+    "ts": "2026-11-02T22:06:25Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "6b87c97",
+    "title": "oracle-workflow-cadence: 2026-11-02 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/6b87c97b1e549ce0271cd5986c8c3a76525c3d16",
+    "ts": "2026-11-02T22:06:27Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "73f7d0a",
+    "title": "oracle-workflow-autograde: 2026-11-02 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/73f7d0a4a29836b01f078c01d73de9e685b29458",
+    "ts": "2026-11-02T22:06:30Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "046348f",
+    "title": "oracle-milestone-autograde: 2026-11-02 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/046348f0e34fa6163777e45297a18e14141b671b",
+    "ts": "2026-11-02T22:06:42Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "ff91380",
+    "title": "oracle-run-autograde: 2026-11-02 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/ff9138085d60f94d88fcce3698f4cb7dc92970d8",
+    "ts": "2026-11-02T22:07:04Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "3cc140a",
+    "title": "oracle-comment-autograde: 2026-11-02 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/3cc140a82a603d8b95f913ef19baed0b59873f87",
+    "ts": "2026-11-02T22:07:10Z",
     "author": "Ogun"
   },
   {
@@ -77102,6 +78830,86 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/d80f24609716f9fa9da4b761968977ba244af63e",
     "ts": "2026-11-03T02:40:05Z",
     "author": "Zashiki-warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "a6bd566",
+    "title": "oracle-issue-comment-cadence: 2026-11-03 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/a6bd5662b8bb2ad424d0a62339e11f5e71dab86a",
+    "ts": "2026-11-03T03:00:00Z",
+    "author": "Zashiki-Warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "a71faa6",
+    "title": "oracle-comment-cadence: 2026-11-03 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/a71faa685091111001e11ffa19c36229c7d8b1a8",
+    "ts": "2026-11-03T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "832dc2b",
+    "title": "oracle-run-cadence: 2026-11-03 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/832dc2b9a455b6ef5ff9f6540ac3c7df6c039a5e",
+    "ts": "2026-11-03T03:00:00Z",
+    "author": "Zashiki-Warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "7eb4d9d",
+    "title": "oracle-milestone-cadence: 2026-11-03 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/7eb4d9d86436c61396d82ac2a1f45ca81f9d3169",
+    "ts": "2026-11-03T03:00:00Z",
+    "author": "Zashiki-Warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "05cd671",
+    "title": "oracle-pr-cadence: 2026-11-03 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/05cd67117b235169efe96532e1f48ba6cdcf5d03",
+    "ts": "2026-11-03T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "94208e0",
+    "title": "oracle-topic-cadence: 2026-11-03 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/94208e03001e6687a0e2c6bdacdaa3bd2db573d5",
+    "ts": "2026-11-03T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "3c7d958",
+    "title": "oracle-label-cadence: 2026-11-03 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/3c7d9586ff5699a2e29e767eb5f48977a2e75622",
+    "ts": "2026-11-03T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "fb324c8",
+    "title": "oracle-tag-cadence: 2026-11-03 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/fb324c823b92c0edead1542db0803b870cf8c228",
+    "ts": "2026-11-03T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "a6ba186",
+    "title": "oracle-subscriber-cadence: 2026-11-03 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/a6ba186d3cd899a2562d5627db73be13dc25762b",
+    "ts": "2026-11-03T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "c321222",
+    "title": "oracle-commit-cadence: 2026-11-03 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/c3212228d3553cec70df924b0bd40e114fcb8baf",
+    "ts": "2026-11-03T03:00:00Z",
+    "author": "Nyx"
   },
   {
     "kind": "commit",
@@ -77273,6 +79081,214 @@
   },
   {
     "kind": "commit",
+    "id": "90f4016",
+    "title": "task 2397: close DONE -- hour 18 UTC, daytime rotation, the 18:00 UTC daily-aggregate hour",
+    "url": "https://github.com/thierrypdamiba/orita/commit/90f40163bf6f10d7742aa52c9737b46703f68a2d",
+    "ts": "2026-11-03T18:51:37Z",
+    "author": "Kwaku Ananse"
+  },
+  {
+    "kind": "commit",
+    "id": "8aa99b4",
+    "title": "seam-scan: 2026-11-03 tablet sealed, report rendered (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/8aa99b485a870cfece4ae63ce7e988bfc27ec5ca",
+    "ts": "2026-11-03T19:05:12Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "7e18888",
+    "title": "task 2398: close DONE -- hour 19 UTC, daytime rotation -- draftback freshness caught and fixed live",
+    "url": "https://github.com/thierrypdamiba/orita/commit/7e1888805beae48adc3d3f798b794f4354f8e95b",
+    "ts": "2026-11-03T19:42:23Z",
+    "author": "Esu-Elegba"
+  },
+  {
+    "kind": "commit",
+    "id": "79e7a94",
+    "title": "oracle-cadence: 2026-11-03 call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/79e7a94237eed883555c285e9ace011fc3ea3504",
+    "ts": "2026-11-03T19:56:01Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "96a4836",
+    "title": "oracle-star-cadence: 2026-11-03 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/96a48364d17486dab82c9d8e491e5ad2c9f040d1",
+    "ts": "2026-11-03T19:56:04Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "ddfe5b0",
+    "title": "oracle-star-autograde: 2026-11-03 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/ddfe5b0d79c105e4575b7c0a78f11990bb51ead3",
+    "ts": "2026-11-03T19:56:07Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "1c6f7e8",
+    "title": "oracle-fork-cadence: 2026-11-03 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/1c6f7e877f646716875828770c2c50f1c1e019c6",
+    "ts": "2026-11-03T19:56:09Z",
+    "author": "Kothar-wa-Khasis"
+  },
+  {
+    "kind": "commit",
+    "id": "5fef698",
+    "title": "oracle-fork-autograde: 2026-11-03 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/5fef698eeebfc507ecff8f35082b01fd433fd64f",
+    "ts": "2026-11-03T19:56:12Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "c8efe2c",
+    "title": "oracle-issue-cadence: 2026-11-03 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/c8efe2c84832d7245f4e4ba459dfbd4640b64e32",
+    "ts": "2026-11-03T19:56:15Z",
+    "author": "Esu-Elegba"
+  },
+  {
+    "kind": "commit",
+    "id": "33501a8",
+    "title": "oracle-issue-autograde: 2026-11-03 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/33501a8b6bb2793e5bf9209d50cecddedcb63d70",
+    "ts": "2026-11-03T19:56:17Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "4ba2776",
+    "title": "oracle-release-cadence: 2026-11-03 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/4ba27767f8359df3558aaa771255dd6418c97402",
+    "ts": "2026-11-03T19:56:20Z",
+    "author": "Kwaku-Ananse"
+  },
+  {
+    "kind": "commit",
+    "id": "8d5aa53",
+    "title": "oracle-release-autograde: 2026-11-03 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/8d5aa534f0869a7099ba6178c2d6467e587df458",
+    "ts": "2026-11-03T19:56:22Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "93f041a",
+    "title": "oracle-contributor-cadence: 2026-11-03 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/93f041a5d8a8718d248a48fc008e564b357ed525",
+    "ts": "2026-11-03T19:56:27Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "1f047c0",
+    "title": "oracle-contributor-autograde: 2026-11-03 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/1f047c0b9b495dbbc6e09f645b3e79c8229dfa95",
+    "ts": "2026-11-03T19:56:30Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "a77c90c",
+    "title": "oracle-branch-cadence: 2026-11-03 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/a77c90ca2ccfeee9962854e61319394fd66faaf0",
+    "ts": "2026-11-03T19:56:33Z",
+    "author": "Esu-Elegba"
+  },
+  {
+    "kind": "commit",
+    "id": "ae832ae",
+    "title": "oracle-branch-autograde: 2026-11-03 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/ae832ae827800a7b75525bf162b7e353ce04098d",
+    "ts": "2026-11-03T19:56:36Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "b29356d",
+    "title": "oracle-commit-autograde: 2026-11-03 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/b29356d7fc04e9ecc60036d8b1895906e2aeba32",
+    "ts": "2026-11-03T19:57:42Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "0b62638",
+    "title": "oracle-subscriber-autograde: 2026-11-03 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/0b62638ed7d887e695247dd85a13355353db10cb",
+    "ts": "2026-11-03T19:57:47Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "ecf9615",
+    "title": "oracle-tag-autograde: 2026-11-03 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/ecf9615292ecb88ce284f022b5bb60a7c431f05e",
+    "ts": "2026-11-03T19:57:52Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "6af2f29",
+    "title": "oracle-label-autograde: 2026-11-03 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/6af2f29b2323013c9dd7cd88b78a89dda73e456c",
+    "ts": "2026-11-03T19:57:57Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "8b44de0",
+    "title": "oracle-topic-autograde: 2026-11-03 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/8b44de0468ebb7e6d45476ef9cd8b352c9fef673",
+    "ts": "2026-11-03T19:58:02Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "6a8ef49",
+    "title": "oracle-pr-autograde: 2026-11-03 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/6a8ef490e28b860c514e7b872153a86b26f1086f",
+    "ts": "2026-11-03T19:58:09Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "82b34a8",
+    "title": "oracle-workflow-cadence: 2026-11-03 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/82b34a802420e6b98b18e241d631547bb298d197",
+    "ts": "2026-11-03T19:58:12Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "60af2bc",
+    "title": "oracle-workflow-autograde: 2026-11-03 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/60af2bcb6cb24c00a07adc3f32b00524a9298e04",
+    "ts": "2026-11-03T19:58:15Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "470bf7c",
+    "title": "oracle-milestone-autograde: 2026-11-03 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/470bf7c138e428b9899e1b2857d9a4a023fa45b8",
+    "ts": "2026-11-03T19:58:23Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "77ef341",
+    "title": "oracle-comment-autograde: 2026-11-03 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/77ef341d77e19e09577a51a67a39642d00921de5",
+    "ts": "2026-11-03T19:58:47Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
     "id": "241104f",
     "title": "oracle-issue-comment-autograde: 2026-11-03 due call(s) graded (automatic, no human trigger)",
     "url": "https://github.com/thierrypdamiba/orita/commit/241104fbcea03f8f419eb4934079c90027644597",
@@ -77366,6 +79382,86 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/5575356361fec12b0264277e393e7725e1384b8c",
     "ts": "2026-11-04T02:39:00Z",
     "author": "Zashiki-Warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "e336624",
+    "title": "oracle-issue-comment-cadence: 2026-11-04 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/e336624f50c4c4ebd3745074049b253ac65217d5",
+    "ts": "2026-11-04T03:00:00Z",
+    "author": "Zashiki-Warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "3fcbb2f",
+    "title": "oracle-comment-cadence: 2026-11-04 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/3fcbb2f334aca016f8f0aa7b95927caca15fff97",
+    "ts": "2026-11-04T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "c4d962d",
+    "title": "oracle-run-cadence: 2026-11-04 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/c4d962d1c9e3c065ffdd0263def0bd1d9ebd890e",
+    "ts": "2026-11-04T03:00:00Z",
+    "author": "Zashiki-Warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "ba267e9",
+    "title": "oracle-milestone-cadence: 2026-11-04 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/ba267e95bc0583c4e282ffed9bf6bc5f9329063b",
+    "ts": "2026-11-04T03:00:00Z",
+    "author": "Zashiki-Warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "ab3b5a3",
+    "title": "oracle-pr-cadence: 2026-11-04 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/ab3b5a3a9f058c97955c41ba4e7b2a02396fdaad",
+    "ts": "2026-11-04T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "61fe344",
+    "title": "oracle-topic-cadence: 2026-11-04 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/61fe3441b854dca81e5c3af64555d6ec7507c61d",
+    "ts": "2026-11-04T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "b6315b9",
+    "title": "oracle-label-cadence: 2026-11-04 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/b6315b9c37f4edf64bfb8b1668a939d22d6f29cb",
+    "ts": "2026-11-04T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "29c7543",
+    "title": "oracle-tag-cadence: 2026-11-04 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/29c7543c3d85c7a6449188612048d5e451296e40",
+    "ts": "2026-11-04T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "f712ef3",
+    "title": "oracle-subscriber-cadence: 2026-11-04 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/f712ef39ea95654c04f336a69a8adf7cfd1e8042",
+    "ts": "2026-11-04T03:00:00Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "69fb26f",
+    "title": "oracle-commit-cadence: 2026-11-04 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/69fb26f4b44cdc4e349f897926f4b7be9b6d538c",
+    "ts": "2026-11-04T03:00:00Z",
+    "author": "Nyx"
   },
   {
     "kind": "commit",
@@ -77513,6 +79609,14 @@
   },
   {
     "kind": "commit",
+    "id": "5e57e77",
+    "title": "task 2421: open WIP -- hour 18 UTC, daytime rotation, the 18:00 UTC daily-aggregate hour",
+    "url": "https://github.com/thierrypdamiba/orita/commit/5e57e778532d880227fe4ec67af1cb24025c193a",
+    "ts": "2026-11-04T18:41:33Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
     "id": "9ae7df1",
     "title": "task 2421: close DONE -- hour 18 UTC",
     "url": "https://github.com/thierrypdamiba/orita/commit/9ae7df14a6a5fb155dcf2243901cc33fafb95307",
@@ -77526,6 +79630,222 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/01b6519804fae6ee7cd78b8ec0c981307e44c533",
     "ts": "2026-11-04T19:23:44Z",
     "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "2bc1d6f",
+    "title": "task 2422: open WIP -- hour 19 UTC, daytime rotation",
+    "url": "https://github.com/thierrypdamiba/orita/commit/2bc1d6f03d8b6f7486ffa301c31314a2dbbd7680",
+    "ts": "2026-11-04T19:36:07Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "d11b7c5",
+    "title": "task 2422: close DONE -- hour 19 UTC, daytime rotation",
+    "url": "https://github.com/thierrypdamiba/orita/commit/d11b7c57ac3f579ab15cc8c4594218c0f4535a33",
+    "ts": "2026-11-04T19:42:40Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "e188f73",
+    "title": "oracle-cadence: 2026-11-04 call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/e188f73431e8efa005b2ba5aeaec5a6956365b0d",
+    "ts": "2026-11-04T20:13:16Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "6da88fe",
+    "title": "oracle-autograde: 2026-11-04 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/6da88feea31d841eeab3dae3bd03b243a3948f8f",
+    "ts": "2026-11-04T20:13:19Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "13fe490",
+    "title": "oracle-star-cadence: 2026-11-04 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/13fe490335a2ffc61ceb194fbcae59c9bbfb989a",
+    "ts": "2026-11-04T20:13:22Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "9c65474",
+    "title": "oracle-star-autograde: 2026-11-04 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/9c6547432f2a76bdebf9979607203237996bf2b6",
+    "ts": "2026-11-04T20:13:24Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "78c6c65",
+    "title": "oracle-fork-cadence: 2026-11-04 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/78c6c65dfbceb349282ecaca06b361272236d645",
+    "ts": "2026-11-04T20:13:27Z",
+    "author": "Kothar-wa-Khasis"
+  },
+  {
+    "kind": "commit",
+    "id": "1d0ab67",
+    "title": "oracle-fork-autograde: 2026-11-04 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/1d0ab6758e750c6a891e8f241fe71c131b9c9e85",
+    "ts": "2026-11-04T20:13:30Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "09ff1b5",
+    "title": "oracle-issue-cadence: 2026-11-04 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/09ff1b579e5ce022be7736b1302d0da910c3432c",
+    "ts": "2026-11-04T20:13:33Z",
+    "author": "Esu-Elegba"
+  },
+  {
+    "kind": "commit",
+    "id": "eb5d198",
+    "title": "oracle-issue-autograde: 2026-11-04 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/eb5d198e2cbf60dc32db411dc8e6a80b2962a391",
+    "ts": "2026-11-04T20:13:36Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "0e00a86",
+    "title": "oracle-release-cadence: 2026-11-04 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/0e00a863c2a1078c9728536fb0c88c22b6a34ea6",
+    "ts": "2026-11-04T20:13:39Z",
+    "author": "Kwaku-Ananse"
+  },
+  {
+    "kind": "commit",
+    "id": "24f670c",
+    "title": "oracle-release-autograde: 2026-11-04 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/24f670cd0da70ad5ca7870fa976a10597ae79752",
+    "ts": "2026-11-04T20:13:42Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "b372a65",
+    "title": "oracle-contributor-cadence: 2026-11-04 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/b372a65d08d418653ad0d9c69b28c0f944d836c1",
+    "ts": "2026-11-04T20:13:47Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "3822067",
+    "title": "oracle-contributor-autograde: 2026-11-04 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/3822067db5e98a65a516694bf2eafc037db3c4a5",
+    "ts": "2026-11-04T20:13:50Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "fe35925",
+    "title": "oracle-branch-cadence: 2026-11-04 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/fe35925017b43b156c52a1834d1e793eb28095be",
+    "ts": "2026-11-04T20:13:53Z",
+    "author": "Esu-Elegba"
+  },
+  {
+    "kind": "commit",
+    "id": "e55336f",
+    "title": "oracle-branch-autograde: 2026-11-04 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/e55336f74e98d3ee5ae9cf0a8b41655136c3568b",
+    "ts": "2026-11-04T20:13:56Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "baf44af",
+    "title": "oracle-commit-autograde: 2026-11-04 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/baf44af995c4e5c01534795cdfe4d9385f2b4f40",
+    "ts": "2026-11-04T20:15:16Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "c579914",
+    "title": "oracle-subscriber-autograde: 2026-11-04 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/c579914a894b92b3deb0ac542cbf549da9643a23",
+    "ts": "2026-11-04T20:15:22Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "24926d3",
+    "title": "oracle-tag-autograde: 2026-11-04 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/24926d3f657535ca5f3fe02612b44776cb162d60",
+    "ts": "2026-11-04T20:15:28Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "c4f3041",
+    "title": "oracle-label-autograde: 2026-11-04 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/c4f3041d76bcd8354dc9f9c5fa5596475c657f5f",
+    "ts": "2026-11-04T20:15:34Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "8e42281",
+    "title": "oracle-topic-autograde: 2026-11-04 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/8e42281f6ac8d4e30ba79e0d8ea55a04237d53f4",
+    "ts": "2026-11-04T20:15:39Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "0ae89ea",
+    "title": "oracle-pr-autograde: 2026-11-04 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/0ae89ea59b345926f8c5662c40a24f7fa7223af3",
+    "ts": "2026-11-04T20:15:45Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "11637b1",
+    "title": "oracle-workflow-cadence: 2026-11-04 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/11637b1af5a8ff8952de954130a1ee20b4867268",
+    "ts": "2026-11-04T20:15:47Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "9124a9a",
+    "title": "oracle-workflow-autograde: 2026-11-04 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/9124a9ab2869b951c5f50fe2085cd2bdf3dd7433",
+    "ts": "2026-11-04T20:15:50Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "987ff2a",
+    "title": "oracle-milestone-autograde: 2026-11-04 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/987ff2aa52515f5c2aed9b1f56db92c52f09a901",
+    "ts": "2026-11-04T20:15:56Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "98b3b2f",
+    "title": "oracle-run-autograde: 2026-11-04 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/98b3b2ff8e1f3aab807d381513252ead0c102dda",
+    "ts": "2026-11-04T20:16:21Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "14feb7a",
+    "title": "oracle-comment-autograde: 2026-11-04 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/14feb7a10107c94d3bad88dcec9210c0f18ac786",
+    "ts": "2026-11-04T20:16:27Z",
+    "author": "Ogun"
   },
   {
     "kind": "commit",
@@ -77654,5 +79974,13 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/31c719befd44563165eeb13c176c180f8d05d126",
     "ts": "2026-11-05T04:42:54Z",
     "author": "Zashiki-Warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "ef506e6",
+    "title": "task 2432: close DONE -- hour 05 UTC, inside the window, mine",
+    "url": "https://github.com/thierrypdamiba/orita/commit/ef506e6e9fef1bf61e25466e2b020dd2a48b1e09",
+    "ts": "2026-11-05T05:40:00Z",
+    "author": "Nyx"
   }
 ]
