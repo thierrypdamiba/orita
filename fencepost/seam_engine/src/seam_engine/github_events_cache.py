@@ -160,6 +160,46 @@ def merge_events(
     return sorted(by_key.values(), key=lambda e: e["ts"])
 
 
+def find_title_conflicts(
+    cache: list[dict[str, Any]], new_events: list[dict[str, Any]]
+) -> list[tuple[dict[str, Any], dict[str, Any]]]:
+    """Entries present in both `cache` and `new_events` under the same
+    `(kind, id)` whose `title` differs.
+
+    `merge_events` keeps the cache's own copy on a duplicate id
+    (first-seen-wins, tested doctrine: never silently replaced by
+    whatever a later fetch hands in) — the right default against a bad
+    NEW fetch, but it means a bad OLD entry stays wrong forever unless
+    something actually looks. Found live, task 2434 (2026-11-05): two
+    entries ingested 2026-10-23 (`a1981e7`/task 2134, `d55a854`/task
+    2135) held titles truncated mid-clause at "...hour NN UTC" — the
+    real commit message continues ", daytime rotation, hourly Fencepost
+    dogfood ritual", so the cached half-title silently missed the
+    `fencepost` `MILESTONE_KEYWORDS` match `_is_milestone` needs. Every
+    `ingest-raw`/`merge` since re-covered that same date range (the cache
+    grows by forward delta, never re-walks old ground) and so never
+    re-saw it: `merge_events`'s own setdefault kept the stale half-title
+    both times, and the resulting 922-vs-924 milestone-count drift
+    against a direct live fetch went unexplained for two hourly rows
+    (tasks 2432, 2433) before this one pinned and corrected it by hand.
+
+    This function doesn't change the cache — it only surfaces a conflict
+    so a caller ingesting a fresh, overlapping fetch can look at it and
+    correct the stale entry by hand (as task 2434 did for these two),
+    rather than the drift going unnoticed again the same way.
+
+    Returns `(cached_entry, incoming_entry)` pairs, in `new_events`
+    order. Pure — no I/O.
+    """
+    cache_by_key = {(e["kind"], e["id"]): e for e in cache}
+    conflicts = []
+    for e in new_events:
+        cached = cache_by_key.get((e["kind"], e["id"]))
+        if cached is not None and cached["title"] != e["title"]:
+            conflicts.append((cached, e))
+    return conflicts
+
+
 def save_cache(events: list[dict[str, Any]], path: Path = DEFAULT_CACHE_PATH) -> None:
     """Write the cache, oldest-first, pretty enough for a human diff to
     read in a PR — the same discipline `candidates/<date>.json` already
@@ -257,6 +297,15 @@ def main(argv: list[str] | None = None) -> int:
             return 1
         cache = load_cache(cache_path)
         before = len(cache)
+        for cached, incoming in find_title_conflicts(cache, new_events):
+            print(
+                f"TITLE CONFLICT on {cached['kind']} {cached['id']}: cache "
+                f"holds {cached['title']!r}, this fetch holds "
+                f"{incoming['title']!r} -- kept the cache's own copy "
+                "(first-seen-wins); if the cache's copy looks truncated, "
+                "fix it by hand, it won't self-correct.",
+                file=sys.stderr,
+            )
         merged = merge_events(cache, new_events)
         save_cache(merged, out_path)
         print(
@@ -311,6 +360,15 @@ def main(argv: list[str] | None = None) -> int:
 
         cache = load_cache(cache_path)
         before = len(cache)
+        for cached, incoming in find_title_conflicts(cache, new_events):
+            print(
+                f"TITLE CONFLICT on {cached['kind']} {cached['id']}: cache "
+                f"holds {cached['title']!r}, this fetch holds "
+                f"{incoming['title']!r} -- kept the cache's own copy "
+                "(first-seen-wins); if the cache's copy looks truncated, "
+                "fix it by hand, it won't self-correct.",
+                file=sys.stderr,
+            )
         merged = merge_events(cache, new_events)
         save_cache(merged, out_path)
         print(

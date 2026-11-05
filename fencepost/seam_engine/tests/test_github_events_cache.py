@@ -91,6 +91,55 @@ def test_merge_events_deduplicates_by_kind_and_id() -> None:
     assert merged[0]["title"] == COMMIT_A["title"]
 
 
+def test_find_title_conflicts_flags_a_differing_title_on_shared_id() -> None:
+    truncated = dict(COMMIT_A, title="Task 1: first")
+    fresh = dict(COMMIT_A, title="Task 1: first thing, and more besides")
+    conflicts = gec.find_title_conflicts([truncated], [fresh])
+    assert conflicts == [(truncated, fresh)]
+
+
+def test_find_title_conflicts_silent_when_titles_match() -> None:
+    assert gec.find_title_conflicts([COMMIT_A], [COMMIT_A]) == []
+
+
+def test_find_title_conflicts_silent_when_ids_dont_overlap() -> None:
+    assert gec.find_title_conflicts([COMMIT_A], [COMMIT_B]) == []
+
+
+def test_find_title_conflicts_does_not_mutate_either_input() -> None:
+    cache = [dict(COMMIT_A, title="stale")]
+    new = [dict(COMMIT_A, title="fresh")]
+    cache_before, new_before = json.dumps(cache), json.dumps(new)
+    gec.find_title_conflicts(cache, new)
+    assert json.dumps(cache) == cache_before
+    assert json.dumps(new) == new_before
+
+
+def test_find_title_conflicts_regression_task_2134_2135() -> None:
+    """The real pair found live task 2434 (2026-11-05): a cache entry
+    truncated mid-clause at "...hour NN UTC" silently dropped the
+    'Fencepost' MILESTONE_KEYWORDS match the real commit message carries,
+    undercounting the seam-engine scan's milestone count by 2 (922 vs the
+    direct-fetch 924) for two hourly rows before anyone looked."""
+    truncated_cached = {
+        "kind": "commit",
+        "id": "a1981e7",
+        "title": "task 2134: close DONE -- hour 15 UTC",
+        "url": "https://github.com/thierrypdamiba/orita/commit/a1981e77cbff2adeb61c8f1c78587d59703adea4",
+        "ts": "2026-10-23T15:51:54Z",
+        "author": "Kothar-wa-Khasis",
+    }
+    fresh_fetch = dict(
+        truncated_cached,
+        title=(
+            "task 2134: close DONE -- hour 15 UTC, daytime rotation, "
+            "hourly Fencepost dogfood ritual"
+        ),
+    )
+    conflicts = gec.find_title_conflicts([truncated_cached], [fresh_fetch])
+    assert conflicts == [(truncated_cached, fresh_fetch)]
+
+
 def test_merge_events_new_entry_missing_key_names_it() -> None:
     broken = dict(COMMIT_A)
     del broken["ts"]
@@ -139,6 +188,27 @@ def test_cli_merge_out_leaves_cache_file_untouched(tmp_path: Path) -> None:
     assert rc == 0
     assert [e["id"] for e in gec.load_cache(cache_path)] == ["aaaaaaa"]
     assert [e["id"] for e in gec.load_cache(out_path)] == ["aaaaaaa", "bbbbbbb"]
+
+
+def test_cli_merge_prints_title_conflict_but_keeps_cache_copy(
+    tmp_path: Path, capsys
+) -> None:
+    cache_path = tmp_path / "cache.json"
+    stale = dict(COMMIT_A, title="Task 1: first")
+    gec.save_cache([stale], cache_path)
+    fresh = dict(COMMIT_A, title="Task 1: first thing, in full")
+    new_events_path = tmp_path / "delta.json"
+    new_events_path.write_text(json.dumps([fresh]))
+
+    rc = gec.main(["merge", str(new_events_path), "--cache", str(cache_path)])
+
+    assert rc == 0
+    err = capsys.readouterr().err
+    assert "TITLE CONFLICT" in err
+    assert "Task 1: first" in err
+    assert "Task 1: first thing, in full" in err
+    merged = gec.load_cache(cache_path)
+    assert merged == [stale]  # first-seen-wins holds; conflict is only surfaced
 
 
 def test_cli_merge_new_events_not_a_list_fails_named(tmp_path: Path, capsys) -> None:
