@@ -2371,3 +2371,4 @@
 {"type": "check", "tool": "X_PostTweet", "status": "forbidden", "checked_at": "2026-11-07T20:35:48Z"}
 {"type": "check", "tool": "X_WhoAmI", "status": "ok", "checked_at": "2026-11-07T22:30:07Z"}
 {"type": "check", "tool": "X_GetUserTweets", "status": "forbidden", "checked_at": "2026-11-07T22:30:07Z"}
+{"type": "check", "tool": "X_PostTweet", "status": "forbidden", "checked_at": "2026-11-07T23:30:23Z"}
