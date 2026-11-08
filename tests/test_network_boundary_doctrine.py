@@ -225,6 +225,7 @@ class RealToolsDirCase(unittest.TestCase):
         "child_work_check.py",
         "chronicle_readme_check.py",
         "ci_watch.py",
+        "commit_author_check.py",
         "consent_template_scope_check.py",
         "duplicate_function_check.py",
         "duplicate_regex_check.py",
@@ -639,7 +640,7 @@ _CARDINAL_WORDS = {
     "twenty-five": 25, "twenty-six": 26, "twenty-seven": 27, "twenty-eight": 28,
     "twenty-nine": 29, "thirty": 30, "thirty-one": 31, "thirty-two": 32,
     "thirty-three": 33, "thirty-four": 34, "thirty-five": 35, "thirty-six": 36,
-    "thirty-seven": 37,
+    "thirty-seven": 37, "thirty-eight": 38,
 }
 
 _TODAY_COUNT_CLAIM_RE = re.compile(r"([a-z-]+) carry it today")
@@ -678,7 +679,7 @@ class DocstringCountDoctrineCase(unittest.TestCase):
         with self.assertRaises(AssertionError):
             claimed_today_count("Nothing here about a file count.")
 
-    def test_real_live_claiming_file_count_is_currently_thirty_seven(self):
+    def test_real_live_claiming_file_count_is_currently_thirty_eight(self):
         # Regression pin: today's real, live tools/*.py claiming-file count.
         # Task 547's proclamation_count_check.py moved this from 26 to 27.
         # Task 554's site_recipe_check.py moved this from 27 to 28.
@@ -711,8 +712,14 @@ class DocstringCountDoctrineCase(unittest.TestCase):
         # 1244/1295/1311 already did once each -- closed the same hour,
         # this correction. Task 1625's daytime_rotation_check.py ("pure
         # text parsing, no network") moved this from 36 to 37 -- same
-        # break, same fifth repeat, closed task 1626.
-        self.assertEqual(len(nbc.find_claiming_files()), 37)
+        # break, same fifth repeat, closed task 1626. Task 2507's
+        # commit_author_check.py ("read-only, local-filesystem-only ...
+        # no network") moved this from 37 to 38 -- that commit's own
+        # verification ran network_boundary_check.py's CLI directly (which
+        # caught the new file and passed) but never ran this doctrine
+        # test file's own hand-typed pins, breaking dawn-run live a sixth
+        # time the same way -- closed the same hour, task 2508.
+        self.assertEqual(len(nbc.find_claiming_files()), 38)
 
     def test_docstring_matches_the_real_live_count(self):
         real_count = len(nbc.find_claiming_files())
@@ -731,7 +738,7 @@ class DocstringCountDoctrineCase(unittest.TestCase):
         not just that it happens to pass today."""
         real_count = len(nbc.find_claiming_files())
         wrong_word = _word_for(real_count - 1)
-        wrong_doc = nbc.__doc__.replace("thirty-seven carry it today", f"{wrong_word} carry it today")
+        wrong_doc = nbc.__doc__.replace("thirty-eight carry it today", f"{wrong_word} carry it today")
         claimed = claimed_today_count(wrong_doc)
         self.assertNotEqual(claimed, real_count)
 

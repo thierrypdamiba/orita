@@ -12,6 +12,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          # Task 2507's test_commit_author_check.py reads full git log
+          # history (max_commits=1_000_000) to prove a known drift commit
+          # is grandfathered. actions/checkout@v4's default fetch-depth: 1
+          # gives this job a single-commit history, so that commit is
+          # unreachable and the test finds an empty set regardless of
+          # which commit it looks for -- broke dawn-run live the same
+          # hour the test shipped. Closed task 2508.
+          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
