@@ -296,6 +296,10 @@ def _vault_leak_check() -> ModuleType:
     return _load_once("_ritual_vault_leak_check", os.path.join(ROOT, "tools", "vault_leak_check.py"))
 
 
+def _commit_author_check() -> ModuleType:
+    return _load_once("_ritual_commit_author_check", os.path.join(ROOT, "tools", "commit_author_check.py"))
+
+
 def _star_covenant_check() -> ModuleType:
     return _load_once("_ritual_star_covenant_check", os.path.join(ROOT, "tools", "star_covenant_check.py"))
 
@@ -962,6 +966,30 @@ def check_vault_leak(orita_dir: str | None = None, vault_dir: str | None = None)
         kwargs["vault_dir"] = vault_dir
     leaks = mod.find_leaks(**kwargs)
     return {"clean": not leaks, "count": len(leaks), "leaks": leaks}
+
+
+def check_commit_authors(repo_root: str | None = None, max_commits: int = 200) -> dict[str, object]:
+    """Task 2507 (Ogun): fold commit_author_check.py's own Iron Rule #3
+    authorship compare into the one block. Unconditional, local-
+    filesystem-only (one git log read on a checkout already on disk, no
+    network) -- the same cheap class check_vault_leak/check_checkout
+    already hold. Never rewrites a commit's author; a real LIVE drift (at
+    or after the check's own FIX_LANDED_AT) is a god-on-duty escalation
+    named honestly, not silently repaired -- an already-pushed commit's
+    author is never amended. A pre-fix drift reads back `grandfathered`,
+    the same shape `check_window_rotation`/`check_daytime_rotation`
+    already hold, and never flips `broken`."""
+    mod = _commit_author_check()
+    kwargs = {}
+    if repo_root is not None:
+        kwargs["repo_root"] = repo_root
+    drift = mod.find_author_drift(max_commits=max_commits, **kwargs)
+    return {
+        "clean": not drift["violations"],
+        "count": len(drift["violations"]),
+        "violations": drift["violations"],
+        "grandfathered": drift["grandfathered"],
+    }
 
 
 def check_star_covenant(orita_dir: str | None = None) -> dict[str, object]:
@@ -2996,6 +3024,7 @@ def run_ritual_check(
         vault_leak = check_vault_leak()
     else:
         vault_leak = check_vault_leak(orita_dir=vault_leak_dirs[0], vault_dir=vault_leak_dirs[1])
+    commit_authors = check_commit_authors()
     star_covenant = check_star_covenant(orita_dir=star_covenant_dir)
     duplicate_regex = check_duplicate_regex(orita_dir=duplicate_regex_dir)
     duplicate_function = check_duplicate_function(orita_dir=duplicate_function_dir)
@@ -3138,6 +3167,7 @@ def run_ritual_check(
         (not town["ok"])
         or (not fencepost["ok"])
         or (not vault_leak["clean"])
+        or (not commit_authors["clean"])
         or (not star_covenant["clean"])
         or (not duplicate_regex["clean"])
         or (not duplicate_function["clean"])
@@ -3220,6 +3250,7 @@ def run_ritual_check(
         "owed_posts": owed_posts,
         "change_gate": change_gate,
         "vault_leak": vault_leak,
+        "commit_authors": commit_authors,
         "star_covenant": star_covenant,
         "duplicate_regex": duplicate_regex,
         "duplicate_function": duplicate_function,
@@ -3372,6 +3403,13 @@ def format_ritual_check(result: dict[str, Any]) -> str:
         lines.append("  vault leak: clean (Proclamation 0001 holds)")
     else:
         lines.append(f"  vault leak: {vl['count']} LEAK(S) -- Proclamation 0001 violated, escalate now")
+    ca = result["commit_authors"]
+    if ca["clean"]:
+        gf = len(ca["grandfathered"])
+        tail = f" ({gf} grandfathered pre-fix instance(s), sealed history)" if gf else ""
+        lines.append(f"  commit authors: clean (every task-ritual commit since the fix authored as its own god{tail})")
+    else:
+        lines.append(f"  commit authors: {ca['count']} DRIFT(ED) commit(s) -- authored as the generic harness identity, named not amended")
     sc = result["star_covenant"]
     if sc["clean"]:
         lines.append("  star covenant: clean (no begging language found)")
