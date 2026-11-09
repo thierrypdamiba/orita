@@ -50,7 +50,7 @@ DEFAULT_HORIZON_HOURS = 24
 DEFAULT_CONFIDENCE = 0.7
 
 _LOG_LINE_RE = re.compile(
-    r"^(?P<date>\d{4}-\d{2}-\d{2}) (?P<time>\d{2}:\d[\dx])(?:/(?P<time_close>\d{2}:\d[\dx]))? UTC \| "
+    r"^(?P<date>\d{4}-\d{2}-\d{2}) (?P<time>\d{2}:[\dx]{2})(?:/(?P<time_close>\d{2}:[\dx]{2}))? UTC \| "
     r"(?P<god>[^|]+) \| (?P<task>[^|]+) \| "
 )
 
@@ -72,7 +72,16 @@ def parse_buildlog(text: str) -> list[dict[str, str]]:
     `time_close`, when present, replaces `time` -- every single-timestamp
     line already means "closed at this time", not "opened at this
     time", so the span's second (close) timestamp is the one consistent
-    with that convention, not its first (open) one."""
+    with that convention, not its first (open) one.
+
+    A span's close side can also obscure BOTH minute digits, not just
+    the ones digit (e.g. "03:3x/04:xx UTC" -- task 2525's own row, task
+    2526's own fix): `_LOG_LINE_RE`'s time group required the tens digit
+    to be a literal digit and only the ones digit could be `x`, so "04:xx"
+    never matched and the whole line was silently dropped the same way
+    every obscured-minute variant before it was. Both minute digits now
+    accept `x`; `_minute_floor`'s `.replace("x", "0")` already handles
+    either one or two of them correctly, so no change was needed there."""
     entries: list[dict[str, str]] = []
     for line in text.splitlines():
         m = _LOG_LINE_RE.match(line)

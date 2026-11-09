@@ -152,6 +152,35 @@ class TestHourSpanConvention(unittest.TestCase):
         self.assertEqual(velocity, 1)
 
 
+class TestFullyObscuredMinuteSpanConvention(unittest.TestCase):
+    """A span's close side can obscure BOTH minute digits, not just the
+    ones digit (e.g. "03:3x/04:xx UTC" -- task 2525's own row). Before
+    this fix, `_LOG_LINE_RE`'s time group required the tens digit to be
+    a literal `\\d` and only the ones digit could be `x`, so "04:xx"
+    never matched and the whole line was silently dropped -- the same
+    shape `test_real_buildlog_has_no_lines_the_parser_silently_drops`
+    caught live against the real file (3170 != 3171), the live `dawn-run`
+    signal that found this bug rather than a human noticing."""
+
+    _FULLY_OBSCURED_SPAN_LOG = (
+        "2026-07-13 07:10 UTC | nisaba | 31 | Prediction schema shipped\n"
+        "2026-11-09 03:3x/04:xx UTC | zashiki-warashi | 2525 | "
+        "Hour-spanning task with a fully obscured close minute\n"
+    )
+
+    def test_parses_a_fully_obscured_minute_span_line(self):
+        entries = cadence.parse_buildlog(self._FULLY_OBSCURED_SPAN_LOG)
+        self.assertEqual(len(entries), 2)
+        tasks = {e["task"].strip() for e in entries}
+        self.assertEqual(tasks, {"31", "2525"})
+
+    def test_fully_obscured_close_minute_floors_to_zero(self):
+        entries = cadence.parse_buildlog(self._FULLY_OBSCURED_SPAN_LOG)
+        span_entry = next(e for e in entries if e["task"].strip() == "2525")
+        self.assertEqual(span_entry["time"], "04:xx")
+        self.assertEqual(cadence._minute_floor(span_entry["time"]), "04:00")
+
+
 class TestRecentTaskVelocity(unittest.TestCase):
     def test_counts_distinct_numbered_tasks_in_window(self):
         entries = cadence.parse_buildlog(_SAMPLE_LOG)
