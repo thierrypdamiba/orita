@@ -540,6 +540,10 @@ def _recipe_command_check() -> ModuleType:
     return _load_once("_ritual_recipe_command_check", os.path.join(ROOT, "tools", "recipe_command_check.py"))
 
 
+def _onboarding_doctrine_check() -> ModuleType:
+    return _load_once("_ritual_onboarding_doctrine_check", os.path.join(ROOT, "tools", "onboarding_doctrine_check.py"))
+
+
 def _chronicle_readme_check() -> ModuleType:
     return _load_once("_ritual_chronicle_readme_check", os.path.join(ROOT, "tools", "chronicle_readme_check.py"))
 
@@ -2764,6 +2768,33 @@ def check_recipe_commands(
     return cast(dict[str, object], mod.check_recipe_commands(**kwargs))
 
 
+def check_onboarding_doctrine(
+    onboarding_doctrine_path: str | None = None,
+    onboarding_doctrine_seam_engine_dir: str | None = None,
+) -> dict[str, object]:
+    """Task 2523 (Zashiki-Warashi): fold `onboarding_doctrine_check.py`'s
+    own live execution of ONBOARDING.md's two safe, falsifiable command
+    claims into the one hourly pass -- `check_recipe_commands`'s own
+    sibling, for the one onboarding page `RECIPES/*/README.md`'s own
+    check never covered. ONBOARDING.md is the page a stranger reads
+    BEFORE trusting Fencepost enough to connect a real account; its own
+    minute-1 pytest-count claim and minute-4 badge-shape claim had never
+    once been re-run and checked against live output -- the identical
+    "documented, not verified" gap `check_recipe_commands` already closed
+    for every recipe README. A real hit here (a stale claimed test
+    count, a claim whose own wording drifted past this check's regex, a
+    command that no longer runs) DOES flip `broken`: a stale number on
+    the public trust-building page is the same severity class
+    `check_recipe_commands` already assigns a dead copy-paste command."""
+    mod = _onboarding_doctrine_check()
+    kwargs = {}
+    if onboarding_doctrine_path is not None:
+        kwargs["onboarding_path"] = onboarding_doctrine_path
+    if onboarding_doctrine_seam_engine_dir is not None:
+        kwargs["seam_engine_dir"] = onboarding_doctrine_seam_engine_dir
+    return cast(dict[str, object], mod.check_onboarding_doctrine(**kwargs))
+
+
 def check_escape_sequences(orita_dir: str | None = None) -> dict[str, object]:
     """Task 434: fold escape_sequence_check.py's own repo-wide compile-
     time scan into the one block. Found by accident this hour running
@@ -2955,6 +2986,8 @@ def run_ritual_check(
     site_recipe_fencepost_root: str | None = None,
     recipe_command_fencepost_root: str | None = None,
     recipe_command_seam_engine_dir: str | None = None,
+    onboarding_doctrine_path: str | None = None,
+    onboarding_doctrine_seam_engine_dir: str | None = None,
     escape_sequence_orita_dir: str | None = None,
     metrics_field_completeness_metrics_path: str | None = None,
     metrics_field_completeness_tools_dir: str | None = None,
@@ -3134,6 +3167,10 @@ def run_ritual_check(
         recipe_command_fencepost_root=recipe_command_fencepost_root,
         recipe_command_seam_engine_dir=recipe_command_seam_engine_dir,
     )
+    onboarding_doctrine = check_onboarding_doctrine(
+        onboarding_doctrine_path=onboarding_doctrine_path,
+        onboarding_doctrine_seam_engine_dir=onboarding_doctrine_seam_engine_dir,
+    )
     escape_sequences = check_escape_sequences(orita_dir=escape_sequence_orita_dir)
     metrics_field_completeness = check_metrics_field_completeness(
         metrics_path=metrics_field_completeness_metrics_path,
@@ -3213,6 +3250,7 @@ def run_ritual_check(
         or (not recipe_readme["clean"])
         or (not site_recipe_readme["clean"])
         or (not recipe_commands["clean"])
+        or (not onboarding_doctrine["clean"])
         or (not strategy_true_positive["clean"])
         or (not gap_true_positive["clean"])
         or (not report_shipped["clean"])
@@ -3308,6 +3346,7 @@ def run_ritual_check(
         "recipe_readme": recipe_readme,
         "site_recipe_readme": site_recipe_readme,
         "recipe_commands": recipe_commands,
+        "onboarding_doctrine": onboarding_doctrine,
         "strategy_true_positive": strategy_true_positive,
         "gap_true_positive": gap_true_positive,
         "report_shipped": report_shipped,
@@ -3760,6 +3799,7 @@ def format_ritual_check(result: dict[str, Any]) -> str:
     lines.append("  " + _recipe_readme_check().format_result(result["recipe_readme"]))
     lines.append("  " + _site_recipe_check().format_result(result["site_recipe_readme"]))
     lines.append("  " + _recipe_command_check().format_result(result["recipe_commands"]))
+    lines.append("  " + _onboarding_doctrine_check().format_result(result["onboarding_doctrine"]))
     stp = result["strategy_true_positive"]
     if stp["clean"]:
         lines.append(
