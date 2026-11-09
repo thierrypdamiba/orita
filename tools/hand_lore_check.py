@@ -200,12 +200,7 @@ def _find_violations_uncached(orita_dir: str = DEFAULT_ORITA_DIR) -> list[dict[s
     the sanctioned lore (Iron Rule #2). Returns a list of violation
     records, empty when the rule has genuinely held. Never writes."""
     violations: list[dict[str, object]] = []
-    for path in _iter_public_files(orita_dir):
-        try:
-            with open(path, encoding="utf-8") as f:
-                text = f.read()
-        except (UnicodeDecodeError, OSError):
-            continue
+    for path, text in scan_files.read_public_files(orita_dir):
         for label, pattern, is_deny in _LORE_VIOLATIONS:
             for sent_start, sent_end in _sentences(text):
                 sentence = text[sent_start:sent_end]

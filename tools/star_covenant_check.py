@@ -159,12 +159,7 @@ def _find_violations_uncached(orita_dir: str = DEFAULT_ORITA_DIR) -> list[dict[s
     list of violation records, empty when the Star Covenant has genuinely
     held across everything the town has published. Never writes."""
     violations = []
-    for path in _iter_public_files(orita_dir):
-        try:
-            with open(path, encoding="utf-8") as f:
-                text = f.read()
-        except (UnicodeDecodeError, OSError):
-            continue
+    for path, text in scan_files.read_public_files(orita_dir):
         for label, pattern in _PATTERNS:
             for m in pattern.finditer(text):
                 if (

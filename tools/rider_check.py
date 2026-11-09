@@ -169,12 +169,7 @@ def _find_violations_uncached(orita_dir: str = DEFAULT_ORITA_DIR) -> list[dict[s
     violation shape their rider forbids. Returns a list of violation
     records, empty when every rider has genuinely held. Never writes."""
     violations = []
-    for path in _iter_public_files(orita_dir):
-        try:
-            with open(path, encoding="utf-8") as f:
-                text = f.read()
-        except (UnicodeDecodeError, OSError):
-            continue
+    for path, text in scan_files.read_public_files(orita_dir):
         for label, god_pattern, violation_pattern in _RIDERS:
             for sent_start, sent_end in _sentences(text):
                 sentence = text[sent_start:sent_end]

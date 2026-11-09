@@ -93,6 +93,58 @@ def iter_public_files(base_dir: str) -> Iterator[str]:
                 yield os.path.join(dirpath, name)
 
 
+_PUBLIC_FILE_TEXT_CACHE: dict[str, list[tuple[str, str]]] = {}
+
+
+def read_public_files(orita_dir: str) -> list[tuple[str, str]]:
+    """Walk + read + decode every public `.md`/`.html` file under
+    `orita_dir` exactly once per real path, memoized across every caller
+    in the same process. Task 2535: `star_covenant_check.py`,
+    `hand_lore_check.py`, and `rider_check.py` each called `iter_public_
+    files` and then opened and decoded every one of the town's (now
+    3,397, ~27.5MB) public files from disk independently -- the same
+    walk, the same bytes, read three separate times in a single
+    `ritual_check.py` run. Measured live (in-process, one `scan_files`
+    cache shared by all three callers): the walk-plus-read-plus-decode
+    itself is cheap on its own, ~0.12s per full pass -- so this closes a
+    real, honest-sized redundancy (two avoided full re-reads per run,
+    growing slowly as the corpus grows) but it is NOT what made
+    `ritual_check.py` exceed a 90s hand-picked timeout three consecutive
+    hours (tasks 2532-2534): a live `cProfile` run that hour (task 2535)
+    found the real run takes ~133s end to end and the three dominant
+    costs are elsewhere entirely -- `vault_leak_check` (~41s, the
+    already-optimized Rabin-Karp corpus scan Iron Rule #1 needs),
+    `onboarding_doctrine_check`'s own live `uv run pytest`/`badge`
+    subprocesses (~28s), and `recipe_command_check`'s 113 live recipe
+    subprocess runs (~19s) -- none of which is this function's concern.
+    See TOWN-OPERATIONS.md's own ritual_check.py note for that finding;
+    this docstring claims only what this one function actually saves.
+    Returns `(path, text)` pairs, skipping any file that fails to decode
+    as UTF-8 or disappears mid-walk -- the identical `except
+    (UnicodeDecodeError, OSError): continue` guard every one of those
+    three callers already carried inline, now run once instead of
+    three times. Never writes."""
+    key = os.path.realpath(orita_dir)
+    if key not in _PUBLIC_FILE_TEXT_CACHE:
+        pairs: list[tuple[str, str]] = []
+        for path in iter_public_files(orita_dir):
+            try:
+                with open(path, encoding="utf-8") as f:
+                    text = f.read()
+            except (UnicodeDecodeError, OSError):
+                continue
+            pairs.append((path, text))
+        _PUBLIC_FILE_TEXT_CACHE[key] = pairs
+    return list(_PUBLIC_FILE_TEXT_CACHE[key])
+
+
+def clear_public_file_cache() -> None:
+    """Drop the `read_public_files` cache -- a test fixture or a long-
+    lived process that edits the checkout mid-run needs this; a fresh
+    `ritual_check.py` invocation (a new process each hour) never does."""
+    _PUBLIC_FILE_TEXT_CACHE.clear()
+
+
 def find_pattern_violations(
     orita_dir: str,
     iter_files: Callable[[str], Iterator[str]],

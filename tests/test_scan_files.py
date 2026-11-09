@@ -61,6 +61,13 @@ ITER_SIBLINGS = [
     ("arcade_hero_check", "_iter_scan_files"),
 ]
 
+# Task 2535: these three (the ones carrying the bare _iter_public_files
+# walk-plus-open-plus-decode loop, not the two already routed through
+# find_pattern_violations) now read file content via the one shared
+# scan_files.read_public_files cache instead of opening every file
+# themselves a second/third time in the same process.
+READ_CACHE_SIBLINGS = ["hand_lore_check", "star_covenant_check", "rider_check"]
+
 CACHE_SIBLINGS = [
     "no_grading_check",
     "hand_lore_check",
@@ -135,6 +142,109 @@ class IterPublicFilesCase(unittest.TestCase):
     def test_nonexistent_dir_yields_nothing(self):
         found = list(sf.iter_public_files(os.path.join(self.tmp, "does-not-exist")))
         self.assertEqual(found, [])
+
+
+class ReadPublicFilesCase(unittest.TestCase):
+    """Task 2535: the shared read-cache `star_covenant_check.py`/
+    `hand_lore_check.py`/`rider_check.py` now all delegate to."""
+
+    def setUp(self):
+        self.tmp = tempfile.mkdtemp()
+        sf.clear_public_file_cache()
+        self.addCleanup(sf.clear_public_file_cache)
+
+    def test_returns_path_text_pairs_for_every_public_file(self):
+        with open(os.path.join(self.tmp, "a.md"), "w", encoding="utf-8") as f:
+            f.write("hello")
+        with open(os.path.join(self.tmp, "b.html"), "w", encoding="utf-8") as f:
+            f.write("world")
+        with open(os.path.join(self.tmp, "c.txt"), "w", encoding="utf-8") as f:
+            f.write("skipped, not a public extension")
+        pairs = dict(sf.read_public_files(self.tmp))
+        self.assertEqual(
+            {os.path.basename(p): t for p, t in pairs.items()},
+            {"a.md": "hello", "b.html": "world"},
+        )
+
+    def test_second_call_is_cached_not_a_fresh_disk_read(self):
+        path = os.path.join(self.tmp, "a.md")
+        with open(path, "w", encoding="utf-8") as f:
+            f.write("original")
+        first = dict(sf.read_public_files(self.tmp))
+        self.assertEqual(first[path], "original")
+        # Rewrite the file on disk -- a cached second call must still
+        # return the first call's own content, proving it never reopened
+        # the file, not merely that the content happens to match.
+        with open(path, "w", encoding="utf-8") as f:
+            f.write("changed after the first call")
+        second = dict(sf.read_public_files(self.tmp))
+        self.assertEqual(second[path], "original")
+
+    def test_clear_public_file_cache_forces_a_fresh_read(self):
+        path = os.path.join(self.tmp, "a.md")
+        with open(path, "w", encoding="utf-8") as f:
+            f.write("original")
+        sf.read_public_files(self.tmp)
+        with open(path, "w", encoding="utf-8") as f:
+            f.write("changed")
+        sf.clear_public_file_cache()
+        second = dict(sf.read_public_files(self.tmp))
+        self.assertEqual(second[path], "changed")
+
+    def test_returned_list_is_a_copy_not_a_shared_reference(self):
+        with open(os.path.join(self.tmp, "a.md"), "w", encoding="utf-8") as f:
+            f.write("x")
+        result = sf.read_public_files(self.tmp)
+        result.append(("bogus", "entry"))
+        self.assertEqual(len(sf.read_public_files(self.tmp)), 1)
+
+    def test_a_file_that_fails_to_decode_is_skipped_not_raised(self):
+        path = os.path.join(self.tmp, "a.md")
+        with open(path, "wb") as f:
+            f.write(b"\xff\xfe\x00\x01invalid utf-8")
+        pairs = sf.read_public_files(self.tmp)
+        self.assertEqual(pairs, [])
+
+    def test_nonexistent_dir_returns_empty(self):
+        self.assertEqual(sf.read_public_files(os.path.join(self.tmp, "nope")), [])
+
+
+class ReadCacheSiblingsDelegateCase(unittest.TestCase):
+    """Each of the three siblings' own `_find_violations_uncached` must
+    get its (path, text) pairs from `scan_files.read_public_files` --
+    proof of delegation (so the cache is actually shared across siblings
+    in one process), not just output that happens to match today."""
+
+    def test_every_sibling_delegates_exactly_once(self):
+        for name in READ_CACHE_SIBLINGS:
+            path = os.path.join(TOOLS, f"{name}.py")
+            with open(path, encoding="utf-8") as f:
+                tree = ast.parse(f.read())
+            calls = 0
+            for node in ast.walk(tree):
+                if isinstance(node, ast.FunctionDef) and node.name == "_find_violations_uncached":
+                    for sub in ast.walk(node):
+                        if (
+                            isinstance(sub, ast.Call)
+                            and isinstance(sub.func, ast.Attribute)
+                            and sub.func.attr == "read_public_files"
+                            and isinstance(sub.func.value, ast.Name)
+                            and sub.func.value.id == "scan_files"
+                        ):
+                            calls += 1
+                    with self.subTest(sibling=name):
+                        self.assertEqual(
+                            calls, 1,
+                            f"{name}._find_violations_uncached does not delegate to "
+                            "scan_files.read_public_files exactly once -- it may have "
+                            "gone back to opening files itself",
+                        )
+
+    def test_real_siblings_still_hold_their_own_pre_fix_output(self):
+        for name in READ_CACHE_SIBLINGS:
+            mod = _load(name, os.path.join(TOOLS, f"{name}.py"))
+            with self.subTest(sibling=name):
+                self.assertEqual(mod.find_violations(), [])
 
 
 class PathMemoizeCase(unittest.TestCase):
