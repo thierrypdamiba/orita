@@ -50,7 +50,8 @@ DEFAULT_HORIZON_HOURS = 24
 DEFAULT_CONFIDENCE = 0.7
 
 _LOG_LINE_RE = re.compile(
-    r"^(?P<date>\d{4}-\d{2}-\d{2}) (?P<time>\d{2}:\d[\dx]) UTC \| (?P<god>[^|]+) \| (?P<task>[^|]+) \| "
+    r"^(?P<date>\d{4}-\d{2}-\d{2}) (?P<time>\d{2}:\d[\dx])(?:/(?P<time_close>\d{2}:\d[\dx]))? UTC \| "
+    r"(?P<god>[^|]+) \| (?P<task>[^|]+) \| "
 )
 
 
@@ -60,12 +61,27 @@ class CadenceError(ValueError):
 
 def parse_buildlog(text: str) -> list[dict[str, str]]:
     """Every well-formed `BUILDLOG.md` line, parsed. Read-only: never
-    touches the file, takes its text and hands back plain dicts."""
+    touches the file, takes its text and hands back plain dicts.
+
+    A task that spans an hour boundary is sometimes logged with a
+    `HH:Mx/HH:Mx` span (e.g. "00:3x/01:0x UTC") instead of the usual
+    single `HH:Mx` -- real, live in the file (task 2523's own row), and
+    silently dropped before this fix the same way the obscured-minute
+    convention was before task 36's own fix: `_LOG_LINE_RE` required
+    exactly one timestamp and the span shape simply never matched.
+    `time_close`, when present, replaces `time` -- every single-timestamp
+    line already means "closed at this time", not "opened at this
+    time", so the span's second (close) timestamp is the one consistent
+    with that convention, not its first (open) one."""
     entries: list[dict[str, str]] = []
     for line in text.splitlines():
         m = _LOG_LINE_RE.match(line)
         if m:
-            entries.append(m.groupdict())
+            d = m.groupdict()
+            time_close = d.pop("time_close")
+            if time_close:
+                d["time"] = time_close
+            entries.append(d)
     return entries
 
 

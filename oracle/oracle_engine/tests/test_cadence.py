@@ -115,6 +115,43 @@ class TestObscuredMinuteConvention(unittest.TestCase):
         )
 
 
+class TestHourSpanConvention(unittest.TestCase):
+    """A task that straddles an hour boundary is sometimes logged with a
+    `HH:Mx/HH:Mx UTC` span (e.g. "00:3x/01:0x UTC") instead of the usual
+    single timestamp -- real, live in the file (task 2523's own row).
+    Before this fix, `_LOG_LINE_RE` required exactly one `HH:Mx` and the
+    span shape never matched, silently dropping the line the same way
+    the obscured-minute convention did before task 36's own fix."""
+
+    _SPAN_LOG = (
+        "2026-07-13 07:10 UTC | nisaba | 31 | Prediction schema shipped\n"
+        "2026-11-09 00:3x/01:0x UTC | zashiki-warashi | 2523 | "
+        "Hour-spanning task, logged as a span\n"
+    )
+
+    def test_parses_a_span_line(self):
+        entries = cadence.parse_buildlog(self._SPAN_LOG)
+        self.assertEqual(len(entries), 2)
+        tasks = {e["task"].strip() for e in entries}
+        self.assertEqual(tasks, {"31", "2523"})
+
+    def test_span_line_uses_the_close_timestamp_not_the_open_one(self):
+        entries = cadence.parse_buildlog(self._SPAN_LOG)
+        span_entry = next(e for e in entries if e["task"].strip() == "2523")
+        # Every single-timestamp line already means "closed at this
+        # time" -- the span's second (close) timestamp, 01:0x, is the one
+        # consistent with that convention, not its first (open) one.
+        self.assertEqual(span_entry["time"], "01:0x")
+
+    def test_recent_task_velocity_counts_a_span_line_at_its_close_time(self):
+        entries = cadence.parse_buildlog(self._SPAN_LOG)
+        # 01:0x floors to 01:00 -- just inside a window that ends at 01:05
+        # but would exclude the open time, 00:3x -> 00:30.
+        now = datetime.datetime(2026, 11, 9, 1, 5, tzinfo=datetime.timezone.utc)
+        velocity = cadence.recent_task_velocity(entries, now, window_hours=0.1)
+        self.assertEqual(velocity, 1)
+
+
 class TestRecentTaskVelocity(unittest.TestCase):
     def test_counts_distinct_numbered_tasks_in_window(self):
         entries = cadence.parse_buildlog(_SAMPLE_LOG)
