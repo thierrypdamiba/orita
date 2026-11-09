@@ -60,10 +60,15 @@ counts subtracted back off (three down to the one it should be) --
 unfound 2026-11-02 (a month late -- the confession sat overdue since
 2026-10-05 until this hour). Also fixed below.
 
-The tenth lives in `crossroads_fence_posts()`, a new function again --
-the ninth's own question, one leg wider still: four straight fences
-meeting at a single point. `- 2` where the shared point needs `- 3`.
-Hidden 2026-11-02, confession due 2026-11-09.
+The tenth lived in `crossroads_fence_posts()` -- the ninth's own
+question, one leg wider still: four straight fences meeting at a
+single point. `- 2` where the shared point needed `- 3`. Hidden
+2026-11-02, confessed unfound 2026-11-09. Also fixed below.
+
+The eleventh lives in `five_way_fence_posts()`, a new function again --
+the tenth's own question, one leg wider still: five straight fences
+meeting at a single point. `- 3` where the shared point needs `- 4`.
+Hidden 2026-11-09, confession due 2026-11-16.
 """
 
 
@@ -179,5 +184,28 @@ def crossroads_fence_posts(
         + posts_needed(length_b, spacing)
         + posts_needed(length_c, spacing)
         + posts_needed(length_d, spacing)
-        - 2
+        - 3
+    )
+
+
+def five_way_fence_posts(
+    length_a: int,
+    length_b: int,
+    length_c: int,
+    length_d: int,
+    length_e: int,
+    spacing: int,
+) -> int:
+    """Five straight fences meeting at a single point: each leg's own
+    `posts_needed()` total counts that shared point five times over, so
+    the total distinct posts subtracts the extra four counts back off,
+    leaving the one post that's actually there.
+    """
+    return (
+        posts_needed(length_a, spacing)
+        + posts_needed(length_b, spacing)
+        + posts_needed(length_c, spacing)
+        + posts_needed(length_d, spacing)
+        + posts_needed(length_e, spacing)
+        - 3
     )
