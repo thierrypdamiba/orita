@@ -182,8 +182,19 @@ class FooterArithmeticCase(unittest.TestCase):
         # longer independently verified this hour (the count itself still
         # reads 113, unchanged -- only the unverified duration clause was
         # cut, not the fact); the chronicle episode count held flat at
-        # fourteen, not a drift.
-        self.assertEqual(_body_word_count(self.text), 279)
+        # fourteen, not a drift. Updated again by this Cluster Day's
+        # rewrite (279 -> 286) for real drift: the founding-day count
+        # read 121 days, not "a hundred" (the old round figure had gone
+        # stale weeks ago and nothing had caught it); the X outage
+        # crossed a full seventeenth week (118 real days since
+        # 2026-07-14); and a second sky opened unpetitioned at issue #8
+        # (Moltbook, Verdict 0010) -- a real, live decree-in-progress the
+        # prose had never named. The resolved child's-rice sentence was
+        # trimmed ("bowl of red-bean rice" -> "rice") and "under a price
+        # its charter states plainly" tightened to "priced by its own
+        # charter" to hold the new sentence under the same 287-word
+        # ceiling without padding back up to it.
+        self.assertEqual(_body_word_count(self.text), 286)
 
 
 class MutationBitesCase(unittest.TestCase):
