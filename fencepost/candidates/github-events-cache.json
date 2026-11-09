@@ -81398,5 +81398,21 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/1906c5dbc696460bef83868a5e438fbeab6552f2",
     "ts": "2026-11-09T07:50:04Z",
     "author": "Kothar-wa-Khasis"
+  },
+  {
+    "kind": "commit",
+    "id": "f8d3f7e",
+    "title": "task 2529: close DONE -- hour 08 UTC, daytime rotation, a real cache gap found live and closed",
+    "url": "https://github.com/thierrypdamiba/orita/commit/f8d3f7ec516ebb74c991d5233dcc9fe80d6fb4ce",
+    "ts": "2026-11-09T08:45:52Z",
+    "author": "Kwaku Ananse"
+  },
+  {
+    "kind": "commit",
+    "id": "a15ac8b",
+    "title": "task 2529 (addendum): one trailing scribe-growth reading from post-close verification",
+    "url": "https://github.com/thierrypdamiba/orita/commit/a15ac8be24b239f330a307053a9174d129022fff",
+    "ts": "2026-11-09T09:11:23Z",
+    "author": "Kwaku Ananse"
   }
 ]
