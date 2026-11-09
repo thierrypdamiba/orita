@@ -494,7 +494,7 @@ class DocstringClaimDoctrineCase(unittest.TestCase):
     def test_docstring_claim_equals_the_real_live_check_count(self):
         self.assertEqual(src.claimed_check_count(), self._real_check_count())
 
-    def test_real_check_count_is_currently_89(self):
+    def test_real_check_count_is_currently_90(self):
         # Regression pin: task 121 shipped this module claiming 27. Five
         # more check_* functions (this module's own check_ritual_completeness
         # fold-in among them, plus task 145's check_toolkits_in_use) were
@@ -613,8 +613,13 @@ class DocstringClaimDoctrineCase(unittest.TestCase):
         # to 89, docstring updated in the same commit -- the Iron Rule
         # #3 authorship-drift catch, wired in the same hour it shipped
         # rather than left to sit unwired the way task 2282's own
-        # checker did.
-        self.assertEqual(self._real_check_count(), 89)
+        # checker did. Task 2523's check_onboarding_doctrine moved this
+        # from 89 to 90, but that commit never bumped this pin nor
+        # ritual_completeness_check.py's own docstring claim -- the exact
+        # "documented, not verified" lapse this module exists to catch,
+        # caught cold by dawn-run itself the next hour (task 2525
+        # corrected both the docstring and this pin in the same commit).
+        self.assertEqual(self._real_check_count(), 90)
 
     def test_stale_27_claim_would_have_been_flagged_against_todays_real_count(self):
         # Mutation-based hand-verification: reconstruct the module's own
