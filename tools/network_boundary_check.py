@@ -2,7 +2,7 @@
 """Task 163. Zashiki-Warashi's first real module.
 
 A phrase ran through eighteen files in `tools/` when this module first
-swept them at task 163; thirty-eight carry it today -- twenty more
+swept them at task 163; thirty-nine carry it today -- twenty-one more
 `tools/*_check.py` files (`duplicate_regex_check.py`,
 `gateway_toolset_check.py`, `good_first_issue_check.py`,
 `metrics_field_completeness_check.py`, `nyx_traffic_check.py`,
@@ -12,7 +12,8 @@ swept them at task 163; thirty-eight carry it today -- twenty more
 `one_action_check.py`, `consent_template_scope_check.py`,
 `book_of_the_gate_check.py`, `ranking_replay_check.py`,
 `scopes_md_consent_sync_check.py`, `fork_gate_check.py`,
-`daytime_rotation_check.py`, `commit_author_check.py`) have
+`daytime_rotation_check.py`, `commit_author_check.py`,
+`onboarding_doctrine_check.py`) have
 independently repeated the same "no network" claim since, each caught by
 this module's own live discovery with no docstring edit required --
 which is the whole point of never hand-typing the list below.

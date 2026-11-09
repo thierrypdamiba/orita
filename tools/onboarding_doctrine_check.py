@@ -52,6 +52,7 @@ Usage:
 from __future__ import annotations
 
 import re
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -85,6 +86,16 @@ _REAL_BADGE_SHAPE_RE = re.compile(r"\d+/\d+ tools read-only")
 
 _DEFAULT_PYTEST_COMMAND = ["uv", "run", "python", "-m", "pytest", "-q"]
 _DEFAULT_BADGE_COMMAND = ["uv", "run", "python", "-m", "seam_engine.badge"]
+
+
+def _invokes_uv(command: list[str]) -> bool:
+    """True when `command`'s own first word is the literal `uv` binary --
+    mirrors `recipe_command_check.py`'s `_UV_INVOCATION_RE` boundary
+    (task 404/588) for this module's own fixed-list commands rather than
+    a documented shell string. Only a command that actually calls `uv`
+    is ever skipped for `uv`'s absence; a test's own `python3 -c ...`
+    override still runs and is judged for real regardless of `uv`."""
+    return bool(command) and command[0] == "uv"
 
 
 _RESULTS_CACHE: dict[tuple[str, str, float, tuple[str, ...], tuple[str, ...]], dict[str, object]] = {}
@@ -161,6 +172,27 @@ def _check_onboarding_doctrine_uncached(
     mechanism, since this check's two commands are fixed strings rather
     than a per-recipe documented one) as `check_recipe_commands`'s own
     `_write_recipe`/`_write_recipe_with_command` fixture doors.
+
+    **Task 2525 fix:** `dawn-run.yml`'s `the-oath` job (where this
+    check's own `run_ritual_check()` fold gets exercised) deliberately
+    installs only `PyYAML`/`httpx` (task 404's lean-root boundary) --
+    it never installs `uv`. Both default commands above start with
+    `uv run`, so a bare subprocess call there raised `FileNotFoundError`
+    on every real hourly `the-oath` run since this check shipped (task
+    2523), which this module then recorded as a genuine `problems`
+    entry -- misreporting an environment gap as a doctrine violation,
+    flipping `clean=False`/`broken=True` for every FoldCase test in
+    `tests/test_ritual_check.py` that calls `run_ritual_check()` without
+    overriding `onboarding_doctrine_*`. The exact same boundary
+    `recipe_command_check.py` already solved at task 404/588 with its
+    own per-command `skipped_no_uv` door: only a command that actually
+    invokes `uv` (`_invokes_uv()` above) is skipped when `uv` isn't on
+    `PATH`; a test's own non-`uv` override command still runs and is
+    judged for real either way, so the fixture suite's failure-shape
+    coverage is untouched. `the-seam-oath` job (which does install `uv`)
+    and any real hourly `ritual_check.py` run in a full dev environment
+    both still execute both commands for real -- neither ever hits the
+    skip.
     """
     if pytest_command is None:
         pytest_command = _DEFAULT_PYTEST_COMMAND
@@ -178,7 +210,9 @@ def _check_onboarding_doctrine_uncached(
 
     text = onboarding_path.read_text(encoding="utf-8")
 
+    uv_present = shutil.which("uv") is not None
     problems: list[dict[str, str]] = []
+    skipped_no_uv: list[str] = []
 
     # -- claim 1: the pytest count ----------------------------------
     claimed_match = _CLAIMED_TEST_COUNT_RE.search(text)
@@ -194,39 +228,43 @@ def _check_onboarding_doctrine_uncached(
     else:
         claimed_count = int(claimed_match.group(1))
 
-    try:
-        proc = subprocess.run(
-            pytest_command,
-            cwd=seam_engine_dir,
-            capture_output=True,
-            text=True,
-            timeout=timeout,
-        )
-    except (subprocess.TimeoutExpired, FileNotFoundError) as exc:
-        problems.append({
-            "claim": "pytest_count",
-            "reason": f"command did not complete: {exc}",
-        })
+    if not uv_present and _invokes_uv(pytest_command):
+        skipped_no_uv.append("pytest_count")
         real_count = None
     else:
-        if proc.returncode != 0:
+        try:
+            proc = subprocess.run(
+                pytest_command,
+                cwd=seam_engine_dir,
+                capture_output=True,
+                text=True,
+                timeout=timeout,
+            )
+        except (subprocess.TimeoutExpired, FileNotFoundError) as exc:
             problems.append({
                 "claim": "pytest_count",
-                "reason": f"'uv run python -m pytest -q' exited "
-                f"{proc.returncode}: {proc.stdout.strip()[-2000:]}",
+                "reason": f"command did not complete: {exc}",
             })
             real_count = None
         else:
-            real_match = _REAL_TEST_COUNT_RE.search(proc.stdout)
-            if real_match is None:
+            if proc.returncode != 0:
                 problems.append({
                     "claim": "pytest_count",
-                    "reason": "command succeeded but its own output never "
-                    f"names an 'N passed' count: {proc.stdout.strip()[-500:]}",
+                    "reason": f"'uv run python -m pytest -q' exited "
+                    f"{proc.returncode}: {proc.stdout.strip()[-2000:]}",
                 })
                 real_count = None
             else:
-                real_count = int(real_match.group(1))
+                real_match = _REAL_TEST_COUNT_RE.search(proc.stdout)
+                if real_match is None:
+                    problems.append({
+                        "claim": "pytest_count",
+                        "reason": "command succeeded but its own output never "
+                        f"names an 'N passed' count: {proc.stdout.strip()[-500:]}",
+                    })
+                    real_count = None
+                else:
+                    real_count = int(real_match.group(1))
 
     if claimed_count is not None and real_count is not None and claimed_count != real_count:
         problems.append({
@@ -244,6 +282,8 @@ def _check_onboarding_doctrine_uncached(
             '"N/N tools read-only"\' claim at all -- this check has '
             "nothing to verify against",
         })
+    elif not uv_present and _invokes_uv(badge_command):
+        skipped_no_uv.append("badge_shape")
     else:
         try:
             badge_proc = subprocess.run(
@@ -273,20 +313,35 @@ def _check_onboarding_doctrine_uncached(
                     f"promises: {badge_proc.stdout.strip()[-500:]}",
                 })
 
+    if skipped_no_uv:
+        status = "unavailable" if len(skipped_no_uv) == 2 else "partially_unavailable"
+    else:
+        status = "checked"
+
     return {
         "clean": not problems,
-        "status": "checked",
+        "status": status,
         "claimed_test_count": claimed_count,
         "real_test_count": real_count,
         "problems": problems,
+        "skipped_no_uv": skipped_no_uv,
     }
 
 
 def format_result(result: dict[str, object]) -> str:
     problems = cast("list[dict[str, str]]", result.get("problems", []))
-    if result.get("status") == "missing_file":
+    status = result.get("status")
+    if status == "missing_file":
         return "onboarding doctrine: BROKEN -- " + "; ".join(p["reason"] for p in problems)
     if result["clean"]:
+        skipped = cast("list[str]", result.get("skipped_no_uv", []))
+        if status == "unavailable":
+            return "onboarding doctrine: clean (uv unavailable in this environment, both claims skipped, nothing to execute)"
+        if status == "partially_unavailable":
+            return (
+                f"onboarding doctrine: clean ({', '.join(skipped)} skipped -- uv "
+                f"unavailable; remaining claim(s) matched a live rerun)"
+            )
         return (
             f"onboarding doctrine: clean (ONBOARDING.md's minute-1 pytest "
             f"claim -- '{result['claimed_test_count']} passed' -- and "

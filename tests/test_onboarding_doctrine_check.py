@@ -10,6 +10,7 @@ import os
 import sys
 import tempfile
 import unittest
+from unittest import mock
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "tools"))
@@ -152,6 +153,82 @@ class CheckOnboardingDoctrineCase(unittest.TestCase):
         self.assertEqual(result["status"], "missing_file")
 
 
+class NoUvSkipCase(unittest.TestCase):
+    """Task 2525. `dawn-run.yml`'s `the-oath` job never installs `uv` --
+    the identical boundary `recipe_command_check.py` already solved at
+    task 404/588 with its own per-command `skipped_no_uv` door, which
+    `check_onboarding_doctrine` (task 2523) never copied: both its
+    default commands start with `uv run`, so a bare subprocess call
+    there raised `FileNotFoundError` on every real `the-oath` run,
+    misreporting an environment gap as `clean=False`/`broken=True` for
+    every FoldCase in `tests/test_ritual_check.py` that calls
+    `run_ritual_check()` without overriding `onboarding_doctrine_*`.
+    `shutil.which("uv")` is mocked to `None` here so these tests prove
+    the skip without needing `uv` actually absent from this machine."""
+
+    def setUp(self):
+        self._tmp = tempfile.TemporaryDirectory()
+        self.onboarding_path = os.path.join(self._tmp.name, "ONBOARDING.md")
+        self.seam_engine_dir = self._tmp.name
+        with open(self.onboarding_path, "w", encoding="utf-8") as f:
+            f.write(_GOOD_ONBOARDING_TEXT)
+
+    def tearDown(self):
+        self._tmp.cleanup()
+
+    def test_both_uv_commands_are_skipped_clean_when_uv_is_absent(self):
+        with mock.patch.object(odc.shutil, "which", return_value=None):
+            result = odc.check_onboarding_doctrine(
+                onboarding_path=self.onboarding_path,
+                seam_engine_dir=self.seam_engine_dir,
+                timeout=15,
+                # Deliberately the REAL default `uv run ...` commands --
+                # if the skip didn't fire, these would raise
+                # FileNotFoundError on any machine without `uv` on PATH,
+                # the exact regression this test exists to pin.
+                pytest_command=["uv", "run", "python", "-m", "pytest", "-q"],
+                badge_command=["uv", "run", "python", "-m", "seam_engine.badge"],
+            )
+        self.assertTrue(result["clean"], result)
+        self.assertEqual(result["status"], "unavailable")
+        self.assertEqual(result["problems"], [])
+        self.assertEqual(set(result["skipped_no_uv"]), {"pytest_count", "badge_shape"})
+        self.assertIsNone(result["real_test_count"])
+        self.assertEqual(result["claimed_test_count"], 42)
+
+    def test_a_non_uv_override_still_runs_for_real_even_when_uv_is_absent(self):
+        # The skip is per-command, not a blanket process-wide early
+        # return: a test's own python3 stand-in command must still run
+        # and be judged for real regardless of uv's absence, the same
+        # per-command boundary recipe_command_check.py already holds.
+        with mock.patch.object(odc.shutil, "which", return_value=None):
+            result = odc.check_onboarding_doctrine(
+                onboarding_path=self.onboarding_path,
+                seam_engine_dir=self.seam_engine_dir,
+                timeout=15,
+                pytest_command=_FAKE_PYTEST_WRONG_COUNT,
+                badge_command=_FAKE_BADGE_OK,
+            )
+        self.assertFalse(result["clean"], result)
+        self.assertEqual(result["status"], "checked")
+        self.assertEqual(result["skipped_no_uv"], [])
+        claims = [p["claim"] for p in result["problems"]]
+        self.assertIn("pytest_count", claims)
+
+    def test_only_the_uv_command_is_skipped_when_the_other_is_overridden(self):
+        with mock.patch.object(odc.shutil, "which", return_value=None):
+            result = odc.check_onboarding_doctrine(
+                onboarding_path=self.onboarding_path,
+                seam_engine_dir=self.seam_engine_dir,
+                timeout=15,
+                pytest_command=["uv", "run", "python", "-m", "pytest", "-q"],
+                badge_command=_FAKE_BADGE_OK,
+            )
+        self.assertTrue(result["clean"], result)
+        self.assertEqual(result["status"], "partially_unavailable")
+        self.assertEqual(result["skipped_no_uv"], ["pytest_count"])
+
+
 class FormatResultCase(unittest.TestCase):
     def test_clean_line_names_the_claimed_count(self):
         line = odc.format_result({"clean": True, "claimed_test_count": 4584})
@@ -176,6 +253,28 @@ class FormatResultCase(unittest.TestCase):
         })
         self.assertIn("/nope.md", line)
 
+    def test_unavailable_line_names_uv_absence_not_a_doctrine_break(self):
+        line = odc.format_result({
+            "clean": True,
+            "status": "unavailable",
+            "problems": [],
+            "skipped_no_uv": ["pytest_count", "badge_shape"],
+        })
+        self.assertIn("clean", line)
+        self.assertIn("uv", line)
+        self.assertNotIn("BROKEN", line)
+
+    def test_partially_unavailable_line_names_the_skipped_claim(self):
+        line = odc.format_result({
+            "clean": True,
+            "status": "partially_unavailable",
+            "problems": [],
+            "skipped_no_uv": ["pytest_count"],
+        })
+        self.assertIn("pytest_count", line)
+        self.assertIn("clean", line)
+        self.assertNotIn("BROKEN", line)
+
 
 class LiveRealOnboardingCase(unittest.TestCase):
     """The same live, unmocked discipline `test_recipe_command_check.py`'s
@@ -185,13 +284,28 @@ class LiveRealOnboardingCase(unittest.TestCase):
     seam_engine.badge` commands, in this repo's own already-synced
     environment. Slow (a real cold pytest run, ~30s) on purpose -- this
     is the check that proves the doc is honest right now, not a stand-in
-    for it."""
+    for it.
+
+    Task 2525: `uv` genuinely isn't installed in `dawn-run.yml`'s
+    `the-oath` job (this test's own root `tests/` suite runs there) --
+    the identical boundary `LiveRealRepoCase` above already names for
+    `check_recipe_commands`. Either both commands actually ran clean, or
+    both were honestly skipped for that one documented environment
+    reason (`status` is `unavailable`, `skipped_no_uv` names both
+    claims); both are `clean`. A real `claimed_test_count` !=
+    `real_test_count` mismatch WITHOUT a skip recorded would still mean
+    the doc genuinely drifted -- that stays a real failure here, not
+    silently waved through."""
 
     def test_the_real_onboarding_page_matches_a_real_live_rerun(self):
         result = odc.check_onboarding_doctrine()
         self.assertTrue(result["clean"], result)
         self.assertIsNotNone(result["claimed_test_count"])
-        self.assertEqual(result["claimed_test_count"], result["real_test_count"])
+        if result["status"] == "checked":
+            self.assertEqual(result["claimed_test_count"], result["real_test_count"])
+        else:
+            self.assertIn(result["status"], ("unavailable", "partially_unavailable"))
+            self.assertIn("pytest_count", result["skipped_no_uv"])
 
 
 if __name__ == "__main__":
