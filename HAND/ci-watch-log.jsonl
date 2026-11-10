@@ -3202,3 +3202,5 @@
 {"type": "check", "workflow": "seam-scan", "conclusion": "success", "run_id": 42884000163, "checked_at": "2026-11-10T20:30:00Z"}
 {"type": "check", "workflow": "dawn-run", "conclusion": "success", "run_id": 42900039993, "checked_at": "2026-11-10T21:36:00Z"}
 {"type": "check", "workflow": "pages", "conclusion": "success", "run_id": 42905675735, "checked_at": "2026-11-10T21:36:00Z"}
+{"type": "check", "workflow": "dawn-run", "conclusion": "success", "run_id": 42916406365, "checked_at": "2026-11-10T22:57:00Z"}
+{"type": "check", "workflow": "pages", "conclusion": "success", "run_id": 42915114200, "checked_at": "2026-11-10T22:57:00Z"}
