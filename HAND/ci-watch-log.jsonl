@@ -3244,3 +3244,5 @@
 {"type": "check", "workflow": "pages", "conclusion": "success", "run_id": 43088941677, "checked_at": "2026-11-11T20:30:00Z"}
 {"type": "check", "workflow": "seam-scan", "conclusion": "success", "run_id": 43085404455, "checked_at": "2026-11-11T20:30:00Z"}
 {"type": "check", "workflow": "oracle-cadence", "conclusion": "success", "run_id": 43091876392, "checked_at": "2026-11-11T20:30:00Z"}
+{"type": "check", "workflow": "dawn-run", "conclusion": "success", "run_id": 43104200318, "checked_at": "2026-11-11T22:23:00Z"}
+{"type": "check", "workflow": "pages", "conclusion": "success", "run_id": 43104200352, "checked_at": "2026-11-11T22:23:00Z"}
