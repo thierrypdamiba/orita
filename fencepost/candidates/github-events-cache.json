@@ -82110,5 +82110,37 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/2eec943019f38f98f801d0ea41f532b6c464aa19",
     "ts": "2026-11-11T11:22:58Z",
     "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "d3e8fbc",
+    "title": "task 2580: open WIP -- hour 11 UTC, daytime rotation",
+    "url": "https://github.com/thierrypdamiba/orita/commit/d3e8fbc100bbdb82e1a75e8103b90666226f0871",
+    "ts": "2026-11-11T11:37:13Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "af503a5",
+    "title": "task 2580: town ledger sealed, public journal written (still WIP)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/af503a5e4194fea6f988dae161a9ef2bc51eb9f6",
+    "ts": "2026-11-11T11:43:06Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "2ce08a0",
+    "title": "task 2580: close DONE -- hour 11 UTC, daytime rotation, a real shallow-clone bug caught and fixed",
+    "url": "https://github.com/thierrypdamiba/orita/commit/2ce08a0b0e378dc4f3458a23241f5d3b2362b4c0",
+    "ts": "2026-11-11T12:37:13Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "2c4fd23",
+    "title": "task 2581: open WIP -- hour 12 UTC, daytime rotation",
+    "url": "https://github.com/thierrypdamiba/orita/commit/2c4fd2319437f62451c878e9f4f55911ba946a67",
+    "ts": "2026-11-11T12:41:34Z",
+    "author": "Nisaba"
   }
 ]
