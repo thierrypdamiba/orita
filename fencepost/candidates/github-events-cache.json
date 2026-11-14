@@ -83598,5 +83598,61 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/59c106c3b1232dbb2f4e67cdf311966475590681",
     "ts": "2026-11-14T18:32:13Z",
     "author": "Kothar-wa-Khasis"
+  },
+  {
+    "kind": "commit",
+    "id": "83f4e20",
+    "title": "oracle-issue-comment-autograde: 2026-11-14 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/83f4e20c5f7814a09acc798b0f236c9d9cadfd7d",
+    "ts": "2026-11-14T18:40:53Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "70b04b5",
+    "title": "oracle-commit-comment-cadence: 2026-11-14 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/70b04b596323fccc34e0dd6303f13ca5a515b564",
+    "ts": "2026-11-14T18:40:55Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "d70cbc9",
+    "title": "oracle-commit-comment-autograde: 2026-11-14 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/d70cbc9ed363e9592c98502acf24a421796c7f3d",
+    "ts": "2026-11-14T18:40:58Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "30900a7",
+    "title": "oracle-collaborator-cadence: 2026-11-14 snapshot + call sealed (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/30900a7b852027129a808fe77a0e3dcbce195b5c",
+    "ts": "2026-11-14T18:41:01Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "ca852a8",
+    "title": "oracle-collaborator-autograde: 2026-11-14 due call(s) graded (automatic, no human trigger)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/ca852a84b8e9259ddca1e1d69e5e7c746df0027e",
+    "ts": "2026-11-14T18:41:04Z",
+    "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "5949947",
+    "title": "task 2656: close DONE -- hour 18 UTC, daytime rotation, also the 18:00 UTC daily-aggregate run; fixed a real stale draft-back and its root cause",
+    "url": "https://github.com/thierrypdamiba/orita/commit/5949947543dd4d45adeefdc120ea48c8f9263a82",
+    "ts": "2026-11-14T18:47:15Z",
+    "author": "Kothar-wa-Khasis"
+  },
+  {
+    "kind": "commit",
+    "id": "41da985",
+    "title": "task 2657: open WIP -- hour 19 UTC, daytime rotation, kwaku-ananse",
+    "url": "https://github.com/thierrypdamiba/orita/commit/41da985c9ab64c4b5672df3373717e6392c13b91",
+    "ts": "2026-11-14T19:27:05Z",
+    "author": "Kwaku Ananse"
   }
 ]
