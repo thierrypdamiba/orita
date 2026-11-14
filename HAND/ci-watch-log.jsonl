@@ -3343,3 +3343,5 @@
 {"type": "check", "workflow": "pages", "conclusion": "success", "run_id": 43562149529, "checked_at": "2026-11-14T06:24:00Z"}
 {"type": "check", "workflow": "dawn-run", "conclusion": "success", "run_id": 43566826384, "checked_at": "2026-11-14T07:27:30Z"}
 {"type": "check", "workflow": "pages", "conclusion": "success", "run_id": 43566826397, "checked_at": "2026-11-14T07:27:30Z"}
+{"type": "check", "workflow": "dawn-run", "conclusion": "failure", "run_id": 43571635548, "checked_at": "2026-11-14T08:28:00Z"}
+{"type": "check", "workflow": "pages", "conclusion": "success", "run_id": 43571635552, "checked_at": "2026-11-14T08:28:00Z"}
