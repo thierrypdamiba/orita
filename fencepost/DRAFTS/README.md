@@ -16,7 +16,10 @@ latest sealed entry as an email-to-self draft or a Notion page, and writes the
 **exact bytes** a live draft would carry into `DRAFTS/YYYY-MM-DD-<channel>.md`
 — every file here starts with `<!-- LOCAL PREVIEW ONLY -->` on purpose. This
 lets anyone read, byte for byte, what the draft-back will say before a single
-live account is connected.
+live account is connected. `seam-scan.yml`'s daily cron runs this step itself
+now (task 2656) — the committed file for today's date should always match a
+fresh `render_preview()` off the live ledger tip; `tools/draftback_freshness_check.py`
+is the standing check that catches it if it ever drifts again.
 
 ## Why it stops here — WIP, on iron
 
