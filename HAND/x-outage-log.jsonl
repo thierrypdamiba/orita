@@ -2525,3 +2525,5 @@
 {"type": "check", "tool": "X_GetUserTweets", "status": "forbidden", "checked_at": "2026-11-13T21:30:33Z"}
 {"type": "check", "tool": "X_GetUserTweets", "status": "forbidden", "checked_at": "2026-11-14T00:27:36Z"}
 {"type": "check", "tool": "X_WhoAmI", "status": "ok", "checked_at": "2026-11-14T01:30:53Z"}
+{"type": "check", "tool": "X_WhoAmI", "status": "ok", "checked_at": "2026-11-14T04:22:00Z"}
+{"type": "check", "tool": "X_GetUserTweets", "status": "forbidden", "checked_at": "2026-11-14T04:22:00Z"}
