@@ -919,6 +919,32 @@ def main(argv: list[str] | None = None) -> int:
         path.write_text(report, encoding="utf-8")
         print(f"\nWritten: {path}", file=sys.stderr)
 
+        # Task 2675's own real finding: this is the one place a report
+        # ever seals for real (the daily cron's `--write`, or an hourly
+        # ritual's manual reseal alike), but nothing here kept
+        # fencepost/DRAFTS/<date>-{email,notion}.md in step with it --
+        # seam-scan.yml's own cron-only draftback regeneration (task 1367)
+        # only covers its own daily tick, so a reseal from any OTHER path
+        # (as task 2674's own hour did) left the committed drafts stale
+        # for the rest of the day. That silently broke dawn-run's
+        # `the-oath` job (test_draftback_freshness_check.py's live test,
+        # cascading into run_ritual_check()'s shared `broken` flag across
+        # dozens of unrelated FoldCase tests) the very next time the full
+        # suite ran. Regenerating both channel previews for this exact
+        # `sealed` right here, every time a report is actually written,
+        # closes the gap at its source instead of at one more call site.
+        # Local import (not module-level) because draftback.py already
+        # imports this module at import time -- a top-level import here
+        # would be circular.
+        from seam_engine import draftback
+
+        draft_dir = draftback.drafts_dir(out_base)
+        draft_dir.mkdir(parents=True, exist_ok=True)
+        for channel in ("email", "notion"):
+            draft_path = draft_dir / f"{date}-{channel}.md"
+            draft_path.write_text(draftback.render_preview(sealed, channel), encoding="utf-8")
+        print(f"Drafts kept in step: {draft_dir}/{date}-{{email,notion}}.md", file=sys.stderr)
+
     return 0
 
 
