@@ -63,6 +63,37 @@ class TestFetchCommitCount(unittest.TestCase):
     def test_empty_repo_is_zero(self):
         self.assertEqual(commit_cadence.fetch_commit_count(http_get=lambda url: []), 0)
 
+    def test_a_422_past_the_endpoints_own_pagination_limit_ends_it_like_a_short_page(self):
+        """Task 2679's real failure: GitHub's commits-list endpoint answers
+        a `page` run past the end of a large repo's history with a 4xx, not
+        an empty list. The prior pages' commits must still count."""
+        import httpx
+
+        calls = []
+
+        def fake_get(url):
+            calls.append(url)
+            page = int(url.rsplit("page=", 1)[1])
+            if page <= 2:
+                return [{"sha": f"r{i}"} for i in range(100)]
+            request = httpx.Request("GET", url)
+            response = httpx.Response(422, request=request)
+            raise httpx.HTTPStatusError("422", request=request, response=response)
+
+        self.assertEqual(commit_cadence.fetch_commit_count(http_get=fake_get), 200)
+        self.assertEqual(len(calls), 3)
+
+    def test_a_non_422_http_error_still_raises(self):
+        import httpx
+
+        def fake_get(url):
+            request = httpx.Request("GET", url)
+            response = httpx.Response(503, request=request)
+            raise httpx.HTTPStatusError("503", request=request, response=response)
+
+        with self.assertRaises(httpx.HTTPStatusError):
+            commit_cadence.fetch_commit_count(http_get=fake_get)
+
 
 class TestSnapshots(unittest.TestCase):
     def test_load_snapshots_of_a_missing_file_is_empty(self):

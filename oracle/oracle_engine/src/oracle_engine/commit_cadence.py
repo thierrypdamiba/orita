@@ -74,11 +74,32 @@ def fetch_commit_count(repo: str = DEFAULT_REPO, http_get: Callable[[str], Any] 
     /`branch_cadence`, this endpoint returns a paginated LIST, not a single
     count field, so this function pages through it rather than trusting one
     response is everything. Same pluggable `http_get` shape every other
-    cadence uses, kept off the real network in tests."""
+    cadence uses, kept off the real network in tests.
+
+    Task 2679's real failure: oracle-cadence's 22:05Z run died here with an
+    uncaught `422 Unprocessable Entity` at `page=86` — this town's own
+    commit history has grown past whatever depth GitHub's commits-list
+    endpoint can serve via `page`-based pagination, and unlike a normal
+    "ran out of results" page, it answers that with a 4xx, not an empty
+    list. `github_auth.default_http_get` already raises a bare 4xx
+    unretried (task 823's doctrine: retrying a wrong request wastes the
+    job's clock on an identical failure) — right for a genuinely bad
+    request, wrong here, where the 422 IS the "no more pages" signal, one
+    HTTP status removed from the `len(payload) < 100` short-page ending
+    every page before it. Caught narrowly (422 only, this endpoint only)
+    so every other cadence module's call through the same shared
+    `default_http_get` keeps failing loud on a real 4xx."""
+    import httpx
+
     getter = http_get or _default_http_get
     total = 0
     for page in range(1, _MAX_PAGES + 1):
-        payload = getter(f"https://api.github.com/repos/{repo}/commits?per_page=100&page={page}")
+        try:
+            payload = getter(f"https://api.github.com/repos/{repo}/commits?per_page=100&page={page}")
+        except httpx.HTTPStatusError as exc:
+            if exc.response.status_code == 422:
+                return total
+            raise
         if not isinstance(payload, list):
             raise CommitCadenceError(f"malformed GitHub API response: {payload!r}")
         total += len(payload)
