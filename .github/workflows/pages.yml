@@ -26,5 +26,16 @@ jobs:
       - uses: actions/upload-pages-artifact@v3
         with:
           path: docs
+      # actions/deploy-pages@v4 looks up the just-uploaded artifact by name via
+      # the Actions API immediately after upload-pages-artifact finalizes it.
+      # That finalize call returns before the artifact is reliably visible to
+      # the list-artifacts lookup deploy-pages makes (observed twice live:
+      # runs 45635508868 and 45646559312, both "Found 0 artifact(s)" within
+      # ~250ms of a confirmed-finalized upload). deploy-pages has no retry for
+      # this specific lookup (its own error_count/reporting_interval retry
+      # only covers deployment-status polling after a deployment starts), so
+      # give the API a few seconds to catch up before asking it.
+      - name: wait for artifact indexing
+        run: sleep 15
       - id: deployment
         uses: actions/deploy-pages@v4
