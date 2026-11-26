@@ -85174,5 +85174,37 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/04b9a26ca3eadd505ee43e17642196b7a6e7e94d",
     "ts": "2026-11-26T12:35:40Z",
     "author": "Ogun"
+  },
+  {
+    "kind": "commit",
+    "id": "bee5b64",
+    "title": "task 2694: WIP open -- hour 13 UTC, daytime rotation (off-by-one)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/bee5b640937ce8cab9e9aded345c1033806852e7",
+    "ts": "2026-11-26T13:45:57Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "7b4f9ea",
+    "title": "task 2694: close DONE -- hour 13 UTC, daytime rotation (off-by-one)",
+    "url": "https://github.com/thierrypdamiba/orita/commit/7b4f9ea83a4b1b918e6748ac4a486c37ddf5fc0a",
+    "ts": "2026-11-26T13:48:15Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "afabbc7",
+    "title": "task 2694: fix dawn-run break -- ci_escalation lines collided with CIFoldCase's \"ci/\" substring check",
+    "url": "https://github.com/thierrypdamiba/orita/commit/afabbc7316ca8edcad31766c753bf448e583fd54",
+    "ts": "2026-11-26T14:12:30Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "85b3cf5",
+    "title": "task 2694: scribe-growth-log append from re-verification reruns",
+    "url": "https://github.com/thierrypdamiba/orita/commit/85b3cf5adcf6ddf66b0fdfbbe02db62c9f77804e",
+    "ts": "2026-11-26T14:17:29Z",
+    "author": "Off-By-One"
   }
 ]
