@@ -3442,7 +3442,13 @@ def format_ritual_check(result: dict[str, Any]) -> str:
         for workflow, line in result["ci"].items():
             lines.append(f"  ci/{workflow}: {line}")
     for workflow, info in result["ci_escalation"].items():
-        lines.append(f"  ci/{workflow} escalation: {'due' if info['due'] else 'not due'} -- {info['reason']}")
+        # No "ci/" prefix -- deliberately kept out of the "ci/" substring
+        # `check_ci`'s own lines use, which only ever appear when the
+        # caller supplied this hour's live `ci_checks` (task 73's own
+        # conditional fold). This fold is unconditional, the identical
+        # shape `check_x_escalation`'s own un-prefixed "{tool} escalation:"
+        # lines already hold -- matched here rather than invented fresh.
+        lines.append(f"  {workflow} escalation: {'due' if info['due'] else 'not due'} -- {info['reason']}")
     w = result["words"]
     lines.append(f"  words: {'changed' if w['changed'] else 'unchanged'} -- {w['reason']}")
     if result["cron"] is not None:
