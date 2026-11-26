@@ -423,7 +423,7 @@ _CARDINAL_WORDS = {
     "one hundred five": 105, "one hundred six": 106, "one hundred seven": 107,
     "one hundred eight": 108, "one hundred nine": 109, "one hundred ten": 110,
     "one hundred eleven": 111, "one hundred twelve": 112,
-    "one hundred thirteen": 113,
+    "one hundred thirteen": 113, "one hundred fourteen": 114,
 }
 
 # The cardinal word itself may be a single hyphenated token ("ninety-nine")
@@ -492,22 +492,22 @@ class DocstringCountDoctrineCase(unittest.TestCase):
         # hundred-eleventh), then 112 until merged-pr-changes-requested-
         # not-addressed merged (task 1613, the hundred-twelfth), then 113
         # until readme-star-count-stale merged (task 1647, the
-        # hundred-thirteenth).
+        # hundred-thirteenth), then 114 until help-wanted-issue-never-
+        # referenced merged (task 2683, the hundred-fourteenth).
         # Task 1380's own addendum named this exact repo-root pin
         # (distinct from the fencepost-side ones in
         # test_recipe_count_doctrine.py etc.) as the one dawn-run itself
         # has now caught missing five separate times (101->102 task 1259,
         # 102->103 task 1353, 103->104 task 1380's own addendum, 110->111
         # task 1608 (catching task 1607's own miss), 111->112 task 1613's
-        # own addendum -- this fix) -- the sixth time this exact pin has
-        # been the thing dawn-run catches, still not caught proactively
-        # before a push. Caught proactively this time (task 1647), before
-        # any push, by running this exact test file live instead of only
-        # the fencepost-side suite.
+        # own addendum -- this fix); task 2684 (this hour) is the seventh
+        # miss of the identical pin, this time by task 2683's own close,
+        # caught live by dawn-run's the-oath job rather than proactively
+        # before that push.
         with open(rrc.DEFAULT_README_PATH, encoding="utf-8") as f:
             text = f.read()
         section = rrc._community_recipes_section(text)
-        self.assertEqual(len(rrc._linked_recipes(section)), 113)
+        self.assertEqual(len(rrc._linked_recipes(section)), 114)
 
     def test_docstring_matches_the_real_live_count(self):
         with open(rrc.DEFAULT_README_PATH, encoding="utf-8") as f:
