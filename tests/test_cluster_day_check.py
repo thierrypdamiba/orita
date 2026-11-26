@@ -324,9 +324,18 @@ class RealChronicleCase(unittest.TestCase):
         # with its own `cluster-day-covers: 2026-11-02, 2026-11-09`
         # marker, paying down both Mondays lapsed since episode-013 --
         # 14->15 and 12->13, bumped before push.
+        #
+        # Task 2690 (kwaku-ananse): recurred a fourteenth time -- dawn-run
+        # caught it live, the same hour it went stale (a real CI failure,
+        # not a Tithe), the moment episode-015 ("The Ten Days Nobody Rang
+        # the Bell") shipped with its own `cluster-day-covers: 2026-11-16,
+        # 2026-11-23` marker, paying down both Mondays the hourly loop's
+        # own ten-day silence had swallowed -- 15->16 and 13->14, reread
+        # live against `cdc.compute_cadence` against the real `chronicle/`
+        # dir on disk, not hand-guessed forward from the pattern.
         result = cdc.compute_cadence(today=date(2026, 7, 29))
-        self.assertEqual(result["total_episodes_on_record"], 15)
-        self.assertEqual(result["cluster_day_episodes_shipped"], 13)
+        self.assertEqual(result["total_episodes_on_record"], 16)
+        self.assertEqual(result["cluster_day_episodes_shipped"], 14)
         self.assertEqual(result["missed_mondays"], [])
 
     def test_real_chronicle_dir_matches_todays_hand_counted_gap(self):
@@ -371,9 +380,13 @@ class RealChronicleCase(unittest.TestCase):
         # Task 2583 (kwaku-ananse): same 14->15 / 12->13 bump as the
         # snapshot test above, for the same reason (episode-014 landed on
         # disk this task).
+        #
+        # Task 2690 (kwaku-ananse): same 15->16 / 13->14 bump as the
+        # snapshot test above, for the same reason (episode-015 landed on
+        # disk this task).
         result = cdc.compute_cadence(today=date(2026, 8, 17))
-        self.assertEqual(result["total_episodes_on_record"], 15)
-        self.assertEqual(result["cluster_day_episodes_shipped"], 13)
+        self.assertEqual(result["total_episodes_on_record"], 16)
+        self.assertEqual(result["cluster_day_episodes_shipped"], 14)
         self.assertEqual(result["missed_mondays"], [])
 
 
