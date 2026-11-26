@@ -3407,3 +3407,5 @@
 {"type": "check", "workflow": "dawn-run", "conclusion": "success", "run_id": 45714688179, "checked_at": "2026-11-25T23:27:00Z"}
 {"type": "check", "workflow": "pages", "conclusion": "success", "run_id": 45714688114, "checked_at": "2026-11-25T23:27:00Z"}
 {"type": "check", "workflow": "seam-scan", "conclusion": "success", "run_id": 45700765457, "checked_at": "2026-11-25T23:27:00Z"}
+{"type": "check", "workflow": "dawn-run", "conclusion": "success", "run_id": 45730075659, "checked_at": "2026-11-26T01:25:00Z"}
+{"type": "check", "workflow": "pages", "conclusion": "success", "run_id": 45730075571, "checked_at": "2026-11-26T01:25:00Z"}
