@@ -334,6 +334,174 @@ class TestTrackedWorkflows(unittest.TestCase):
                 os.remove(path)
 
 
+class TestShouldEscalate(unittest.TestCase):
+    """Task 2694. A sustained CI failure streak should tell the Hand
+    exactly once when it crosses the threshold -- not every hour it stays
+    broken, and not before it's actually old enough to matter. Mirrors
+    tests/test_x_outage_tracker.py's TestShouldEscalate, one fixed tier."""
+
+    def test_not_due_with_no_active_failure_streak(self):
+        due, reason = ciw.should_escalate([], "oracle-cadence", "2026-11-26T10:00:00Z", escalation_entries=[])
+        self.assertFalse(due)
+        self.assertIn("no active failure streak", reason)
+
+    def test_not_due_below_threshold(self):
+        entries = [{"type": "check", "workflow": "oracle-cadence", "conclusion": "failure", "run_id": 1, "checked_at": "2026-11-26T05:25:00Z"}]
+        due, reason = ciw.should_escalate(
+            entries, "oracle-cadence", "2026-11-26T08:00:00Z", threshold_hours=6.0, escalation_entries=[]
+        )
+        self.assertFalse(due)
+        self.assertIn("below 6.0h threshold", reason)
+
+    def test_due_once_the_streak_crosses_the_threshold(self):
+        entries = [{"type": "check", "workflow": "oracle-cadence", "conclusion": "failure", "run_id": 1, "checked_at": "2026-11-26T05:25:00Z"}]
+        due, reason = ciw.should_escalate(
+            entries, "oracle-cadence", "2026-11-26T12:00:00Z", threshold_hours=6.0, escalation_entries=[]
+        )
+        self.assertTrue(due)
+        self.assertIn("crosses 6.0h threshold", reason)
+
+    def test_boundary_is_exact_not_off_by_one_hour(self):
+        entries = [{"type": "check", "workflow": "oracle-cadence", "conclusion": "failure", "run_id": 1, "checked_at": "2026-11-26T05:25:00Z"}]
+        due_before, _ = ciw.should_escalate(
+            entries, "oracle-cadence", "2026-11-26T11:24:59Z", threshold_hours=6.0, escalation_entries=[]
+        )
+        due_at, _ = ciw.should_escalate(
+            entries, "oracle-cadence", "2026-11-26T11:25:00Z", threshold_hours=6.0, escalation_entries=[]
+        )
+        self.assertFalse(due_before)
+        self.assertTrue(due_at)
+
+    def test_a_success_breaking_the_streak_clears_the_escalation(self):
+        entries = [
+            {"type": "check", "workflow": "oracle-cadence", "conclusion": "failure", "run_id": 1, "checked_at": "2026-11-26T05:25:00Z"},
+            {"type": "check", "workflow": "oracle-cadence", "conclusion": "success", "run_id": 2, "checked_at": "2026-11-26T13:00:00Z"},
+        ]
+        due, reason = ciw.should_escalate(
+            entries, "oracle-cadence", "2026-11-26T14:00:00Z", threshold_hours=6.0, escalation_entries=[]
+        )
+        self.assertFalse(due)
+        self.assertIn("no active failure streak", reason)
+
+    def test_not_due_a_second_time_for_the_same_streak(self):
+        entries = [{"type": "check", "workflow": "oracle-cadence", "conclusion": "failure", "run_id": 1, "checked_at": "2026-11-26T05:25:00Z"}]
+        prior_escalations = [
+            {
+                "type": "escalation",
+                "workflow": "oracle-cadence",
+                "streak_started_at": "2026-11-26T05:25:00Z",
+                "escalated_at": "2026-11-26T12:00:00Z",
+                "hours": 6.6,
+                "threshold_hours": 6.0,
+            }
+        ]
+        due, reason = ciw.should_escalate(
+            entries,
+            "oracle-cadence",
+            "2026-11-26T18:00:00Z",
+            threshold_hours=6.0,
+            escalation_entries=prior_escalations,
+        )
+        self.assertFalse(due)
+        self.assertIn("already escalated", reason)
+
+    def test_a_fresh_streak_after_recovery_gets_its_own_chance(self):
+        entries = [
+            {"type": "check", "workflow": "oracle-cadence", "conclusion": "failure", "run_id": 1, "checked_at": "2026-11-26T05:25:00Z"},
+            {"type": "check", "workflow": "oracle-cadence", "conclusion": "success", "run_id": 2, "checked_at": "2026-11-26T13:00:00Z"},
+            {"type": "check", "workflow": "oracle-cadence", "conclusion": "failure", "run_id": 3, "checked_at": "2026-11-27T00:00:00Z"},
+        ]
+        prior_escalations = [
+            {
+                "type": "escalation",
+                "workflow": "oracle-cadence",
+                "streak_started_at": "2026-11-26T05:25:00Z",
+                "escalated_at": "2026-11-26T12:00:00Z",
+                "hours": 6.6,
+                "threshold_hours": 6.0,
+            }
+        ]
+        due, reason = ciw.should_escalate(
+            entries,
+            "oracle-cadence",
+            "2026-11-27T07:00:00Z",
+            threshold_hours=6.0,
+            escalation_entries=prior_escalations,
+        )
+        self.assertTrue(due)
+        self.assertIn("crosses 6.0h threshold", reason)
+
+
+class TestRecordEscalation(_TempLogCase):
+    def test_records_a_line_and_never_edits_a_prior_one(self):
+        ciw.record_escalation("oracle-cadence", "2026-11-26T05:25:00Z", "2026-11-26T12:00:00Z", 6.6, path=self.path)
+        with open(self.path) as f:
+            before = f.readlines()
+        ciw.record_escalation("seam-scan", "2026-11-26T06:00:00Z", "2026-11-26T13:00:00Z", 7.0, path=self.path)
+        with open(self.path) as f:
+            after = f.readlines()
+        self.assertEqual(after[0], before[0])
+        self.assertEqual(len(after), 2)
+
+    def test_already_escalated_for_streak_reads_the_written_entry_back(self):
+        ciw.record_escalation("oracle-cadence", "2026-11-26T05:25:00Z", "2026-11-26T12:00:00Z", 6.6, path=self.path)
+        entries = ciw._escalation_entries(path=self.path)
+        self.assertTrue(ciw.already_escalated_for_streak(entries, "oracle-cadence", "2026-11-26T05:25:00Z"))
+        self.assertFalse(ciw.already_escalated_for_streak(entries, "oracle-cadence", "2026-11-26T06:00:00Z"))
+        self.assertFalse(ciw.already_escalated_for_streak(entries, "seam-scan", "2026-11-26T05:25:00Z"))
+
+    def test_omitted_threshold_defaults_to_the_6h_tier(self):
+        ciw.record_escalation("oracle-cadence", "2026-11-26T05:25:00Z", "2026-11-26T12:00:00Z", 6.6, path=self.path)
+        entry = ciw._escalation_entries(path=self.path)[0]
+        self.assertEqual(entry["threshold_hours"], 6.0)
+
+    def test_malformed_escalation_log_line_raises_instead_of_guessing(self):
+        with open(self.path, "w") as f:
+            f.write('{"type": "escalation", broken <<<< not json\n')
+        entries = ciw._escalation_entries(path=self.path)
+        with self.assertRaises(ciw.CIWatchTamperedError):
+            ciw.already_escalated_for_streak(entries, "oracle-cadence", "2026-11-26T05:25:00Z")
+
+
+class ShouldEscalateCliCase(unittest.TestCase):
+    SCRIPT = os.path.join(ROOT, "tools", "ci_watch.py")
+
+    def test_should_escalate_cli_reports_due(self):
+        fd, path = tempfile.mkstemp(suffix=".jsonl")
+        os.close(fd)
+        os.remove(path)
+        try:
+            ciw.record_check("oracle-cadence", "failure", 1, "2026-11-26T05:25:00Z", path=path)
+            result = subprocess.run(
+                [
+                    sys.executable, self.SCRIPT, "should-escalate", "oracle-cadence", "2026-11-26T12:00:00Z", "6.0",
+                ],
+                capture_output=True,
+                text=True,
+                env={**os.environ},
+                cwd=ROOT,
+            )
+            # The CLI reads the real LOG path, not our temp one -- this just
+            # proves the subcommand parses its args and runs end to end
+            # without crashing, the same boundary CliArgvBoundsCase below
+            # already holds for `record`.
+            self.assertEqual(result.returncode, 0, result)
+            self.assertTrue(result.stdout.startswith("due") or result.stdout.startswith("not due"), result.stdout)
+        finally:
+            if os.path.exists(path):
+                os.remove(path)
+
+    def test_should_escalate_with_too_few_args_names_the_problem(self):
+        result = subprocess.run(
+            [sys.executable, self.SCRIPT, "should-escalate", "oracle-cadence"],
+            capture_output=True,
+            text=True,
+        )
+        self.assertEqual(result.returncode, 2, result)
+        self.assertIn("usage: ci_watch.py should-escalate", result.stdout, result)
+        self.assertNotIn("Traceback", result.stderr, result)
+
+
 class CliArgvBoundsCase(unittest.TestCase):
     """Task 683. `record` with fewer than 4 positional args raised a bare
     `IndexError` instead of a named usage error -- the same unguarded-argv

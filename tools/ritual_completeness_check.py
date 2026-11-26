@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Task 121. Off-By-One counts the tool that counts everything else.
 
-`tools/ritual_check.py` hand-wires 90 `check_*` functions into one hourly
+`tools/ritual_check.py` hand-wires 91 `check_*` functions into one hourly
 block: each is called inside `run_ritual_check`, its result assigned to a
 dict key, and that key printed as a line in `format_ritual_check`. Three
 separate places a single typo or a forgotten wire-up can silently drop a
@@ -451,7 +451,12 @@ check never checked: that `ROADMAP.md`'s rows are always appended in
 ascending task-number order, so `rows[-1]` really is the most recent one.
 Task 1853's own row broke that assumption for the first time, silently
 naming a stale next-owner and failing `dawn-run` live until this hour's
-fix.
+fix. **Updated to 91** the same hour task 2694's `check_ci_escalation`
+was wired in -- `ci_watch.py`'s own new escalation fold (a sustained
+`oracle-cadence`/`seam-scan` failure streak, watched by `check_ci` since
+task 73 but never surfaced past a status line), the identical gap
+`check_x_escalation` (task 81) already closed for the X outage, applied
+here for the first time.
 
 Usage:
     python3 tools/ritual_completeness_check.py check

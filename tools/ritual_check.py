@@ -850,6 +850,26 @@ def check_ci(ci_checks: list[dict[str, object]] | None) -> dict[str, object] | N
     return result
 
 
+def check_ci_escalation(now_iso: str) -> dict[str, object]:
+    """should_escalate() for every workflow in ci_watch.TRACKED_WORKFLOWS,
+    via the real HAND/ci-watch-log.jsonl and HAND/ci-watch-escalation-
+    log.jsonl. Mirrors check_x_escalation's exact shape (task 638) one
+    rung simpler: ci_watch's own escalation (task 2694) is a single fixed
+    tier, not x_outage_tracker's later extended/recurring ladder -- no CI
+    streak has yet lived long enough past its first tier to need one.
+    Makes no network call and no write of its own; a real escalation is
+    only ever recorded when the god on duty actually calls
+    ci_watch.record_escalation."""
+    mod = _ci_watch()
+    entries = mod._entries(mod.LOG)
+    escalation_entries = mod._escalation_entries(mod.ESCALATION_LOG)
+    result: dict[str, object] = {}
+    for workflow in mod.TRACKED_WORKFLOWS:
+        due, reason = mod.should_escalate(entries, workflow, now_iso, escalation_entries=escalation_entries)
+        result[workflow] = {"due": due, "reason": reason, "threshold_hours": mod.DEFAULT_ESCALATION_THRESHOLD_HOURS}
+    return result
+
+
 def check_cron(cron_checks: list[dict[str, object]] | None, now_iso: str) -> dict[str, object] | None:
     """Fold this hour's already-fetched `{workflow, cron_expr, last_run_at}`
     dicts through `cron_health.schedule_status`, mirroring `check_ci`'s
@@ -3049,6 +3069,7 @@ def run_ritual_check(
     good_first_issues = check_good_first_issues(good_first_issues_state)
     scribe_growth = check_scribe_growth(now_iso, scribe_root=scribe_root, record=record_scribe_growth)
     ci = check_ci(ci_checks)
+    ci_escalation = check_ci_escalation(now_iso)
     words = check_words(now_iso, record=record_words)
     cron = check_cron(cron_checks, now_iso)
     owed_posts = check_owed_posts()
@@ -3283,6 +3304,7 @@ def run_ritual_check(
         "good_first_issues": good_first_issues,
         "scribe_growth": scribe_growth,
         "ci": ci,
+        "ci_escalation": ci_escalation,
         "words": words,
         "cron": cron,
         "owed_posts": owed_posts,
@@ -3419,6 +3441,8 @@ def format_ritual_check(result: dict[str, Any]) -> str:
     if result["ci"] is not None:
         for workflow, line in result["ci"].items():
             lines.append(f"  ci/{workflow}: {line}")
+    for workflow, info in result["ci_escalation"].items():
+        lines.append(f"  ci/{workflow} escalation: {'due' if info['due'] else 'not due'} -- {info['reason']}")
     w = result["words"]
     lines.append(f"  words: {'changed' if w['changed'] else 'unchanged'} -- {w['reason']}")
     if result["cron"] is not None:
