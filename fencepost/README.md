@@ -2243,6 +2243,23 @@ so it sits below `manifest-version-never-tagged`'s own 0.75. Neither
 `GetFileContents` nor `CountStargazers` is a new scope — no scope asked
 for anywhere in this recipe.
 
+[`RECIPES/help-wanted-issue-never-referenced/`](RECIPES/help-wanted-issue-never-referenced/)
+is the hundred-fourteenth (ROADMAP.md #2683) — the sibling of
+`good-first-issue-never-referenced` for GitHub's other standard onboarding
+label. An issue labeled `help wanted` is the same kind of open invitation,
+and nothing in the API checks that one either: this recipe holds
+`ListIssues` and `ListPullRequests` at once and surfaces a `help wanted`
+issue that no pull request, open, closed, or merged, has ever named
+through a real closing keyword. One deliberate difference from the twin,
+not a copy: the staleness bar is 336 hours (14 days), double the 168-hour
+bar `good-first-issue-never-referenced` uses, because `help wanted` is
+GitHub's own signal that a shelf item is NOT scoped for a first-time
+contributor, so it honestly deserves longer before silence counts as a
+settled gap. An issue without the label is skipped entirely, not even
+named in `excluded` — it was never this recipe's candidate. Neither
+`ListIssues` nor `ListPullRequests` is a new scope — no scope asked for
+anywhere in this recipe.
+
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)
 (ROADMAP.md #111) is that second promise, kept: it runs `scan.py`'s own

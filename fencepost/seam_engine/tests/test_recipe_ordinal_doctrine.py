@@ -87,6 +87,7 @@ _ORDINAL_WORDS = {
     "hundred-sixth": 106, "hundred-seventh": 107, "hundred-eighth": 108,
     "hundred-ninth": 109, "hundred-tenth": 110, "hundred-eleventh": 111,
     "hundred-twelfth": 112, "hundred-thirteenth": 113,
+    "hundred-fourteenth": 114,
 }
 
 # Matches right at the top of the docstring only (``re.match``, not
@@ -200,11 +201,13 @@ def test_the_real_ordinal_claims_are_currently_clean():
     merged (the hundred-eleventh real recipe), then 111/2..111 until
     merged-pr-changes-requested-not-addressed merged (the hundred-twelfth
     real recipe), then 112/2..112 until readme-star-count-stale merged
-    (the hundred-thirteenth real recipe)."""
+    (the hundred-thirteenth real recipe), then 113/2..113 until
+    help-wanted-issue-never-referenced merged (the hundred-fourteenth real
+    recipe)."""
     claims = live_ordinal_claims(FENCEPOST_ROOT)
     numbered = sorted(n for n in claims.values() if n is not None)
-    assert len(claims) == 113
-    assert numbered == list(range(2, 114))
+    assert len(claims) == 114
+    assert numbered == list(range(2, 115))
 
 
 def test_a_duplicate_ordinal_would_flip_this_check_red(tmp_path):

@@ -348,6 +348,7 @@ def test_runs_all_real_recipes_in_the_actual_repo_without_error(monkeypatch):
         "manifest-version-never-tagged",
         "merged-pr-changes-requested-not-addressed",
         "readme-star-count-stale",
+        "help-wanted-issue-never-referenced",
     }
 
 

@@ -1,0 +1,42 @@
+[
+  {
+    "number": 801,
+    "title": "Add a dark-mode toggle to the Gap Ledger site",
+    "state": "open",
+    "labels": ["help wanted", "house:kothar-wa-khasis"],
+    "created_at": "2026-07-01T09:00:00Z",
+    "url": "https://github.com/example/example-repo/issues/801"
+  },
+  {
+    "number": 802,
+    "title": "Investigate flaky oracle-cadence retries",
+    "state": "open",
+    "labels": ["help wanted"],
+    "created_at": "2026-11-20T18:00:00Z",
+    "url": "https://github.com/example/example-repo/issues/802"
+  },
+  {
+    "number": 803,
+    "title": "Write a Notion write-back adapter for the Gap Ledger",
+    "state": "open",
+    "labels": ["help wanted"],
+    "created_at": "2026-06-10T12:00:00Z",
+    "url": "https://github.com/example/example-repo/issues/803"
+  },
+  {
+    "number": 804,
+    "title": "Speed up the seam_engine test suite",
+    "state": "closed",
+    "labels": ["help wanted"],
+    "created_at": "2026-06-01T08:00:00Z",
+    "url": "https://github.com/example/example-repo/issues/804"
+  },
+  {
+    "number": 805,
+    "title": "Refactor the internal ledger hash chain",
+    "state": "open",
+    "labels": ["house:nisaba"],
+    "created_at": "2026-05-01T08:00:00Z",
+    "url": "https://github.com/example/example-repo/issues/805"
+  }
+]

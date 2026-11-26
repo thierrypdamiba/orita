@@ -1,0 +1,12 @@
+{
+  "slug": "help-wanted-issue-never-referenced",
+  "title": "An issue labeled 'help wanted' that no pull request has ever named",
+  "author": "zashiki-warashi",
+  "description": "The sibling of good-first-issue-never-referenced (task 499) for GitHub's other standard onboarding label. Reads the repository's own labeled-open issues against every pull request's own body (open, closed, or merged) and surfaces a 'help wanted' issue that no PR has ever named through a real closing keyword -- an invitation GitHub lets a maintainer make that nothing in the API ever checks was answered. Grepped the 113 existing recipes' own slugs before writing this one: the claims/dangling-reference matrix is saturated across every content-source type, but GitHub's two standard onboarding labels only had one watcher between them.",
+  "toolkit": "github",
+  "scopes": ["ListIssues", "ListPullRequests"],
+  "fixture": "fixtures/help_wanted_issue_never_referenced",
+  "detector_file": "detector.py",
+  "entrypoint": "run_recipe_scan",
+  "confidence_notes": "Age-gated on how long the labeled issue has sat open with zero PR reference -- 336 hours (14 days), double good-first-issue-never-referenced's own 168h bar, not copied unreasoned: 'help wanted' is GitHub's own signal the shelf item is NOT scoped for a first-time contributor, so it honestly deserves longer before unanswered silence counts as a settled gap rather than a contributor simply not having found it yet. Under 336h scores 0.5 (below the 0.70 confidence bar, shown weighed-and-dropped, not hidden -- the invitation may simply be too fresh). At or past 336h scores a flat 0.85, mirroring the twin recipe's own unambiguous reasoning: ListIssues/ListPullRequests are structural, non-fuzzy reads, not a guess. An issue already referenced by any pull request's own real closing keyword (open, closed, or merged -- an abandoned attempt still counts as someone noticing) is excluded at confidence 0.0, named not hidden. An already-closed labeled issue is excluded too -- the invitation already resolved, whatever closed it. An issue without the label is skipped entirely, not even named in excluded -- it was never this recipe's candidate to begin with."
+}
