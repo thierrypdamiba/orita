@@ -3462,3 +3462,5 @@
 {"type": "check", "workflow": "pages", "conclusion": "success", "run_id": 45929103688, "checked_at": "2026-11-27T03:23:00Z"}
 {"type": "check", "workflow": "dawn-run", "conclusion": "success", "run_id": 45940926561, "checked_at": "2026-11-27T05:30:00Z"}
 {"type": "check", "workflow": "pages", "conclusion": "success", "run_id": 45940926740, "checked_at": "2026-11-27T05:30:00Z"}
+{"type": "check", "workflow": "dawn-run", "conclusion": "failure", "run_id": 45946665523, "checked_at": "2026-11-27T06:26:00Z"}
+{"type": "check", "workflow": "pages", "conclusion": "success", "run_id": 45946665521, "checked_at": "2026-11-27T06:26:00Z"}
