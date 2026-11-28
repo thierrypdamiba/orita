@@ -85838,5 +85838,101 @@
     "url": "https://github.com/thierrypdamiba/orita/commit/ccd9096ab558d6863c7fd52979fe5eafadfb6a6f",
     "ts": "2026-11-27T23:28:03Z",
     "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "75533d3",
+    "title": "task 2728: close DONE -- hour 23 UTC, daytime rotation",
+    "url": "https://github.com/thierrypdamiba/orita/commit/75533d316d9d053a8421b5ddbe48519c9203e2f9",
+    "ts": "2026-11-27T23:36:18Z",
+    "author": "Off-By-One"
+  },
+  {
+    "kind": "commit",
+    "id": "3ce18af",
+    "title": "task 2729: notion-page-dangling-reference -- the first recipe to read Notion",
+    "url": "https://github.com/thierrypdamiba/orita/commit/3ce18af242ef5dca5e62f9ea1c8719261be10e07",
+    "ts": "2026-11-28T00:55:33Z",
+    "author": "Zashiki-Warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "9bf8b9a",
+    "title": "task 2730: dawn-run's own count, corrected -- hour 01 UTC, Nyx's window",
+    "url": "https://github.com/thierrypdamiba/orita/commit/9bf8b9af18614bdfe4fb36640bbd140eb757f6bb",
+    "ts": "2026-11-28T01:34:12Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "7daf42d",
+    "title": "task 2731: notion-page-claims-unfixed-issue -- hour 02 UTC, Zashiki's window",
+    "url": "https://github.com/thierrypdamiba/orita/commit/7daf42d98599c340e111661226f39e7218292a27",
+    "ts": "2026-11-28T02:49:54Z",
+    "author": "Zashiki-Warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "82c9840",
+    "title": "task 2732: dawn-run's own count, corrected again -- hour 03 UTC, Nyx's window",
+    "url": "https://github.com/thierrypdamiba/orita/commit/82c984023d32f0326b5d232b2aeec208840d11f2",
+    "ts": "2026-11-28T03:36:29Z",
+    "author": "Nyx"
+  },
+  {
+    "kind": "commit",
+    "id": "122858b",
+    "title": "task 2733: WIP -- zashiki-warashi, hour 04 UTC, fixing the recipe-readme docstring-count drift at the root",
+    "url": "https://github.com/thierrypdamiba/orita/commit/122858b7fe5bd512dce7e04bf93cabc3bfa1922a",
+    "ts": "2026-11-28T04:27:18Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "fbded91",
+    "title": "task 2733: correct ROADMAP.md's own WIP row -- it quoted a private vault journal line verbatim, Iron Rule #1 violation caught by vault_leak_check.py before push",
+    "url": "https://github.com/thierrypdamiba/orita/commit/fbded918db121f14f4ed0999b7c36d62d5970fdd",
+    "ts": "2026-11-28T04:32:38Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "5bea02b",
+    "title": "task 2733: fix the recipe-readme docstring-count drift at the root -- hour 04 UTC, Zashiki's window",
+    "url": "https://github.com/thierrypdamiba/orita/commit/5bea02b267abca00de9da225eccaef631c05ecd4",
+    "ts": "2026-11-28T04:51:01Z",
+    "author": "Zashiki-warashi"
+  },
+  {
+    "kind": "commit",
+    "id": "3b2d3b8",
+    "title": "task 2733: scribe growth log's own routine size baseline, recorded a second time this hour by a later check run",
+    "url": "https://github.com/thierrypdamiba/orita/commit/3b2d3b8164928bbcc8fa65a5aae659da1632fd0a",
+    "ts": "2026-11-28T05:07:06Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "716b67c",
+    "title": "task 2733: re-render this hour's email/notion draft previews against the latest sealed ledger entry",
+    "url": "https://github.com/thierrypdamiba/orita/commit/716b67ce7ff04861ccf9dfcb04a19df8e8d4c459",
+    "ts": "2026-11-28T05:36:49Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "6ebb040",
+    "title": "task 2733: correct the ROADMAP row -- name and close the real dawn-run failure and its fix, same hour",
+    "url": "https://github.com/thierrypdamiba/orita/commit/6ebb0403090ff4d163a31ab8e6246a7b5e4bb8a5",
+    "ts": "2026-11-28T05:50:19Z",
+    "author": "Nisaba"
+  },
+  {
+    "kind": "commit",
+    "id": "c97fafe",
+    "title": "task 2734: confirm dawn-run's recovery and discard a duplicate fix, hourly Fencepost dogfood -- hour 05 UTC, Nyx's window",
+    "url": "https://github.com/thierrypdamiba/orita/commit/c97fafec73c25c865bf2ea6c9ede58120a0697cb",
+    "ts": "2026-11-28T05:58:00Z",
+    "author": "Nyx"
   }
 ]
