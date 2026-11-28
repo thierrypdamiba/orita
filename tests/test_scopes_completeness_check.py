@@ -370,12 +370,13 @@ uses. It says nothing about what else the shared gateway can reach.*
 
     def test_real_live_scopes_md_claim_matches_its_own_real_table(self):
         """Hand-verification against the actual repo file: proves this
-        task's own fix (four -> six) is real, not just true against a
-        synthetic fixture."""
+        task's own fix (four -> six, then ROADMAP.md #2729's six -> seven
+        when notion-page-dangling-reference added Notion to the oath) is
+        real, not just true against a synthetic fixture."""
         result = scc.check_scopes_completeness()
         self.assertFalse(result["stale_toolkit_count_claim"])
-        self.assertEqual(result["claimed_toolkit_count"], 6)
-        self.assertEqual(result["live_toolkit_count"], 6)
+        self.assertEqual(result["claimed_toolkit_count"], 7)
+        self.assertEqual(result["live_toolkit_count"], 7)
 
     def test_mutating_the_real_file_back_to_four_is_caught(self):
         """The same before/after discipline `test_consent_doctrine.py`'s
@@ -387,7 +388,7 @@ uses. It says nothing about what else the shared gateway can reach.*
         the doc said."""
         with open(scc.DEFAULT_SCOPES_PATH, encoding="utf-8") as f:
             real_text = f.read()
-        real_sentence = "table above names the six toolkits"
+        real_sentence = "table above names the seven toolkits"
         self.assertIn(real_sentence, real_text, "SCOPES.md's claim sentence has already changed shape -- update this fixture")
         mutated_text = real_text.replace(real_sentence, "table above names the four toolkits")
         self.assertNotEqual(mutated_text, real_text)
@@ -398,7 +399,7 @@ uses. It says nothing about what else the shared gateway can reach.*
             result = scc.check_scopes_completeness(scopes_path=mutated_path, app_log_path=scc.DEFAULT_APP_LOG_PATH)
             self.assertTrue(result["stale_toolkit_count_claim"])
             self.assertEqual(result["claimed_toolkit_count"], 4)
-            self.assertEqual(result["live_toolkit_count"], 6)
+            self.assertEqual(result["live_toolkit_count"], 7)
 
 
 if __name__ == "__main__":

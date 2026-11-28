@@ -91,6 +91,21 @@ from datetime import datetime, timezone
 # recipe, checked live via `Arcade_ListApps` the same hour) -- the
 # identical "registered on the Oath, not yet wired into the gateway" shape
 # `gmail`/`google_calendar`/`slack` already carry here.
+#
+# ROADMAP.md #2729: `notion` is the third toolkit this dict ever names that
+# is not GitHub or X -- the first toolkit this dict has ever named that
+# Fencepost previously only ever WROTE to (`draftback.py`'s `CreatePage`,
+# the one authorized write), never read from. `RECIPES/notion-page-
+# dangling-reference/` is the first recipe to read a Notion page at all,
+# the eleventh leg of the dangling-reference family and the first to watch
+# a seam the-hand's own gateway surface has never exposed a READ tool for
+# before. `SearchPages` is the one scope that recipe asks for -- Notion's
+# own read-side analog of `slack`'s `SearchChannelMessages` and `linear`'s
+# `SearchIssueComments`, both already sitting here. Zero Notion-read tools
+# are exposed on the-hand's live gateway today (only `CreatePage`, the
+# write side, has ever been named on SCOPES.md) -- the identical
+# "registered on the Oath, not yet wired into the gateway" shape
+# `gmail`/`google_calendar`/`slack`/`linear` already carry here.
 REQUIRED_SCOPES: dict[str, frozenset[str]] = {
     "github": frozenset({
         "GetRepository", "ListRepoCommits", "ListIssues", "GetIssue",
@@ -104,6 +119,7 @@ REQUIRED_SCOPES: dict[str, frozenset[str]] = {
     "google_calendar": frozenset({"ListEvents", "GetEvent"}),
     "slack": frozenset({"SearchChannelMessages"}),
     "linear": frozenset({"SearchIssueComments"}),
+    "notion": frozenset({"SearchPages"}),
 }
 
 # A public issue must be a real, reachable GitHub issue URL — not a private

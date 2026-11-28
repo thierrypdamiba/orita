@@ -2259,6 +2259,19 @@ settled gap. An issue without the label is skipped entirely, not even
 named in `excluded` — it was never this recipe's candidate. Neither
 `ListIssues` nor `ListPullRequests` is a new scope — no scope asked for
 anywhere in this recipe.
+[`RECIPES/notion-page-dangling-reference/`](RECIPES/notion-page-dangling-reference/)
+is the hundred-and-fifteenth (ROADMAP.md #2729), the eleventh leg of the
+dangling-reference family and the first recipe in the engine to read a
+Notion page at all: a page's own title+body text names a bare `#N`, and
+if no issue or PR with that number exists in either tracker, whoever
+wrote the page has a belief about the project already out of sync with
+GitHub's real number space. The first recipe to ask the oath for a
+Notion READ scope — `SearchPages`, the read-side analog of `slack`'s
+`SearchChannelMessages` and `linear`'s `SearchIssueComments` — added to
+`consent.py`'s `REQUIRED_SCOPES`, `SCOPES.md`'s table, and
+`.github/ISSUE_TEMPLATE/point-fencepost.md`'s scope-confirm table in the
+same commit; Notion had only ever been named once before on the oath,
+for `CreatePage`, draftback's one authorized write.
 
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)

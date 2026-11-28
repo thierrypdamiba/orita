@@ -1,0 +1,14 @@
+[
+  {
+    "number": 6210,
+    "title": "Nightly seam-scan cron intermittently slow",
+    "state": "open",
+    "url": "https://github.com/thierrypdamiba/orita/issues/6210"
+  },
+  {
+    "number": 6211,
+    "title": "Badge repaint skipped after ledger reseal",
+    "state": "closed",
+    "url": "https://github.com/thierrypdamiba/orita/issues/6211"
+  }
+]

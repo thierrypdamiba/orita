@@ -18,6 +18,7 @@ Concretely, on the toolkits in use:
 | Google Calendar (v0.2) | ListEvents, GetEvent | CreateEvent, UpdateEvent, DeleteEvent |
 | Slack (proposed) | SearchChannelMessages | PostMessage, chat:write, UpdateMessage, DeleteMessage |
 | Linear (proposed) | SearchIssueComments | CreateComment, CreateIssue, UpdateIssue, DeleteIssue |
+| Notion (proposed) | SearchPages | CreatePage*, UpdatePage, DeletePage, ArchivePage |
 
 **WIP note (ROADMAP.md #653), `RECIPES/tag-never-released/`:**
 the first recipe under `RECIPES/` to name `ListTags` or `ListReleases` at
@@ -139,7 +140,7 @@ the claim quietly aging past whatever it says.
 
 ## Every connected app, accounted for
 
-*Task 135. The table above names the six toolkits Fencepost's own code uses. It says nothing about what else the-hand's shared gateway can already reach — an Oath that stays silent on that is not the complete account of risk surface. `tools/arcade_app_watch.py`'s durable log is the source of truth; this section is re-derived from its last recorded state, never typed from memory.*
+*Task 135 (ROADMAP.md #2729 raised the count to seven: Notion joins the table). The table above names the seven toolkits Fencepost's own code uses. It says nothing about what else the-hand's shared gateway can already reach — an Oath that stays silent on that is not the complete account of risk surface. `tools/arcade_app_watch.py`'s durable log is the source of truth; this section is re-derived from its last recorded state, never typed from memory.*
 
 *Task 887 (2026-08-20): the five rows below (`arcade-google`, `arcade-linear`, `arcade-slack`, `sybill`, `ap_3Fdn9uGDlF9Cj0ix9PJZbkMKDrF`) held "connected on the shared gateway" from task 135 until this hour, unchanged, on a baseline last actually reread 2026-08-08 — twelve days stale. A live `Arcade_ListApps` recheck this hour (confirmed twice, not a transient read) shows the-hand's own gateway now carries exactly two connected apps: `arcade-github` and the X auth app. The five below are no longer connected upstream. This changes no live risk surface Fencepost ever actually used — none of the five ever exposed a Fencepost-callable tool, so the read-only, GitHub-only surface this Oath swears to did not move — but the table itself was stale and is corrected here rather than left to keep reading a twelve-day-old account as current.*
 

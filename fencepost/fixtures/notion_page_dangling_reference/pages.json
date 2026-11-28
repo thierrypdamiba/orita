@@ -1,0 +1,42 @@
+[
+  {
+    "id": "NTN-D-9001",
+    "title": "Incident review -- cron slowness",
+    "author": "town-crier",
+    "text": "root cause write-up pending, same shape as #6301 from last sprint",
+    "last_edited_at": "2026-08-05T10:00:00Z",
+    "url": "https://www.notion.so/orita-town/Incident-review-cron-slowness-9001"
+  },
+  {
+    "id": "NTN-D-9002",
+    "title": "Sprint notes -- week 32",
+    "author": "quiet-shipper",
+    "text": "ship is blocked on #6302 landing first, will retest after",
+    "last_edited_at": "2026-08-10T09:00:00Z",
+    "url": "https://www.notion.so/orita-town/Sprint-notes-week-32-9002"
+  },
+  {
+    "id": "NTN-D-9003",
+    "title": "Known issues tracker",
+    "author": "helpful-mod",
+    "text": "already tracked in #6210, no need for a second entry",
+    "last_edited_at": "2026-08-05T11:00:00Z",
+    "url": "https://www.notion.so/orita-town/Known-issues-tracker-9003"
+  },
+  {
+    "id": "NTN-D-9004",
+    "title": "Changelog draft",
+    "author": "quiet-watcher",
+    "text": "the fix for this actually landed in #6220 last week",
+    "last_edited_at": "2026-08-05T12:00:00Z",
+    "url": "https://www.notion.so/orita-town/Changelog-draft-9004"
+  },
+  {
+    "id": "NTN-D-9005",
+    "title": "Onboarding checklist",
+    "author": "confused-newcomer",
+    "text": "thanks for the context, makes sense now",
+    "last_edited_at": "2026-08-05T13:00:00Z",
+    "url": "https://www.notion.so/orita-town/Onboarding-checklist-9005"
+  }
+]

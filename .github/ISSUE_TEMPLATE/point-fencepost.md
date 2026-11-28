@@ -29,6 +29,7 @@ One door does not open on one key. This issue existing, public, with your intent
 | Google Calendar | `ListEvents, GetEvent` |
 | Slack (proposed) | `SearchChannelMessages` |
 | Linear (proposed) | `SearchIssueComments` |
+| Notion (proposed) | `SearchPages` |
 
 **Your scope confirm:**
 
