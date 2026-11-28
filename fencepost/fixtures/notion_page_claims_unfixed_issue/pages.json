@@ -1,0 +1,42 @@
+[
+  {
+    "id": "NTN-C-9101",
+    "title": "Incident review -- badge cache",
+    "author": "town-crier",
+    "text": "fixes #1101 -- root cause confirmed, write-up attached below.",
+    "last_edited_at": "2026-07-24T10:00:00Z",
+    "url": "https://www.notion.so/orita-town/Incident-review-badge-cache-9101"
+  },
+  {
+    "id": "NTN-C-9102",
+    "title": "Sprint notes -- week 32",
+    "author": "quiet-shipper",
+    "text": "resolves #1103, the journal numbering widening -- will retest after deploy.",
+    "last_edited_at": "2026-07-29T08:00:00Z",
+    "url": "https://www.notion.so/orita-town/Sprint-notes-week-32-9102"
+  },
+  {
+    "id": "NTN-C-9103",
+    "title": "Known issues tracker",
+    "author": "helpful-mod",
+    "text": "closes #1102, the streak status command -- shipped last week.",
+    "last_edited_at": "2026-07-24T09:00:00Z",
+    "url": "https://www.notion.so/orita-town/Known-issues-tracker-9103"
+  },
+  {
+    "id": "NTN-C-9104",
+    "title": "Changelog draft",
+    "author": "quiet-watcher",
+    "text": "fix #1999 today, small one.",
+    "last_edited_at": "2026-07-24T09:00:00Z",
+    "url": "https://www.notion.so/orita-town/Changelog-draft-9104"
+  },
+  {
+    "id": "NTN-C-9105",
+    "title": "Onboarding checklist",
+    "author": "confused-newcomer",
+    "text": "see #1105 for background, nothing fixed to claim here.",
+    "last_edited_at": "2026-07-24T09:00:00Z",
+    "url": "https://www.notion.so/orita-town/Onboarding-checklist-9105"
+  }
+]

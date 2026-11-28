@@ -88,6 +88,7 @@ _ORDINAL_WORDS = {
     "hundred-ninth": 109, "hundred-tenth": 110, "hundred-eleventh": 111,
     "hundred-twelfth": 112, "hundred-thirteenth": 113,
     "hundred-fourteenth": 114, "hundred-fifteenth": 115,
+    "hundred-sixteenth": 116,
 }
 
 # Matches right at the top of the docstring only (``re.match``, not
@@ -204,11 +205,13 @@ def test_the_real_ordinal_claims_are_currently_clean():
     (the hundred-thirteenth real recipe), then 113/2..113 until
     help-wanted-issue-never-referenced merged (the hundred-fourteenth real
     recipe), then 114/2..114 until notion-page-dangling-reference merged
-    (ROADMAP.md #2729, the hundred-fifteenth real recipe)."""
+    (ROADMAP.md #2729, the hundred-fifteenth real recipe), then 115/2..115
+    until notion-page-claims-unfixed-issue merged (ROADMAP.md #2731, the
+    hundred-sixteenth real recipe)."""
     claims = live_ordinal_claims(FENCEPOST_ROOT)
     numbered = sorted(n for n in claims.values() if n is not None)
-    assert len(claims) == 115
-    assert numbered == list(range(2, 116))
+    assert len(claims) == 116
+    assert numbered == list(range(2, 117))
 
 
 def test_a_duplicate_ordinal_would_flip_this_check_red(tmp_path):

@@ -2272,6 +2272,14 @@ Notion READ scope — `SearchPages`, the read-side analog of `slack`'s
 `.github/ISSUE_TEMPLATE/point-fencepost.md`'s scope-confirm table in the
 same commit; Notion had only ever been named once before on the oath,
 for `CreatePage`, draftback's one authorized write.
+[`RECIPES/notion-page-claims-unfixed-issue/`](RECIPES/notion-page-claims-unfixed-issue/)
+is the hundred-and-sixteenth (ROADMAP.md #2731), the first Notion leg of
+the claims-unfixed-issue family: a page's own title+body text invokes a
+real closing keyword (`fixes`/`closes`/`resolves #N`, both tenses)
+against an issue that never actually closed. A durable written record
+saying something was fixed which, in fact, was not. Asks the oath for no
+new scope — `SearchPages` and `ListIssues` both already cleared by the
+prior task.
 
 Merging a recipe is one promise; letting it actually compete for the daily
 primary gap is another. [`seam_engine/src/seam_engine/combined_scan.py`](seam_engine/src/seam_engine/combined_scan.py)

@@ -66,7 +66,7 @@ _CARDINAL_WORDS = {
     "one hundred eight": 108, "one hundred nine": 109, "one hundred ten": 110,
     "one hundred eleven": 111, "one hundred twelve": 112,
     "one hundred thirteen": 113, "one hundred fourteen": 114,
-    "one hundred fifteen": 115,
+    "one hundred fifteen": 115, "one hundred sixteen": 116,
 }
 
 # The cardinal word itself may be a single hyphenated token ("ninety-nine")
@@ -138,10 +138,12 @@ def test_real_recipe_count_is_currently_one_hundred_eleven():
     RECIPES/readme-star-count-stale/ merged (the hundred-thirteenth), then
     113 until RECIPES/help-wanted-issue-never-referenced/ merged (the
     hundred-fourteenth), then 114 until RECIPES/notion-page-dangling-
-    reference/ merged (ROADMAP.md #2729, the hundred-fifteenth) -- the
-    exact drift this whole doctrine file exists to catch, now caught once
-    for real instead of only rehearsed by the mutation test below."""
-    assert real_recipe_count(FENCEPOST_ROOT) == 115
+    reference/ merged (ROADMAP.md #2729, the hundred-fifteenth), then 115
+    until RECIPES/notion-page-claims-unfixed-issue/ merged (ROADMAP.md
+    #2731, the hundred-sixteenth) -- the exact drift this whole doctrine
+    file exists to catch, now caught once for real instead of only
+    rehearsed by the mutation test below."""
+    assert real_recipe_count(FENCEPOST_ROOT) == 116
 
 
 def test_site_claim_matches_the_real_live_count():

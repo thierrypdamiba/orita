@@ -350,6 +350,7 @@ def test_runs_all_real_recipes_in_the_actual_repo_without_error(monkeypatch):
         "readme-star-count-stale",
         "help-wanted-issue-never-referenced",
         "notion-page-dangling-reference",
+        "notion-page-claims-unfixed-issue",
     }
 
 

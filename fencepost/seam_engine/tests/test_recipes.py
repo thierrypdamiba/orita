@@ -673,7 +673,7 @@ _CARDINAL_WORDS = {
     "one hundred eight": 108, "one hundred nine": 109, "one hundred ten": 110,
     "one hundred eleven": 111, "one hundred twelve": 112,
     "one hundred thirteen": 113, "one hundred fourteen": 114,
-    "one hundred fifteen": 115,
+    "one hundred fifteen": 115, "one hundred sixteen": 116,
 }
 
 # The total-count word may be a single hyphenated token ("ninety-nine") or
@@ -761,13 +761,16 @@ def test_real_plus_joined_counts_are_currently_thirty_eight_of_one_hundred_eleve
     # Then notion-page-dangling-reference merged (ROADMAP.md #2729, the
     # hundred-fifteenth real recipe, toolkit "notion+github" -- the first
     # recipe to name Notion at all -- plus-joined, so both counts climb
-    # together this time: 39 of 115.
+    # together this time: 39 of 115. Then notion-page-claims-unfixed-issue
+    # merged (ROADMAP.md #2731, the hundred-sixteenth real recipe, toolkit
+    # "notion+github" -- the second recipe to name Notion -- plus-joined,
+    # so both counts climb together again this time: 40 of 116.
     # `real_plus_joined_counts` counts every recipe whose OWN toolkit
     # string contains "+" -- not distinct toolkit-pair strings. Verified
     # against the live tree, not assumed from a prior task's own note:
     # every one of today's plus-joined recipes was grepped by hand before
     # pinning this number.
-    assert real_plus_joined_counts(FENCEPOST_ROOT) == (39, 115)
+    assert real_plus_joined_counts(FENCEPOST_ROOT) == (40, 116)
 
 
 def test_oath_scopes_for_toolkit_docstring_matches_the_real_live_counts():
