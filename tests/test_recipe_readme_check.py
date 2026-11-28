@@ -393,81 +393,20 @@ class RealRepoCase(unittest.TestCase):
 # read that docstring back against `_linked_recipes`/`discover_recipes`'s
 # live count -- fixed at the root (the docstring itself), pinned here so
 # it cannot silently drift again.
-_CARDINAL_WORDS = {
-    "zero": 0, "one": 1, "two": 2, "three": 3, "four": 4, "five": 5,
-    "six": 6, "seven": 7, "eight": 8, "nine": 9, "ten": 10, "eleven": 11,
-    "twelve": 12, "thirteen": 13, "fourteen": 14, "fifteen": 15, "sixteen": 16,
-    "seventeen": 17, "eighteen": 18, "nineteen": 19, "twenty": 20,
-    "twenty-one": 21, "twenty-two": 22, "twenty-three": 23, "twenty-four": 24,
-    "twenty-five": 25, "twenty-six": 26, "twenty-seven": 27, "twenty-eight": 28,
-    "twenty-nine": 29, "thirty": 30, "thirty-one": 31, "thirty-two": 32,
-    "thirty-three": 33, "thirty-four": 34, "thirty-five": 35, "thirty-six": 36,
-    "thirty-seven": 37, "thirty-eight": 38, "thirty-nine": 39, "forty": 40,
-    "forty-one": 41, "forty-two": 42, "forty-three": 43, "forty-four": 44,
-    "forty-five": 45, "forty-six": 46, "forty-seven": 47, "forty-eight": 48,
-    "forty-nine": 49, "fifty": 50, "fifty-one": 51, "fifty-two": 52,
-    "fifty-three": 53, "fifty-four": 54, "fifty-five": 55, "fifty-six": 56,
-    "fifty-seven": 57, "fifty-eight": 58, "fifty-nine": 59, "sixty": 60,
-    "sixty-one": 61, "sixty-two": 62, "sixty-three": 63, "sixty-four": 64,
-    "sixty-five": 65, "sixty-six": 66, "sixty-seven": 67, "sixty-eight": 68,
-    "sixty-nine": 69, "seventy": 70, "seventy-one": 71, "seventy-two": 72,
-    "seventy-three": 73, "seventy-four": 74, "seventy-five": 75,
-    "seventy-six": 76, "seventy-seven": 77, "seventy-eight": 78,
-    "seventy-nine": 79, "eighty": 80, "eighty-one": 81, "eighty-two": 82,
-    "eighty-three": 83, "eighty-four": 84, "eighty-five": 85, "eighty-six": 86,
-    "eighty-seven": 87, "eighty-eight": 88, "eighty-nine": 89, "ninety": 90,
-    "ninety-one": 91, "ninety-two": 92, "ninety-three": 93, "ninety-four": 94,
-    "ninety-five": 95, "ninety-six": 96, "ninety-seven": 97, "ninety-eight": 98,
-    "ninety-nine": 99, "one hundred": 100, "one hundred one": 101,
-    "one hundred two": 102, "one hundred three": 103, "one hundred four": 104,
-    "one hundred five": 105, "one hundred six": 106, "one hundred seven": 107,
-    "one hundred eight": 108, "one hundred nine": 109, "one hundred ten": 110,
-    "one hundred eleven": 111, "one hundred twelve": 112,
-    "one hundred thirteen": 113, "one hundred fourteen": 114,
-    "one hundred fifteen": 115, "one hundred sixteen": 116,
-}
-
-# The cardinal word itself may be a single hyphenated token ("ninety-nine")
-# or two-or-three separate words ("one hundred", "one hundred one") --
-# task 1195's own fix widened this from one word to two the first time
-# this doctrine file's claim ever needed a second word; this is the
-# SECOND widening (two to three real words), the day the count first
-# needed a third (email-claims-dangling-milestone, the hundred-first real
-# recipe).
-_SECTION_COUNT_CLAIM_RE = re.compile(
-    r"never mistaken for one of the ([a-z]+(?:[ -][a-z]+){0,2}) community\n?\s*recipes this section actually enumerates"
-)
-
-
-def _word_for(n: int) -> str:
-    for word, value in _CARDINAL_WORDS.items():
-        if value == n:
-            return word
-    raise AssertionError(f"no cardinal word known for {n}")
-
-
-def claimed_section_count(doc_text: str) -> int:
-    """Live-extracts `_community_recipes_section`'s own "one of the N
-    community recipes this section actually enumerates" claim -- never a
-    second hand-typed 26. Raises if the sentence is missing or uses a
-    cardinal word this check doesn't recognize, rather than silently
-    passing an unchecked claim through."""
-    match = _SECTION_COUNT_CLAIM_RE.search(doc_text.replace("\n", " "))
-    if not match:
-        raise AssertionError(
-            "_community_recipes_section's docstring no longer contains a "
-            "'one of the N community recipes this section actually "
-            "enumerates' sentence -- this doctrine test has nothing left "
-            "to cross-check"
-        )
-    word = match.group(1).lower()
-    if word not in _CARDINAL_WORDS:
-        raise AssertionError(
-            f"_community_recipes_section's docstring uses an unrecognized "
-            f"cardinal word {word!r} -- add it to _CARDINAL_WORDS before "
-            "trusting this check"
-        )
-    return _CARDINAL_WORDS[word]
+# Task 2733: this file used to hold its OWN hand-typed `_CARDINAL_WORDS`
+# map (zero through "one hundred sixteen", needing a new line added by
+# hand every time the live count grew past its own ceiling) purely to
+# parse and re-synthesize `_community_recipes_section`'s one-sentence
+# count claim -- the identical "needs hand-extending every time the
+# number grows, easy to forget" shape as the nine-time recurring bug this
+# whole file exists to catch, and a straight duplicate of logic that now
+# lives in production code (`cardinal_word`/`cardinal_value`/
+# `claimed_section_count` in `tools/recipe_readme_check.py` itself,
+# where `check_recipe_readme()` can also use it live). Delegating here
+# removes the duplicate rather than maintaining two independent copies of
+# the same ceiling-limited map.
+_word_for = rrc.cardinal_word
+claimed_section_count = rrc.claimed_section_count
 
 
 class DocstringCountDoctrineCase(unittest.TestCase):
@@ -544,6 +483,131 @@ class DocstringCountDoctrineCase(unittest.TestCase):
             "community recipes this section actually enumerates"
         )
         self.assertNotEqual(claimed_section_count(stale_doc), real_count)
+
+
+class CardinalWordRoundTripCase(unittest.TestCase):
+    """`cardinal_word`/`cardinal_value` replace the old hand-typed,
+    ceiling-limited `_CARDINAL_WORDS` map -- proves the round trip holds
+    across the full 0-999 range the docstring claim could ever need, not
+    just the handful of values this repo has hit so far."""
+
+    def test_round_trip_every_value_zero_to_nine_hundred_ninety_nine(self):
+        for n in range(0, 1000):
+            self.assertEqual(rrc.cardinal_value(rrc.cardinal_word(n)), n)
+
+    def test_matches_every_value_the_old_hand_typed_map_once_held(self):
+        # The exact spot-checks the retired _CARDINAL_WORDS map's entries
+        # covered, so the replacement is proven byte-for-byte equivalent
+        # on real history, not just internally consistent with itself.
+        known = {
+            0: "zero", 16: "sixteen", 20: "twenty", 26: "twenty-six",
+            29: "twenty-nine", 99: "ninety-nine", 100: "one hundred",
+            101: "one hundred one", 110: "one hundred ten",
+            112: "one hundred twelve", 116: "one hundred sixteen",
+        }
+        for value, word in known.items():
+            self.assertEqual(rrc.cardinal_word(value), word)
+            self.assertEqual(rrc.cardinal_value(word), value)
+
+    def test_out_of_range_raises_instead_of_truncating(self):
+        with self.assertRaises(ValueError):
+            rrc.cardinal_word(1000)
+        with self.assertRaises(ValueError):
+            rrc.cardinal_word(-1)
+
+    def test_unrecognized_word_raises_instead_of_guessing(self):
+        with self.assertRaises(ValueError):
+            rrc.cardinal_value("eleventy-one")
+
+
+class CheckRecipeReadmeDocstringMismatchCase(unittest.TestCase):
+    """`check_recipe_readme()` itself -- the live command the hourly
+    ritual already runs -- now folds in the docstring-count claim rather
+    than staying blind to the exact drift that broke `dawn-run` nine
+    times, caught only by this file's own separate doctrine test."""
+
+    def test_live_check_is_clean_against_todays_real_docstring(self):
+        result = rrc.check_recipe_readme()
+        self.assertTrue(result["clean"])
+        self.assertIsNone(result["docstring_count_mismatch"])
+
+    def test_live_check_flags_a_staled_docstring(self):
+        original_doc = rrc._community_recipes_section.__doc__
+        try:
+            rrc._community_recipes_section.__doc__ = (
+                "never mistaken for one of the twelve community\n"
+                "    recipes this section actually enumerates today."
+            )
+            result = rrc.check_recipe_readme()
+            self.assertFalse(result["clean"])
+            self.assertEqual(result["real_count"], result["docstring_count_mismatch"]["real"])
+            self.assertEqual(result["docstring_count_mismatch"]["claimed"], 12)
+            self.assertIn("docstring claims", rrc.format_result(result))
+        finally:
+            rrc._community_recipes_section.__doc__ = original_doc
+
+
+class FixDocstringCountCase(unittest.TestCase):
+    """`fix` -- the one-command self-correction every future recipe-
+    adding task should run instead of hand-editing this prose from
+    memory and missing it a tenth time."""
+
+    def _temp_copy(self, tmp_dir: str) -> str:
+        tmp_path = os.path.join(tmp_dir, "recipe_readme_check.py")
+        with open(os.path.join(ROOT, "tools", "recipe_readme_check.py"), encoding="utf-8") as f:
+            source_text = f.read()
+        with open(tmp_path, "w", encoding="utf-8") as f:
+            f.write(source_text)
+        return tmp_path
+
+    def test_fix_rewrites_a_staled_count_to_match_reality(self):
+        real_count = rrc.check_recipe_readme()["real_count"]
+        stale_word = _word_for(real_count - 1)
+        current_word = _word_for(real_count)
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp_path = self._temp_copy(tmp_dir)
+            with open(tmp_path, encoding="utf-8") as f:
+                src = f.read()
+            self.assertIn(f"one of the {current_word} community", src)
+            src = src.replace(f"one of the {current_word} community", f"one of the {stale_word} community")
+            with open(tmp_path, "w", encoding="utf-8") as f:
+                f.write(src)
+
+            changed = rrc.fix_docstring_count(module_path=tmp_path)
+            self.assertTrue(changed)
+            with open(tmp_path, encoding="utf-8") as f:
+                fixed_src = f.read()
+            self.assertIn(f"one of the {current_word} community", fixed_src)
+            self.assertNotIn(f"one of the {stale_word} community", fixed_src)
+
+    def test_fix_is_idempotent_on_an_already_correct_file(self):
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp_path = self._temp_copy(tmp_dir)
+            with open(tmp_path, encoding="utf-8") as f:
+                before = f.read()
+            changed = rrc.fix_docstring_count(module_path=tmp_path)
+            self.assertFalse(changed)
+            with open(tmp_path, encoding="utf-8") as f:
+                after = f.read()
+            self.assertEqual(before, after)
+
+    def test_fix_touches_nothing_outside_the_one_claim_sentence(self):
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp_path = self._temp_copy(tmp_dir)
+            real_count = rrc.check_recipe_readme()["real_count"]
+            current_word = _word_for(real_count)
+            stale_word = _word_for(real_count - 1)
+            with open(tmp_path, encoding="utf-8") as f:
+                src = f.read()
+            src = src.replace(f"one of the {current_word} community", f"one of the {stale_word} community")
+            with open(tmp_path, "w", encoding="utf-8") as f:
+                f.write(src)
+            rrc.fix_docstring_count(module_path=tmp_path)
+            with open(tmp_path, encoding="utf-8") as f:
+                fixed_src = f.read()
+            with open(os.path.join(ROOT, "tools", "recipe_readme_check.py"), encoding="utf-8") as f:
+                real_src = f.read()
+            self.assertEqual(fixed_src, real_src)
 
 
 if __name__ == "__main__":
